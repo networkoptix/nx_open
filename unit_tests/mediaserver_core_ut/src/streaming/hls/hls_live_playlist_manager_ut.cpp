@@ -21,7 +21,7 @@ TEST(hls_LivePlaylistManager, general)
     const int gopSizeFrames = 15;
     const hours testDuration(1);
 
-    MediaStreamCache mediaCache(10*1000);
+    MediaStreamCache mediaCache(10*1000, 90);
     nx_hls::HLSLivePlaylistManager hlsPlaylistManager(&mediaCache, targetDuration.count());
 
     microseconds totalTimestampChange(0);
