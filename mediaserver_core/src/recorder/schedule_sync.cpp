@@ -23,7 +23,6 @@ QnScheduleSync::QnScheduleSync()
       m_syncing(false),
       m_forced(false),
       m_interrupted(false),
-      m_backupDone(false),
       m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
