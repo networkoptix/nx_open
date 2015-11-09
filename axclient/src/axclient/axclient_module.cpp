@@ -16,7 +16,6 @@
 #include <nx_ec/ec_api.h>
 #include <nx_ec/ec2_lib.h>
 
-#include <plugins/resource/client_camera/client_camera_factory.h>
 #include <plugins/storage/file_storage/qtfile_storage_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 

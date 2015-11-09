@@ -662,7 +662,9 @@ bool QnVideoCamera::ensureLiveCacheStarted(
 
     if( !m_liveCache[streamQuality].get() )
     {
-        m_liveCache[streamQuality].reset( new MediaStreamCache( MEDIA_CACHE_SIZE_MILLIS ) );
+        m_liveCache[streamQuality].reset( new MediaStreamCache(
+            MEDIA_CACHE_SIZE_MILLIS,
+            MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
         m_hlsLivePlaylistManager[streamQuality] = 
             std::make_shared<nx_hls::HLSLivePlaylistManager>(
                 m_liveCache[streamQuality].get(),

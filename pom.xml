@@ -473,9 +473,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton</module>
                 <module>plugins/acs/paxton-installer</module>
-                <!-- Uncomment this when 2.3.1_paxton is merged -->
-                <!-- <module>plugins/acs/paxton</module>
-                <module>plugins/acs/paxton-installer</module> -->
             </modules>
         </profile>
         <profile>
@@ -833,11 +830,6 @@
             <id>mobile-common</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>                
                 <property>
                     <name>newmobile</name>
                     <value>true</value>
@@ -855,11 +847,6 @@
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>
                 <property>
                     <name>box</name>
                     <value>android</value>
@@ -889,11 +876,6 @@
             <id>mobile-android-desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>
-                </os>                
                 <property>
                     <name>box</name>
                     <value>android-desktop</value>

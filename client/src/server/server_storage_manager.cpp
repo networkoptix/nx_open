@@ -19,8 +19,14 @@ namespace {
     /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
 
-    /** Regular check if backup started. */
-    const int updateBackupRegularStatusDelayMs = 500;
+    /** Regular check if backup was started. */
+    const int updateBackupRegularStatusDelayMs = 10 * 60* 1000;
+
+    void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
+        storage->setFreeSpace(spaceInfo.freeSpace);
+        storage->setTotalSpace(spaceInfo.totalSpace);
+        storage->setWritable(spaceInfo.isWritable);
+    }
 }
 
 struct ServerPoolInfo {
@@ -326,14 +332,15 @@ bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourc
 
 void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSpaceReply &reply, int handle ) {
 
+    QSet<QnUuid> processedStorages;
+
     for (const QnStorageSpaceData &spaceInfo: reply.storages) {
         QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
         if (!storage)
             continue;
-
-        storage->setFreeSpace(spaceInfo.freeSpace);
-        storage->setTotalSpace(spaceInfo.totalSpace);
-        storage->setWritable(spaceInfo.isWritable);
+       
+        processStorage(storage, spaceInfo);
+        processedStorages.insert(spaceInfo.storageId);
     }
 
     /* Requests were invalidated. */
@@ -355,6 +362,33 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
 
     if(status != 0)
         return;
+
+    /* 
+     * Reply can contain some storages that were instantiated after the server starts.
+     * Therefore they will be absent in the resource pool, but user can add them manually.
+     * This code should be executed if and only if server still exists and our request is actual.
+     */
+    for (const QnStorageSpaceData &spaceInfo: reply.storages) {
+        /* Skip storages that are already exist. */
+        if (processedStorages.contains(spaceInfo.storageId))
+            continue;
+
+        /* Storage was already added */
+        if (QnStorageResourcePtr existing = requestKey.server->getStorageByUrl(spaceInfo.url))
+            continue;
+
+        Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
+        if (!spaceInfo.storageId.isNull())
+            continue;
+
+        QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);             
+        storage->setStorageType(spaceInfo.storageType);
+
+        processStorage(storage, spaceInfo);
+
+        qnResPool->addResource(storage);
+    }
+
 
     auto replyProtocols = reply.storageProtocols.toSet();
     if (serverInfo.protocols != replyProtocols) {

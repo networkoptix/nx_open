@@ -15,6 +15,7 @@
 
 #include <utils/common/singleton.h>
 #include <utils/common/uuid.h>
+#include "api/server_rest_connection_fwd.h"
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
@@ -52,6 +53,9 @@ public:
 
     /** \return list of camera id's that have footage on the selected server. */
     std::vector<QnUuid> getServerFootageData(const QnUuid& serverGuid) const;
+
+    /** \return list of camera id's that have footage on the selected server. */
+    QnVirtualCameraResourceList getServerFootageCameras(const QnMediaServerResourcePtr &server) const;
 
     /** \return server list where the selected camera has footage. */
     QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId) const;
@@ -132,11 +136,13 @@ private:
     QnVirtualCameraResourcePtr toCamera(const QnUuid& guid) const;
     QnMediaServerResourcePtr toMediaServer(const QnUuid& guid) const;
 
-    void at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
+    void at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback);
 
     /** Mark camera history as dirty and subject to update. */
     void invalidateCameraHistory(const QnUuid &cameraId);
 
+private:
+    void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
 private:
 
     mutable QnMutex m_mutex;
@@ -152,6 +158,7 @@ private:
     QSet<QnUuid> m_runningRequests;
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;
+    QSet<QnUuid> m_camerasToCheck;
 };
 
 

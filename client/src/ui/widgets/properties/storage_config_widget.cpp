@@ -9,6 +9,7 @@
 
 #include <core/resource/client_storage_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -28,7 +29,8 @@
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/event_processors.h>
-
+#include <utils/common/synctime.h>
+#include <utils/common/qtimespan.h>
 
 namespace {
     static const int COLUMN_SPACING = 8;
@@ -56,6 +58,7 @@ namespace {
     };
 
 
+    const qint64 minDeltaForMessageMs = 1000ll * 3600 * 24;
 
 } // anonymous namespace
 
@@ -95,7 +98,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
  
     ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("Never"), Qn::Backup_Disabled);
+    ui->comboBoxBackupType->addItem(tr("Manual only"), Qn::Backup_Manual);
 
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);
@@ -186,6 +189,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
     item.id = QnStorageResource::fillID(m_server->getId(), item.url);
     item.isBackup = !addToMain;
+    item.isUsed = true;
 
     m_model->addStorage(item);
     updateColumnWidth();
@@ -226,8 +230,7 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) {
     emit hasChangesChanged();
 }
 
-void QnStorageConfigWidget::updateFromSettings()
-{
+void QnStorageConfigWidget::loadDataToUi() {
     if (!m_server)
         return;
 
@@ -338,21 +341,14 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             }
         }
         else {
-            // create new storage
-            QnClientStorageResourcePtr storage(new QnClientStorageResource());
-            storage->setId(storageData.id);
-            QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
-            if (resType)
-                storage->setTypeId(resType->getId());
+            QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(m_server, storageData.url);
+            Q_ASSERT_X(storage->getId() == storageData.id, Q_FUNC_INFO, "Id's must be equal");
 
-            storage->setName(QnUuid::createUuid().toString());
-            storage->setParentId(m_server->getId());
-            storage->setUrl(storageData.url);
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
             storage->setBackup(storageData.isBackup);
-            qnResPool->addResource(storage);
 
+            qnResPool->addResource(storage);
             result << storage;
         }
     }
@@ -379,7 +375,7 @@ bool QnStorageConfigWidget::hasStoragesChanges( const QnStorageModelInfoList &st
 }
 
 
-void QnStorageConfigWidget::submitToSettings()
+void QnStorageConfigWidget::applyChanges()
 {
     if (isReadOnly())
         return;
@@ -494,15 +490,15 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (data.state != Qn::BackupState_None) 
         return error(tr("Backup is already in progress."));
 
-    if (m_backupSchedule.backupType != Qn::Backup_Schedule)
-        return error(tr("Manual backup is available only in Schedule mode."));
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return error(tr("Manual backup is available only in Schedule or Manual mode."));
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
         return storage.isWritable && storage.isUsed && storage.isBackup;
     }))
         return error(tr("Select at least one backup storage."));
-
-    if (!any_of(qnResPool->getAllCameras(QnResourcePtr(), true), [](const QnVirtualCameraResourcePtr &camera){
+   
+    if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
         return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
     }))
         return error(tr("Select at least one camera to backup"));
@@ -512,6 +508,24 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
 
     return true;
 }
+
+QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
+
+    QDateTime now = qnSyncTime->currentDateTime();
+
+    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::SystemLocaleLongDate));
+
+    qint64 deltaMs = now.toMSecsSinceEpoch() - backupTimeMs;
+    if (deltaMs > minDeltaForMessageMs) {
+        QTimeSpan span(deltaMs);
+        span.normalize();
+        QString deltaStr = tr("(%1 before now)").arg(span.toApproximateString());
+        return lit("%1 %2").arg(result).arg(deltaStr);
+    } 
+
+    return result;
+}
+
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 {
@@ -523,11 +537,16 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     QString backupInfo;
     bool canStartBackup = this->canStartBackup(reply, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
-            
+
+    //TODO: #GDM discuss texts
+    QString backedUpTo = reply.backupTimeMs > 0
+        ? tr("Archive is backup up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        : tr("Backup was never started.");
+    ui->backupTimeLabel->setText(backedUpTo);
+
     ui->backupStartButton->setEnabled(canStartBackup);
     ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
     ui->stackedWidgetBackupInfo->setCurrentWidget(reply.state == Qn::BackupState_InProgress ? ui->backupProgressPage : ui->backupPreparePage);
-    //ui->stackedWidgetBackupInfo->setVisible(reply.state == Qn::BackupState_InProgress);
 }
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)

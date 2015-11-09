@@ -32,10 +32,10 @@ public:
     QnStorageConfigWidget(QWidget* parent = 0);
     virtual ~QnStorageConfigWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
 
     void setServer(const QnMediaServerResourcePtr &server);
-    virtual void submitToSettings() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
     virtual void retranslateUi() override;
@@ -67,6 +67,7 @@ private:
     /** Check if backup can be started right now - and show additional info if not. */
     bool canStartBackup(const QnBackupStatusData& data, QString *info);
 
+    QString backupPositionToString(qint64 backupTimeMs);
 private slots:
    
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);

@@ -74,9 +74,14 @@ quint64 MediaStreamCache::SequentialReadContext::currentPos() const
 }
 
 
-MediaStreamCache::MediaStreamCache( unsigned int cacheSizeMillis )
+MediaStreamCache::MediaStreamCache(
+    unsigned int cacheSizeMillis,
+    unsigned int maxCacheSizeMillis)
 :
-    m_sharedImpl( std::make_shared<detail::MediaStreamCache>( cacheSizeMillis ) )
+    m_sharedImpl(
+        std::make_shared<detail::MediaStreamCache>(
+            cacheSizeMillis,
+            maxCacheSizeMillis))
 {
 }
 
@@ -146,14 +151,14 @@ QnAbstractDataPacketPtr MediaStreamCache::getNextPacket( quint64 timestamp, quin
     return m_sharedImpl->getNextPacket( timestamp, foundTimestamp );
 }
 
-int MediaStreamCache::addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver )
+void MediaStreamCache::addEventReceiver( QnMediaStreamEventReceiver* eventReceiver  )
 {
-    return m_sharedImpl->addKeyFrameEventReceiver( std::move(keyFrameEventReceiver) );
+    m_sharedImpl->addEventReceiver( eventReceiver );
 }
 
-void MediaStreamCache::removeKeyFrameEventReceiver( int receiverID )
+void MediaStreamCache::removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver )
 {
-    return m_sharedImpl->removeKeyFrameEventReceiver( receiverID );
+    return m_sharedImpl->removeEventReceiver( eventReceiver );
 }
 
 int MediaStreamCache::blockData( quint64 timestamp )

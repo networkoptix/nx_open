@@ -2,6 +2,7 @@
 
 #include <QtCore/QUrl>
 
+#include <core/resource_management/resource_pool.h>
 #include "api/abstract_connection.h"
 #include "api/app_server_connection.h"
 #include "api/session_manager.h"
@@ -129,5 +130,10 @@ bool QnConnectionManager::disconnectFromServer(bool force) {
 //    QnResource::stopCommandProc();
 
     qnCommon->instance<QnUserWatcher>()->setUserName(QString());
+
+    // TODO: #dklychkov Move it to a better place
+    QnResourceList remoteResources = qnResPool->getResourcesWithFlag(Qn::remote);
+    qnResPool->removeResources(remoteResources);
+
     return true;
 }

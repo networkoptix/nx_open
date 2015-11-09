@@ -10,11 +10,14 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include "api/server_rest_connection.h"
 
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
+#include "utils/common/synctime.h"
 
 namespace {
+    static const int HistoryCheckDelay = 1000 * 15;
 
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
         /* Find first data with timestamp not less than given. */
@@ -25,12 +28,8 @@ namespace {
         /* Check exact match. */
         if (iter != data.cend() && iter->timestampMs == timestamp)
             return iter;
-
-        /* Check if the first data is already greater than required. */
-        if (iter == data.cbegin())
-            return data.cend();
-
-        /* Otherwise get previous server. */
+        
+        /* get previous server. */
         if (data.cbegin() != iter)
             --iter;
 
@@ -40,11 +39,51 @@ namespace {
 
 // ------------------- CameraHistory Pool ------------------------
 
+
+void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam)
+{
+    /* 
+    * When camera goes to a recording state it's expected that current history server is the same as parentID.
+    * Check it after some delay to avoid call 'invalidateCameraHistory' several times in a row.
+    * It could be because client video camera sends extra 'statusChanged' signal when camera is moved.
+    * Also, online->recording may occurs on the server side before history information updated. 
+    * Excact delay isn't important, at worse scenario we just do extra work. So, do it delayed.
+    */
+
+    if (cam->getStatus() != Qn::Recording) {
+        m_camerasToCheck.remove(cam->getId());
+        return;
+    }
+
+    QnUuid id = cam->getId();
+    if (m_camerasToCheck.contains(id))
+        return;
+    m_camerasToCheck << cam->getId();
+    executeDelayed([this, id]()
+    {
+        if (!m_camerasToCheck.contains(id))
+            return;
+        m_camerasToCheck.remove(id);
+
+        QnVirtualCameraResourcePtr cam = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+        if (!cam)
+            return;
+
+        auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
+        if (cam && server && server->getId() != cam->getParentId())
+            invalidateCameraHistory(id);
+    }, HistoryCheckDelay);
+}
+
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
     m_mutex(QnMutex::Recursive)
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
+        QnVirtualCameraResourcePtr cam = qnResPool->getResourceById<QnVirtualCameraResource>(resource->getId());
+        if (cam)
+            checkCameraHistoryDelayed(cam);
+
         /* Fast check. */
         if (!resource->hasFlags(Qn::remote_server))
             return;
@@ -102,18 +141,19 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     request.resList << camera;
     
     using namespace std::placeholders;
-    bool ok = server->newApiConnection().cameraHistoryAsync(request, [this, callback] (bool success, const ec2::ApiCameraHistoryDataList &periods) {
-        at_cameraPrepared(success, periods, callback);
+    bool started = server->serverRestConnection()->cameraHistoryAsync(request, [this, callback] (bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods) {
+        at_cameraPrepared(success, id, periods, callback);
     });
-
-    if (!ok && callback)
+    
+    if (!started && callback)
         executeDelayed([callback] { callback(false); });
 
-    return ok;
+    return started;
 }
 
-void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
+void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback) 
 {
+    Q_UNUSED(requestId);
     QnMutexLocker lock(&m_mutex);
 
     QSet<QnUuid> loadedCamerasIds;
@@ -149,7 +189,7 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const ec2::ApiCameraHi
 
     lock.unlock();
     if (callback)
-        callback(success);
+        executeDelayed([callback, success] { callback(success); }, kDefaultDelay, this->thread());
 
     for (const QnUuid &cameraId: loadedCamerasIds)
         if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
@@ -323,11 +363,22 @@ void QnCameraHistoryPool::setServerFootageData(const ec2::ApiServerFootageData &
 
 std::vector<QnUuid> QnCameraHistoryPool::getServerFootageData(const QnUuid& serverGuid) const {
     QnMutexLocker lock( &m_mutex );
-    std::vector<QnUuid> result;
-    for(const auto& value: m_archivedCamerasByServer.value(serverGuid))
-        result.push_back(value);
+    return m_archivedCamerasByServer.value(serverGuid);
+}
+
+QnVirtualCameraResourceList QnCameraHistoryPool::getServerFootageCameras( const QnMediaServerResourcePtr &server ) const {
+    QnVirtualCameraResourceList result;
+    if (!server)
+        return result;
+
+    for (const QnUuid &cameraId: getServerFootageData(server->getId())) {
+        if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+            result << camera;
+    }
+
     return result;
 }
+
 
 bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera)
 {

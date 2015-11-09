@@ -333,6 +333,14 @@ Item {
                     else
                         mediaPlayer.play(timeline.position)
                 }
+
+                Connections {
+                    target: Qt.application
+                    onStateChanged: {
+                        if (Qt.application.state != Qt.ApplicationActive)
+                            playbackController.paused = true
+                    }
+                }
             }
 
             Rectangle {

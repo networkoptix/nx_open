@@ -81,7 +81,9 @@ BUG FIXES (TBC)
     Advanced camera settings were not being requested for DW-MB421TIR camera. Fixed. - VMS-742
     MJPEG for ACTi-E921 doesn't work. Fixed. - VMS-941
     ONVIF-driven multi-channel encoders initialized incorrectly. Fixed. - VMS-585
-
+    If replace HDD with with system, than archive on another hard disk could be removed. Fixed.
+    If multicast is disabled, than camera isn't recorded evenif "enable recording" is set. Fixed.
+     
 
 -----------------------------------------------2.4.0.xxxx-----------------------------------------
 NEW FEATURES:

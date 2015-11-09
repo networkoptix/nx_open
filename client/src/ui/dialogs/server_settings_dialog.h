@@ -14,10 +14,10 @@ namespace Ui {
     class ServerSettingsDialog;
 }
 
-class QnServerSettingsDialog: public QnGenericTabbedDialog, public QnWorkbenchContextAware {
+class QnServerSettingsDialog: public QnWorkbenchStateDependentTabbedDialog {
     Q_OBJECT
 
-    typedef QnGenericTabbedDialog base_type;
+    typedef QnWorkbenchStateDependentTabbedDialog base_type;
 
 public:
     enum DialogPage {
@@ -35,17 +35,15 @@ public:
     void setServer(const QnMediaServerResourcePtr &server);
 
 protected:
-    virtual void loadData() override;
+    virtual void retranslateUi() override;
 
-    virtual QString confirmMessageTitle() const override;
-    virtual QString confirmMessageText() const override;
+    virtual QMessageBox::StandardButton showConfirmationDialog() override;
 private:
     Q_DISABLE_COPY(QnServerSettingsDialog)
 
     QScopedPointer<Ui::ServerSettingsDialog> ui;
     QnMediaServerResourcePtr m_server;
 
-    QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
     QnServerSettingsWidget* m_generalPage;
     QnRecordingStatisticsWidget* m_statisticsPage;
     QnStorageConfigWidget* m_storagesPage;

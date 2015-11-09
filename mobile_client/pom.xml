@@ -49,6 +49,44 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>      
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <id>auto-clean</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>manual-clean</id>
+                        <phase>pre-clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                        <configuration>
+                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                            <filesets>
+                                <fileset>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>*.apk</include>
+                                        <include>*.ipa</include>
+                                    </includes>
+                                </fileset>                                                                  
+                            </filesets>
+                            <skip>${clean-skip}</skip>							
+                        </configuration>            
+                    </execution>
+                </executions>
+            </plugin>    
+        </plugins>    
+    </build>
+    
     <profiles>
         <profile>
             <id>nobeta</id>
@@ -67,11 +105,6 @@
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                    <arch>i386</arch>                    
-                </os>                
                 <property>
                     <name>box</name>
                     <value>android</value>
@@ -125,24 +158,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>com.coderplus.maven.plugins</groupId>
-                        <artifactId>copy-rename-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                            <execution>
-                                <id>copy-apk</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <sourceFile>${project.build.directory}/apk/bin/QtApp-release-signed.apk</sourceFile>
-                                    <destinationFile>${project.build.directory}/${product.name.short}-release-signed.apk</destinationFile>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -154,7 +169,7 @@
                     <family>mac</family>
                 </os>                
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>

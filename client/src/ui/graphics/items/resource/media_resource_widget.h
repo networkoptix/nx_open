@@ -19,6 +19,7 @@
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
 class QnResourceDisplay;
@@ -270,6 +271,9 @@ private:
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
+
+    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
+    QnSingleCamLicenceStatusHelperPtr m_licenceStatus;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

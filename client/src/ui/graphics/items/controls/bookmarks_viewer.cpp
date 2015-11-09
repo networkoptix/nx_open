@@ -220,7 +220,7 @@ namespace
 
         const QnCameraBookmark &bookmark() const;
         
-        void setPosition(const QPointF &pos);
+        void setPosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
         BookmarkToolTipFrame *next() const;        
 
@@ -375,7 +375,7 @@ namespace
         }
     }
 
-    void BookmarkToolTipFrame::setPosition(const QPointF &pos)
+    void BookmarkToolTipFrame::setPosition(const QnBookmarksViewer::PosAndBoundsPair &params)
     {
         enum 
         {
@@ -384,26 +384,37 @@ namespace
             , kHalfTailWidth = kTailWidth / 2
             , kTailOffset = 15
             , kSpacerHeight = 3
+            , kTailDefaultOffsetLeft = kTailOffset + kHalfTailWidth
+            , kTailDefaultOffsetRight = kBookmarkFrameWidth - kTailDefaultOffsetLeft
         };
 
         setTailWidth(kTailWidth);
 
+        const auto pos = params.first;
+        const auto bounds = params.second;
+
         const bool isFirstItem = !prev();
         const auto height = geometry().height();
-        const auto offset = height + (isFirstItem ? kTailHeight : kSpacerHeight);
-        const auto currentPos = pos - QPointF(0, offset);
+        const auto totalHeight = height + (isFirstItem ? kTailHeight : kSpacerHeight);
+        const auto currentPos = pos - QPointF(0, totalHeight);
 
-        const auto tailHorOffset = kTailOffset + kHalfTailWidth;
+        const auto leftSideDistance = (pos.x() - bounds.first);
+        const auto rightSideDistance = (bounds.second - pos.x());
+
+        const qreal finalTailOffset = ((leftSideDistance - kTailDefaultOffsetLeft) < 0 ? leftSideDistance
+            : (rightSideDistance - kTailDefaultOffsetRight < 0 ? kBookmarkFrameWidth - rightSideDistance 
+                : kTailDefaultOffsetLeft));
+        
         if (isFirstItem)
         {
-            setTailPos(QPointF(tailHorOffset, offset));
+            setTailPos(QPointF(finalTailOffset, totalHeight));
             pointTo(pos);
         }
         else
-            setPos(currentPos - QPointF(tailHorOffset, 0));
+            setPos(currentPos - QPointF(finalTailOffset, 0));
 
         if (m_next)
-            m_next->setPosition(currentPos);
+            m_next->setPosition(QnBookmarksViewer::PosAndBoundsPair(currentPos, bounds));
     }
 
     void BookmarkToolTipFrame::onBookmarkAction(const QString &anchorName)
@@ -563,9 +574,9 @@ public:
     const QnBookmarkColors &colors() const;
 
 private:
-    void updatePosition(const QPointF &basePosition);
+    void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
-    void updatePositionImpl(const QPointF &pos);
+    void updatePositionImpl(const QnBookmarksViewer::PosAndBoundsPair &params);
 
     void updateBookmarks(QnCameraBookmarkList bookmarks);
 
@@ -591,7 +602,7 @@ private:
     QnCameraBookmarkList m_bookmarks;
     BookmarkToolTipFrame *m_headFrame;
 
-    QPointF m_futurePosition;
+    QnBookmarksViewer::PosAndBoundsPair m_futurePosition;
 };
 
 enum { kInvalidTimstamp = -1 };
@@ -690,8 +701,9 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
     if (m_targetTimestamp == kInvalidTimstamp)
         return;
 
-    const auto newPos = m_getPos(m_targetTimestamp);
-    if (newPos.isNull())
+    const auto params = m_getPos(m_targetTimestamp);
+    const auto bounds = params.second;
+    if (params.first.isNull() || ((bounds.second - bounds.first) < kBookmarkFrameWidth))
     {
         updateBookmarksImpl(QnCameraBookmarkList());
         return;
@@ -701,10 +713,10 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
     {
         m_owner->setVisible(false);
         updateBookmarksImpl(m_getBookmarks(m_targetTimestamp));
-        updatePosition(newPos);
+        updatePosition(params);
     }
     else
-        updatePositionImpl(newPos);
+        updatePositionImpl(params);
 }
 
 void QnBookmarksViewer::Impl::resetBookmarksImpl()
@@ -823,16 +835,16 @@ void QnBookmarksViewer::Impl::emitBookmarkEvent(const QnCameraBookmark &bookmark
     qApp->postEvent(this, new BookmarkActionEvent(eventId, bookmark));
 }
 
-void QnBookmarksViewer::Impl::updatePosition(const QPointF &basePosition)
+void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params)
 {
-    m_futurePosition = basePosition;
+    m_futurePosition = params;
     qApp->postEvent(this, new QEvent(static_cast<QEvent::Type>(kBookmarkUpdatePositionEventId)));
 }
 
-void QnBookmarksViewer::Impl::updatePositionImpl(const QPointF &pos)
+void QnBookmarksViewer::Impl::updatePositionImpl(const QnBookmarksViewer::PosAndBoundsPair &params)
 {
     if (m_headFrame)
-        m_headFrame->setPosition(pos);
+        m_headFrame->setPosition(params);
 }
 
 ///

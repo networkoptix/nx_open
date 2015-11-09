@@ -228,7 +228,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(const QnUpdateBook
 void QnMultiserverBookmarksRestHandlerPrivate::updateBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, QnUpdateBookmarkRequestContext* ctx) {
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Update));
 
-    QnMultiserverRequestData modifiedRequest = ctx->request;
+    QnUpdateBookmarkRequestData modifiedRequest = ctx->request;
     modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
@@ -258,7 +258,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(const QnDeleteBook
 void QnMultiserverBookmarksRestHandlerPrivate::deleteBookmarkRemoteAsync(const QnMediaServerResourcePtr &server, QnDeleteBookmarkRequestContext* ctx) {
     QUrl apiUrl(getApiUrl(server, QnBookmarkOperation::Delete));
 
-    QnMultiserverRequestData modifiedRequest = ctx->request;
+    QnDeleteBookmarkRequestData modifiedRequest = ctx->request;
     modifiedRequest.makeLocal();
     apiUrl.setQuery(modifiedRequest.toUrlQuery());
 

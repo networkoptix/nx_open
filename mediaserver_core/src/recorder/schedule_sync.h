@@ -25,8 +25,21 @@ private:
         QnServer::ChunksCatalog  catalog;
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
+
+    struct SyncData 
+    {
+        double  coeff;
+        int     startIndex;
+
+        SyncData() : coeff(0.0), startIndex(0) {}
+        SyncData(double coeff, int startIndex) 
+            : coeff(coeff),
+              startIndex(startIndex)
+        {}
+    };
     
-    typedef std::vector<ChunkKey> ChunkKeyVector;
+    typedef std::vector<ChunkKey>         ChunkKeyVector;
+    typedef std::map<ChunkKey, SyncData>  SyncDataMap;
 
 public:
     enum code {
@@ -46,10 +59,14 @@ public:
     int forceStart(); 
     virtual void stop() override;
     int interrupt();
+
+    void updateLastSyncPoint();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
 private:
+    qint64 findLastSyncPointUnsafe() const;
+
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
     APPLY(NoBackupStorageError) \
@@ -94,25 +111,25 @@ private:
 
     int state() const;
 
-    boost::optional<ChunkKeyVector> getOldestChunk();    
+    boost::optional<ChunkKeyVector> getOldestChunk() const;
     ChunkKey getOldestChunk(
         const QString           &cameraId,
         QnServer::ChunksCatalog catalog
-    );
+    ) const;
 
 private:
     std::atomic<bool>       m_backupSyncOn;
     std::atomic<bool>       m_syncing;
     std::atomic<bool>       m_forced;
     std::atomic<bool>       m_interrupted;
-    bool                    m_backupDone;
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;
-    std::atomic<int64_t>    m_syncTimePoint;
+    std::atomic<qint64>     m_syncTimePoint;
+    QnMutex                 m_syncPointMutex;
 
-    std::map<ChunkKey, double> m_syncData;
-    mutable std::mutex         m_syncDataMutex;
+    SyncDataMap           m_syncData;
+    mutable QnMutex       m_syncDataMutex;
 };
 
 #endif

@@ -27,8 +27,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
-
-
+#include "api/server_rest_connection.h"
 
 namespace {
     const QString protoVersionPropertyName = lit("protoVersion");
@@ -234,9 +233,14 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
     return m_restConnection;
 }
 
-QnNewMediaServerConnection QnMediaServerResource::newApiConnection()
+rest::QnConnectionPtr QnMediaServerResource::serverRestConnection()
 {
-    return QnNewMediaServerConnection(getId());
+    QnMutexLocker lock( &m_mutex );
+
+    if (!m_serverRestConnection)
+        m_serverRestConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
+    
+    return m_serverRestConnection;
 }
 
 QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)

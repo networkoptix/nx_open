@@ -1,12 +1,37 @@
-#include <cassert>
 #include "client_storage_resource.h"
+
+#include <cassert>
+
+#include <core/resource/media_server_resource.h>
 
 QnClientStorageResource::QnClientStorageResource()
     : QnStorageResource()
     , m_freeSpace(QnStorageResource::UnknownSize)
     , m_totalSpace(QnStorageResource::UnknownSize)
     , m_writable(false)
-{}
+{
+
+}
+
+QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {
+    Q_ASSERT_X(parentServer, Q_FUNC_INFO, "Server must exist here");
+
+    QnClientStorageResourcePtr storage(new QnClientStorageResource());  
+
+    QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
+    if (resType)
+        storage->setTypeId(resType->getId());
+
+    if (parentServer) {
+        storage->setParentId(parentServer->getId());
+        storage->setId(fillID(parentServer->getId(), url));
+    }
+
+    storage->setName(QnUuid::createUuid().toString());
+    storage->setUrl(url);
+    return storage;
+}
+
 
 QnClientStorageResource::~QnClientStorageResource()
 {}
@@ -15,7 +40,9 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
     QnResource::updateInner(other, modifiedFields);
 
     QnClientStorageResource* localOther = dynamic_cast<QnClientStorageResource*>(other.data());
-    if(localOther) {
+
+    /* Do not overwrite space info data with invalid values. */
+    if(localOther && localOther->isSpaceInfoAvailable()) {
         if (m_freeSpace != localOther->m_freeSpace)
             modifiedFields << "freeSpaceChanged";
         m_freeSpace = localOther->m_freeSpace;
@@ -28,6 +55,10 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
             modifiedFields << "isWritableChanged";
         m_writable = localOther->m_writable;
     }
+}
+
+bool QnClientStorageResource::isSpaceInfoAvailable() const {
+    return m_totalSpace != QnStorageResource::UnknownSize;
 }
 
 

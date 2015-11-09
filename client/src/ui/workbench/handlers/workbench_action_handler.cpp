@@ -265,7 +265,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
@@ -1379,7 +1379,15 @@ void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
     const bool checked = bookmarkModeAction->isChecked();
     const bool enabled = bookmarkModeAction->isEnabled();
 
-    if (enabled)
+    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
+    if (!checked)
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        canSaveBookmarksMode = (!currentWidget 
+            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+    }
+
+    if (enabled && canSaveBookmarksMode)
         context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
 
     if (checked)
