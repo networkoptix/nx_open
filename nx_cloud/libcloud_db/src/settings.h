@@ -53,6 +53,7 @@ public:
     const QnEmailSettings& email() const;
     const Auth& auth() const;
     const QString& cloudBackendUrl() const;
+    const QString& changeUser() const;
 
     //!Loads settings from both command line and conf file (or win32 registry)
     void load( int argc, char **argv );
@@ -69,6 +70,7 @@ private:
     QnEmailSettings m_email;
     Auth m_auth;
     QString m_cloudBackendUrl;
+    QString m_changeUser;
 
     void fillSupportedCmdParameters();
     void loadConfiguration();

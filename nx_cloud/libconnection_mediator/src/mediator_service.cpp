@@ -12,6 +12,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 
+#include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
@@ -160,7 +161,8 @@ int MediatorProcess::executeApplication()
     if( !m_multiAddressStunServer->bind( stunAddrToListenList ) )
         return 2;
 
-    //TODO: #ak process privilege reduction should be made here
+    // process privilege reduction
+    CurrentProcess::changeUser( m_settings->value( lit("changeUser") ).toString() );
 
     if( !m_multiAddressStunServer->listen() )
         return 4;

@@ -60,6 +60,8 @@ namespace
     static const QLatin1String CLOUD_DB_URL( "cloudDbUrl" );
     static const QLatin1String DEFAULT_CLOUD_DB_URL( "http://nowhere.com:3346/" );
 
+    static const QLatin1String CHANGE_USER( "changeUser" );
+
     //email settings
     static const QLatin1String EMAIL_FROM_ADDRESS( "email/fromAddress" );
     static const QLatin1String EMAIL_SMTP_CONNECTION_TYPE( "email/smtpConnectionType" );
@@ -129,6 +131,11 @@ const Auth& Settings::auth() const
 const QString& Settings::cloudBackendUrl() const
 {
     return m_cloudBackendUrl;
+}
+
+const QString& Settings::changeUser() const
+{
+    return m_changeUser;
 }
 
 std::list<SocketAddress> Settings::endpointsToListen() const
@@ -201,6 +208,7 @@ void Settings::loadConfiguration()
         m_dbConnectionOptions.maxConnectionCount = std::thread::hardware_concurrency();
 
     m_cloudBackendUrl = m_settings.value( CLOUD_DB_URL, DEFAULT_CLOUD_DB_URL ).toString();
+    m_changeUser = m_settings.value( CHANGE_USER ).toString();
 
     //email
     m_email.email = m_settings.value( EMAIL_FROM_ADDRESS ).toString();

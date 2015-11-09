@@ -15,6 +15,7 @@
 #include <QtSql/QSqlQuery>
 
 #include <api/global_settings.h>
+#include <platform/process/current_process.h>
 #include <utils/network/auth_restriction_list.h>
 #include <utils/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
@@ -160,8 +161,9 @@ int CloudDBProcess::executeApplication()
 
         if( !multiAddressHttpServer.bind(httpAddrToListenList) )
             return 3;
-    
-        //TODO: #ak process privilege reduction should be made here
+
+        // process privilege reduction
+        CurrentProcess::changeUser( settings.changeUser() );
     
         if( !multiAddressHttpServer.listen() )
             return 5;
