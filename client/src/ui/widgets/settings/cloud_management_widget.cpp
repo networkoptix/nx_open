@@ -63,12 +63,12 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent /* = NULL*/)
 QnCloudManagementWidget::~QnCloudManagementWidget() {
 }
 
-void QnCloudManagementWidget::updateFromSettings() {
+void QnCloudManagementWidget::loadDataToUi() {
     //QnGlobalSettings *settings = QnGlobalSettings::instance();
     //TODO #ak
 }
 
-void QnCloudManagementWidget::submitToSettings() {
+void QnCloudManagementWidget::applyChanges() {
     //TODO #ak
 }
 

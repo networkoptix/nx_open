@@ -317,7 +317,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::SocketGlobals::cloudInfo().enableMediator(true);
+    nx::SocketGlobals::mediatorConnector().enable(true);
 
 	// TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {

@@ -21,6 +21,7 @@
 #include "ui/models/server_addresses_model.h"
 #include "ui/style/warning_style.h"
 
+#include "utils/network/socket_common.h"
 #include "utils/common/string.h"
 #include "utils/common/util.h"
 
