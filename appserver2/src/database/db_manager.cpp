@@ -1108,6 +1108,9 @@ bool QnDbManager::beforeInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/30_update_history_guid.sql")) {
         return removeOldCameraHistory();
     }
+    else if (updateName == lit(":/updates/33_history_refactor_dummy.sql")) {
+        return removeOldCameraHistory();
+    }
 
     return true;
 }
