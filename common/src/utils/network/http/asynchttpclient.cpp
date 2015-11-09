@@ -120,7 +120,7 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody)
+        nx_http::StringType messageBody)
     {
         if( !url.isValid() )
             return false;
@@ -132,14 +132,14 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
-        m_request.messageBody = messageBody;
+        m_request.messageBody = std::move(messageBody);
         return initiateHttpMessageDelivery( url );
     }
 
     bool AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
+        nx_http::StringType messageBody )
     {
         if( !url.isValid() )
             return false;
@@ -150,7 +150,7 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
-        m_request.messageBody = messageBody;
+        m_request.messageBody = std::move(messageBody);
         return initiateHttpMessageDelivery( url );
     }
 

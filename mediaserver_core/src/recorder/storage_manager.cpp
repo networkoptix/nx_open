@@ -221,6 +221,8 @@ public:
                 qDebug() << "rebuild archive time for storage" << scanData.storage->getUrl() << "is:" << t.elapsed() << "msec";
             }
             m_scanTasks.removeFirst(1);
+            assert(qnBackupStorageMan->scheduleSync());
+            qnBackupStorageMan->scheduleSync()->updateLastSyncPoint();
         }
     }
 };
@@ -432,7 +434,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     bool isRebuildFinished = false;
     {
         QnMutexLocker lock( &m_rebuildStateMtx );
-        isRebuildFinished = ((data.state == Qn::RebuildState_None || Qn::RebuildState_Canceled) && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        isRebuildFinished = ((data.state == Qn::RebuildState_None || data.state == Qn::RebuildState_Canceled) && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
         m_archiveRebuildInfo = data;
         if (m_archiveRebuildInfo.state == Qn::RebuildState_Canceled)
             m_archiveRebuildInfo.state = Qn::RebuildState_None;

@@ -14,6 +14,32 @@
     
     \section intro_sec Introduction
     This is the example project aimed to demonstrate NX Storage plugin API SDK possible implementation.
+    \subsection tips_subsec Some tips
+    - nx_spl::StorageFactory::createStorage() function will receive url to base folder
+      For example:
+      \code
+      'ftp://10.10.2.54/some/path'.
+      \endcode
+    - All other API functions which have URL parameter will receive URL without scheme and host.
+      For example:
+      \code
+      /some/path/folder1/folder2
+      \endcode
+    - In FileInfoIterator::next() plug-in should provide full URL to target location (with or without scheme + host).
+      For example:
+      \code
+      fileInfo.url = ftp://10.10.2.54/some/path/file1.mkv   // right
+      fileInfo.url = /some/path/file1.mkv                   // right
+      fileInfo.url = file1.mkv                              // wrong
+      \endcode
+    - Some of the API functions are called frequently, for example open(), some - based on some (sometimes quite long) timeout, for example, removeDir(). 
+      But MediaServer calls all of them in time, so every function should be implemented correctly.
+    - For some storages types, for example FTP, it may be impossible to 'honestly' implement such fuctions as getTotalSpace() and getFreeSpace().
+      In this case these functions are allowed to return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in determing "best"​ storage algorithm. 
+      For example if some storage total space is far smaller than others this storage won't be selected for writing. 
+      Or if some storage is twice larger than another, it will be written on twice more data. Also total space value is displayed in client for every storage in list.
+      getFreeSpace() is used to rotate data on storages. If MediaServer sees that some storage free space becomes lower than predefined limit (5gb by default) 
+      it will try to remove some old files and folders on this storage.
 
     \section build_how_to Build how-to
     Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.

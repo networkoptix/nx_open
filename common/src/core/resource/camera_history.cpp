@@ -14,8 +14,10 @@
 
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
+#include "utils/common/synctime.h"
 
 namespace {
+    static const int HistoryCheckDelay = 1000 * 15;
 
     ec2::ApiCameraHistoryItemDataList::const_iterator getMediaServerOnTimeInternal(const ec2::ApiCameraHistoryItemDataList& data, qint64 timestamp) {
         /* Find first data with timestamp not less than given. */
@@ -37,11 +39,51 @@ namespace {
 
 // ------------------- CameraHistory Pool ------------------------
 
+
+void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam)
+{
+    /* 
+    * When camera goes to a recording state it's expected that current history server is the same as parentID.
+    * Check it after some delay to avoid call 'invalidateCameraHistory' several times in a row.
+    * It could be because client video camera sends extra 'statusChanged' signal when camera is moved.
+    * Also, online->recording may occurs on the server side before history information updated. 
+    * Excact delay isn't important, at worse scenario we just do extra work. So, do it delayed.
+    */
+
+    if (cam->getStatus() != Qn::Recording) {
+        m_camerasToCheck.remove(cam->getId());
+        return;
+    }
+
+    QnUuid id = cam->getId();
+    if (m_camerasToCheck.contains(id))
+        return;
+    m_camerasToCheck << cam->getId();
+    executeDelayed([this, id]()
+    {
+        if (!m_camerasToCheck.contains(id))
+            return;
+        m_camerasToCheck.remove(id);
+
+        QnVirtualCameraResourcePtr cam = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+        if (!cam)
+            return;
+
+        auto server = getMediaServerOnTime(cam, qnSyncTime->currentMSecsSinceEpoch());
+        if (cam && server && server->getId() != cam->getParentId())
+            invalidateCameraHistory(id);
+    }, HistoryCheckDelay);
+}
+
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
     m_mutex(QnMutex::Recursive)
 {
     connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource) {
+        QnVirtualCameraResourcePtr cam = qnResPool->getResourceById<QnVirtualCameraResource>(resource->getId());
+        if (cam)
+            checkCameraHistoryDelayed(cam);
+
         /* Fast check. */
         if (!resource->hasFlags(Qn::remote_server))
             return;

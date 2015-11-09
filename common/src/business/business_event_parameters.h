@@ -12,6 +12,36 @@ struct QnEventMetaData
 {
     //! Cameras list which associated with event. EventResourceId may be POS terminal, but this is a camera list which should be shown with this event
     std::vector<QnUuid> cameraRefs;
+
+    QnEventMetaData() {}
+
+    QnEventMetaData(const QnEventMetaData& right)
+    :
+        cameraRefs(right.cameraRefs)
+    {
+    }
+
+    QnEventMetaData(QnEventMetaData&& right)
+    :
+        cameraRefs(std::move(right.cameraRefs))
+    {
+    }
+
+    QnEventMetaData& operator=(const QnEventMetaData& right)
+    {
+        if (&right == this)
+            return *this;
+        cameraRefs = right.cameraRefs;
+        return *this;
+    }
+    
+    QnEventMetaData& operator=(QnEventMetaData&& right)
+    {
+        if (&right == this)
+            return *this;
+        cameraRefs = std::move(right.cameraRefs);
+        return *this;
+    }
 };
 #define QnEventMetaData_Fields (cameraRefs)
 QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));

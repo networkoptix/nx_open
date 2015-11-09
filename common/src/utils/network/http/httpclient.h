@@ -6,12 +6,14 @@
 #ifndef HTTPCLIENT_H
 #define HTTPCLIENT_H
 
-#include "asynchttpclient.h"
+#include <boost/optional.hpp>
 
 #include <utils/thread/wait_condition.h>
 #include <utils/thread/mutex.h>
 
 #include <utils/common/stoppable.h>
+
+#include "asynchttpclient.h"
 
 
 /*!
@@ -43,7 +45,7 @@ namespace nx_http
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         const Response* response() const;
         //!
         bool eof() const;
@@ -73,6 +75,16 @@ namespace nx_http
         bool m_done;
         bool m_terminated;
         nx_http::BufferType m_msgBodyBuffer;
+        std::vector<std::pair<StringType, StringType>> m_additionalHeaders;
+        boost::optional<int> m_subsequentReconnectTries;
+        boost::optional<int> m_reconnectTries;
+        boost::optional<unsigned int> m_messageBodyReadTimeoutMs;
+        boost::optional<QString> m_userAgent;
+        boost::optional<QString> m_userName;
+        boost::optional<QString> m_userPassword;
+
+        template<typename AsyncClientFunc>
+            bool doRequest(AsyncClientFunc func);
 
     private slots:
         void onResponseReceived();
