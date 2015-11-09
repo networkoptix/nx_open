@@ -16,9 +16,9 @@ Item {
     readonly property bool timelineMoving: timeline.moving
     readonly property real timelinePosition: timeline.position
 
-    width: parent.width
+    width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height
-    anchors.bottom: parent.bottom
+    anchors.bottom: parent ? parent.bottom : undefined
 
     QtObject {
         id: d

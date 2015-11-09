@@ -13,6 +13,7 @@
 #include "models/login_sessions_model.h"
 #include "models/calendar_model.h"
 #include "resources/media_resource_helper.h"
+#include "resources/camera_access_rights_helper.h"
 #include "utils/mobile_app_info.h"
 #include "utils/mjpeg/mjpeg_player.h"
 #include "mobile_client/mobile_client_settings.h"
@@ -42,6 +43,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLoginSessionsModel>("com.networkoptix.qml", 1, 0, "QnLoginSessionsModel");
     qmlRegisterType<QnMediaResourceHelper>("com.networkoptix.qml", 1, 0, "QnMediaResourceHelper");
+    qmlRegisterType<QnCameraAccessRughtsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRughtsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
     qmlRegisterType<QnMjpegPlayer>("com.networkoptix.qml", 1, 0, "QnMjpegPlayer");
