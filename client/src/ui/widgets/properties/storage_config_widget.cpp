@@ -511,11 +511,10 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
 
 QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 
-    QDateTime now = qnSyncTime->currentDateTime();
+    const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
+    QString result = lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
 
-    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::SystemLocaleLongDate));
-
-    qint64 deltaMs = now.toMSecsSinceEpoch() - backupTimeMs;
+    qint64 deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
     if (deltaMs > minDeltaForMessageMs) {
         QTimeSpan span(deltaMs);
         span.normalize();
