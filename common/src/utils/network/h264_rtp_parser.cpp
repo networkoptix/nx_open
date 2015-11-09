@@ -293,7 +293,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     int packetType = *curPtr & 0x1f;
     int nalRefIDC = *curPtr++ & 0xe0;
-
+    bool isLastPacket = rtpHeader->marker;
     switch (packetType)
     {
         case STAP_B_PACKET:
@@ -344,6 +344,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             {
                 if (quint16(sequenceNum - m_firstSeqNum) != m_packetPerNal)
                     return clearInternalBuffer(); // packet loss detected
+                isLastPacket = true;
             }
 
             curPtr++;
@@ -381,7 +382,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
-    if (rtpHeader->marker && m_frameExists) {
+    if (isLastPacket && m_frameExists) {
         m_mediaData = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
         gotData = true;
     }
