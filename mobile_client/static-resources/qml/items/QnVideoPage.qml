@@ -134,7 +134,6 @@ QnPage {
         resourceId: videoPlayer.resourceId
 
         onPlayingChanged: {
-            console.log("Playing: " + playing)
             if (playing)
                 video.clearScreenshotSource()
         }
