@@ -41,7 +41,6 @@ public:
             recursiveClean(path);
     }
 
-private:
     struct TimePeriod
     {
         int64_t startTimeMs;
@@ -240,6 +239,16 @@ private:
     QStringList m_storageUrls;
     TimeLine m_timeLine;
 };
+
+TEST(ServerArchiveDelegate_playback_test, TestHelper)
+{
+    TestHelper::TimePeriod tp1(0, 10);
+    TestHelper::TimePeriod tp2(5, 30);
+
+    auto tp3 = TestHelper::TimePeriod::merge(tp2, tp1);
+    ASSERT_TRUE(tp3.startTimeMs == 0);
+    ASSERT_TRUE(tp3.durationMs == 30);
+}
 
 TEST(ServerArchiveDelegate_playback_test, Main) 
 {
