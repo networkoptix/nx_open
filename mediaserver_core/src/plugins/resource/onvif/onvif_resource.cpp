@@ -2414,8 +2414,8 @@ bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value
     bool result = false;
     {
         QnMutexLocker lock( &m_physicalParamsMutex );
-        if (!m_advancedParamsCache.contains(id))
-            return false;
+        //if (!m_advancedParamsCache.contains(id))
+        //    return false; // there are no write-only parameters in a cache
 
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
         if (!parameter.isValid())
