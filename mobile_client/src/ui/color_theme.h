@@ -11,6 +11,7 @@ public:
     explicit QnColorTheme(QObject *parent = 0);
 
     void readFromFile(const QString &fileName);
+    void readFromFiles(const QStringList &fileNames);
 
     Q_INVOKABLE QColor color(const QString &key) const;
     QPalette palette() const;
