@@ -80,7 +80,7 @@ void AsyncClient::closeConnection(
     ConnectionHandler disconnectHandler;
     {
         QnMutexLocker lock( &m_mutex );
-        disconnectHandler = m_disconnectHandler;    //TODO #muskov std::move(m_disconnectHandler)?
+        disconnectHandler = m_disconnectHandler;
         closeConnectionImpl( &lock, errorCode );
     }
 

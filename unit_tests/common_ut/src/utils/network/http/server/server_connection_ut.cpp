@@ -131,7 +131,7 @@ public:
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
+TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
 {
     static const int REQUESTS_TO_SEND = 10;
 
@@ -171,15 +171,18 @@ TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
     nx::Buffer readBuf;
     readBuf.resize( 4096 );
     int dataSize = 0;
-    sock->setRecvTimeout( 2000 );
-    while( msgCounter > 0 )
+    ASSERT_TRUE(sock->setRecvTimeout(500));
+    while (msgCounter > 0)
     {
-        auto bytesRead = sock->recv(
-            readBuf.data() + dataSize,
-            readBuf.size() - dataSize );
-        ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
+        if (dataSize == 0)
+        {
+            auto bytesRead = sock->recv(
+                readBuf.data() + dataSize,
+                readBuf.size() - dataSize );
+            ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
+            dataSize += bytesRead;
+        }
 
-        dataSize += bytesRead;
         size_t bytesParsed = 0;
         ASSERT_TRUE(
             httpMsgReader.parseBytes(
