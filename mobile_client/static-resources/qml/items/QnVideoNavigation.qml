@@ -15,10 +15,11 @@ Item {
     readonly property bool timelineDragging: timeline.dragging
     readonly property bool timelineMoving: timeline.moving
     readonly property real timelinePosition: timeline.position
+    readonly property bool timelineAtLive: timeline.stickToEnd
 
-    width: parent.width
+    width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height
-    anchors.bottom: parent.bottom
+    anchors.bottom: parent ? parent.bottom : undefined
 
     QtObject {
         id: d
@@ -93,6 +94,8 @@ Item {
 
             QnTimeline {
                 id: timeline
+
+                enabled: startBound > 0
 
                 anchors.bottom: parent.bottom
                 width: parent.width
@@ -197,6 +200,18 @@ Item {
                 Component.onCompleted: timeline.timelineView.visible = false
             }
 
+            Text {
+                anchors.horizontalCenter: timeline.horizontalCenter
+                text: qsTr("No Archive")
+                font.capitalization: Font.AllUppercase
+                font.pixelSize: sp(12)
+                anchors.bottom: timeline.bottom
+                anchors.bottomMargin: (timeline.chunkBarHeight - height) / 2
+                color: QnTheme.windowText
+                visible: timeline.startBound <= 0
+                opacity: 0.5
+            }
+
             Rectangle {
                 id: navigationPanel
                 width: parent.width
@@ -237,7 +252,8 @@ Item {
                     anchors.horizontalCenterOffset: -width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/minus.png"
-                    visible: timeline.startBound > 0
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: timeline.zoomOut()
                 }
 
@@ -247,7 +263,8 @@ Item {
                     anchors.horizontalCenterOffset: width / 2
                     anchors.verticalCenter: parent.verticalCenter
                     icon: "image://icon/plus.png"
-                    visible: timeline.startBound > 0
+                    enabled: timeline.startBound > 0
+                    opacity: enabled ? 1.0 : 0.15
                     onClicked: timeline.zoomIn()
                 }
 
@@ -325,7 +342,9 @@ Item {
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                loading: mediaPlayer.loading
+                loading: mediaPlayer.loading || (!paused && timeline.dragging)
+
+                gripTickVisible: timeline.startBound > 0
 
                 onPausedChanged: {
                     if (paused)
@@ -349,6 +368,7 @@ Item {
                 anchors.bottom: parent.bottom
                 width: dp(2)
                 height: timeline.chunkBarHeight + dp(8)
+                visible: timeline.startBound > 0
             }
         }
     }

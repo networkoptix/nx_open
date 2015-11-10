@@ -12,7 +12,7 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool loading: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position == 0 : false
+    readonly property bool loading: d.mediaPlayer && d.mediaPlayer.loading
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
@@ -40,6 +40,7 @@ QnObject {
         property bool updateTimeline: false
         property bool dirty: true
         property alias mediaPlayer: playerLoader.item
+        property bool resetUrlOnConnect: false
     }
 
     Loader {
@@ -55,10 +56,24 @@ QnObject {
 
             autoPlay: !d.paused
 
-            onPositionChanged: updatePosition()
+            onPositionChanged: {
+                updatePosition()
+            }
+
             onSourceChanged: console.log(source)
 
             readonly property bool hasTimestamp: false
+
+            readonly property bool loading: {
+                if (playbackState == MediaPlayer.PlayingState)
+                    return position == 0
+
+                return status == MediaPlayer.Loading ||
+                       status == MediaPlayer.Buffering ||
+                       status == MediaPlayer.Stalled ||
+                       status == MediaPlayer.Loaded ||
+                       status == MediaPlayer.Buffered
+            }
         }
     }
 
@@ -73,6 +88,8 @@ QnObject {
             reconnectOnPlay: atLive
 
             readonly property bool hasTimestamp: true
+
+            readonly property bool loading: playbackState == MediaPlayer.PlayingState && position == 0
         }
     }
 
@@ -99,6 +116,20 @@ QnObject {
         interval: 5000
         running: player.playing && d.position >= 0
         onTriggered: d.updateTimeline = true
+    }
+
+    Connections {
+        target: connectionManager
+        onConnectionStateChanged: {
+            if (connectionManager.connectionState == QnConnectionManager.Connected) {
+                if (d.resetUrlOnConnect) {
+                    d.resetUrlOnConnect = false
+                    resourceHelper.setPosition(position)
+                }
+            } else {
+                d.resetUrlOnConnect = true
+            }
+        }
     }
 
     function alignedPosition(pos) {

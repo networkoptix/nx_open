@@ -246,7 +246,7 @@ QnPage {
             if (!activePage)
                 return
 
-            showWarning(status, statusMessage)
+            showWarning(status, infoParameter)
         }
     }
 
@@ -258,7 +258,17 @@ QnPage {
         onTriggered: loginWithCurrentFields()
     }
 
-    function showWarning(status, message) {
+    function showWarning(status, infoParameter) {
+        var message = ""
+        if (status == QnConnectionManager.Unauthorized)
+            message = qsTr("Incorrect login or password")
+        else if (status == QnConnectionManager.NetworkError)
+            message = qsTr("Server or network is not available")
+        else if (status == QnConnectionManager.InvalidServer)
+            message = qsTr("Incompatible server")
+        else if (status == QnConnectionManager.InvalidVersion)
+            message = qsTr("Incompatible server version %1").arg(infoParameter)
+
         warningText.text = message
         if (status === QnConnectionManager.Unauthorized)
             _authError = true

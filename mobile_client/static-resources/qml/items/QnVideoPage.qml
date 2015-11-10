@@ -17,6 +17,11 @@ QnPage {
     property string resourceId
     property string initialScreenshot
 
+    QtObject {
+        id: d
+        property var videoNavigation: navigationLoader.item
+    }
+
     Rectangle {
         width: mainWindow.width
         height: mainWindow.height
@@ -33,7 +38,7 @@ QnPage {
         anchors.bottom: parent.top
         backgroundOpacity: 0.0
 
-        title: mediaPlayer.resourceName
+        title: player.resourceName
 
         QnMenuBackButton {
             x: dp(10)
@@ -56,17 +61,17 @@ QnPage {
 
     QnCameraMenu {
         id: cameraMenu
-        currentQuality: mediaPlayer.resourceHelper.resolution
+        currentQuality: player.resourceHelper.resolution
         onSelectQuality: qualityDialog.show()
     }
 
     QnQualityDialog {
         id: qualityDialog
-        resolutionList: mediaPlayer.resourceHelper.resolutions
-        currentResolution: mediaPlayer.resourceHelper.resolution
+        resolutionList: player.resourceHelper.resolutions
+        currentResolution: player.resourceHelper.resolution
         onQualityPicked: {
-            mediaPlayer.seek(mediaPlayer.position)
-            mediaPlayer.resourceHelper.resolution = resolution
+            player.seek(player.position)
+            player.resourceHelper.resolution = resolution
         }
         onHidden: videoPlayer.forceActiveFocus()
     }
@@ -80,8 +85,8 @@ QnPage {
     Binding {
         target: thumbnailLoader
         property: "position"
-        value: videoNavigation.timelinePosition
-        when: videoNavigation.timelineDragging && !mediaPlayer.atLive
+        value: d.videoNavigation.timelinePosition
+        when: d.videoNavigation.timelineDragging && !d.videoNavigation.timelineAtLive
     }
 
     QnScalableVideo {
@@ -92,15 +97,19 @@ QnPage {
         anchors.bottomMargin: -navigationBarPlaceholder.realHeight
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
-        source: mediaPlayer.mediaPlayer
+        source: player.mediaPlayer
         screenshotSource: initialResourceScreenshot
-        screenshotAspectRatio: mediaPlayer.resourceHelper.aspectRatio
+        screenshotAspectRatio: player.resourceHelper.aspectRatio
 
         onClicked: {
-            if (videoNavigation.visible)
+            if (navigationLoader.visible)
                 hideUi()
             else
                 showUi()
+        }
+
+        function clearScreenshotSource() {
+            screenshotSource = ""
         }
 
         function bindScreenshotSource() {
@@ -121,12 +130,12 @@ QnPage {
     }
 
     QnMediaPlayer {
-        id: mediaPlayer
+        id: player
         resourceId: videoPlayer.resourceId
 
         onPlayingChanged: {
             if (playing)
-                video.screenshotSource = ""
+                video.clearScreenshotSource()
         }
 
         onLoadingChanged: {
@@ -134,35 +143,73 @@ QnPage {
                 return
 
             video.bindScreenshotSource()
-            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+            thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
         onTimelinePositionRequest: {
+            if (player.playing) {
+                video.clearScreenshotSource()
+                return
+            }
+
             video.bindScreenshotSource()
-            thumbnailLoader.forceLoadThumbnail(mediaPlayer.position)
+            thumbnailLoader.forceLoadThumbnail(player.position)
         }
     }
 
-    QnVideoNavigation {
-        id: videoNavigation
-        mediaPlayer: mediaPlayer
+    QnCameraAccessRightsHelper {
+        id: accessRightsHelper
+        resourceId: videoPlayer.resourceId
+    }
+
+    Loader {
+        id: navigationLoader
+
+        anchors.bottom: parent.bottom
+        width: parent.width
 
         visible: opacity > 0
         opacity: 1.0
         Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
 
-        onTimelineDraggingChanged: {
-            if (timelineDragging)
-                video.bindScreenshotSource()
+        Component.onCompleted: {
+            sourceComponent = accessRightsHelper.canViewArchive ? navigationComponent : liveNavigationComponent
+        }
+    }
+
+    Component {
+        id: navigationComponent
+
+        QnVideoNavigation {
+            id: videoNavigation
+            mediaPlayer: player
+
+            onTimelineDraggingChanged: {
+                if (timelineDragging)
+                    video.bindScreenshotSource()
+                else if (player.playing)
+                    video.clearScreenshotSource()
+            }
+        }
+    }
+
+    Component {
+        id: liveNavigationComponent
+
+        QnLiveVideoNavigation {
+            id: liveVideoNavigation
+
+            readonly property real timelinePosition: -1
+            readonly property bool timelineDragging: false
         }
     }
 
     Component.onCompleted: {
-        mediaPlayer.playLive()
+        player.playLive()
     }
 
     function hideUi() {
-        videoNavigation.opacity = 0.0
+        navigationLoader.opacity = 0.0
         toolBar.opacity = 0.0
         navigationBarTint.opacity = 0.0
         if (Main.isMobile())
@@ -171,7 +218,7 @@ QnPage {
 
     function showUi() {
         exitFullscreen()
-        videoNavigation.opacity = 1.0
+        navigationLoader.opacity = 1.0
         toolBar.opacity = 1.0
         navigationBarTint.opacity = 1.0
     }

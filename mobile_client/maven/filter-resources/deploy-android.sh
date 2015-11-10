@@ -12,13 +12,12 @@ BUILD_TYPE=
 SIGN=
 SOURCE_APK=
 if [[ "${build.configuration}" == "release" ]]; then
-    BUILD_TYPE=--release
-
     if [[ "${skip.sign}" != "true" ]]; then
+        BUILD_TYPE=--release
         SIGN="--sign ${google.keystore} ${google.alias} --storepass ${google.storepass} --keypass ${google.keypass}"
         SOURCE_APK=apk/bin/QtApp-release-signed.apk
     else
-        SOURCE_APK=apk/bin/QtApp-release-unsigned.apk
+        SOURCE_APK=apk/bin/QtApp-debug.apk
     fi
 
     if [[ "${beta}" == "true" ]]; then

@@ -14,6 +14,7 @@
 #include "core/resource/camera_history.h"
 #include "common/common_module.h"
 #include "network/authutil.h"
+#include "http/custom_headers.h"
 #include "utils/common/model_functions.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"
@@ -205,9 +206,9 @@ void QnMediaResourceHelper::updateUrl() {
     if (protocol == Mjpeg)
         query.addQueryItem(lit("ct"), lit("false"));
 
-    query.addQueryItem(lit("X-runtime-guid"), qnCommon->runningInstanceGUID().toString());
-    query.addQueryItem(lit("X-Nx-User-Name"), QnAppServerConnectionFactory::url().userName());
-    query.addQueryItem(lit("User-Agent"), QLatin1String(nx_http::userAgentString()));
+    query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
+    query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
+    query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
 
     url.setQuery(query);
 

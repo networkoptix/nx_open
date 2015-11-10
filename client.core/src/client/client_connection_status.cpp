@@ -46,7 +46,7 @@ QnConnectionState QnClientConnectionStatus::state() const {
 
 void QnClientConnectionStatus::setState(QnConnectionState state) {
 #ifdef STRICT_STATE_CONTROL
-    qDebug() << "QnClientConnectionStatus::setState" << stateToString(state);
+    qDebug() << "QnClientConnectionStatus::setState" << QnConnectionStateUtils::toString(state);
 #endif
 
     if (!m_allowedTransactions.values(m_state).contains(state))

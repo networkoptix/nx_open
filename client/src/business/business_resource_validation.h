@@ -55,6 +55,8 @@ public:
     static inline bool emptyListIsValid() { return false; }
 };
 
+typedef QnCameraRecordingPolicy QnBookmarkActionPolicy;
+
 class QnUserEmailPolicy {
     Q_DECLARE_TR_FUNCTIONS(QnUserEmailPolicy)
 public:
