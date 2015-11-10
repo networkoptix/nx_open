@@ -157,7 +157,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
 
         ui->actionAtLabel->setText(m_model->actionType() == QnBusiness::SendMailAction ? tr("to") : tr("at"));
 
-        bool actionIsInstant = !m_model->isActionProlonged();
+        bool actionIsInstant = !QnBusiness::hasToggleState(m_model->actionType());
         ui->aggregationWidget->setVisible(actionIsInstant);
 
         initActionParameters();
