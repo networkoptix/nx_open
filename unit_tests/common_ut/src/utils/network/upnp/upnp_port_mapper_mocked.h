@@ -37,8 +37,8 @@ public:
                      std::function< void( MappingInfo ) > callback ) override;
 
     typedef std::map<
-            std::pair< quint16 /*port*/, Protocol /*protocol*/ >,
-            std::pair< SocketAddress /*external*/, QString /*description*/ >
+            std::pair< quint16 /*external*/, Protocol /*protocol*/ >,
+            std::pair< SocketAddress /*internal*/, QString /*description*/ >
         > Mappings;
 
     Mappings mappings() const;

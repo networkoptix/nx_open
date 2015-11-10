@@ -43,7 +43,7 @@ private:
     std::queue< T > m_queue;
 };
 
-TEST( UpnpPortMapper, DISABLED_NormalUsage )
+TEST( UpnpPortMapper, NormalUsage )
 {
     TimerManager timerManager;
     DeviceSearcher deviceSearcher;
@@ -56,11 +56,13 @@ TEST( UpnpPortMapper, DISABLED_NormalUsage )
                  [&]( SocketAddress info )
                  { queue7001.push( info ); } ) );
 
-    EXPECT_EQ( queue7001.pop().toString(), "12.34.56.78:7001" );
+    const auto map7001 = queue7001.pop();
+    EXPECT_EQ( map7001.address.toString(), lit( "12.34.56.78" ) );
     EXPECT_EQ( clientMock.mappings().size(), 1 );
 
-    const auto addr7001 = clientMock.mappings()[ tcpPort( 7001 ) ].first;
-    EXPECT_EQ( addr7001.toString(), lit( "192.168.0.10:7001" ) );
+    const auto& addr7001 = *clientMock.mappings().begin();
+    EXPECT_EQ( addr7001.first, tcpPort( map7001.port ) );
+    EXPECT_EQ( addr7001.second.first.toString(), lit( "192.168.0.10:7001" ) );
 
     SyncQueue< SocketAddress > queue80;
     EXPECT_TRUE( portMapper.enableMapping( 80, PortMapper::Protocol::TCP,
@@ -68,7 +70,7 @@ TEST( UpnpPortMapper, DISABLED_NormalUsage )
                  { queue80.push( info ); } ) );
 
     const auto map80 = queue80.pop();
-    EXPECT_EQ( map80.address.toString(), lit("12.34.56.78") );
+    EXPECT_EQ( map80.address.toString(), lit( "12.34.56.78" ) );
     EXPECT_GT( map80.port, 80 );
     EXPECT_EQ( clientMock.mappingsCount(), 2 );
 
@@ -102,7 +104,7 @@ TEST( UpnpPortMapper, ReuseExisting )
                  { queue7001.push( std::move( info ) ); } ) );
 
     // existed mapping should be in use
-    EXPECT_EQ( queue7001.pop().toString(), lit("12.34.56.78:6666") );
+    EXPECT_EQ( queue7001.pop().toString(), lit( "12.34.56.78:6666" ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
     // existed mapping should be removed when if need
@@ -110,7 +112,7 @@ TEST( UpnpPortMapper, ReuseExisting )
     EXPECT_EQ( clientMock.mappingsCount(), 0 );
 }
 
-TEST( UpnpPortMapper, DISABLED_CheckMappings )
+TEST( UpnpPortMapper, CheckMappings )
 {
     TimerManager timerManager;
     DeviceSearcher deviceSearcher;
@@ -123,11 +125,9 @@ TEST( UpnpPortMapper, DISABLED_CheckMappings )
                  [&]( SocketAddress info )
                  { queue7001.push( std::move(info) ); } ) );
 
-    EXPECT_EQ( queue7001.pop().toString(), "12.34.56.78:7001" );
+    EXPECT_EQ( queue7001.pop().address.toString(), lit( "12.34.56.78" ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
-
-    EXPECT_TRUE( clientMock.rmMapping( 7001, PortMapper::Protocol::TCP ) );
-    EXPECT_EQ( clientMock.mappingsCount(), 0 );
+    clientMock.mappings().clear();
 
     QThread::sleep( 1 ); // wait for mapping to be restored
     EXPECT_EQ( clientMock.mappings().size(), 1 );
