@@ -16,6 +16,7 @@
 #include <QtCore/QThread>
 
 #include <utils/network/dns_resolver.h>
+#include <utils/network/socket_global.h>
 #include <utils/network/http/httpclient.h>
 
 #include "socket_test_helper.h"
@@ -328,4 +329,12 @@ TEST( Socket, postCancellation )
 
     for( auto& f: futures )
         f.wait();
+}
+
+TEST(Socket, post)
+{
+    int x = 0;
+    nx::SocketGlobals::aioService().post([&x](){ ++x; });
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_EQ(1, x);
 }

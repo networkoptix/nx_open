@@ -131,6 +131,18 @@ namespace aio
             threadToUse->post( sock, std::forward<Handler>(handler) );
         }
 
+        //!Calls \a handler in random aio thread
+        template<class Handler>
+        void post(Handler handler)
+        {
+            QnMutexLocker lk(&m_mutex);
+
+            //if sock is not still bound to aio thread, binding it
+            auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
+            assert(threadToUse);
+            threadToUse->post(nullptr, std::move(handler));
+        }
+
         //!Call \a handler from within aio thread \a sock is bound to
         /*!
             \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a aio::AIOService::post does
@@ -276,7 +288,7 @@ namespace aio
         {
             typedef AIOThread<SocketType> AIOThreadType;
 
-            std::list<std::unique_ptr<AIOThreadType>> aioThreadPool;
+            std::vector<std::unique_ptr<AIOThreadType>> aioThreadPool;
             //!map<pair<socket, event_type>, pair<thread, socket timeout>>
             std::map<std::pair<SocketType*, aio::EventType>, std::pair<AIOThreadType*, unsigned int> > sockets;
         };

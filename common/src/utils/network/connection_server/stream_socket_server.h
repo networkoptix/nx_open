@@ -127,7 +127,7 @@ public:
     {
         using namespace std::placeholders;
 
-        //TODO #ak handle errorCode
+        //TODO #ak handle errorCode: try to call acceptAsync after some delay?
 
         if( newConnection )
         {

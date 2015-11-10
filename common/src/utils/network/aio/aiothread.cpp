@@ -147,7 +147,8 @@ namespace aio
                     nullptr )
             {
                 this->postHandler = std::move(_postHandler);
-                this->socketSequence = _socket->impl()->socketSequence;
+                if (_socket)
+                    this->socketSequence = _socket->impl()->socketSequence;
             }
         };
 
@@ -806,7 +807,9 @@ namespace aio
     }
 
     template<class SocketType>
-    void AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::post(
+        SocketType* const sock,
+        std::function<void()>&& functor )
     {
         m_impl->pollSetModificationQueue.push_back(
             typename AIOThreadImplType::PostAsyncCallTask(
