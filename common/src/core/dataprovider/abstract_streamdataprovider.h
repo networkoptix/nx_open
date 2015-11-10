@@ -58,7 +58,7 @@ protected:
 
 protected:
     QList<QnAbstractDataReceptor*> m_dataprocessors;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QHash<QByteArray, QVariant> m_streamParam;
     Qn::ConnectionRole m_role;
 };

@@ -1,3 +1,4 @@
+#ifdef ENABLE_DATA_PROVIDERS
 
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
@@ -49,7 +50,7 @@ static const QString DEFAULT_REALM(lit("NetworkOptix"));
 
 
 QByteArray RTPSession::m_guid;
-QMutex RTPSession::m_guidMutex;
+QnMutex RTPSession::m_guidMutex;
 
 #if 0
 static QString getValueFromString(const QString& line)
@@ -161,7 +162,7 @@ quint32 RTPSession::SDPTrackInfo::getSSRC() const
 
 // ================================================== QnRtspTimeHelper ==========================================
 
-QMutex QnRtspTimeHelper::m_camClockMutex;
+QnMutex QnRtspTimeHelper::m_camClockMutex;
 //!map<resID, <CamSyncInfo, refcount> >
 QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > QnRtspTimeHelper::m_camClock;
 
@@ -174,7 +175,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
     m_resId(resId)
 {
     {
-        QMutexLocker lock(&m_camClockMutex);
+        QnMutexLocker lock( &m_camClockMutex );
 
         QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int>& val = m_camClock[resId];
         if( !val.first )
@@ -191,7 +192,7 @@ QnRtspTimeHelper::QnRtspTimeHelper(const QString& resId)
 QnRtspTimeHelper::~QnRtspTimeHelper()
 {
     {
-        QMutexLocker lock(&m_camClockMutex);
+        QnMutexLocker lock( &m_camClockMutex );
 
         QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> >::iterator it = m_camClock.find( m_resId );
         if( it != m_camClock.end() )
@@ -204,7 +205,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 {
     double localtime = qnSyncTime->currentMSecsSinceEpoch()/1000.0;
     
-    QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
+    QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
     if (m_cameraClockToLocalDiff->timeDiff == INT_MAX)  
         m_cameraClockToLocalDiff->timeDiff = localtime - cameraTime;
     double result = cameraTime + m_cameraClockToLocalDiff->timeDiff;
@@ -233,7 +234,7 @@ double QnRtspTimeHelper::cameraTimeToLocalTime(double cameraTime)
 
 void QnRtspTimeHelper::reset()
 {
-    QMutexLocker lock(&m_cameraClockToLocalDiff->mutex);
+    QnMutexLocker lock( &m_cameraClockToLocalDiff->mutex );
     
     m_cameraClockToLocalDiff->timeDiff = INT_MAX;
     m_cameraClockToLocalDiff->driftStats.clear();
@@ -395,7 +396,7 @@ RTPSession::RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_userAgent(QByteArray(QN_PRODUCT_NAME_LONG) + QByteArray(" ") + QByteArray(QN_APPLICATION_VERSION)),
+    m_userAgent(nx_http::userAgentString()),
     m_defaultAuthScheme(nx_http::header::AuthScheme::digest)
 {
     m_responseBuffer = new quint8[RTSP_BUFFER_LEN];
@@ -739,7 +740,7 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool RTPSession::stop()
 {
-    QMutexLocker lock(&m_sockMutex);
+    QnMutexLocker lock( &m_sockMutex );
     m_tcpSock->close();
     return true;
 }
@@ -769,7 +770,7 @@ QByteArray RTPSession::calcDefaultNonce() const
 #if 1
 void RTPSession::addAuth( nx_http::Request* const request )
 {
-    qnAuthHelper->addAuthorizationToRequest(
+    QnClientAuthHelper::addAuthorizationToRequest(
         m_auth,
         request,
         &m_rtspAuthCtx );   //ignoring result
@@ -1172,7 +1173,7 @@ void RTPSession::addRangeHeader( nx_http::Request* const request, qint64 startPo
 
 QByteArray RTPSession::getGuid()
 {
-    QMutexLocker lock(&m_guidMutex);
+    QnMutexLocker lock( &m_guidMutex );
     if (m_guid.isEmpty())
         m_guid = QnUuid::createUuid().toString().toUtf8();
     return m_guid;
@@ -1787,7 +1788,9 @@ static_assert(
     MAX_BITRATE_BYTES_PER_SECOND > ADDITIONAL_READ_BUFFER_CAPACITY * 10,
     "MAX_BITRATE_BYTES_PER_SECOND MUST be 10 times greater than ADDITIONAL_READ_BUFFER_CAPACITY" );
 
+#ifdef __arm__
 static const size_t MS_PER_SEC = 1000;
+#endif
 
 int RTPSession::readSocketWithBuffering( quint8* buf, size_t bufSize, bool readSome )
 {
@@ -1902,7 +1905,7 @@ bool RTPSession::sendRequestAndReceiveResponse( nx_http::Request&& request, QByt
                 return true;
         }
 
-        if( qnAuthHelper->authenticate(
+        if( QnClientAuthHelper::authenticate(
                 m_auth,
                 response,
                 &request,
@@ -1917,3 +1920,5 @@ RTPSession::TrackMap RTPSession::getTrackInfo() const
 {
     return m_sdpTracks;
 }
+
+#endif // ENABLE_DATA_PROVIDERS

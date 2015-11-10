@@ -129,7 +129,7 @@ public:
     }
 
 public:
-    static const qint64 UnknownSize = 0x0000FFFFFFFFFFFFll; // TODO: #Elric replace with -1.
+    static const qint64 UnknownSize = -1;
 
     virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 

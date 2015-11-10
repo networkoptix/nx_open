@@ -122,7 +122,6 @@ const QString& compileCpuArchicture()
     HardwareInformation::HardwareInformation()
         : phisicalMemory(0)
         , cpuArchitecture(CPU_UNKNOWN)
-        , cpuCoreCount(0)
     {
     }
 

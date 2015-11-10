@@ -10,9 +10,10 @@
 #include <queue>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include "hls_playlist_manager.h"
+#include "utils/media/media_stream_cache.h"
 
 
 class MediaStreamCache;
@@ -26,6 +27,7 @@ namespace nx_hls
     */
     class HLSLivePlaylistManager
     :
+        public QnMediaStreamEventReceiver,
         public AbstractPlaylistManager
     {
     public:
@@ -54,16 +56,16 @@ namespace nx_hls
         const quint64 m_targetDurationUSec;
         mutable unsigned int m_mediaSequence;
         AbstractPlaylistManager::ChunkData m_currentChunk;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalPlaylistDuration;
         //queue<pair<timestamp to block; playlist start timestamp, blocking lives to> >
         std::queue<std::pair<quint64, quint64> > m_timestampToBlock;
         int m_blockID;
         const int m_removedChunksToKeepCount;
-        int m_eventRegistrationID;
         mutable QElapsedTimer m_inactivityTimer;
 
-        void onKeyFrame( quint64 currentPacketTimestampUSec );
+        virtual void onKeyFrame(quint64 currentPacketTimestampUSec) override;
+        virtual void onDiscontinue() override;
     };
 
     //!Using std::shared_ptr for \a std::shared_ptr::unique()

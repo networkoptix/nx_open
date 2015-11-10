@@ -1,13 +1,15 @@
 #ifndef __MJPEG_RTP_PARSER_H
 #define __MJPEG_RTP_PARSER_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
+//#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 
 class QnMjpegRtpParser: public QnRtpVideoStreamParser
@@ -46,4 +48,7 @@ private:
     int m_frameSize;
 };
 
+#endif // ENABLE_DATA_PROVIDERS
+
 #endif
+

@@ -3,9 +3,10 @@
 
 #include <QtCore/QObject>
 
-#include <camera/client_video_camera.h>
 #include <recording/time_period.h>
+#include <transcoding/filters/filter_helper.h>
 
+class QnClientVideoCamera;
 
 class QnClientVideoCameraExportTool : public QObject
 {
@@ -15,13 +16,8 @@ public:
             QnClientVideoCamera *camera,
             const QnTimePeriod &timePeriod,
             const QString &fileName,
-            Qn::Corner timestamps,
-            qint64 timeOffsetMs, qint64 serverTimeZoneMs,
-            QRectF sourceRect,
-            const ImageCorrectionParams &imageCorrectionParams,
-            const QnItemDewarpingParams &itemDewarpingParams,
-            int rotationAngle,
-            qreal customAR,
+            const QnImageFilterHelper &imageParameters,
+            qint64 serverTimeZoneMs,
             QObject *parent = 0);
 
     /**
@@ -71,15 +67,9 @@ private:
     QnClientVideoCamera *m_camera;
     QnTimePeriod m_timePeriod;
     QString m_fileName;
-    Qn::Corner m_timestampPos;
-    int m_timeOffsetMs;
+    QnImageFilterHelper m_parameters;
     qint64 m_serverTimeZoneMs;
-    QRectF m_sourceRect;
-    ImageCorrectionParams m_imageCorrectionParams;
-    QnItemDewarpingParams m_itemDewarpingParams;
     int m_status;
-    int m_rotationAngle; // in degree
-    qreal m_customAR;
 };
 
 #endif // CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H

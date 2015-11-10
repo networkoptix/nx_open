@@ -21,6 +21,7 @@
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
+#include <camera/camera_data_manager.h>
 
 #include <client/client_connection_data.h>
 #include <client/client_message_processor.h>
@@ -71,6 +72,7 @@
 #include <ui/dialogs/business_rules_dialog.h>
 #include <ui/dialogs/checkable_message_box.h>
 #include <ui/dialogs/failover_priority_dialog.h>
+#include <ui/dialogs/backup_cameras_dialog.h>
 #include <ui/dialogs/layout_settings_dialog.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/file_dialog.h>
@@ -105,8 +107,8 @@
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include <ui/workbench/handlers/workbench_layouts_handler.h>            //TODO: #GDM dependencies
 
@@ -128,10 +130,10 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/string.h>
 #include <utils/common/time.h>
-#include <utils/email/email.h>
 #include <utils/common/synctime.h>
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/common/url.h>
+#include <utils/email/email.h>
 #include <utils/math/math.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
@@ -150,7 +152,7 @@
 #include "ui/dialogs/adjust_video_dialog.h"
 #include "ui/graphics/items/resource/resource_widget_renderer.h"
 #include "ui/widgets/palette_widget.h"
-#include "network/authenticate_helper.h"
+#include "network/authutil.h"
 
 namespace {
     const char* uploadingImageARPropertyName = "_qn_uploadingImageARPropertyName";
@@ -193,7 +195,8 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BusinessEventsAction),                   SIGNAL(triggered()),    this,   SLOT(at_businessEventsAction_triggered()));
     connect(action(Qn::OpenBusinessRulesAction),                SIGNAL(triggered()),    this,   SLOT(at_openBusinessRulesAction_triggered()));
     connect(action(Qn::OpenFailoverPriorityAction),             &QAction::triggered,    this,   &QnWorkbenchActionHandler::openFailoverPriorityDialog);
-    connect(action(Qn::BusinessEventsLogAction),                SIGNAL(triggered()),    this,   SLOT(at_businessEventsLogAction_triggered()));
+    connect(action(Qn::OpenBackupCamerasAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::openBackupCamerasDialog);
+    connect(action(Qn::OpenBookmarksSearchAction),              SIGNAL(triggered()),    this,   SLOT(at_openBookmarksSearchAction_triggered()));
     connect(action(Qn::OpenBusinessLogAction),                  SIGNAL(triggered()),    this,   SLOT(at_openBusinessLogAction_triggered()));
     connect(action(Qn::OpenAuditLogAction),                     SIGNAL(triggered()),    this,   SLOT(at_openAuditLogAction_triggered()));
     connect(action(Qn::CameraListAction),                       SIGNAL(triggered()),    this,   SLOT(at_cameraListAction_triggered()));
@@ -240,6 +243,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
+    connect(action(Qn::BookmarksModeAction),                    &QAction::toggled,      this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -261,7 +265,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::BetaVersionMessageAction),               SIGNAL(triggered()),    this,   SLOT(at_betaVersionMessageAction_triggered()));
     connect(action(Qn::AllowStatisticsReportMessageAction),     &QAction::triggered,    this,   [this] { checkIfStatisticsReportAllowed(); });
 
-    /* Qt::QueuedConnection is important! See QnPreferencesDialog::confirm() for details. */
+    /* Qt::QueuedConnection is important! See QnPreferencesDialog::canApplyChanges() for details. */
     connect(action(Qn::QueueAppRestartAction),                  SIGNAL(triggered()),    this,   SLOT(at_queueAppRestartAction_triggered()), Qt::QueuedConnection);
     connect(action(Qn::SelectTimeServerAction),                 SIGNAL(triggered()),    this,   SLOT(at_selectTimeServerAction_triggered()));
 
@@ -1040,6 +1044,12 @@ void QnWorkbenchActionHandler::openFailoverPriorityDialog() {
     dialog->exec();
 }
 
+void QnWorkbenchActionHandler::openBackupCamerasDialog() {
+    QScopedPointer<QnBackupCamerasDialog> dialog(new QnBackupCamerasDialog(mainWindow()));
+    dialog->setWindowModality(Qt::ApplicationModal);
+    dialog->exec();
+}
+
 void QnWorkbenchActionHandler::at_showcaseAction_triggered() {
     QDesktopServices::openUrl(qnSettings->showcaseUrl());
 }
@@ -1098,7 +1108,7 @@ void QnWorkbenchActionHandler::at_webClientAction_triggered() {
     QnMediaServerResourcePtr server = parameters.resource().dynamicCast<QnMediaServerResource>();
     if (!server)
         /* If target server is not provided, open the server we are currently connected to. */
-        server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+        server = qnCommon->currentServer();
 
     if (!server)
         return;
@@ -1127,8 +1137,9 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
 }
 
-void QnWorkbenchActionHandler::at_businessEventsLogAction_triggered() {
-    menu()->trigger(Qn::OpenBusinessLogAction);
+void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
+{
+    QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1193,11 +1204,11 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     }
 
     /* Adjust for chunks. If they are provided, they MUST intersect with period */
-    if(!periods.isEmpty()) {
+    if(!periods.empty()) {
 
         QnTimePeriodList localPeriods = periods.intersected(period);
 
-        qint64 startDelta = localPeriods.first().startTimeMs - period.startTimeMs;
+        qint64 startDelta = localPeriods.begin()->startTimeMs - period.startTimeMs;
         if (startDelta > 0) { //user selected period before the first chunk
             period.startTimeMs += startDelta;
             period.durationMs -= startDelta;
@@ -1327,8 +1338,8 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         QnTimePeriod localPeriod (time, step);
         QnTimePeriodList localPeriods = periods.intersected(localPeriod);
         qint64 localTime = time;
-        if (!localPeriods.isEmpty())
-            localTime = qMax(localTime, localPeriods.first().startTimeMs);
+        if (!localPeriods.empty())
+            localTime = qMax(localTime, localPeriods.begin()->startTimeMs);
 
         QnLayoutItemData item;
         item.flags = Qn::Pinned;
@@ -1361,6 +1372,28 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
+}
+
+void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
+    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
+    const bool checked = bookmarkModeAction->isChecked();
+    const bool enabled = bookmarkModeAction->isEnabled();
+
+    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
+    if (!checked)
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        canSaveBookmarksMode = (!currentWidget 
+            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+    }
+
+    if (enabled && canSaveBookmarksMode)
+        context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
+
+    if (checked)
+        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
+
+    navigator()->setBookmarksModeEnabled(checked);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
@@ -1456,10 +1489,11 @@ void QnWorkbenchActionHandler::at_serverLogsAction_triggered() {
     QString login = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     QUrlQuery urlQuery(url);
+    auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
     urlQuery.addQueryItem(
         lit("auth"),
-        QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
-            login, password, server->realm(), nx_http::Method::GET)));
+        QLatin1String(createHttpQueryAuthParam(
+            login, password, server->realm(), nx_http::Method::GET, nonce)));
     urlQuery.addQueryItem(lit("lines"), QLatin1String("1000"));
     url.setQuery(urlQuery);
     url = QnNetworkProxyFactory::instance()->urlToResource(url, server);
@@ -1744,7 +1778,6 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             && !camera->isManuallyAdded();
     });
 
-    //TODO: #GDM #tr strings are really untranslatable. Also second and third sentences are always plural.
     QString question;
     /* First version of the dialog - if all resources are cameras and all of them are auto-discovered. */
     if (resources.size() == onlineAutoDiscoveredCameras.size()) {

@@ -24,8 +24,11 @@ QnTimeSliderColors::QnTimeSliderColors() {
     pastMotion = QColor(255, 0, 0, 128);
     futureMotion = QColor(255, 0, 0, 64);
 
-    pastBookmark = QColor(0, 0, 255, 128);
-    futureBookmark = QColor(0, 0, 255, 64);
+    pastBookmark = QColor("#b21083dc");
+    futureBookmark = QColor("#b21083dc");
+
+    pastBookmarkBound = QColor("#1c8fe7");
+    futureBookmarkBound = QColor("#1c8fe7");
 
     separator = QColor(255, 255, 255, 64);
 
@@ -47,13 +50,16 @@ QnBackgroundColors::QnBackgroundColors() {
     panic = QColor(255, 0, 0, 255);
 }
 
-QnCalendarColors::QnCalendarColors() {
-    selection = QColor(0, 150, 255, 192);
-    primaryRecording = QColor(32, 128, 32, 255);
-    secondaryRecording = QColor(32, 255, 32, 255);
-    primaryMotion = QColor(128, 0, 0, 255);
-    secondaryMotion = QColor(255, 0, 0, 255);
-    separator = QColor(0, 0, 0, 255);
+QnCalendarColors::QnCalendarColors()
+    : selection(0, 150, 255, 192)
+    , primaryRecording(32, 128, 32, 255)
+    , secondaryRecording(32, 255, 32, 255)
+    , primaryBookmark(55, 117, 196, 255)
+    , secondaryBookmark(105, 164, 240, 255)
+    , primaryMotion(128, 0, 0, 255)
+    , secondaryMotion(255, 0, 0, 255)
+    , separator(0, 0, 0, 255)
+{
 }
 
 QnStatisticsColors::QnStatisticsColors() {
@@ -82,6 +88,7 @@ QnStatisticsColors::QnStatisticsColors() {
 
 QnIoModuleColors::QnIoModuleColors() {
     idLabel = QColor(0x57, 0x57, 0x57);
+    buttonBackground = QColor("#1c1c1c");
 }
 
 QnScheduleGridColors::QnScheduleGridColors() {
@@ -120,6 +127,15 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
     normal = QColor(128, 128, 128, 196);
     active = normal.lighter();
     selected = QColor(64, 130, 180, 128);
+}
+
+QnBookmarkColors::QnBookmarkColors()
+    : tooltipBackground("#204969")
+    , background("#b22e6996")
+    , text(Qt::white)
+    , separator("#3E6E93")
+    , tags("#698796")
+{
 }
 
 QnLicensesListModelColors::QnLicensesListModelColors() {
@@ -180,11 +196,22 @@ QnServerUpdatesColors::QnServerUpdatesColors() {
     error = Qt::red;
 }
 
+QnBackupScheduleColors::QnBackupScheduleColors() {
+    weekEnd = QColor(0xff8080);
+}
+
 QnFailoverPriorityColors::QnFailoverPriorityColors() {
     never   = QColor(0x808080);
     low     = QColor(0x9eb236);
     medium  = QColor(0xcc853d);
     high    = QColor(0xff5500);
+}
+
+QnBackupCamerasColors::QnBackupCamerasColors() {
+    disabled= QColor(0x808080);
+    low     = QColor(0x9eb236);
+    high    = QColor(0xff5500);
+    both    = QColor(0xcc853d);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

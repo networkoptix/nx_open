@@ -74,6 +74,7 @@ public slots:
     void clear();
 
 signals:
+    /// For correct usage, textInteractionFlags should be set to Qt::TextBrowserInteraction
     void linkActivated(const QString &link);
     void linkHovered(const QString &link);
 

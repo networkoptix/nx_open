@@ -87,7 +87,7 @@ void PluginManager::loadPlugins(
     const QSettings* settings,
     PluginManager::PluginType pluginsToLoad )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     std::set<QString> directoriesToSearchForPlugins;
 
@@ -187,11 +187,15 @@ bool PluginManager::loadNxPlugin(
 {
     QLibrary lib( fullFilePath );
     if( !lib.load() )
+    {
+        NX_LOG( lit("Failed to load %1: %2").arg(fullFilePath).arg(lib.errorString()), cl_logERROR );
         return false;
+    }
     
     nxpl::CreateNXPluginInstanceProc entryProc = (nxpl::CreateNXPluginInstanceProc)lib.resolve( "createNXPluginInstance" );
     if( entryProc == NULL )
     {
+        NX_LOG( lit("Failed to load %1: no createNXPluginInstance").arg(fullFilePath), cl_logERROR );
         lib.unload();
         return false;
     }
@@ -199,6 +203,7 @@ bool PluginManager::loadNxPlugin(
     nxpl::PluginInterface* obj = entryProc();
     if( !obj )
     {
+        NX_LOG( lit("Failed to load %1: no PluginInterface").arg(fullFilePath), cl_logERROR );
         lib.unload();
         return false;
     }

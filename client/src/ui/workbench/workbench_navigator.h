@@ -8,6 +8,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -27,14 +28,18 @@ class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 class QnAbstractArchiveReader;
-class QnCachingCameraDataLoader;
 class QnThumbnailsLoader;
+class QnCameraDataManager;
+class QnCachingCameraDataLoader;
 class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
 class QnSearchLineEdit;
+class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
+class QnPendingOperation;
+class QnCameraBookmarkAggregation;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -66,11 +71,13 @@ public:
     QnDayTimeWidget *dayTimeWidget() const;
     void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
 
+    bool bookmarksModeEnabled() const;
+    void setBookmarksModeEnabled(bool bookmarksModeEnabled);
+
     QnSearchLineEdit *bookmarksSearchWidget() const;
     void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
 
-    QnCameraBookmarkTags bookmarkTags() const;
-    void setBookmarkTags(const QnCameraBookmarkTags &tags);
+    QnSearchQueryStrategy *bookmarksSearchStrategy() const;
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -87,8 +94,8 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
-    qint64 position() const;
-    void setPosition(qint64 position);
+    qint64 positionUsec() const;
+    void setPosition(qint64 positionUsec);
 
     QnResourceWidget *currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
@@ -103,8 +110,6 @@ public:
 
     virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
-    QnCachingCameraDataLoader *loader(const QnResourcePtr &resource);
-
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
@@ -115,6 +120,7 @@ signals:
     void speedChanged();
     void speedRangeChanged();
     void positionChanged();
+    void bookmarksModeEnabledChanged();
 
 protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
@@ -137,13 +143,10 @@ protected:
 
     void setPlayingTemporary(bool playing);
 
-    QnCachingCameraDataLoader *loader(QnResourceWidget *widget);
+    QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
+    QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
 
-    QnThumbnailsLoader *thumbnailLoader(const QnResourcePtr &resource);
-    QnThumbnailsLoader *thumbnailLoader(QnResourceWidget *widget);
-public slots:
-    void clearLoaderCache();
-protected slots:
+    protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);
@@ -162,8 +165,6 @@ protected slots:
     void updateSyncedPeriods(qint64 startTimeMs = 0);
     void updateSyncedPeriods(Qn::TimePeriodContent timePeriodType, qint64 startTimeMs = 0);
 
-    void updateCurrentBookmarks();
-    void updateTargetPeriod();
     void updateLines();
     void updateCalendar();
 
@@ -194,8 +195,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(QnCachingCameraDataLoader *loader, Qn::TimePeriodContent type, qint64 startTimeMs);
-    void updateLoaderBookmarks(QnCachingCameraDataLoader *loader);
+    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);   
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -206,12 +206,22 @@ protected slots:
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
+    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks);
+
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
     
     void at_calendar_dateClicked(const QDate &date);
 
     void at_dayTimeWidget_timeClicked(const QTime &time);
+
+private:
+    QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
+
+    bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
+    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
+    void updateSliderBookmarks();
+    void updateBookmarkTags();
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -221,9 +231,10 @@ private:
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
     QnSearchLineEdit *m_bookmarksSearchWidget;
+    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
-    QMultiHash<QnResourcePtr, QHashDummyValue> m_syncedResources;
+    QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;
 
     QSet<QnResourceWidget *> m_motionIgnoreWidgets;
 
@@ -257,15 +268,20 @@ private:
     qreal m_lastMaximalSpeed;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
+   
+    QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
-    QHash<QnResourcePtr, QnCachingCameraDataLoader *> m_loaderByResource;   
-    QHash<QnResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
-
-    QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
+    QnCameraBookmarksQueryPtr m_bookmarkQuery;
+    QScopedPointer<QnCameraBookmarkAggregation> m_bookmarkAggregation;
+    QnPendingOperation *m_sliderBookmarksRefreshOperation;
+
+    QnCameraDataManager* m_cameraDataManager;
 
     int m_chunkMergingProcessHandle;
     std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
+    /** Set of cameras, for which history was not loaded and should be updated again. */
+    QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

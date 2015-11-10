@@ -87,7 +87,7 @@ private:
         QnDesktopFileEncoder* m_owner;
         HWAVEIN hWaveIn;
         QQueue<WAVEHDR*> m_buffers;
-        QMutex m_mtx;
+        QnMutex m_mtx;
         bool m_terminated;
     };
 

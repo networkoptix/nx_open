@@ -3,7 +3,7 @@
 
 #include <memory> // for auto_ptr
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
@@ -103,7 +103,7 @@ public:
     ResourceSearcherList plugins() const;
 
     //!This method MUST be called from non-GUI thread, since it can block for some time
-    void doResourceDiscoverIteration();
+    virtual void doResourceDiscoverIteration();
 
     State state() const;
     
@@ -113,7 +113,7 @@ public slots:
     virtual void start( Priority priority = InheritPriority ) override;
 
 protected:
-    QMutex m_discoveryMutex;
+    QnMutex m_discoveryMutex;
 
     unsigned int m_runNumber;
 
@@ -143,7 +143,7 @@ private:
     void updateSearchersUsage();
     bool isRedundancyUsing() const;
 private:
-    QMutex m_searchersListMutex;
+    QnMutex m_searchersListMutex;
     ResourceSearcherList m_searchersList;
     QnResourceProcessor* m_resourceProcessor;
     QnManualCameraInfoMap m_manualCameraMap;
@@ -162,7 +162,7 @@ private:
     QHash<QnUuid, QnManualCameraSearchStatus> m_searchProcessStatuses;
     QHash<QnUuid, QnManualCameraSearchCameraList> m_searchProcessResults;
 
-    mutable QMutex m_resListMutex;
+    mutable QnMutex m_resListMutex;
     QnResourceList m_lastDiscoveredResources[6];
     int m_discoveryUpdateIdx;
 protected:

@@ -28,6 +28,8 @@ public:
 
     QColor pastBookmark;
     QColor futureBookmark;
+    QColor pastBookmarkBound;
+    QColor futureBookmarkBound;
 
     QColor separator;
 
@@ -40,7 +42,7 @@ public:
 #define QnTimeSliderColors_Fields (tickmark)(positionMarker)(indicator)(selection)(selectionMarker)\
     (pastBackground)(futureBackground)(pastRecording)(futureRecording)(pastMotion)(futureMotion)\
     (separator)(dateOverlay)(dateOverlayAlternate)(pastLastMinute)(futureLastMinute)\
-    (pastBookmark)(futureBookmark)
+    (pastBookmark)(futureBookmark)(pastBookmarkBound)(futureBookmarkBound)
 
 struct QnTimeScrollBarColors {
     QnTimeScrollBarColors();
@@ -67,15 +69,19 @@ struct QnCalendarColors {
     QColor selection;
     QColor primaryRecording;
     QColor secondaryRecording;
+    QColor primaryBookmark;
+    QColor secondaryBookmark;
     QColor primaryMotion;
     QColor secondaryMotion;
     QColor separator;
 
     /* These are defined in calendar_item_delegate.cpp. */
-    QColor primary(int fillType) const;
-    QColor secondary(int fillType) const;
+    QColor getBackground(int fillType
+        , bool isPrimary) const;
+    QColor getMotionBackground(bool isPrimary) const;
 };
-#define QnCalendarColors_Fields (selection)(primaryRecording)(secondaryRecording)(primaryMotion)(secondaryMotion)(separator)
+#define QnCalendarColors_Fields (selection)(primaryRecording)(secondaryRecording)\
+    (primaryBookmark)(secondaryBookmark)(primaryMotion)(secondaryMotion)(separator)
 
 
 struct QnStatisticsColors {
@@ -95,8 +101,9 @@ struct QnIoModuleColors {
     QnIoModuleColors();
 
     QColor idLabel;
+    QColor buttonBackground;
 };
-#define QnIoModuleColors_Fields (idLabel)
+#define QnIoModuleColors_Fields (idLabel)(buttonBackground)
 
 
 struct QnScheduleGridColors {
@@ -156,6 +163,20 @@ struct QnResourceWidgetFrameColors {
     QColor selected;
 };
 #define QnResourceWidgetFrameColors_Fields (normal)(active)(selected)
+
+
+struct QnBookmarkColors {
+    QnBookmarkColors();
+
+    QColor tooltipBackground;
+    QColor background;
+    QColor text;
+
+    QColor separator;
+    QColor tags;
+};
+
+#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)(separator)(tags)
 
 
 struct QnLicensesListModelColors {
@@ -232,6 +253,13 @@ struct QnServerUpdatesColors {
 };
 #define QnServerUpdatesColors_Fields (latest)(target)(error)
 
+struct QnBackupScheduleColors {
+    QnBackupScheduleColors();
+
+    QColor weekEnd;
+};
+#define QnBackupScheduleColors_Fields (weekEnd)
+
 struct QnFailoverPriorityColors {
     QnFailoverPriorityColors();
 
@@ -242,6 +270,16 @@ struct QnFailoverPriorityColors {
 };
 #define QnFailoverPriorityColors_Fields (never)(low)(medium)(high)
 
+struct QnBackupCamerasColors {
+    QnBackupCamerasColors();
+
+    QColor disabled;
+    QColor low;
+    QColor high;
+    QColor both;
+};
+#define QnBackupCamerasColors_Fields (disabled)(low)(high)(both)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -249,8 +287,9 @@ struct QnFailoverPriorityColors {
     (QnRoutingManagementColors)(QnAuditLogColors)(QnRecordingStatsColors)(QnVideowallManageWidgetColors) \
     (QnUserManagementColors) \
     (QnServerUpdatesColors)(QnIoModuleColors) \
+    (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
-
+    (QnBackupCamerasColors) \
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,

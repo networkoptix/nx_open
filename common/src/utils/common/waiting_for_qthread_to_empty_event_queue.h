@@ -6,10 +6,11 @@
 #ifndef WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
 #define WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H
 
-#include <QMutex>
 #include <QObject>
 #include <QThread>
-#include <QWaitCondition>
+
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include "joinable.h"
 
@@ -44,8 +45,8 @@ public slots:
 private:
     const int m_howManyTimesToWait;
     int m_waitsDone;
-    QMutex m_mutex;
-    QWaitCondition m_condVar;
+    QnMutex m_mutex;
+    QnWaitCondition m_condVar;
 };
 
 #endif  //WAITING_FOR_QTHREAD_TO_EMPTY_EVENT_QUEUE_H

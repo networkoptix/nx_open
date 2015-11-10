@@ -82,7 +82,7 @@ void QnInstallUpdatesPeerTask::doStart() {
         return;
     }
 
-    m_ecServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    m_ecServer = qnCommon->currentServer();
 
     connect(qnResPool, &QnResourcePool::resourceChanged, this, &QnInstallUpdatesPeerTask::at_resourceChanged);
 

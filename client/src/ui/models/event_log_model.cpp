@@ -4,19 +4,21 @@
 
 #include <QtGui/QPalette>
 
+#include <business/events/reasoned_business_event.h>
+#include <business/business_strings_helper.h>
+
+#include <core/resource/resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <ui/common/ui_resource_name.h>
+#include <ui/style/resource_icon_cache.h>
+#include <ui/help/business_help.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
-#include "core/resource/resource.h"
-#include "business/events/reasoned_business_event.h"
-#include "core/resource_management/resource_pool.h"
-#include "ui/style/resource_icon_cache.h"
-#include <ui/help/business_help.h>
-#include "business/business_strings_helper.h"
-#include "client/client_globals.h"
 #include <utils/math/math.h>
-#include <plugins/resource/server_camera/server_camera.h>
-#include "client/client_settings.h"
-#include <ui/common/ui_resource_name.h>
 
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -28,7 +30,11 @@ QHash<QnUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
 class QnEventLogModel::DataIndex
 {
 public:
-    DataIndex(): m_sortCol(DateTimeColumn), m_sortOrder(Qt::DescendingOrder), m_size(0)
+    DataIndex(QnEventLogModel *parent)
+        : m_parent(parent)
+        , m_sortCol(DateTimeColumn)
+        , m_sortOrder(Qt::DescendingOrder)
+        , m_size(0)
     {
         static bool firstCall = true;
         if (firstCall) {
@@ -191,7 +197,7 @@ public:
         default:
             lessThan = &lessLexographic;
             for (int i = 0; i < m_records.size(); ++i)
-                m_records[i]->compareString = QnEventLogModel::textData(m_sortCol, *m_records[i]);
+                m_records[i]->compareString = m_parent->textData(m_sortCol, *m_records[i]);
             break;
         }
 
@@ -199,6 +205,7 @@ public:
     }
 
 private:
+    QnEventLogModel *m_parent; 
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
     QVector<QnBusinessActionDataListPtr> m_events;
@@ -215,18 +222,20 @@ int QnEventLogModel::DataIndex::m_actionTypeToLexOrder[256];
 // -------------------------------------------------------------------------- //
 // QnEventLogModel
 // -------------------------------------------------------------------------- //
-QnEventLogModel::QnEventLogModel(QObject *parent):
-    base_type(parent),
-    m_linkBrush(QPalette().link())
+QnEventLogModel::QnEventLogModel(QObject *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , m_columns()
+    , m_linkBrush(QPalette().link())
+    , m_linkFont()
+    , m_index(new DataIndex(this))
 {
     m_linkFont.setUnderline(true);
-    m_index = new DataIndex();
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnEventLogModel::at_resource_removed);
 }
 
 QnEventLogModel::~QnEventLogModel() {
-    delete m_index;
 }
 
 void QnEventLogModel::setEvents(const QVector<QnBusinessActionDataListPtr> &events) {
@@ -387,11 +396,12 @@ QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value) {
     return QString();
 }
 
-QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action) {
+QString QnEventLogModel::textData(const Column& column,const QnBusinessActionData& action) const {
     switch(column) {
     case DateTimeColumn: {
-        qint64 timestampUsec = action.eventParams.eventTimestampUsec;
-        QDateTime dt = QDateTime::fromMSecsSinceEpoch(timestampUsec/1000);
+        qint64 timestampMs = action.eventParams.eventTimestampUsec / 1000;
+
+        QDateTime dt = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampMs);
         return dt.toString(Qt::SystemLocaleShortDate);
     }
     case EventColumn:
@@ -423,7 +433,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                 result = tr("Motion video");
         }
         else {
-            result = QnBusinessStringsHelper::eventDetails(action.eventParams, 1, lit("\n"));
+            result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
         }
 
         if (!QnBusiness::hasToggleState(eventType)) {

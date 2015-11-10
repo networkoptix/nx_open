@@ -54,9 +54,6 @@ signals:
 
     void videowallControlMessageReceived(const QnVideoWallControlMessage &message);
 
-    void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
-    void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
-
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
     void remotePeerFound(const ec2::ApiPeerAliveData &data);
     void remotePeerLost(const ec2::ApiPeerAliveData &data);
@@ -81,7 +78,7 @@ protected:
 
     virtual void resetResources(const QnResourceList &resources);
     void resetLicenses(const QnLicenseList &licenses);
-    void resetCameraServerItems(const QnCameraHistoryList &cameraHistoryList);
+    void resetCamerasWithArchiveList(const ec2::ApiServerFootageDataList &cameraHistoryList);
     
     virtual bool canRemoveResource(const QnUuid& resourceId);
     virtual void removeResourceIgnored(const QnUuid& resourceId);
@@ -105,8 +102,7 @@ private slots:
 
     void on_cameraUserAttributesChanged(const QnCameraUserAttributesPtr& userAttributes);
     void on_cameraUserAttributesRemoved(const QnUuid& cameraID);
-    void on_cameraHistoryChanged(const QnCameraHistoryItemPtr &cameraHistory);
-    void on_cameraHistoryRemoved(const QnCameraHistoryItemPtr &cameraHistory);
+    void on_cameraHistoryChanged(const ec2::ApiServerFootageData &cameraHistory);
 
     void on_mediaServerUserAttributesChanged(const QnMediaServerUserAttributesPtr& userAttributes);
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverID);

@@ -20,7 +20,7 @@ QnImageFilterHelper::QnImageFilterHelper():
 {
 }
 
-void QnImageFilterHelper::setVideoLayout(QnConstResourceVideoLayoutPtr layout)
+void QnImageFilterHelper::setVideoLayout(const QnConstResourceVideoLayoutPtr &layout)
 {
     m_layout = layout;
 }

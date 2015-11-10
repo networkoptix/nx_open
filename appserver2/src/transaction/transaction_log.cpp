@@ -11,8 +11,6 @@
 #include "utils/common/synctime.h"
 #include "utils/common/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
-
 
 namespace ec2
 {
@@ -119,7 +117,7 @@ qint64 QnTransactionLog::getTimeStamp()
     qint64 absoluteTime = qnSyncTime->currentMSecsSinceEpoch();
     qint64 newTime = absoluteTime;
 
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (newTime > m_lastTimestamp)
     {
         m_baseTime = m_lastTimestamp = newTime;
@@ -173,14 +171,6 @@ QnUuid QnTransactionLog::transactionHash(const ApiResourceParamWithRefData& para
     hash.addData("res_params");
     hash.addData(param.resourceId.toRfc4122());
     hash.addData(param.name.toUtf8());
-    return QnUuid::fromRfc4122(hash.result());
-}
-
-QnUuid QnTransactionLog::makeHash(const QString& extraData, const ApiCameraBookmarkTagDataList& data) const {
-    QCryptographicHash hash(QCryptographicHash::Md5);
-    hash.addData(extraData.toUtf8());
-    for(const ApiCameraBookmarkTagData tag: data)
-        hash.addData(tag.name.toUtf8());
     return QnUuid::fromRfc4122(hash.result());
 }
 
@@ -276,7 +266,7 @@ ErrorCode QnTransactionLog::saveToDB(const QnAbstractTransaction& tran, const Qn
     */
     m_commitData.updateHistory[hash] = UpdateHistoryData(key, tran.persistentInfo.timestamp);
 
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_lastTimestamp = qMax(m_lastTimestamp, tran.persistentInfo.timestamp);
     return ErrorCode::ok;
 }
@@ -415,13 +405,13 @@ void QnTransactionLog::fillPersistentInfo(QnAbstractTransaction& tran)
 
 qint64 QnTransactionLog::getTransactionLogTime() const
 {
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     return m_lastTimestamp;
 }
 
 void QnTransactionLog::setTransactionLogTime(qint64 value)
 {
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     m_lastTimestamp = qMax(value, m_lastTimestamp);
 }
 

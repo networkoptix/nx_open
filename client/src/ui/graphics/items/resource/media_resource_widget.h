@@ -5,10 +5,13 @@
 
 #include <QtGui/QStaticText>
 
+#include <camera/camera_bookmarks_manager_fwd.h>
+
 #include <core/resource/resource_fwd.h>
 
 #include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
 #include <core/resource/motion_window.h>
+#include <core/resource/camera_bookmark_fwd.h>
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/ptz/item_dewarping_params.h>
@@ -16,12 +19,15 @@
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
 class QnResourceDisplay;
 class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
+class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
+class QnBookmarksOverlayWidget;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -161,7 +167,6 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
-
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -184,6 +189,7 @@ private slots:
     void at_videoLayoutChanged();
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
+    void createButtons();
 
     Q_SLOT void updateDisplay();
     Q_SLOT void updateAspectRatio();
@@ -194,6 +200,15 @@ private:
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
+
+    void updateBookmarksMode();
+    void updateBookmarksFilter();
+    void updateBookmarks();
+    void updateBookmarksVisibility();
+
+    qint64 getDisplayTimeUsec() const;
+    qint64 getUtcCurrentTimeUsec() const;
+    qint64 getUtcCurrentTimeMs() const;
 
 private:
     struct ResourceStates
@@ -250,8 +265,15 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
+    QnCameraBookmarkList m_bookmarks;
+    QnCameraBookmarksQueryPtr m_bookmarksQuery;
+    QnBookmarksOverlayWidget *m_bookmarksOverlayWidget;
+
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
+
+    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
+    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

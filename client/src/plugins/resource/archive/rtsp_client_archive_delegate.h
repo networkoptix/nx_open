@@ -80,7 +80,7 @@ private:
     void lockTime(qint64 value);
     void unlockTime();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     RTPSession m_rtspSession;
     RTPIODevice* m_rtpData;
     quint8* m_rtpDataBuffer;
@@ -121,7 +121,7 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
-    mutable QMutex m_timeMutex;
+    mutable QnMutex m_timeMutex;
     qint64 m_lockedTime;
 };
 

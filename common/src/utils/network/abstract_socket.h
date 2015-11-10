@@ -146,14 +146,14 @@ public:
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     template<class HandlerType>
-    bool post( HandlerType&& handler ) { return postImpl( std::forward<HandlerType>(handler) ); }
+    void post( HandlerType&& handler ) { postImpl( std::forward<HandlerType>(handler) ); }
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
     template<class HandlerType>
-    bool dispatch( HandlerType&& handler ) { return dispatchImpl( std::forward<HandlerType>(handler) ); }
+    void dispatch( HandlerType&& handler ) { dispatchImpl( std::forward<HandlerType>(handler) ); }
     //!Terminates socket operations. This means that no operations can be executed on socket after this call
     /*!
         \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
@@ -161,8 +161,8 @@ public:
     virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) = 0;
 
 protected:
-    virtual bool postImpl( std::function<void()>&& handler ) = 0;
-    virtual bool dispatchImpl( std::function<void()>&& handler ) = 0;
+    virtual void postImpl( std::function<void()>&& handler ) = 0;
+    virtual void dispatchImpl( std::function<void()>&& handler ) = 0;
 };
 
 //!Interface for writing to/reading from socket

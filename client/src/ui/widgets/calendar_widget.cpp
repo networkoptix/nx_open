@@ -26,13 +26,14 @@ namespace {
 } // anonymous namespace
 
 
-QnCalendarWidget::QnCalendarWidget(QWidget *parent):
-    base_type(parent),
-    m_delegate(new QnCalendarItemDelegate(this)),
-    m_empty(true),
-    m_currentTimePeriodsVisible(false),
-    m_currentTime(0),
-    m_localOffset(0)
+QnCalendarWidget::QnCalendarWidget(QWidget *parent)
+    : base_type(parent)
+    , m_delegate(new QnCalendarItemDelegate(this))
+    , m_empty(true)
+    , m_currentTimePeriodsVisible(false)
+    , m_currentTime(0)
+    , m_localOffset(0)
+    , m_navigationBar(nullptr)
 {
     setHorizontalHeaderFormat(QCalendarWidget::ShortDayNames);
     setVerticalHeaderFormat(QCalendarWidget::NoVerticalHeader);
@@ -60,9 +61,11 @@ QnCalendarWidget::QnCalendarWidget(QWidget *parent):
     QAbstractItemModel *model = tableView->model();
     connect(model, SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(updateEnabledPeriod()));
 
-    QWidget *navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
-    navigationBar->setBackgroundRole(QPalette::Window);
-
+    m_navigationBar = findChild<QWidget *>(QLatin1String("qt_calendar_navigationbar"));
+    
+    Q_ASSERT_X(m_navigationBar, Q_FUNC_INFO, "Navigator bar is nullptr!");
+    m_navigationBar->setBackgroundRole(QPalette::Window);
+    
     updateEnabledPeriod();
     updateCurrentTime();
     updateEmpty();
@@ -114,23 +117,20 @@ bool QnCalendarWidget::isEmpty() {
     return m_empty;
 }
 
-void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const {
+void QnCalendarWidget::paintCell(QPainter *painter, const QRect &rect, const QDate &date) const
+{
     QnTimePeriod period(QDateTime(date).toMSecsSinceEpoch(), DAY); 
     if (period.startTimeMs > m_currentTime)
         period = QnTimePeriod();
 
-    m_delegate->paintCell(
-        painter, 
-        palette(), 
-        rect, 
-        period, 
-        m_localOffset,
-        m_enabledPeriod, 
-        m_selectedPeriod, 
-        m_currentTimePeriodsVisible ? m_currentPeriodStorage : m_emptyPeriodStorage,
-        m_syncedPeriodStorage, 
-        QString::number(date.day())
-    );
+    const QnTimePeriod localPeriod(period.startTimeMs - m_localOffset, period.durationMs);
+    const bool isEnabled = m_enabledPeriod.intersects(localPeriod);
+    const bool isSelected = m_selectedPeriod.intersects(localPeriod);
+
+    const QnTimePeriodStorage &primaryPeriods = 
+        (m_currentTimePeriodsVisible ? m_currentPeriodStorage : m_emptyPeriodStorage);
+    m_delegate->paintCell(painter, rect, localPeriod, primaryPeriods, m_syncedPeriodStorage, isEnabled, isSelected);
+    m_delegate->paintCellText(painter, palette(), rect, QString::number(date.day()), isEnabled);
 }
 
 void QnCalendarWidget::updateEmpty() {
@@ -185,3 +185,9 @@ void QnCalendarWidget::setLocalOffset(qint64 localOffset) {
 
     update();
 }
+
+int QnCalendarWidget::headerHeight() const
+{
+    return m_navigationBar->height();
+}
+

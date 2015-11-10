@@ -188,6 +188,11 @@ namespace Qn {
         OpenFailoverPriorityAction,
 
         /**
+         * Opens the Backup Cameras dialog.
+         */
+        OpenBackupCamerasAction,
+
+        /**
          * Opens videowall control layouts for all items in the provided QnVideoWallItemIndexList.
          */
         StartVideoWallControlAction,
@@ -353,9 +358,9 @@ namespace Qn {
         BusinessEventsAction,
 
         /**
-         * Opens business events log dialog.
+         * Opens bookmarks dialog.
          */
-        BusinessEventsLogAction,
+        OpenBookmarksSearchAction,
 
         /**
          * Opens camera list dialog.
@@ -937,6 +942,11 @@ namespace Qn {
         ToggleThumbnailsAction,
 
         /**
+         * Shows/hides bookmarks.
+         */
+        BookmarksModeAction,
+
+        /**
          * Shows/hides calendar.
          */
         ToggleCalendarAction,
@@ -957,14 +967,19 @@ namespace Qn {
         PinTreeAction,
 
         /**
+         * Pins/unpins calendar and day/time view
+         */
+        PinCalendarAction,
+
+        /** 
+         * Minimazes day/time view
+         */
+        MinimizeDayTimeViewAction,
+
+        /**
          * Shows/hides slider.
          */
         ToggleSliderAction,
-
-        /** 
-         * Shows/hides bookmarks search panel.
-         */
-        ToggleBookmarksSearchAction,
 
         PinNotificationsAction,
 

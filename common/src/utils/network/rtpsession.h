@@ -1,6 +1,8 @@
 #ifndef rtp_session_h_1935_h
 #define rtp_session_h_1935_h
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include <fstream>
 #include <memory>
 #include <vector>
@@ -19,7 +21,7 @@ extern "C"
 #include <QtCore/QUrl>
 #include "../common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
-#include <network/authenticate_helper.h>
+#include "network/client_authenticate_helper.h"
 #include "http/httptypes.h"
 
 //#define DEBUG_TIMINGS
@@ -73,7 +75,7 @@ private:
 
     struct CamSyncInfo {
         CamSyncInfo(): timeDiff(INT_MAX), driftSum(0) {}
-        QMutex mutex;
+        QnMutex mutex;
         double timeDiff;
         QnUnsafeQueue<qint64> driftStats;
         qint64 driftSum;
@@ -82,7 +84,7 @@ private:
     QSharedPointer<CamSyncInfo> m_cameraClockToLocalDiff;
     QString m_resId;
 
-    static QMutex m_camClockMutex;
+    static QnMutex m_camClockMutex;
     static QMap<QString, QPair<QSharedPointer<QnRtspTimeHelper::CamSyncInfo>, int> > m_camClock;
     qint64 m_lastWarnTime;
 
@@ -362,7 +364,7 @@ private:
     TransportType m_prefferedTransport;
 
     static QByteArray m_guid; // client guid. used in proprietary extension
-    static QMutex m_guidMutex;
+    static QnMutex m_guidMutex;
 
     std::vector<QSharedPointer<SDPTrackInfo> > m_rtpToTrack;
     QString m_reasonPhrase;
@@ -372,7 +374,7 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
-    mutable QMutex m_sockMutex;
+    mutable QnMutex m_sockMutex;
     QByteArray m_userAgent;
 #ifdef _DUMP_STREAM
     std::ofstream m_inStreamFile;
@@ -392,5 +394,7 @@ private:
     */
     bool sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responce );
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif //rtp_session_h_1935_h

@@ -1,12 +1,14 @@
 #ifndef MULTICAST_MODULE_FINDER_H
 #define MULTICAST_MODULE_FINDER_H
 
-#include <QtCore/QMutex>
 #include <QCache>
 
 #include <utils/common/long_runnable.h>
-#include "aio/pollset.h"
+#include <utils/network/aio/pollset.h>
+#include <utils/thread/mutex.h>
+
 #include "networkoptixmodulerevealcommon.h"
+
 
 class UDPSocket;
 struct QnModuleInformation;
@@ -53,6 +55,8 @@ class QnMulticastModuleFinder : public QnLongRunnable {
     //! \param compatibilityMode         New compatibility mode state.
     void setCompatibilityMode(bool compatibilityMode);
 
+    void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
+
 public slots:
     virtual void pleaseStop() override;
 private slots:
@@ -69,20 +73,21 @@ private:
     void updateInterfaces();
     RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     aio::PollSet m_pollSet;
     QHash<QHostAddress, UDPSocket*> m_clientSockets;
     UDPSocket *m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
+    unsigned int m_checkInterfacesTimeoutMs;
     quint64 m_lastInterfacesCheckMs;
     bool m_compatibilityMode;
     QHostAddress m_multicastGroupAddress;
     quint16 m_multicastGroupPort;
     QCache<QByteArray, RevealResponse> m_cachedResponse;
     QByteArray m_serializedModuleInfo;
-    mutable QMutex m_moduleInfoMutex;
+    mutable QnMutex m_moduleInfoMutex;
 };
 
 #endif // MULTICAST_MODULE_FINDER_H

@@ -15,7 +15,7 @@ public:
     AbstractStreamServerSocket* serverSocket;
     QList<QnLongRunnable*> connections;
     QByteArray authDigest;
-    QMutex connectionMtx;
+    QnMutex connectionMtx;
     std::atomic<int> newPort;
     QHostAddress serverAddress;
     std::atomic<int> localPort;
@@ -88,7 +88,7 @@ bool QnTcpListener::bindToLocalAddress()
 {
     Q_D(QnTcpListener);
 
-    d->serverSocket = SocketFactory::createStreamServerSocket(true/*d->useSSL*/);
+    d->serverSocket = SocketFactory::createStreamServerSocket(d->useSSL);
     if( !d->serverSocket->setReuseAddrFlag( true ) ||
         !d->serverSocket->bind( SocketAddress( d->serverAddress.toString(), d->localPort ) ) ||
         !d->serverSocket->listen() )
@@ -117,7 +117,7 @@ void QnTcpListener::removeDisconnectedConnections()
     QVector<QnLongRunnable*> toDeleteList;
 
     {
-        QMutexLocker lock(&d->connectionMtx);
+        QnMutexLocker lock( &d->connectionMtx );
         for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end();)
         {
             QnLongRunnable* processor = *itr;
@@ -137,7 +137,7 @@ void QnTcpListener::removeDisconnectedConnections()
 void QnTcpListener::removeOwnership(QnLongRunnable* processor)
 {
     Q_D(QnTcpListener);
-    QMutexLocker lock(&d->connectionMtx);
+    QnMutexLocker lock( &d->connectionMtx );
     for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
     {
         if (processor == *itr) {
@@ -151,7 +151,7 @@ void QnTcpListener::addOwnership(QnLongRunnable* processor)
 {
     Q_D(QnTcpListener);
 
-    QMutexLocker lock(&d->connectionMtx);
+    QnMutexLocker lock( &d->connectionMtx );
     d->connections << processor;
 }
 
@@ -176,7 +176,7 @@ void QnTcpListener::removeAllConnections()
 
     QList<QnLongRunnable*> oldConnections = d->connections;
     {
-        QMutexLocker lock(&d->connectionMtx);
+        QnMutexLocker lock( &d->connectionMtx );
 
         for (QList<QnLongRunnable*>::iterator itr = d->connections.begin(); itr != d->connections.end(); ++itr)
         {
@@ -263,7 +263,7 @@ void QnTcpListener::run()
                 clientSocket->setRecvTimeout(processor->getSocketTimeout());
                 clientSocket->setSendTimeout(processor->getSocketTimeout());
                 
-                QMutexLocker lock(&d->connectionMtx);
+                QnMutexLocker lock( &d->connectionMtx );
                 d->connections << processor;
                 processor->start();
             }

@@ -163,9 +163,9 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         initActionParameters();
     }
 
-    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField)) {
-        bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
-        ui->eventStatesComboBox->setVisible(prolonged);
+    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField)) {
+        bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
+        ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
     if (fields & QnBusiness::ActionResourcesField) {
@@ -302,8 +302,7 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    bool prolonged = QnBusiness::hasToggleState(m_model->eventType()) && !QnBusiness::hasToggleState(m_model->actionType());
-    if (!prolonged)
+    if (!QnBusiness::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
@@ -362,10 +361,13 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked() {
     QnBusiness::ActionType actionType = m_model->actionType();
     if (actionType == QnBusiness::CameraRecordingAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
+    if (actionType == QnBusiness::BookmarkAction)
+        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
     else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
     else if (actionType == QnBusiness::SendMailAction)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnUserEmailPolicy>(this));
+
     dialog.setSelectedResources(m_model->actionResources());
 
     if (dialog.exec() != QDialog::Accepted)

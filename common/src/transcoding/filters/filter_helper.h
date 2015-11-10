@@ -14,7 +14,7 @@ class QnImageFilterHelper
 public:
     QnImageFilterHelper();
 
-    void setVideoLayout(QnConstResourceVideoLayoutPtr layout); // tiled image filter
+    void setVideoLayout(const QnConstResourceVideoLayoutPtr &layout); // tiled image filter
     void setCustomAR(qreal customAR); // tiled image filter
     void setRotation(int angle); // rotate image filter
     void setSrcRect(const QRectF& cropRect); // crop image filter

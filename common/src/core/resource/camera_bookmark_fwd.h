@@ -1,19 +1,18 @@
-#ifndef QN_CAMERA_BOOKMARK_FWD_H
-#define QN_CAMERA_BOOKMARK_FWD_H
+#pragma once
+
+#include <functional>
 
 #include <QtCore/QList>
-
-#include <utils/common/model_functions_fwd.h>
+#include <QtCore/QStringList>
 
 struct QnCameraBookmark;
-typedef QList<QnCameraBookmark> QnCameraBookmarkList;
+typedef QVector<QnCameraBookmark> QnCameraBookmarkList;
+typedef std::vector<QnCameraBookmarkList> QnMultiServerCameraBookmarkList;
 
 struct QnCameraBookmarkSearchFilter;
 
-typedef QStringList QnCameraBookmarkTags;
+typedef QSet<QString> QnCameraBookmarkTags;
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq))
-
-#endif // QN_CAMERA_BOOKMARK_FWD_H
-
+struct QnCameraBookmarkTag;
+typedef QVector<QnCameraBookmarkTag> QnCameraBookmarkTagList;
+typedef std::vector<QnCameraBookmarkTagList> QnMultiServerCameraBookmarkTagList;

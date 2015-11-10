@@ -4,7 +4,6 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
-#include <network/authenticate_helper.h>
 #include <utils/common/app_info.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>

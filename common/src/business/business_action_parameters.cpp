@@ -2,14 +2,22 @@
 
 #include <utils/common/model_functions.h>
 
-QnBusinessActionParameters::QnBusinessActionParameters() {
-    userGroup = QnBusiness::EveryOne;
-    fps = 10;
-    streamQuality = Qn::QualityHighest;
-    recordingDuration = 0;
-    recordAfter = 0;
-    relayAutoResetTimeout = 0;
-}
+QnBusinessActionParameters::QnBusinessActionParameters()
+    : actionResourceId()
+    , soundUrl()
+    , emailAddress()
+    , userGroup(QnBusiness::EveryOne)
+    , fps(10)
+    , streamQuality(Qn::QualityHighest)
+    , recordingDuration(0)
+    , recordAfter(0)
+    , relayOutputId()
+    , relayAutoResetTimeout(0)
+    , inputPortId()
+    , sayText()
+    , tags()
+    , bookmarkDuration(0)
+{}
 
 
 bool QnBusinessActionParameters::isDefault() const

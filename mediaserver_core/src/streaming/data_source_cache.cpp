@@ -4,7 +4,7 @@
 
 #include "data_source_cache.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include "streaming_chunk_cache_key.h"
 
@@ -21,7 +21,7 @@ DataSourceCache::~DataSourceCache()
         //only DataSourceCache::onTimer method can be called while we are here
     std::map<quint64, StreamingChunkCacheKey> timers;
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_terminated = true;
         std::swap( timers, m_timers );
     }
@@ -33,7 +33,7 @@ DataSourceCache::~DataSourceCache()
 DataSourceContextPtr DataSourceCache::take( const StreamingChunkCacheKey& key )
 {
     TimerManager::TimerGuard timerGuard;
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     //searching reader in cache
     for( auto it = m_cachedDataProviders.begin(); it != m_cachedDataProviders.end(); )
@@ -64,7 +64,7 @@ void DataSourceCache::put(
     DataSourceContextPtr data,
     const unsigned int livetimeMs )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     const quint64 timerID = TimerManager::instance()->addTimer(
         this,
         livetimeMs == 0 ? DEFAULT_LIVE_TIME_MS : livetimeMs );
@@ -77,7 +77,7 @@ void DataSourceCache::removeRange(
     const StreamingChunkCacheKey& endKey )
 {
     std::list<TimerManager::TimerGuard> timerGuards;
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     for( auto
         it = m_cachedDataProviders.lower_bound( beginKey );
         it != m_cachedDataProviders.end() && (it->first < endKey);
@@ -90,7 +90,7 @@ void DataSourceCache::removeRange(
 
 void DataSourceCache::onTimer( const quint64& timerID )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if( m_terminated )
         return;
 

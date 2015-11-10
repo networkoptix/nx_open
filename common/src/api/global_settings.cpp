@@ -47,6 +47,7 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+    const QString nameDefaultBackupQualities(lit("defaultBackupQualities"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -69,6 +70,8 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
+    m_defaultBackupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameDefaultBackupQualities, Qn::CameraBackup_Disabled, this);
+
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
@@ -109,7 +112,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_ldapSearchFilterAdaptor
         ;
 
-    m_allAdaptors 
+    m_allAdaptors
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
@@ -117,6 +120,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << emailAdaptors
         << ldapAdaptors
         << m_auditTrailEnabledAdaptor
+        << m_defaultBackupQualitiesAdaptor
         ;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -191,7 +195,7 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     if(!user->isAdmin())
         return;
 
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
 
     m_admin = user;
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
@@ -202,7 +206,7 @@ void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &reso
     if (!m_admin || resource != m_admin)
         return;
 
-    QMutexLocker locker(&m_mutex);
+    QnMutexLocker locker( &m_mutex );
     m_admin.reset();
 
     for (QnAbstractResourcePropertyAdaptor* adaptor: m_allAdaptors)
@@ -279,4 +283,12 @@ bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
 
 void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled) {
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
+}
+
+Qn::CameraBackupQualities QnGlobalSettings::defaultBackupQualities() const {
+    return m_defaultBackupQualitiesAdaptor->value();
+}
+
+void QnGlobalSettings::setDefauldBackupQualities( Qn::CameraBackupQualities value ) {
+    m_defaultBackupQualitiesAdaptor->setValue(value);
 }

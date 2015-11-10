@@ -11,6 +11,7 @@
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
 #include <utils/common/log.h>
+#include <utils/common/unused.h>
 #include <utils/common/singleton.h>
 
 
@@ -219,10 +220,7 @@ namespace ec2
         ErrorCode doQueryNoLock(const QnUuid& mServerId, ApiMediaServerDataExList& cameraList);
 
         //getCameraServerItems
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraServerItemDataList& historyList);
-
-        //getCameraBookmarkTags
-        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags);
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiServerFootageDataList& historyList);
 
         //getUserList
         ErrorCode doQueryNoLock(const QnUuid& userId, ApiUserDataList& userList);
@@ -271,7 +269,7 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraServerItemData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiServerFootageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFileData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStoredFilePath> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceData>& tran);
@@ -293,9 +291,6 @@ namespace ec2
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLicenseData>& tran);
-
-        /* Add or remove camera bookmark tags */
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList>& tran);
 
         ErrorCode executeTransactionInternal(const QnTransaction<ApiIdDataList>& /*tran*/)
         {
@@ -502,9 +497,6 @@ namespace ec2
         ErrorCode saveLicense(const ApiLicenseData& license);
         ErrorCode removeLicense(const ApiLicenseData& license);
 
-        ErrorCode addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
-        ErrorCode removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag);
-
         ErrorCode insertOrReplaceStoredFile(const QString &fileName, const QByteArray &fileContents);
 
         bool createDatabase();
@@ -532,6 +524,7 @@ namespace ec2
         bool updateTableGuids(const QString& tableName, const QString& fieldName, const QMap<int, QnUuid>& guids);
         bool updateResourceTypeGuids();
         bool updateGuids();
+        bool updateBusinessActionParameters();
         QnUuid getType(const QString& typeName);
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
@@ -541,15 +534,16 @@ namespace ec2
 
         virtual bool beforeInstallUpdate(const QString& updateName) override;
         virtual bool afterInstallUpdate(const QString& updateName) override;
-        ErrorCode addCameraHistory(const ApiCameraServerItemData& params);
-        ErrorCode removeCameraHistory(const ApiCameraServerItemData& params);
+
+        ErrorCode addCameraHistory(const ApiServerFootageData& params);
+        ErrorCode removeCameraHistory(const QnUuid& serverId);
         ErrorCode getScheduleTasks(const QnUuid& serverId, std::vector<ApiScheduleTaskWithRefData>& scheduleTaskList);
         void addResourceTypesFromXML(ApiResourceTypeDataList& data);
         void loadResourceTypeXML(const QString& fileName, ApiResourceTypeDataList& data);
         bool removeServerStatusFromTransactionLog();
         bool removeEmptyLayoutsFromTransactionLog();
         bool tuneDBAfterOpen();
-        bool updateCameraHistoryGuids();
+        bool removeOldCameraHistory();
         bool migrateServerGUID(const QString& table, const QString& field);
         bool removeWrongSupportedMotionTypeForONVIF();
         bool fixBusinessRules();

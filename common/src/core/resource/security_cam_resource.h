@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
 
@@ -14,6 +14,7 @@
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
 
+#include <mutex>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -163,6 +164,12 @@ public:
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
 
+    Qn::CameraBackupQualities getBackupQualities() const;
+    void setBackupQualities(Qn::CameraBackupQualities value);
+
+    /** Get backup qualities, substantiating default value. */
+    Qn::CameraBackupQualities getActualBackupQualities() const;
+
     QString getModel() const;
     void setModel(const QString &model);
 
@@ -245,6 +252,10 @@ public:
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
+
+    bool isCameraInfoSavedToDisk() const;
+    void setCameraInfoSavedToDisk();
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -262,6 +273,7 @@ signals:
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
+    void backupQualitiesChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -291,7 +303,10 @@ protected slots:
 protected:
     void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
+#ifdef ENABLE_DATA_PROVIDERS
     virtual QnAbstractStreamDataProvider* createDataProviderInternal(Qn::ConnectionRole role) override;
+#endif
+
     virtual void initializationDone() override;
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
@@ -311,6 +326,7 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -331,6 +347,8 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
+
+    bool m_cameraInfoSavedToDisk;
 
 private slots:
     void resetCachedValues();

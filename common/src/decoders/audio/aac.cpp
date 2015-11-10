@@ -1,4 +1,7 @@
 #include "aac.h"
+
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "utils/media/bitStream.h"
 
 // convert AAC prifle to mpeg 4 object type.
@@ -155,3 +158,5 @@ bool AACCodec::readConfig(const QByteArray& data)
         return false;
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS

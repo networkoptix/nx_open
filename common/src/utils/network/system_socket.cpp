@@ -294,14 +294,14 @@ bool Socket::getLastError( SystemError::ErrorCode* errorCode )
     return getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
 }
 
-bool Socket::postImpl( std::function<void()>&& handler )
+void Socket::postImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->post( std::move(handler) );
+    m_baseAsyncHelper->post( std::move(handler) );
 }
 
-bool Socket::dispatchImpl( std::function<void()>&& handler )
+void Socket::dispatchImpl( std::function<void()>&& handler )
 {
-    return m_baseAsyncHelper->dispatch( std::move(handler) );
+    m_baseAsyncHelper->dispatch( std::move(handler) );
 }
 
 unsigned short Socket::getLocalPort() const
@@ -410,7 +410,11 @@ bool Socket::fillAddr(
     memset(&hints, 0, sizeof(struct addrinfo));
     hints.ai_family = AF_INET;    /* Allow only IPv4 */
     hints.ai_socktype = 0; /* Any socket */
+#ifndef ANDROID
     hints.ai_flags = AI_ALL;    /* For wildcard IP address */
+#else
+    hints.ai_flags = AI_ADDRCONFIG;    /* AI_ALL isn't supported in getaddrinfo in adnroid */
+#endif
     hints.ai_protocol = 0;          /* Any protocol */
     hints.ai_canonname = NULL;
     hints.ai_addr = NULL;

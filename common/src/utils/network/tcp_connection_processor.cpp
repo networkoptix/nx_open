@@ -157,7 +157,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QnByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -165,7 +165,7 @@ bool QnTCPConnectionProcessor::sendBuffer(const QByteArray& sendBuffer)
 {
     Q_D(QnTCPConnectionProcessor);
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     return sendData(sendBuffer.data(), sendBuffer.size());
 }
 
@@ -245,7 +245,7 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
         arg(d->socket->getForeignAddress().toString()).
         arg(QString::fromLatin1(QByteArray::fromRawData(response.constData(), response.size() - (!contentEncoding.isEmpty() ? d->response.messageBody.size() : 0)))), cl_logDEBUG1 );
 
-    QMutexLocker lock(&d->sockMutex);
+    QnMutexLocker lock( &d->sockMutex );
     sendData(response.data(), response.size());
 }
 
@@ -452,7 +452,7 @@ QUrl QnTCPConnectionProcessor::getDecodedUrl() const
     return d->request.requestLine.url;
 }
 
-void QnTCPConnectionProcessor::execute(QMutex& mutex)
+void QnTCPConnectionProcessor::execute(QnMutex& mutex)
 {
     m_needStop = false;
     mutex.unlock();
@@ -512,10 +512,9 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     result.id = nx_http::getHeaderValue(d->request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     if (result.id.isNull())
         result.id = d->request.getCookieValue(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
-    if (result.id.isNull()) {
-        QUrlQuery query(d->request.requestLine.url.query());
+    const QUrlQuery query(d->request.requestLine.url.query());
+    if (result.id.isNull())
         result.id = query.queryItemValue(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME));
-    }
     if (result.id.isNull()) {
         QByteArray nonce = d->request.getCookieValue("auth");
         if (!nonce.isEmpty()) {
@@ -530,7 +529,9 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
     result.userHost = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_HOST_HEADER_NAME));
     if (result.userHost.isEmpty())
         result.userHost = d->socket->getForeignAddress().address.toString();
-    result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, "User-Agent"));
+    result.userAgent = query.queryItemValue(QLatin1String(Qn::USER_AGENT_HEADER_NAME));
+    if (result.userAgent.isEmpty())
+        result.userAgent = QString::fromUtf8(nx_http::getHeaderValue(d->request.headers, Qn::USER_AGENT_HEADER_NAME));
 
     int trimmedPos = result.userAgent.indexOf(lit("/"));
     if (trimmedPos != -1) {

@@ -2,7 +2,7 @@
 #define __RTSP_CONNECTION_H_
 
 #include <QtNetwork/QHostAddress>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include "utils/network/ffmpeg_sdp.h"
 #include "utils/network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>
@@ -38,7 +38,7 @@ struct RtspServerTrackInfo
     AbstractDatagramSocket* mediaSocket;
     AbstractDatagramSocket* rtcpSocket;
     QnRtspEncoderPtr encoder;
-    static QMutex m_createSocketMutex;
+    static QnMutex m_createSocketMutex;
 };
 typedef QSharedPointer<RtspServerTrackInfo> RtspServerTrackInfoPtr;
 typedef QMap<int, RtspServerTrackInfoPtr> ServerTrackInfoMap;

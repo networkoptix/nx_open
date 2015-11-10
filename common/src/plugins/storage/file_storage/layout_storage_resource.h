@@ -99,8 +99,8 @@ private:
     friend class QnLayoutFile;
     QnLayoutFileIndex m_index;
     QSet<QnLayoutFile*> m_openedFiles;
-    QMutex m_fileSync;
-    static QMutex m_storageSync;
+    QnMutex m_fileSync;
+    static QnMutex m_storageSync;
     static QSet<QnLayoutFileStorageResource*> m_allStorages;
     qint64 m_novFileOffset;
 

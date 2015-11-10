@@ -25,6 +25,7 @@
 #include <ui/common/geometry.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/time_slider_pixmap_cache.h>
 #include <ui/graphics/items/standard/graphics_slider_p.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
@@ -33,9 +34,11 @@
 
 #include <ui/help/help_topics.h>
 
+#include <utils/common/delayed.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/checked_cast.h>
+#include <utils/common/pending_operation.h>
 #include <utils/math/math.h>
 #include <utils/math/color_transformations.h>
 
@@ -189,6 +192,12 @@ namespace {
 
     const int startDragDistance = 5;
 
+    const int bookmarkFontPixelSize = 11;
+    const int bookmarkTextPadding = 6;
+    const int minBookmarkTextCharsVisible = 6;
+    const int bookmarkMergeDistance = 100;
+    const int minBookmarksToMerge = 5;
+    const int mergeBookmarksInterval = 2000;
 
 
     bool checkLine(int line) {
@@ -293,12 +302,10 @@ public:
 
         m_pastColor[Qn::RecordingContent]           = colors.pastRecording;
         m_pastColor[Qn::MotionContent]              = colors.pastMotion;
-        m_pastColor[Qn::BookmarksContent]           = colors.pastBookmark;
         m_pastColor[Qn::TimePeriodContentCount]     = colors.pastBackground;
 
         m_futureColor[Qn::RecordingContent]         = colors.futureRecording;
         m_futureColor[Qn::MotionContent]            = colors.futureMotion;
-        m_futureColor[Qn::BookmarksContent]         = colors.futureBookmark;
         m_futureColor[Qn::TimePeriodContentCount]   = colors.futureBackground;
 
         m_position = m_centralPosition = m_minChunkLength = 0;
@@ -370,23 +377,11 @@ private:
     QColor currentColor(const boost::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
         qreal rc = m_weights[Qn::RecordingContent];
         qreal mc = m_weights[Qn::MotionContent];
-        qreal bc = m_weights[Qn::BookmarksContent];
         qreal nc = m_weights[Qn::TimePeriodContentCount];
         qreal sum = m_pendingLength;
 
-        if (!qFuzzyIsNull(bc) && !(qFuzzyIsNull(mc))) {
-            qreal localSum = mc + bc;
-            return linearCombine(mc / localSum, colors[Qn::MotionContent], bc/localSum, colors[Qn::BookmarksContent]);
-        }
-
-        if (!qFuzzyIsNull(bc)) {
-            /* Make sure bookmark is noticeable even if there isn't much of it. 
-             * Note that these adjustments don't change sum. */
-            rc = rc * (1.0 - lineBarMinNoticeableFraction);
-            bc = sum * lineBarMinNoticeableFraction + bc * (1.0 - lineBarMinNoticeableFraction);
-            nc = nc * (1.0 - lineBarMinNoticeableFraction);
-        } else if (!qFuzzyIsNull(mc)) {
-            /* Make sure motion is noticeable even if there isn't much of it. 
+        if (!qFuzzyIsNull(mc)) {
+            /* Make sure motion is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum. */
             rc = rc * (1.0 - lineBarMinNoticeableFraction);
             mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
@@ -398,13 +393,7 @@ private:
             nc = sum * (1.0 - lineBarMinNoticeableFraction);
         }
 
-        return 
-            linearCombine(
-                1.0,
-                linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
-                1.0, 
-                linearCombine(bc / sum, colors[Qn::BookmarksContent], nc / sum, colors[Qn::TimePeriodContentCount])
-            );
+        return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));
     }
 
 private:
@@ -455,8 +444,10 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 // -------------------------------------------------------------------------- //
 // QnTimeSlider
 // -------------------------------------------------------------------------- //
-QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
+QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
+    , QGraphicsItem *tooltipParent):
     base_type(parent),
+
     m_windowStart(0),
     m_windowEnd(0),
     m_minimalWindow(0),
@@ -474,6 +465,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
+    m_mergeBookmarksPendingOperation(new QnPendingOperation([this](){ mergeBookmarks(); }, mergeBookmarksInterval, this)),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
@@ -485,6 +477,32 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     m_lastMinuteAnimationDelta(0),
     m_pixmapCache(new QnTimeSliderPixmapCache(this)),
     m_localOffset(0)
+
+    , m_currentRulerRectMousePos()
+    , m_lastLineBarValue()
+    , m_bookmarksViewer(new QnBookmarksViewer( 
+        std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
+        , [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
+        {
+            if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
+                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
+
+            const auto viewer = bookmarksViewer();
+            const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+
+            const auto pos = positionFromValue(timestamp);
+            const auto target = QPointF(pos.x(), lineBarRect.top());
+
+            Q_D(const GraphicsSlider);
+
+            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
+        }
+        , this))
+    , m_bookmarksVisible(false)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -531,6 +549,12 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent):
     updateMinimalWindow();
     updatePixmapCache();
     sliderChange(SliderRangeChange);
+
+    m_bookmarksViewer->setParent(this);
+    m_bookmarksViewer->setParentItem(tooltipParent);
+    m_bookmarksViewer->setZValue(std::numeric_limits<qreal>::max());
+    toolTipItem()->setParentItem(tooltipParent);
+    toolTipItem()->stackBefore(m_bookmarksViewer);
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -749,6 +773,7 @@ QnCameraBookmarkList QnTimeSlider::bookmarks() const {
 
 void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
     m_bookmarks = bookmarks;
+    mergeBookmarks();
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -835,12 +860,21 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             m_animating = true;
             setAnimationStart(start);
             setAnimationEnd(end);
-        } else {
+        }
+        else 
+        {
+            m_bookmarksViewer->updateOnWindowChange();
+
+            qint64 oldWindowSize = m_windowEnd - m_windowStart;
+
             m_windowStart = start;
             m_windowEnd = end;
 
             sliderChange(SliderMappingChange);
             emit windowChanged(m_windowStart, m_windowEnd);
+
+            if (oldWindowSize != m_windowEnd - m_windowStart)
+                m_mergeBookmarksPendingOperation->requestOperation();
 
             updateToolTipVisibility();
             updateMSecsPerPixel();
@@ -1203,6 +1237,77 @@ void QnTimeSlider::clearThumbnails() {
     m_thumbnailData.clear();
 }
 
+void QnTimeSlider::mergeBookmarks() {
+    qint64 windowLength = m_windowEnd - m_windowStart;
+    qint64 mergeDistance = windowLength * bookmarkMergeDistance / rect().width();
+
+    m_mergedBookmarks.clear();
+
+    int firstBookmarkIndex = -1;
+    int lastBookmarkIndex = -1;
+
+    auto mergePendingBookmarks = [this](int firstBookmarkIndex, int lastBookmarkIndex) {
+        BookmarkCluster mergedCluster;
+
+        mergedCluster.startTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
+        mergedCluster.firstBookmarkIndex = firstBookmarkIndex;
+        mergedCluster.lastBookmarkIndex = lastBookmarkIndex;
+
+        mergedCluster.endTimeMs = 0;
+        for (int i = firstBookmarkIndex; i <= lastBookmarkIndex; ++i)
+            mergedCluster.endTimeMs = std::max(mergedCluster.endTimeMs, m_bookmarks[i].endTimeMs());
+
+        return mergedCluster;
+    };
+
+    for (int i = 0; i < m_bookmarks.size(); ++i) {
+        const QnCameraBookmark &bookmark = m_bookmarks[i];
+
+        if (firstBookmarkIndex >= 0 && bookmark.startTimeMs - m_bookmarks[firstBookmarkIndex].startTimeMs >= mergeDistance) {
+            if (lastBookmarkIndex - firstBookmarkIndex + 1 >= minBookmarksToMerge) {
+                m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
+            } else {
+                qint64 firstStartTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
+                do {
+                    m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
+                    ++firstBookmarkIndex;
+                } while (firstBookmarkIndex <= lastBookmarkIndex && bookmark.startTimeMs - firstStartTimeMs >= mergeDistance);
+            }
+            firstBookmarkIndex = lastBookmarkIndex = -1;
+        }
+
+        if (firstBookmarkIndex == -1)
+            firstBookmarkIndex = lastBookmarkIndex = i;
+        else
+            ++lastBookmarkIndex;
+    }
+
+    if (firstBookmarkIndex < 0)
+        return;
+
+    if (lastBookmarkIndex - firstBookmarkIndex + 1 >= minBookmarksToMerge) {
+        m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
+    } else {
+        while (firstBookmarkIndex <= lastBookmarkIndex) {
+            m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
+            ++firstBookmarkIndex;
+        }
+    }
+}
+
+QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
+    QnCameraBookmarkList result;
+
+    for (const BookmarkCluster &cluster: m_mergedBookmarks) {
+        if (cluster.startTimeMs <= position && position < cluster.endTimeMs) {
+            for (int i = cluster.firstBookmarkIndex; i <= cluster.lastBookmarkIndex; ++i)
+                result.append(m_bookmarks[i]);
+        }
+    }
+
+    return result;
+}
+
 void QnTimeSlider::freezeThumbnails() {
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
@@ -1268,13 +1373,30 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
     return m_lastMinuteIndicatorVisible[line];
 }
 
+QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
+{
+    return m_bookmarksViewer;
+}
+
+bool QnTimeSlider::isBookmarksVisible() const {
+    return m_bookmarksVisible;
+}
+
+void QnTimeSlider::setBookmarksVisible(bool bookmarksVisible) {
+    if (m_bookmarksVisible == bookmarksVisible)
+        return;
+
+    m_bookmarksVisible = bookmarksVisible;
+
+    update();
+}
+
 int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
     if (thumbnailsRect().contains(pos))
         return Qn::MainWindow_Thumbnails_Help;
-
     bool hasMotion = false;
     for (int i = 0; i < m_lineCount; i++) {
-        if (!timePeriods(i, Qn::MotionContent).isEmpty()) {
+        if (!timePeriods(i, Qn::MotionContent).empty()) {
             hasMotion = true;
             break;
         }
@@ -1682,7 +1804,7 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
     QRectF dateBarRect = positionRect(rulerRect, dateBarPosition);
     QRectF lineBarRect = positionRect(rulerRect, lineBarPosition);
     QRectF tickmarkBarRect = positionRect(rulerRect, tickmarkBarPosition);
-    
+
     qreal lineTop, lineUnit = qFuzzyIsNull(m_totalLineStretch) ? 0.0 : lineBarRect.height() / m_totalLineStretch;
 
     /* Draw background. */
@@ -1706,11 +1828,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 painter,
                 m_lineData[line].timeStorage.aggregated(Qn::RecordingContent),
                 m_lineData[line].timeStorage.aggregated(Qn::MotionContent),
-#ifdef QN_ENABLE_BOOKMARKS
-                m_lineData[line].timeStorage.aggregated(Qn::BookmarksContent),
-#else
-                QnTimePeriodList(),
-#endif
                 lineRect
             );
 
@@ -1729,8 +1846,11 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
                 drawLastMinute(painter, lineRect);
             drawSeparator(painter, lineRect);
 
+
             lineTop += lineHeight;
         }
+
+        drawBookmarks(painter, lineBarRect);
     }
 
     /* Draw thumbnails. */
@@ -1778,11 +1898,6 @@ void QnTimeSlider::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QW
 
     /* Draw dates. */
     drawDates(painter, dateBarRect);
-
-#ifdef QN_ENABLE_BOOKMARKS
-    /* Draw bookmarks. */
-    drawBookmarks(painter, bookmarkRect);
-#endif
 
     /* Draw position marker. */
     drawMarker(painter, sliderPosition(), m_colors.positionMarker);
@@ -1869,7 +1984,7 @@ void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color
     painter->drawLine(QPointF(x, rect.top()), QPointF(x, rect.bottom()));
 }
 
-void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect) {
+void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect) {
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
 
@@ -1879,7 +1994,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
 
     /* Note that constness of period lists is important here as requesting
      * iterators from a non-const object will result in detach. */
-    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion, bookmarks};
+    const QnTimePeriodList periods[Qn::TimePeriodContentCount] = {recorded, motion};
 
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
@@ -1899,7 +2014,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     chunkPainter.start(value, this->sliderPosition(), m_msecsPerPixel, rect);
 
     while(value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue, maximumValue};
+        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if(pos[i] == end[i]) 
                 continue;
@@ -1913,12 +2028,10 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
-        qint64 bestValue = qMin(qMin(nextValue[0], nextValue[1]), nextValue[2]);
+        qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
         
         Qn::TimePeriodContent content;
-        if (inside[Qn::BookmarksContent]) {
-            content = Qn::BookmarksContent;
-        } else if (inside[Qn::MotionContent]) {
+        if (inside[Qn::MotionContent]) {
             content = Qn::MotionContent;
         } else if (inside[Qn::RecordingContent]) {
             content = Qn::RecordingContent;
@@ -2174,41 +2287,66 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 }
 
 //TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
-//TODO: #GDM #Bookmarks check text length to fit right edge
-//TODO: #GDM #Bookmarks check text overlapping - paint longest if overlaps
-//TODO: #GDM #Bookmarks move text from left edge a bit
 void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
-    qint64 windowLength = m_windowEnd - m_windowStart;
-    qint64 minBookmarkDuration = windowLength / 16;
-    QnCameraBookmarkList displaying;
+    if (!m_bookmarksVisible)
+        return;
 
-    QnTimePeriod window(m_windowStart, m_windowEnd - m_windowStart);
-    foreach(const QnCameraBookmark &bookmark, m_bookmarks) {
-        if (bookmark.name.isEmpty())
-            continue;
-        if (QnTimePeriod(bookmark.startTimeMs, bookmark.durationMs).intersected(window).durationMs < minBookmarkDuration)
-            continue;
-        displaying << bookmark;
-    }
-
-    if (displaying.isEmpty())
+    if (m_mergedBookmarks.isEmpty())
         return;
     
-    /* Do some precalculations. */
-    const qreal textHeight = rect.height() * 0.7;
-    const qreal textTopMargin = rect.height() * 0.15;
-
-    QnScopedPainterPenRollback penRollback(painter);
-    QnScopedPainterBrushRollback brushRollback(painter);
+    QFontMetricsF fontMetrics(m_pixmapCache->font());
     
-    /* Draw highlight. */
+    qreal pos = quickPositionFromValue(sliderPosition());
 
-    foreach (const QnCameraBookmark &bookmark, displaying) {
-        qreal x = quickPositionFromValue(qMax(bookmark.startTimeMs, m_windowStart));
-        QPixmap pixmap = m_pixmapCache->textPixmap(bookmark.name, textHeight);
+    QBrush pastBrush(m_colors.pastBookmarkBound);
+    QBrush futureBrush(m_colors.futureBookmarkBound);
 
-        QRectF textRect(x, rect.top() + textTopMargin, pixmap.width(), pixmap.height());
-        drawCroppedPixmap(painter, textRect, rect, pixmap, pixmap.rect());
+    for (int i = 0; i < m_mergedBookmarks.size(); ++i) {
+        const BookmarkCluster &bookmarkCluster = m_mergedBookmarks[i];
+
+        if (bookmarkCluster.startTimeMs >= m_windowEnd || bookmarkCluster.endTimeMs <= m_windowStart)
+            continue;
+
+        QRectF bookmarkRect = rect;
+        bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkCluster.startTimeMs, m_windowStart)));
+        bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkCluster.endTimeMs, m_windowEnd)));
+
+        QBrush leftBoundBrush;
+        QBrush rightBoundBrush;
+        if (pos > bookmarkRect.left() && pos < bookmarkRect.right()) {
+            painter->fillRect(bookmarkRect.x(), bookmarkRect.y(), pos - bookmarkRect.x(), bookmarkRect.height(), m_colors.pastBookmark);
+            painter->fillRect(pos, bookmarkRect.y(), bookmarkRect.right() - pos, bookmarkRect.height(), m_colors.futureBookmark);
+            leftBoundBrush = pastBrush;
+            rightBoundBrush = futureBrush;
+        } else if (pos >= bookmarkRect.right()) {
+            painter->fillRect(bookmarkRect, m_colors.pastBookmark);
+            leftBoundBrush = rightBoundBrush = pastBrush;
+        } else {
+            painter->fillRect(bookmarkRect, m_colors.futureBookmark);
+            leftBoundBrush = rightBoundBrush = futureBrush;
+        }
+
+        painter->fillRect(bookmarkRect.left(), bookmarkRect.top(), 1, bookmarkRect.height(), leftBoundBrush);
+        painter->fillRect(bookmarkRect.right() - 1, bookmarkRect.top(), 1, bookmarkRect.height(), rightBoundBrush);
+
+        if (bookmarkCluster.firstBookmarkIndex != bookmarkCluster.lastBookmarkIndex)
+            continue;
+
+        const QnCameraBookmark &bookmark = m_bookmarks[bookmarkCluster.firstBookmarkIndex];
+
+        QRectF textRect = bookmarkRect;
+        if (i < m_mergedBookmarks.size() - 1)
+            textRect.setRight(qMin(bookmarkRect.right(), quickPositionFromValue(m_mergedBookmarks[i + 1].startTimeMs)));
+        textRect.adjust(bookmarkTextPadding, 0, -bookmarkTextPadding, 0);
+
+        QString text = fontMetrics.elidedText(bookmark.name, Qt::ElideRight, textRect.width());
+        static const int elideStringLength = 3; /* "..." */
+        if (text != bookmark.name && text.length() - elideStringLength < minBookmarkTextCharsVisible)
+            continue;
+
+        QPixmap pixmap = m_pixmapCache->textPixmap(text, bookmarkFontPixelSize);
+        qreal textY = bookmarkRect.top() + (bookmarkRect.height() - pixmap.height()) / 2;
+        painter->drawPixmap(textRect.left(), textY, pixmap);
     }
 }
 
@@ -2425,7 +2563,7 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
-
+    
     unsetCursor();
 }
 
@@ -2435,6 +2573,8 @@ void QnTimeSlider::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     unsetCursor();
 
     setThumbnailSelecting(m_lastHoverThumbnail, false);
+
+    m_currentRulerRectMousePos = QPointF();
 }
 
 void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
@@ -2460,6 +2600,40 @@ void QnTimeSlider::hoverMoveEvent(QGraphicsSceneHoverEvent *event) {
         setThumbnailSelecting(m_lastHoverThumbnail, false);
         m_lastHoverThumbnail = -1;
     }
+
+    processBoomarksHover(event);
+}
+
+void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent *event)
+{  
+    const auto pos = event->pos();
+    m_currentRulerRectMousePos = event->pos();
+
+    enum { kMouseMoveFilterTimeout = 100 };
+    const auto filterMouseMove = [this, pos]()
+    {
+        if (pos != m_currentRulerRectMousePos)
+            return;
+
+        if (!rulerRect().contains(pos))
+        {
+            m_bookmarksViewer->resetBookmarks();
+            return;
+        }
+
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+        if (lineBarRect.contains(pos))
+        {
+            const auto timestamp = valueFromPosition(pos);
+            const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
+            if (emptyBookmarks)
+                m_bookmarksViewer->resetBookmarks();
+            else
+                m_bookmarksViewer->setTargetTimestamp(timestamp);
+        }
+    };
+
+    executeDelayed(filterMouseMove, kMouseMoveFilterTimeout);
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
@@ -2489,9 +2663,9 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept();
 }
 
-void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) {
+void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
+{
     dragProcessor()->mouseMoveEvent(this, event);
-
     event->accept();
 }
 
@@ -2591,4 +2765,20 @@ void QnTimeSlider::finishDrag(DragInfo *) {
     }
 
     setSliderDown(false);
+}
+
+QnTimeSlider::BookmarkCluster::BookmarkCluster()
+    : startTimeMs(-1)
+    , endTimeMs(-1)
+    , firstBookmarkIndex(-1)
+    , lastBookmarkIndex(-1)
+{
+}
+
+QnTimeSlider::BookmarkCluster::BookmarkCluster(const QnCameraBookmark &bookmark, int index)
+    : startTimeMs(bookmark.startTimeMs)
+    , endTimeMs(bookmark.endTimeMs())
+    , firstBookmarkIndex(index)
+    , lastBookmarkIndex(index)
+{
 }

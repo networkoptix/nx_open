@@ -10,6 +10,7 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventT
     case QnBusiness::CameraInputEvent:
     case QnBusiness::ServerStartEvent:
     case QnBusiness::UserDefinedEvent:
+    case QnBusiness::BackupFinishedEvent:
         return Qn::CommonNotification;      
     case QnBusiness::CameraDisconnectEvent:
     case QnBusiness::StorageFailureEvent:
@@ -29,6 +30,7 @@ Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnBusiness::EventT
 Qn::NotificationLevel QnNotificationLevels::notificationLevel(QnSystemHealth::MessageType messageType) {
     switch (messageType) {
     case QnSystemHealth::ArchiveRebuildFinished:
+    case QnSystemHealth::ArchiveRebuildCanceled:
         return Qn::CommonNotification;
     default:
         return Qn::SystemNotification;

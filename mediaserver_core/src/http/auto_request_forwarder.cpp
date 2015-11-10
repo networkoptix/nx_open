@@ -10,7 +10,7 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <utils/common/log.h>
@@ -62,12 +62,11 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
             if( timestampMs != -1 )
             {
                 //searching server for timestamp
-                QnCameraHistoryPtr history =
-                    QnCameraHistoryPool::instance()->getCameraHistory( cameraRes );
-                if( history )
+                QnVirtualCameraResourcePtr virtualCameraRes = cameraRes.dynamicCast<QnVirtualCameraResource>();
+                if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer = 
-                        history->getMediaServerOnTime( timestampMs, false );
+                        qnCameraHistoryPool->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }

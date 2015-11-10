@@ -13,6 +13,7 @@
 #include <QtCore/QPointer>
 
 #include "forward.h"
+#include "unused.h"
 
 /* Properly defined NULL is required for this class to work, so we just redefine 
  * it here. Defining it only in config.h doesn't work for some compilers. */
@@ -52,7 +53,7 @@ namespace Qn {
 
     template<class T1, class S1, class T2, class S2>
     inline bool disconnect(const T1 *sender, const S1 &signal, const T2 *receiver, const S2 &method) {
-        unused(method, signal); /* Silence the spurious MSVC warning. */
+        QN_UNUSED(method, signal);
         return QObject::disconnect(sender, signal, receiver, method);
     }
 

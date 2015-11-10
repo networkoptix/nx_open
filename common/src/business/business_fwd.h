@@ -8,6 +8,8 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QSharedPointer>
 
+#include <common/common_globals.h>
+
 #include <utils/common/model_functions_fwd.h>
 
 class QnAbstractBusinessEvent;
@@ -59,7 +61,12 @@ public:
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
-        LicenseRemoved
+        LicenseRemoved,
+
+        BackupFailed,
+        BackupEndOfPeriod,
+        BackupDone,
+        BackupCancelled
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(EventReason)
 
@@ -105,6 +112,9 @@ public:
         
         /** Not enough licenses */
         LicenseIssueEvent = 10,
+
+        /** Archive backup done */
+        BackupFinishedEvent = 11,
 
         /** System health message. */
         SystemHealthEvent = 500,

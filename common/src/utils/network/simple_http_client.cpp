@@ -7,7 +7,6 @@
 
 #include "http/httptypes.h"
 #include "../common/util.h"
-#include "network/authenticate_helper.h"
 #include "network/authutil.h"
 
 

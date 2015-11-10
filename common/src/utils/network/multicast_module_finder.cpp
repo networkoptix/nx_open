@@ -42,6 +42,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
     m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
     m_prevPingClock(0),
+    m_checkInterfacesTimeoutMs(checkInterfacesTimeoutMs),
     m_lastInterfacesCheckMs(0),
     m_compatibilityMode(false),
     m_multicastGroupAddress(multicastGroupAddress.isNull() ? defaultModuleRevealMulticastGroup : multicastGroupAddress),
@@ -65,7 +66,7 @@ QnMulticastModuleFinder::~QnMulticastModuleFinder() {
 }
 
 bool QnMulticastModuleFinder::isValid() const {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     return !m_clientSockets.empty();
 }
 
@@ -77,8 +78,12 @@ void QnMulticastModuleFinder::setCompatibilityMode(bool compatibilityMode) {
     m_compatibilityMode = compatibilityMode;
 }
 
+void QnMulticastModuleFinder::setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs) {
+    m_checkInterfacesTimeoutMs = checkInterfacesTimeoutMs;
+}
+
 void QnMulticastModuleFinder::updateInterfaces() {
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
 
     QList<QHostAddress> addressesToRemove = m_clientSockets.keys();
 
@@ -144,7 +149,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
     //TODO #ak RevealResponse class is excess here. Should send/receive QnModuleInformation
     {
-        QMutexLocker lock(&m_moduleInfoMutex);
+        QnMutexLocker lock(&m_moduleInfoMutex);
         if (m_serializedModuleInfo.isEmpty())
             m_serializedModuleInfo = RevealResponse(qnCommon->moduleInformation()).serialize();
     }
@@ -159,7 +164,7 @@ bool QnMulticastModuleFinder::processDiscoveryRequest(UDPSocket *udpSocket) {
 
 void QnMulticastModuleFinder::at_moduleInformationChanged()
 {
-    QMutexLocker lock(&m_moduleInfoMutex);
+    QnMutexLocker lock(&m_moduleInfoMutex);
     m_serializedModuleInfo.clear(); // clear cached value
 }
 
@@ -231,7 +236,7 @@ void QnMulticastModuleFinder::run() {
     while (!needToStop()) {
         quint64 currentClock = QDateTime::currentMSecsSinceEpoch();
 
-        if (currentClock - m_lastInterfacesCheckMs >= checkInterfacesTimeoutMs) {
+        if (currentClock - m_lastInterfacesCheckMs >= m_checkInterfacesTimeoutMs) {
             updateInterfaces();
             m_lastInterfacesCheckMs = currentClock;
         }
@@ -239,7 +244,7 @@ void QnMulticastModuleFinder::run() {
         currentClock = QDateTime::currentMSecsSinceEpoch();
 
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis) {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk( &m_mutex );
 
             for (UDPSocket *socket: m_clientSockets) {
                 if (!socket->send(revealRequest.data(), revealRequest.size())) {
@@ -284,7 +289,7 @@ void QnMulticastModuleFinder::run() {
         }
     }
 
-    QMutexLocker lk(&m_mutex);
+    QnMutexLocker lk( &m_mutex );
     for (UDPSocket *socket: m_clientSockets)
         m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
     if (m_serverSocket)

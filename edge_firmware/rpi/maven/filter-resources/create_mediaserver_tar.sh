@@ -65,6 +65,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \
@@ -162,6 +163,10 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
 fi 
+
+if [[ "${box}" == "bpi" ]]; then 
+    cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
+fi
 
 chmod -R 755 $BUILD_DIR/etc/init.d
 chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts

@@ -28,7 +28,9 @@ public:
     explicit QnUserManagementWidget(QWidget *parent = 0);
     ~QnUserManagementWidget();
 
-    virtual void updateFromSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
+    virtual bool hasChanges() const override;
 
     const QnUserManagementColors colors() const;
     void setColors(const QnUserManagementColors &colors);

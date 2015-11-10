@@ -7,6 +7,8 @@
 #include "nx_ec/impl/ec_api_impl.h"
 #include "nx_ec/data/api_server_alive_data.h"
 #include <utils/network/http/httptypes.h>
+#include "network/universal_tcp_listener.h"
+
 
 class QHostAddress;
 
@@ -45,7 +47,7 @@ private slots:
     void at_remotePeerUnauthorized(const QnUuid& id);
 
 private:
-    mutable QMutex m_mutexAddrList;
+    mutable QnMutex m_mutexAddrList;
     const int m_serverPort;
     QnUniversalTcpListener* m_universalTcpListener;
     mutable QnMediaServerResourcePtr m_mServer;

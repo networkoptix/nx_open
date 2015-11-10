@@ -233,7 +233,13 @@ public:
                     errorMessageParts 
                         << QnDeviceDependentStrings::getNameFromSet(details, device);
                     break;
-                }
+				}
+            case cameraPluginError:
+				{
+	                requiredParamCount = 1;
+    	            errorMessageParts   << tr("Camera plugin error. %1");
+					break;
+				}
             default:
             {
                 int nonEmptyParamCount = 0;

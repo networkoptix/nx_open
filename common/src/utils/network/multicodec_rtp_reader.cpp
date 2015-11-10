@@ -472,7 +472,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 
     m_numberOfVideoChannels = camera && camera->allowRtspVideoLayout() ?  m_RtpSession.getTrackCount(RTPSession::TT_VIDEO) : 1;
     {
-        QMutexLocker lock(&m_layoutMutex);
+        QnMutexLocker lock( &m_layoutMutex );
         m_customVideoLayout.clear();
         QString newVideoLayout;
         if (m_numberOfVideoChannels > 1) {
@@ -583,7 +583,7 @@ void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 
 QnConstResourceVideoLayoutPtr QnMulticodecRtpReader::getVideoLayout() const
 {
-    QMutexLocker lock(&m_layoutMutex);
+    QnMutexLocker lock( &m_layoutMutex );
     return m_customVideoLayout;
 }
 

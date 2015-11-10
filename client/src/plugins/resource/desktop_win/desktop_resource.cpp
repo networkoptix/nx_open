@@ -40,7 +40,7 @@ QString QnDesktopResource::toString() const {
 
 QnAbstractStreamDataProvider* QnDesktopResource::createDataProviderInternal(Qn::ConnectionRole /*role*/) 
 {
-    QMutexLocker lock(&m_dpMutex);
+    QnMutexLocker lock( &m_dpMutex );
 
     createSharedDataProvider();
     if (m_desktopDataProvider == 0)

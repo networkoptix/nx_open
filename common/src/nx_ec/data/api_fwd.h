@@ -20,8 +20,9 @@ namespace ec2 {
     struct ApiCameraAttributesData;
     struct ApiCameraDataEx;
     struct ApiCameraDataStatistics;
-    struct ApiCameraServerItemDataOld;
-    struct ApiCameraServerItemData;
+    struct ApiServerFootageData;
+    struct ApiCameraHistoryItemData;
+    struct ApiCameraHistoryData;
     struct ApiClientInfoData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
@@ -74,7 +75,6 @@ namespace ec2 {
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
-    struct ApiCameraBookmarkTagData;
     struct ApiModuleData;
     struct ApiLoginData;
     struct ApiDiscoveryData;
@@ -103,8 +103,6 @@ namespace ec2 {
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
     typedef std::vector<ApiCameraDataStatistics> ApiCameraDataStatisticsList;
-    typedef std::vector<ApiCameraServerItemDataOld> ApiCameraServerItemDataOldList;
-    typedef std::vector<ApiCameraServerItemData> ApiCameraServerItemDataList;
     typedef std::vector<ApiClientInfoData> ApiClientInfoDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
@@ -122,7 +120,6 @@ namespace ec2 {
     typedef std::vector<ApiStorageDataStatistics> ApiStorageDataStatisticsList;
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
-    typedef std::vector<ApiCameraBookmarkTagData> ApiCameraBookmarkTagDataList;
     typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
@@ -130,17 +127,21 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiIdData> ApiIdDataList;
     typedef std::vector<ApiResourceStatusData> ApiResourceStatusDataList;
+    typedef std::vector<ApiServerFootageData> ApiServerFootageDataList;
+    typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
+    typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
     (ApiBusinessRuleData)\
 	(ApiBusinessRuleStatistics)\
     (ApiCameraData)\
+    (ApiServerFootageData)\
+    (ApiCameraHistoryItemData)\
+    (ApiCameraHistoryData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
     (ApiCameraDataStatistics)\
-    (ApiCameraServerItemDataOld)\
-    (ApiCameraServerItemData)\
     (ApiClientInfoData)\
     (ApiEmailData)\
     (ApiEmailSettingsData)\
@@ -194,7 +195,6 @@ namespace ec2 {
     (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
-    (ApiCameraBookmarkTagData)\
     (ApiModuleData)\
     (ApiLoginData)\
     (ApiDiscoveryData)\

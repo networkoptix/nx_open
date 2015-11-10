@@ -78,12 +78,26 @@ namespace QnBusiness {
         }
     }
 
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters) {
+        if (!hasToggleState(actionType))
+            return false;
+
+        switch (actionType) {
+        case BookmarkAction:
+            return parameters.bookmarkDuration <= 0;
+        default:
+            break;
+        }
+
+        return true;
+    }
+
     QList<ActionType> allActions() {
         QList<ActionType> result;
         result
             << CameraOutputAction
             << CameraOutputOnceAction
-            //<< BookmarkAction
+            << BookmarkAction
             << CameraRecordingAction
             << PanicRecordingAction
             << SendMailAction
@@ -164,6 +178,10 @@ bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
 int QnAbstractBusinessAction::getAggregationCount() const
 {
     return m_aggregationCount;
+}
+
+bool QnAbstractBusinessAction::isProlonged() const {
+    return QnBusiness::isActionProlonged(m_actionType, m_params);
 }
 
 void QnAbstractBusinessAction::setAggregationCount(int value)

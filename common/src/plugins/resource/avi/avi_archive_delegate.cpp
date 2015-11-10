@@ -124,7 +124,7 @@ QnAviArchiveDelegate::QnAviArchiveDelegate():
     m_duration(AV_NOPTS_VALUE),
     m_ioContext(0),
     m_eofReached(false),
-    m_openMutex(QMutex::Recursive),
+    m_openMutex(QnMutex::Recursive),
     m_fastStreamFind(false),
     m_hasVideo(true),
     m_lastSeekTime(AV_NOPTS_VALUE)
@@ -305,7 +305,7 @@ bool QnAviArchiveDelegate::reopen()
 
 bool QnAviArchiveDelegate::open(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_openMutex); // need refactor. Now open may be called from UI thread!!!
+    QnMutexLocker lock( &m_openMutex ); // need refactor. Now open may be called from UI thread!!!
 
     m_resource = resource;
     if (m_formatContext == 0)

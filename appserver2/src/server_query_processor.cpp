@@ -2,5 +2,5 @@
 
 namespace ec2
 {
-    QMutex ServerQueryProcessor::m_updateDataMutex;
+    QnMutex ServerQueryProcessor::m_updateDataMutex;
 }

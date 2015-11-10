@@ -41,12 +41,12 @@ void QnFileDeletor::run()
         
         static const int RAND_RANGE = 5; // in range [-5..+5] seconds
         int thresholdSecs = (SPACE_CLEARANCE_INTERVAL - RAND_RANGE) + rand() % (RAND_RANGE*2 + 1);
-        if (qnStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
+        if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
         {
-            qnStorageMan->clearSpace();
+            qnNormalStorageMan->clearSpace();
+            qnBackupStorageMan->clearSpace();
             m_storagesTimer.restart();
         }
-
         msleep(500);
     }
 }
@@ -92,7 +92,7 @@ void QnFileDeletor::deleteFile(const QString& fileName)
 
 void QnFileDeletor::postponeFile(const QString& fileName)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     m_newPostponedFiles << fileName;
 }
 
@@ -117,7 +117,7 @@ void QnFileDeletor::processPostponedFiles()
 
     QQueue<QString> newPostponedFiles;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         newPostponedFiles = m_newPostponedFiles;
         m_newPostponedFiles.clear();
     }

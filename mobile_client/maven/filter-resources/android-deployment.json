@@ -1,0 +1,14 @@
+{
+   "description": "Configuration file for androiddeployqt.",
+   "qt": "${qt.plaindir}",
+   "sdk": "${env.environment}/android/android-sdk",
+   "ndk": "${env.environment}/android/android-ndk",
+   "toolchain-prefix": "arm-linux-androideabi",
+   "tool-prefix": "arm-linux-androideabi",
+   "toolchain-version": "4.8",
+   "ndk-host": "linux-x86",
+   "target-architecture": "armeabi-v7a",
+   "android-package-source-directory": "${project.build.directory}/android",
+   "android-extra-libs": "${libdir}/lib/${build.configuration}/libssl.so,${libdir}/lib/${build.configuration}/libcrypto.so",
+   "application-binary": "${libdir}/lib/${build.configuration}/libmobile_client.so"
+}

@@ -1,7 +1,7 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/data/api_fwd.h>
@@ -50,6 +50,9 @@ public:
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
+
+    Qn::CameraBackupQualities defaultBackupQualities() const;
+    void setDefauldBackupQualities(Qn::CameraBackupQualities value);
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -68,6 +71,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
+    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_defaultBackupQualitiesAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
@@ -92,9 +96,10 @@ private:
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnUserResourcePtr m_admin;
 };
 
+#define qnGlobalSettings QnGlobalSettings::instance()
 
 #endif // QN_GLOBAL_SETTINGS_H

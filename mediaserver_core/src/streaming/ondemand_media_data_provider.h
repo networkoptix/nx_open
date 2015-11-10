@@ -8,7 +8,7 @@
 #include <deque>
 #include <memory>
 
-#include <QMutex>
+#include <utils/thread/mutex.h>
 #include <QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
@@ -48,7 +48,7 @@ public:
 
 private:
     QSharedPointer<QnAbstractStreamDataProvider> m_dataProvider;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::deque<QnAbstractDataPacketPtr> m_dataQueue;
     qint64 m_prevPacketTimestamp;
 };

@@ -5,9 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QFileInfo>
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <deque>
 #include <QtCore/QFileInfo>
@@ -20,6 +20,7 @@
 
 class QnTimePeriodList;
 class QnTimePeriod;
+class QnStorageManager;
 
 class DeviceFileCatalog: public QObject
 {
@@ -28,8 +29,9 @@ public:
 
     struct Chunk
     {
-        static const quint16 FILE_INDEX_NONE = 0xffff;
-        static const int UnknownDuration = -1;
+        static const quint16 FILE_INDEX_NONE           = 0xffff;
+        static const quint16 FILE_INDEX_WITH_DURATION  = 0xfffe;
+        static const int UnknownDuration               = -1;
 
         Chunk(): startTimeMs(-1), durationMs(0), storageIndex(0), fileIndex(0),timeZone(-1), fileSizeHi(0), fileSizeLo(0) {}
         Chunk(qint64 _startTime, int _storageIndex, int _fileIndex, int _duration, qint16 _timeZone, quint16 fileSizeHi = 0, quint32 fileSizeLo = 0) : 
@@ -41,7 +43,6 @@ public:
         qint64 distanceToTime(qint64 timeMs) const;
         qint64 endTimeMs() const;
         bool containsTime(qint64 timeMs) const;
-        void truncate(qint64 timeMs);
         qint64 getFileSize() const { return ((qint64) fileSizeHi << 32) + fileSizeLo; } // 256Tb as max file size
         void setFileSize(qint64 value) { fileSizeHi = quint16(value >> 32); fileSizeLo = quint32(value); } // 256Tb as max file size
 
@@ -58,6 +59,32 @@ public:
         quint32 fileSizeLo;
     };
 
+    struct TruncableChunk : Chunk
+    {
+        using Chunk::Chunk;
+        int64_t originalDuration;
+
+        TruncableChunk() 
+            : Chunk(),
+              originalDuration(0)
+        {}
+
+        TruncableChunk(const Chunk &other) 
+            : Chunk(other), 
+              originalDuration(other.durationMs) 
+        {}
+
+        Chunk toBaseChunk() const
+        {
+            Chunk ret(*this);
+            if (originalDuration != 0)
+                ret.durationMs = originalDuration;
+            return ret;
+        }
+
+        void truncate(qint64 timeMs);
+    };
+
     struct EmptyFileInfo
     {
         EmptyFileInfo(): startTimeMs(0) {}
@@ -70,10 +97,14 @@ public:
     // TODO: #Elric #enum
     enum FindMethod {OnRecordHole_NextChunk, OnRecordHole_PrevChunk};
 
-    DeviceFileCatalog(const QString &cameraUniqueId, QnServer::ChunksCatalog catalog);
+    DeviceFileCatalog(
+        const QString           &cameraUniqueId, 
+        QnServer::ChunksCatalog catalog, 
+        QnServer::StoragePool   role
+    );
     //void deserializeTitleFile();
     void addRecord(const Chunk& chunk);
-    Chunk updateDuration(int durationMs, qint64 fileSize);
+    Chunk updateDuration(int durationMs, qint64 fileSize, bool indexWithDuration);
     qint64 lastChunkStartTime() const;
     Chunk takeChunk(qint64 startTimeMs, qint64 durationMs);
 
@@ -83,9 +114,11 @@ public:
     QVector<Chunk> deleteRecordsBefore(int idx);
 
     bool isEmpty() const;
+    size_t size() const {return m_chunks.size();}
     void clear();
     void deleteRecordsByStorage(int storageIndex, qint64 timeMs);
     int findFileIndex(qint64 startTimeMs, FindMethod method) const;
+    int findNextFileIndex(qint64 startTimeMs) const;
     void updateChunkDuration(Chunk& chunk);
     QString fileDir(const Chunk& chunk) const;
     QString fullFileName(const Chunk& chunk) const;
@@ -111,6 +144,9 @@ public:
     QString rootFolder(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog) const;
     QString cameraUniqueId() const;
 
+    void setLastSyncTime(int64_t);
+    int64_t getLastSyncTime() const;
+
     static QString prefixByCatalog(QnServer::ChunksCatalog catalog);
     static QnServer::ChunksCatalog catalogByPrefix(const QString &prefix);
 
@@ -118,7 +154,7 @@ public:
     static bool needRebuildPause();
     static void rebuildPause(void*);
     static void rebuildResume(void*);
-    static QMutex m_rebuildMutex;
+    static QnMutex m_rebuildMutex;
     static QSet<void*> m_pauseList;
 
     bool doRebuildArchive(const QnStorageResourcePtr &storage, const QnTimePeriod& period);
@@ -142,6 +178,9 @@ public:
     bool fromCSVFile(const QString& fileName);
     QnServer::ChunksCatalog getRole() const;
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
+
+    QnServer::StoragePool getStoragePool() const;
+    void setStoragePool(QnServer::StoragePool value);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -156,10 +195,13 @@ private:
     void removeChunks(int storageIndex);
     void removeRecord(int idx);
     int detectTimeZone(qint64 startTimeMs, const QString& fileName);
-private:
+    
     friend class QnStorageManager;
 
-    mutable QMutex m_mutex;
+    QnStorageManager *getMyStorageMan() const;
+private:
+
+    mutable QnMutex m_mutex;
     //QFile m_file;
     std::deque<Chunk> m_chunks; 
     QString m_cameraUniqueId;
@@ -180,7 +222,9 @@ private:
     //QMap<int,QString> m_prevFileNames;
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
-    QMutex m_IOMutex;
+    QnMutex m_IOMutex;
+    QnServer::StoragePool m_storagePool;
+    mutable int64_t m_lastSyncTime;
 };
 
 typedef QSharedPointer<DeviceFileCatalog> DeviceFileCatalogPtr;

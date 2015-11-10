@@ -4,6 +4,8 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/media_server_resource.h>
+
 #include <utils/common/synctime.h>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
@@ -99,7 +101,13 @@ namespace ec2
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);
-        for (auto& lic : licenses) outData->licenses.push_back(std::move(lic));
+        for (auto& license : licenses)
+        {
+            QnLicense qnLicense(license.licenseBlock);
+            ApiLicenseStatistics statLicense(std::move(license));
+            statLicense.validation = qnLicense.validationInfo();
+            outData->licenses.push_back(std::move(statLicense));
+        }
 
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
@@ -186,7 +194,7 @@ namespace ec2
 
     void Ec2StaticticsReporter::setupTimer()
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         if (!m_timerDisabled)
         {
             m_timerId = TimerManager::instance()->addTimer(
@@ -201,7 +209,7 @@ namespace ec2
     {
         boost::optional<quint64> timerId;
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             m_timerDisabled = true;
 
             if (timerId = m_timerId)
@@ -215,7 +223,7 @@ namespace ec2
             client->terminate();
 
         {
-            QMutexLocker lk(&m_mutex);
+            QnMutexLocker lk(&m_mutex);
             m_timerDisabled = false;
         }
     }

@@ -1,5 +1,7 @@
 #include "workbench_user_watcher.h"
 
+#include <common/common_module.h>
+
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
@@ -90,7 +92,8 @@ void QnWorkbenchUserWatcher::at_resourcePool_resourceRemoved(const QnResourcePtr
         return;
 
     setCurrentUser(QnUserResourcePtr());
-    menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
+    if (!qnCommon->remoteGUID().isNull())
+        menu()->trigger(Qn::DisconnectAction, QnActionParameters().withArgument(Qn::ForceRole, true));
 }
 
 bool QnWorkbenchUserWatcher::isReconnectRequired(const QnUserResourcePtr &user) {
@@ -129,8 +132,8 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
     /* Reconnect if some permissions were removed */
     bool reconnect = (newPermissions & m_userPermissions) != m_userPermissions;
     /* Also reconnect if 'administrator' state was changed. */
-    bool wasAdmin =     ((m_userPermissions & Qn::GlobalAdminPermissions) == Qn::GlobalAdminPermissions);
-    bool becameAdmin =  ((newPermissions    & Qn::GlobalAdminPermissions) == Qn::GlobalAdminPermissions);
+    bool wasAdmin =     m_userPermissions.testFlag(Qn::GlobalProtectedPermission);
+    bool becameAdmin =  newPermissions.testFlag(Qn::GlobalProtectedPermission);
     reconnect |= (wasAdmin != becameAdmin); 
 
     m_userPermissions = newPermissions;

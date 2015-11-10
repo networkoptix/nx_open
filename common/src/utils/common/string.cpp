@@ -59,7 +59,7 @@ qint64 parseDateTime( const QString& dateTime )
     }
 }
 
-QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString pattern) {
+QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern) {
     static const char *metricSuffixes[] = {"B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB"};
     static const char *binarySuffixes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"};
 
@@ -387,4 +387,13 @@ void trimInPlace( QString* const str, const QString& symbols )
 
 QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
+}
+
+QString elideString(const QString &source, int maxLength, const QString &tail)
+{
+    static const auto resultTemplate = lit("%1%2");
+
+    const auto tailLength = tail.length();
+    return (source.length() <= maxLength ? source 
+        : resultTemplate.arg(source.left(maxLength - tailLength), tail));
 }

@@ -51,7 +51,7 @@ private:
         {}
     };
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QHash<QnUuid, QnUuid> m_fakeUuidByServerUuid;
     QHash<QnUuid, QnUuid> m_serverUuidByFakeUuid;
     QHash<QnUuid, ModuleInformationItem> m_moduleInformationById;

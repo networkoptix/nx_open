@@ -23,6 +23,7 @@
 #include "common/common_module.h"
 #include "data_only_camera_resource.h"
 #include "media_server/settings.h"
+#include "plugins/resource/upnp/upnp_device_searcher.h"
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
@@ -70,7 +71,7 @@ static void printInLogNetResources(const QnResourceList& resources)
 
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources)
 {
-    QMutexLocker lock(&m_discoveryMutex);
+    QnMutexLocker lock( &m_discoveryMutex );
 
     // fill camera's ID
 
@@ -360,4 +361,11 @@ void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
             ping.ping(rpNetRes->getHostAddress(), 1, 300);
         }
     }
+}
+
+void QnMServerResourceDiscoveryManager::doResourceDiscoverIteration()
+{
+    if( UPNPDeviceSearcher::instance() )
+        UPNPDeviceSearcher::instance()->saveDiscoveredDevicesSnapshot();
+    base_type::doResourceDiscoverIteration();
 }

@@ -1694,7 +1694,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->pleaseStop();
         }
 
-        if(const QnResourcePtr &resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid())) {
+        if(QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>()) {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
             connect(m_loader, &QnThumbnailsLoader::thumbnailLoaded, this,       &QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded);
@@ -1708,6 +1708,8 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             m_loader->start();
         }
     }
+
+    action(Qn::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
 
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
@@ -1761,9 +1763,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
 
-            qint64 displayTime = time;
-            if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
+            qint64 displayTime = time + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
             QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) 

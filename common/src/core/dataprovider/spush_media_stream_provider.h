@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <QWaitCondition>
+#include <utils/thread/wait_condition.h>
 
 #include "abstract_media_stream_provider.h"
 #include "core/dataprovider/live_stream_provider.h"
@@ -55,8 +55,8 @@ private:
     CameraDiagnostics::Result m_openStreamResult;
     //!Incremented with every open stream attempt
     int m_openStreamCounter;
-    QWaitCondition m_cond;
-    QMutex m_openStreamMutex;
+    QnWaitCondition m_cond;
+    QnMutex m_openStreamMutex;
     int m_FrameCnt;
     QElapsedTimer m_needControlTimer;
 

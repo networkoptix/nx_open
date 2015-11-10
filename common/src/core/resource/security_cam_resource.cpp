@@ -1,6 +1,6 @@
 #include "security_cam_resource.h"
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <api/global_settings.h>
 
@@ -21,8 +21,9 @@
 #include "api/model/api_ioport_data.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
+#include "media_server_user_attributes.h"
 
-#define SAFE(expr) {QMutexLocker lock(&m_mutex); expr;}
+#define SAFE(expr) {QnMutexLocker lock( &m_mutex ); expr;}
 
 
 namespace {
@@ -65,8 +66,8 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
-        &m_mutex )
-
+        &m_mutex ),
+    m_cameraInfoSavedToDisk(false)
 {
     addFlags(Qn::live_cam);
 
@@ -94,6 +95,15 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
+bool QnSecurityCamResource::isCameraInfoSavedToDisk() const
+{
+    SAFE(return m_cameraInfoSavedToDisk);
+}
+
+void QnSecurityCamResource::setCameraInfoSavedToDisk()
+{
+    SAFE(m_cameraInfoSavedToDisk = true);
+}
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
     return hasParam(lit("groupplay"));
@@ -154,6 +164,7 @@ int QnSecurityCamResource::reservedSecondStreamFps() const {
     return value.isNull() ? defaultReservedSecondStreamFps : value.toInt();
 }
 
+#ifdef ENABLE_DATA_PROVIDERS
 QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(Qn::ConnectionRole role) {
     if (role == Qn::CR_LiveVideo || role == Qn::CR_Default || role == Qn::CR_SecondaryLiveVideo)
     {
@@ -177,6 +188,7 @@ QnAbstractStreamDataProvider* QnSecurityCamResource::createDataProviderInternal(
         return m_dpFactory->createDataProviderInternal(toSharedPointer(), role);
     return 0;
 }
+#endif // ENABLE_DATA_PROVIDERS
 
 void QnSecurityCamResource::initializationDone() 
 {
@@ -382,7 +394,7 @@ bool QnSecurityCamResource::setRelayOutputState(const QString& ouputID, bool act
 }
 
 void QnSecurityCamResource::inputPortListenerAttached() {
-    QMutexLocker lk( &m_initMutex );
+    QnMutexLocker lk( &m_initMutex );
 
     //if camera is not initialized yet, delayed input monitoring will start on initialization completion
     const int inputPortListenerCount = m_inputPortListenerCount.fetchAndAddOrdered( 1 );
@@ -392,7 +404,7 @@ void QnSecurityCamResource::inputPortListenerAttached() {
 }
 
 void QnSecurityCamResource::inputPortListenerDetached() {
-    QMutexLocker lk( &m_initMutex );
+    QnMutexLocker lk( &m_initMutex );
  
     if( m_inputPortListenerCount.load() <= 0 )
         return;
@@ -563,16 +575,16 @@ QString QnSecurityCamResource::getGroupName() const {
 
 QString QnSecurityCamResource::getDefaultGroupName() const
 {
-    QMutexLocker locker(&m_mutex);
-    return m_groupName;
+    SAFE(return m_groupName);
 }
 
 void QnSecurityCamResource::setGroupName(const QString& value) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_groupName == value)
             return;
         m_groupName = value;
+        m_cameraInfoSavedToDisk = false;
     }
     emit groupNameChanged(::toSharedPointer(this));
 }
@@ -587,6 +599,7 @@ void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
             return;
         (*userAttributesLock)->groupName = value;
     }
+    SAFE(m_cameraInfoSavedToDisk = false);
     emit groupNameChanged(::toSharedPointer(this));
 }
 
@@ -596,13 +609,14 @@ QString QnSecurityCamResource::getGroupId() const {
 
 void QnSecurityCamResource::setGroupId(const QString& value) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_groupId == value)
             return;
         m_groupId = value;
+        m_cameraInfoSavedToDisk = false;
     }
-
     emit groupIdChanged(::toSharedPointer(this));   
+
 }
 
 QString QnSecurityCamResource::getModel() const {
@@ -610,7 +624,9 @@ QString QnSecurityCamResource::getModel() const {
 }
 
 void QnSecurityCamResource::setModel(const QString &model) {
-    SAFE(m_model = model)
+    QnMutexLocker lk(&m_mutex);
+    m_model = model;
+    m_cameraInfoSavedToDisk = false;
 }
 
 QString QnSecurityCamResource::getFirmware() const {
@@ -775,6 +791,30 @@ void QnSecurityCamResource::setManuallyAdded(bool value) {
     m_manuallyAdded = value;
 }
 
+Qn::CameraBackupQualities QnSecurityCamResource::getBackupQualities() const
+{
+    QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+    return (*userAttributesLock)->backupQualities;
+}
+
+void QnSecurityCamResource::setBackupQualities(Qn::CameraBackupQualities value)
+{
+    {
+        QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
+        if ((*userAttributesLock)->backupQualities == value)
+            return;
+        (*userAttributesLock)->backupQualities = value;
+    }
+    emit backupQualitiesChanged(::toSharedPointer(this));
+}
+
+Qn::CameraBackupQualities QnSecurityCamResource::getActualBackupQualities() const {
+    Qn::CameraBackupQualities result = getBackupQualities();
+    if (result != Qn::CameraBackup_Default)
+        return result;
+    return qnGlobalSettings->defaultBackupQualities();
+}
+
 void QnSecurityCamResource::setSecondaryStreamQuality(Qn::SecondStreamQuality quality) {
     QnCameraUserAttributePool::ScopedLock userAttributesLock( QnCameraUserAttributePool::instance(), getId() );
     (*userAttributesLock)->secondaryQuality = quality;
@@ -829,7 +869,7 @@ bool QnSecurityCamResource::hasStatusFlags(Qn::CameraStatusFlag value) const
 
 void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         if(m_statusFlags == value)
             return;
         m_statusFlags = value;
@@ -839,7 +879,7 @@ void QnSecurityCamResource::setStatusFlags(Qn::CameraStatusFlags value) {
 
 void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag flag) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         Qn::CameraStatusFlags value = m_statusFlags | flag;
         if(m_statusFlags == value)
             return;
@@ -850,7 +890,7 @@ void QnSecurityCamResource::addStatusFlags(Qn::CameraStatusFlag flag) {
 
 void QnSecurityCamResource::removeStatusFlags(Qn::CameraStatusFlag flag) {
     {
-        QMutexLocker locker(&m_mutex);
+        QnMutexLocker locker( &m_mutex );
         Qn::CameraStatusFlags value = m_statusFlags & ~flag;
         if(m_statusFlags == value)
             return;

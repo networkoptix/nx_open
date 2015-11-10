@@ -9,6 +9,7 @@
 #include <api/common_message_processor.h>
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <server/server_globals.h>
 
 #include "http/auto_request_forwarder.h"
 #include "http/progressive_downloading_server.h"
@@ -59,7 +60,8 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
-    void at_storageManager_rebuildFinished();
+    void at_storageManager_rebuildFinished(bool isCanceled);
+    void at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
@@ -95,12 +97,12 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     QHostAddress m_publicAddress;
-    QMutex m_mutex;
+    QnMutex m_mutex;
     std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
-    mutable QMutex m_stopMutex;
+    mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
 };
 

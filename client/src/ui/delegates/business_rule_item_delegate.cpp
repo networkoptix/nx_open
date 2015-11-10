@@ -185,6 +185,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         if (actionType == QnBusiness::CameraRecordingAction) {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
         }
+        else if (actionType == QnBusiness::BookmarkAction) {
+            btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
+        }
         else if (actionType == QnBusiness::CameraOutputAction || actionType == QnBusiness::CameraOutputOnceAction) {
             btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
         }
@@ -204,10 +207,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     }
     case QnBusiness::ActionColumn:
     {
-        bool instant = index.data(Qn::ActionIsInstantRole).toBool();
+        bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
         QComboBox* comboBox = new QComboBox(parent);
         for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
-            if (instant && QnBusiness::hasToggleState(actionType))
+            if (instantOnly && QnBusiness::hasToggleState(actionType))
                 continue;
             comboBox->addItem(QnBusinessStringsHelper::actionName(actionType), actionType);
         }

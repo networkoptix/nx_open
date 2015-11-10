@@ -104,7 +104,7 @@ protected:
     */
     virtual void onStreamResolutionChanged( int channelNumber, const QSize& picSize );
 protected:
-    mutable QMutex m_livemutex;
+    mutable QnMutex m_livemutex;
 private:
     float getDefaultFps() const;
 private:
@@ -119,7 +119,7 @@ private:
     size_t m_totalVideoFrames;
     size_t m_totalAudioFrames;
 
-    QMutex m_motionRoleMtx;
+    QnMutex m_motionRoleMtx;
     Qn::ConnectionRole m_softMotionRole;
     QString m_forcedMotionStream;
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION

@@ -6,6 +6,10 @@
 #include <QtCore/5.2.1/QtCore/private/qthread_p.h>
 #elif QT_VERSION == 0x050401
 #include <QtCore/5.4.1/QtCore/private/qthread_p.h>
+#elif QT_VERSION == 0x050500
+#include <QtCore/5.5.0/QtCore/private/qthread_p.h>
+#elif QT_VERSION == 0x050501
+#include <QtCore/5.5.1/QtCore/private/qthread_p.h>
 #else
 #error "Include proper header here!"
 #endif
@@ -20,8 +24,12 @@
  *                                      error checking only.
  */
 inline bool qnHasEventLoop(QThread *thread) {
+#ifndef Q_OS_ANDROID
     int loopLevel = QThreadData::get2(thread)->loopLevel;
     return loopLevel > 0;
+#else
+    return true;
+#endif
 }
 
 #endif // QN_EVENT_LOOP_H

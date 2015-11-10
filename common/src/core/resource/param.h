@@ -34,10 +34,8 @@ namespace Qn
     static const QString CAMERA_BITRATE_INFO_LIST_PARAM_NAME = lit("bitrateInfos");
     static const QString CAMERA_AUDIO_CODEC_PARAM_NAME = lit("audioCodec");
     static const QString VIDEO_LAYOUT_PARAM_NAME = lit("VideoLayout");
-    //!Contains XML describing camera parameteres. If empty, :camera_settings/camera_settings.xml file is used
-    static const QString PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME = lit("physicalCameraSettingsXml");
-    //!ID of camera in camera_settings.xml or in parameter \a PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME value
-    static const QString CAMERA_SETTINGS_ID_PARAM_NAME = lit("cameraSettingsId");
+    //!Contains QnCameraAdvancedParams in ubjson-serialized state
+    static const QString CAMERA_ADVANCED_PARAMETERS = lit("cameraAdvancedParams");
     static const QString PROFILE_LEVEL_ID_PARAM_NAME = lit("profile-level-id");
     static const QString SPROP_PARAMETER_SETS_PARAM_NAME = lit("sprop-parameter-sets");
     static const QString FIRMWARE_PARAM_NAME = lit("firmware");
@@ -46,6 +44,7 @@ namespace Qn
     static const QString IO_SETTINGS_PARAM_NAME = lit("ioSettings");
     static const QString IO_CONFIG_PARAM_NAME = lit("ioConfigCapability");
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
+    static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
 
     /* Whether statistics gathering is allowed on the current server. */
     static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");

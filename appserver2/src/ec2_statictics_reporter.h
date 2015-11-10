@@ -1,13 +1,15 @@
 #ifndef EC2_STATICTICS_REPORTER_H
 #define EC2_STATICTICS_REPORTER_H
 
-#include <QtCore/QMutex>
+#include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/timermanager.h>
 #include <utils/network/http/asynchttpclient.h>
+#include <utils/thread/mutex.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
+
 
 namespace ec2
 {
@@ -73,7 +75,7 @@ namespace ec2
         boost::optional<QDateTime> m_plannedReportTime;
         uint m_timerCycle;
 
-        QMutex m_mutex;
+        QnMutex m_mutex;
         bool m_timerDisabled;
         boost::optional<qint64> m_timerId;
     };

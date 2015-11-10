@@ -21,7 +21,7 @@ private:
     static const QString FROM_SEP;
     static const QString TO_SEP;
 public:
-    QnFileStorageResource(QnStorageManager *storageManager);
+    QnFileStorageResource();
     ~QnFileStorageResource();
 
     static QnStorageResource* instance(const QString&);
@@ -42,8 +42,6 @@ public:
 
     virtual int getCapabilities() const override;
     virtual bool isAvailable() const override;
-
-    virtual float getStorageBitrateCoeff() const override;
 
     virtual void setUrl(const QString& url) override;
 
@@ -79,15 +77,13 @@ public:
 
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    float m_storageBitrateCoeff;
     mutable bool m_dirty;
     mutable bool m_valid;
 
 private:
-    mutable QMutex      m_mutexPermission;
+    mutable QnMutex     m_mutexPermission;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
-    QnStorageManager    *m_storageManager;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 

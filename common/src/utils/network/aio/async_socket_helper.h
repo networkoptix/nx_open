@@ -8,6 +8,7 @@
 
 #include <atomic>
 #include <functional>
+#include <future>
 
 #include <QtCore/QThread>
 
@@ -31,20 +32,20 @@ public:
 
     virtual ~BaseAsyncSocketImplHelper() {}
 
-    bool post( std::function<void()>&& handler )
+    void post( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->post( m_socket, std::move(handler) );
+        aio::AIOService::instance()->post( m_socket, std::move(handler) );
     }
 
-    bool dispatch( std::function<void()>&& handler )
+    void dispatch( std::function<void()>&& handler )
     {
         if( m_socket->impl()->terminated.load( std::memory_order_relaxed ) )
-            return true;
+            return;
 
-        return aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
+        aio::AIOService::instance()->dispatch( m_socket, std::move(handler) );
     }
     
     //!This call stops async I/O on socket and it can never be resumed!
@@ -186,7 +187,7 @@ public:
         m_recvBuffer = buf;
         m_recvHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_recvAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etRead, this );
     }
@@ -210,7 +211,7 @@ public:
         m_sendHandler = std::move( handler );
         m_sendBufPos = 0;
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
@@ -222,7 +223,7 @@ public:
 
         m_timerHandler = std::move( handler );
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_registerTimerCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe(
             this->m_socket,
@@ -343,7 +344,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -364,7 +365,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( recvAsyncCallCounterBak == m_recvAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etRead );
         };
@@ -388,7 +389,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etWrite );
         };
@@ -408,7 +409,7 @@ private:
 
             if( terminated )
                 return;     //most likely, socket has been removed in handler
-            QMutexLocker lk( aio::AIOService::instance()->mutex() );
+            QnMutexLocker lk( aio::AIOService::instance()->mutex() );
             if( registerTimerCallCounterBak == m_registerTimerCallCounter )
                 aio::AIOService::instance()->removeFromWatchNonSafe( sock, aio::etTimedOut );
         };
@@ -587,7 +588,7 @@ private:
         m_asyncSendIssued = true;
 #endif
 
-        QMutexLocker lk( aio::AIOService::instance()->mutex() );
+        QnMutexLocker lk( aio::AIOService::instance()->mutex() );
         ++m_connectSendAsyncCallCounter;
         return aio::AIOService::instance()->watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }

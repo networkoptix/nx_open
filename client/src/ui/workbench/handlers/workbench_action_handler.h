@@ -23,6 +23,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <ui/dialogs/event_log_dialog.h>
 #include <ui/dialogs/camera_list_dialog.h>
+#include <ui/dialogs/search_bookmarks_dialog.h>
 #include "ui/dialogs/audit_log_dialog.h"
 
 #include <utils/color_space/image_correction.h>
@@ -153,7 +154,7 @@ protected slots:
     void at_aboutAction_triggered();
     void at_businessEventsAction_triggered();
     void at_openBusinessRulesAction_triggered();
-    void at_businessEventsLogAction_triggered();
+    void at_openBookmarksSearchAction_triggered();
     void at_openBusinessLogAction_triggered();
     void at_openAuditLogAction_triggered();
     void at_cameraListAction_triggered();
@@ -178,6 +179,7 @@ protected slots:
     void at_serverIssuesAction_triggered();
     void at_pingAction_triggered();
     void at_thumbnailsSearchAction_triggered();
+    void at_bookmarksModeAction_triggered();
 
     void at_openInFolderAction_triggered();
     void at_deleteFromDiskAction_triggered();
@@ -229,6 +231,7 @@ private:
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
     void openFailoverPriorityDialog();
+    void openBackupCamerasDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -248,6 +251,7 @@ private:
 
     QPointer<QnBusinessRulesDialog> m_businessRulesDialog;
     QPointer<QnEventLogDialog> m_businessEventsLogDialog;
+	QPointer<QnSearchBookmarksDialog> m_searchBookmarksDialog;
     QPointer<QnAuditLogDialog> m_auditLogDialog;
     QPointer<QnCameraListDialog> m_cameraListDialog;
     QPointer<QnCameraAdditionDialog> m_cameraAdditionDialog;

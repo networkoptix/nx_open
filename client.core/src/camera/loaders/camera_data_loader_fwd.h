@@ -1,0 +1,4 @@
+#pragma once
+
+class QnAbstractCameraDataLoader;
+typedef QSharedPointer<QnAbstractCameraDataLoader> QnAbstractCameraDataLoaderPtr;

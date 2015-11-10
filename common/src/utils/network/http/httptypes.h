@@ -220,6 +220,7 @@ namespace nx_http
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
             rangeNotSatisfiable = 416,
+            invalidParameter = 451,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503

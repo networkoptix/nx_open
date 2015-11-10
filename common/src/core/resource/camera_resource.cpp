@@ -16,11 +16,31 @@ static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+namespace {
+    const int CODEC_ID_H264 = 25;
+    const int CODEC_ID_MPEG4 = 13;
+    const int CODEC_ID_MJPEG = 8;
+}
+#endif
+
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
     m_issueCounter(0),
     m_lastIssueTimer()
 {}
+
+QString QnVirtualCameraResource::getUniqueId() const
+{
+    return getPhysicalId();
+}
+
+QString QnVirtualCameraResource::toSearchString() const
+{
+    QString result;
+    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
+    return result;
+}
 
 QnPhysicalCameraResource::QnPhysicalCameraResource(): 
     QnVirtualCameraResource(),
@@ -49,7 +69,7 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
 
 int QnPhysicalCameraResource::getChannel() const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     return m_channelNumber;
 }
 
@@ -57,7 +77,7 @@ void QnPhysicalCameraResource::setUrl(const QString &urlStr)
 {
     QnVirtualCameraResource::setUrl( urlStr ); /* This call emits, so we should not invoke it under lock. */
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     QUrl url( urlStr );
     m_channelNumber = QUrlQuery( url.query() ).queryItemValue( QLatin1String( "channel" ) ).toInt();
     setHttpPort( url.port( httpPort() ) );
@@ -178,7 +198,7 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     const auto hasDualStreamingLocal = hasDualStreaming2();
 
     //TODO #ak remove m_mediaStreamsMutex lock, use resource mutex
-    QMutexLocker lk( &m_mediaStreamsMutex );
+    QnMutexLocker lk( &m_mediaStreamsMutex );
 
     //get saved stream info with index encoderIndex
     const QString& mediaStreamsStr = getProperty( Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME );
@@ -364,11 +384,6 @@ void QnVirtualCameraResource::unLockDTSFactory()
 }
 
 
-QString QnVirtualCameraResource::getUniqueId() const
-{
-    return getPhysicalId();
-}
-
 bool QnVirtualCameraResource::isForcedAudioSupported() const {
     QString val = getProperty(Qn::FORCED_IS_AUDIO_SUPPORTED_PARAM_NAME);
     return val.toUInt() > 0;
@@ -400,14 +415,6 @@ void QnVirtualCameraResource::saveParamsAsync()
     propertyDictionary->saveParamsAsync(getId());
 }
 
-QString QnVirtualCameraResource::toSearchString() const
-{
-    QString result;
-    QTextStream(&result) << QnNetworkResource::toSearchString() << " " << getModel() << " " << getFirmware() << " " << getVendor(); //TODO: #Elric evil!
-    return result;
-}
-
-
 int QnVirtualCameraResource::saveAsync()
 {
     ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
@@ -418,7 +425,7 @@ void QnVirtualCameraResource::issueOccured() {
     bool tooManyIssues = false;
     {
         /* Calculate how many issues have occurred during last check period. */
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         m_issueCounter++;
         tooManyIssues = m_issueCounter >= MAX_ISSUE_CNT;
         m_lastIssueTimer.restart();
@@ -432,7 +439,7 @@ void QnVirtualCameraResource::issueOccured() {
 void QnVirtualCameraResource::cleanCameraIssues() {
     {
         /* Check if no issues occurred during last check period. */
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock( &m_mutex );
         if (!m_lastIssueTimer.hasExpired(issuesTimeoutMs())) 
             return;
         m_issueCounter = 0;

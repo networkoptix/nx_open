@@ -194,7 +194,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     case Qn::ValidRole:
         return isValid();
     case Qn::ActionIsInstantRole:
-        return !QnBusiness::hasToggleState(m_eventType);
+        return !isActionProlonged();
     case Qn::ShortTextRole:
         return getText(column, false);
 
@@ -491,9 +491,7 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
         fields |= QnBusiness::AggregationField;
     }
 
-    if (QnBusiness::hasToggleState(m_eventType) &&
-            !QnBusiness::hasToggleState(m_actionType) &&
-            m_eventState == QnBusiness::UndefinedState) {
+    if (QnBusiness::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == QnBusiness::UndefinedState) {
         m_eventState = allowedEventStates(m_eventType).first();
         fields |= QnBusiness::EventStateField;
     }
@@ -516,6 +514,10 @@ void QnBusinessRuleViewModel::setActionResources(const QnResourceList &value) {
     m_modified = true;
 
     emit dataChanged(this, QnBusiness::ActionResourcesField | QnBusiness::ModifiedField);
+}
+
+bool QnBusinessRuleViewModel::isActionProlonged() const {
+    return QnBusiness::isActionProlonged(m_actionType, m_actionParams);
 }
 
 QnBusinessActionParameters QnBusinessRuleViewModel::actionParams() const
@@ -612,7 +614,7 @@ QString QnBusinessRuleViewModel::getText(const int column, const bool detailed) 
     case QnBusiness::ModifiedColumn:
         return (m_modified ? QLatin1String("*") : QString());
     case QnBusiness::EventColumn:
-        return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType);
+        return QnBusinessStringsHelper::eventTypeString(m_eventType, m_eventState, m_actionType, m_actionParams);
     case QnBusiness::SourceColumn:
         return getSourceText(detailed);
     case QnBusiness::SpacerColumn:
@@ -765,6 +767,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         }
         case QnBusiness::CameraRecordingAction:
             return isResourcesListValid<QnCameraRecordingPolicy>(QnBusiness::filteredResources<QnCameraRecordingPolicy::resource_type>(m_actionResources));
+        case QnBusiness::BookmarkAction:
+            return isResourcesListValid<QnCameraRecordingPolicy>(QnBusiness::filteredResources<QnBookmarkActionPolicy::resource_type>(m_actionResources));
         case QnBusiness::CameraOutputAction:
         case QnBusiness::CameraOutputOnceAction:
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
@@ -865,6 +869,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         else
             return tr("All Users");
     }
+    case QnBusiness::BookmarkAction:
     case QnBusiness::CameraRecordingAction:
     {
         return QnCameraRecordingPolicy::getText(resources, detailed);

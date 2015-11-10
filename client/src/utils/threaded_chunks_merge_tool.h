@@ -1,16 +1,18 @@
 #pragma once
 
 #include <utils/common/long_runnable.h>
+#include <utils/thread/mutex.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+
 
 class QnThreadedChunksMergeTool: public QnLongRunnable {
     Q_OBJECT
 public:
     QnThreadedChunksMergeTool();
 
-    void queueMerge(const QVector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle);
+    void queueMerge(const std::vector<QnTimePeriodList> &periodsList, const QnTimePeriodList &syncedPeriods, qint64 startTimeMs, int handle);
 signals:
     void finished(int handle, const QnTimePeriodList &result);
 
@@ -21,11 +23,11 @@ private:
     void processData();
 
 private:
-    QVector<QnTimePeriodList> m_periodsList;
+    std::vector<QnTimePeriodList> m_periodsList;
     QnTimePeriodList m_syncedPeriods;
     qint64 m_startTimeMs;
     int m_handle;
     bool m_queuedData;
 
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };

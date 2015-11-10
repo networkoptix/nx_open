@@ -50,6 +50,7 @@ namespace rtu
     {
         QUuid id;
         QUuid runtimeId;
+        QString customization;
 
         bool safeMode;
         VersionHolder version;

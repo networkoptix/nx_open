@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtGlobal>
 #include <QtCore/QElapsedTimer>
@@ -27,6 +27,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_transport.h"
 
+#include <utils/thread/mutex.h>
 
 /*! \page time_sync Time synchronization in cluster
     Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 
@@ -235,7 +236,7 @@ namespace ec2
         QElapsedTimer m_monotonicClock;
         //!priority key of current server
         TimePriorityKey m_localTimePriorityKey;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         TimeSyncInfo m_usedTimeSyncInfo;
         quint64 m_broadcastSysTimeTaskID;
         quint64 m_internetSynchronizationTaskID;
@@ -265,7 +266,7 @@ namespace ec2
                 - low DWORD - some random number
         */
         void remotePeerTimeSyncUpdate(
-            QMutexLocker* const lock,
+            QnMutexLockerBase* const lock,
             const QnUuid& remotePeerID,
             qint64 localMonotonicClock,
             qint64 remotePeerSyncTime,
@@ -293,16 +294,16 @@ namespace ec2
             const QnUuid& peerID,
             nx_http::AsyncHttpClientPtr clientPtr );
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
-        void syncTimeWithAllKnownServers(QMutexLocker* const lock);
+        void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(
             QnTransactionTransport* transport,
             nx_http::HttpHeaders* const headers);
         void onTransactionReceived(
             QnTransactionTransport* transport,
             const nx_http::HttpHeaders& headers);
-        void forgetSynchronizedTimeNonSafe(QMutexLocker* const /*lock*/);
+        void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
         void checkSystemTimeForChange();
-        void handleLocalTimePriorityKeyChange(QMutexLocker* const lk);
+        void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );

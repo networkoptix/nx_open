@@ -31,6 +31,7 @@ class QnWorkbenchItem;
 class QnStatusOverlayWidget;
 class QnImageButtonWidget;
 class QnImageButtonBar;
+class QnProxyLabel;
 
 class GraphicsLabel;
 
@@ -85,6 +86,8 @@ public:
      * Virtual destructor.
      */
     virtual ~QnResourceWidget();
+
+    void setBookmarksLabelText(const QString &text);
 
     /**
      * \returns                         Resource associated with this widget.
@@ -353,6 +356,10 @@ protected:
 
     float defaultAspectRatio() const;
 private:
+    void createButtons();
+    void createHeaderOverlay();
+    void createFooterOverlay();
+
     void setTitleTextInternal(const QString &titleText);
     void setInfoTextInternal(const QString &infoText);
 
@@ -364,6 +371,8 @@ private:
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
+
+    void updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag);
 
 private:
     friend class QnWorkbenchDisplay;
@@ -412,7 +421,6 @@ private:
     QnImageButtonWidget *m_iconButton;
 
 
-
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
@@ -432,6 +440,11 @@ private:
     };
     
     OverlayWidgets m_overlayWidgets;
+
+    /** Main widget header is too small and thus should be hidden. */
+    bool m_mainHeaderIsTooSmall;
+    /** Short info widget header is too small and thus should be hidden. */
+    bool m_infoHeaderIsTooSmall;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

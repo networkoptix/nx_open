@@ -32,6 +32,10 @@ struct QnBusinessActionParameters {
     // Say Text
     QString sayText;
 
+    // Bookmark
+    QString tags;
+    int bookmarkDuration;
+
     /** 
      * \returns                        Whether all parameters have default values. 
      */
@@ -39,7 +43,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(bookmarkDuration)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

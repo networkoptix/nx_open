@@ -41,7 +41,7 @@ private:
 
 private:
     /** Mutex that is used to synchronize access to manual camera addition progress. */
-    QMutex m_searchProcessMutex;
+    QnMutex m_searchProcessMutex;
 
     QHash<QnUuid, QnManualCameraSearcher*> m_searchProcesses;
     QHash<QnUuid, QnConcurrent::QnFuture<bool> > m_searchProcessRuns;

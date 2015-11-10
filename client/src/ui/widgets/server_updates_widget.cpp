@@ -113,6 +113,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         checkForUpdatesLocal();
     });
 
+    connect(ui->updatesNotificationCheckbox,    &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
     initSourceMenu();
     initLinkButtons();
     initBuildSelectionButtons();
@@ -284,21 +286,33 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
     return m_updateTool;
 }
 
-void QnServerUpdatesWidget::updateFromSettings() {
+void QnServerUpdatesWidget::loadDataToUi() {
     ui->updatesNotificationCheckbox->setChecked(QnGlobalSettings::instance()->isUpdateNotificationsEnabled());
 }
 
-bool QnServerUpdatesWidget::confirm() {
+void QnServerUpdatesWidget::applyChanges() {
+    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
+}
+
+bool QnServerUpdatesWidget::hasChanges() const {
+    if (isReadOnly())
+        return false;
+
+    return QnGlobalSettings::instance()->isUpdateNotificationsEnabled() != ui->updatesNotificationCheckbox->isChecked();
+}
+
+bool QnServerUpdatesWidget::canApplyChanges() {
+    //TODO: #GDM now this prevents other tabs from saving their changes
     if (isUpdating()) {
         QMessageBox::information(this, tr("Information"), tr("Update is in process now."));
         return false;
     }
-
-    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
+   
     return true;
 }
 
-bool QnServerUpdatesWidget::discard() {
+bool QnServerUpdatesWidget::canDiscardChanges() {
+    //TODO: #GDM now this prevents other tabs from discarding their changes
     if(!cancelUpdate()) {
         QMessageBox::critical(this, tr("Error"), tr("Cannot cancel update at this state.") + L'\n' + tr("Please wait until update is finished"));
         return false;

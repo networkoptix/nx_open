@@ -38,9 +38,9 @@ namespace ec2 {
     void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraDataEx &dst);
     void fromResourceListToApi(const QnVirtualCameraResourceList &src, ApiCameraDataExList &dst);
 
-    void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst);
-    void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst);
-    void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst);
+    //void fromResourceToApi(const QnCameraHistoryItem &src, ApiCameraServerItemData &dst);
+    //void fromApiToResource(const ApiCameraServerItemData &src, QnCameraHistoryItem &dst);
+    //void fromApiToResourceList(const ApiCameraServerItemDataList &src, QnCameraHistoryList &dst);
 
     void fromResourceToApi(const QnEmailSettings &src, ApiEmailSettingsData &dst);
     void fromApiToResource(const ApiEmailSettingsData &src, QnEmailSettings &dst);
@@ -98,10 +98,6 @@ namespace ec2 {
 
     void fromApiToResource(const ApiVideowallControlMessageData &data, QnVideoWallControlMessage &message);
     void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallControlMessageData &data);
-
-    void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags);
-    void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data);
-    
 
 } // namespace ec2
 

@@ -17,8 +17,9 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-QnSyncTime::QnSyncTime()
+QnSyncTime::QnSyncTime(QObject *parent)
 :
+    QObject(parent),
     m_lastReceivedTime( 0 ),
     m_lastWarnTime( 0 ),
     m_lastLocalTime( 0 ),
@@ -38,7 +39,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
         return;
     }
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
     qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
     
     m_lastReceivedTime = newTime;
@@ -75,7 +76,7 @@ void QnSyncTime::updateTime(qint64 newTime)
 
 qint64 QnSyncTime::currentMSecsSinceEpoch()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock( &m_mutex );
 
     const qint64 localTime = QDateTime::currentMSecsSinceEpoch();
     if (

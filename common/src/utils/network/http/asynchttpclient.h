@@ -9,9 +9,10 @@
 #include <map>
 #include <memory>
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
+#include <QtNetwork/QAuthenticator>
 #include <QSharedPointer>
 
 #include "utils/network/abstract_socket.h"
@@ -92,11 +93,11 @@ namespace nx_http
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         bool doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
@@ -143,6 +144,7 @@ namespace nx_http
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
+        void addRequestHeaders(const HttpHeaders& headers);
         void removeAdditionalHeader( const StringType& key );
         template<class HttpHeadersRef>
         void setAdditionalHeaders( HttpHeadersRef&& additionalHeaders )
@@ -228,7 +230,7 @@ namespace nx_http
         bool m_authorizationTried;
         bool m_ha1RecalcTried;
         bool m_terminated;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         quint64 m_totalBytesRead;
         bool m_contentEncodingUsed;
         unsigned int m_sendTimeoutMs;
@@ -387,11 +389,19 @@ namespace nx_http
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,
         int* const statusCode,
         nx_http::BufferType* const msgBody );
+
+    //!Same as downloadFileAsync but provide contentType at callback
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
 }
 
 #endif  //ASYNCHTTPCLIENT_H

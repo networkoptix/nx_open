@@ -90,7 +90,7 @@ namespace {
 }
 
 QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
-    m_itemsMutex(QMutex::Recursive),
+    m_itemsMutex(QnMutex::Recursive),
     m_elapsedTimer(),
     m_timer(new QTimer(this)),
     m_clientMode(clientMode),
@@ -176,7 +176,7 @@ void QnModuleFinder::pleaseStop() {
 }
 
 QList<QnModuleInformation> QnModuleFinder::foundModules() const {
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
     QList<QnModuleInformation> result;
     for (const ModuleItem &moduleItem: m_moduleItemById) {
         if (moduleItem.moduleInformation.id.isNull())
@@ -206,17 +206,17 @@ QList<QnModuleInformationWithAddresses> QnModuleFinder::foundModulesWithAddresse
 }
 
 QnModuleInformation QnModuleFinder::moduleInformation(const QnUuid &moduleId) const {
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(moduleId).moduleInformation;
 }
 
 QSet<SocketAddress> QnModuleFinder::moduleAddresses(const QnUuid &id) const {
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(id).addresses;
 }
 
 SocketAddress QnModuleFinder::primaryAddress(const QnUuid &id) const {
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
     return m_moduleItemById.value(id).primaryAddress;
 }
 
@@ -243,7 +243,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
     qint64 currentTime = m_elapsedTimer.elapsed();
 
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
 
     ModuleItem &item = m_moduleItemById[moduleInformation.id];
 
@@ -268,7 +268,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             }
         }
 
-        QMutexLocker lk(&m_itemsMutex);
+        QnMutexLocker lk(&m_itemsMutex);
 
         if (!newModuleIsValid || oldModuleIsValid) {
             if (currentTime - item.lastConflictResponse < pingTimeout()) {
@@ -302,7 +302,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
-            QMutexLocker lk(&m_itemsMutex);
+            QnMutexLocker lk(&m_itemsMutex);
             item.primaryAddress = SocketAddress();
             lk.unlock();
 
@@ -312,7 +312,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             }
         }
 
-        QMutexLocker lk(&m_itemsMutex);
+        QnMutexLocker lk(&m_itemsMutex);
 
         item.moduleInformation = moduleInformation;
         if (item.primaryAddress.port == 0 && !ignoredAddress)
@@ -345,8 +345,9 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
 
             sendModuleInformation(moduleInformation, address, true);
         }
-
-        lk.unlock();
+        else {
+            lk.unlock();
+        }
 
         NX_LOG(lit("QnModuleFinder: New module URL: %1 %2")
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
@@ -400,7 +401,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
     if (it == m_moduleItemById.end())
         return;
 
-    QMutexLocker lk(&m_itemsMutex);
+    QnMutexLocker lk(&m_itemsMutex);
 
     if (!it->addresses.remove(address))
         return;
@@ -419,8 +420,10 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
         else
             sendModuleInformation(moduleInformation, address, false);
     }
-
-    lk.unlock();
+    else
+    {
+        lk.unlock();
+    }
 
     NX_LOG(lit("QnModuleFinder: Module URL lost: %1 %2:%3")
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);

@@ -262,11 +262,22 @@ QnMediaServerResourcePtr QnRecordingStatisticsWidget::server() const {
 }
 
 void QnRecordingStatisticsWidget::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
     m_server = server;
+    // loadDataToUi() is called from the dialog
 }
 
-void QnRecordingStatisticsWidget::updateFromSettings() {
+void QnRecordingStatisticsWidget::loadDataToUi() {
     updateData();
+}
+
+void QnRecordingStatisticsWidget::applyChanges() {
+    /* This widget is read-only. */
+}
+
+bool QnRecordingStatisticsWidget::hasChanges() const {
+    return false;
 }
 
 void QnRecordingStatisticsWidget::updateData() {
@@ -328,8 +339,7 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
         m_requests.insert(handle, m_server->getId());
-        handle = m_server->apiConnection()->getStorageSpaceAsync(
-            this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        handle = m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         m_requests.insert(handle, m_server->getId());
     }
 }
@@ -355,8 +365,9 @@ void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorage
         return;
     m_requests.remove(requestNum);
     if (status == 0) {
-        for (const auto& storage: data.storages) 
+        for (const auto& storage: data.storages) {
             m_availStorages << storage;
+        }
     }
     if (m_requests.isEmpty()) {
         requestFinished();

@@ -116,7 +116,7 @@ void QnWorkbenchRenderWatcher::at_widget_displayChanged() {
 }
 
 void QnWorkbenchRenderWatcher::at_widget_displayChanged(QnMediaResourceWidget *widget) {
-    int isDisplaying = this->isDisplaying(widget);
+    bool isDisplaying = this->isDisplaying(widget);
     
     setDisplaying(widget, false);
     m_dataByWidget[widget].display = widget->display().data();

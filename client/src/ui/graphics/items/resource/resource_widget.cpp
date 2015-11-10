@@ -9,6 +9,7 @@
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -31,6 +32,7 @@
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
@@ -110,9 +112,8 @@ namespace {
 
 } // anonymous namespace
 
-
 QnResourceWidget::OverlayWidgets::OverlayWidgets():
-      infoOverlay(nullptr)
+    infoOverlay(nullptr)
     , mainOverlay(nullptr)
     , mainNameLabel(createGraphicsLabel())
     , mainExtrasLabel(createGraphicsLabel())
@@ -121,7 +122,6 @@ QnResourceWidget::OverlayWidgets::OverlayWidgets():
     , infoNameLabel(createGraphicsLabel())
     , infoTimeLabel(createGraphicsLabel())
 {}
-
 
 // -------------------------------------------------------------------------- //
 // Logic
@@ -139,6 +139,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_titleTextFormatHasPlaceholder(true),
     m_infoTextFormatHasPlaceholder(true),
     m_overlayWidgets(),
+    m_mainHeaderIsTooSmall(false),
+    m_infoHeaderIsTooSmall(false),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
     m_statusOverlay(Qn::EmptyOverlay),
@@ -161,40 +163,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
-    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
-    closeButton->setIcon(qnSkin->icon("item/close.png"));
-    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
-    closeButton->setToolTip(tr("Close"));
-    connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
-
-    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
-    infoButton->setIcon(qnSkin->icon("item/info.png"));
-    infoButton->setCheckable(true);
-    infoButton->setChecked(item->displayInfo());
-    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
-    infoButton->setToolTip(tr("Information"));
-    connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
-    
-    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
-    rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
-    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
-    rotateButton->setToolTip(tr("Rotate"));
-    setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
-    connect(rotateButton, &QnImageButtonWidget::pressed, this, &QnResourceWidget::rotationStartRequested);
-    connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
-
-    m_buttonBar = new QnImageButtonBar();
-    m_buttonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
-    m_buttonBar->addButton(CloseButton, closeButton);
-    m_buttonBar->addButton(InfoButton, infoButton);
-    m_buttonBar->addButton(RotateButton, rotateButton);
-    connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
-
-    m_iconButton = new QnImageButtonWidget();
-    m_iconButton->setParent(this);
-    m_iconButton->setPreferredSize(24.0, 24.0);
-    m_iconButton->setVisible(false);
+    createButtons();
 
     addInfoOverlay();
     addMainOverlay();
@@ -203,6 +172,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
     addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, StatusLayer);
 
+
+    /* Initialize resource. */
+    m_resource = qnResPool->getResourceByUniqueId(item->resourceUid());
+    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     m_aspectRatio = defaultAspectRatio();
@@ -213,10 +186,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     QnLicenseUsageWatcher* videowallLicenseHelper = new QnVideoWallLicenseUsageWatcher(this);
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
 
-    /* Instantly display info overlays. */
-    setInfoVisible(infoButton->isChecked(), false);
-
     /* Run handlers. */
+    setInfoVisible(buttonBar()->button(InfoButton)->isChecked(), false);
     updateTitleText();
     updateButtonsVisibility();
     updateCursor();
@@ -225,15 +196,12 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         if (m_enclosingGeometry.isValid())
             setGeometry(calculateGeometry(m_enclosingGeometry));
     });
-
-    connect(this, &QnResourceWidget::displayInfoChanged, this, [this]() {
-        setInfoVisible(this->item()->displayInfo());
-    });
 }
 
 QnResourceWidget::~QnResourceWidget() {
     ensureAboutToBeDestroyedEmitted();
 }
+
 
 void QnResourceWidget::addInfoOverlay() {
     auto titleLayout = createGraphicsLayout(Qt::Horizontal);
@@ -254,12 +222,17 @@ void QnResourceWidget::addInfoOverlay() {
     overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    m_overlayWidgets.infoOverlay = new QnViewportBoundWidget(this);
-    m_overlayWidgets.infoOverlay->setLayout(overlayLayout);
-    m_overlayWidgets.infoOverlay->setAcceptedMouseButtons(0);
+    QnViewportBoundWidget *infoOverlay = new QnViewportBoundWidget(this);
+    infoOverlay->setLayout(overlayLayout);
+    infoOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.infoOverlay = infoOverlay;
 
     addOverlayWidget(m_overlayWidgets.infoOverlay, UserVisible, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, false, false);
+
+    connect(infoOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, titleWidget](QGraphicsView *view){
+        updateHeaderIsTooSmallFlag(titleWidget, view, &m_infoHeaderIsTooSmall);
+    });
 }
 
 void QnResourceWidget::addMainOverlay() {
@@ -293,16 +266,58 @@ void QnResourceWidget::addMainOverlay() {
     overlayLayout->addStretch();
     overlayLayout->addItem(footerWidget);
 
-    m_overlayWidgets.mainOverlay = new QnViewportBoundWidget(this);
-    m_overlayWidgets.mainOverlay->setLayout(overlayLayout);
-    m_overlayWidgets.mainOverlay->setAcceptedMouseButtons(0);
+    QnViewportBoundWidget *mainOverlay = new QnViewportBoundWidget(this);
+    mainOverlay->setLayout(overlayLayout);
+    mainOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.mainOverlay = mainOverlay;
+
+    connect(mainOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, headerWidget](QGraphicsView *view){
+        updateHeaderIsTooSmallFlag(headerWidget, view, &m_mainHeaderIsTooSmall);
+    });
 
     OverlayVisibility visibility = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
         ? OverlayVisibility::Invisible
-        : OverlayVisibility::AutoVisible;
+        : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
 
     addOverlayWidget(m_overlayWidgets.mainOverlay, visibility, true, true, InfoLayer);
     setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
+}
+
+void QnResourceWidget::createButtons() {
+    QnImageButtonWidget *closeButton = new QnImageButtonWidget();
+    closeButton->setIcon(qnSkin->icon("item/close.png"));
+    closeButton->setProperty(Qn::NoBlockMotionSelection, true);
+    closeButton->setToolTip(tr("Close"));
+    connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
+    connect(accessController()->notifier(m_item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
+
+    QnImageButtonWidget *infoButton = new QnImageButtonWidget();
+    infoButton->setIcon(qnSkin->icon("item/info.png"));
+    infoButton->setCheckable(true);
+    infoButton->setChecked(item()->displayInfo());
+    infoButton->setProperty(Qn::NoBlockMotionSelection, true);
+    infoButton->setToolTip(tr("Information"));
+    connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
+
+    QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
+    rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
+    rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
+    rotateButton->setToolTip(tr("Rotate"));
+    setHelpTopic(rotateButton, Qn::MainWindow_MediaItem_Rotate_Help);
+    connect(rotateButton, &QnImageButtonWidget::pressed, this, &QnResourceWidget::rotationStartRequested);
+    connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
+
+    m_buttonBar = new QnImageButtonBar();
+    m_buttonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
+    m_buttonBar->addButton(CloseButton, closeButton);
+    m_buttonBar->addButton(InfoButton, infoButton);
+    m_buttonBar->addButton(RotateButton, rotateButton);
+    connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
+
+    m_iconButton = new QnImageButtonWidget();
+    m_iconButton->setParent(this);
+    m_iconButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setVisible(false);
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {
@@ -478,7 +493,7 @@ void QnResourceWidget::setInfoTextFormat(const QString &infoTextFormat) {
 
 void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
     QString leftText, rightText;
-    
+
     splitFormat(infoText, &leftText, &rightText);
 
     m_overlayWidgets.mainDetailsLabel->setText(leftText);
@@ -763,16 +778,28 @@ void QnResourceWidget::updateHud(bool animate) {
 
     m_buttonBar->setVisible(buttonsVisible);
 
-    bool visible = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
+    bool infoVisible = m_infoHeaderIsTooSmall || options().testFlag(QnResourceWidget::InfoOverlaysForbidden) || qnRuntime->showFullInfo()
         ? false
         : detailsVisible && !m_mouseInWidget;
-    setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, visible, animate);
+
+    OverlayVisibility mainInfoVisibility = Invisible;
+
+    if (!options().testFlag(QnResourceWidget::InfoOverlaysForbidden) && !m_mainHeaderIsTooSmall) {
+        mainInfoVisibility = qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible
+                                                       : OverlayVisibility::AutoVisible;
+    }
+    setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainInfoVisibility);
+
+    bool mainVisible = !m_mainHeaderIsTooSmall && qnRuntime->showFullInfo() && (detailsVisible || m_mouseInWidget);
+    if (qnRuntime->showFullInfo())
+        setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, mainVisible, animate);
+    else
+        setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, infoVisible, animate);
 }
 
 bool QnResourceWidget::isHovered() const {
     return m_mouseInWidget;
 }
-
 
 // -------------------------------------------------------------------------- //
 // Painting
@@ -909,17 +936,19 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
-void QnResourceWidget::optionsChangedNotify(Options changedFlags) {
+void QnResourceWidget::optionsChangedNotify(Options changedFlags){
     if (
-        ((changedFlags & DisplayInfo) && (visibleButtons() & InfoButton))
-        || (changedFlags & DisplayButtons)
+        (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
+        || changedFlags.testFlag(DisplayButtons)
         )
         updateHud(false);
 
     if (changedFlags.testFlag(InfoOverlaysForbidden)) {
         bool forbidden = options().testFlag(InfoOverlaysForbidden);
 
-        OverlayVisibility mainVisibility = forbidden ? OverlayVisibility::Invisible : OverlayVisibility::AutoVisible;
+        OverlayVisibility mainVisibility = forbidden 
+            ? OverlayVisibility::Invisible 
+            : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
         setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainVisibility);
         updateHud(false);
     }
@@ -942,4 +971,23 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
 
     item()->setData(Qn::ItemCheckedButtonsRole, static_cast<int>(checkedButtons()));
     update();
+}
+
+void QnResourceWidget::updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag) {
+    if (!view)
+        return;
+
+    enum { minimalHeaderHeight = 8 };
+
+    qreal sceneScale = widget->sceneTransform().m11();
+    qreal viewportScale = view->transform().m11();
+    qreal headerHeight = widget->size().height() * sceneScale * viewportScale;
+    bool headerIsTooSmall = headerHeight < minimalHeaderHeight;
+
+    if (headerIsTooSmall == *targetFlag)
+        return;
+
+    *targetFlag = headerIsTooSmall;
+
+    updateHud();
 }

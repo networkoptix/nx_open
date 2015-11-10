@@ -26,7 +26,7 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
         return nx_http::StatusCode::badRequest; //missing resource id 
     QnUuid resourceID(pathParts[2]);
 
-    QnResourcePtr res = QnResourcePool::instance()->getResourceById(resourceID);
+    QnResourcePtr res = qnResPool->getResourceById(resourceID);
     if( !res )
         return nx_http::StatusCode::notFound;
 

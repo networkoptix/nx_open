@@ -8,8 +8,9 @@
 const static QString __CAMERA_EXCEPT_PARAMS[] = {
 	Qn::CAMERA_CREDENTIALS_PARAM_NAME,
     Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, 
-    Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
-    Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
+//     Qn::CAMERA_SETTINGS_ID_PARAM_NAME,
+//     Qn::PHYSICAL_CAMERA_SETTINGS_XML_PARAM_NAME,
+	Qn::CAMERA_ADVANCED_PARAMETERS,
     QLatin1String("DeviceID"), QLatin1String("DeviceUrl"), // from plugin onvif
     QLatin1String("MediaUrl"),
 };
@@ -23,7 +24,7 @@ namespace ec2 {
             (ApiCameraDataStatistics)(ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
             (ApiLicenseStatistics)(ApiBusinessRuleStatistics) \
 			(ApiSystemStatistics)(ApiStatisticsServerInfo), \
-            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields)
+            (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 
     ApiCameraDataStatistics::ApiCameraDataStatistics() {}
 
@@ -59,8 +60,10 @@ namespace ec2 {
     ApiMediaServerDataStatistics::ApiMediaServerDataStatistics(ApiMediaServerDataEx&& data)
         : ApiMediaServerDataEx(std::move(data))
     {
-        for (auto s : ApiMediaServerDataEx::storages)
+        for (auto& s : ApiMediaServerDataEx::storages)
             storages.push_back(std::move(s));
+
+        ApiMediaServerDataEx::storages.clear();
     }
 
     ApiLicenseStatistics::ApiLicenseStatistics()
@@ -70,7 +73,7 @@ namespace ec2 {
         : cameraCount(0)
     {
         QMap<QString, QString> parsed;
-        for (auto value : data.licenseBlock.split('\n'))
+        for (const auto& value : data.licenseBlock.split('\n'))
         {
             auto pair = value.split('=');
             if (pair.size() == 2) 

@@ -44,13 +44,6 @@
        <item>
         <widget class="QLineEdit" name="urlEdit"/>
        </item>
-       <item>
-        <widget class="QToolButton" name="browseButton">
-         <property name="text">
-          <string>...</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </item>
      <item row="2" column="0">

@@ -12,6 +12,10 @@
 
 #include "security_cam_resource.h"
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#define CodecID int
+#define CODEC_ID_NONE 0
+#endif
 
 class QnAbstractDTSFactory;
 
@@ -95,7 +99,7 @@ protected:
 private:
     void saveResolutionList( const CameraMediaStreams& supportedNativeStreams );
 private:
-    QMutex m_mediaStreamsMutex;
+    QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
 };
 

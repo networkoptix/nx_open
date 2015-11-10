@@ -7,7 +7,7 @@
 
 #include <limits>
 
-#include <QtCore/QMutexLocker>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 
@@ -30,7 +30,7 @@ PtsToClockMapper::TimeSynchronizationData::TimeSynchronizationData()
 
 void PtsToClockMapper::TimeSynchronizationData::mapLocalTimeToSourceAbsoluteTime( int64_t localTimeUSec, int64_t sourceTimeUSec )
 {
-    QMutexLocker lk( &m_timestampSynchronizationMutex );
+    QnMutexLocker lk( &m_timestampSynchronizationMutex );
     m_localToSourceTimeShift = localTimeUSec - sourceTimeUSec;
     ++m_modificationSequence;
 #ifdef DEBUG_OUTPUT
@@ -41,13 +41,13 @@ void PtsToClockMapper::TimeSynchronizationData::mapLocalTimeToSourceAbsoluteTime
 
 int64_t PtsToClockMapper::TimeSynchronizationData::localToSourceTimeShift() const
 {
-    QMutexLocker lk( &m_timestampSynchronizationMutex );
+    QnMutexLocker lk( &m_timestampSynchronizationMutex );
     return m_localToSourceTimeShift;
 }
 
 size_t PtsToClockMapper::TimeSynchronizationData::modificationSequence() const
 {
-    QMutexLocker lk( &m_timestampSynchronizationMutex );
+    QnMutexLocker lk( &m_timestampSynchronizationMutex );
     return m_modificationSequence;
 }
 

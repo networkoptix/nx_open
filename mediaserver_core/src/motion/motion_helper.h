@@ -46,13 +46,13 @@ private:
         qint64 msStartTime,
         qint64 msEndTime,
         int detailLevel,
-        QVector<QnTimePeriodList>* const timePeriods );
+        std::vector<QnTimePeriodList>* const timePeriods );
 
 private:
     typedef QPair<QnNetworkResourcePtr, int> MotionArchiveKey;
     typedef QMap<MotionArchiveKey, QnMotionArchive*> MotionWriters;
     MotionWriters m_writers;
-    QMutex m_mutex;
+    QnMutex m_mutex;
 };
 
 

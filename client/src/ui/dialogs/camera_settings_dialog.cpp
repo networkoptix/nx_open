@@ -73,13 +73,13 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
             setCameras(cameras);
     });  
 
-    at_settingsWidget_hasChangesChanged();
-    retranslateUi();
-
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
     safeModeWatcher->addWarningLabel(m_buttonBox);
     safeModeWatcher->addControlledWidget(m_okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
     safeModeWatcher->addControlledWidget(m_applyButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
+
+    at_settingsWidget_hasChangesChanged();
+    retranslateUi();
 }
 
 QnCameraSettingsDialog::~QnCameraSettingsDialog() {
@@ -139,7 +139,7 @@ void QnCameraSettingsDialog::reject() {
 // -------------------------------------------------------------------------- //
 void QnCameraSettingsDialog::at_settingsWidget_hasChangesChanged() {
     bool hasChanges = m_settingsWidget->hasDbChanges();
-    m_applyButton->setEnabled(hasChanges);
+    m_applyButton->setEnabled(hasChanges && !qnCommon->isReadOnly());
     m_settingsWidget->setExportScheduleButtonEnabled(!hasChanges);
 }
 

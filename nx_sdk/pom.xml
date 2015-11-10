@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<parent>
-		<artifactId>hdwitness</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.4.1-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <parent>
+        <artifactId>hdwitness</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>2.5.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.4.1-SNAPSHOT</version>
+    <version>2.5.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_sdk</artifactId>
     <packaging>pom</packaging>
@@ -19,7 +19,7 @@
 
     <build>
         <directory>nx_sdk</directory>
-        <finalName>${deb.customization.company.name}</finalName>
+        <finalName>vms</finalName>
         <plugins>    
             <plugin>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -49,13 +49,13 @@
                         </goals>
                         <configuration>
                             <failOnError>false</failOnError>
-                            <target>							
+                            <target>                            
                                 <chmod file="${project.basedir}/build_sdk.sh" perm="755"/>
                                 <!-- script.extension is set in base pom.xml in profiles: Windows - "bat", Unix - "sh" -->
-			        <exec dir="${project.basedir}" executable="${project.basedir}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
+                    <exec dir="${project.basedir}" executable="${project.basedir}/build_sdk.${script.extension}" failifexecutionfails="true" />                                        
                             </target>
                         </configuration>
-                    </execution>					
+                    </execution>                    
                 </executions>
             </plugin>
 <!--
@@ -93,8 +93,8 @@
                             </descriptors>
                         </configuration>
                     </execution>
-                </executions>				
-            </plugin> 		
+                </executions>               
+            </plugin>       
         </plugins>    
     </build>
 </project>

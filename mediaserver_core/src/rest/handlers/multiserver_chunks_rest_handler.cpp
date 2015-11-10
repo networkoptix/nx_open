@@ -23,15 +23,12 @@
 #include "recorder/storage_manager.h"
 #include "http/custom_headers.h"
 #include "rest/server/rest_connection_processor.h"
+#include <rest/helpers/chunks_request_helper.h>
 #include "utils/network/tcp_listener.h"
 
 namespace {
     static QString urlPath;
 }
-
-typedef QMutexLocker QnMutexLocker;
-typedef QMutex QnMutex;
-typedef QWaitCondition QnWaitCondition;
 
 struct QnMultiserverChunksRestHandler::InternalContext
 {
@@ -102,9 +99,7 @@ void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& ou
 {
     MultiServerPeriodData record;
     record.guid = qnCommon->moduleGUID();
-    record.periods = qnStorageMan->getRecordedPeriods(ctx->request.resList, ctx->request.startTimeMs, ctx->request.endTimeMs, ctx->request.detailLevel, ctx->request.keepSmallChunks,
-        QList<QnServer::ChunksCatalog>() << QnServer::LowQualityCatalog << QnServer::HiQualityCatalog,
-        ctx->request.limit);
+    record.periods = QnChunksRequestHelper::load(ctx->request);
 
     if (!record.periods.empty()) {
         QnMutexLocker lock(&ctx->mutex);
@@ -131,7 +126,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     {
         QSet<QnMediaServerResourcePtr> servers;
         for (const auto& camera: ctx.request.resList)
-            servers += qnHistoryPool->getAllCameraServers(camera).toSet();
+            servers += qnCameraHistoryPool->getCameraFootageData(camera).toSet();
 
         for (const auto& server: servers) 
         {
@@ -159,15 +154,14 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
     outputData = loadDataSync(request, owner);
 
     if (request.flat) {
-        QVector<QnTimePeriodList> periodsList;
+        std::vector<QnTimePeriodList> periodsList;
         for (const MultiServerPeriodData& value: outputData)
-            periodsList << value.periods;
+            periodsList.push_back( value.periods );
         QnTimePeriodList timePeriodList = QnTimePeriodList::mergeTimePeriods(periodsList);
 
         if (request.format == Qn::CompressedPeriodsFormat)
-        {
-            bool signedSerialization = request.periodsType == Qn::BookmarksContent;
-            result = QnCompressedTime::serialized(timePeriodList, signedSerialization);
+        {            
+            result = QnCompressedTime::serialized(timePeriodList, false);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else {
@@ -178,8 +172,7 @@ int QnMultiserverChunksRestHandler::executeGet(const QString& path, const QnRequ
     else {
         if (request.format == Qn::CompressedPeriodsFormat)
         {
-            bool signedSerialization = request.periodsType == Qn::BookmarksContent;
-            result = QnCompressedTime::serialized(outputData, signedSerialization);
+            result = QnCompressedTime::serialized(outputData, false);
             contentType = Qn::serializationFormatToHttpContentType(Qn::CompressedPeriodsFormat);
         }
         else {

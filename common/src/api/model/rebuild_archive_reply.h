@@ -16,7 +16,7 @@ struct QnStorageScanData
 };
 #define QnStorageScanData_Fields (state)(path)(progress)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnStorageScanData, (json)(metatype))
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageScanData, (json)(metatype)(eq))
 
 
 #include <QtCore/QMetaType>

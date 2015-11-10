@@ -6,6 +6,7 @@
 #include <business/actions/panic_business_action.h>
 #include <business/actions/recording_business_action.h>
 #include <business/actions/sendmail_business_action.h>
+#include <business/actions/bookmark_business_action.h>
 #include <business/actions/common_business_action.h>
 
 #include <core/resource/resource.h>
@@ -62,7 +63,6 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
     switch(actionType)
     {
         case QnBusiness::UndefinedAction:
-        case QnBusiness::BookmarkAction:
         case QnBusiness::DiagnosticsAction:
         case QnBusiness::ShowPopupAction:
         case QnBusiness::PlaySoundOnceAction:
@@ -70,11 +70,13 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::SayTextAction:
             return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 
-        case QnBusiness::CameraOutputAction:       return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
-        case QnBusiness::CameraOutputOnceAction:return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
-        case QnBusiness::CameraRecordingAction:    return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
-        case QnBusiness::PanicRecordingAction:     return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
-        case QnBusiness::SendMailAction:           return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
-        default: return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+        case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
+        case QnBusiness::CameraOutputOnceAction:    return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
+        case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
+        case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
+        case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
+        case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
+        default: 
+            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
     }
 }

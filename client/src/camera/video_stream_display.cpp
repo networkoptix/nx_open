@@ -69,7 +69,7 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
 
 
     delete m_bufferedFrameDisplayer;
-    QMutexLocker _lock(&m_mtx);
+    QnMutexLocker _lock( &m_mtx );
 
     foreach(QnAbstractVideoDecoder* decoder, m_decoder)
     {
@@ -87,13 +87,13 @@ void QnVideoStreamDisplay::pleaseStop()
 int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 {
     {
-        QMutexLocker lock(&m_mtx);
+        QnMutexLocker lock( &m_mtx );
         renderer->setPaused(m_isPaused);
         if (m_lastDisplayedFrame)
             renderer->draw(m_lastDisplayedFrame);
     }
 
-    QMutexLocker lock(&m_renderListMtx);
+    QnMutexLocker lock( &m_renderListMtx );
     renderer->setScreenshotInterface(this);
     m_newList << renderer;
     m_renderListModified = true;
@@ -102,7 +102,7 @@ int QnVideoStreamDisplay::addRenderer(QnAbstractRenderer* renderer)
 
 int QnVideoStreamDisplay::removeRenderer(QnAbstractRenderer* renderer)
 {
-    QMutexLocker lock(&m_renderListMtx);
+    QnMutexLocker lock( &m_renderListMtx );
     m_newList.remove(renderer);
     m_renderListModified = true;
     return m_newList.size();
@@ -363,7 +363,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
 
 void QnVideoStreamDisplay::updateRenderList()
 {
-    QMutexLocker lock(&m_renderListMtx);
+    QnMutexLocker lock( &m_renderListMtx );
     if (m_renderListModified) 
     {
         foreach(QnAbstractRenderer* renderer, m_newList)
@@ -407,7 +407,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (enableFrameQueue && qAbs(m_speed - 1.0) < FPS_EPS && m_canUseBufferedFrameDisplayer)
     {
         if (!m_bufferedFrameDisplayer) {
-            //QMutexLocker lock(&m_timeMutex);
+            //QnMutexLocker lock( &m_timeMutex );
             m_bufferedFrameDisplayer = new QnBufferedFrameDisplayer();
             m_bufferedFrameDisplayer->setRenderList(m_renderList);
             m_queueWasFilled = false;
@@ -419,7 +419,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         {
             m_bufferedFrameDisplayer->waitForFramesDisplayed();
             //overrideTimestampOfNextFrameToRender(m_bufferedFrameDisplayer->getTimestampOfNextFrameToRender());
-            //QMutexLocker lock(&m_timeMutex);
+            //QnMutexLocker lock( &m_timeMutex );
             delete m_bufferedFrameDisplayer;
             m_bufferedFrameDisplayer = 0;
         }
@@ -439,7 +439,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     }
     
     if (m_needReinitDecoders) {
-        QMutexLocker lock(&m_mtx);
+        QnMutexLocker lock( &m_mtx );
         foreach(QnAbstractVideoDecoder* decoder, m_decoder)
             decoder->setMTDecoding(enableFrameQueue);
         m_needReinitDecoders = false;
@@ -477,7 +477,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
     if (reverseMode != m_prevReverseMode || m_needResetDecoder) 
     {
         clearReverseQueue();
-        QMutexLocker lock(&m_mtx);
+        QnMutexLocker lock( &m_mtx );
         dec->resetDecoder(data);
         m_prevReverseMode = reverseMode;
         m_needResetDecoder = false;
@@ -581,12 +581,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         if (qFuzzyIsNull(m_overridenAspectRatio)) {
             //qreal sampleAr = decodeToFrame->height > 0 ? (qreal)decodeToFrame->width / (qreal)decodeToFrame->height : 1.0;
             QSize imageSize(decodeToFrame->width * dec->getSampleAspectRatio(), decodeToFrame->height);
-            QMutexLocker lock(&m_imageSizeMtx);
+            QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
         else {
             QSize imageSize(decodeToFrame->height*m_overridenAspectRatio, decodeToFrame->height);
-            QMutexLocker lock(&m_imageSizeMtx);
+            QnMutexLocker lock( &m_imageSizeMtx );
             m_imageSize = imageSize;
         }
     }
@@ -839,7 +839,7 @@ bool QnVideoStreamDisplay::rescaleFrame(const CLVideoDecoderOutput& srcFrame, CL
 void QnVideoStreamDisplay::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val)
 {
     m_decodeMode = val;
-    QMutexLocker mutex(&m_mtx);
+    QnMutexLocker mutex( &m_mtx );
 
     foreach(QnAbstractVideoDecoder* decoder, m_decoder)
     {
@@ -872,7 +872,7 @@ void QnVideoStreamDisplay::setSpeed(float value)
     if (m_reverseMode)
         m_enableFrameQueue = true;
 
-    QMutexLocker lock(&m_mtx);
+    QnMutexLocker lock( &m_mtx );
     for( QMap<CodecID, QnAbstractVideoDecoder*>::const_iterator
         it = m_decoder.begin();
         it != m_decoder.end();
@@ -888,7 +888,7 @@ void QnVideoStreamDisplay::setSpeed(float value)
 /*
 qint64 QnVideoStreamDisplay::getTimestampOfNextFrameToRender() const 
 { 
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (m_drawer && m_timeChangeEnabled)
         return m_drawer->lastDisplayedTime(m_channelNumber);
     else
@@ -931,7 +931,7 @@ void QnVideoStreamDisplay::blockTimeValue(qint64 time)
 
 void QnVideoStreamDisplay::setPausedSafe(bool value)
 {
-    QMutexLocker lock(&m_renderListMtx);
+    QnMutexLocker lock( &m_renderListMtx );
     foreach(QnAbstractRenderer* render, m_renderList)
         render->setPaused(value);
     foreach(QnAbstractRenderer* render, m_newList)
@@ -941,7 +941,7 @@ void QnVideoStreamDisplay::setPausedSafe(bool value)
 
 void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 {
-    QMutexLocker lock(&m_renderListMtx);
+    QnMutexLocker lock( &m_renderListMtx );
     foreach(QnAbstractRenderer* render, m_renderList)
         render->blockTimeValue(m_channelNumber, time);
 }
@@ -957,7 +957,7 @@ bool QnVideoStreamDisplay::isTimeBlocked() const
 void QnVideoStreamDisplay::unblockTimeValue()
 {
     /*
-    QMutexLocker lock(&m_timeMutex);
+    QnMutexLocker lock( &m_timeMutex );
     if (m_bufferedFrameDisplayer)
         m_bufferedFrameDisplayer->overrideTimestampOfNextFrameToRender(m_lastDisplayedTime);
     m_timeChangeEnabled = true;
@@ -993,7 +993,7 @@ void QnVideoStreamDisplay::clearReverseQueue()
     foreach(QnAbstractRenderer* render, m_renderList)
         render->finishPostedFramesRender(0);
     
-    QMutexLocker lock(&m_mtx);
+    QnMutexLocker lock( &m_mtx );
     m_reverseQueue.clear();
     m_reverseSizeInBytes = 0;
 }
@@ -1003,7 +1003,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
     if (m_decoder.isEmpty())
         return QImage();
     QnAbstractVideoDecoder* dec = m_decoder.begin().value();
-    QMutexLocker mutex(&m_mtx);
+    QnMutexLocker mutex( &m_mtx );
     const AVFrame* lastFrame = dec->lastFrame();
     if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
         lastFrame = m_lastDisplayedFrame.data();
@@ -1020,7 +1020,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 
 CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
-    QMutexLocker mutex(&m_mtx);
+    QnMutexLocker mutex( &m_mtx );
 
     if (!m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width)
         return CLVideoDecoderOutputPtr();
@@ -1056,7 +1056,7 @@ void QnVideoStreamDisplay::canUseBufferedFrameDisplayer(bool value)
 
 QSize QnVideoStreamDisplay::getImageSize() const
 {
-    QMutexLocker lock(&m_imageSizeMtx);
+    QnMutexLocker lock( &m_imageSizeMtx );
     return m_imageSize;
 }
 

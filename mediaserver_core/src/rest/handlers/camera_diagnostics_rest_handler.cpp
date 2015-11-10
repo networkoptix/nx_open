@@ -31,7 +31,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
         return nx_http::StatusCode::badRequest;
     
     //retrieving resource
-    QnResourcePtr resource = QnResourcePool::instance()->getResourceById( resID );
+    QnResourcePtr resource = qnResPool->getResourceById( resID );
     if( !resource )
         return nx_http::StatusCode::notFound;
     QnSecurityCamResourcePtr secCamRes = resource.dynamicCast<QnSecurityCamResource>();

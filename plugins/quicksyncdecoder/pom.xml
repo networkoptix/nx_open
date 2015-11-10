@@ -10,21 +10,23 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.4.1-SNAPSHOT</version>
+		<version>2.5.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.4.1-SNAPSHOT</version>
+	<version>2.5.0-SNAPSHOT</version>
 	<artifactId>quicksyncdecoder</artifactId>
 	<packaging>pom</packaging>
 	<name>HD Witness Intel Quick Sync decoder plugin</name>	
 
 	<properties>
-		<product.title>${quicksyncdecoder.name}</product.title>	
+		<guid>${quicksyncdecoder.guid}</guid>
+        <product.title>${quicksyncdecoder.name}</product.title>	
 		<!--Global libs-->
 		<qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
-		<global.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lprotobuf</global.libs>
+        <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
+		<global.libs>-lcommon -lprotobuf</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>DbgHelp.lib -lDxErr -ld3d9 -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lssleay32 -llibeay32 -lglu32 -lDxva2 -llibmfxmd</windows.oslibs>
 		<windows.oslibs.release></windows.oslibs.release>

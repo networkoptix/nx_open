@@ -21,7 +21,7 @@
 #include <media_server/settings.h>
 #include <recorder/storage_manager.h>
 
-#ifdef __linux__
+#ifndef _WIN32
 #   include <sys/mount.h>
 #   include <sys/types.h>
 #   include <sys/stat.h>
@@ -44,6 +44,12 @@
 #else
     const QString QnFileStorageResource::FROM_SEP = lit("/");
     const QString QnFileStorageResource::TO_SEP = lit("\\");
+#endif
+
+#ifdef __APPLE__
+static const auto MS_NODEV = MNT_NODEV;
+static const auto MS_NOSUID = MNT_NOSUID;
+static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
 
@@ -78,7 +84,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
         new QBufferedFile(
             std::shared_ptr<IQnFile>(new QnFile(fileName)), 
             ioBlockSize, 
-            ffmpegBufferSize
+            ffmpegBufferSize,
+            getId()
         ) 
     );
     rez->setSystemFlags(systemFlags);
@@ -98,7 +105,7 @@ QString QnFileStorageResource::getPath() const
 
 bool QnFileStorageResource::initOrUpdate() const
 {
-    QMutexLocker lock(&m_mutexPermission);
+    QnMutexLocker lock(&m_mutexPermission);
     
     if (getUrl().isEmpty())
         return false;
@@ -224,7 +231,11 @@ void QnFileStorageResource::removeOldDirs()
         if (entry.absoluteFilePath().indexOf(prefix) == -1)
             continue;
 
+#if __linux__
         int ecode = umount(entry.absoluteFilePath().toLatin1().constData());
+#elif __APPLE__
+        int ecode = unmount(entry.absoluteFilePath().toLatin1().constData(), 0);
+#endif
         if (ecode != 0)
         {
             bool safeToRemove = true;
@@ -294,6 +305,7 @@ int QnFileStorageResource::mountTmpDrive() const
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
+#if __linux__
     retCode = mount(        
         srcString.toLatin1().constData(),
         m_localPath.toLatin1().constData(),
@@ -301,6 +313,9 @@ int QnFileStorageResource::mountTmpDrive() const
         MS_NODEV | MS_NOEXEC | MS_NOSUID,
         cifsOptionsString.toLatin1().constData()
     );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
     if (retCode == -1) 
     {
@@ -354,17 +369,15 @@ int QnFileStorageResource::mountTmpDrive() const
 
 void QnFileStorageResource::setUrl(const QString& url)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     QnStorageResource::setUrl(url);
     m_dirty = true;
 }
 
-QnFileStorageResource::QnFileStorageResource(QnStorageManager *storageManager):
-    m_storageBitrateCoeff(1.0),
+QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
-    m_capabilities(0),
-    m_storageManager(storageManager)
+    m_capabilities(0)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -376,7 +389,11 @@ QnFileStorageResource::~QnFileStorageResource()
 #ifndef _WIN32
     if (!m_localPath.isEmpty())
     {
+#if __linux__
         umount(m_localPath.toLatin1().constData());
+#elif __APPLE__
+        unmount(m_localPath.toLatin1().constData(), 0);
+#endif
         rmdir(m_localPath.toLatin1().constData());
     }
 #endif
@@ -429,7 +446,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 qint64 QnFileStorageResource::getFreeSpace()
 {
     if (!initOrUpdate())
-        return -1;
+        return QnStorageResource::UnknownSize;
 
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
@@ -441,7 +458,7 @@ qint64 QnFileStorageResource::getFreeSpace()
 qint64 QnFileStorageResource::getTotalSpace()
 {
     if (!initOrUpdate())
-        return -1;
+        return QnStorageResource::UnknownSize;
 
     return getDiskTotalSpace(
         m_localPath.isEmpty() ?
@@ -531,21 +548,20 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
 
 QnStorageResource* QnFileStorageResource::instance(const QString&)
 {
-    assert(QnStorageManager::instance());
-    QnStorageResource* storage = new QnFileStorageResource(QnStorageManager::instance());
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+    QnStorageResource* storage = new QnFileStorageResource();
+    storage->setSpaceLimit(
+        MSSettings::roSettings()->value(
+            nx_ms_conf::MIN_STORAGE_SPACE, 
+            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+        ).toLongLong() 
+    );
     return storage;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const
 {
-    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getPath());
+    QueueFileWriter* writer = QnWriterPool::instance()->getWriter(getId());
     return writer ? writer->getAvarageUsage() : 0;
-}
-
-float QnFileStorageResource::getStorageBitrateCoeff() const
-{
-    return m_storageBitrateCoeff;
 }
 
 #ifdef _WIN32
@@ -618,6 +634,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
         );
 
+#if __linux__
         int retCode = mount(
             srcString.toLatin1().constData(),
             tmpPath.toLatin1().constData(),
@@ -625,6 +642,9 @@ bool QnFileStorageResource::isStorageDirMounted() const
             MS_NOSUID | MS_NODEV | MS_NOEXEC,
             cifsOptionsString.toLatin1().constData()
         );
+#elif __APPLE__
+#error "TODO BSD-style mount call"
+#endif
 
         if (retCode == -1)
         {
@@ -638,7 +658,11 @@ bool QnFileStorageResource::isStorageDirMounted() const
         }
         else
         {
+#if __linux__
             umount(tmpPath.toLatin1().constData());
+#elif __APPLE__
+            unmount(tmpPath.toLatin1().constData(), 0);
+#endif
             rmdir(tmpPath.toLatin1().constData());
         }
         return true;

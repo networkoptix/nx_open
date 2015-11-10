@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <QtCore/QWaitCondition>
+#include <utils/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"
@@ -39,8 +39,8 @@ private:
         QBufferedFile* file;
         const char* data;
         int len;
-        QMutex mutex;
-        QWaitCondition condition;
+        QnMutex mutex;
+        QnWaitCondition condition;
         qint64 result;
     };
 
@@ -49,23 +49,23 @@ private:
     typedef QPair<qint64, int> WriteTimingInfo;
     QQueue<WriteTimingInfo> m_writeTimings;
     int m_writeTime;
-    mutable QMutex m_timingsMutex;
+    mutable QnMutex m_timingsMutex;
 };
 
 class QnWriterPool
 {
 public:
-    typedef QMap<QString, QueueFileWriter*> WritersMap;
+    typedef QMap<QnUuid, QueueFileWriter*> WritersMap;
 
     QnWriterPool();
     ~QnWriterPool();
 
     static QnWriterPool* instance();
 
-    QueueFileWriter* getWriter(const QString& fileName);
+    QueueFileWriter* getWriter(const QnUuid& writePoolId);
     WritersMap getAllWriters();
 private:
-    QMutex m_mutex;
+    QnMutex m_mutex;
     WritersMap m_writers;
 };
 
@@ -77,7 +77,7 @@ public:
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize);
+    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize, const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
     /*
@@ -120,6 +120,7 @@ private:
     QnByteArray m_cachedBuffer; // cached file begin
     QnByteArray m_tmpBuffer;
     qint64 m_lastSeekPos;
+    QnUuid m_writerPoolId;
 };
 
 #endif // __BUFFERED_FILE_H__

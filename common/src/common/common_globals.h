@@ -29,18 +29,20 @@ namespace Qn
 {
 #ifdef Q_MOC_RUN
     Q_GADGET
-    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace CameraDataType
+    Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
             ConnectionRole ResourceStatus
-            StreamQuality SecondStreamQuality PanicMode RebuildState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
-            ServerFlag CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+            BookmarkSearchStrategy
+            ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
+            RebuildAction BackupAction
             FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
             CameraCapabilities 
             PtzDataFields PtzCapabilities PtzTraits 
             MotionTypes TimePeriodTypes 
-            ServerFlags CameraStatusFlags IOPortTypes)
+            ServerFlags CameraBackupQualities CameraStatusFlags IOPortTypes)
 public:
 #else
     Q_NAMESPACE
@@ -152,9 +154,16 @@ public:
         RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
-        RebuildState_PartialScan = 3
+        RebuildState_PartialScan = 3,
+        RebuildState_Canceled    = 4,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
+
+    enum BackupState {
+        BackupState_None        = 0,
+        BackupState_InProgress  = 1
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupState)
 
     enum PtzCoordinateSpace {
         DevicePtzCoordinateSpace,
@@ -412,17 +421,8 @@ public:
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
-        BookmarksContent,
+
         TimePeriodContentCount
-    };
-
-    enum CameraDataType {
-        RecordedTimePeriod,
-        MotionTimePeriod,
-        BookmarkTimePeriod,
-        BookmarkData,
-
-        CameraDataTypeCount
     };
 
     enum SystemComponent {
@@ -467,6 +467,7 @@ public:
         LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
+        LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
 
         /* Item-based. */
         ItemUuidRole,                               /**< Role for item's UUID. Value of type QnUuid. */
@@ -565,7 +566,13 @@ public:
         AlternateColorRole,                         /**< Use alternate color in painting */
         AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
-        LastItemDataRole
+        LastItemDataRole,
+
+        StorageInfoDataRole,                        /** return QnStorageModelInfo object at QnStorageConfigWidget */
+        BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
+        TextWidthDataRole,                          /** used in BackupSettings model */
+
+        RoleCount
     };
 
     // TODO: #Elric #EC2 rename
@@ -706,6 +713,13 @@ public:
         LC_Count
     };
 
+    /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
+    enum BookmarkSearchStrategy {
+        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+    };
+
     /**
     * Authentication error code
     */
@@ -732,6 +746,51 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
     static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
+
+    // TODO: #MSAPI move to api/model or even to common_globals, 
+    // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
+    // 
+    // Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
+    // and in handler.
+    // 
+    // And name them sanely =)
+    enum RebuildAction
+    {
+        RebuildAction_ShowProgress,
+        RebuildAction_Start,
+        RebuildAction_Cancel
+    };
+
+    enum BackupAction
+    {
+        BackupAction_ShowProgress,
+        BackupAction_Start,
+        BackupAction_Cancel
+    };
+
+
+    /** 
+     * backup settings 
+     */
+    enum BackupType
+    {
+        Backup_Manual,
+        Backup_RealTime,
+        Backup_Schedule
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)
+
+    enum CameraBackupQuality
+    {
+        CameraBackup_Disabled       = 0,
+        CameraBackup_HighQuality    = 1,
+        CameraBackup_LowQuality     = 2,
+        CameraBackup_Both           = CameraBackup_HighQuality | CameraBackup_LowQuality,
+        CameraBackup_Default        = 4 // backup type didn't configured so far. Default value will be used
+    };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(CameraBackupQuality)
+    Q_DECLARE_FLAGS(CameraBackupQualities, CameraBackupQuality)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(CameraBackupQualities)
 
     /**
      * Invalid value for a timezone UTC offset.
@@ -773,15 +832,19 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 #endif
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::CameraDataType), 
+    (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)(Qn::ServerFlag)(Qn::PanicMode)(Qn::RecordingType)
+        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
+        (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)
+        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+        (Qn::BookmarkSearchStrategy)
+        (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)
         ,
@@ -789,7 +852,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraStatusFlags),
+    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::CameraStatusFlags),
     (metatype)(numeric)(lexical)
 )
 

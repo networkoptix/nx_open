@@ -8,10 +8,11 @@
 #include <map>
 #include <set>
 
-#include <QMutex>
 #include <QSharedPointer>
 #include <QString>
-#include <QWaitCondition>
+
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include <core/datapacket/media_data_packet.h>
 #include <utils/common/timermanager.h>
@@ -69,7 +70,7 @@ namespace nx_hls
         std::map<std::pair<MediaQuality, QString>, std::pair<quint64, quint64> > m_chunksByAlias;
         QPair<QString, QString> m_playlistAuthenticationQueryItem;
         QPair<QString, QString> m_chunkAuthenticationQueryItem;
-        mutable QMutex m_mutex;
+        mutable QnMutex m_mutex;
         AuditHandle m_auditHandle;
         QnAuthSession m_authSession;
     };
@@ -151,8 +152,8 @@ namespace nx_hls
                 unsigned int _keepAliveTimeoutMS );
         };
 
-        mutable QMutex m_mutex;
-        QWaitCondition m_cond;
+        mutable QnMutex m_mutex;
+        QnWaitCondition m_cond;
         std::set<QString> m_lockedIDs;
         std::map<QString, HLSSessionContext> m_sessionByID;
         std::map<quint64, QString> m_taskToSessionID;
