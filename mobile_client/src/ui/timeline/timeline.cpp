@@ -420,7 +420,7 @@ qint64 QnTimeline::position() const {
 }
 
 void QnTimeline::setPosition(qint64 position) {
-    if (position == this->position())
+    if (position == this->position() && (d->targetPosition == -1 || d->targetPosition == position))
         return;
 
     clearCorrection();
