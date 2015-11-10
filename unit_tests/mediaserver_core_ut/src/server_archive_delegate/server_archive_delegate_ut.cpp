@@ -28,9 +28,11 @@ const QString hqFolder("hi_quality");
 
 class TestHelper
 {
+    static const int DEFAULT_TIME_GAP_MS = 1000;
 public:
     TestHelper(QStringList &&paths)
-        : m_storageUrls(std::move(paths))
+        : m_storageUrls(std::move(paths)),
+          m_timeLine(DEFAULT_TIME_GAP_MS)
     {
         generateTestData();
     }
@@ -85,18 +87,22 @@ public:
         typedef std::list<TimePeriod> TimePeriodList;
         typedef TimePeriodList::iterator TimePeriodListIterator;
 
-        const static int TIME_GAP_MS = 1000;
     public:
-        TimeLine() 
-            : m_currentIt(m_timeLine.begin()),
-              m_timePoint(std::numeric_limits<int64_t>::max())
+        TimeLine(int timeGapMs) 
+            : m_timePoint(std::numeric_limits<int64_t>::max()),
+              m_timeGapMs(timeGapMs)
         {}
+
+        void addTimePeriod(int64_t startTime, int duration)
+        {
+            addTimePeriod(TimePeriod(startTime, duration));
+        }
 
         void addTimePeriod(const TimePeriod &period)
         {
             TimePeriod newPeriod = period;
             bool foundOverlapped = false;
-            TimePeriodListIterator insertIterator;
+            TimePeriodListIterator insertIterator = m_timeLine.end();
             bool firstToTheRight = true;
 
             for (auto it = m_timeLine.begin(); it != m_timeLine.end(); ++it) {
@@ -110,7 +116,7 @@ public:
                     it = m_timeLine.erase(it);
                     it = m_timeLine.insert(it, newPeriod);
                 } else if (!foundOverlapped && firstToTheRight && 
-                           newPeriod.startTimeMs > it->startTimeMs) {
+                           it->startTimeMs > newPeriod.startTimeMs) {
                     firstToTheRight = false;
                     insertIterator = it;
                 }
@@ -125,22 +131,34 @@ public:
 
         bool checkTime(int64_t time)
         {
-            if (std::abs(time - m_timePoint) > TIME_GAP_MS)
+            if (time < m_currentIt->startTimeMs || time > m_currentIt->durationMs +
+                                                          m_currentIt->startTimeMs) {
+                return false;
+            }
+
+            if (std::abs(time - m_timePoint) > m_timeGapMs)
                 return false;
 
             m_timePoint = time;
             if (std::abs(m_timePoint - (m_currentIt->startTimeMs + 
-                                        m_currentIt->durationMs)) < TIME_GAP_MS) {
+                                        m_currentIt->durationMs)) < m_timeGapMs) {
                 ++m_currentIt;
                 if (m_currentIt != m_timeLine.end())
                     m_timePoint = m_currentIt->startTimeMs;
             }
+            return true;
+        }
+
+        void finalize()
+        {
+            m_currentIt = m_timeLine.begin();
         }
 
     private:
         TimePeriodList m_timeLine;
         TimePeriodListIterator m_currentIt;
         int64_t m_timePoint;
+        int m_timeGapMs;
     };
 
 private:
@@ -247,7 +265,51 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
 
     auto tp3 = TestHelper::TimePeriod::merge(tp2, tp1);
     ASSERT_TRUE(tp3.startTimeMs == 0);
-    ASSERT_TRUE(tp3.durationMs == 30);
+    ASSERT_TRUE(tp3.durationMs == 35);
+
+    tp3 = TestHelper::TimePeriod::merge(tp1, tp2);
+    ASSERT_TRUE(tp3.startTimeMs == 0);
+    ASSERT_TRUE(tp3.durationMs == 35);
+    
+    tp1 = TestHelper::TimePeriod(5, 10);
+    tp2 = TestHelper::TimePeriod(0, 20);
+
+    tp3 = TestHelper::TimePeriod::merge(tp1, tp2);
+    ASSERT_TRUE(tp3.startTimeMs == 0);
+    ASSERT_TRUE(tp3.durationMs == 20);
+
+    tp3 = TestHelper::TimePeriod::merge(tp2, tp1);
+    ASSERT_TRUE(tp3.startTimeMs == 0);
+    ASSERT_TRUE(tp3.durationMs == 20);
+
+    TestHelper::TimeLine timeLine(2);
+    timeLine.addTimePeriod(0, 10);
+    timeLine.addTimePeriod(5, 15);
+    timeLine.addTimePeriod(25, 10);
+    timeLine.addTimePeriod(30, 20);
+    timeLine.addTimePeriod(45, 15);
+    timeLine.addTimePeriod(30, 20);
+
+    timeLine.finalize();
+
+    ASSERT_TRUE(timeLine.checkTime(0));
+    ASSERT_TRUE(timeLine.checkTime(2));
+    ASSERT_TRUE(timeLine.checkTime(4));
+    ASSERT_TRUE(timeLine.checkTime(5));
+    ASSERT_TRUE(timeLine.checkTime(6));
+    ASSERT_TRUE(timeLine.checkTime(8));
+    ASSERT_TRUE(timeLine.checkTime(10));
+    ASSERT_TRUE(timeLine.checkTime(12));
+    ASSERT_TRUE(timeLine.checkTime(14));
+    ASSERT_TRUE(timeLine.checkTime(16));
+    ASSERT_TRUE(timeLine.checkTime(18));
+    ASSERT_TRUE(timeLine.checkTime(19));
+    ASSERT_TRUE(!timeLine.checkTime(21));
+    ASSERT_TRUE(!timeLine.checkTime(22));
+    ASSERT_TRUE(!timeLine.checkTime(24));
+    ASSERT_TRUE(timeLine.checkTime(25));
+    ASSERT_TRUE(timeLine.checkTime(26));
+    ASSERT_TRUE(timeLine.checkTime(28));
 }
 
 TEST(ServerArchiveDelegate_playback_test, Main) 
