@@ -131,7 +131,7 @@ public:
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
+TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
 {
     static const int REQUESTS_TO_SEND = 10;
 
@@ -177,14 +177,13 @@ TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
         auto bytesRead = sock->recv(
             readBuf.data() + dataSize,
             readBuf.size() - dataSize );
-        if( bytesRead == 0 || bytesRead == -1 )
-            break;  //read error on connection closed
+        ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
         dataSize += bytesRead;
         size_t bytesParsed = 0;
-        if( !httpMsgReader.parseBytes(
+        ASSERT_TRUE(
+            httpMsgReader.parseBytes(
                 QnByteArrayConstRef( readBuf, 0, dataSize ),
-                &bytesParsed ) )
-            break;  //parse error
+                &bytesParsed ) );
         readBuf.remove( 0, bytesParsed );
         dataSize -= bytesParsed;
         if( httpMsgReader.state() == nx_http::HttpStreamReader::messageDone )
