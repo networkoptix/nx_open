@@ -176,8 +176,7 @@ AbstractStreamSocket* MixedTcpUdtServerSocket::accept()
         if( m_acceptingFlags[i] )
             continue;
         using namespace std::placeholders;
-        if( !m_socketDelegates[i]->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAcceptedSync, this, m_socketDelegates[i], i, _1, _2)) )
-            return nullptr;
+        m_socketDelegates[i]->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAcceptedSync, this, m_socketDelegates[i], i, _1, _2));
         m_acceptingFlags[i] = true;
     }
 
@@ -225,20 +224,24 @@ void MixedTcpUdtServerSocket::dispatchImpl( std::function<void()>&& handler )
     m_socketDelegates[0]->dispatch( std::move(handler) );
 }
 
-bool MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+void MixedTcpUdtServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
 {
     for( size_t i = 0; i < m_socketDelegates.size(); ++i )
     {
         if( m_acceptingFlags[i] )
             continue;
         using namespace std::placeholders;
-        if( !m_socketDelegates[i]->acceptAsync(std::bind(&MixedTcpUdtServerSocket::connectionAcceptedAsync, this, m_socketDelegates[i], i, _1, _2)) )
-            return false;
+        m_socketDelegates[i]->acceptAsync(std::bind(
+            &MixedTcpUdtServerSocket::connectionAcceptedAsync,
+            this,
+            m_socketDelegates[i],
+            i,
+            _1,
+            _2));
         m_acceptingFlags[i] = true;
     }
 
     m_asyncHandler = std::move( handler );
-    return true;
 }
 
 void MixedTcpUdtServerSocket::connectionAcceptedSync(

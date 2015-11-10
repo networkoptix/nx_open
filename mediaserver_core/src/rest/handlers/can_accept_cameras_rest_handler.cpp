@@ -62,12 +62,10 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     QnConcurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
     {
-        if( !camerasToPing[i]->checkIfOnlineAsync( [&camerasToPingResults, i]( bool result ) {
-                camerasToPingResults.setResultAt( i, result ); } ) )
-        {
-            //failed to start asynchronous check
-            camerasToPingResults.setResultAt( i, false );
-        }
+        camerasToPing[i]->checkIfOnlineAsync(
+            [&camerasToPingResults, i]( bool result ) {
+                camerasToPingResults.setResultAt( i, result );
+            });
     }
 
     manualDiscoveryResults.waitForFinished();

@@ -65,11 +65,7 @@ void CloudModuleEndPointFetcher::get(
             onHttpClientDone(std::move(client));
         },
         Qt::DirectConnection);
-    if (!m_httpClient->doGet(QUrl(lit(QN_CLOUD_MODULES_XML))))
-    {
-        m_httpClient.reset();
-        return handler(nx_http::StatusCode::serviceUnavailable, SocketAddress());
-    }
+    m_httpClient->doGet(QUrl(lit(QN_CLOUD_MODULES_XML)));
 
     //if async resolve is already started, should wait for its completion
     m_resolveHandlers.emplace_back(std::move(handler));

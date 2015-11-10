@@ -348,13 +348,9 @@ void AddressResolver::mediatorStunResolve( HaInfoIterator info, QnMutexLockerBas
     };
 
     lk->unlock();
-    if( !m_stunClient->sendRequest( std::move( request ), std::move( functor ) ) )
-    {
-        lk->relock();
-        info->second.setMediatorEntries();
-        const auto guards = grabHandlers( SystemError::dnsServerFailure, info );
-        lk->unlock();
-    }
+    m_stunClient->sendRequest(
+        std::move(request),
+        std::move(functor));
 }
 
 std::vector< Guard > AddressResolver::grabHandlers(

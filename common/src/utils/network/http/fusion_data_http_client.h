@@ -87,13 +87,10 @@ public:
     /*!
         \return \a false if failed to initiate async request
     */
-    bool get(std::function<HandlerFunc> handler)
+    void get(std::function<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
-        if (m_httpClient->doGet(m_url))
-            return true;
-        m_handler = std::function<HandlerFunc>();
-        return false;
+        m_httpClient->doGet(m_url);
     }
 
 protected:

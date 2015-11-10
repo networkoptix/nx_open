@@ -188,13 +188,13 @@ public:
     //!Implementation of AbstractCommunicatingSocket::isConnected
     bool isConnected() const;
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
+    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
+    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
     //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
+    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 
@@ -289,7 +289,7 @@ public:
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
+    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
 
 private:
     bool setListen(int queueLen);

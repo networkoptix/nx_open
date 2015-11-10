@@ -31,7 +31,7 @@ public:
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl(
+    virtual void acceptAsyncImpl(
         std::function<void(
             SystemError::ErrorCode,
             AbstractStreamSocket* )>&& handler ) override;

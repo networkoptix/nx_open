@@ -82,14 +82,12 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksRemoteAsync(QnMultiSe
     QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
 
     QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc,
         headers,
-        nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-    {
-        ctx->requestsInProgress++;
-    }
+        nx_http::AsyncHttpClient::authDigestWithPasswordHash );
+    ctx->requestsInProgress++;
 }
 
 void QnMultiserverBookmarksRestHandlerPrivate::getBookmarksLocal(QnMultiServerCameraBookmarkList& outputData, QnGetBookmarksRequestContext* ctx) {
@@ -127,14 +125,12 @@ void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsRemoteAsync(QnMult
     QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
 
     QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc,
         headers,
-        nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-    {
-        ctx->requestsInProgress++;
-    }
+        nx_http::AsyncHttpClient::authDigestWithPasswordHash );
+    ctx->requestsInProgress++;
 }
 
 void QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTagsLocal(QnMultiServerCameraBookmarkTagList& outputData, QnGetBookmarkTagsRequestContext* ctx) {
@@ -276,13 +272,11 @@ void QnMultiserverBookmarksRestHandlerPrivate::sendAsyncRequest(const QnMediaSer
     QnRouter::instance()->updateRequest(url, headers, server->getId());
 
     QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         url,
         requestCompletionFunc,
         headers,
-        nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-    {
-        ctx->requestsInProgress++;
-    }
+        nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+    ctx->requestsInProgress++;
 }
 

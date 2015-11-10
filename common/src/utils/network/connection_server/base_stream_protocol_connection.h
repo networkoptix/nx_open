@@ -149,8 +149,7 @@ namespace nx_api
                 assert( false );
             }
             //assuming that all bytes will be written or none
-            if( !BaseType::sendBufAsync( m_writeBuffer ) )
-                reportErrorAndCloseConnection( SystemError::getLastOSErrorCode() );
+            BaseType::sendBufAsync(m_writeBuffer);
 
             //on completion readyToSendData will be called
         }
@@ -282,8 +281,7 @@ namespace nx_api
                 assert( m_writeBuffer.isEmpty() );
                 m_writeBuffer = std::move( task.buf.get() );
                 m_serializerState = SerializerState::done;
-                if( !BaseType::sendBufAsync( m_writeBuffer ) )
-                    reportErrorAndCloseConnection( SystemError::getLastOSErrorCode() );
+                BaseType::sendBufAsync( m_writeBuffer );
             }
         }
 
@@ -298,6 +296,7 @@ namespace nx_api
                 return; //connection has been removed by handler
             m_connectionFreedFlag = nullptr;
             this->connectionManager()->closeConnection(
+                errorCode,
                 static_cast<typename CustomConnectionManagerType::ConnectionType*>(this) );
         }
     };

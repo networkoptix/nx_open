@@ -246,22 +246,21 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
     connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
-    bool result = false;
     if (request.method == HttpMethod::Get)
-        result = httpClientCaptured->doGet(request.url);
-    else if (request.method == HttpMethod::Post)
-        result = httpClientCaptured->doPost(request.url, request.contentType, request.messageBody);
-    else
-        qWarning() << Q_FUNC_INFO << __LINE__ << "Unknown HTTP request type" << (int) request.method;
-
-    if (result) {
-        m_runningRequests.insert(requestId, httpClientCaptured);
-        return requestId;
+    {
+        httpClientCaptured->doGet(request.url);
     }
-    else {
-        disconnect( httpClientCaptured.get(), nullptr, this, nullptr );
+    else if (request.method == HttpMethod::Post)
+    {
+        httpClientCaptured->doPost(request.url, request.contentType, request.messageBody);
+    }
+    else
+    {
+        disconnect(httpClientCaptured.get(), nullptr, this, nullptr);
         return Handle();
     }
+    m_runningRequests.insert(requestId, httpClientCaptured);
+    return requestId;
 }
 
 } // namespace rest

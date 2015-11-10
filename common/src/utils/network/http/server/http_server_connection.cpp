@@ -166,7 +166,7 @@ namespace nx_http
         if( !m_currentMsgBody->readAsync(
                 std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
         {
-            closeConnection();
+            closeConnection(SystemError::getLastOSErrorCode());
             return;
         }
     }
@@ -177,7 +177,7 @@ namespace nx_http
     {
         if( errorCode != SystemError::noError )
         {
-            closeConnection();
+            closeConnection(errorCode);
             return;
         }
 
@@ -200,9 +200,9 @@ namespace nx_http
     {
         using namespace std::placeholders;
         if( !m_currentMsgBody->readAsync(
-            std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
+                std::bind( &HttpServerConnection::someMsgBodyRead, this, _1, _2 ) ) )
         {
-            closeConnection();
+            closeConnection(SystemError::getLastOSErrorCode());
             return;
         }
     }
@@ -211,7 +211,7 @@ namespace nx_http
     {
         //if connection is NOT persistent then closing it
         if( !m_isPersistent )
-            closeConnection();
+            closeConnection(SystemError::noError);
     }
 
     void HttpServerConnection::checkForConnectionPersistency( const Message& msg )

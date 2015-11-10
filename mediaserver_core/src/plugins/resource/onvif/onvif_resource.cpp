@@ -384,12 +384,15 @@ typedef GSoapAsyncCallWrapper <
     NetIfacesResp
 > GSoapDeviceGetNetworkIntfAsyncWrapper;
 
-bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     const QAuthenticator auth( getAuth() );
     const QString deviceUrl = getDeviceOnvifUrl();
     if( deviceUrl.isEmpty() )
-        return false;
+    {
+        //TODO #ak calling completionHandler(false)
+        return;
+    }
 
     std::unique_ptr<DeviceSoapWrapper> soapWrapper( new DeviceSoapWrapper(
         deviceUrl.toStdString(),
@@ -415,7 +418,7 @@ bool QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         };
 
     NetIfacesReq request;
-    return asyncWrapper->callAsync(
+    asyncWrapper->callAsync(
         request,
         onvifCallCompletionFunc );
 }
@@ -3076,21 +3079,10 @@ void QnPlOnvifResource::pullMessages(quint64 timerID)
     );
 
     using namespace std::placeholders;
-    if( asyncPullMessagesCallWrapper->callAsync(
-            request,
-            std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1)) )
-    {
-        m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
-    }
-    else
-    {
-        using namespace std::placeholders;
-        //will try later
-        Q_ASSERT( m_nextPullMessagesTimerID == 0 );
-        m_nextPullMessagesTimerID = TimerManager::instance()->addTimer(
-            std::bind(&QnPlOnvifResource::pullMessages, this, _1),
-            PULLPOINT_NOTIFICATION_CHECK_TIMEOUT_SEC*MS_PER_SECOND);
-    }
+    asyncPullMessagesCallWrapper->callAsync(
+        request,
+        std::bind(&QnPlOnvifResource::onPullMessagesDone, this, asyncPullMessagesCallWrapper.data(), _1));
+    m_asyncPullMessagesCallWrapper = std::move(asyncPullMessagesCallWrapper);
 }
 
 void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode)

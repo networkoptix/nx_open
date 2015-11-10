@@ -180,13 +180,9 @@ bool CrashReporter::send(const QUrl& serverApi, const QFileInfo& crash, QSetting
 
     NX_LOGX(lit("Send %1 to %2").arg(filePath).arg(serverApi.toString()), cl_logINFO);
 
-    if (httpClient->doPost(serverApi, "application/octet-stream", content))
-    {
-        m_activeHttpClient = std::move(httpClient);
-        return true;
-    }
-
-    return false;
+    httpClient->doPost(serverApi, "application/octet-stream", content);
+    m_activeHttpClient = std::move(httpClient);
+    return true;
 }
 
 ReportData::ReportData(const QFileInfo& crashFile, QSettings* settings,

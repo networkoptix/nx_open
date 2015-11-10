@@ -297,16 +297,25 @@ std::shared_ptr<AbstractDatagramSocket> DeviceSearcher::getSockByIntf( const QnI
 
     p.first->second.sock = sock;
     p.first->second.buf.reserve( READ_BUF_CAPACITY );
-    if( !sock->setReuseAddrFlag( true ) ||
+    if (!sock->setReuseAddrFlag( true ) ||
         !sock->bind( SocketAddress(localAddress, GROUP_PORT) ) ||
         !sock->joinGroup( groupAddress.toString(), iface.address.toString() ) ||
         !sock->setMulticastIF( localAddress ) ||
-        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ) ||
-        !sock->readSomeAsync( &p.first->second.buf, std::bind( &DeviceSearcher::onSomeBytesRead, this, sock.get(), _1, &p.first->second.buf, _2 ) ) )
+        !sock->setRecvBufferSize( MAX_UPNP_RESPONSE_PACKET_SIZE ))
     {
-        QMutexLocker lk( &m_mutex );
-        m_socketList.erase( p.first );
-        return std::shared_ptr<AbstractDatagramSocket>();
+        sock->post(
+            std::bind(
+                &DeviceSearcher::onSomeBytesRead, this,
+                sock.get(), SystemError::getLastOSErrorCode(), nullptr, 0));
+    }
+    else
+    {
+        //TODO #ak WTF? we start async operation with some internal handle and RETURN this socket
+        sock->readSomeAsync(
+            &p.first->second.buf,
+            std::bind(
+                &DeviceSearcher::onSomeBytesRead, this,
+                sock.get(), _1, &p.first->second.buf, _2));
     }
 
     return sock;
@@ -357,17 +366,7 @@ void DeviceSearcher::startFetchDeviceXml(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         this, &DeviceSearcher::onDeviceDescriptionXmlRequestDone,
         Qt::DirectConnection );
-    if( !httpClient->doGet( descriptionUrl ) )
-    {
-        QObject::disconnect(
-            httpClient.get(), &nx_http::AsyncHttpClient::done,
-            this, &DeviceSearcher::onDeviceDescriptionXmlRequestDone );
-
-        QMutexLocker lk( &m_mutex );
-        httpClient->terminate();
-        m_httpClients.erase( httpClient );
-        return;
-    }
+    httpClient->doGet(descriptionUrl);
 }
 
 void DeviceSearcher::processDeviceXml(

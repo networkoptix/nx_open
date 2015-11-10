@@ -85,7 +85,7 @@ TEST_F( AsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcesse
         arg( m_testHttpServer->serverAddress().port ).arg( TestHandler::PATH ) );
 
     auto client = nx_http::AsyncHttpClient::create();
-    ASSERT_TRUE( client->doGet( url ) );
+    client->doGet( url );
     std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
     client.reset();
 
@@ -131,7 +131,7 @@ public:
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
+TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
 {
     static const int REQUESTS_TO_SEND = 10;
 
@@ -177,14 +177,14 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
         auto bytesRead = sock->recv(
             readBuf.data() + dataSize,
             readBuf.size() - dataSize );
-        if( bytesRead == 0 || bytesRead == -1 )
-            break;  //read error on connection closed
+        ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
+        
         dataSize += bytesRead;
         size_t bytesParsed = 0;
-        if( !httpMsgReader.parseBytes(
+        ASSERT_TRUE(
+            httpMsgReader.parseBytes(
                 QnByteArrayConstRef( readBuf, 0, dataSize ),
-                &bytesParsed ) )
-            break;  //parse error
+                &bytesParsed ) );
         readBuf.remove( 0, bytesParsed );
         dataSize -= bytesParsed;
         if( httpMsgReader.state() == nx_http::HttpStreamReader::messageDone )
@@ -197,7 +197,7 @@ TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
         }
     }
 
-    ASSERT_EQ( msgCounter, 0 );
+    ASSERT_EQ( 0, msgCounter);
 }
 
 }

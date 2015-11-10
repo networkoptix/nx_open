@@ -37,7 +37,9 @@ public:
         connections.clear();
     }
 
-    void closeConnection( ConnectionType* connection )
+    void closeConnection(
+        SystemError::ErrorCode /*closeReason*/,
+        ConnectionType* connection )
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         m_connections.erase( connection );
@@ -62,7 +64,8 @@ protected:
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
-    public StreamConnectionHolder<ConnectionType>
+    public StreamConnectionHolder<ConnectionType>,
+    public QnStoppable
 {
     typedef StreamConnectionHolder<ConnectionType> BaseType;
 
@@ -81,6 +84,11 @@ public:
     }
 
     ~StreamSocketServer()
+    {
+        pleaseStop();
+    }
+
+    virtual void pleaseStop()
     {
         m_socket->cancelAsyncIO();
     }
@@ -104,7 +112,8 @@ public:
 
         if( !m_socket->listen() )
             return false;
-        return m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
+        m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) );
+        return true;
     }
 
     SocketAddress address() const
@@ -118,16 +127,15 @@ public:
     {
         using namespace std::placeholders;
 
+        //TODO #ak handle errorCode
+
         if( newConnection )
         {
             auto conn = createConnection( std::unique_ptr<AbstractStreamSocket>(newConnection) );
-            if( conn->startReadingConnection() )
-                this->saveConnection( std::move( conn ) );
+            conn->startReadingConnection();
+            this->saveConnection(std::move(conn));
         }
-        if( !m_socket->acceptAsync( std::bind( &SelfType::newConnectionAccepted, this, _1, _2 ) ) )
-        {
-            //TODO #ak
-        }
+        m_socket->acceptAsync(std::bind(&SelfType::newConnectionAccepted, this, _1, _2));
     }
 
 protected:

@@ -144,7 +144,7 @@ QString AsyncClient::Message::toString() const
             .arg( paramList.join( lit(", ") ) );
 }
 
-bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
+void AsyncClient::doUpnp( const QUrl& url, const Message& message,
                           std::function< void( const Message& )> callback )
 {
     const auto service = toUpnpUrn( message.service, lit("service") );
@@ -200,16 +200,7 @@ bool AsyncClient::doUpnp( const QUrl& url, const Message& message,
 
     QnMutexLocker lk(&m_mutex);
     m_httpClients.insert( httpClient );
-    if( !httpClient->doPost( url, "text/xml", request.toUtf8() ) )
-    {
-        NX_LOGX( lit( "Could not send request to %1" )
-                 .arg( url.toString() ), cl_logERROR );
-
-        m_httpClients.erase( httpClient );
-        return false;
-    }
-
-    return true;
+    httpClient->doPost( url, "text/xml", request.toUtf8() );
 }
 
 const QString AsyncClient::CLIENT_ID        = lit( "NX UpnpAsyncClient" );
@@ -232,16 +223,16 @@ static const QString ENABLED        = lit("NewEnabled");
 static const QString DESCRIPTION    = lit("NewPortMappingDescription");
 static const QString DURATION       = lit("NewLeaseDuration");
 
-bool AsyncClient::externalIp( const QUrl& url,
+void AsyncClient::externalIp( const QUrl& url,
                               std::function< void( const HostAddress& ) > callback )
 {
     AsyncClient::Message request = { GET_EXTERNAL_IP, WAN_IP };
-    return doUpnp( url, request, [callback]( const Message& response ) {
+    doUpnp( url, request, [callback]( const Message& response ) {
         callback( response.getParam( EXTERNAL_IP ) );
     } );
 }
 
-bool AsyncClient::addMapping(
+void AsyncClient::addMapping(
         const QUrl& url, const HostAddress& internalIp, quint16 internalPort,
         quint16 externalPort, Protocol protocol, const QString& description,
         quint64 duration, std::function< void( bool ) > callback )
@@ -258,12 +249,12 @@ bool AsyncClient::addMapping(
     request.params[ DESCRIPTION ]   = description.isEmpty() ? CLIENT_ID : description;
     request.params[ DURATION ]      = QString::number( duration );
 
-    return doUpnp( url, request, [ callback ]( const Message& response ) { 
+    doUpnp( url, request, [ callback ]( const Message& response ) { 
         callback( response.isOk() );
     } );
 }
 
-bool AsyncClient::deleteMapping(
+void AsyncClient::deleteMapping(
         const QUrl& url, quint16 externalPort, Protocol protocol,
         std::function< void( bool ) > callback )
 {
@@ -273,7 +264,7 @@ bool AsyncClient::deleteMapping(
     request.params[ EXTERNAL_PORT ] = QString::number( externalPort );
     request.params[ PROTOCOL ] = QnLexical::serialized( protocol );
 
-    return doUpnp( url, request, [ callback ]( const Message& response ) {
+    doUpnp( url, request, [ callback ]( const Message& response ) {
         callback( response.isOk() );
     } );
 }
@@ -299,7 +290,7 @@ QString AsyncClient::MappingInfo::toString() const
             .arg( description ).arg(duration);
 }
 
-bool AsyncClient::getMapping(
+void AsyncClient::getMapping(
         const QUrl& url, quint32 index,
         std::function< void( MappingInfo ) > callback )
 {
@@ -322,7 +313,7 @@ bool AsyncClient::getMapping(
     } );
 }
 
-bool AsyncClient::getMapping(
+void AsyncClient::getMapping(
         const QUrl& url, quint16 externalPort, Protocol protocol,
         std::function< void( MappingInfo ) > callback )
 {
@@ -360,19 +351,15 @@ void fetchMappingsRecursive(
     }
 
     collected->push_back( std::move( newMap ) );
-    if( !client->getMapping( url, collected->size(),
+    client->getMapping( url, collected->size(),
                              [ client, url, callback, collected ]
                              ( AsyncClient::MappingInfo nextMap )
         {
             fetchMappingsRecursive( client, url, callback, collected, std::move(nextMap) );
-        } ) )
-    {
-        // return what we have rather then nothing
-        callback( std::move( *collected ) );
-    }
+        } );
 }
 
-bool AsyncClient::getAllMappings(
+void AsyncClient::getAllMappings(
         const QUrl& url, std::function< void( MappingList ) > callback )
 {
     auto mappings = std::make_shared< std::vector< MappingInfo > >();

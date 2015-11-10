@@ -31,7 +31,7 @@ AsyncClient::~AsyncClient()
     m_baseConnection.reset();
 }
 
-bool AsyncClient::openConnection( ConnectionHandler connectHandler,
+void AsyncClient::openConnection( ConnectionHandler connectHandler,
                                   IndicationHandler indicationHandler,
                                   ConnectionHandler disconnectHandler )
 {
@@ -41,10 +41,10 @@ bool AsyncClient::openConnection( ConnectionHandler connectHandler,
     if( indicationHandler ) m_indicationHandler = std::move( indicationHandler );
     if( disconnectHandler ) m_disconnectHandler = std::move( disconnectHandler );
 
-    return openConnectionImpl( &lock );
+    openConnectionImpl( &lock );
 }
 
-bool AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
+void AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
 {
     QnMutexLocker lock( &m_mutex );
     m_requestQueue.push_back( std::make_pair(
@@ -57,31 +57,30 @@ bool AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
 
         case State::connecting:
             // dispatchRequestsInQueue will be called in onConnectionComplete
-            return true;
+            return;
 
         case State::connected:
             dispatchRequestsInQueue( &lock );
-            return true;
+            return;
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
-            return false;
+            return;
     };
 }
 
-void AsyncClient::closeConnection( BaseConnectionType* connection )
+void AsyncClient::closeConnection(
+    SystemError::ErrorCode errorCode,
+    BaseConnectionType* connection)
 {
     Q_ASSERT( !m_baseConnection || connection == m_baseConnection.get() );
 
     ConnectionHandler disconnectHandler;
-    SystemError::ErrorCode errorCode;
     {
         QnMutexLocker lock( &m_mutex );
-        disconnectHandler = m_disconnectHandler;
-
-        errorCode = SystemError::getLastOSErrorCode();
+        disconnectHandler = m_disconnectHandler;    //TODO #muskov std::move(m_disconnectHandler)?
         closeConnectionImpl( &lock, errorCode );
     }
 
@@ -110,7 +109,7 @@ boost::optional< QString >
     return boost::none;
 }
 
-bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
+void AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
 {
     switch( m_state )
     {
@@ -122,35 +121,36 @@ bool AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
             auto onComplete = [ this ]( SystemError::ErrorCode code )
                 { onConnectionComplete( code ); };
 
-            if( !m_connectingSocket->setNonBlockingMode( true ) ||
+            if (!m_connectingSocket->setNonBlockingMode( true ) ||
                 !m_connectingSocket->setSendTimeout( m_timeouts.send ) ||
                 // TODO: #mu Use m_timeouts.recv on timer when request is sent
-                !m_connectingSocket->setRecvTimeout( 0 ) ||
-                !m_connectingSocket->connectAsync( m_endpoint,
-                                                   std::move(onComplete) ) )
+                !m_connectingSocket->setRecvTimeout( 0 ))
             {
-                m_connectingSocket = nullptr;
-                return false;
+                m_connectingSocket->post(
+                    std::bind(onComplete, SystemError::getLastOSErrorCode()));
+                return;
             }
 
+            m_connectingSocket->connectAsync(m_endpoint, std::move(onComplete));
+
             m_state = State::connecting;
-            return true;
+            return;
         }
 
         case State::connected:
             m_baseConnection->socket()->post( std::bind(
                 std::move( m_connectHandler ), SystemError::noError ) );
-            return true;
+            return;
 
         case State::connecting:
             // m_connectHandler will be called in onConnectionComplete
-            return true;
+            return;
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "m_state is invalid" );
             NX_LOGX( lit( "m_state has invalid value: %1" )
                      .arg( static_cast< int >( m_state ) ), cl_logERROR );
-            return false;
+            return;
     }
 }
 
@@ -231,12 +231,7 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     m_baseConnection->setMessageHandler( 
         [ this ]( Message message ){ processMessage( std::move(message) ); } );
 
-    if( !m_baseConnection->startReadingConnection() )
-    {
-        code = SystemError::getLastOSErrorCode();
-        m_state = State::disconnected;
-        return;
-    }
+    m_baseConnection->startReadingConnection();
 
     m_state = State::connected;
     dispatchRequestsInQueue( &lock );

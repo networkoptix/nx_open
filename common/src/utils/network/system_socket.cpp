@@ -768,22 +768,22 @@ void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForR
     m_aioHelper->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
 }
 
-bool CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
 {
     return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
 }
 
-bool CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
     return m_aioHelper->recvAsyncImpl( buf, std::move( handler ) );
 }
 
-bool CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
 {
     return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
 }
 
-bool CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+void CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
 {
     return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
 }
@@ -1179,7 +1179,7 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-bool TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
+void TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );

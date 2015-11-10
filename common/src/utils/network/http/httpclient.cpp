@@ -163,8 +163,7 @@ namespace nx_http
             connect(m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection);
         }
 
-        if (!func(m_asyncHttpClient.get()))
-            return false;
+        func(m_asyncHttpClient.get());
 
         QnMutexLocker lk( &m_mutex );
         while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )

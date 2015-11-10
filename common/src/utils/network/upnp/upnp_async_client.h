@@ -34,7 +34,7 @@ public:
     };
 
     //! Creates request by @param message and calls @fn doPost
-    bool doUpnp( const QUrl& url, const Message& message,
+    void doUpnp( const QUrl& url, const Message& message,
                  std::function< void( const Message& ) > callback );
 
     //! ID string of this client
@@ -45,7 +45,7 @@ public:
 
     //! Finds out external IP address
     virtual
-    bool externalIp( const QUrl& url,
+    void externalIp( const QUrl& url,
                      std::function< void( const HostAddress& ) > callback );
 
     //! UPnP Service for @fn externalIp, @fn addMapping
@@ -53,14 +53,14 @@ public:
 
     //! Maps @param externalPort to @param internalPort on @param internalIp
     virtual
-    bool addMapping( const QUrl& url, const HostAddress& internalIp,
+    void addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort,
                      Protocol protocol, const QString& description, quint64 duration,
                      std::function< void( bool ) > callback );
 
     //! Removes mapping of @param externalPort
     virtual
-    bool deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
+    void deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                         std::function< void( bool ) > callback );
 
     struct MappingInfo
@@ -83,17 +83,17 @@ public:
 
     //! Provides mapping info by @param index
     virtual
-    bool getMapping( const QUrl& url, quint32 index,
+    void getMapping( const QUrl& url, quint32 index,
                      std::function< void( MappingInfo ) > callback );
 
     //! Provides mapping info by @param externalPort and @param protocol
     virtual
-    bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
+    void getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                      std::function< void( MappingInfo ) > callback );
 
     typedef std::vector< MappingInfo > MappingList;
 
-    bool getAllMappings( const QUrl& url,
+    void getAllMappings( const QUrl& url,
                          std::function< void( MappingList ) > callback  );
 
 private:

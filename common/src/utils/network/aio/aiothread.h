@@ -42,10 +42,9 @@ namespace aio
 
         //!Monitor socket \a sock for event \a eventToWatch occurrence and trigger \a eventHandler on event
         /*!
-            \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
             \note MUST be called with \a mutex locked
         */
-        bool watchSocket(
+        void watchSocket(
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
@@ -55,7 +54,7 @@ namespace aio
         /*!
             \note If \a sock is not polled, undefined behaviour can occur
         */
-        bool changeSocketTimeout(
+        void changeSocketTimeout(
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
@@ -66,11 +65,10 @@ namespace aio
             Garantees that no \a eventTriggered will be called after return of this method.
             If \a eventTriggered is running and \a removeFromWatch called not from \a eventTriggered, method blocks till \a eventTriggered had returned
             \param waitForRunningHandlerCompletion See comment to \a aio::AIOService::removeFromWatch
-            \return true if removed socket. false if failed to remove
             \note Calling this method with same parameters simultaneously from multiple threads can cause undefined behavour
             \note MUST be called with \a mutex locked
         */
-        bool removeFromWatch(
+        void removeFromWatch(
             SocketType* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion );

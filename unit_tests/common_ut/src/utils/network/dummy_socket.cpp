@@ -169,28 +169,24 @@ void DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
 {
 }
 
-bool DummySocket::connectAsyncImpl( const SocketAddress& /*addr*/,
+void DummySocket::connectAsyncImpl( const SocketAddress& /*addr*/,
                                     std::function<void( SystemError::ErrorCode )>&& /*handler*/ )
 {
-    return false;
 }
 
-bool DummySocket::recvAsyncImpl( nx::Buffer* const /*buf*/,
+void DummySocket::recvAsyncImpl( nx::Buffer* const /*buf*/,
                                  std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
-    return false;
 }
 
-bool DummySocket::sendAsyncImpl( const nx::Buffer& /*buf*/,
+void DummySocket::sendAsyncImpl( const nx::Buffer& /*buf*/,
                                  std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
 {
-    return false;
 }
 
-bool DummySocket::registerTimerImpl( unsigned int /*timeoutMs*/,
+void DummySocket::registerTimerImpl( unsigned int /*timeoutMs*/,
                                      std::function<void()>&& /*handler*/ )
 {
-    return false;
 }
 
 

@@ -112,24 +112,22 @@ namespace nx_http
         \return true, if socket is created and async connect is started. false otherwise
         To get error description use SystemError::getLastOSErrorCode()
     */
-    bool AsyncHttpClient::doGet( const QUrl& url )
+    void AsyncHttpClient::doGet( const QUrl& url )
     {
-        if( !url.isValid() )
-            return false;
+        Q_ASSERT( url.isValid() );
 
         resetDataBeforeNewRequest();
         m_url = url;
         composeRequest( nx_http::Method::GET );
-        return initiateHttpMessageDelivery( url );
+        initiateHttpMessageDelivery( url );
     }
 
-    bool AsyncHttpClient::doPost(
+    void AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody)
     {
-        if( !url.isValid() )
-            return false;
+        Q_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -139,16 +137,15 @@ namespace nx_http
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
         m_request.messageBody = std::move(messageBody);
-        return initiateHttpMessageDelivery( url );
+        initiateHttpMessageDelivery( url );
     }
 
-    bool AsyncHttpClient::doPut(
+    void AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody )
     {
-        if( !url.isValid() )
-            return false;
+        Q_ASSERT(url.isValid());
 
         resetDataBeforeNewRequest();
         m_url = url;
@@ -157,7 +154,7 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.messageBody = std::move(messageBody);
-        return initiateHttpMessageDelivery( url );
+        initiateHttpMessageDelivery( url );
     }
 
     const nx_http::Request& AsyncHttpClient::request() const
@@ -286,10 +283,8 @@ namespace nx_http
             emit tcpConnectionEstablished( sharedThis );
             lk.relock();
             using namespace std::placeholders;
-            if( m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
-                return;
-
-            NX_LOGX( lit( "Failed to send request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+            m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) );
+            return;
         }
         else
         {
@@ -342,29 +337,26 @@ namespace nx_http
         m_requestBytesSent += bytesWritten;
         if( (int)m_requestBytesSent < m_requestBuffer.size() )
         {
-            if( !m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) ) )
-            {
-                NX_LOGX( lit( "Error sending (2) http request to %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
-                m_state = sFailed;
-                lk.unlock();
-                emit done( sharedThis );
-                lk.relock();
-            }
+            m_socket->sendAsync( m_requestBuffer, std::bind( &AsyncHttpClient::asyncSendDone, this, sock, _1, _2 ) );
             return;
         }
 
         NX_LOGX( lit( "Http request has been successfully sent to %1" ).arg( m_url.toString() ), cl_logDEBUG2 );
         m_state = sReceivingResponse;
         m_responseBuffer.resize( 0 );
-        if( !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) ||
-            !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+        if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
         {
             NX_LOGX( lit( "Error reading (1) http response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
             m_state = sFailed;
             lk.unlock();
             emit done( sharedThis );
             lk.relock();
+            return;
         }
+
+        m_socket->readSomeAsync(
+            &m_responseBuffer,
+            std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
     }
 
     void AsyncHttpClient::onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead )
@@ -418,18 +410,19 @@ namespace nx_http
                 {
                     //response has not been read yet, reading futher
                     m_responseBuffer.resize( 0 );
-                    if( m_connectionClosed ||
-                        !m_socket->readSomeAsync(
-                            &m_responseBuffer,
-                            std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if (m_connectionClosed)
                     {
                         NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).
-                            arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
+                            arg( m_url.toString() ).arg(SystemError::connectionReset), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
+                        return;
                     }
+                    m_socket->readSomeAsync(
+                        &m_responseBuffer,
+                        std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
                     return;
                 }
 
@@ -515,15 +508,18 @@ namespace nx_http
                 {
                     //reading more data
                     m_responseBuffer.resize( 0 );
-                    if( !m_socket->setRecvTimeout( m_msgBodyReadTimeoutMs ) ||
-                        !m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
+                    if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
                     {
                         NX_LOGX( lit( "Failed to read (1) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
                         m_state = sFailed;
                         lk.unlock();
                         emit done( sharedThis );
                         lk.relock();
+                        return;
                     }
+                    m_socket->readSomeAsync(
+                        &m_responseBuffer,
+                        std::bind(&AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2));
                     return;
                 }
 
@@ -553,15 +549,10 @@ namespace nx_http
                 if( m_state != sFailed && m_state != sDone )
                 {
                     m_responseBuffer.resize( 0 );
-                    if( m_socket->readSomeAsync( &m_responseBuffer, std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) ) )
-                    {
-                        return;
-                    }
-                    else
-                    {
-                        NX_LOGX( lit( "Failed to read (2) response from %1. %2" ).arg( m_url.toString() ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
-                        m_state = sFailed;
-                    }
+                    m_socket->readSomeAsync(
+                        &m_responseBuffer,
+                        std::bind( &AsyncHttpClient::onSomeBytesReadAsync, this, sock, _1, _2 ) );
+                    return;
                 }
 
                 lk.unlock();
@@ -586,7 +577,7 @@ namespace nx_http
         m_request = nx_http::Request();
     }
 
-    bool AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
+    void AsyncHttpClient::initiateHttpMessageDelivery( const QUrl& url )
     {
         using namespace std::placeholders;
 
@@ -612,16 +603,10 @@ namespace nx_http
                 serializeRequest();
                 m_state = sSendingRequest;
 
-                if( !m_socket->sendAsync(
-                        m_requestBuffer,
-                        std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ) ) )
-                {
-                    NX_LOGX( lit("Failed to init async socket call (connecting to %1) to aio service. %2").
-                        arg(remoteEndpoint.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-                    m_socket.clear();
-                    return false;
-                }
-                return true;
+                m_socket->sendAsync(
+                    m_requestBuffer,
+                    std::bind( &AsyncHttpClient::asyncSendDone, this, m_socket.data(), _1, _2 ));
+                return;
             }
             else
             {
@@ -633,10 +618,10 @@ namespace nx_http
         m_httpStreamReader.resetState();
         m_awaitedMessageNumber = 0;
 
-        return initiateTcpConnection();
+        initiateTcpConnection();
     }
 
-    bool AsyncHttpClient::initiateTcpConnection()
+    void AsyncHttpClient::initiateTcpConnection()
     {
         const SocketAddress remoteAddress( m_url.host(), m_url.port( nx_http::DEFAULT_HTTP_PORT ) );
 
@@ -650,28 +635,20 @@ namespace nx_http
             !m_socket->setSendTimeout( m_sendTimeoutMs ) ||
             !m_socket->setRecvTimeout( m_responseReadTimeoutMs ) )
         {
-            NX_LOGX( lit("Failed to put socket to non blocking mode. %1").
-                arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            return false;
+            m_socket->post(std::bind(
+                &AsyncHttpClient::asyncConnectDone,
+                this,
+                m_socket.data(),
+                SystemError::getLastOSErrorCode()));
+            return;
         }
 
         m_state = sWaitingConnectToHost;
 
         //starting async connect
-        if( !m_socket->connectAsync(
-                remoteAddress,
-                std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) ) )
-        {
-            NX_LOGX( lit("Failed to perform async connect to %1. %2").
-                arg(remoteAddress.toString()).arg(SystemError::toString(SystemError::getLastOSErrorCode())), cl_logDEBUG1 );
-            m_socket.clear();
-            m_url.clear();
-            m_state = sInit;
-            return false;
-        }
-
-        return true;
+        m_socket->connectAsync(
+            remoteAddress,
+            std::bind( &AsyncHttpClient::asyncConnectDone, this, m_socket.data(), std::placeholders::_1 ) );
     }
 
     size_t AsyncHttpClient::readAndParseHttp( size_t bytesRead )
@@ -887,7 +864,8 @@ namespace nx_http
         doSomeCustomLogic( response, &m_request );
 
         m_authorizationTried = true;
-        return initiateHttpMessageDelivery( m_url );
+        initiateHttpMessageDelivery( m_url );
+        return true;
     }
 
     void AsyncHttpClient::doSomeCustomLogic(
@@ -960,20 +938,24 @@ namespace nx_http
     * utils
     ***********************************************************/
 
-    bool downloadFileAsync(
+    void downloadFileAsync(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders,
         AsyncHttpClient::AuthType authType )
     {
-        auto handler = [completionHandler](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType msgBody ) 
+        auto handler = [completionHandler](
+            SystemError::ErrorCode osErrorCode,
+            int statusCode,
+            nx_http::StringType,
+            nx_http::BufferType msgBody ) 
         {
             completionHandler(osErrorCode, statusCode, msgBody);
         };
-        return downloadFileAsyncEx(url, handler, extraHeaders, authType);
+        downloadFileAsyncEx(url, handler, extraHeaders, authType);
     }
 
-    bool downloadFileAsyncEx(
+    void downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders,
@@ -990,20 +972,24 @@ namespace nx_http
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
-                return completionHandler(
-                SystemError::connectionReset,
-                nx_http::StatusCode::ok,
-                nx_http::StringType(),
-                nx_http::BufferType() );
+            {
+                completionHandler(
+                    SystemError::connectionReset,
+                    nx_http::StatusCode::ok,
+                    nx_http::StringType(),
+                    nx_http::BufferType() );
+                return;
+            }
 
             if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
                 httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent )
             {
-                return completionHandler(
+                completionHandler(
                     SystemError::noError,
                     httpClient->response()->statusLine.statusCode,
                     nx_http::StringType(),
                     nx_http::BufferType());
+                return;
             }
 
             completionHandler( 
@@ -1017,13 +1003,7 @@ namespace nx_http
             httpClientCaptured.get(), requestCompletionFunc,
             Qt::DirectConnection );
 
-        if( !httpClientCaptured->doGet( url ) )
-        {
-            //if we do not disconnect, http client object will not be destroyed
-            httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
-            return false;
-        }
-        return true;
+        httpClientCaptured->doGet( url );
     }
 
     SystemError::ErrorCode downloadFileSync(
@@ -1035,7 +1015,7 @@ namespace nx_http
         SystemError::ErrorCode resultingErrorCode = SystemError::noError;
         std::mutex mtx;
         std::condition_variable condVar;
-        const bool res = downloadFileAsync(
+        downloadFileAsync(
             url,
             [&resultingErrorCode, statusCode, msgBody, &mtx, &condVar, &done]
             ( SystemError::ErrorCode errorCode, int _statusCode, const nx_http::BufferType& _msgBody ) {
@@ -1046,8 +1026,6 @@ namespace nx_http
                 done = true;
                 condVar.notify_all();
             } );
-        if( !res )
-            return SystemError::getLastOSErrorCode();
 
         std::unique_lock<std::mutex> lk( mtx );
         while( !done )

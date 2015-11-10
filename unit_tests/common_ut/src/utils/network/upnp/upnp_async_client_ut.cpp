@@ -20,29 +20,29 @@ TEST( UpnpAsyncClient, DISABLED_GetIp )
     AsyncClient client;
     {
         std::promise< HostAddress > prom;
-        EXPECT_TRUE( client.externalIp( URL,
-                     [&]( const HostAddress& v ) { prom.set_value( v ); } ) );
+        client.externalIp( URL,
+                     [&]( const HostAddress& v ) { prom.set_value( v ); } );
         EXPECT_EQ( prom.get_future().get().toString(), EXTERNAL_IP );
     }
     {
         std::promise< AsyncClient::MappingInfo > prom;
-        EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
+        client.getMapping( URL, 8877, TCP,
                      [&]( const AsyncClient::MappingInfo& mapping )
-                     { prom.set_value( mapping ); } ) );
+                     { prom.set_value( mapping ); } );
 
         // no such mapping
         EXPECT_FALSE( prom.get_future().get().isValid() );
     }
     {
         std::promise< bool > prom;
-        EXPECT_TRUE( client.deleteMapping( URL, 8877, TCP,
-                     [&]( bool v ) { prom.set_value( v ); } ) );
+        client.deleteMapping( URL, 8877, TCP,
+                     [&]( bool v ) { prom.set_value( v ); } );
         EXPECT_FALSE( prom.get_future().get() ); // no such mapping
     }
     {
         std::promise< AsyncClient::MappingList > prom;
-        EXPECT_TRUE( client.getAllMappings( URL,
-                     [&]( const AsyncClient::MappingList& v ) { prom.set_value( v ); } ) );
+        client.getAllMappings( URL,
+                     [&]( const AsyncClient::MappingList& v ) { prom.set_value( v ); } );
         EXPECT_EQ( prom.get_future().get().size(), 2 ); // mappings from Skype ;)
     }
 }
@@ -53,32 +53,32 @@ TEST( UpnpAsyncClient, DISABLED_Mapping )
     AsyncClient client;
     {
          std::promise< bool > prom;
-         EXPECT_TRUE( client.addMapping( URL, INTERNAL_IP, 80, 80, TCP, DESC, 0,
-                      [&]( bool v ) { prom.set_value( v ); } ) );
+         client.addMapping( URL, INTERNAL_IP, 80, 80, TCP, DESC, 0,
+                      [&]( bool v ) { prom.set_value( v ); } );
 
          EXPECT_FALSE( prom.get_future().get() ); // wrong port
     }
     {
         std::promise< bool > prom;
-        EXPECT_TRUE( client.addMapping( URL, INTERNAL_IP, 80, 8877, TCP, DESC, 0,
-                     [&]( bool v ) { prom.set_value( v ); } ) );
+        client.addMapping( URL, INTERNAL_IP, 80, 8877, TCP, DESC, 0,
+                     [&]( bool v ) { prom.set_value( v ); } );
 
         ASSERT_TRUE( prom.get_future().get() );
     }
     {
         std::promise< SocketAddress > prom;
-        EXPECT_TRUE( client.getMapping( URL, 8877, TCP,
+        client.getMapping( URL, 8877, TCP,
                      [&]( const AsyncClient::MappingInfo& m )
                      { prom.set_value( SocketAddress( m.internalIp,
-                                                      m.internalPort ) ); } ) );
+                                                      m.internalPort ) ); } );
 
         EXPECT_EQ( prom.get_future().get().toString(),
                    SocketAddress( INTERNAL_IP, 80 ).toString() );
     }
     {
         std::promise< bool > prom;
-        EXPECT_TRUE( client.deleteMapping( URL, 8877, TCP,
-                     [&]( bool v ) { prom.set_value( v ); } ) );
+        client.deleteMapping( URL, 8877, TCP,
+                     [&]( bool v ) { prom.set_value( v ); } );
 
         EXPECT_TRUE( prom.get_future().get() );
     }

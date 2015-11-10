@@ -201,7 +201,7 @@ private:
         QnMutexLocker lk(&m_mutex);
         m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
         auto requestIter = std::prev(m_runningRequests.end());
-        const bool result = client->get(
+        client->get(
             [completionHandler, requestIter, this](
                 SystemError::ErrorCode errCode,
                 nx_http::StatusCode::Value statusCode,
@@ -215,15 +215,7 @@ private:
                     return completionHandler(api::ResultCode::networkError, OutputData());
                 completionHandler(api::httpStatusCodeToResultCode(statusCode), std::move(data));
             });
-        if (result)
-        {
-            m_runningRequests.back() = std::move(client);
-        }
-        else
-        {
-            m_runningRequests.pop_back();
-            completionHandler(api::ResultCode::networkError, OutputData());
-        }
+        m_runningRequests.back() = std::move(client);
     }
 
     //without output
@@ -235,7 +227,7 @@ private:
         QnMutexLocker lk(&m_mutex);
         m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
         auto requestIter = std::prev(m_runningRequests.end());
-        const bool result = client->get(
+        client->get(
             [completionHandler, requestIter, this](
                 SystemError::ErrorCode errCode,
                 nx_http::StatusCode::Value statusCode)
@@ -248,15 +240,7 @@ private:
                     return completionHandler(api::ResultCode::networkError);
                 completionHandler(api::httpStatusCodeToResultCode(statusCode));
             });
-        if (result)
-        {
-            m_runningRequests.back() = std::move(client);
-        }
-        else
-        {
-            m_runningRequests.pop_back();
-            completionHandler(api::ResultCode::networkError);
-        }
+        m_runningRequests.back() = std::move(client);
     }
 };
 

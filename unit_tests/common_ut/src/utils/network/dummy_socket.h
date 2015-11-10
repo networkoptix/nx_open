@@ -54,10 +54,10 @@ protected:
     virtual void postImpl( std::function<void()>&& handler ) override;
     virtual void dispatchImpl( std::function<void()>&& handler ) override;
 
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
+    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
+    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
 
 private:
     SocketAddress m_localAddress;

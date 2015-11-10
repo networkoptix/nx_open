@@ -273,16 +273,7 @@ namespace ec2
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
         const auto format = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        if (!m_httpClient->doPost(url, format, QJson::serialized(data)))
-        {
-            if ((m_timerCycle *= 2) > TIMER_CYCLE_MAX)
-                m_timerCycle = TIMER_CYCLE_MAX;
-
-            NX_LOG(lit("Ec2StaticticsReporter: Could not doPost to %1, update timer cycle to %2")
-                   .arg(url.toString()).arg(m_timerCycle), cl_logWARNING);
-
-            return ErrorCode::failure;
-        }
+        m_httpClient->doPost(url, format, QJson::serialized(data));
 
         NX_LOG(lit("Ec2StaticticsReporter: Sending statistics asynchronously to %1")
                .arg(url.toString()), cl_logDEBUG1);

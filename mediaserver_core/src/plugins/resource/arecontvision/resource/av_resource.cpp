@@ -172,14 +172,15 @@ QnResourcePtr QnPlAreconVisionResource::updateResource()
 bool QnPlAreconVisionResource::ping()
 {
     QnConcurrent::QnFuture<bool> result(1);
-    if( !checkIfOnlineAsync( [&result]( bool onlineOrNot ) {
-            result.setResultAt(0, onlineOrNot); } ) )
-        return false;
+    checkIfOnlineAsync(
+        [&result]( bool onlineOrNot ) {
+            result.setResultAt(0, onlineOrNot);
+        } );
     result.waitForFinished();
     return result.resultAt(0);
 }
 
-bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     //checking that camera is alive and on its place
     const QString& urlStr = getUrl();
@@ -224,12 +225,7 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
              this, httpReqCompletionHandler,
              Qt::DirectConnection );
 
-    if( !httpClientCaptured->doGet( url ) )
-    {
-        httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
-        return false;
-    }
-    return true;
+    httpClientCaptured->doGet( url );
 }
 
 CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()

@@ -5,7 +5,9 @@
 #include <utils/common/systemerror.h>
 
 #include "cloud_tunnel.h"
+#include "../socket_global.h"
 #include "../system_socket.h"
+
 
 namespace nx {
 namespace cc {
@@ -22,8 +24,7 @@ bool CloudStreamSocket::connect(
     auto completionHandler = [&completionPromise]( SystemError::ErrorCode errorCode ) mutable {
         completionPromise.set_value( errorCode );
     };
-    if( !connectAsyncImpl( remoteAddress, completionHandler ) )
-        return false;
+    connectAsyncImpl( remoteAddress, completionHandler );
     asyncRequestCompletionResult.wait();
     if( asyncRequestCompletionResult.get() == SystemError::noError )
         return true;
@@ -31,56 +32,35 @@ bool CloudStreamSocket::connect(
     return false;
 }
 
-bool CloudStreamSocket::connectAsyncImpl(
+void CloudStreamSocket::connectAsyncImpl(
     const SocketAddress& addr,
     std::function<void( SystemError::ErrorCode )>&& handler )
 {
     //TODO #ak use socket write timeout
-
-    using namespace std::placeholders;
     m_connectHandler = std::move(handler);
-    std::vector<AddressEntry> dnsEntries;
-    const int remotePort = addr.port;
 
-    return true;
-    // TODO: rework later for cloud socket
-    /*
-    const AddressResolver::ResolveResult result = AddressResolver::instance()->resolveAsync(
+    const auto remotePort = addr.port;
+    nx::SocketGlobals::addressResolver().resolveAsync(
         addr.address,
-        &dnsEntries,
-        [this, remotePort]( std::vector<DnsEntry> dnsEntries )
+        [this, remotePort](
+            SystemError::ErrorCode osErrorCode,
+            std::vector<AddressEntry> dnsEntries)
         {
-            if( !startAsyncConnect( std::move( dnsEntries ), remotePort ) )
+            if (osErrorCode != SystemError::noError)
+            {
+                auto connectHandlerBak = std::move(m_connectHandler);
+                connectHandlerBak(osErrorCode);
+                return;
+            }
+
+            if (!startAsyncConnect(std::move(dnsEntries), remotePort))
             {
                 auto connectHandlerBak = std::move( m_connectHandler );
                 connectHandlerBak( SystemError::getLastOSErrorCode() );
             }
-        } );
-    switch( result )
-    {
-        case AddressResolver::ResolveResult::done:
-            break;  //operation completed
-
-        case AddressResolver::ResolveResult::startedAsync:
-            //async resolve has been started
-            return true;
-
-        case AddressResolver::ResolveResult::failed:
-            //resetting handler, since it may hold some resources
-            m_connectHandler = std::function<void( SystemError::ErrorCode )>();
-            SystemError::setLastErrorCode( SystemError::hostUnreach );
-            return false;
-    }
-
-    if( startAsyncConnect( std::move( dnsEntries ), addr.port ) )
-        return true;
-
-    //resetting handler, since it may hold some resources
-    m_connectHandler = std::function<void( SystemError::ErrorCode )>();
-    return false;
-    */
-
-    return true;
+        },
+        true,
+        this);   //TODO #ak resolve cancellation
 }
 
 void CloudStreamSocket::applyCachedAttributes()
@@ -109,20 +89,18 @@ bool CloudStreamSocket::startAsyncConnect(
         return false;
     }
 
-    return true;
-    // TODO: rework
-    /*
-    //TODO #ak should prefer regular address to a cloud one
+    //TODO #ak try every resolved address? Also, should prefer regular address to a cloud one
     AddressEntry& dnsEntry = dnsEntries[0];
     switch( dnsEntry.type )
     {
         case AddressType::regular:
             //using tcp connection
-            m_socketDelegate.reset( new TCPSocket() );
+            m_socketDelegate.reset( new TCPSocket(true) );
             applyCachedAttributes();
-            return m_socketDelegate->connectAsync(
-                SocketAddress(std::move(dnsEntry.address), port),
+            m_socketDelegate->connectAsync(
+                SocketAddress(std::move(dnsEntry.host), port),
                 m_connectHandler );
+            return true;
 
         case AddressType::cloud:
         case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
@@ -133,7 +111,7 @@ bool CloudStreamSocket::startAsyncConnect(
 
             //establishing cloud connect
             auto tunnel = CloudTunnelPool::instance()->getTunnelToHost(
-                SocketAddress( std::move( dnsEntry.address ), port ) );
+                SocketAddress( std::move( dnsEntry.host ), port ) );
             return tunnel->connect(
                 sockSendTimeout,
                 [this, tunnel](
@@ -152,7 +130,6 @@ bool CloudStreamSocket::startAsyncConnect(
             SystemError::setLastErrorCode( SystemError::hostUnreach );
             return false;
     }
-    */
 }
 
 void CloudStreamSocket::cloudConnectDone(

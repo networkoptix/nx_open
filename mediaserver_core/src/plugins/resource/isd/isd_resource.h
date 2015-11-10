@@ -19,7 +19,7 @@ public:
     QnPlIsdResource();
 
     //!Implementation of QnNetworkResource::checkIfOnlineAsync
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler ) override;
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler ) override;
 
     QSize getPrimaryResolution() const;
     QSize getSecondaryResolution() const;

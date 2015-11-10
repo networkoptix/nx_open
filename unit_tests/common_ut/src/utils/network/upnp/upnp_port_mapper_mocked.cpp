@@ -15,15 +15,14 @@ AsyncClientMock::AsyncClientMock( const HostAddress& externalIp )
 {
 }
 
-bool AsyncClientMock::externalIp(
+void AsyncClientMock::externalIp(
         const QUrl& /*url*/,
         std::function< void( const HostAddress& ) > callback )
 {
     QtConcurrent::run( [ this, callback ]{ callback( m_externalIp ); } );
-    return true;
 }
 
-bool AsyncClientMock::addMapping(
+void AsyncClientMock::addMapping(
         const QUrl& /*url*/, const HostAddress& internalIp,
         quint16 internalPort, quint16 externalPort,
         Protocol protocol, const QString& description, quint64 duration,
@@ -35,28 +34,26 @@ bool AsyncClientMock::addMapping(
                 != m_mappings.end() )
     {
         QtConcurrent::run( [ callback ]{ callback( false ); } );
-        return true;
+        return;
     }
 
     m_mappings[ std::make_pair( externalPort, protocol ) ]
         = std::make_pair( SocketAddress( internalIp, internalPort ), description );
 
     QtConcurrent::run( [ callback ]{ callback( true ); } );
-    return true;
 
 }
 
-bool AsyncClientMock::deleteMapping(
+void AsyncClientMock::deleteMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         std::function< void( bool ) > callback )
 {
     QMutexLocker lock( &m_mutex );
     const bool isErased = m_mappings.erase( std::make_pair( externalPort, protocol ) );
     QtConcurrent::run( [ isErased, callback ]{ callback( isErased ); } );
-    return true;
 }
 
-bool AsyncClientMock::getMapping(
+void AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint32 index,
         std::function< void( MappingInfo ) > callback )
 {
@@ -64,7 +61,7 @@ bool AsyncClientMock::getMapping(
     if( m_mappings.size() <= index )
     {
         QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
-        return true;
+        return;
     }
 
     const auto mapping = *std::next( m_mappings.begin(), index );
@@ -77,11 +74,9 @@ bool AsyncClientMock::getMapping(
             mapping.first.second,
             mapping.second.second ) );
     } );
-
-    return true;
 }
 
-bool AsyncClientMock::getMapping(
+void AsyncClientMock::getMapping(
         const QUrl& /*url*/, quint16 externalPort, Protocol protocol,
         std::function< void( MappingInfo ) > callback )
 {
@@ -90,7 +85,7 @@ bool AsyncClientMock::getMapping(
     if( it == m_mappings.end() )
     {
         QtConcurrent::run( [ callback ]{ callback( MappingInfo() ); } );
-        return true;
+        return;
     }
 
     const auto mapping = *it;
@@ -103,8 +98,6 @@ bool AsyncClientMock::getMapping(
             mapping.first.second,
             mapping.second.second ) );
     } );
-
-    return true;
 }
 
 AsyncClientMock::Mappings AsyncClientMock::mappings() const

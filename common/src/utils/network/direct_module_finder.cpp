@@ -129,8 +129,7 @@ void QnDirectModuleFinder::activateRequests() {
         std::unique_ptr<QnAsyncHttpClientReply> reply( new QnAsyncHttpClientReply(client, this) );
         connect(reply.get(), &QnAsyncHttpClientReply::finished, this, &QnDirectModuleFinder::at_reply_finished);
 
-        if (!client->doGet(url))
-            return;
+        client->doGet(url);
 
         Q_ASSERT_X(!m_activeRequests.contains(url), "Duplicate request issued", Q_FUNC_INFO);
         m_activeRequests.insert(url, reply.release());

@@ -58,14 +58,14 @@ namespace aio
             \note If not called from aio thread \a sock can be added to event loop with some delay
         */
         template<class SocketType>
-        bool watchSocket(
+        void watchSocket(
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
             std::function<void()> socketAddedToPollHandler = std::function<void()>() )
         {
             QnMutexLocker lk( &m_mutex );
-            return watchSocketNonSafe( sock, eventToWatch, eventHandler, socketAddedToPollHandler );
+            watchSocketNonSafe( sock, eventToWatch, eventHandler, socketAddedToPollHandler );
         }
 
         //!Cancel monitoring \a sock for event \a eventType
@@ -85,7 +85,7 @@ namespace aio
             bool waitForRunningHandlerCompletion = true )
         {
             QnMutexLocker lk( &m_mutex );
-            return removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
+            removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
         }
 
         //!Register timeout, associated with socket \a sock
@@ -93,13 +93,13 @@ namespace aio
             \a eventHandler->eventTriggered( \a sock, aio::etTimedOut ) will be called every \a timeoutMillis milliseconds until cancelled with \a aio::AIOService::removeFromWatch( \a sock, \a aio::etTimedOut )
         */
         template<class SocketType, class HandlerType>
-        bool registerTimer(
+        void registerTimer(
             SocketType* const sock,
             unsigned int timeoutMillis,
             AIOEventHandler<SocketType>* const eventHandler )
         {
             QnMutexLocker lk( &m_mutex );
-            return watchSocketNonSafe( sock, aio::etTimedOut, eventHandler, timeoutMillis );
+            watchSocketNonSafe( sock, aio::etTimedOut, eventHandler, timeoutMillis );
         }
 
         //!Returns \a true, if socket is still listened for state changes
@@ -155,7 +155,7 @@ namespace aio
             \param socketAddedToPollHandler Called after socket has been added to pollset but before pollset.poll has been called
         */
         template<class SocketType>
-        bool watchSocketNonSafe(
+        void watchSocketNonSafe(
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
@@ -170,12 +170,28 @@ namespace aio
                 if( eventToWatch == aio::etRead )
                 {
                     if( !sock->getRecvTimeout( &sockTimeoutMS ) )
-                        return false;
+                    {
+                        //reporting error via event thread
+                        post(sock, std::bind(
+                            &AIOEventHandler<SocketType>::eventTriggered,
+                            eventHandler,
+                            sock,
+                            aio::etError));
+                        return;
+                    }
                 }
                 else if( eventToWatch == aio::etWrite )
                 {
                     if( !sock->getSendTimeout( &sockTimeoutMS ) )
-                        return false;
+                    {
+                        //reporting error via event thread
+                        post(sock, std::bind(
+                            &AIOEventHandler<SocketType>::eventTriggered,
+                            eventHandler,
+                            sock,
+                            aio::etError));
+                        return;
+                    }
                 }
                 else
                 {
@@ -202,18 +218,17 @@ namespace aio
                 }
             }
             if( sameSockAndEventIter != aioHandlingContext.sockets.end() && sameSockAndEventIter->second.second == timeoutMillis )
-                return true;    //socket already monitored for eventToWatch
+                return;    //socket already monitored for eventToWatch
 
             if( (closestSockIter != aioHandlingContext.sockets.end()) && (closestSockIter->first.first == sockCtx.first) )  //same socket is already polled
             {
                 if( sameSockAndEventIter != aioHandlingContext.sockets.end() )
                 {
                     //socket is already polled for this event but with another timeout. Just changing timeout
-                    if( sameSockAndEventIter->second.first->changeSocketTimeout( sock, eventToWatch, eventHandler, timeoutMillis.get() ) )
-                    {
-                        sameSockAndEventIter->second.second = timeoutMillis.get();
-                        return true;
-                    }
+                    sameSockAndEventIter->second.first->changeSocketTimeout(
+                        sock, eventToWatch, eventHandler, timeoutMillis.get() );
+                    sameSockAndEventIter->second.second = timeoutMillis.get();
+                    return;
                 }
             }
 
@@ -222,14 +237,9 @@ namespace aio
                 threadToUse = bindSocketToAioThread( sock );
             assert( threadToUse );
 
-            if( threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler ) )
-            {
-                if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( threadToUse, timeoutMillis.get() ) ) ).second )
-                    assert( false );
-                return true;
-            }
-
-            return false;
+            threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler );
+            if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( threadToUse, timeoutMillis.get() ) ) ).second )
+                assert( false );
         }
 
         //!Same as \a AIOService::removeFromWatch, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method

@@ -241,9 +241,9 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
-bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    return false;
+    //TODO #ak call completionHandler(false) in aio_thread
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

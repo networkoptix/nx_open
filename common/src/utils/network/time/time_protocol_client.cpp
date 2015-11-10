@@ -58,25 +58,27 @@ void TimeProtocolClient::join()
     m_tcpSock.reset();
 }
 
-bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
+void TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
     NX_LOGX( lit( "rfc868 time_sync. Starting time synchronization with server %1:%2" ).
         arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ), cl_logDEBUG2 );
 
     {
         QnMutexLocker lk( &m_mutex );
-        m_tcpSock.reset( SocketFactory::createStreamSocket(
-                             false, SocketFactory::nttDisabled ).release() );
-        if( !m_tcpSock )
-            return false;
+        m_tcpSock.reset(
+            SocketFactory::createStreamSocket(
+                false, SocketFactory::nttDisabled ).release() );
     }
 
     if( !m_tcpSock->setNonBlockingMode( true ) ||
         !m_tcpSock->setRecvTimeout(SOCKET_READ_TIMEOUT) ||
         !m_tcpSock->setSendTimeout(SOCKET_READ_TIMEOUT) )
     {
-        m_tcpSock->terminateAsyncIO( true );
-        return false;
+        m_tcpSock->post(std::bind(
+            &TimeProtocolClient::onConnectionEstablished,
+            this,
+            SystemError::getLastOSErrorCode()));
+        return;
     }
 
     m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
@@ -90,20 +92,9 @@ bool TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
     };
 
     using namespace std::placeholders;
-    if( !m_tcpSock->connectAsync(
-            SocketAddress( HostAddress( m_timeServer ), TIME_PROTOCOL_DEFAULT_PORT ),
-            std::bind( &TimeProtocolClient::onConnectionEstablished, this, _1 ) ) )
-    {
-        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX( lit( "rfc868 time_sync. Failed to start async connect (2) from %1:%2. %3" ).
-            arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
-        m_handlerFunc = std::function<void( qint64, SystemError::ErrorCode )>();
-        m_tcpSock->terminateAsyncIO( true );
-        SystemError::setLastErrorCode( errorCode );
-        return false;
-    }
-
-    return true;
+    m_tcpSock->connectAsync(
+        SocketAddress( HostAddress( m_timeServer ), TIME_PROTOCOL_DEFAULT_PORT ),
+        std::bind( &TimeProtocolClient::onConnectionEstablished, this, _1 ) );
 }
 
 namespace
@@ -136,13 +127,9 @@ void TimeProtocolClient::onConnectionEstablished( SystemError::ErrorCode errorCo
     m_timeStr.resize( 0 );
 
     using namespace std::placeholders;
-    if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) ) )
-    {
-        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX( lit( "rfc868 time_sync. Failed to start async read (1) from %1:%2. %3" ).
-            arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
-        m_handlerFunc( -1, errorCode );
-    }
+    m_tcpSock->readSomeAsync(
+        &m_timeStr,
+        std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) );
 }
 
 void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
@@ -183,11 +170,7 @@ void TimeProtocolClient::onSomeBytesRead( SystemError::ErrorCode errorCode, size
 
     //reading futher data
     using namespace std::placeholders;
-    if( !m_tcpSock->readSomeAsync( &m_timeStr, std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) ) )
-    {
-        const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX( lit( "rfc868 time_sync. Failed to start async read (2) from %1:%2. %3" ).
-            arg( m_timeServer ).arg( TIME_PROTOCOL_DEFAULT_PORT ).arg( SystemError::toString( errorCode ) ), cl_logDEBUG2 );
-        m_handlerFunc( -1, errorCode );
-    }
+    m_tcpSock->readSomeAsync(
+        &m_timeStr,
+        std::bind( &TimeProtocolClient::onSomeBytesRead, this, _1, _2 ) );
 }

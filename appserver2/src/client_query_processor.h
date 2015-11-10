@@ -103,11 +103,10 @@ namespace ec2
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
-            if( !httpClient->doPost(requestUrl, Qn::serializationFormatToHttpContentType(format), tranBuffer) )
-            {
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure ) );
-                return;
-            }
+            httpClient->doPost(
+                requestUrl,
+                Qn::serializationFormatToHttpContentType(format),
+                std::move(tranBuffer));
             auto func = [this, httpClient, handler](){ processHttpPostResponse( httpClient, handler ); };
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }
@@ -145,11 +144,7 @@ namespace ec2
             connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &ClientQueryProcessor::onHttpDone, Qt::DirectConnection );
 
             QnMutexLocker lk( &m_mutex );
-            if( !httpClient->doGet( requestUrl ) )
-            {
-                QnConcurrent::run( Ec2ThreadPool::instance(), std::bind( handler, ErrorCode::failure, OutputData() ) );
-                return;
-            }
+            httpClient->doGet( requestUrl );
             auto func = std::bind( std::mem_fn( &ClientQueryProcessor::processHttpGetResponse<OutputData, HandlerType> ), this, httpClient, handler );
             m_runningHttpRequests[httpClient] = std::function<void()>( func );
         }

@@ -15,25 +15,25 @@ public:
     AsyncClientMock( const HostAddress& externalIp );
 
     virtual
-    bool externalIp( const QUrl& url,
+        void externalIp( const QUrl& url,
                      std::function< void( const HostAddress& ) > callback ) override;
 
     virtual
-    bool addMapping( const QUrl& url, const HostAddress& internalIp,
+        void addMapping( const QUrl& url, const HostAddress& internalIp,
                      quint16 internalPort, quint16 externalPort,
                      Protocol protocol, const QString& description, quint64 duration,
                      std::function< void( bool ) > callback ) override;
 
     virtual
-    bool deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
+    void deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                         std::function< void( bool ) > callback ) override;
 
     virtual
-    bool getMapping( const QUrl& url, quint32 index,
+        void getMapping( const QUrl& url, quint32 index,
                      std::function< void( MappingInfo ) > callback ) override;
 
     virtual
-    bool getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
+        void getMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                      std::function< void( MappingInfo ) > callback ) override;
 
     typedef std::map<
