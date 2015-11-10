@@ -1,15 +1,15 @@
 #pragma once
 
-class QnCameraAccessRughtsHelperPrivate;
-class QnCameraAccessRughtsHelper : public QObject
+class QnCameraAccessRightsHelperPrivate;
+class QnCameraAccessRightsHelper : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool canViewArchive READ canViewArchive NOTIFY canViewArchiveChanged)
 
 public:
-    explicit QnCameraAccessRughtsHelper(QObject *parent = nullptr);
-    ~QnCameraAccessRughtsHelper();
+    explicit QnCameraAccessRightsHelper(QObject *parent = nullptr);
+    ~QnCameraAccessRightsHelper();
 
     QString resourceId() const;
     void setResourceId(const QString &id);
@@ -21,6 +21,6 @@ signals:
     void canViewArchiveChanged();
 
 private:
-    QScopedPointer<QnCameraAccessRughtsHelperPrivate> const d_ptr;
-    Q_DECLARE_PRIVATE(QnCameraAccessRughtsHelper)
+    QScopedPointer<QnCameraAccessRightsHelperPrivate> const d_ptr;
+    Q_DECLARE_PRIVATE(QnCameraAccessRightsHelper)
 };

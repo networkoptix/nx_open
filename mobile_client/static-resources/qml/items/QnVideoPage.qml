@@ -157,7 +157,7 @@ QnPage {
         }
     }
 
-    QnCameraAccessRughtsHelper {
+    QnCameraAccessRightsHelper {
         id: accessRightsHelper
         resourceId: videoPlayer.resourceId
     }

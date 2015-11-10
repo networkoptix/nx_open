@@ -13,12 +13,12 @@ namespace {
     }
 }
 
-class QnCameraAccessRughtsHelperPrivate : public QObject {
-    QnCameraAccessRughtsHelper * const q_ptr;
-    Q_DECLARE_PUBLIC(QnCameraAccessRughtsHelper)
+class QnCameraAccessRightsHelperPrivate : public QObject {
+    QnCameraAccessRightsHelper * const q_ptr;
+    Q_DECLARE_PUBLIC(QnCameraAccessRightsHelper)
 
 public:
-    QnCameraAccessRughtsHelperPrivate(QnCameraAccessRughtsHelper *q);
+    QnCameraAccessRightsHelperPrivate(QnCameraAccessRightsHelper *q);
 
     void updateAccessRights();
     void at_userWatcher_userChanged(const QnUserResourcePtr &newUser);
@@ -29,54 +29,54 @@ public:
     bool canViewArchive;
 };
 
-QnCameraAccessRughtsHelper::QnCameraAccessRughtsHelper(QObject *parent)
+QnCameraAccessRightsHelper::QnCameraAccessRightsHelper(QObject *parent)
     : QObject(parent)
-    , d_ptr(new QnCameraAccessRughtsHelperPrivate(this))
+    , d_ptr(new QnCameraAccessRightsHelperPrivate(this))
 {
-    Q_D(QnCameraAccessRughtsHelper);
+    Q_D(QnCameraAccessRightsHelper);
 
     QnUserWatcher *userWatcher = qnCommon->instance<QnUserWatcher>();
-    connect(userWatcher, &QnUserWatcher::userChanged, d, &QnCameraAccessRughtsHelperPrivate::at_userWatcher_userChanged);
+    connect(userWatcher, &QnUserWatcher::userChanged, d, &QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged);
     d->user = userWatcher->user();
 }
 
-QnCameraAccessRughtsHelper::~QnCameraAccessRughtsHelper()
+QnCameraAccessRightsHelper::~QnCameraAccessRightsHelper()
 {
 }
 
-QString QnCameraAccessRughtsHelper::resourceId() const
+QString QnCameraAccessRightsHelper::resourceId() const
 {
-    Q_D(const QnCameraAccessRughtsHelper);
+    Q_D(const QnCameraAccessRightsHelper);
     if (d->camera)
         return d->camera->getId().toString();
 
     return QString();
 }
 
-void QnCameraAccessRughtsHelper::setResourceId(const QString &id)
+void QnCameraAccessRightsHelper::setResourceId(const QString &id)
 {
     if (id == resourceId())
         return;
 
-    Q_D(QnCameraAccessRughtsHelper);
+    Q_D(QnCameraAccessRightsHelper);
     d->camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
     d->updateAccessRights();
 }
 
-bool QnCameraAccessRughtsHelper::canViewArchive() const
+bool QnCameraAccessRightsHelper::canViewArchive() const
 {
-    Q_D(const QnCameraAccessRughtsHelper);
+    Q_D(const QnCameraAccessRightsHelper);
     return d->canViewArchive;
 }
 
 
-QnCameraAccessRughtsHelperPrivate::QnCameraAccessRughtsHelperPrivate(QnCameraAccessRughtsHelper *q)
+QnCameraAccessRightsHelperPrivate::QnCameraAccessRightsHelperPrivate(QnCameraAccessRightsHelper *q)
     : q_ptr(q)
     , canViewArchive(false)
 {
 }
 
-void QnCameraAccessRughtsHelperPrivate::updateAccessRights()
+void QnCameraAccessRightsHelperPrivate::updateAccessRights()
 {
     if (camera && user) {
         canViewArchive = userIsAdmin(user) || user->getPermissions() & Qn::GlobalViewArchivePermission;
@@ -84,11 +84,11 @@ void QnCameraAccessRughtsHelperPrivate::updateAccessRights()
         canViewArchive = false;
     }
 
-    Q_Q(QnCameraAccessRughtsHelper);
+    Q_Q(QnCameraAccessRightsHelper);
     emit q->canViewArchiveChanged();
 }
 
-void QnCameraAccessRughtsHelperPrivate::at_userWatcher_userChanged(const QnUserResourcePtr &newUser)
+void QnCameraAccessRightsHelperPrivate::at_userWatcher_userChanged(const QnUserResourcePtr &newUser)
 {
     if (user == newUser)
         return;
