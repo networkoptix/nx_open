@@ -172,7 +172,8 @@ Item {
             width: circle.width - dp(6)
             height: circle.height - dp(6)
             color: QnTheme.playPause
-            opacity: rootItem.loading ? 1.0 : 0.0
+            lineWidth: dp(2)
+            opacity: rootItem.loading ? 0.5 : 0.0
             visible: opacity > 0
             Behavior on opacity {
                 SequentialAnimation {
@@ -199,6 +200,9 @@ Item {
             scale: iconScale()
             pauseState: rootItem.paused
             color: QnTheme.playPause
+
+            opacity: rootItem.loading ? 0.5 : 1.0
+            Behavior on opacity { NumberAnimation { duration: 250 } }
         }
 
         Rectangle {

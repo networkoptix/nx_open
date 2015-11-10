@@ -342,7 +342,7 @@ Item {
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
-                loading: mediaPlayer.loading
+                loading: mediaPlayer.loading || (!paused && timeline.dragging)
 
                 gripTickVisible: timeline.startBound > 0
 
