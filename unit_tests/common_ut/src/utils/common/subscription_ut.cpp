@@ -28,14 +28,14 @@ TEST(UtilsCommon, SubscriptionGuard)
     EXPECT_EQ(b, 3);
 }
 
-TEST(UtilsCommon, DISABLED_SubscriptionThreadSafe)
+TEST(UtilsCommon, SubscriptionThreadSafe)
 {
     Subscription<int> subscription;
 
     std::atomic<int> a(1);
     auto ga = subscription.subscribe([&](int v)
     {
-        std::this_thread::sleep_for(std::chrono::microseconds(500));
+        std::this_thread::sleep_for(std::chrono::seconds(5));
         a = v;
     });
 
@@ -43,7 +43,7 @@ TEST(UtilsCommon, DISABLED_SubscriptionThreadSafe)
     std::thread thread([&]() { subscription.notify(3); });
 
     // wait for thread to start
-    std::this_thread::sleep_for(std::chrono::microseconds(100));
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     EXPECT_EQ(a, 1);
 
     // event should be waited here
