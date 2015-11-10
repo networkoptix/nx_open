@@ -36,7 +36,7 @@ public:
 
     bool registerStaticProcessor(
         const QString& path,
-        QByteArray response,
+        QByteArray msgBody,
         const nx_http::StringType& mimeType);
     bool registerFileProvider(
         const QString& httpPath,

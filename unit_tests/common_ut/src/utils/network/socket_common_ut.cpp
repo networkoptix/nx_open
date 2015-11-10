@@ -12,7 +12,7 @@ static void checkLocalhost(const HostAddress& host)
     EXPECT_EQ(ipV6.toHex(), host.ipv6().toHex());
 }
 
-TEST(UtilsNetworkSocketCommon, HostAddressLocalhost)
+TEST(UtilsNetworkSocketCommon, DISABLED_HostAddressLocalhost)
 {
     checkLocalhost(HostAddress("localhost"));
     checkLocalhost(HostAddress("127.0.0.1"));

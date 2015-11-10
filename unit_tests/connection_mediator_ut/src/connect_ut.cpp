@@ -48,7 +48,7 @@ TEST_F( ConnectTest, BindConnect )
 {
     TestHttpServer testHttpServer;
     {
-        ASSERT_TRUE( testHttpServer.registerStaticProcessor( "/test", "test" ) );
+        ASSERT_TRUE( testHttpServer.registerStaticProcessor( "/test", "test", "application/text" ) );
         ASSERT_TRUE( testHttpServer.bindAndListen() );
     }
 

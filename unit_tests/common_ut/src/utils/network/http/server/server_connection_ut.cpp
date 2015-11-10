@@ -178,7 +178,7 @@ TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
             readBuf.data() + dataSize,
             readBuf.size() - dataSize );
         ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
-        
+
         dataSize += bytesRead;
         size_t bytesParsed = 0;
         ASSERT_TRUE(

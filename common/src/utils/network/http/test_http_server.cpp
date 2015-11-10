@@ -68,7 +68,7 @@ private:
 
 bool TestHttpServer::registerStaticProcessor(
     const QString& path,
-    QByteArray response,
+    QByteArray msgBody,
     const nx_http::StringType& mimeType)
 {
     return registerRequestProcessor< StaticHandler >(
@@ -76,7 +76,7 @@ bool TestHttpServer::registerStaticProcessor(
         {
             return std::make_unique< StaticHandler >(
                 mimeType,
-                std::move( response ) );
+                std::move(msgBody) );
         } );
 }
 
