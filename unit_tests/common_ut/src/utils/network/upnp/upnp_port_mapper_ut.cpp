@@ -43,7 +43,7 @@ private:
     std::queue< T > m_queue;
 };
 
-TEST( UpnpPortMapper, NormalUsage )
+TEST( UpnpPortMapper, DISABLED_NormalUsage )
 {
     TimerManager timerManager;
     DeviceSearcher deviceSearcher;
@@ -110,7 +110,7 @@ TEST( UpnpPortMapper, ReuseExisting )
     EXPECT_EQ( clientMock.mappingsCount(), 0 );
 }
 
-TEST( UpnpPortMapper, CheckMappings )
+TEST( UpnpPortMapper, DISABLED_CheckMappings )
 {
     TimerManager timerManager;
     DeviceSearcher deviceSearcher;

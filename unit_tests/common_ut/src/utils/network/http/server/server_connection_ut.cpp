@@ -131,7 +131,7 @@ public:
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
 
-TEST_F( AsyncServerConnectionTest, requestPipeliningTest )
+TEST_F( AsyncServerConnectionTest, DISABLED_requestPipeliningTest )
 {
     static const int REQUESTS_TO_SEND = 10;
 

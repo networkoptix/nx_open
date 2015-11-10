@@ -28,7 +28,7 @@ TEST(UtilsCommon, SubscriptionGuard)
     EXPECT_EQ(b, 3);
 }
 
-TEST(UtilsCommon, SubscriptionThreadSafe)
+TEST(UtilsCommon, DISABLED_SubscriptionThreadSafe)
 {
     Subscription<int> subscription;
 
