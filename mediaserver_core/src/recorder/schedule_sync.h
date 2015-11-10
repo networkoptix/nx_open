@@ -122,6 +122,7 @@ private:
     std::atomic<bool>       m_syncing;
     std::atomic<bool>       m_forced;
     std::atomic<bool>       m_interrupted;
+    bool                    m_failReported;
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;

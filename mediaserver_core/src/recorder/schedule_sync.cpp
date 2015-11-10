@@ -23,6 +23,7 @@ QnScheduleSync::QnScheduleSync()
       m_syncing(false),
       m_forced(false),
       m_interrupted(false),
+      m_failReported(false),
       m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
@@ -323,8 +324,6 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 );
                 if (err == CopyError::NoBackupStorageError || 
                     err == CopyError::FromStorageError) {
-                    emit backupFinished(m_syncTimePoint, 
-                                        QnServer::BackupResultCode::Failed);
                     return QnServer::BackupResultCode::Failed;
                 } else if (err == CopyError::Interrupted) {
                     return QnServer::BackupResultCode::Cancelled;
@@ -498,7 +497,14 @@ void QnScheduleSync::run()
             }
             m_forced = false;
             m_syncing = false;
-            emit backupFinished(m_syncTimePoint, result);
+
+            if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
+                emit backupFinished(m_syncTimePoint, result);
+                m_failReported = true;
+            } else if (result != QnServer::BackupResultCode::Failed) {
+                emit backupFinished(m_syncTimePoint, result);
+                m_failReported = false; 
+            }
         }
     }
 }
