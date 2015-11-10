@@ -131,6 +131,7 @@ public:
     qreal startZoom;
     qint64 startWindowSize;
     QnKineticHelper<qreal> zoomKineticHelper;
+    bool dragWasInterruptedByZoom;
 
     QVector<QnTimelineZoomLevel> zoomLevels;
 
@@ -170,6 +171,7 @@ public:
         textLevel(1.0),
         targetTextLevel(1.0),
         textOpacity(1.0),
+        dragWasInterruptedByZoom(false),
         timeZoneShift(0),
         chunkProvider(nullptr)
     {
@@ -502,35 +504,40 @@ qint64 QnTimeline::startBound() const {
 }
 
 void QnTimeline::zoomIn() {
-    d->stickyTime = position();
     d->zoomWindow(zoomMultiplier);
 }
 
 void QnTimeline::zoomOut() {
-    d->stickyTime = position();
     d->zoomWindow(1.0 / zoomMultiplier);
 }
 
-void QnTimeline::startPinch(int x, qreal scale) {
+void QnTimeline::startZoom(qreal scale) {
     Q_UNUSED(scale)
 
-    d->stickyTime = d->pixelPosToTime(x);
+    if (!d->stickyPointKineticHelper.isStopped()) {
+        d->stickyPointKineticHelper.stop();
+        d->dragWasInterruptedByZoom = true;
+    }
+
     d->startWindowSize = windowEnd() - windowStart();
     d->startZoom = width();
-    d->stickyPointKineticHelper.start(x);
     d->zoomKineticHelper.start(d->startZoom);
     update();
 }
 
-void QnTimeline::updatePinch(int x, qreal scale) {
-    d->stickyPointKineticHelper.move(x);
+void QnTimeline::updateZoom(qreal scale) {
     d->zoomKineticHelper.move(d->startZoom * scale);
     update();
 }
 
-void QnTimeline::finishPinch(int x, qreal scale) {
+void QnTimeline::finishZoom(qreal scale) {
     d->zoomKineticHelper.finish(d->startZoom * scale);
-    d->stickyPointKineticHelper.finish(x);
+
+    if (d->dragWasInterruptedByZoom) {
+        d->dragWasInterruptedByZoom = false;
+        emit moveFinished();
+    }
+
     update();
 }
 
@@ -1130,7 +1137,8 @@ void QnTimelinePrivate::animateProperties(qint64 dt) {
 
         factor = windowSize / (windowEnd - windowStart);
 
-        windowStart = stickyTime - (stickyTime - windowStart) * factor;
+        qint64 position = parent->position();
+        windowStart = position - (position - windowStart) * factor;
         windowEnd = windowStart + static_cast<qint64>(windowSize);
 
         updateZoomLevel();

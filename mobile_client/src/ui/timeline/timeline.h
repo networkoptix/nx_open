@@ -90,9 +90,9 @@ public:
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
 
-    Q_INVOKABLE void startPinch(int x, qreal scale);
-    Q_INVOKABLE void updatePinch(int x, qreal scale);
-    Q_INVOKABLE void finishPinch(int x, qreal scale);
+    Q_INVOKABLE void startZoom(qreal scale);
+    Q_INVOKABLE void updateZoom(qreal scale);
+    Q_INVOKABLE void finishZoom(qreal scale);
 
     Q_INVOKABLE void startDrag(int x);
     Q_INVOKABLE void updateDrag(int x);
