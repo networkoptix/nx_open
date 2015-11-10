@@ -63,6 +63,12 @@ QnObject {
 
             onSourceChanged: console.log(source)
 
+            onPlaybackStateChanged: {
+                // A workaround for inconsistent playbackState changes of Qt MediaPlayer
+                if (playbackState == MediaPlayer.PlayingState && d.paused)
+                    pause()
+            }
+
             readonly property bool hasTimestamp: false
 
             readonly property bool loading: {
