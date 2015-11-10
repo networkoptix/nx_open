@@ -47,7 +47,7 @@ protected:
     std::unique_ptr< SocketServer > server;
 };
 
-TEST_F( StunClientServerTest, DISABLED_Connectivity )
+TEST_F( StunClientServerTest, Connectivity )
 {
     SyncQueue< SystemError::ErrorCode > connected;
     SyncQueue< SystemError::ErrorCode > disconnected;
@@ -82,7 +82,7 @@ TEST_F( StunClientServerTest, DISABLED_Connectivity )
     EXPECT_TRUE( disconnected.isEmpty() );
 }
 
-TEST_F( StunClientServerTest, DISABLED_RequestResponse )
+TEST_F( StunClientServerTest, RequestResponse )
 {
     // try to sendRequest with no server
     {

@@ -20,15 +20,16 @@ AsyncClient::AsyncClient( const SocketAddress& endpoint, bool useSsl, Timeouts t
 AsyncClient::~AsyncClient()
 {
     std::unique_ptr< AbstractStreamSocket > connectingSocket;
+	std::unique_ptr< BaseConnectionType > baseConnection;
     {
         QnMutexLocker lock( &m_mutex );
         connectingSocket = std::move( m_connectingSocket );
+		baseConnection = std::move( m_baseConnection );
         m_state = State::terminated;
     }
 
     if( connectingSocket )
         connectingSocket->terminateAsyncIO( true );
-    m_baseConnection.reset();
 }
 
 void AsyncClient::openConnection( ConnectionHandler connectHandler,
@@ -78,16 +79,16 @@ void AsyncClient::closeConnection(
     Q_ASSERT( !m_baseConnection || connection == m_baseConnection.get() );
 
     ConnectionHandler disconnectHandler;
+	std::unique_ptr< BaseConnectionType > baseConnection;
     {
         QnMutexLocker lock( &m_mutex );
         disconnectHandler = m_disconnectHandler;
         closeConnectionImpl( &lock, errorCode );
+		baseConnection = std::move( m_baseConnection );
     }
 
     if( disconnectHandler )
         disconnectHandler( errorCode );
-
-    m_baseConnection = nullptr;
 }
 
 boost::optional< QString >

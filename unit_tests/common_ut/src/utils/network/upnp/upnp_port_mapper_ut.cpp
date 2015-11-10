@@ -60,7 +60,7 @@ TEST( UpnpPortMapper, NormalUsage )
     EXPECT_EQ( map7001.address.toString(), lit( "12.34.56.78" ) );
     EXPECT_EQ( clientMock.mappings().size(), 1 );
 
-    const auto& addr7001 = *clientMock.mappings().begin();
+    const auto addr7001 = *clientMock.mappings().begin();
     EXPECT_EQ( addr7001.first, tcpPort( map7001.port ) );
     EXPECT_EQ( addr7001.second.first.toString(), lit( "192.168.0.10:7001" ) );
 

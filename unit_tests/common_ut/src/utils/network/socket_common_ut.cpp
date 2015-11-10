@@ -12,12 +12,13 @@ static void checkLocalhost(const HostAddress& host)
     EXPECT_EQ(ipV6.toHex(), host.ipv6().toHex());
 }
 
-TEST(UtilsNetworkSocketCommon, DISABLED_HostAddressLocalhost)
+TEST(UtilsNetworkSocketCommon, HostAddressLocalhost)
 {
     checkLocalhost(HostAddress("localhost"));
     checkLocalhost(HostAddress("127.0.0.1"));
 
-    struct in_addr addr = { 0x0100007F };
+    struct in_addr addr;
+    addr.s_addr = 0x0100007F;
     checkLocalhost(HostAddress(addr));
 
     checkLocalhost(HostAddress(0x7F000001));
