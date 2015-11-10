@@ -12,6 +12,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.liveOnly = true;
         $scope.storage.cameraId = $routeParams.cameraId || $scope.storage.cameraId   || null;
 
+        $scope.allowDebug = Config.allowDebugMode;
+
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
             $location.path('/view/' + $scope.storage.cameraId, false);
         }
@@ -49,8 +51,8 @@ angular.module('webadminApp').controller('ViewCtrl',
         $scope.availableFormats = [
             'Auto',
             'video/webm',
-            'application/x-mpegURL',
-            'application/x-rtsp'
+            'application/x-mpegURL'
+            //,'application/x-rtsp'
         ];
 
         $scope.settings = {id: ''};
@@ -255,7 +257,7 @@ angular.module('webadminApp').controller('ViewCtrl',
                 resolutionHls = 'hi';
             }
 
-            $scope.acitveVideoSource = _.filter([
+            $scope.activeVideoSource = _.filter([
                 { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
                 { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' },
 
@@ -265,8 +267,9 @@ angular.module('webadminApp').controller('ViewCtrl',
                 // Require plugin
                 { src: ( rtspUrl + '/' + cameraId + '?' + positionMedia + rstpAuthPararm  + '&stream=' + ($scope.activeResolution === 'lo'?1:0)), type: mimeTypes.rtsp, transport:'rtsp'}
             ],function(src){
-                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto'|| $scope.activeFormat === src.type;
+                return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.activeFormat === src.type;
             });
+
         }
 
         $scope.activeVideoRecords = null;

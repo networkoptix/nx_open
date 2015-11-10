@@ -25,6 +25,7 @@ angular.module('webadminApp')
             scope: {
                 vgUpdateTime:"&",
                 vgPlayerReady:"&",
+                vgPlayingSrc:"=",
                 vgSrc:"="
             },
             templateUrl: 'views/components/videowindow.html',// ???
@@ -47,6 +48,7 @@ angular.module('webadminApp')
                     if( scope.debugMode){
                         console.log("playing",src?src.src:null);
                     }
+                    scope.vgPlayingSrc = src?src.src:null;
                     return src?src.src:null;
                 }
 
@@ -384,7 +386,7 @@ angular.module('webadminApp')
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
                             // Some problem happened. We must reload video here
                             $timeout(srcChanged);
-                        };
+                        }
 
                         if(!format){
                             scope.native = false;

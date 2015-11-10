@@ -87,6 +87,9 @@ angular.module('webadminApp').run(['$route', '$rootScope', '$location', function
                 un();
             });
         }
+        if($location.search().debug){
+            Config.allowDebugMode = $location.search().debug;
+        }
         return original.apply($location, [path]);
     };
 }]);
