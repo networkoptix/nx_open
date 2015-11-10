@@ -2640,12 +2640,6 @@ void QnWorkbenchUi::createSearchWidget() {
     searchLine->setCloseButtonVisible(false);
     searchLine->lineEdit()->setPlaceholderText(tr("Search bookmarks"));
 
-    connect(searchLine, &QnSearchLineEdit::textChanged, this, [this](const QString & /* text */)
-    {
-        qDebug()<<"test";
-//        menu()->trigger(Qn::EscapeHotkeyAction);
-    });
-
     navigator()->setBookmarksSearchWidget(searchLine);
 
     m_searchWidget = new QnMaskedProxyWidget(m_controlsWidget);
