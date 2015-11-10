@@ -1413,6 +1413,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncClientInfoData = true;
     }
+    else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
+    }
 
     return true;
 }
