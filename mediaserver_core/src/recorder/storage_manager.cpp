@@ -434,7 +434,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     bool isRebuildFinished = false;
     {
         QnMutexLocker lock( &m_rebuildStateMtx );
-        isRebuildFinished = ((data.state == Qn::RebuildState_None || Qn::RebuildState_Canceled) && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
+        isRebuildFinished = ((data.state == Qn::RebuildState_None || data.state == Qn::RebuildState_Canceled) && m_archiveRebuildInfo.state == Qn::RebuildState_FullScan);
         m_archiveRebuildInfo = data;
         if (m_archiveRebuildInfo.state == Qn::RebuildState_Canceled)
             m_archiveRebuildInfo.state = Qn::RebuildState_None;

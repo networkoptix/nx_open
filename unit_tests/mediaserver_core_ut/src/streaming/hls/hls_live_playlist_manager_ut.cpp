@@ -20,8 +20,12 @@ TEST(hls_LivePlaylistManager, general)
     const microseconds frameStep(30*1000);
     const int gopSizeFrames = 15;
     const hours testDuration(1);
+    const milliseconds targetCacheSize = seconds(10);
+    const milliseconds maxCacheSize = std::chrono::duration_cast<milliseconds>(targetDuration)*5;
 
-    MediaStreamCache mediaCache(10*1000, 90);
+    MediaStreamCache mediaCache(
+        targetCacheSize.count(),
+        maxCacheSize.count());
     nx_hls::HLSLivePlaylistManager hlsPlaylistManager(&mediaCache, targetDuration.count());
 
     microseconds totalTimestampChange(0);
