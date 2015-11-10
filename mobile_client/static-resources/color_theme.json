@@ -88,7 +88,9 @@
     "sessionItem" : {
         "background" :              "palette.base.color_7",
         "backgroundActive" :        "palette.base.color_9",
-        "activeMark" :              "palette.accent.color_5"
+        "backgroundIncompatible" :  "palette.base.color_6",
+        "activeMark" :              "palette.accent.color_5",
+        "incompatibleMark" :        "palette.attention.color_2"
     },
 
     "sideNavigation" : {

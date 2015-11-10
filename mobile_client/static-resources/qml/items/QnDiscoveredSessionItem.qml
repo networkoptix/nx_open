@@ -12,17 +12,17 @@ Rectangle {
     property int port
 
     width: parent.width
-    height: dp(79)
-    color: QnTheme.sessionItemBackground
+    height: isCompatible ? dp(79) : dp(103)
+    color: isCompatible ? QnTheme.sessionItemBackground : QnTheme.sessionItemBackgroundIncompatible
     radius: dp(2)
 
     QnMaterialSurface {
+        enabled: isCompatible
         onClicked: Main.openDiscoveredSession(host, port, systemName)
     }
 
     Column {
         anchors.verticalCenter: parent.verticalCenter
-        spacing: dp(8)
         x: dp(16)
         width: parent.width - 2 * x
 
@@ -31,6 +31,10 @@ Rectangle {
             color: QnTheme.listText
             font.pixelSize: sp(18)
             font.weight: Font.DemiBold
+            height: dp(32)
+            verticalAlignment: Text.AlignVCenter
+            width: parent.width - dp(32)
+            elide: Text.ElideRight
         }
 
         Text {
@@ -38,6 +42,20 @@ Rectangle {
             color: QnTheme.listSubText
             font.pixelSize: sp(15)
             font.weight: Font.DemiBold
+            height: dp(24)
+            verticalAlignment: Text.AlignVCenter
+            width: parent.width - dp(32)
+            elide: Text.ElideRight
+        }
+
+        Text {
+            text: qsTr("incompatible server version")
+            color: QnTheme.sessionItemIncompatibleMark
+            font.pixelSize: sp(12)
+            font.weight: Font.DemiBold
+            height: dp(24)
+            verticalAlignment: Text.AlignVCenter
+            visible: !isCompatible
         }
     }
 }
