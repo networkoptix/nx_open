@@ -109,6 +109,11 @@ public:
                 if (newPeriod.startTimeMs + newPeriod.durationMs > it->startTimeMs && 
                     (newPeriod.startTimeMs <= it->startTimeMs || 
                      newPeriod.startTimeMs < it->startTimeMs + it->durationMs)) {
+                    if (foundOverlapped) {
+                        auto copyIt = it;
+                        --copyIt;
+                        m_timeLine.erase(copyIt);
+                    }
                     foundOverlapped = true;
                     newPeriod = TimePeriod::merge(newPeriod, *it);
                     if (newPeriod.startTimeMs < m_timePoint)
@@ -198,7 +203,7 @@ private:
             bool isHole = normalOrHoleDist(gen) == 1 ? true : false;
             int64_t curStartTime = isHole ? holeStartDistMs(gen) + startTimeMs : 
                                             normalStartDistMs(gen) + startTimeMs;
-            QString fileName = lit("%1_%2.mkv").arg(startTimeMs).arg(curDuration);
+            QString fileName = lit("%1_%2.mkv").arg(curStartTime).arg(curDuration);
             QString pathString = QnStorageManager::dateTimeStr(curStartTime, 
                                                                currentTimeZone()/60, 
                                                                lit("/"));
@@ -212,19 +217,20 @@ private:
             else
                 testFile_2.copy(closeDirPath(root) + closeDirPath(pathString) + fileName);
 
-            return curDuration;
+            m_timeLine.addTimePeriod(curStartTime, curDuration);
+            return curStartTime + curDuration;
         };
 
-        for (int i = 0; i < 100; ++i) {
-            //int timeDelta;
+        for (int i = 0; i < 10; ++i) {
+            int64_t newTime = 0;
             for (int j = 0; j < m_storageUrls.size(); ++j) {
-                int d1 = copyFile(m_storageUrls[j], j, lqFolder);
-                int d2 = copyFile(m_storageUrls[j], j, hqFolder);
-                //timeDelta = timeDelta > (d1 > d2 ? d1 : d2) ? timeDelta : 
-                //                                              (d1 > d2 ? d1 : d2);
+                int64_t d1 = copyFile(m_storageUrls[j], j, lqFolder);
+                int64_t d2 = copyFile(m_storageUrls[j], j, hqFolder);
+                newTime = newTime > (d1 > d2 ? d1 : d2) ? newTime : (d1 > d2 ? d1 : d2);
             }
-            startTimeMs += duration_2;
+            startTimeMs = newTime - 500;
         }
+        m_timeLine.finalize();
     }
 
     TimeLine &getTimeLine() {return m_timeLine;}
@@ -284,6 +290,9 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
 
     TestHelper::TimeLine timeLine(2);
     timeLine.addTimePeriod(0, 10);
+    timeLine.addTimePeriod(0, 10);
+    timeLine.addTimePeriod(0, 13);
+    timeLine.addTimePeriod(5, 8);
     timeLine.addTimePeriod(5, 15);
     timeLine.addTimePeriod(25, 10);
     timeLine.addTimePeriod(30, 20);
