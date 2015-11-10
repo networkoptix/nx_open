@@ -38,6 +38,7 @@ private:
 
     /** Cache of the search results to avoid using too much regexps. */
     mutable QHash<QString, QnResourceData> m_cachedResultByKey;
+    mutable QMutex m_cachedDataMtx;
 };
 
 

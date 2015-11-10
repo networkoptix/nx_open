@@ -8,11 +8,13 @@
 
 #include <deque>
 #include <map>
+#include <set>
 
 #include <QtCore/QElapsedTimer>
 
 #include <core/datapacket/abstract_data_packet.h>
 
+class QnMediaStreamEventReceiver;
 
 namespace detail {
 
@@ -20,9 +22,13 @@ class MediaStreamCache
 {
 public:
     /*!
-        \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
+        \param desiredCacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis 
+            is dropped unless data is blocked by \a MediaStreamCache::blockData call
+        \param maxCacheSizeMillis if cache size increases this value, data is dropped despite existing blockings
     */
-    MediaStreamCache( unsigned int cacheSizeMillis );
+    MediaStreamCache(
+        unsigned int desiredCacheSizeMillis,
+        unsigned int maxCacheSizeMillis);
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
     bool canAcceptData() const;
@@ -57,14 +63,11 @@ public:
     //!Returns packet with min timestamp greater than \a timestamp
     QnAbstractDataPacketPtr getNextPacket( quint64 timestamp, quint64* const foundTimestamp ) const;
 
-    /*!
-        \return id of event receiver
-    */
-    int addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver );
+    void addEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
     /*!
         \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
     */
-    void removeKeyFrameEventReceiver( int receiverID );
+    void removeEventReceiver( QnMediaStreamEventReceiver* keyFrameEventReceiver );
 
     //!Prevents data starting with \a timestamp from removal
     /*!
@@ -108,17 +111,19 @@ private:
     //!map<timestamp, pair<packet, key_flag> >
     typedef std::deque<MediaPacketContext> PacketContainerType;
 
-    unsigned int m_cacheSizeMillis;
+    const qint64 m_cacheSizeUsec;
+    const qint64 m_maxCacheSizeUsec;
     PacketContainerType m_packetsByTimestamp;
     mutable QMutex m_mutex;
     //!In micros
     qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
     //!map<event receiver id, function>
-    std::map<int, std::function<void (quint64)> > m_eventReceivers;
-    int m_prevGivenEventReceiverID;
+    std::set<QnMediaStreamEventReceiver* > m_eventReceivers;
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
+
+    void clearCacheIfNeeded(QMutexLocker* const lk);
 };
 
 }

@@ -92,11 +92,11 @@ namespace nx_http
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         bool doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted

@@ -43,8 +43,6 @@ public:
     virtual int getCapabilities() const override;
     virtual bool isAvailable() const override;
 
-    virtual float getStorageBitrateCoeff() const override;
-
     virtual void setUrl(const QString& url) override;
 
     QString getLocalPath() const
@@ -79,7 +77,6 @@ public:
 
 private:
     // used for 'virtual' storage bitrate. If storage has more free space, increase 'virtual' storage bitrate for full storage space filling
-    float m_storageBitrateCoeff;
     mutable bool m_dirty;
     mutable bool m_valid;
 
