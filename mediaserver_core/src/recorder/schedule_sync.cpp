@@ -445,6 +445,8 @@ void QnScheduleSync::run()
 
         auto isItTimeForSync = [this] ()
         {
+            if (!m_backupSyncOn)
+                return SyncCode::Interrupted;
             if (m_forced)
                 return SyncCode::Ok;
             if (m_schedule.backupType != Qn::Backup_Schedule)
