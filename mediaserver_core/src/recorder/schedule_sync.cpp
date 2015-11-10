@@ -349,8 +349,6 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 
 void QnScheduleSync::stop() 
 { 
-    if (!m_backupSyncOn)
-        return;
     m_backupSyncOn  = false;
     m_forced        = false;
     m_syncing       = false;
