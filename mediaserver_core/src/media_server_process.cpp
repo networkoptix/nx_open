@@ -934,6 +934,9 @@ void MediaServerProcess::stopObjects()
 {
     qWarning() << "QnMain::stopObjects() called";
 
+    qnBackupStorageMan->scheduleSync()->stop();
+    NX_LOG("QnScheduleSync::stop() done", cl_logINFO);
+
     qnNormalStorageMan->cancelRebuildCatalogAsync();
     qnBackupStorageMan->cancelRebuildCatalogAsync();
 
