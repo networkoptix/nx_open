@@ -23,7 +23,7 @@ QnScheduleSync::QnScheduleSync()
       m_syncing(false),
       m_forced(false),
       m_interrupted(false),
-      m_lastFailed(false),
+      m_failReported(false),
       m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
@@ -498,12 +498,12 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            if (result == QnServer::BackupResultCode::Failed && !m_lastFailed) {
+            if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
                 emit backupFinished(m_syncTimePoint, result);
-                m_lastFailed = true;
+                m_failReported = true;
             } else if (result != QnServer::BackupResultCode::Failed) {
                 emit backupFinished(m_syncTimePoint, result);
-                m_lastFailed = false; 
+                m_failReported = false; 
             }
         }
     }
