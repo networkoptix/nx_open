@@ -32,6 +32,7 @@ QnObject {
         id: d
 
         readonly property int lastMinuteLength: 60000
+        readonly property int maximumInitialPosition: 2000
 
         property bool paused: false
         property real position: -1
@@ -212,7 +213,15 @@ QnObject {
             }
             return
         } else {
-            d.position += d.mediaPlayer.position - d.prevPlayerPosition
+            if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
+                /* A workaround for Android issue 11590
+                   Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
+                   To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
+                 */
+                d.position += 300
+            } else {
+                d.position += d.mediaPlayer.position - d.prevPlayerPosition
+            }
             d.prevPlayerPosition = d.mediaPlayer.position
         }
 
