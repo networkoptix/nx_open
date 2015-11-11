@@ -742,6 +742,8 @@ void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
 
 void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client)
 {
+    static const unsigned int INPUT_PORT_STATE_CHECK_TIMEOUT_MS = 1000;
+
     bool portEnabled = false;
     if (client->failed() ||
         client->response() == nullptr ||
@@ -768,7 +770,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
     const auto url = client->url();
     //scheduling next HTTP request
     client->socket()->registerTimer(
-        1000,
+        INPUT_PORT_STATE_CHECK_TIMEOUT_MS,
         [url, this](){
             m_relayInputClient->doGet(url);
         });
