@@ -46,7 +46,17 @@ QnObject {
 
     Loader {
         id: playerLoader
-        sourceComponent: resourceHelper.protocol != QnMediaResourceHelper.Mjpeg ? qtPlayer : mjpegPlayer
+
+        Timer {
+            interval: 300
+            repeat: false
+            running: true
+            onTriggered: {
+                playerLoader.sourceComponent = Qt.binding(function() {
+                    return resourceHelper.protocol != QnMediaResourceHelper.Mjpeg ? qtPlayer : mjpegPlayer
+                })
+            }
+        }
     }
 
     Component {

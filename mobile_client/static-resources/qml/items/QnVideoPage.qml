@@ -133,6 +133,8 @@ QnPage {
         id: player
         resourceId: videoPlayer.resourceId
 
+        property bool initialized: false
+
         onPlayingChanged: {
             if (playing)
                 video.clearScreenshotSource()
@@ -154,6 +156,17 @@ QnPage {
 
             video.bindScreenshotSource()
             thumbnailLoader.forceLoadThumbnail(player.position)
+        }
+
+        onMediaPlayerChanged: {
+            if (initialized)
+                return
+
+            if (!mediaPlayer)
+                return
+
+            initialized = true
+            playLive()
         }
     }
 
@@ -202,10 +215,6 @@ QnPage {
             readonly property real timelinePosition: -1
             readonly property bool timelineDragging: false
         }
-    }
-
-    Component.onCompleted: {
-        player.playLive()
     }
 
     function hideUi() {
