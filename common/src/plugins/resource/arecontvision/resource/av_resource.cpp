@@ -13,6 +13,7 @@
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
+#include <utils/common/synctime.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/ping.h>
@@ -35,7 +36,8 @@ QnPlAreconVisionResource::QnPlAreconVisionResource()
       m_zoneSite(8),
       m_channelCount(0),
       m_prevMotionChannel(0),
-      m_dualsensor(false)
+      m_dualsensor(false),
+      m_inputPortState(false)
 {
     setVendor(lit("ArecontVision"));
 }
@@ -708,6 +710,68 @@ void QnPlAreconVisionResource::setMotionMaskPhysical(int channel)
             break; // only 1 sensitivity for all frame is supported
         }
     }
+}
+
+bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler)
+{
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(getHostAddress());
+    url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    url.setPath(lit("/get?auxin"));
+    url.setUserName(getAuth().user());
+    url.setPassword(getAuth().password());
+
+    m_relayInputClient = nx_http::AsyncHttpClient::create();
+    connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
+            this, &QnPlAreconVisionResource::inputPortStateRequestDone,
+            Qt::DirectConnection);
+    if (!m_relayInputClient->doGet(url))
+        return false;
+
+    if (completionHandler)
+        m_relayInputClient->socket()->post(
+            std::bind(std::move(completionHandler), true));
+    return true;
+}
+
+void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
+{
+    m_relayInputClient.reset();
+}
+
+void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client)
+{
+    bool portEnabled = false;
+    if (client->failed() ||
+        client->response() == nullptr ||
+        client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
+        const auto msg = client->fetchMessageBodyBuffer();
+        bool portEnabled = msg.indexOf("auxin=on") != -1;
+    }
+    else
+    {
+        portEnabled = false;
+    }
+
+    if (m_inputPortState != portEnabled)
+    {
+        m_inputPortState = portEnabled;
+        emit cameraInput(
+            toSharedPointer(),
+            lit("1"),
+            m_inputPortState,
+            qnSyncTime->currentMSecsSinceEpoch() * 1000ll);
+    }
+
+    const auto url = client->url();
+    //scheduling next HTTP request
+    client->socket()->registerTimer(
+        1000,
+        [url, this](){
+            m_relayInputClient->doGet(url);
+        });
 }
 
 bool QnPlAreconVisionResource::isRTSPSupported() const

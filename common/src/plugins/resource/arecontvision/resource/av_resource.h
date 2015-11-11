@@ -7,8 +7,10 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
+#include "utils/network/http/asynchttpclient.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/media_data_packet.h"
+
 
 class QDomElement;
 
@@ -89,6 +91,8 @@ protected:
     virtual bool setParamPhysical(const QString &param, const QVariant &val) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
+    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
+    virtual void stopInputPortMonitoringAsync() override;
 
     virtual bool isRTSPSupported() const;
 
@@ -101,8 +105,11 @@ private:
     int m_channelCount;
     int m_prevMotionChannel;
     bool m_dualsensor;
+    bool m_inputPortState;
+    nx_http::AsyncHttpClientPtr m_relayInputClient;
 
     bool getParamPhysical2(int channel, const QString& name, QVariant &val);
+    void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
