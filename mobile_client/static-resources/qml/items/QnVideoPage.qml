@@ -99,7 +99,8 @@ QnPage {
 
         source: player.mediaPlayer
         screenshotSource: initialResourceScreenshot
-        screenshotAspectRatio: player.resourceHelper.aspectRatio
+        aspectRatio: screenshotSource == initialResourceScreenshot ? player.resourceHelper.rotatedAspectRatio : player.resourceHelper.aspectRatio
+        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : player.resourceHelper.rotation
 
         onClicked: {
             if (navigationLoader.visible)
@@ -155,6 +156,8 @@ QnPage {
             video.bindScreenshotSource()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
+
+        Component.onCompleted: player.playLive()
     }
 
     QnCameraAccessRightsHelper {
@@ -202,10 +205,6 @@ QnPage {
             readonly property real timelinePosition: -1
             readonly property bool timelineDragging: false
         }
-    }
-
-    Component.onCompleted: {
-        player.playLive()
     }
 
     function hideUi() {

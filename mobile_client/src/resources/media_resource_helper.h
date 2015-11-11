@@ -18,6 +18,8 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
     Q_PROPERTY(Protocol protocol READ protocol NOTIFY protocolChanged)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
+    Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
+    Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
 
     Q_ENUMS(Protocol)
 
@@ -54,6 +56,10 @@ public:
     Protocol protocol() const;
 
     qreal aspectRatio() const;
+    qreal sensorAspectRatio() const;
+    qreal rotatedAspectRatio() const;
+
+    int rotation() const;
 
 signals:
     void resourceIdChanged();
@@ -64,6 +70,8 @@ signals:
     void screenSizeChanged();
     void protocolChanged();
     void aspectRatioChanged();
+    void rotatedAspectRatioChanged();
+    void rotationChanged();
 
 private:
     void updateMediaStreams();
@@ -74,12 +82,14 @@ private:
     void setUrl(const QUrl &url);
     void updateUrl();
     int nativeStreamIndex(const QString &resolution) const;
+    QString resolutionString(int resolution) const;
+    QString currentResolutionString() const;
 
 private:
     QnVirtualCameraResourcePtr m_camera;
     QUrl m_url;
     qint64 m_position;
-    QString m_resolution;
+    int m_resolution;
     QList<int> m_standardResolutions;
     QSize m_screenSize;
     int m_nativeStreamIndex;
