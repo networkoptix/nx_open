@@ -134,8 +134,6 @@ QnPage {
         id: player
         resourceId: videoPlayer.resourceId
 
-        property bool initialized: false
-
         onPlayingChanged: {
             if (playing)
                 video.clearScreenshotSource()
@@ -159,16 +157,7 @@ QnPage {
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
-        onMediaPlayerChanged: {
-            if (initialized)
-                return
-
-            if (!mediaPlayer)
-                return
-
-            initialized = true
-            playLive()
-        }
+        Component.onCompleted: player.playLive()
     }
 
     QnCameraAccessRightsHelper {
