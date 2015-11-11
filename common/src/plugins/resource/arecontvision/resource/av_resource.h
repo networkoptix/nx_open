@@ -54,6 +54,11 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS) override;
+
     //virtual QnMediaInfo getMediaInfo() const;
 
     int totalMdZones() const;

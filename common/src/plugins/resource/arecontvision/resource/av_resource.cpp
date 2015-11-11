@@ -296,6 +296,11 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
+    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
+        setCameraCapability(Qn::RelayInputCapability, true);
+    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
+        setCameraCapability(Qn::RelayOutputCapability, true);
+
     setFirmware(firmwareVersion.toString());
     saveParams();
 
@@ -331,6 +336,51 @@ QImage QnPlAreconVisionResource::getImage(int /*channnel*/, QDateTime /*time*/, 
 
 void QnPlAreconVisionResource::setIframeDistance(int /*frames*/, int /*timems*/)
 {
+}
+
+bool QnPlAreconVisionResource::setRelayOutputState(
+    const QString& /*ouputID*/,
+    bool activate,
+    unsigned int autoResetTimeoutMS)
+{
+    QUrl url;
+    url.setScheme(lit("http"));
+    url.setHost(getHostAddress());
+    url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
+    url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
+    url.setUserName(getAuth().user());
+    url.setPassword(getAuth().password());
+
+    const auto activateWithAutoResetDoneHandler =
+        [autoResetTimeoutMS, url](
+            SystemError::ErrorCode errorCode,
+            int statusCode,
+            nx_http::BufferType)
+        {
+            if (errorCode != SystemError::noError ||
+                statusCode != nx_http::StatusCode::ok)
+            {
+                return;
+            }
+
+            //scheduling auto-reset
+            TimerManager::instance()->addTimer(
+                [url](qint64){
+                    auto resetOutputUrl = url;
+                    resetOutputUrl.setPath(lit("/set?auxout=off"));
+                    nx_http::downloadFileAsync(
+                        resetOutputUrl,
+                        [](SystemError::ErrorCode, int, nx_http::BufferType){});
+                },
+                autoResetTimeoutMS);
+        };
+
+    const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
+
+    if (activate && (autoResetTimeoutMS > 0))
+        return nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
+    else
+        return nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
