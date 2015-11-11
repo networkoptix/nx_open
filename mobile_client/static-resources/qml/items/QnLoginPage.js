@@ -40,7 +40,7 @@ function saveSession(sessionId, host, port, login, password, systemName) {
 
     Main.gotoMainScreen()
 
-    if (!connectionManager.connected)
+    if (connectionManager.connectionState == QnConnectionManager.Disconnected)
         sideNavigation.show()
 }
 

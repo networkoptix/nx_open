@@ -6,6 +6,10 @@
 #include <utils/network/module_finder.h>
 #include <context/session_settings.h>
 
+namespace {
+    const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
+}
+
 QnLoginSessionsModel::QnLoginSessionsModel(QObject *parent) :
     QAbstractListModel(parent),
     m_displayMode(ShowAll),
@@ -59,6 +63,8 @@ QVariant QnLoginSessionsModel::data(const QModelIndex &index, int role) const {
         return session.password;
     case SectionRole:
         return savedSessionIndex(index.row()) != -1 ? tr("Saved sessions") : tr("Discovered servers");
+    case IsCompatibleRole:
+        return session.serverVersion.isNull() || session.serverVersion >= minimalSupportedVersion;
     }
 
     return QVariant();
@@ -73,6 +79,7 @@ QHash<int, QByteArray> QnLoginSessionsModel::roleNames() const {
     roleNames[UserRole] = "user";
     roleNames[PasswordRole] = "password";
     roleNames[SectionRole] = "section";
+    roleNames[IsCompatibleRole] = "isCompatible";
     return roleNames;
 }
 
@@ -163,6 +170,9 @@ void QnLoginSessionsModel::deleteSession(const QString &id) {
 }
 
 void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+    auto it = std::find_if(m_discoveredSessions.begin(), m_discoveredSessions.end(), [&address](const QnLoginSession &session) {
+        return session.address == address.address.toString() && session.port == address.port;
+    });
     bool found = false;
     for (const QnLoginSession &session: m_discoveredSessions) {
         if (session.address == address.address.toString() && session.port == address.port) {
@@ -171,13 +181,21 @@ void QnLoginSessionsModel::at_moduleFinder_moduleAddressFound(const QnModuleInfo
         }
     }
 
-    if (found)
-        return;
-
     QnLoginSession session;
     session.address = address.address.toString();
     session.port = address.port;
     session.systemName = moduleInformation.systemName;
+    session.serverVersion = moduleInformation.version;
+
+    if (it != m_discoveredSessions.end()) {
+        int row = discoveredSessionRow(std::distance(m_discoveredSessions.begin(), it));
+        const QModelIndex idx = index(row);
+
+        *it = session;
+        emit dataChanged(idx, idx);
+
+        return;
+    }
 
     int row = discoveredSessionRow(m_discoveredSessions.size());
     if (row >= 0) {

@@ -247,7 +247,7 @@ QnFlickable {
 
         interval: 2 * 60 * 1000
         repeat: true
-        running: true
+        running: connectionManager.connectionState == QnConnectionManager.Connected
 
         triggeredOnStart: true
 

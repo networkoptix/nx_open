@@ -1,4 +1,5 @@
 .import QtQuick.Window 2.2 as QtWindow
+.import com.networkoptix.qml 1.0 as Nx
 
 function findRootItem(item) {
     while (item.parent)
@@ -66,7 +67,7 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
     })
 }
 
-function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
+function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, infoParameter) {
     var push = stackView.depth == 1
 
     var item = null
@@ -112,7 +113,7 @@ function openFailedSession(_sessionId, _host, _port, _login, _password, _systemN
         item.sessionId = _sessionId
     }
 
-    item.showWarning(status, statusMessage)
+    item.showWarning(status, infoParameter)
 }
 
 function gotoNewSession() {
@@ -121,7 +122,7 @@ function gotoNewSession() {
     sideNavigation.enabled = true
     menuBackButton.animateToMenu()
 
-    if (connectionManager.connected) {
+    if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected) {
         connectionManager.disconnectFromServer(true)
         return
     }
@@ -158,7 +159,7 @@ function gotoMainScreen() {
     toolBar.backgroundOpacity = 1.0
     exitFullscreen()
 
-    if (connectionManager.connected)
+    if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected)
         gotoResources()
     else
         gotoNewSession()

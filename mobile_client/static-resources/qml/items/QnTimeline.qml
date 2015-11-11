@@ -68,17 +68,14 @@ Item {
         pinch.dragAxis: Qt.XAxis
 
         onPinchStarted: {
-            timeline.moving = true
-            timeline.dragging = true
-            timeline.startPinch(pinch.center.x, pinch.scale)
+            timeline.startZoom(pinch.scale)
+            timeline.dragging = false
         }
         onPinchUpdated: {
-            timeline.updatePinch(pinch.center.x, pinch.scale)
+            timeline.updateZoom(pinch.scale)
         }
         onPinchFinished: {
-            timeline.dragging = false
-            timeline.finishPinch(pinch.center.x, pinch.scale)
-            root.dragFinished()
+            timeline.finishZoom(pinch.scale)
         }
 
         MouseArea {

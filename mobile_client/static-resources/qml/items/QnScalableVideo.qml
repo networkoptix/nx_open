@@ -8,7 +8,8 @@ QnZoomableFlickable {
 
     property alias source: video.source
     property alias screenshotSource: screenshot.source
-    property real screenshotAspectRatio: 0
+    property real aspectRatio: 0
+    property int videoRotation: 0
 
     property real maxZoomFactor: 4
 
@@ -22,23 +23,33 @@ QnZoomableFlickable {
     Item {
         id: content
 
+        readonly property bool rotated90: zf.videoRotation % 90 == 0 && zf.videoRotation % 180 != 0
+        onRotated90Changed: resetSize()
+
         width: contentWidth
         height: contentHeight
 
         VideoOutput {
             id: video
 
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: content.rotated90 ? parent.height : parent.width
+            height: content.rotated90 ? parent.width : parent.height
+            rotation: zf.videoRotation
 
-            onSourceRectChanged: {
-                content.updateSize(sourceRect.width, sourceRect.height)
-            }
+            fillMode: VideoOutput.Stretch
+
+            onSourceRectChanged: content.updateWithVideoSize()
         }
 
         Image {
             id: screenshot
 
-            anchors.fill: parent
+            anchors.centerIn: parent
+            width: content.rotated90 ? parent.height : parent.width
+            height: content.rotated90 ? parent.width : parent.height
+            rotation: zf.videoRotation
+
             visible: source != ""
 
             onStatusChanged: {
@@ -52,10 +63,29 @@ QnZoomableFlickable {
             }
         }
 
+        function resetSize() {
+            var hasVideo = video.sourceRect.width > 0 && video.sourceRect.height > 0
+            var hasScreenshot = screenshot.sourceSize.width > 0 && screenshot.sourceSize.height > 0
+            var emptySize = width <= 0 || height <= 0
+
+            if ((!hasVideo && !hasScreenshot) || emptySize)
+                return
+
+            if (hasVideo)
+                updateWithVideoSize()
+            else if (hasScreenshot)
+                updateWithScreenshotSize()
+        }
+
         function updateSize(w, h) {
             if (w <= 0 || h <= 0)
                 return
 
+            if (rotated90) {
+                var tmp = w
+                w = h
+                h = tmp
+            }
             var scale = Math.min(zf.width / w, zf.height / h)
             w *= scale
             h *= scale
@@ -64,11 +94,20 @@ QnZoomableFlickable {
             resizeContent(w, h, false, true)
         }
 
+        function updateWithVideoSize() {
+            var w = video.sourceRect.width
+
+            if (aspectRatio > 0)
+                w = video.sourceRect.height * aspectRatio
+
+            content.updateSize(w, video.sourceRect.height)
+        }
+
         function updateWithScreenshotSize() {
             var w = screenshot.sourceSize.width
 
-            if (screenshotAspectRatio > 0)
-                w = screenshot.sourceSize.height * screenshotAspectRatio
+            if (aspectRatio > 0)
+                w = screenshot.sourceSize.height * aspectRatio
 
             content.updateSize(w, screenshot.sourceSize.height)
         }
@@ -87,7 +126,7 @@ QnZoomableFlickable {
 
         if (contentWidth <= 0 || contentHeight <= 0) {
             if (hasVideo) {
-                content.updateSize(video.sourceRect.width, video.sourceRect.height)
+                content.updateWithVideoSize()
                 return
             } else if (hasScreenshot) {
                 content.updateWithScreenshotSize()

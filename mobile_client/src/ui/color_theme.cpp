@@ -27,7 +27,7 @@ QVariantMap plainify(const QVariantMap &map, const QString &prefix = QString()) 
     return result;
 }
 
-QVariantMap readColorsMap(const QString &fileName) {
+QVariantMap readColorMap(const QString &fileName) {
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly)) {
         qWarning() << "Could not open color theme file" << fileName;
@@ -57,14 +57,19 @@ QVariantMap readColorsMap(const QString &fileName) {
     return plainify(document.toVariant().toMap());
 }
 
+void appendColorMap(QVariantMap &colorMap, const QVariantMap &otherColorMap) {
+    for (auto it = otherColorMap.begin(); it != otherColorMap.end(); ++it)
+        colorMap.insert(it.key(), it.value());
+}
+
 bool isColor(const QString &value) {
     return colorRegExp.exactMatch(value);
 }
 
-QHash<QString, QColor> parseColors(const QVariantMap &colorsMap, QHash<QString, QColor> parsed) {
+QHash<QString, QColor> parseColors(const QVariantMap &colorMap, QHash<QString, QColor> parsed) {
     QVariantMap pending;
 
-    for (auto it = colorsMap.begin(); it != colorsMap.end(); ++it) {
+    for (auto it = colorMap.begin(); it != colorMap.end(); ++it) {
         QString value = it.value().toString();
         QColor color = warningColor;
 
@@ -81,7 +86,7 @@ QHash<QString, QColor> parseColors(const QVariantMap &colorsMap, QHash<QString, 
     }
 
     /* nothing parsed: set fallback color */
-    if (pending.size() == colorsMap.size()) {
+    if (pending.size() == colorMap.size()) {
         for (auto it = pending.begin(); it != pending.end(); ++it) {
             qWarning() << "QnColorTheme: Couldn't find color for" << it.key() << ":" << it.value().toString();
             parsed.insert(it.key(), warningColor);
@@ -93,8 +98,8 @@ QHash<QString, QColor> parseColors(const QVariantMap &colorsMap, QHash<QString, 
     return parsed;
 }
 
-QHash<QString, QColor> parseColors(const QVariantMap &colorsMap) {
-    return parseColors(colorsMap, QHash<QString, QColor>());
+QHash<QString, QColor> parseColors(const QVariantMap &colorMap) {
+    return parseColors(colorMap, QHash<QString, QColor>());
 }
 
 QPalette::ColorGroup colorGroup(const QString &groupName) {
@@ -134,9 +139,9 @@ QPalette::ColorRole colorRole(const QString &colorRole) {
     return nameToRoleHash.value(colorRole, QPalette::NoRole);
 }
 
-void fillPalette(QPalette &palette, const QHash<QString, QColor> &colorsMap) {
+void fillPalette(QPalette &palette, const QHash<QString, QColor> &colorMap) {
     QRegExp paletteColorRegExp(lit("palette\\.(active|inactive|disabled)\\.(.+)"));
-    for (auto it = colorsMap.begin(); it != colorsMap.end(); ++it) {
+    for (auto it = colorMap.begin(); it != colorMap.end(); ++it) {
         if (!paletteColorRegExp.exactMatch(it.key()))
             continue;
         QPalette::ColorGroup group = colorGroup(paletteColorRegExp.cap(1));
@@ -157,11 +162,24 @@ QnColorTheme::QnColorTheme(QObject *parent) :
 }
 
 void QnColorTheme::readFromFile(const QString &fileName) {
-    QVariantMap colorsMap = readColorsMap(fileName);
-    if (colorsMap.isEmpty())
+    QVariantMap colorMap = readColorMap(fileName);
+    if (colorMap.isEmpty())
         return;
 
-    m_colors = parseColors(colorsMap);
+    m_colors = parseColors(colorMap);
+    fillPalette(m_palette, m_colors);
+
+    emit updated();
+}
+
+void QnColorTheme::readFromFiles(const QStringList &fileNames) {
+    QVariantMap colorMap;
+    for (const QString &fileName: fileNames) {
+        QVariantMap map = readColorMap(fileName);
+        appendColorMap(colorMap, map);
+    }
+
+    m_colors = parseColors(colorMap);
     fillPalette(m_palette, m_colors);
 
     emit updated();

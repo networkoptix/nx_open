@@ -12,7 +12,7 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool loading: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position == 0 : false
+    readonly property bool loading: d.mediaPlayer && d.mediaPlayer.loading
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
@@ -32,6 +32,7 @@ QnObject {
         id: d
 
         readonly property int lastMinuteLength: 60000
+        readonly property int maximumInitialPosition: 2000
 
         property bool paused: false
         property real position: -1
@@ -40,6 +41,7 @@ QnObject {
         property bool updateTimeline: false
         property bool dirty: true
         property alias mediaPlayer: playerLoader.item
+        property bool resetUrlOnConnect: false
     }
 
     Loader {
@@ -55,10 +57,30 @@ QnObject {
 
             autoPlay: !d.paused
 
-            onPositionChanged: updatePosition()
+            onPositionChanged: {
+                updatePosition()
+            }
+
             onSourceChanged: console.log(source)
 
+            onPlaybackStateChanged: {
+                // A workaround for inconsistent playbackState changes of Qt MediaPlayer
+                if (playbackState == MediaPlayer.PlayingState && d.paused)
+                    pause()
+            }
+
             readonly property bool hasTimestamp: false
+
+            readonly property bool loading: {
+                if (playbackState == MediaPlayer.PlayingState)
+                    return position == 0
+
+                return status == MediaPlayer.Loading ||
+                       status == MediaPlayer.Buffering ||
+                       status == MediaPlayer.Stalled ||
+                       status == MediaPlayer.Loaded ||
+                       status == MediaPlayer.Buffered
+            }
         }
     }
 
@@ -73,6 +95,8 @@ QnObject {
             reconnectOnPlay: atLive
 
             readonly property bool hasTimestamp: true
+
+            readonly property bool loading: playbackState == MediaPlayer.PlayingState && position == 0
         }
     }
 
@@ -99,6 +123,20 @@ QnObject {
         interval: 5000
         running: player.playing && d.position >= 0
         onTriggered: d.updateTimeline = true
+    }
+
+    Connections {
+        target: connectionManager
+        onConnectionStateChanged: {
+            if (connectionManager.connectionState == QnConnectionManager.Connected) {
+                if (d.resetUrlOnConnect) {
+                    d.resetUrlOnConnect = false
+                    resourceHelper.setPosition(position)
+                }
+            } else {
+                d.resetUrlOnConnect = true
+            }
+        }
     }
 
     function alignedPosition(pos) {
@@ -181,7 +219,15 @@ QnObject {
             }
             return
         } else {
-            d.position += d.mediaPlayer.position - d.prevPlayerPosition
+            if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
+                /* A workaround for Android issue 11590
+                   Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
+                   To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
+                 */
+                d.position += 300
+            } else {
+                d.position += d.mediaPlayer.position - d.prevPlayerPosition
+            }
             d.prevPlayerPosition = d.mediaPlayer.position
         }
 

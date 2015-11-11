@@ -26,7 +26,16 @@ QnContext::QnContext(QObject *parent):
     m_settings(new QnContextSettings(this)),
     m_resolutionUtil(customDensityClass == -1 ? new QnResolutionUtil() : new QnResolutionUtil(static_cast<QnResolutionUtil::DensityClass>(customDensityClass)))
 {
-    connect(m_connectionManager, &QnConnectionManager::connectedChanged, this, &QnContext::at_connectionManager_connectedChanged);
+    connect(m_connectionManager, &QnConnectionManager::connectionStateChanged, this, [this](){
+        QnCameraThumbnailCache *thumbnailCache = QnCameraThumbnailCache::instance();
+        if (!thumbnailCache)
+            return;
+
+        if (m_connectionManager->connectionState() == QnConnectionManager::Connected)
+            thumbnailCache->start();
+        else
+            thumbnailCache->stop();
+    });
 }
 
 QnContext::~QnContext() {}
@@ -65,15 +74,4 @@ bool QnContext::getDeviceIsPhone() const {
 
 void QnContext::enterFullscreen() {
     hideSystemUi();
-}
-
-void QnContext::at_connectionManager_connectedChanged() {
-    QnCameraThumbnailCache *thumbnailCache = QnCameraThumbnailCache::instance();
-    if (!thumbnailCache)
-        return;
-
-    if (m_connectionManager->connected())
-        thumbnailCache->start();
-    else
-        thumbnailCache->stop();
 }
