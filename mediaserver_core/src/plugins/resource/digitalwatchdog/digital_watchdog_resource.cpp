@@ -192,4 +192,26 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdva
     return m_cameraProxy->setParam(parameter, value);
 }
 
+bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+{
+    bool success = true;
+    QVector<QPair<QnCameraAdvancedParameter, QString>> moreParamsToProcess;
+    for(const QnCameraAdvancedParamValue &value: values) 
+    {
+        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
+        if (parameter.isValid()) {
+            bool baseResult = base_type::setAdvancedParameterUnderLock(parameter, value.value);
+            if (baseResult)
+                result << value;
+            else
+                moreParamsToProcess << QPair<QnCameraAdvancedParameter, QString>(parameter, value.value);
+        }
+        else
+            success = false;
+    }
+    if (!success)
+        return false;
+    return m_cameraProxy->setParams(moreParamsToProcess, result);
+}
+
 #endif //ENABLE_ONVIF
