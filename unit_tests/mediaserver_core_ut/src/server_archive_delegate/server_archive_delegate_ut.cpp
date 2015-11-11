@@ -12,6 +12,7 @@
 #include <core/resource_management/status_dictionary.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/network_resource.h>
 #include <utils/common/util.h>
 
 #include <functional>
@@ -22,7 +23,7 @@
 #include <random>
 #include <cmath>
 
-const QString cameraFolderPrefix("camera");
+const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
 const QString hqFolder("hi_quality");
 
@@ -30,11 +31,14 @@ class TestHelper
 {
     static const int DEFAULT_TIME_GAP_MS = 1000;
 public:
-    TestHelper(QStringList &&paths)
+    TestHelper(QStringList &&paths, int fileCount)
         : m_storageUrls(std::move(paths)),
-          m_timeLine(DEFAULT_TIME_GAP_MS)
+          m_timeLine(DEFAULT_TIME_GAP_MS),
+          m_fileCount(fileCount)
     {
         generateTestData();
+        createStorages();
+        loadMedia();
     }
     
     ~TestHelper()
@@ -178,13 +182,9 @@ private:
 
         for (int i = 0; i < m_storageUrls.size(); ++i) {
             QDir(closeDirPath(m_storageUrls[i]))
-                    .mkpath(lit("%1_%2/%3").arg(cameraFolderPrefix)
-                                           .arg(QString::number(i))
-                                           .arg(lqFolder));
+                    .mkpath(lit("%2/%1").arg(cameraFolder).arg(lqFolder));
             QDir(closeDirPath(m_storageUrls[i]))
-                    .mkpath(lit("%1_%2/%3").arg(cameraFolderPrefix)
-                                           .arg(QString::number(i))
-                                           .arg(hqFolder));
+                    .mkpath(lit("%2/%1").arg(cameraFolder).arg(hqFolder));
         }
 
         QFile testFile_1("://1445529661948_77158.mkv");
@@ -197,7 +197,7 @@ private:
         const int duration_1 = 77158;
         const int duration_2 = 64712;
 
-        auto copyFile = [&](const QString& root, int cameraInd, const QString &quality)
+        auto copyFile = [&](const QString& root, const QString &quality)
         {
             int curDuration = durationDist(gen) == 0 ? duration_1 : duration_2;
             bool isHole = normalOrHoleDist(gen) == 1 ? true : false;
@@ -207,10 +207,7 @@ private:
             QString pathString = QnStorageManager::dateTimeStr(curStartTime, 
                                                                currentTimeZone()/60, 
                                                                lit("/"));
-            pathString = lit("%1_%2/%3/%4").arg(cameraFolderPrefix)
-                                           .arg(QString::number(cameraInd))
-                                           .arg(quality)
-                                           .arg(pathString);
+            pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             QDir(root).mkpath(pathString);
             if (curDuration == duration_1)
                 testFile_1.copy(closeDirPath(root) + closeDirPath(pathString) + fileName);
@@ -221,16 +218,52 @@ private:
             return curStartTime + curDuration;
         };
 
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < m_fileCount; ++i) {
             int64_t newTime = 0;
             for (int j = 0; j < m_storageUrls.size(); ++j) {
-                int64_t d1 = copyFile(m_storageUrls[j], j, lqFolder);
-                int64_t d2 = copyFile(m_storageUrls[j], j, hqFolder);
+                int64_t d1 = copyFile(m_storageUrls[j], lqFolder);
+                int64_t d2 = copyFile(m_storageUrls[j], hqFolder);
                 newTime = newTime > (d1 > d2 ? d1 : d2) ? newTime : (d1 > d2 ? d1 : d2);
             }
             startTimeMs = newTime - 500;
         }
         m_timeLine.finalize();
+    }
+
+    void createStorages()
+    {
+        for (int i = 0; i < m_storageUrls.size(); ++i) {
+            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource);
+            storage->setUrl(m_storageUrls[i]);
+            storage->setId(QnUuid::createUuid());
+            storage->setUsedForWriting(true);
+            if (i % 2 == 0)
+                qnNormalStorageMan->addStorage(storage);
+            else
+                qnBackupStorageMan->addStorage(storage);
+            storage->setStatus(Qn::Online, true);
+            m_storages.push_back(storage);
+        }
+    }
+
+    void loadMedia()
+    {
+        for (int i = 0; i < m_storageUrls.size(); ++i) {
+            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : 
+                                                     qnBackupStorageMan;
+            manager->getFileCatalog(lit("%1").arg(cameraFolder), 
+                                    QnServer::LowQualityCatalog);
+
+            manager->getFileCatalog(lit("%1").arg(cameraFolder),
+                                    QnServer::HiQualityCatalog);
+            manager->m_rebuildCancelled = false;
+
+            manager->loadFullFileCatalogFromMedia(m_storages[i], 
+                                                  QnServer::LowQualityCatalog, 0.0);
+
+            manager->loadFullFileCatalogFromMedia(m_storages[i], 
+                                                  QnServer::HiQualityCatalog, 0.0);
+        }
     }
 
     TimeLine &getTimeLine() {return m_timeLine;}
@@ -262,7 +295,10 @@ private:
  private:
     QStringList m_storageUrls;
     TimeLine m_timeLine;
+    int m_fileCount;
+    std::vector<QnStorageResourcePtr> m_storages;
 };
+
 
 TEST(ServerArchiveDelegate_playback_test, TestHelper)
 {
@@ -321,6 +357,37 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     ASSERT_TRUE(timeLine.checkTime(28));
 }
 
+static int lockmgr(void **mtx, enum AVLockOp op)
+{
+    QnMutex** qMutex = (QnMutex**) mtx;
+    switch(op) {
+        case AV_LOCK_CREATE:
+            *qMutex = new QnMutex();
+            return 0;
+        case AV_LOCK_OBTAIN:
+            (*qMutex)->lock();
+            return 0;
+        case AV_LOCK_RELEASE:
+            (*qMutex)->unlock();
+            return 0;
+        case AV_LOCK_DESTROY:
+            delete *qMutex;
+            return 0;
+    }
+    return 1;
+}
+
+static void ffmpegInit()
+{
+    //avcodec_init();
+    av_register_all();
+
+    if(av_lockmgr_register(lockmgr) != 0)
+    {
+        qCritical() << "Failed to register ffmpeg lock manager";
+    }
+}
+
 TEST(ServerArchiveDelegate_playback_test, Main) 
 {
     const QString storageUrl_1 = qApp->applicationDirPath() + lit("/tmp/path1");
@@ -363,24 +430,21 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    QnStorageResourcePtr storage_1 = QnStorageResourcePtr(new QnFileStorageResource);
-    storage_1->setUrl(storageUrl_1);
-    storage_1->setId("{04F021EA-9B0C-4ACD-923C-DE70B38D7021}");
-    storage_1->setUsedForWriting(true);
+    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 10);
 
-    QnStorageResourcePtr storage_2 = QnStorageResourcePtr(new QnFileStorageResource);
-    storage_2->setUrl(storageUrl_2);
-    storage_2->setId("{FB08E83E-6BC2-48E2-9A09-4FDAA7065A46}");
-    storage_2->setUsedForWriting(true);
+    QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
+    cameraResource->setPhysicalId(cameraFolder);
 
-    qnNormalStorageMan->addStorage(storage_1);
-    qnBackupStorageMan->addStorage(storage_2);
+    ffmpegInit();
 
-    storage_1->setStatus(Qn::Online, true);
-    storage_2->setStatus(Qn::Online, true);
+    QnServerArchiveDelegate archiveDelegate;
+    archiveDelegate.open(cameraResource);
+    archiveDelegate.seek(0, true);
 
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2));
-    //storage1->setStatus(Qn::Online, true);
-    //storage2->setStatus(Qn::Online, true);
-    //storage3->setStatus(Qn::Online, true);
+    QnAbstractMediaDataPtr data;
+    do {
+        data = archiveDelegate.getNextData();
+        if (data)
+            qDebug() << data->timestamp;
+    } while (data);
 }

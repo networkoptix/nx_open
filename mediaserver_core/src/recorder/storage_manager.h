@@ -39,6 +39,7 @@ class QnScheduleSync;
 class QnStorageManager: public QObject
 {
     Q_OBJECT
+    friend class TestHelper;
 public:
     typedef QMap<int, QnStorageResourcePtr> StorageMap;
     typedef QMap<QString, DeviceFileCatalogPtr> FileCatalogMap;   /* Map by camera unique id. */
