@@ -111,10 +111,11 @@ private:
 
     int state() const;
 
-    boost::optional<ChunkKeyVector> getOldestChunk() const;
+    boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
     ChunkKey getOldestChunk(
         const QString           &cameraId,
-        QnServer::ChunksCatalog catalog
+        QnServer::ChunksCatalog catalog,
+        qint64                  fromTimeMs
     ) const;
 
 private:
@@ -122,6 +123,7 @@ private:
     std::atomic<bool>       m_syncing;
     std::atomic<bool>       m_forced;
     std::atomic<bool>       m_interrupted;
+    bool                    m_failReported;
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;

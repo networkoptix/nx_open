@@ -197,7 +197,7 @@ win* {
 ## BOTH LINUX AND MAC
 unix: {
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Wuninitialized
+  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 ## LINUX

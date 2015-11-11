@@ -24,7 +24,8 @@ public:
         UserRole,
         PasswordRole,
         SectionRole,
-        SessionIdRole
+        SessionIdRole,
+        IsCompatibleRole
     };
 
     enum DisplayMode {

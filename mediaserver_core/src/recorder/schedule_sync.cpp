@@ -15,7 +15,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/storage_resource.h>
 
-#include <mutex>
 #include <numeric>
 
 QnScheduleSync::QnScheduleSync()
@@ -23,6 +22,7 @@ QnScheduleSync::QnScheduleSync()
       m_syncing(false),
       m_forced(false),
       m_interrupted(false),
+      m_failReported(false),
       m_curDow(ec2::backup::Never),
       m_syncTimePoint(0)
 {
@@ -41,12 +41,12 @@ void QnScheduleSync::updateLastSyncPoint()
 
 qint64 QnScheduleSync::findLastSyncPointUnsafe() const
 {
-    int64_t prevSyncPoint = 0;
     qint64 result = 0;
+    qint64 prevResult = 0;
 
-    while (auto chunkVector = getOldestChunk()) {
+    while (auto chunkVector = getOldestChunk(result)) {
         auto chunkKey = (*chunkVector)[0];
-        prevSyncPoint = m_syncTimePoint;
+        prevResult = result;
         result = chunkKey.chunk.startTimeMs;
 
         auto fromCatalog = qnNormalStorageMan->getFileCatalog(
@@ -63,8 +63,8 @@ qint64 QnScheduleSync::findLastSyncPointUnsafe() const
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < chunkKey.chunk.startTimeMs) {
-            result = prevSyncPoint;
+        if (toCatalog->getLastSyncTime() < result) {
+            result = prevResult;
             break;
         }
     }
@@ -73,7 +73,8 @@ qint64 QnScheduleSync::findLastSyncPointUnsafe() const
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
     const QString           &cameraId,
-    QnServer::ChunksCatalog catalog
+    QnServer::ChunksCatalog catalog,
+    qint64                  fromTimeMs
 ) const
 {
     auto fromCatalog = qnNormalStorageMan->getFileCatalog(
@@ -88,7 +89,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
         );
         return ChunkKey();
     }
-    int nextFileIndex = fromCatalog->findNextFileIndex(m_syncTimePoint);
+    int nextFileIndex = fromCatalog->findNextFileIndex(fromTimeMs);
     auto chunk = fromCatalog->chunkAt(nextFileIndex);
 
     ChunkKey ret = {chunk, cameraId, catalog};
@@ -97,7 +98,7 @@ QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
 
 
 boost::optional<QnScheduleSync::ChunkKeyVector> 
-QnScheduleSync::getOldestChunk() const
+QnScheduleSync::getOldestChunk(qint64 fromTimeMs) const
 {
     ChunkKeyVector ret;
     int64_t minTime = std::numeric_limits<int64_t>::max();
@@ -109,7 +110,7 @@ QnScheduleSync::getOldestChunk() const
         ChunkKey tmp;
 
         if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
-            tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog);
+            tmp = getOldestChunk(camera->getUniqueId(), QnServer::HiQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
@@ -126,7 +127,7 @@ QnScheduleSync::getOldestChunk() const
         }
 
         if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
-            tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog);
+            tmp = getOldestChunk(camera->getUniqueId(), QnServer::LowQualityCatalog, fromTimeMs);
 
         if (tmp.chunk.durationMs != -1 && tmp.chunk.startTimeMs != -1)
         {
@@ -307,7 +308,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     m_syncTimePoint = findLastSyncPointUnsafe();
 
     while (1) {
-        auto chunkKeyVector = getOldestChunk();
+        auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
         if (!chunkKeyVector) {
             break;
         }
@@ -323,8 +324,6 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 );
                 if (err == CopyError::NoBackupStorageError || 
                     err == CopyError::FromStorageError) {
-                    emit backupFinished(m_syncTimePoint, 
-                                        QnServer::BackupResultCode::Failed);
                     return QnServer::BackupResultCode::Failed;
                 } else if (err == CopyError::Interrupted) {
                     return QnServer::BackupResultCode::Cancelled;
@@ -445,6 +444,8 @@ void QnScheduleSync::run()
 
         auto isItTimeForSync = [this] ()
         {
+            if (!m_backupSyncOn)
+                return SyncCode::Interrupted;
             if (m_forced)
                 return SyncCode::Ok;
             if (m_schedule.backupType != Qn::Backup_Schedule)
@@ -496,7 +497,14 @@ void QnScheduleSync::run()
             }
             m_forced = false;
             m_syncing = false;
-            emit backupFinished(m_syncTimePoint, result);
+
+            if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
+                emit backupFinished(m_syncTimePoint, result);
+                m_failReported = true;
+            } else if (result != QnServer::BackupResultCode::Failed) {
+                emit backupFinished(m_syncTimePoint, result);
+                m_failReported = false; 
+            }
         }
     }
 }

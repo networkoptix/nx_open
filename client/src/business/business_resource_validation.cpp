@@ -14,11 +14,12 @@ namespace {
         Q_DECLARE_TR_FUNCTIONS(QnBusinessResourceValidationStrings)
     public:
         static QString subsetCameras(int count, const QnVirtualCameraResourceList &total) {
+            const auto totalCount = total.size();
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("%1 of %n devices"),
-                    tr("%1 of %n cameras"),
-                    tr("%1 of %n IO modules")
+                    tr("%1 of %n devices", nullptr, totalCount),
+                    tr("%1 of %n cameras", nullptr, totalCount),
+                    tr("%1 of %n IO modules", nullptr, totalCount)
                 ), total
             ).arg(count);
         } 

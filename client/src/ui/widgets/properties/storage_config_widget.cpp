@@ -184,14 +184,14 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
     QnStorageModelInfo item = dialog->storage();
     /* Check if somebody have added this storage right now */
-    if(!item.id.isNull())
-        return;
+    if(item.id.isNull())
+    {
+        item.id = QnStorageResource::fillID(m_server->getId(), item.url);
+        item.isBackup = !addToMain;
+        item.isUsed = true;
+    }
 
-    item.id = QnStorageResource::fillID(m_server->getId(), item.url);
-    item.isBackup = !addToMain;
-    item.isUsed = true;
-
-    m_model->addStorage(item);
+    m_model->addStorage(item);  /// Adds or updates storage model data
     updateColumnWidth();
 
     emit hasChangesChanged();
@@ -206,13 +206,32 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
     QnStoragesPoolFilterModel* filterModel = new QnStoragesPoolFilterModel(isMainPool, this);
     filterModel->setSourceModel(m_model.data());
     tableView->setModel(filterModel);
+    
+    if (!isMainPool)
+    {
+        // Hides table when data model is empty
+        const auto onCountChanged = [this, tableView]()
+        {
+            const auto model = tableView->model();
+            const bool shouldBeVisible = (model && model->rowCount());
+            const bool currentVisible = tableView->isVisible();
+            if (currentVisible != shouldBeVisible)
+                tableView->setVisible(shouldBeVisible);
+        };
 
+        tableView->setVisible(false);
+        connect(tableView->model(), &QAbstractItemModel::rowsRemoved, this, onCountChanged);
+        connect(tableView->model(), &QAbstractItemModel::rowsInserted, this, onCountChanged);
+        connect(tableView->model(), &QAbstractItemModel::modelReset, this, onCountChanged);
+    }
+    
     tableView->resizeColumnsToContents();
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     tableView->horizontalHeader()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
 
+    
     connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
     connect(filterModel, &QnStorageListModel::dataChanged, this, 
         [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
@@ -511,11 +530,10 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
 
 QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 
-    QDateTime now = qnSyncTime->currentDateTime();
+    const QDateTime backupDateTime = QDateTime::fromMSecsSinceEpoch(backupTimeMs);
+    QString result = lit("%1 %2").arg(backupDateTime.date().toString()).arg(backupDateTime.time().toString(Qt::SystemLocaleLongDate));
 
-    QString result = lit("%1 %2").arg(now.date().toString()).arg(now.time().toString(Qt::SystemLocaleLongDate));
-
-    qint64 deltaMs = now.toMSecsSinceEpoch() - backupTimeMs;
+    qint64 deltaMs = qnSyncTime->currentDateTime().toMSecsSinceEpoch() - backupTimeMs;
     if (deltaMs > minDeltaForMessageMs) {
         QTimeSpan span(deltaMs);
         span.normalize();

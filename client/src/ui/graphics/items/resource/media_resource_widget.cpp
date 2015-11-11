@@ -166,7 +166,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_bookmarksOverlayWidget(nullptr)
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
-    , m_licenceStatus()
+    , m_ioLicenceStatusHelper() /// Will be created only for IO modules
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -269,13 +269,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
     {
-        m_licenceStatus.reset(new QnSingleCamLicenceStatusHelper(m_camera));
+        m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
         addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
 
-        connect(m_licenceStatus, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
+        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
             , [this]() { updateIoModuleVisibility(true); });
 
         updateButtonsVisibility();
@@ -1487,16 +1487,16 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
-    Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_licenceStatus
+    Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
         , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for io modules");
 
-    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_licenceStatus)
+    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
         return;
 
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = (!m_camera->hasVideo(m_display->mediaProvider()));
-    const bool correctLicenceStatus = (m_licenceStatus->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
+    const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
 
     const auto resource = m_display->resource();
     
@@ -1525,12 +1525,12 @@ void QnMediaResourceWidget::updateOverlayButton() {
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
             
-            Q_ASSERT_X(m_licenceStatus, Q_FUNC_INFO, "Query IO status overlay for resource widget that not contains IO module");
+            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query IO status overlay for resource widget which is not containing IO module");
 
-            if (!m_licenceStatus)
+            if (!m_ioLicenceStatusHelper)
                 return;
 
-            switch (m_licenceStatus->status()) {
+            switch (m_ioLicenceStatusHelper->status()) {
             case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::IoEnableButton);
                 return;
@@ -1552,13 +1552,13 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
-    Q_ASSERT_X(m_licenceStatus, Q_FUNC_INFO
+    Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO
         , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-io modules");
 
-    if (!m_licenceStatus)
+    if (!m_ioLicenceStatusHelper)
         return;
 
-    const auto licenceStatus = m_licenceStatus->status();
+    const auto licenceStatus = m_ioLicenceStatusHelper->status();
     if (licenceStatus != QnSingleCamLicenceStatusHelper::LicenseNotUsed)
         return;
     

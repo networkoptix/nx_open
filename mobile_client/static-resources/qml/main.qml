@@ -178,17 +178,21 @@ Window {
     Connections {
         target: connectionManager
 
-        onConnectedChanged: {
-            if (connectionManager.connected) {
+        onConnectionStateChanged: {
+            var connectionState = connectionManager.connectionState
+            if (connectionState == QnConnectionManager.Connected) {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
-                stackView.setFadeTransition()
-                Main.gotoResources()
-            } else if (currentSessionId == "") {
+                if (stackView.currentItem.objectName == "newConnectionPage" || stackView.currentItem.objectName == "loginPage") {
+                    stackView.setFadeTransition()
+                    Main.gotoResources()
+                }
+            } else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
-                Main.gotoNewSession()
+                if (stackView.currentItem.objectName != "newConnectionPage" && stackView.currentItem.objectName != "loginPage")
+                    Main.gotoNewSession()
             }
         }
 
@@ -198,7 +202,7 @@ Window {
                         currentHost, currentPort,
                         currentLogin, currentPasswrod,
                         currentSystemName,
-                        status, statusMessage)
+                        status, infoParameter)
         }
     }
 
