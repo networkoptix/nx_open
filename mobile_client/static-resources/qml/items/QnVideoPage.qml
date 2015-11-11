@@ -99,7 +99,8 @@ QnPage {
 
         source: player.mediaPlayer
         screenshotSource: initialResourceScreenshot
-        screenshotAspectRatio: player.resourceHelper.aspectRatio
+        aspectRatio: screenshotSource == initialResourceScreenshot ? player.resourceHelper.rotatedAspectRatio : player.resourceHelper.aspectRatio
+        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : player.resourceHelper.rotation
 
         onClicked: {
             if (navigationLoader.visible)
