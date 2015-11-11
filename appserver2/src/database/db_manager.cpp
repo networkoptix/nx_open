@@ -1413,6 +1413,10 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         if (!m_dbJustCreated)
             m_needResyncClientInfoData = true;
     }
+    else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
+    }
 
     return true;
 }
@@ -3184,7 +3188,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.max_archive_days as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed,                    \
-            cu.failover_priority as failoverPriority           \
+            cu.failover_priority as failoverPriority,          \
+            cu.backup_type as backupType                       \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \
