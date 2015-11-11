@@ -14,6 +14,7 @@
 #include "core/resource/camera_history.h"
 #include "common/common_module.h"
 #include "network/authutil.h"
+#include "http/custom_headers.h"
 #include "utils/common/model_functions.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"
@@ -82,6 +83,8 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_nativeProtocol(nativeStreamProtocol)
 {
     setStardardResolutions();
+    connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
+    connect(this, &QnMediaResourceHelper::rotationChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
 }
 
 QString QnMediaResourceHelper::resourceId() const {
@@ -112,10 +115,11 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
             if (m_camera != resource)
                 return;
 
-            if (key != Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
-                return;
+            if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+                updateMediaStreams();
+            else if (key == QnMediaResource::rotationKey())
+                emit rotationChanged();
 
-            updateMediaStreams();
         });
         at_resource_parentIdChanged(camera);
         updateMediaStreams();
@@ -125,6 +129,7 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
         m_resolution = qnSettings->lastUsedQuality();
         emit resolutionChanged();
+        emit rotationChanged();
     }
 
     updateUrl();
@@ -156,7 +161,7 @@ void QnMediaResourceHelper::updateUrl() {
         return;
     }
 
-    if ((m_transcodingSupported && m_resolution.isEmpty() && m_screenSize.isEmpty()) ||
+    if ((m_transcodingSupported && m_resolution <= 0 && m_screenSize.isEmpty()) ||
         (!m_transcodingSupported && m_nativeResolutions.isEmpty()))
     {
         setUrl(QUrl());
@@ -185,7 +190,7 @@ void QnMediaResourceHelper::updateUrl() {
     } else {
         if (m_transcodingSupported) {
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
-            query.addQueryItem(lit("resolution"), m_resolution.isEmpty() ? optimalResolution() : m_resolution);
+            query.addQueryItem(lit("resolution"), currentResolutionString());
             query.addQueryItem(lit("rt"), lit("true"));
         } else if (protocol == Mjpeg) {
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
@@ -205,9 +210,10 @@ void QnMediaResourceHelper::updateUrl() {
     if (protocol == Mjpeg)
         query.addQueryItem(lit("ct"), lit("false"));
 
-    query.addQueryItem(lit("X-runtime-guid"), qnCommon->runningInstanceGUID().toString());
-    query.addQueryItem(lit("X-Nx-User-Name"), QnAppServerConnectionFactory::url().userName());
-    query.addQueryItem(lit("User-Agent"), QLatin1String(nx_http::userAgentString()));
+    query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
+    query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
+    query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
+    query.addQueryItem(lit("rotation"), lit("0"));
 
     url.setQuery(query);
 
@@ -223,6 +229,13 @@ int QnMediaResourceHelper::nativeStreamIndex(const QString &resolution) const {
     return it.key();
 }
 
+QString QnMediaResourceHelper::resolutionString(int resolution) const {
+    return lit("%1x%2").arg(int(sensorAspectRatio() * resolution)).arg(resolution);
+}
+
+QString QnMediaResourceHelper::currentResolutionString() const {
+    return m_resolution > 0 ? resolutionString(m_resolution) : optimalResolution();
+}
 
 QString QnMediaResourceHelper::resourceName() const {
     if (!m_camera)
@@ -252,18 +265,21 @@ QStringList QnMediaResourceHelper::resolutions() const {
 }
 
 QString QnMediaResourceHelper::resolution() const {
-    if (m_transcodingSupported)
-        return m_resolution;
-    else
+    if (m_transcodingSupported) {
+        return m_resolution > 0 ? lit("%1p").arg(m_resolution) : QString();
+    } else {
         return m_nativeResolutions.value(m_nativeStreamIndex);
+    }
 }
 
 void QnMediaResourceHelper::setResolution(const QString &resolution) {
     if (m_transcodingSupported) {
-        if (m_resolution == resolution)
+        int resolutionHeight = resolution.leftRef(resolution.length() - 1).toInt();
+
+        if (m_resolution == resolutionHeight)
             return;
 
-        m_resolution = resolution;
+        m_resolution = resolutionHeight;
         qnSettings->setLastUsedQuality(m_resolution);
     } else {
         int index = nativeStreamIndex(resolution);
@@ -290,9 +306,11 @@ void QnMediaResourceHelper::setScreenSize(const QSize &size) {
     if (m_screenSize == size)
         return;
 
-    bool updateRequired = m_screenSize != size.transposed();
+    QString resolution = currentResolutionString();
 
     m_screenSize = size;
+
+    bool updateRequired = resolution != currentResolutionString();
 
     emit screenSizeChanged();
 
@@ -310,7 +328,7 @@ QString QnMediaResourceHelper::optimalResolution() const {
     int maxHeight = qMax(m_screenSize.width(), m_screenSize.height());
     auto it = qUpperBound(m_standardResolutions.begin(), m_standardResolutions.end(), maxHeight);
     int resolution = it == m_standardResolutions.end() ? m_standardResolutions.last() : *it;
-    return lit("%1p").arg(resolution);
+    return resolutionString(resolution);
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
@@ -321,6 +339,18 @@ QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
 }
 
 qreal QnMediaResourceHelper::aspectRatio() const {
+    qreal aspectRatio = sensorAspectRatio();
+    if (qFuzzyIsNull(aspectRatio))
+        return 0;
+
+    QSize layoutSize = m_camera->getVideoLayout()->size();
+    if (!layoutSize.isEmpty())
+        aspectRatio *= qreal(layoutSize.width()) / layoutSize.height();
+
+    return aspectRatio;
+}
+
+qreal QnMediaResourceHelper::sensorAspectRatio() const {
     if (!m_camera)
         return 0;
 
@@ -344,15 +374,26 @@ qreal QnMediaResourceHelper::aspectRatio() const {
             aspectRatio = qreal(size.width()) / size.height();
     }
 
-    QSize layoutSize = m_camera->getVideoLayout()->size();
-    if (!layoutSize.isEmpty())
-        aspectRatio *= qreal(layoutSize.width()) / layoutSize.height();
-
-    int rotation = m_camera->getProperty(QnMediaResource::rotationKey()).toInt();
-    if (rotation % 90 == 0 && rotation % 180 != 0)
-        aspectRatio = 1.0 / aspectRatio;
-
     return aspectRatio;
+}
+
+qreal QnMediaResourceHelper::rotatedAspectRatio() const {
+    qreal ar = aspectRatio();
+    if (qFuzzyIsNull(ar))
+        return ar;
+
+    int rot = rotation();
+    if (rot % 90 == 0 && rot % 180 != 0)
+        return 1.0 / ar;
+
+    return ar;
+}
+
+int QnMediaResourceHelper::rotation() const {
+    if (!m_camera)
+        return 0;
+
+    return m_camera->getProperty(QnMediaResource::rotationKey()).toInt();
 }
 
 void QnMediaResourceHelper::updateMediaStreams() {

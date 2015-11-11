@@ -265,6 +265,7 @@ QnPlOnvifResource::QnPlOnvifResource()
     m_prevPullMessageResponseClock(0)
 {
     m_monotonicClock.start();
+    m_advSettingsLastUpdated.restart();
 }
 
 QnPlOnvifResource::~QnPlOnvifResource()
@@ -2375,19 +2376,41 @@ bool QnPlOnvifResource::loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMa
     return m_prevOnvifResultCode.errorCode == CameraDiagnostics::ErrorCode::noError;
 }
 
+bool QnPlOnvifResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result)
+{
+    if (m_appStopping)
+        return false;
+    
+    QnMutexLocker lock( &m_physicalParamsMutex );
+    m_advancedParamsCache.clear();
+    if (loadAdvancedParamsUnderLock(m_advancedParamsCache)) {
+        m_advSettingsLastUpdated.restart();
+    }
+    else {
+        m_advSettingsLastUpdated.invalidate();
+        return false;
+    }
+    bool success = true;
+    for(const QString &id: idList) {
+        if (m_advancedParamsCache.contains(id))
+            result << QnCameraAdvancedParamValue(id, m_advancedParamsCache[id]);
+        else
+            success = false;
+    }
+
+    return success;
+}
 
 bool QnPlOnvifResource::getParamPhysical(const QString &id, QString &value) {
     if (m_appStopping)
         return false;
 
-    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests 
-    //to camera. All values can be get by one request, but our framework do getParamPhysical for every single param.
+    //Caching camera values during ADVANCED_SETTINGS_VALID_TIME to avoid multiple excessive 'get' requests to camera
     QnMutexLocker lock( &m_physicalParamsMutex );
-    QDateTime curTime = QDateTime::currentDateTime();
-    if (m_advSettingsLastUpdated.isNull() || m_advSettingsLastUpdated.secsTo(curTime) > ADVANCED_SETTINGS_VALID_TIME) {
+    if (!m_advSettingsLastUpdated.isValid() || m_advSettingsLastUpdated.hasExpired(ADVANCED_SETTINGS_VALID_TIME * 1000)) {
         m_advancedParamsCache.clear();
         if (loadAdvancedParamsUnderLock(m_advancedParamsCache))
-            m_advSettingsLastUpdated = curTime;
+            m_advSettingsLastUpdated.restart();
     }
 
     if (!m_advancedParamsCache.contains(id))
@@ -2406,6 +2429,35 @@ bool QnPlOnvifResource::setAdvancedParameterUnderLock(const QnCameraAdvancedPara
     return false;
 }
 
+bool QnPlOnvifResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+{
+    bool success = true;
+    for(const QnCameraAdvancedParamValue &value: values) 
+    {
+        QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(value.id);
+        if (parameter.isValid() && setAdvancedParameterUnderLock(parameter, value.value))
+            result << value;
+        else
+            success = false;
+    }
+    return success;
+}
+
+bool QnPlOnvifResource::setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
+{
+    bool success;
+    {
+        setParamsBegin();
+        QnMutexLocker lock( &m_physicalParamsMutex );
+        success = setAdvancedParametersUnderLock(values, result);
+        for (const auto& updatedValue: result)
+            m_advancedParamsCache[updatedValue.id] = updatedValue.value;
+        setParamsEnd();
+    }
+    for (const auto& updatedValue: result)
+        emit advancedParameterChanged(updatedValue.id, updatedValue.value);
+    return success;
+}
 
 bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value) {
     if (m_appStopping)
@@ -2414,8 +2466,8 @@ bool QnPlOnvifResource::setParamPhysical(const QString &id, const QString& value
     bool result = false;
     {
         QnMutexLocker lock( &m_physicalParamsMutex );
-        if (!m_advancedParamsCache.contains(id))
-            return false;
+        //if (!m_advancedParamsCache.contains(id))
+        //    return false; // there are no write-only parameters in a cache
 
         QnCameraAdvancedParameter parameter = m_advancedParameters.getParameterById(id);
         if (!parameter.isValid())

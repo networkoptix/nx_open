@@ -35,6 +35,7 @@ protected:
 
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
+    virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();

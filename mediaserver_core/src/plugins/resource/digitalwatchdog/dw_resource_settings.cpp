@@ -35,9 +35,42 @@ QnCameraAdvancedParamValueList DWCameraProxy::fetchParamsFromHttpResponse(const 
     return result;
 }
 
+bool DWCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList &result)
+{
+    QnCameraAdvancedParamValueList tmpList;
+    QString postMsgBody;
+    for (const auto& data: parameters)
+    {
+        const QnCameraAdvancedParameter& parameter = data.first;
+        const QString& value = data.second;
+        if (parameter.tag == lit("POST")) {
+            bool success = setParam(parameter, value); // we can't set such parameters together
+            if (success)
+                result << QnCameraAdvancedParamValue(parameter.id, value);
+            else
+                return false;
+        }
+        else {
+            QString innerValue = toInnerValue(parameter, value);
+            if (!postMsgBody.isEmpty())
+                postMsgBody.append(L'&');
+            postMsgBody.append(parameter.id).append(L'=').append(innerValue);
+            tmpList << QnCameraAdvancedParamValue(parameter.id, value);
+        }
+    }
 
-bool DWCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) {
+    if (postMsgBody.isEmpty())
+        return true;
 
+    CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
+    if (httpClient.doPOST(lit("cgi-bin/camerasetup.cgi"), postMsgBody) != CL_HTTP_SUCCESS)
+        return false;
+    result << tmpList;
+    return true;
+}
+
+QString DWCameraProxy::toInnerValue(const QnCameraAdvancedParameter &parameter, const QString &value)
+{
     QString innerValue = value;
     if (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration) {
         int idx = parameter.getRange().indexOf(value);
@@ -48,6 +81,13 @@ bool DWCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const Q
         int idx = value == lit("true") ? 1 : 0;
         innerValue = QString::number(idx);
     }
+
+    return innerValue;
+}
+
+bool DWCameraProxy::setParam(const QnCameraAdvancedParameter &parameter, const QString &value) 
+{
+    QString innerValue = toInnerValue(parameter, value);
 
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
 

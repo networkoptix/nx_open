@@ -45,6 +45,8 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , waitingForFrame(true)
     , framePresentationTime(0)
     , videoSurface(0)
+    , position(0)
+    , timestamp(0)
     , reconnectOnPlay(false)
 {
 }

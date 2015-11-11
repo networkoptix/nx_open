@@ -56,13 +56,6 @@
                 <version>2.5</version>
                 <executions>
                     <execution>
-                        <id>auto-clean</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                    <execution>
                         <id>manual-clean</id>
                         <phase>pre-clean</phase>
                         <goals>

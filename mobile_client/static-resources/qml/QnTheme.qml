@@ -33,7 +33,9 @@ QtObject {
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
+    property color sessionItemBackgroundIncompatible
     property color sessionItemActiveMark
+    property color sessionItemIncompatibleMark
 
     property color sideNavigationBackground
     property color sideNavigationCopyright
@@ -108,7 +110,9 @@ QtObject {
         listSeparator           = colorTheme.color("list.separator")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
+        sessionItemBackgroundIncompatible = colorTheme.color("sessionItem.backgroundIncompatible")
         sessionItemActiveMark   = colorTheme.color("sessionItem.activeMark")
+        sessionItemIncompatibleMark = colorTheme.color("sessionItem.incompatibleMark")
         sideNavigationBackground = colorTheme.color("sideNavigation.background")
         sideNavigationCopyright = colorTheme.color("sideNavigation.copyright")
         sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")

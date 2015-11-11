@@ -141,6 +141,11 @@ class QnCamLicenseUsageHelper: public QnLicenseUsageHelper {
 
     typedef QnLicenseUsageHelper base_type;
 public:
+    /*
+        Constructors. Each one uses specified watcher or create a new one if parameter is empty.
+        With empty watcher parameter creates instance which tracks all cameras.
+    */
+
     QnCamLicenseUsageHelper(const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr()
         , QObject *parent = NULL);
 
@@ -150,6 +155,7 @@ public:
     QnCamLicenseUsageHelper(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable
         , const QnCamLicenseUsageWatcherPtr &watcher = QnCamLicenseUsageWatcherPtr(), QObject *parent = NULL);
 
+public:
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
     void propose(const QnVirtualCameraResourceList &proposedCameras, bool proposedEnable);
     bool isOverflowForCamera(const QnVirtualCameraResourcePtr &camera);

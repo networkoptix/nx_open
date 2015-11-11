@@ -83,17 +83,10 @@ public:
     bool execute()
     {
         bool success = isConnectedToTheResource();
-        
         QnCameraAdvancedParamValueList result;
-        if (success) {
-            for(const QString &id: m_ids) {
-                QString value;
-                if (m_resource->getParamPhysical(id, value))
-                    result << QnCameraAdvancedParamValue(id, value);
-                else
-                    success = false;
-            }
-        }
+        if (success)
+            success = m_resource->getParamsPhysical(m_ids, result);
+        
         emit m_resource->asyncParamsGetDone(m_resource, result);
         return success;
     }
@@ -152,16 +145,8 @@ public:
         bool success = isConnectedToTheResource();
 
         QnCameraAdvancedParamValueList result;
-        if (success) {
-            m_resource->setParamsBegin();
-            for(const QnCameraAdvancedParamValue &value: m_values) {
-                if (m_resource->setParamPhysical(value.id, value.value))
-                    result << value;
-                else
-                    success = false;
-            }
-            m_resource->setParamsEnd();
-        }
+        if (success)
+            success = m_resource->setParamsPhysical(m_values, result);
         emit m_resource->asyncParamsSetDone(m_resource, result);
         return success;
     }
@@ -488,10 +473,37 @@ bool QnResource::getParamPhysical(const QString &id, QString &value) {
     return false;
 }
 
+bool QnResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) 
+{
+    bool success = true;
+    for(const QString &id: idList) {
+        QString value;
+        if (getParamPhysical(id, value))
+            result << QnCameraAdvancedParamValue(id, value);
+        else
+            success = false;
+    }
+    return success;
+}
+
 bool QnResource::setParamPhysical(const QString &id, const QString &value) {
     Q_UNUSED(id)
     Q_UNUSED(value)
     return false;
+}
+
+bool QnResource::setParamsPhysical(const QnCameraAdvancedParamValueList &value, QnCameraAdvancedParamValueList &result)
+{
+    bool success = true;
+    setParamsBegin();
+    for(const QnCameraAdvancedParamValue &value: value) {
+        if (setParamPhysical(value.id, value.value))
+            result << value;
+        else
+            success = false;
+    }
+    setParamsEnd();
+    return success;
 }
 
 bool QnResource::setParamsBegin() {
