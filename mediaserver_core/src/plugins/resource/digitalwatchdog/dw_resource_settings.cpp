@@ -59,6 +59,9 @@ bool DWCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParameter, QSt
         }
     }
 
+    if (postMsgBody.isEmpty())
+        return true;
+
     CLSimpleHTTPClient httpClient(m_host, m_port, m_timeout, m_auth);
     if (httpClient.doPOST(lit("cgi-bin/camerasetup.cgi"), postMsgBody) != CL_HTTP_SUCCESS)
         return false;
