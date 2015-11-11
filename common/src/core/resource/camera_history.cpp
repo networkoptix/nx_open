@@ -305,9 +305,11 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(
         if (++detailItr == detailData.end())
             return  QnMediaServerResourcePtr();
         foundPeriod->startTimeMs = detailItr->timestampMs;
-        if (++detailItr == detailData.end())
-            return  QnMediaServerResourcePtr();
-        foundPeriod->durationMs = detailItr->timestampMs - foundPeriod->startTimeMs;
+        auto nextServerItr = detailItr;
+        if (++nextServerItr == detailData.end())
+            foundPeriod->durationMs = QnTimePeriod::UnlimitedPeriod;
+        else
+            foundPeriod->durationMs = nextServerItr->timestampMs - foundPeriod->startTimeMs;
     }
     else {
         if (detailItr == detailData.cbegin())
