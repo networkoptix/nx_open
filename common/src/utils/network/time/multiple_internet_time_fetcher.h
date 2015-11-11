@@ -34,7 +34,7 @@ public:
     virtual void join() override;
 
     //!Implementation of AbstractAccurateTimeFetcher
-    virtual bool getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
+    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
 
     void addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher );
 

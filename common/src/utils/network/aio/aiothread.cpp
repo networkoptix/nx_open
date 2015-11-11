@@ -147,7 +147,8 @@ namespace aio
                     nullptr )
             {
                 this->postHandler = std::move(_postHandler);
-                this->socketSequence = _socket->impl()->socketSequence;
+                if (_socket)
+                    this->socketSequence = _socket->impl()->socketSequence;
             }
         };
 
@@ -333,6 +334,7 @@ namespace aio
                 {
                     const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                     NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
+                    //TODO #ak report error to eventHandler
                     return false;
                 }
             socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
@@ -664,7 +666,7 @@ namespace aio
         \return true, if added successfully. If \a false, error can be read by \a SystemError::getLastOSErrorCode() function
     */
     template<class SocketType>
-    bool AIOThread<SocketType>::watchSocket(
+    void AIOThread<SocketType>::watchSocket(
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
@@ -675,7 +677,7 @@ namespace aio
 
         //checking queue for reverse task for \a sock
         if( m_impl->removeReverseTask( sock, eventToWatch, TaskType::tAdding, eventHandler, timeoutMs ) )
-            return true;    //ignoring task
+            return;    //ignoring task
 
         m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tAdding,
@@ -691,12 +693,10 @@ namespace aio
             ++m_impl->newWriteMonitorTaskCount;
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
-
-        return true;
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::changeSocketTimeout(
+    void AIOThread<SocketType>::changeSocketTimeout(
         SocketType* const sock,
         aio::EventType eventToWatch,
         AIOEventHandler<SocketType>* const eventHandler,
@@ -716,7 +716,7 @@ namespace aio
         void* userData = sock->impl()->eventTypeToUserData[eventToWatch];
         assert( userData != nullptr );  //socket is not polled, but someone wants to change timeout
         if( static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data->markedForRemoval.load(std::memory_order_relaxed) > 0 )
-            return true;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
+            return;   //socket marked for removal, ignoring timeout change (like, cancelling it right now)
 
         m_impl->pollSetModificationQueue.push_back( typename AIOThreadImplType::SocketAddRemoveTask(
             TaskType::tChangingTimeout,
@@ -728,12 +728,10 @@ namespace aio
             socketAddedToPollHandler ) );
         if( currentThreadSystemId() != systemThreadId() )  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
-
-        return true;
     }
 
     template<class SocketType>
-    bool AIOThread<SocketType>::removeFromWatch(
+    void AIOThread<SocketType>::removeFromWatch(
         SocketType* const sock,
         aio::EventType eventType,
         bool waitForRunningHandlerCompletion )
@@ -742,14 +740,13 @@ namespace aio
 
         //checking queue for reverse task for \a sock
         if( m_impl->removeReverseTask( sock, eventType, TaskType::tRemoving, NULL, 0 ) )
-            return true;    //ignoring task
+            return;    //ignoring task
 
         void*& userData = sock->impl()->eventTypeToUserData[eventType];
-        if( userData == NULL )
-            return false;   //socket is not polled. assert?
+        Q_ASSERT( userData != NULL );   //socket is not polled. assert?
         std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData = static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData)->data;
         if( handlingData->markedForRemoval.load(std::memory_order_relaxed) > 0 )
-            return false;   //socket already marked for removal
+            return;   //socket already marked for removal
         ++handlingData->markedForRemoval;
 
         const bool inAIOThread = currentThreadSystemId() == systemThreadId();
@@ -807,12 +804,12 @@ namespace aio
                 0 ) );
             m_impl->pollSet.interrupt();
         }
-
-        return true;
     }
 
     template<class SocketType>
-    void AIOThread<SocketType>::post( SocketType* const sock, std::function<void()>&& functor )
+    void AIOThread<SocketType>::post(
+        SocketType* const sock,
+        std::function<void()>&& functor )
     {
         m_impl->pollSetModificationQueue.push_back(
             typename AIOThreadImplType::PostAsyncCallTask(

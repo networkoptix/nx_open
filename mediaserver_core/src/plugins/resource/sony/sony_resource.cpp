@@ -179,7 +179,8 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     m_inputMonitorHttpClient->setTotalReconnectTries( AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
-    return m_inputMonitorHttpClient->doGet( requestUrl );
+    m_inputMonitorHttpClient->doGet( requestUrl );
+    return true;
 }
 
 void QnPlSonyResource::stopInputPortMonitoringAsync()

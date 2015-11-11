@@ -99,11 +99,8 @@ bool QnIpRangeCheckerAsync::launchHostCheck()
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         this, &QnIpRangeCheckerAsync::onDone,
         Qt::DirectConnection );
-    if( !httpClient->doGet( QUrl( lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) ) )
-        return true;
- 
+    httpClient->doGet( QUrl( lit("http://%1:%2/").arg(QHostAddress(ipToCheck).toString()).arg(m_portToScan) ) );
     m_socketsBeingScanned.insert( httpClient );
-
     return true;
 }
 

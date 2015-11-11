@@ -31,7 +31,7 @@ public:
 
 protected:
     //!Implementation of AbstractStreamSocket::connectAsyncImpl
-    virtual bool connectAsyncImpl(
+    virtual void connectAsyncImpl(
         const SocketAddress& addr,
         std::function<void( SystemError::ErrorCode )>&& handler ) override;
 

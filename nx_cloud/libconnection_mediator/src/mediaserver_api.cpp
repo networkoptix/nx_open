@@ -144,12 +144,7 @@ void MediaserverApi::pingServer( const SocketAddress& address, const String& exp
             onPinged( std::move( address ), true );
         } );
 
-    if( !httpClient->doGet( lit( "http://%1/api/ping" ).arg( address.toString() ) ) )
-    {
-        NX_LOGX( lit("Mediaserver %1 is unaccesible")
-                 .arg( address.toString() ), cl_logDEBUG1 )
-        return onPinged( address, false );
-    }
+    httpClient->doGet( lit( "http://%1/api/ping" ).arg( address.toString() ) );
 
     QnMutexLocker lk( &m_mutex );
     m_httpClients.insert( std::move( httpClient ) );

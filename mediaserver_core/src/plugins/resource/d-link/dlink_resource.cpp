@@ -123,7 +123,7 @@ QnPlDlinkResource::QnPlDlinkResource()
     setDefaultAuth(QLatin1String("admin"), QLatin1String(""));
 }
 
-bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -166,7 +166,7 @@ bool QnPlDlinkResource::checkIfOnlineAsync( std::function<void(bool)>&& completi
         completionHandler( false );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }

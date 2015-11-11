@@ -32,7 +32,7 @@ public:
         \note Implementation is NOT REQUIRED to support performing multiple simultaneous operations
         \return \a true if request issued successfully, otherwise \a false
     */
-    virtual bool getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) = 0;
+    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) = 0;
 };
 
 #endif  //ABSTRACT_ACCURATE_TIME_FETCHER_H

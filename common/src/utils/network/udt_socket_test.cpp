@@ -164,21 +164,16 @@ private:
         if( !error_code ) {
             std::unique_ptr<Connection> conn( new Connection );
             conn->socket = static_cast<UdtStreamSocket*>(new_conn);
-            if(!new_conn->readSomeAsync(
+            new_conn->readSomeAsync(
                 &(conn->buffer),
                 std::bind(
                 &UdtSocketProfileServer::OnRead,
                 this,
                 std::placeholders::_1,
                 std::placeholders::_2,
-                conn.get()))) {
-                    ++broken_or_error_conn_;
-                    conn->socket->cancelAsyncIO( aio::etNone );
-                    new_conn->close();
-            } else {
-                ++current_conn_size_;
-                conn.release();
-            }
+                conn.get()));
+            ++current_conn_size_;
+            conn.release();
         }
         server_socket_->acceptAsync(
             std::bind(
@@ -203,22 +198,15 @@ private:
             } else {
                 total_recv_bytes_ += bytes_transferred;
                 conn->buffer.resize(0);
-                if(!conn->socket->readSomeAsync(
+                conn->socket->readSomeAsync(
                     &(conn->buffer),
                     std::bind(
                     &UdtSocketProfileServer::OnRead,
                     this,
                     std::placeholders::_1,
                     std::placeholders::_2,
-                    conn.get()))) {
-                        ++broken_or_error_conn_;
-                        --current_conn_size_;
-                        conn->socket->cancelAsyncIO(aio::etNone );
-                        conn->socket->close();
-                        return;
-                } else {
-                    conn.release();
-                }
+                    conn.get()));
+                conn.release();
             }
         }
     }
@@ -353,19 +341,13 @@ private:
         int length = random_.RandomRange(minimum_allowed_content_,maximum_allowed_content_);
         conn->buffer = random_.RandomString(length);
 
-        if( !conn->socket->sendAsync(
+        conn->socket->sendAsync(
             conn->buffer,
             std::bind(
             &UdtSocketProfileClient::OnWrite,
             this,
-            std::placeholders::_1,std::placeholders::_2,conn.get()))) {
-                conn->socket->cancelAsyncIO();
-                conn->socket->close();
-                --connected_socket_size_;
-                ++failed_connection_size_;
-        } else {
-            conn.release();
-        }
+            std::placeholders::_1,std::placeholders::_2,conn.get()));
+        conn.release();
     }
     void ScheduleSleepSockets();
     bool ScheduleSleepSocket( Connection* ptr ) {
@@ -459,19 +441,13 @@ void UdtSocketProfileClient::ScheduleConnection() {
             conn->socket->setReuseAddrFlag(true);
             if( !conn->socket->bind(SocketAddress(HostAddress::anyHost,reused_port_)) )
                 continue;
-            if(!conn->socket->connectAsync(
+            conn->socket->connectAsync(
                 SocketAddress( HostAddress(address_), port_ ) ,
                 std::bind(
                 &UdtSocketProfileClient::OnConnect,
                 this,
-                std::placeholders::_1, conn.get()))) {
-                    ++failed_connection_size_;
-                    conn->socket->cancelAsyncIO();
-                    conn->socket->close();
-                    continue;
-            } else {
-                conn.release();
-            }
+                std::placeholders::_1, conn.get()));
+            conn.release();
             ++active_conn_sockets_size_;
             ++scheduled_size;
             if( scheduled_size > per_conn_size ) {

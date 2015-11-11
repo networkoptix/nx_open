@@ -140,7 +140,7 @@ void MediatorAddressPublisher::pingReportedAddresses()
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_reportedAddresses );
     request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
-    const auto ret = m_stunClient->sendRequest(
+    m_stunClient->sendRequest(
         std::move( request ),
         [ this ]( SystemError::ErrorCode code, stun::Message response )
     {
@@ -166,9 +166,6 @@ void MediatorAddressPublisher::pingReportedAddresses()
 
         publishPingedAddresses();
     } );
-
-    if( !ret )
-        setupUpdateTimer();
 }
 
 void MediatorAddressPublisher::publishPingedAddresses()
@@ -183,7 +180,7 @@ void MediatorAddressPublisher::publishPingedAddresses()
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_pingedAddresses );
     request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
-    const auto ret = m_stunClient->sendRequest(
+    m_stunClient->sendRequest(
         std::move( request ),
         [ this ]( SystemError::ErrorCode code, stun::Message response )
     {
@@ -200,9 +197,6 @@ void MediatorAddressPublisher::publishPingedAddresses()
 
         setupUpdateTimer();
     } );
-
-    if( !ret )
-        setupUpdateTimer();
 }
 
 } // namespase cc

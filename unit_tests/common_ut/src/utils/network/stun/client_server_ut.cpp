@@ -47,15 +47,15 @@ protected:
     std::unique_ptr< SocketServer > server;
 };
 
-TEST_F( StunClientServerTest, DISABLED_Connectivity )
+TEST_F( StunClientServerTest, Connectivity )
 {
     SyncQueue< SystemError::ErrorCode > connected;
     SyncQueue< SystemError::ErrorCode > disconnected;
     SyncQueue< Message > indicated;
 
     // 1. try to connect with no server
-    ASSERT_TRUE( client.openConnection(
-        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
+    client.openConnection(
+        connected.pusher(), indicated.pusher(), disconnected.pusher() );
 
     ASSERT_EQ( connected.pop(), SystemError::connectionRefused );
     EXPECT_TRUE( connected.isEmpty() );
@@ -65,10 +65,10 @@ TEST_F( StunClientServerTest, DISABLED_Connectivity )
     // 2. connect to normal server
     startServer();
 
-    ASSERT_TRUE( client.openConnection(
-        connected.pusher(), indicated.pusher(), disconnected.pusher() ) );
+    client.openConnection(
+        connected.pusher(), indicated.pusher(), disconnected.pusher() );
 
-    ASSERT_EQ( connected.pop(), SystemError::noError );
+    ASSERT_EQ(SystemError::noError, connected.pop());
     EXPECT_TRUE( connected.isEmpty() );
     EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
@@ -76,20 +76,20 @@ TEST_F( StunClientServerTest, DISABLED_Connectivity )
     // 3. remove server and see what's gonna happen
     stopServer();
 
-    ASSERT_EQ( disconnected.pop(), SystemError::connectionReset );
+    ASSERT_EQ(SystemError::connectionReset, disconnected.pop());
     EXPECT_TRUE( connected.isEmpty() );
     EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 }
 
-TEST_F( StunClientServerTest, DISABLED_RequestResponse )
+TEST_F( StunClientServerTest, RequestResponse )
 {
     // try to sendRequest with no server
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
+        client.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::connectionRefused );
@@ -100,7 +100,7 @@ TEST_F( StunClientServerTest, DISABLED_RequestResponse )
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
+        client.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );
@@ -118,7 +118,7 @@ TEST_F( StunClientServerTest, DISABLED_RequestResponse )
         Message request( Header( MessageClass::request, 0xFFF /* unknown */ ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
+        client.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );

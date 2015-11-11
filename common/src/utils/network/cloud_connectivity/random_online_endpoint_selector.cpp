@@ -49,14 +49,14 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     {
         auto sock = SocketFactory::createStreamSocket(false, SocketFactory::nttDisabled);
         if (!sock->setNonBlockingMode(true) ||
-            !sock->setSendTimeout(CONNECT_TIMEOUT_MS)||
-            !sock->connectAsync(
-                endpoint,
-                std::bind(&RandomOnlineEndpointSelector::done, this,
-                          sock.get(), _1, endpoint)))
+            !sock->setSendTimeout(CONNECT_TIMEOUT_MS))
         {
             continue;
         }
+        sock->connectAsync(
+            endpoint,
+            std::bind(&RandomOnlineEndpointSelector::done, this,
+                sock.get(), _1, endpoint));
         m_sockets.emplace(sock.get(), std::move(sock));
     }
 

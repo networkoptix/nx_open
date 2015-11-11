@@ -28,6 +28,11 @@ public:
     {
     }
 
+    ~SocketServer()
+    {
+        pleaseStop();
+    }
+
 protected:
     virtual std::shared_ptr<ServerConnection> createConnection(
         std::unique_ptr<AbstractStreamSocket> _socket) override

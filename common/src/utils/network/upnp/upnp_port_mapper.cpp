@@ -188,7 +188,7 @@ void PortMapper::updateExternalIp( Device& device )
     if( !device.failCounter.isOk() )
         return;
 
-    const auto result = m_upnpClient->externalIp(
+    m_upnpClient->externalIp(
         device.url, [ this, &device ]( HostAddress externalIp )
     {
         std::list< Guard > callbackGuards;
@@ -209,9 +209,6 @@ void PortMapper::updateExternalIp( Device& device )
                 callbackGuards = changeIpEvents( device, std::move(externalIp) );
         }
     });
-
-    if( !result )
-        device.failCounter.failure();
 }
 
 // TODO: reduse the size of method
@@ -221,7 +218,7 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
     if( !device.failCounter.isOk() )
         return;
 
-    const auto result = m_upnpClient->getMapping(
+    m_upnpClient->getMapping(
         device.url, exPort, protocol,
         [ this, &device, inPort, exPort, protocol ]( AsyncClient::MappingInfo info )
     {
@@ -254,9 +251,6 @@ void PortMapper::checkMapping( Device& device, quint16 inPort, quint16 exPort,
         lk.unlock();
         callback( invalid );
     } );
-
-    if( !result )
-        device.failCounter.failure();
 }
 
 // TODO: reduse the size of method
@@ -265,7 +259,7 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
     if( !device.failCounter.isOk() )
         return;
 
-    const bool result = m_upnpClient->getAllMappings( device.url,
+    m_upnpClient->getAllMappings( device.url,
         [ this, &device, inPort, protocol ]( AsyncClient::MappingList list )
     {
         QnMutexLocker lk( &m_mutex );
@@ -321,9 +315,6 @@ void PortMapper::ensureMapping( Device& device, quint16 inPort, Protocol protoco
             callback( invalid );
         }
     } );
-
-    if( !result )
-        device.failCounter.failure();
 }
 
 // TODO: move into function below when supported
@@ -344,7 +335,7 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
         desiredPort = portDistribution( randomEngine );
     while( device.engagedPorts.count( PortId( desiredPort, protocol ) ) );
 
-    const bool result = m_upnpClient->addMapping(
+    m_upnpClient->addMapping(
         device.url, device.internalIp, inPort, desiredPort, protocol, m_description,
         m_checkMappingsInterval * MAPPING_TIME_RATIO,
         [ this, &device, inPort, desiredPort, protocol, retries ]( bool success )
@@ -379,9 +370,6 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
         lk.unlock();
         callback( SocketAddress( device.externalIp, desiredPort ) );
     } );
-
-    if( !result )
-        device.failCounter.failure();
 }
 
 std::list< Guard > PortMapper::changeIpEvents( Device& device, HostAddress externalIp )

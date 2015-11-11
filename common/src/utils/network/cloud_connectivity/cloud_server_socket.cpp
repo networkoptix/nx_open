@@ -20,13 +20,12 @@ void CloudServerSocket::cancelAsyncIO( bool /*waitForRunningHandlerCompletion*/ 
     //TODO #ak
 }
 
-bool CloudServerSocket::acceptAsyncImpl(
+void CloudServerSocket::acceptAsyncImpl(
     std::function<void(
         SystemError::ErrorCode,
         AbstractStreamSocket* )>&& /*handler*/ )
 {
     //TODO #ak
-    return false;
 }
 
 } // namespace cc

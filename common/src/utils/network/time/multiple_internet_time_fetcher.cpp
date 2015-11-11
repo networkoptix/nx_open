@@ -52,7 +52,7 @@ void MultipleInternetTimeFetcher::join()
         ctx->timeFetcher->join();
 }
 
-bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
+void MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc )
 {
     using namespace std::placeholders;
 
@@ -62,29 +62,15 @@ bool MultipleInternetTimeFetcher::getTimeAsync( std::function<void(qint64, Syste
 
     for( std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers )
     {
-        if( ctx->timeFetcher->getTimeAsync( std::bind(
-                &MultipleInternetTimeFetcher::timeFetchingDone,
-                this, ctx.get(), _1, _2 ) ) )
-        {
-            ++m_awaitedAnswers;
-            ctx->errorCode = SystemError::noError;
-            ctx->state = TimeFetcherContext::working;
-        }
-        else
-        {
-            ctx->errorCode = SystemError::getLastOSErrorCode();
-            ctx->state = TimeFetcherContext::done;
-            break;
-        }
+        ctx->timeFetcher->getTimeAsync( std::bind(
+            &MultipleInternetTimeFetcher::timeFetchingDone,
+            this, ctx.get(), _1, _2 ) );
+        ++m_awaitedAnswers;
+        ctx->errorCode = SystemError::noError;
+        ctx->state = TimeFetcherContext::working;
     }
 
-    if( m_awaitedAnswers > 0 )
-    {
-        m_handlerFunc = std::move(handlerFunc);
-        return true;
-    }
-
-    return false;
+    m_handlerFunc = std::move(handlerFunc);
 }
 
 void MultipleInternetTimeFetcher::addTimeFetcher( std::unique_ptr<AbstractAccurateTimeFetcher> timeFetcher )

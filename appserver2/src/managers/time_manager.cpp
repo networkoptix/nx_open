@@ -787,17 +787,8 @@ namespace ec2
             clientPtr->setUserPassword( peerIter->second.authData.ha1.get() );
         }
 
-        if( !clientPtr->doGet( targetUrl ) )
-        {
-            clientPtr.reset();
-            peerIter->second.syncTimerID = TimerManager::instance()->addTimer(
-                std::bind( &TimeSynchronizationManager::synchronizeWithPeer, this, peerID ),
-                TIME_SYNC_SEND_TIMEOUT_SEC * MILLIS_PER_SEC );
-        }
-        else
-        {
-            peerIter->second.syncTimerID.reset();
-        }
+        clientPtr->doGet( targetUrl );
+        peerIter->second.syncTimerID.reset();
         peerIter->second.httpClient.swap( clientPtr );
         //clientPtr will be destroyed after mutex unlock
     }
@@ -919,16 +910,10 @@ namespace ec2
 
         //synchronizing with some internet server
         using namespace std::placeholders;
-        if( !m_timeSynchronizer->getTimeAsync( std::bind( &TimeSynchronizationManager::onTimeFetchingDone, this, _1, _2 ) ) )
-        {
-            NX_LOGX( lit( "Failed to start internet time synchronization. %1" ).arg( SystemError::getLastOSErrorText() ), cl_logDEBUG1 );
-            //failure
-            m_internetTimeSynchronizationPeriod = std::min<>(
-                MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
-
-            addInternetTimeSynchronizationTask();
-        }
+        m_timeSynchronizer->getTimeAsync(
+            std::bind(
+                &TimeSynchronizationManager::onTimeFetchingDone,
+                this, _1, _2 ) );
     }
 
     void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )

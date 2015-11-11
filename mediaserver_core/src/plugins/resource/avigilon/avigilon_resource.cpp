@@ -122,12 +122,7 @@ void QnAvigilonResource::checkInputPortState( qint64 timerID )
                  this, &QnAvigilonResource::onCheckPortRequestDone, Qt::DirectConnection );
     }
 
-    if( !m_checkInputPortsRequest->doGet( m_checkInputUrl ) )
-    {
-        m_checkInputPortStatusTimerID = TimerManager::instance()->addTimer(
-            std::bind(&QnAvigilonResource::checkInputPortState, this, std::placeholders::_1),
-            INPUT_PORT_CHECK_PERIOD_MS );
-    }
+    m_checkInputPortsRequest->doGet(m_checkInputUrl);
 }
 
 void QnAvigilonResource::onCheckPortRequestDone( nx_http::AsyncHttpClientPtr httpClient )

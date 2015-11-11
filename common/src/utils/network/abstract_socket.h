@@ -230,7 +230,7 @@ public:
         \note uses sendTimeout
     */
     template<class HandlerType>
-        bool connectAsync( const SocketAddress& addr, HandlerType&& handler )
+        void connectAsync( const SocketAddress& addr, HandlerType&& handler )
         {
             return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::forward<HandlerType>(handler) ) );
         }
@@ -250,7 +250,7 @@ public:
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
     template<class HandlerType>
-        bool readSomeAsync( nx::Buffer* const dst, HandlerType&& handler )
+        void readSomeAsync( nx::Buffer* const dst, HandlerType&& handler )
         {
             return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
         }
@@ -264,7 +264,7 @@ public:
             \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool sendAsync( const nx::Buffer& src, HandlerType&& handler )
+        void sendAsync( const nx::Buffer& src, HandlerType&& handler )
         {
             return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
         }
@@ -274,7 +274,7 @@ public:
         \param handler functor with no parameters
     */
     template<class HandlerType>
-        bool registerTimer( unsigned int timeoutMs, HandlerType&& handler )
+        void registerTimer( unsigned int timeoutMs, HandlerType&& handler )
         {
             return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
         }
@@ -288,10 +288,10 @@ public:
     virtual void cancelAsyncIO( aio::EventType eventType = aio::etNone, bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
+    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
+    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
+    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
 };
 
 struct StreamSocketInfo
@@ -432,7 +432,7 @@ public:
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
     template<class HandlerType>
-        bool acceptAsync( HandlerType&& handler )
+        void acceptAsync( HandlerType&& handler )
         {
             return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
         }
@@ -443,7 +443,7 @@ public:
     virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
+    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

@@ -22,7 +22,7 @@ typedef int SocketSequenceType;
 typedef uint64_t SocketSequenceType;
 #endif
 
-static std::atomic<SocketSequenceType> socketSequenceCounter;
+static std::atomic<SocketSequenceType> socketSequenceCounter(1);
 
 template<class SocketType>
 class CommonSocketImpl

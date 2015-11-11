@@ -10,6 +10,7 @@
 #include "utils/common/sleep.h"
 #include "utils/network/ping.h"
 #include "utils/network/socket.h"
+#include "utils/network/socket_global.h"
 #include "utils/network/http/httptypes.h"
 #include "utils/network/rtsp/rtsp_types.h"
 #include "resource_consumer.h"
@@ -241,9 +242,10 @@ bool QnNetworkResource::ping()
     return sock->connect( getHostAddress(), QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT) );
 }
 
-bool QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)>&& /*completionHandler*/ )
+void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
-    return false;
+    //calling completionHandler(false) in aio_thread
+    nx::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

@@ -362,29 +362,17 @@ namespace
             m_buf.resize(0);
 
             using namespace std::placeholders;
-            if( !m_sock->readSomeAsync(
-                    &m_buf,
-                    std::bind( &AsyncReadHandler::onBytesRead, this, _1, _2 ) ) )
-            {
-                //std::unique_lock<std::mutex> lk( m_mutex );
-                std::cerr<<"Error issuing async read"<<std::endl;
-                m_done = true;
-                //m_cond.notify_all();
-                return;
-            }
+            m_sock->readSomeAsync(
+                &m_buf,
+                std::bind( &AsyncReadHandler::onBytesRead, this, _1, _2 ) );
         }
 
-        bool start()
+        void start()
         {
             using namespace std::placeholders;
-            if( !m_sock->readSomeAsync(
-                    &m_buf,
-                    std::bind( &AsyncReadHandler::onBytesRead, this, _1, _2 ) ) )
-            {
-                std::cerr<<"Error issuing async read"<<std::endl;
-                return false;
-            }
-            return true;
+            m_sock->readSomeAsync(
+                &m_buf,
+                std::bind( &AsyncReadHandler::onBytesRead, this, _1, _2 ) );
         }
 
         void wait()
@@ -437,7 +425,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     for( size_t i = 0; i < asyncReadHandlers.size(); ++i )
     {
         asyncReadHandlers[i].reset( new AsyncReadHandler( rtspSessions[i]->tcpSock() ) );
-        ASSERT_TRUE( asyncReadHandlers[i]->start() );
+        asyncReadHandlers[i]->start();
     }
 
     for( ;; )

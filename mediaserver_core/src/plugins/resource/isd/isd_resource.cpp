@@ -38,7 +38,7 @@ QnPlIsdResource::QnPlIsdResource()
     setDefaultAuth(QLatin1String("root"), QLatin1String("admin"));
 }
 
-bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completionHandler )
+void QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     QUrl apiUrl;
     apiUrl.setScheme( lit("http") );
@@ -66,7 +66,7 @@ bool QnPlIsdResource::checkIfOnlineAsync( std::function<void(bool)>&& completion
         completionHandler( macAddress == resourceMac.toLatin1() );
     };
 
-    return nx_http::downloadFileAsync(
+    nx_http::downloadFileAsync(
         apiUrl,
         requestCompletionFunc );
 }

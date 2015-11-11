@@ -37,7 +37,7 @@ namespace nx_api
         and method(s):
         \code {*.cpp}
             //!This connection is passed here just after socket has been terminated
-            closeConnection( std::shared_ptr<CustomConnectionManagerType::ConnectionType> )
+            closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionManagerType::ConnectionType* )
         \endcode
 
         \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
@@ -53,7 +53,7 @@ namespace nx_api
         typedef BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
 
         /*!
-            \param connectionManager When connection is finished, \a connectionManager->closeConnection(this) is called
+            \param connectionManager When connection is finished, \a connectionManager->closeConnection(closeReason, this) is called
         */
         BaseServerConnection(
             CustomConnectionManagerType* connectionManager,
@@ -80,28 +80,32 @@ namespace nx_api
         /*!
             \return \a false, if could not start asynchronous operation (this can happen due to lack of resources on host machine)
         */
-        bool startReadingConnection()
+        void startReadingConnection()
         {
             using namespace std::placeholders;
-            return m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
+            m_streamSocket->readSomeAsync(
+                &m_readBuffer,
+                std::bind( &SelfType::onBytesRead, this, _1, _2 ) );
         }
 
         /*!
             \return \a true, if started async send operation
         */
-        bool sendBufAsync( const nx::Buffer& buf )
+        void sendBufAsync( const nx::Buffer& buf )
         {
             using namespace std::placeholders;
-            if( !m_streamSocket->sendAsync( buf, std::bind( &SelfType::onBytesSent, this, _1, _2 ) ) )
-                return false;
+            m_streamSocket->sendAsync(
+                buf,
+                std::bind( &SelfType::onBytesSent, this, _1, _2 ) );
             m_bytesToSend = buf.size();
-            return true;
         }
 
-        void closeConnection()
+        void closeConnection(SystemError::ErrorCode closeReasonCode)
         {
             typedef typename CustomConnectionManagerType::ConnectionType ConnectionType;
-            m_connectionManager->closeConnection( static_cast<ConnectionType*>(this) );
+            m_connectionManager->closeConnection(
+                closeReasonCode,
+                static_cast<ConnectionType*>(this) );
         }
 
         //!Register handler to be executed when connection just about to be destroyed
@@ -144,13 +148,16 @@ namespace nx_api
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
-                return m_connectionManager->closeConnection( static_cast<ConnectionType*>(this) );
+                return m_connectionManager->closeConnection(
+                    SystemError::connectionReset,
+                    static_cast<ConnectionType*>(this) );
 
             assert( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
             m_readBuffer.resize( 0 );
-            if( !m_streamSocket->readSomeAsync( &m_readBuffer, std::bind( &SelfType::onBytesRead, this, _1, _2 ) ) )
-                return handleSocketError( SystemError::getLastOSErrorCode() );
+            m_streamSocket->readSomeAsync(
+                &m_readBuffer,
+                std::bind(&SelfType::onBytesRead, this, _1, _2));
         }
 
         void onBytesSent( SystemError::ErrorCode errorCode, size_t count )
@@ -174,11 +181,14 @@ namespace nx_api
 
                 case SystemError::connectionReset:
                 case SystemError::notConnected:
-                    return m_connectionManager->closeConnection( static_cast<ConnectionType*>(this) );
+                    return m_connectionManager->closeConnection(
+                        errorCode,
+                        static_cast<ConnectionType*>(this) );
 
                 default:
-                    //TODO #ak process error code
-                    return m_connectionManager->closeConnection( static_cast<ConnectionType*>(this) );
+                    return m_connectionManager->closeConnection(
+                        errorCode,
+                        static_cast<ConnectionType*>(this) );
             }
         }
     };

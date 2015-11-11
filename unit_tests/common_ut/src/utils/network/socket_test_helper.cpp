@@ -92,18 +92,23 @@ void TestConnection::pleaseStop()
     //TODO
 }
 
-bool TestConnection::start()
+void TestConnection::start()
 {
     std::unique_lock<std::mutex> lk(m_mutex);
 
     if( m_connected )
         return startIO();
 
-    return
-        m_socket->setNonBlockingMode(true) &&
-        m_socket->connectAsync(
-            m_remoteAddress,
-            std::bind(&TestConnection::onConnected, this, m_id, std::placeholders::_1) );
+    if (!m_socket->setNonBlockingMode(true))
+        return m_socket->post(std::bind(
+            &TestConnection::onConnected,
+            this,
+            m_id,
+            SystemError::getLastOSErrorCode()));
+
+    m_socket->connectAsync(
+        m_remoteAddress,
+        std::bind(&TestConnection::onConnected, this, m_id, std::placeholders::_1) );
 }
 
 size_t TestConnection::totalBytesSent() const
@@ -135,37 +140,22 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
         return handler( id, this, errorCode );
     }
 
-    if( !startIO() )
-    {
-        m_socket->terminateAsyncIO(true);
-        auto handler = std::move( m_handler );
-        lk.unlock();
-        return handler( id, this, SystemError::getLastOSErrorCode() );
-    }
+    startIO();
 }
 
-bool TestConnection::startIO()
+void TestConnection::startIO()
 {
     using namespace std::placeholders;
 
     //TODO #ak we need mutex here because async socket API lacks way to start async read and write atomically.
         //Should note that aio::AIOService provides such functionality
 
-    if( !m_socket->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&TestConnection::onDataReceived, this, m_id, _1, _2) ) )
-    {
-        return false;
-    }
-
-    if( !m_socket->sendAsync(
-            m_outData,
-            std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) ) )
-    {
-        return false;
-    }
-
-    return true;
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, m_id, _1, _2) );
+    m_socket->sendAsync(
+        m_outData,
+        std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
 }
 
 void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead )
@@ -190,15 +180,9 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
     m_readBuffer.reserve( READ_BUF_SIZE );
 
     using namespace std::placeholders;
-    if( !m_socket->readSomeAsync(
-            &m_readBuffer,
-            std::bind(&TestConnection::onDataReceived, this, m_id,  _1, _2) ) )
-    {
-        m_socket->terminateAsyncIO(true);
-        auto handler = std::move( m_handler );
-        lk.unlock();
-        handler( id, this, SystemError::getLastOSErrorCode() );
-    }
+    m_socket->readSomeAsync(
+        &m_readBuffer,
+        std::bind(&TestConnection::onDataReceived, this, m_id,  _1, _2) );
 }
 
 void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten )
@@ -229,15 +213,9 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     }
 
     using namespace std::placeholders;
-    if( !m_socket->sendAsync(
-            m_outData,
-            std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) ) )
-    {
-        m_socket->terminateAsyncIO(true);
-        auto handler = std::move( m_handler );
-        lk.unlock();
-        handler( id, this, SystemError::getLastOSErrorCode() );
-    }
+    m_socket->sendAsync(
+        m_outData,
+        std::bind(&TestConnection::onDataSent, this, m_id, _1, _2) );
 }
 
 
@@ -276,13 +254,9 @@ bool RandomDataTcpServer::start()
         m_serverSocket.reset();
         return false;
     }
-    if( !m_serverSocket->acceptAsync( std::bind(
-            &RandomDataTcpServer::onNewConnection, this,
-            std::placeholders::_1, std::placeholders::_2 ) ) )
-    {
-        m_serverSocket.reset();
-        return false;
-    }
+    m_serverSocket->acceptAsync( std::bind(
+        &RandomDataTcpServer::onNewConnection, this,
+        std::placeholders::_1, std::placeholders::_2 ) );
 
     return true;
 }
@@ -301,8 +275,8 @@ void RandomDataTcpServer::onNewConnection( SystemError::ErrorCode errorCode, Abs
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_bytesToSendThrough,
             std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 ) ) );
-        if( testConnection->start() )
-            testConnection.release();
+        testConnection->start();
+        testConnection.release();
         //TODO #ak save connection somewhere
     }
 
@@ -374,7 +348,7 @@ void ConnectionsGenerator::enableErrorEmulation(int errorPercent)
     m_errorEmulationPercent = errorPercent;
 }
 
-bool ConnectionsGenerator::start()
+void ConnectionsGenerator::start()
 {
     for( size_t i = 0; i < m_maxSimultaneousConnectionsCount; ++i )
     {
@@ -387,18 +361,9 @@ bool ConnectionsGenerator::start()
             std::bind(&ConnectionsGenerator::onConnectionFinished, this,
                       std::placeholders::_1, std::prev(m_connections.end())) ) );
         m_connections.back().swap( connection );
-        if( !m_connections.back()->start() )
-        {
-            const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
-            std::cerr << "Failure initially starting test connection "<<i<<". " 
-                << SystemError::toString(osErrorCode).toStdString() << std::endl;
-            m_connections.pop_back();
-            return false;
-        }
+        m_connections.back()->start();
         ++m_totalConnectionsEstablished;
     }
-
-    return true;
 }
 
 size_t ConnectionsGenerator::totalConnectionsEstablished() const
@@ -448,7 +413,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
         const bool emulatingError = 
             m_errorEmulationPercent > 0 &&
             m_errorEmulationDistribution(m_randomEngine) < m_errorEmulationPercent;
-        if (emulatingError || !m_connections.back()->start())
+        if (emulatingError)
         {
             const SystemError::ErrorCode osErrorCode = SystemError::getLastOSErrorCode();
             std::cerr<<"Failed to start test connection. "<<SystemError::toString(osErrorCode).toStdString()<<std::endl;
@@ -461,6 +426,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
             return;
         }
 
+        m_connections.back()->start();
         ++m_totalConnectionsEstablished;
     }
 }

@@ -833,20 +833,20 @@ void UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
     nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
-bool UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
+void UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
     //return detail::UdtConnector(impl_.get()).AsyncConnect(addr,std::move(handler));
     return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
 }
 
-bool UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+void UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
     return m_aioHelper->recvAsyncImpl(buf, std::move(handler));
 }
 
-bool UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
+void UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
     return m_aioHelper->sendAsyncImpl(buf, std::move(handler));
 }
 
-bool UdtStreamSocket::registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) {
+void UdtStreamSocket::registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) {
     return m_aioHelper->registerTimerImpl(timeoutMillis, std::move(handler));
 }
 
@@ -981,7 +981,7 @@ void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
     nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
-bool UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
+void UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
     return m_aioHelper->acceptAsync( std::move(handler) );
 }
 

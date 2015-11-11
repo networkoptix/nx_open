@@ -45,7 +45,7 @@ public:
         \return \a false, if could not start asynchronous operation
         \note It is valid to call after \fn sendRequest to setup handlers
     */
-    bool openConnection( ConnectionHandler connectHandler = nullptr,
+    void openConnection( ConnectionHandler connectHandler = nullptr,
                          IndicationHandler indicationHandler = nullptr,
                          ConnectionHandler disconnectHandler = nullptr );
 
@@ -58,10 +58,10 @@ public:
         \note It is valid to call this method independent of \a openConnection
             (connection will be opened automaticly)
     */
-    bool sendRequest( Message request, RequestHandler requestHandler );
+    void sendRequest( Message request, RequestHandler requestHandler );
 
     //! \note Required by \a nx_api::BaseServerConnection
-    void closeConnection( BaseConnectionType* );
+    void closeConnection(SystemError::ErrorCode errorCode, BaseConnectionType*);
 
     static boost::optional< QString >
         hasError( SystemError::ErrorCode code, const Message& message );
@@ -75,7 +75,7 @@ private:
         terminated,
     };
 
-    bool openConnectionImpl( QnMutexLockerBase* lock );
+    void openConnectionImpl( QnMutexLockerBase* lock );
     void closeConnectionImpl( QnMutexLockerBase* lock, SystemError::ErrorCode code );
     void dispatchRequestsInQueue( QnMutexLockerBase* lock );
     void onConnectionComplete( SystemError::ErrorCode code );

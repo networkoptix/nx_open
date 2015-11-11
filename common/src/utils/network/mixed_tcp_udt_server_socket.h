@@ -83,7 +83,7 @@ protected:
     //!Implementation of AbstractSocket::dispatchImpl
     virtual void dispatchImpl( std::function<void()>&& handler ) override;
     //!Implementation of SSLServerSocket::acceptAsyncImpl
-    virtual bool acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
+    virtual void acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
 
 private:
     std::vector<AbstractStreamServerSocket*> m_socketDelegates;

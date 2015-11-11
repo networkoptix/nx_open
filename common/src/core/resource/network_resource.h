@@ -96,7 +96,7 @@ public:
         \note Implementation MUST check not only camera address:port accessibility, but also check some unique parameters of camera
         \note Default implementation returns false
     */
-    virtual bool checkIfOnlineAsync( std::function<void(bool)>&& completionHandler );
+    virtual void checkIfOnlineAsync( std::function<void(bool)> completionHandler );
 
     static QnUuid uniqueIdToId(const QString& uniqId);
     virtual bool isAbstractResource() const { return false; }

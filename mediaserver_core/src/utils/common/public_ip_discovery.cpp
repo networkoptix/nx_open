@@ -142,10 +142,7 @@ void QnPublicIPDiscovery::sendRequest(const QString &url)
 
     httpRequest->setResponseReadTimeoutMs(requestTimeoutMs);
     connect( httpRequest.get(), &nx_http::AsyncHttpClient::done, this, at_reply_finished, Qt::DirectConnection );
-    if( !httpRequest->doGet( url ) ) {
-        httpRequest->disconnect();
-        m_replyInProgress--;
-    }
+    httpRequest->doGet( url );
 }
 
 void QnPublicIPDiscovery::nextStage() {

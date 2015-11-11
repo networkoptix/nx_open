@@ -42,7 +42,7 @@ public:
     virtual void pleaseStop() override;
 
     int id() const;
-    bool start();
+    void start();
 
     size_t totalBytesSent() const;
     size_t totalBytesReceived() const;
@@ -62,7 +62,7 @@ private:
     int m_id;
 
     void onConnected( int id, SystemError::ErrorCode );
-    bool startIO();
+    void startIO();
     void onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead );
     void onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten );
 };
@@ -115,7 +115,7 @@ public:
     virtual void join() override;
 
     void enableErrorEmulation(int errorPercent);
-    bool start();
+    void start();
 
     size_t totalConnectionsEstablished() const;
     size_t totalBytesSent() const;

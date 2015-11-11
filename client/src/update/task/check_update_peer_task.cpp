@@ -126,11 +126,7 @@ void QnCheckForUpdatesPeerTask::checkBuildOnline() {
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_buildReply_finished);
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(url.toString()), cl_logDEBUG2);
-    if (!httpClient->doGet(url)) {
-        if (!tryNextServer())
-            finishTask(QnCheckForUpdateResult::InternetProblem);
-        return;
-    }
+    httpClient->doGet(url);
 
     m_runningRequests.insert(reply);
 }
@@ -441,11 +437,8 @@ bool QnCheckForUpdatesPeerTask::tryNextServer() {
     QnAsyncHttpClientReply *reply = new QnAsyncHttpClientReply(httpClient);
     connect(reply, &QnAsyncHttpClientReply::finished, this, &QnCheckForUpdatesPeerTask::at_updateReply_finished);
     NX_LOG(lit("Update: QnCheckForUpdatesPeerTask: Request [%1]").arg(m_currentUpdateUrl.toString()), cl_logDEBUG2);
-    if (!httpClient->doGet(m_currentUpdateUrl))
-        return false;
-
+    httpClient->doGet(m_currentUpdateUrl);
     m_runningRequests.insert(reply);
-
     return true;
 }
 

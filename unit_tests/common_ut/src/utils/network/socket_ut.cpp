@@ -16,6 +16,7 @@
 #include <QtCore/QThread>
 
 #include <utils/network/dns_resolver.h>
+#include <utils/network/socket_global.h>
 #include <utils/network/http/httpclient.h>
 
 #include "socket_test_helper.h"
@@ -51,9 +52,9 @@ protected:
         AbstractStreamSocket* connectionPtr = connection.get();
         m_connections.push_back( std::move(connection) );
         ASSERT_TRUE( connectionPtr->setNonBlockingMode( true ) );
-        ASSERT_TRUE( connectionPtr->connectAsync(
+        connectionPtr->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
-            std::bind( &SocketHostNameResolveTest::onConnectionComplete, this, connectionPtr, std::placeholders::_1 ) ) );
+            std::bind( &SocketHostNameResolveTest::onConnectionComplete, this, connectionPtr, std::placeholders::_1 ) );
     }
 
     void onConnectionComplete(
@@ -118,7 +119,7 @@ TEST( Socket, AsyncOperationCancellation )
             SocketAddress( QString::fromLatin1("localhost"), server.addressBeingListened().port ),
             MAX_SIMULTANEOUS_CONNECTIONS,
             BYTES_TO_SEND_THROUGH_CONNECTION );
-        ASSERT_TRUE( connectionsGenerator.start() );
+        connectionsGenerator.start();
 
         std::this_thread::sleep_for(TEST_DURATION);
 
@@ -143,7 +144,7 @@ TEST( Socket, ServerSocketAsyncCancellation )
         ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
         ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
         ASSERT_TRUE( serverSocket->listen() );
-        ASSERT_TRUE( serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } ) );
+        serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
         serverSocket->terminateAsyncIO( true );
     }
 
@@ -160,7 +161,7 @@ TEST( Socket, HostNameResolve1 )
     bool done = false;
     HostAddress resolvedAddress;
     ASSERT_TRUE( connection->setNonBlockingMode( true ) );
-    ASSERT_TRUE( connection->connectAsync(
+    connection->connectAsync(
         SocketAddress(QString::fromLatin1("ya.ru"), 80),
         [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
             std::unique_lock<std::mutex> lk( mutex );
@@ -168,7 +169,7 @@ TEST( Socket, HostNameResolve1 )
             cond.notify_all();
             done = true;
             resolvedAddress = connection->getForeignAddress().address;
-        } ) );
+        } );
 
     std::unique_lock<std::mutex> lk( mutex );
     while( !done )
@@ -255,7 +256,7 @@ TEST( Socket, HostNameResolveCancellation )
         bool done = false;
         HostAddress resolvedAddress;
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
-        ASSERT_TRUE( connection->connectAsync(
+        connection->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
             [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
                 std::unique_lock<std::mutex> lk( mutex );
@@ -263,7 +264,7 @@ TEST( Socket, HostNameResolveCancellation )
                 cond.notify_all();
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
-            } ) );
+            } );
         connection->terminateAsyncIO(true);
     }
 }
@@ -277,12 +278,12 @@ TEST( Socket, BadHostNameResolve )
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
         int iBak = i;
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
-        ASSERT_TRUE( connection->connectAsync(
+        connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
             [&i, iBak]
             ( SystemError::ErrorCode /*errorCode*/ ) mutable {
                 ASSERT_EQ( i, iBak );
-            } ) );
+            } );
         connection->terminateAsyncIO(true);
     }
 }
@@ -328,4 +329,12 @@ TEST( Socket, postCancellation )
 
     for( auto& f: futures )
         f.wait();
+}
+
+TEST(Socket, post)
+{
+    int x = 0;
+    nx::SocketGlobals::aioService().post([&x](){ ++x; });
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_EQ(1, x);
 }

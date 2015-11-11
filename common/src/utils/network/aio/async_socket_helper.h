@@ -135,7 +135,7 @@ public:
         }
     }
 
-    bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
@@ -145,18 +145,24 @@ public:
             //Returning true to trick calling party: let it think everything OK and
             //finish its completion handler correctly.
             //TODO #ak is it really ok to trick someone?
-            return true;
+            return;
         }
 
         unsigned int sendTimeout = 0;
 #ifdef _DEBUG
         bool isNonBlockingModeEnabled = false;
-        if( !m_abstractSocketPtr->getNonBlockingMode( &isNonBlockingModeEnabled ) )
-            return false;
+        if (!m_abstractSocketPtr->getNonBlockingMode(&isNonBlockingModeEnabled))
+        {
+            this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
+            return;
+        }
         assert( isNonBlockingModeEnabled );
 #endif
-        if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
-            return false;
+        if (!m_abstractSocketPtr->getSendTimeout(&sendTimeout))
+        {
+            this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
+            return;
+        }
 
         m_connectHandler = std::move( handler );
 
@@ -164,7 +170,11 @@ public:
         //NOTE: socket cannot be read from/written to if not connected yet. TODO #ak check that with assert
 
         if( addr.address.isResolved() )
-            return startAsyncConnect( addr );
+        {
+            if (!startAsyncConnect(addr))
+                this->post(std::bind(m_connectHandler, SystemError::getLastOSErrorCode()));
+            return;
+        }
 
         nx::SocketGlobals::addressResolver().resolveAsync(
             addr.address,
@@ -203,14 +213,12 @@ public:
             },
             m_natTraversalEnabled,
             this );
-
-        return true;
     }
 
-    bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
-            return true;
+            return;
 
         static const int DEFAULT_RESERVE_SIZE = 4*1024;
 
@@ -225,13 +233,13 @@ public:
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_recvAsyncCallCounter;
-        return nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etRead, this );
+        nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etRead, this );
     }
 
-    bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
-            return true;
+            return;
 
         assert( buf.size() > 0 );
 
@@ -249,19 +257,19 @@ public:
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_connectSendAsyncCallCounter;
-        return nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etWrite, this );
+        nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etWrite, this );
     }
 
-    bool registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
-            return true;
+            return;
 
         m_timerHandler = std::move( handler );
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_registerTimerCallCounter;
-        return nx::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::SocketGlobals::aioService().watchSocketNonSafe(
             this->m_socket,
             aio::etTimedOut,
             this,
@@ -627,12 +635,13 @@ private:
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_connectSendAsyncCallCounter;
-        return nx::SocketGlobals::aioService().watchSocketNonSafe(
+        nx::SocketGlobals::aioService().watchSocketNonSafe(
             this->m_socket,
             aio::etWrite,
             this,
             boost::optional<unsigned int>(),
             [this, resolvedAddress, sendTimeout](){ m_abstractSocketPtr->connect( resolvedAddress, sendTimeout ); } );    //to be called between pollset.add and pollset.poll
+        return true;
     }
 
     //!Call this from within aio thread only
@@ -730,7 +739,7 @@ public:
         }
     }
 
-    bool acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+    void acceptAsync(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
     {
         m_acceptHandler = std::move(handler);
 

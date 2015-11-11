@@ -85,17 +85,17 @@ namespace nx_http
             \return true, if socket is created and async connect is started. false otherwise
             To get error description use SystemError::getLastOSErrorCode()
         */
-        bool doGet( const QUrl& url );
+        void doGet( const QUrl& url );
         //!Start POST request to \a url
         /*!
             \todo Infinite POST message body support
             \return true, if socket is created and async connect is started. false otherwise
         */
-        bool doPost(
+        void doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody );
-        bool doPut(
+        void doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
             nx_http::StringType messageBody );
@@ -219,8 +219,8 @@ namespace nx_http
         void onSomeBytesReadAsync( AbstractSocket* sock, SystemError::ErrorCode errorCode, size_t bytesRead );
 
         void resetDataBeforeNewRequest();
-        bool initiateHttpMessageDelivery( const QUrl& url );
-        bool initiateTcpConnection();
+        void initiateHttpMessageDelivery( const QUrl& url );
+        void initiateTcpConnection();
         /*!
             \return Number of bytes, read from socket. -1 in case of read error
         */
@@ -353,7 +353,7 @@ namespace nx_http
         \note It is strongly recommended to use this for downloading only small files (e.g., camera params).
             For real files better to use \a nx_http::AsyncHttpClient directly
     */
-    bool downloadFileAsync(
+    void downloadFileAsync(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
@@ -366,7 +366,7 @@ namespace nx_http
         nx_http::BufferType* const msgBody );
 
     //!Same as downloadFileAsync but provide contentType at callback
-    bool downloadFileAsyncEx(
+    void downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),

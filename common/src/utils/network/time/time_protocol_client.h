@@ -33,7 +33,7 @@ public:
     virtual void join() override;
 
     //!Implementation of \a AbstractAccurateTimeFetcher::getTimeAsync
-    virtual bool getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
+    virtual void getTimeAsync( std::function<void(qint64, SystemError::ErrorCode)> handlerFunc ) override;
 
 private:
     const QString m_timeServer;

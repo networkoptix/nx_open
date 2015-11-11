@@ -149,10 +149,10 @@ protected:
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
 
-    virtual bool connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    virtual bool recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual bool sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual bool registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) override;
+    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
+    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
+    virtual void registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) override;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -195,7 +195,7 @@ protected:
     virtual void postImpl( std::function<void()>&& handler ) override;
     //!Implementation of AbstractSocket::dispatchImpl
     virtual void dispatchImpl( std::function<void()>&& handler ) override;
-    virtual bool acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
+    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
 
 private:
     std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;

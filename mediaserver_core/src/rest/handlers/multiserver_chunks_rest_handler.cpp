@@ -91,8 +91,8 @@ void QnMultiserverChunksRestHandler::loadRemoteDataAsync(MultiServerPeriodDataLi
     }
 
     QnMutexLocker lock(&ctx->mutex);
-    if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-        ctx->requestsInProgress++;
+    nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash );
+    ctx->requestsInProgress++;
 }
 
 void QnMultiserverChunksRestHandler::loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx)
