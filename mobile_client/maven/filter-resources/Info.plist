@@ -54,6 +54,7 @@
 		<key>CFBundlePrimaryIcon</key>
 		<dict>
 			<key>CFBundleIconFiles</key>
+			<array>
 				<string>icon_76x76.png</string>
 				<string>icon_152x152.png</string>
 				<string>icon_167x167.png</string>
@@ -61,7 +62,6 @@
 				<string>icon_120x120.png</string>
 				<string>icon_29x29.png</string>
 				<string>icon_58x58.png</string>
-			<array>
 			</array>
 		</dict>
 	</dict>
