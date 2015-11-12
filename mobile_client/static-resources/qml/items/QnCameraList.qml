@@ -8,6 +8,8 @@ import "../controls"
 QnListView {
     id: camerasList
 
+    clip: true
+
     leftMargin: dp(8)
     rightMargin: dp(8)
     topMargin: dp(8)

@@ -38,6 +38,7 @@ public:
     void setHiddenCamerasOnly(bool hiddenCamerasOnly);
 
 public slots:
+    void refreshThumbnail(int row);
     void refreshThumbnails(int from, int to);
     void updateLayout(int width, qreal desiredAspectRatio);
 
