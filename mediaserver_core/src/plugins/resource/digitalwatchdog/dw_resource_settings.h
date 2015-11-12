@@ -19,9 +19,11 @@ public:
 
     QnCameraAdvancedParamValueList getParamsList() const;
     bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value);
+    bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList &result);
 private:
     QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
     QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;
+    QString toInnerValue(const QnCameraAdvancedParameter &parameter, const QString &value);
 private:
     QnCameraAdvancedParamValueMap m_valuesCache;
     QnCameraAdvancedParams m_params;
