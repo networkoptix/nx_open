@@ -2466,6 +2466,15 @@ void QnWorkbenchUi::createSliderWidget()
         connect(navigator(),           &QnWorkbenchNavigator::positionChanged,      this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
         connect(navigator(),           &QnWorkbenchNavigator::speedChanged,         this,           &QnWorkbenchUi::updateCalendarVisibilityAnimated);
     }
+
+    connect(action(Qn::ToggleTourModeAction),   &QAction::toggled, this, [this](bool toggled)
+    {
+        /// If tour mode is going to be turned on, focus should be forced to main window
+        /// because otherwise we can't cancel tour mode by clicking any key (in some cases)
+        if (toggled)
+            mainWindow()->setFocus();
+    });
+
     connect(action(Qn::ToggleTourModeAction),   &QAction::toggled,                  this,           &QnWorkbenchUi::updateControlsVisibilityAnimated);
     connect(action(Qn::ToggleThumbnailsAction), &QAction::toggled,                  this,           [this](bool checked){ setThumbnailsVisible(checked); });
     connect(action(Qn::ToggleSliderAction),     &QAction::toggled,                  this,           [this](bool checked){ if (!m_ignoreClickEvent) setSliderOpened(checked);});

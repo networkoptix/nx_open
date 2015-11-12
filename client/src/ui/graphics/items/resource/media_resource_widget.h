@@ -273,7 +273,7 @@ private:
     bool m_ioCouldBeShown;
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
-    QnSingleCamLicenceStatusHelperPtr m_licenceStatus;
+    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

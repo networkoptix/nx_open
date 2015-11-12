@@ -45,7 +45,7 @@ public:
 	}
 
 	virtual void setValue(const QString &newValue) override	{
-		m_checkBox->setChecked(newValue == lit("true"));
+		m_checkBox->setChecked(newValue == lit("true") || newValue == lit("1"));
 	}
 
 private:

@@ -65,7 +65,7 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force) {
         return;
 
     requestId = server->apiConnection()->getThumbnailAsync(
-                camera, position, -1, currentSize(),
+                camera, position, 0, currentSize(),
                 lit("jpg"), QnMediaServerConnection::IFrameAfterTime,
                 this, SLOT(at_thumbnailReceived(int, const QImage&, int)));
     fetchTimer.start();

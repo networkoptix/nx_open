@@ -70,7 +70,7 @@ QnPage {
                 height: dp(56)
                 verticalAlignment: Qt.AlignVCenter
 
-                text: connectionManager.connected ? qsTr("Loading...") : qsTr("Connecting...")
+                text: connectionManager.connectionState == QnConnectionManager.Connecting ? qsTr("Connecting...") : qsTr("Loading...")
                 font.pixelSize: sp(32)
                 color: QnTheme.loadingText
             }
@@ -113,8 +113,8 @@ QnPage {
             loadingDummy.opacity = 0.0
             camerasList.setLoaded()
         }
-        onConnectedChanged: {
-            if (!connectionManager.connected) {
+        onConnectionStateChanged: {
+            if (connectionManager.connectionState == QnConnectionManager.Disconnected) {
                 loadingDummy.opacity = 1.0
             }
         }

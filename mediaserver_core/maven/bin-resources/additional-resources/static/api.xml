@@ -721,6 +721,46 @@
                         <caption>Return object in requested format</caption>
                     </result>
                 </function>
+                <function>
+                    <name>getStorages</name>
+                    <description>Read current storages list</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+						<param>
+							<name>id</name>
+							<description>Server unique ID</description>
+                            <optional>true</optional>
+							<values/>
+						</param>
+					</params>
+                    <result>
+                        <caption>Returns storages list data formatted in a requested format. If id parameter is specified, the list contais only that server storages.</caption>
+                    </result>
+                </function>
             </functions>
         </group>
         <group>
@@ -1296,12 +1336,18 @@
                 <function>
                     <name>rebuildArchive</name>
                     <description>Start or stop server archive rebuilding.</description>
-                    <method>POST</method>
+                    <method>GET</method>
                     <params>
                         <param>
-                            <name>rebuild</name>
-                            <description>'start' or 'stop' value.</description>
+                            <name>action</name>
+                            <description>'start', 'stop' or '0' value.</description>
                             <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>mainPool</name>
+                            <description>1 (for the main storage) or 0 (for the backup storage)</description>
+                            <optional/>
                             <values/>
                         </param>
                     </params>
