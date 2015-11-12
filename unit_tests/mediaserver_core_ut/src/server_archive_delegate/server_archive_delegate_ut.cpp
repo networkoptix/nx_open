@@ -36,6 +36,7 @@ public:
           m_timeLine(DEFAULT_TIME_GAP_MS),
           m_fileCount(fileCount)
     {
+        recursiveClean(qApp->applicationDirPath() + "/tmp");
         generateTestData();
         createStorages();
         loadMedia();
@@ -43,8 +44,7 @@ public:
     
     ~TestHelper()
     {
-        for (const auto &path : m_storageUrls)
-            recursiveClean(path);
+        recursiveClean(qApp->applicationDirPath() + "/tmp");
     }
 
     struct TimePeriod
@@ -214,8 +214,8 @@ private:
     {
         std::random_device rd;
         std::mt19937 gen(rd());
-        std::uniform_int_distribution<int> normalStartDistMs(0, 2000);
-        std::uniform_int_distribution<int> holeStartDistMs(5000, 20000);
+        std::uniform_int_distribution<int> normalStartDistMs(5000, 7000);
+        std::uniform_int_distribution<int> holeStartDistMs(10000, 25000);
         std::uniform_int_distribution<int> normalOrHoleDist(1, 5);
         std::uniform_int_distribution<int> durationDist(0, 1);
 
@@ -264,7 +264,7 @@ private:
                 int64_t d2 = copyFile(m_storageUrls[j], hqFolder);
                 newTime = newTime > (d1 > d2 ? d1 : d2) ? newTime : (d1 > d2 ? d1 : d2);
             }
-            startTimeMs = newTime - 500;
+            startTimeMs = newTime;
         }
         m_timeLine.finalize();
     }
@@ -483,8 +483,6 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     QnAbstractMediaDataPtr data;
     do {
         data = archiveDelegate.getNextData();
-        //if (data)
-        //    qDebug() << data->timestamp << testHelper.getTimeLine().checkTime(data->timestamp/1000);
         if (data)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
     } while (data);
