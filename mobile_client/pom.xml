@@ -90,7 +90,7 @@
                 </property>
             </activation>
             <properties>
-                <provisioning_profile>${project.build.directory}/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <provisioning_profile>${customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
             </properties>
         </profile>
 
