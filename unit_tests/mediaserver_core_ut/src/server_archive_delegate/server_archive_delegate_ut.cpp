@@ -29,7 +29,7 @@ const QString hqFolder("hi_quality");
 
 class TestHelper
 {
-    static const int DEFAULT_TIME_GAP_MS = 1000;
+    static const int DEFAULT_TIME_GAP_MS = 500;
 public:
     TestHelper(QStringList &&paths, int fileCount)
         : m_storageUrls(std::move(paths)),
@@ -90,7 +90,8 @@ public:
     {
         typedef std::list<TimePeriod> TimePeriodList;
         typedef TimePeriodList::iterator TimePeriodListIterator;
-
+        friend class TestHelper;
+        
     public:
         TimeLine(int timeGapMs) 
             : m_timePoint(std::numeric_limits<int64_t>::max()),
@@ -140,6 +141,17 @@ public:
 
         bool checkTime(int64_t time)
         {
+            if (m_currentIt == m_timeLine.cend())
+                return true;
+
+            qDebug() << "current time period: (" 
+                     << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
+                     << lit("%1 left to the end ) ")
+                            .arg(m_currentIt->startTimeMs + 
+                                 m_currentIt->durationMs - 
+                                 m_timePoint)
+                     << "time: " << time << " m_time: " << m_timePoint
+                     << " diff: " << std::abs(time - m_timePoint);
             if (time < m_currentIt->startTimeMs || time > m_currentIt->durationMs +
                                                           m_currentIt->startTimeMs) {
                 return false;
@@ -169,6 +181,33 @@ public:
         int64_t m_timePoint;
         int m_timeGapMs;
     };
+
+public:
+    TimeLine &getTimeLine() {return m_timeLine;}
+    void print() const 
+    {
+        qDebug() << lit("We have %1 files, %2 time periods")
+                        .arg(m_fileCount)
+                        .arg(m_timeLine.m_timeLine.size());
+
+        qint64 prevStartTime;
+        int prevDuration;
+        qDebug() << "Time periods details: ";
+
+        for (auto it = m_timeLine.m_timeLine.cbegin(); 
+             it != m_timeLine.m_timeLine.cend(); 
+             ++it) {
+            qDebug() << it->startTimeMs << " " << it->durationMs;
+            if (it != m_timeLine.m_timeLine.cbegin()) {
+                qDebug() << "\tGap from previous: " 
+                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms (" 
+                         << (it->startTimeMs - (prevStartTime + prevDuration))/1000
+                         << "s )";
+            }
+            prevStartTime = it->startTimeMs;
+            prevDuration = it->durationMs;
+        }
+    }
 
 private:
     void generateTestData()
@@ -266,7 +305,6 @@ private:
         }
     }
 
-    TimeLine &getTimeLine() {return m_timeLine;}
 
     bool recursiveClean(const QString &path) const
     {
@@ -430,7 +468,8 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 10);
+    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 2);
+    testHelper.print();
 
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
     cameraResource->setPhysicalId(cameraFolder);
@@ -444,7 +483,9 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     QnAbstractMediaDataPtr data;
     do {
         data = archiveDelegate.getNextData();
+        //if (data)
+        //    qDebug() << data->timestamp << testHelper.getTimeLine().checkTime(data->timestamp/1000);
         if (data)
-            qDebug() << data->timestamp;
+            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
     } while (data);
 }
