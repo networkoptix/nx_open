@@ -16,10 +16,11 @@
 
 #include <stdint.h>
 
+#include <QString>
+
 #include <boost/optional.hpp>
 #include "utils/common/hash.h"
 
-#include <QString>
 
 namespace nx { class DnsResolver; }
 

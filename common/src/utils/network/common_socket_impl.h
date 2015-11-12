@@ -9,20 +9,15 @@
 #include <array>
 #include <atomic>
 
-#include <stdint.h>
+#include "detail/socket_sequence.h"
 
-#include "aio/pollset.h"
-#include "aio/aiothread.h"
-
-
-#ifdef __arm__
-//ISD Jaguar requires kernel update to support 64-bit atomics
-typedef int SocketSequenceType;
-#else
-typedef uint64_t SocketSequenceType;
-#endif
 
 static std::atomic<SocketSequenceType> socketSequenceCounter(1);
+
+namespace aio
+{
+    template<class SocketType> class AIOThread;
+}
 
 template<class SocketType>
 class CommonSocketImpl

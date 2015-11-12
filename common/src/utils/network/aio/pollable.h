@@ -13,10 +13,10 @@
 
 
 class Pollable;
-namespace aio
-{
-    extern template class AIOThread<Pollable>;
-}
+//namespace aio
+//{
+//    extern template class AIOThread<Pollable>;
+//}
 
 #ifndef _WIN32
 static const int INVALID_SOCKET = -1;
