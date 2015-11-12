@@ -165,6 +165,8 @@ void QnConnectionManagerPrivate::doConnect() {
     if (!url.isValid())
         return;
 
+    qnCommon->updateRunningInstanceGuid();
+
     QnEc2ConnectionRequestResult *result = new QnEc2ConnectionRequestResult(this);
     QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
