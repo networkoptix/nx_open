@@ -1336,12 +1336,18 @@
                 <function>
                     <name>rebuildArchive</name>
                     <description>Start or stop server archive rebuilding.</description>
-                    <method>POST</method>
+                    <method>GET</method>
                     <params>
                         <param>
-                            <name>rebuild</name>
-                            <description>'start' or 'stop' value.</description>
+                            <name>action</name>
+                            <description>'start', 'stop' or '0' value.</description>
                             <optional>true</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>mainPool</name>
+                            <description>1 (for the main storage) or 0 (for the backup storage)</description>
+                            <optional/>
                             <values/>
                         </param>
                     </params>
