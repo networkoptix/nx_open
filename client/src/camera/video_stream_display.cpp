@@ -133,17 +133,24 @@ void QnVideoStreamDisplay::freeScaleContext()
     }
 }
 
-QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QnAbstractRenderer* render,
+QnFrameScaler::DownscaleFactor QnVideoStreamDisplay::determineScaleFactor(QSet<QnAbstractRenderer*> renderList,
                                                                           int channelNumber, 
                                                                           int srcWidth, int srcHeight, 
                                                                           QnFrameScaler::DownscaleFactor force_factor)
 {
-    if (render->constantDownscaleFactor())
-       force_factor = QnFrameScaler::factor_1;
+    for (QnAbstractRenderer* render: renderList) {
+        if (render->constantDownscaleFactor())
+            force_factor = QnFrameScaler::factor_1;
+    }
 
     if (force_factor==QnFrameScaler::factor_any) // if nobody pushing lets peek it
     {
-        QSize on_screen = render->sizeOnScreen(channelNumber);
+        QSize on_screen;
+        for (QnAbstractRenderer* render: renderList) {
+            QSize size = render->sizeOnScreen(channelNumber);
+            on_screen.setWidth(qMax(on_screen.width(), size.width()));
+            on_screen.setHeight(qMax(on_screen.height(), size.height()));
+        }
         /* Check if item size is not calculated yet. */
         if (on_screen.isEmpty()) {  
             on_screen.setHeight(srcHeight);
@@ -314,9 +321,7 @@ QSharedPointer<CLVideoDecoderOutput> QnVideoStreamDisplay::flush(QnFrameScaler::
     if (dec == 0)
         return QSharedPointer<CLVideoDecoderOutput>();
 
-    QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
-    foreach(QnAbstractRenderer* render, m_renderList)
-        scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channelNum, dec->getWidth(), dec->getHeight(), force_factor));
+    QnFrameScaler::DownscaleFactor scaleFactor = determineScaleFactor(m_renderList, channelNum, dec->getWidth(), dec->getHeight(), force_factor);
 
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
     outFrame->channel = channelNum;
@@ -488,8 +493,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0) {
-        foreach(QnAbstractRenderer* render, m_renderList)
-            scaleFactor = qMin(scaleFactor, determineScaleFactor(render, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor));
+        scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
     PixelFormat pixFmt = dec->GetPixelFormat();
@@ -609,8 +613,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         // for stiil images decoder parameters are not know before decoding, so recalculate parameters
         // It is got one more data copy from tmpFrame, but for movies we have got valid dst pointer (tmp or not) immediate before decoding
         // It is necessary for new logic with display queue
-        foreach(QnAbstractRenderer* render, m_renderList)
-            scaleFactor = qMin(scaleFactor, determineScaleFactor(render, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor));
+        scaleFactor = determineScaleFactor(m_renderList, data->channelNumber, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
     if (!draw || m_renderList.isEmpty())
@@ -694,8 +697,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0) {
-        foreach(QnAbstractRenderer* render, m_renderList)
-            scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channel, dec->getWidth(), dec->getHeight(), force_factor));
+        scaleFactor = determineScaleFactor(m_renderList, channel, dec->getWidth(), dec->getHeight(), force_factor);
     }
     
     QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
@@ -714,8 +716,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
     m_mtx.unlock();
 
     if (scaleFactor == QnFrameScaler::factor_unknown) {
-        foreach(QnAbstractRenderer* render, m_renderList)
-            scaleFactor = qMin(scaleFactor, determineScaleFactor(render, channel, dec->getWidth(), dec->getHeight(), force_factor));
+        scaleFactor = determineScaleFactor(m_renderList, channel, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
     PixelFormat pixFmt = dec->GetPixelFormat();

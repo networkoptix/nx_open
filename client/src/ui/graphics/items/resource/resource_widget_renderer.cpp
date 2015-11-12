@@ -177,7 +177,7 @@ QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 }
 
 Qn::RenderStatus QnResourceWidgetRenderer::paint(int channel, const QRectF &sourceRect, const QRectF &targetRect, qreal opacity) {
-    if (m_channelRenderers.size() < static_cast<size_t>(channel))
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
         return Qn::NothingRendered;
     RenderingTools &ctx = m_channelRenderers[channel];
     if(!ctx.renderer)
@@ -195,6 +195,9 @@ void QnResourceWidgetRenderer::skip(int channel) {
 
 void QnResourceWidgetRenderer::setDisplayedRect(int channel, const QRectF& rect)
 {
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return;
+
     m_displayRect[channel] = rect;
 
     RenderingTools& ctx = m_channelRenderers[channel];
@@ -218,11 +221,14 @@ void QnResourceWidgetRenderer::setScreenshotInterface(ScreenshotInterface* value
 bool QnResourceWidgetRenderer::isEnabled(int channelNumber) const
 {
     QMutexLocker lk( &m_mutex );
-    return m_renderingEnabled[channelNumber];
+    return channelNumber < m_renderingEnabled.size() ? m_renderingEnabled[channelNumber] : false;
 }
 
 void QnResourceWidgetRenderer::setEnabled(int channelNumber, bool enabled)
 {
+    if (m_channelRenderers.size() <= static_cast<size_t>(channelNumber))
+        return;
+
     RenderingTools& ctx = m_channelRenderers[channelNumber];
     if( !ctx.uploader )
         return;
