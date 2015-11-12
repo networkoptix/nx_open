@@ -52,7 +52,11 @@ int runUi(QGuiApplication *application) {
 
     QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
 
-    context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
+    QStringList colorThemeFiles;
+    colorThemeFiles.append(fileSelector.select(lit(":/color_theme.json")));
+    if (QFile::exists(lit(":/color_theme_custom.json")))
+        colorThemeFiles.append(fileSelector.select(lit(":/color_theme_custom.json")));
+    context.colorTheme()->readFromFiles(colorThemeFiles);
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;

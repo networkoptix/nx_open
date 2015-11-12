@@ -22,6 +22,7 @@ class QnTimeline : public QQuickItem {
     Q_PROPERTY(int timeZoneShift READ timeZoneShift WRITE setTimeZoneShift NOTIFY timeZoneShiftChanged)
 
     Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor NOTIFY textColorChanged)
+    Q_PROPERTY(QColor chunkBarColor READ chunkBarColor WRITE setChunkBarColor NOTIFY chunkBarColorChanged)
     Q_PROPERTY(QColor chunkColor READ chunkColor WRITE setChunkColor NOTIFY chunkColorChanged)
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
 
@@ -44,6 +45,9 @@ public:
 
     QColor chunkColor() const;
     void setChunkColor(const QColor &color);
+
+    QColor chunkBarColor() const;
+    void setChunkBarColor(const QColor &color);
 
     int chunkBarHeight() const;
     void setChunkBarHeight(int chunkBarHeight);
@@ -86,9 +90,9 @@ public:
     Q_INVOKABLE void zoomIn();
     Q_INVOKABLE void zoomOut();
 
-    Q_INVOKABLE void startPinch(int x, qreal scale);
-    Q_INVOKABLE void updatePinch(int x, qreal scale);
-    Q_INVOKABLE void finishPinch(int x, qreal scale);
+    Q_INVOKABLE void startZoom(qreal scale);
+    Q_INVOKABLE void updateZoom(qreal scale);
+    Q_INVOKABLE void finishZoom(qreal scale);
 
     Q_INVOKABLE void startDrag(int x);
     Q_INVOKABLE void updateDrag(int x);
@@ -117,6 +121,7 @@ signals:
 
     void textColorChanged();
     void chunkColorChanged();
+    void chunkBarColorChanged();
     void fontChanged();
 
     void chunkBarHeightChanged();

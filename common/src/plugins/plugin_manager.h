@@ -10,12 +10,13 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
+
+#include <utils/common/singleton.h>
+#include <utils/thread/mutex.h>
 
 #include "plugin_api.h"
 
@@ -33,7 +34,8 @@
 */
 class PluginManager
 :
-    public QObject
+    public QObject,
+    public Singleton<PluginManager>
 {
     Q_OBJECT
 
@@ -89,9 +91,6 @@ public:
     void loadPlugins(
         const QSettings* settings,
         PluginType pluginsToLoad = AllPlugins );
-
-    //!Guess what
-    static PluginManager* instance( const QString& pluginDir = QString() );
 
 signals:
     //!Emitted just after new plugin has been loaded

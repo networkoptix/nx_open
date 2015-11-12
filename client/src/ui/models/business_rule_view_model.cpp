@@ -767,6 +767,8 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         }
         case QnBusiness::CameraRecordingAction:
             return isResourcesListValid<QnCameraRecordingPolicy>(QnBusiness::filteredResources<QnCameraRecordingPolicy::resource_type>(m_actionResources));
+        case QnBusiness::BookmarkAction:
+            return isResourcesListValid<QnCameraRecordingPolicy>(QnBusiness::filteredResources<QnBookmarkActionPolicy::resource_type>(m_actionResources));
         case QnBusiness::CameraOutputAction:
         case QnBusiness::CameraOutputOnceAction:
             return isResourcesListValid<QnCameraOutputPolicy>(QnBusiness::filteredResources<QnCameraOutputPolicy::resource_type>(m_actionResources));
@@ -867,6 +869,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         else
             return tr("All Users");
     }
+    case QnBusiness::BookmarkAction:
     case QnBusiness::CameraRecordingAction:
     {
         return QnCameraRecordingPolicy::getText(resources, detailed);

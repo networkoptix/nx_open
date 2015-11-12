@@ -111,10 +111,11 @@ private:
 
     int state() const;
 
-    boost::optional<ChunkKeyVector> getOldestChunk() const;
+    boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
     ChunkKey getOldestChunk(
         const QString           &cameraId,
-        QnServer::ChunksCatalog catalog
+        QnServer::ChunksCatalog catalog,
+        qint64                  fromTimeMs
     ) const;
 
 private:
