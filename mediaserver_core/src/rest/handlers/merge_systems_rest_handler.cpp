@@ -211,12 +211,12 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+    QString requestStr = lit("/api/configure?systemName=%1").arg(systemName);
+    requestStr += lit("&sysIdTime=%1").arg(qnCommon->systemIdentityTime());
+    requestStr += lit("&tranLogTime=%1").arg(ec2Connection->getTransactionLogTime());
     if (oneServer) {
         auto authSession = owner->authSession();
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2&tranLogTime=%3")
-            .arg(systemName)
-            .arg(qnCommon->systemIdentityTime())
-            .arg(ec2Connection->getTransactionLogTime()));
+        CLHttpStatus status = client.doGET(requestStr);
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
@@ -226,10 +226,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
         authenticator.setPassword(currentPassword);
         CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2&tranLogTime=%3")
-            .arg(systemName)
-            .arg(qnCommon->systemIdentityTime())
-            .arg(ec2Connection->getTransactionLogTime()));
+        CLHttpStatus status = client.doGET(requestStr + lit("&wholeSystem=true"));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
