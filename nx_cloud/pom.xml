@@ -18,6 +18,15 @@
         <!-- <libtype>plugin</libtype>
         <buildLib>sharedlib</buildLib> -->
     </properties>
+
+    <modules>
+        <module>cloud_db</module>
+        <module>cloud_db_client</module>
+        <module>connection_mediator</module>
+        <module>libconnection_mediator</module>
+        <module>libcloud_db</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
