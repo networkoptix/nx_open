@@ -1844,6 +1844,7 @@ void MediaServerProcess::run()
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
 
     //Initializing plugin manager
+    PluginManager pluginManager;
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;

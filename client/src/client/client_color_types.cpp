@@ -130,7 +130,7 @@ QnResourceWidgetFrameColors::QnResourceWidgetFrameColors() {
 }
 
 QnBookmarkColors::QnBookmarkColors()
-    : tooltipBackground("#204969")
+    : tooltipBackground("#295E87")
     , background("#b22e6996")
     , text(Qt::white)
     , separator("#3E6E93")

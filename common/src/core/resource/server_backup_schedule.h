@@ -12,6 +12,7 @@ struct QnServerBackupSchedule {
     int     backupDurationSec;   // duration of synchronization period in seconds. -1 if not set.
     int     backupBitrate;       // bitrate cap in bytes per second. Any value <= 0 if not capped.
 
+    static const int defaultBackupBitrate;
     QnServerBackupSchedule();
 };
 
