@@ -15,6 +15,11 @@
 #include <core/resource/network_resource.h>
 #include <utils/common/util.h>
 
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
+
 #include <functional>
 #include <thread>
 #include <chrono>
@@ -510,6 +515,15 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     if (!qnStorageDbPool) {
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
+
+#ifndef _WIN32
+    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    if (!qnPlatform) {
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(
+            new QnPlatformAbstraction
+        );
+    }
+#endif
 
     TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
     testHelper.print();
