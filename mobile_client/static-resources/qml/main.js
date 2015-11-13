@@ -188,14 +188,13 @@ function backPressed() {
     if (sideNavigation.open) {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth == 2) {
+    } else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage") {
         // First stack item is always resources page.
-
-        if (stackView.currentItem.objectName == "newConnectionPage")
-            return false
-
+        return false
+    } else if (stackView.depth >= 2) {
         gotoMainScreen()
         return true
     }
+
     return false
 }

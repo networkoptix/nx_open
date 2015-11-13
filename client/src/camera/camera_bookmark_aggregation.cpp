@@ -37,9 +37,11 @@ void QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark) 
 void QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &bookmarkList) {
     if (m_bookmarkList.isEmpty())
         setBookmarkList(bookmarkList);
-
-    for (const QnCameraBookmark &bookmark: bookmarkList)
-        addBookmark(bookmark);
+    else 
+    {
+        for (const QnCameraBookmark &bookmark: bookmarkList)
+            addBookmark(bookmark);
+    }
 }
 
 bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId) {

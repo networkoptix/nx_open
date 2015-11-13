@@ -216,10 +216,15 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
             const bool shouldBeVisible = (model && model->rowCount());
             const bool currentVisible = tableView->isVisible();
             if (currentVisible != shouldBeVisible)
+            {
                 tableView->setVisible(shouldBeVisible);
+                ui->backupControls->setVisible(shouldBeVisible);
+            }
         };
 
         tableView->setVisible(false);
+        ui->backupControls->setVisible(false);
+
         connect(tableView->model(), &QAbstractItemModel::rowsRemoved, this, onCountChanged);
         connect(tableView->model(), &QAbstractItemModel::rowsInserted, this, onCountChanged);
         connect(tableView->model(), &QAbstractItemModel::modelReset, this, onCountChanged);

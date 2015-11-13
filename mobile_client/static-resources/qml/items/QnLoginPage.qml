@@ -149,6 +149,7 @@ QnPage {
                 width: parent.width
                 text: qsTr("Connect")
                 color: QnTheme.buttonAccentBackground
+                textColor: QnTheme.buttonAccentText
 
                 onClicked: {
                     loginPage.removeWarnings()

@@ -50,6 +50,7 @@ Item {
             rightPadding: dp(48)
             showDecoration: false
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+            cursorColor: textColor
 
             Keys.forwardTo: searchItem
         }
