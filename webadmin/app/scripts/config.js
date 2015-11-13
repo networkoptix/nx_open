@@ -8,11 +8,11 @@ var Config = {
     demo:"/~ebalashov/webclient/api",
     demoMedia:"//10.0.2.186:7001",
     webclientEnabled: true, // set to false to disable webclient from top menu and show placeholder instead
-    allowDebugMode: false, // Allow debugging at all. Set to false in production
+    allowDebugMode: true, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
-        videoFormat: false,//"flashls", // videowindow.js - force video player
-        chunksOnTimeline: false // timeline.js - draw debug events
+        videoFormat: false, // "flashls", // videowindow.js - force video player
+        chunksOnTimeline: true // timeline.js - draw debug events
     },
     helpLinks:[
         // Additional Links to show in help

@@ -390,6 +390,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             self.cacheRequestedInterval(start,end,level);
 
             deferred.resolve(self.chunksTree);
+
         }, function (error) {
             deferred.reject(error);
         });
