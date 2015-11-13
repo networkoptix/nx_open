@@ -104,12 +104,10 @@ Item {
         add: Transition {
             id: addTransition
             NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
         }
         populate: Transition {
             id: populateTransition
             NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-            NumberAnimation { property: "opacity"; from: 0.0; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
         }
         remove: Transition {
             NumberAnimation { property: "opacity"; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
