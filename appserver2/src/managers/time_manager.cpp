@@ -20,6 +20,9 @@
 #include <api/runtime_info_manager.h>
 
 #include <common/common_module.h>
+#include <common/common_globals.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
 #include <transaction/transaction_message_bus.h>
 
@@ -98,15 +101,15 @@ namespace ec2
 
     bool TimePriorityKey::operator<( const TimePriorityKey& right ) const
     {
-        const int peerIsServerSet = flags & TimeSynchronizationManager::peerIsServer;
-        const int right_peerIsServerSet = right.flags & TimeSynchronizationManager::peerIsServer;
+        const int peerIsServerSet = flags & Qn::TF_peerIsServer;
+        const int right_peerIsServerSet = right.flags & Qn::TF_peerIsServer;
         if( peerIsServerSet < right_peerIsServerSet )
             return true;
         if( right_peerIsServerSet < peerIsServerSet )
             return false;
 
-        const int internetFlagSet = flags & TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer;
-        const int right_internetFlagSet = right.flags & TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer;
+        const int internetFlagSet = flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
+        const int right_internetFlagSet = right.flags & Qn::TF_peerTimeSynchronizedWithInternetServer;
         if( internetFlagSet < right_internetFlagSet )
             return true;
         if( right_internetFlagSet < internetFlagSet )
@@ -308,16 +311,16 @@ namespace ec2
     void TimeSynchronizationManager::start()
     {
         if( m_peerType == Qn::PT_Server )
-            m_localTimePriorityKey.flags |= peerIsServer;
+            m_localTimePriorityKey.flags |= Qn::TF_peerIsServer;
 
 #ifndef EDGE_SERVER
-        m_localTimePriorityKey.flags |= peerIsNotEdgeServer;
+        m_localTimePriorityKey.flags |= Qn::TF_peerIsNotEdgeServer;
 #endif
         QByteArray localGUID = qnCommon->moduleGUID().toByteArray();
         m_localTimePriorityKey.seed = crc32(0, (const Bytef*)localGUID.constData(), localGUID.size());
         //TODO #ak use guid to avoid handle priority key duplicates
         if( QElapsedTimer::isMonotonic() )
-            m_localTimePriorityKey.flags |= peerHasMonotonicClock;
+            m_localTimePriorityKey.flags |= Qn::TF_peerHasMonotonicClock;
 
         m_monotonicClock.restart();
         //initializing synchronized time with local system time
@@ -371,6 +374,35 @@ namespace ec2
         return getSyncTimeNonSafe();
     }
 
+    ApiTimeData TimeSynchronizationManager::getTimeInfo() const
+    {
+        QnMutexLocker lk(&m_mutex);
+        ApiTimeData result;
+        result.value = getSyncTimeNonSafe();
+        result.isPrimaryTimeServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
+
+        if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer)
+            result.syncTimeFlags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
+        if (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSetByUser)
+            result.syncTimeFlags |= Qn::TF_peerTimeSetByUser;
+        
+        if (m_resCtx.pool)
+        {
+            const auto allServers = m_resCtx.pool->getResources<QnMediaServerResource>();
+            for (const auto& server: allServers)
+            {
+                const auto guidStr = server->getId().toByteArray();
+                if (m_usedTimeSyncInfo.timePriorityKey.seed ==
+                    crc32(0, (const Bytef*)guidStr.constData(), guidStr.size()))
+                {
+                    result.primaryTimeServerGuid = server->getId();
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
     void TimeSynchronizationManager::primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran )
     {
         quint64 localTimePriorityBak = 0;
@@ -387,11 +419,11 @@ namespace ec2
             {
                 //local peer is selected by user as primary time server
                 const bool synchronizingByCurrentServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
-                m_localTimePriorityKey.flags |= peerTimeSetByUser;
+                m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
                 //incrementing sequence 
                 m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
                 //"select primary time server" means "take its local time", so resetting internet synchronization flag
-                m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
+                m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
                 if( m_localTimePriorityKey > m_usedTimeSyncInfo.timePriorityKey )
                 {
                     //using current server time info
@@ -438,7 +470,7 @@ namespace ec2
             }
             else
             {
-                m_localTimePriorityKey.flags &= ~peerTimeSetByUser;
+                m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
             }
             newLocalTimePriority = m_localTimePriorityKey.toUInt64();
             if (newLocalTimePriority != localTimePriorityBak)
@@ -581,6 +613,12 @@ namespace ec2
             rttMillis );
         if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
             handleLocalTimePriorityKeyChange(&lk);
+    }
+
+    void TimeSynchronizationManager::setContext(const ResourceContext& resCtx)
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_resCtx = resCtx;
     }
 
     void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
@@ -871,8 +909,8 @@ namespace ec2
             MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS );
 
         if( m_systemTimeByPeer.empty() ||
-            (m_usedTimeSyncInfo.timePriorityKey.flags & peerTimeSynchronizedWithInternetServer) > 0 ||
-            (m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer) > 0 )
+            (m_usedTimeSyncInfo.timePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 ||
+            (m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer) > 0 )
         {
             //we know nothing about other peers. 
             //Or we have time taken from the Internet, which means someone has connection to the Internet, 
@@ -887,7 +925,7 @@ namespace ec2
 
 #ifndef TEST_PTS_SELECTION
         if( (peersByTimePriorityFlags.count(peersByTimePriorityFlags.cbegin()->first) > 1) &&               //multiple servers have same priority
-            ((peersByTimePriorityFlags.cbegin()->first & peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
+            ((peersByTimePriorityFlags.cbegin()->first & Qn::TF_peerTimeSynchronizedWithInternetServer) == 0) )    //those servers do not have internet access
 #endif
         {
             WhileExecutingDirectCall callGuard( this );
@@ -938,7 +976,7 @@ namespace ec2
 
                 //using received time
                 const auto localTimePriorityKeyBak = m_localTimePriorityKey;
-                m_localTimePriorityKey.flags |= peerTimeSynchronizedWithInternetServer;
+                m_localTimePriorityKey.flags |= Qn::TF_peerTimeSynchronizedWithInternetServer;
 
                 if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS )
                 {
@@ -981,7 +1019,7 @@ namespace ec2
 
                 ++m_internetSynchronizationFailureCount;
                 if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )
-                    m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
+                    m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
             }
 
             addInternetTimeSynchronizationTask();
@@ -1048,12 +1086,12 @@ namespace ec2
             TimePriorityKey restoredPriorityKey;
             restoredPriorityKey.fromUInt64( restoredPriorityKeyVal );
             //considering time, restored from DB, to be unreliable
-            restoredPriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
+            restoredPriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
 
             if( m_localTimePriorityKey.sequence < restoredPriorityKey.sequence )
                 m_localTimePriorityKey.sequence = restoredPriorityKey.sequence;
-            if( restoredPriorityKey.flags & peerTimeSetByUser )
-                m_localTimePriorityKey.flags |= peerTimeSetByUser;
+            if( restoredPriorityKey.flags & Qn::TF_peerTimeSetByUser )
+                m_localTimePriorityKey.flags |= Qn::TF_peerTimeSetByUser;
 
             ApiPeerSystemTimeData peerSystemTimeData;
             peerSystemTimeData.peerID = qnCommon->moduleGUID();
@@ -1155,7 +1193,7 @@ namespace ec2
         m_localSystemTimeDelta = std::numeric_limits<qint64>::min();
         m_systemTimeByPeer.clear();
         m_timeSynchronized = false;
-        m_localTimePriorityKey.flags &= ~peerTimeSynchronizedWithInternetServer;
+        m_localTimePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
         ++m_localTimePriorityKey.sequence;
         m_usedTimeSyncInfo = TimeSyncInfo(
             m_monotonicClock.elapsed(),
@@ -1178,7 +1216,7 @@ namespace ec2
             //local OS time has been changed. If system time is set 
             //by local host time then updating system time
             if (m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey &&
-                !(m_localTimePriorityKey.flags & peerTimeSynchronizedWithInternetServer))
+                !(m_localTimePriorityKey.flags & Qn::TF_peerTimeSynchronizedWithInternetServer))
             {
                 forceTimeResync();
             }

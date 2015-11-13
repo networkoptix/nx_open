@@ -928,6 +928,8 @@ void QnPlOnvifResource::notificationReceived(
     if( (minNotificationTime != (time_t)-1) && (handler.utcTime.toTime_t() < minNotificationTime) )
         return; //ignoring old notifications: DW camera can deliver old cached notifications
 
+    bool sourceIsExplicitRelayInput = false;
+
     //checking that there is single source and this source is a relay port
     std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator portSourceIter = handler.source.end();
     for( std::list<NotificationMessageParseHandler::SimpleItem>::const_iterator
@@ -936,11 +938,16 @@ void QnPlOnvifResource::notificationReceived(
         ++it )
     {
         if( it->name == lit("port") || 
-            it->name == lit("InputToken") || 
             it->name == lit("RelayToken") || 
-            it->name == lit("Index") ||
-            it->name == lit("RelayInputToken") )
+            it->name == lit("Index") )
         {
+            portSourceIter = it;
+            break;
+        }
+        else if (it->name == lit("InputToken") ||
+                 it->name == lit("RelayInputToken"))
+        {
+            sourceIsExplicitRelayInput = true;
             portSourceIter = it;
             break;
         }
@@ -957,7 +964,8 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //some cameras (especially, Vista) send here events on output port, filtering them out
-    if( !handler.source.empty() &&
+    if( !sourceIsExplicitRelayInput &&
+        !handler.source.empty() &&
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
@@ -3147,7 +3155,11 @@ void QnPlOnvifResource::onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* as
     std::unique_ptr<QnPlOnvifResource, decltype(SCOPED_GUARD_FUNC)>
         SCOPED_GUARD( this, SCOPED_GUARD_FUNC );
 
-    if( resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND )
+    if( (resultCode != SOAP_OK && resultCode != SOAP_MUSTUNDERSTAND) ||  //error has been reported by camera
+        (asyncWrapper->response().soap && 
+            asyncWrapper->response().soap->header &&
+            asyncWrapper->response().soap->header->wsa__Action &&
+            strstr(asyncWrapper->response().soap->header->wsa__Action, "/soap/fault") != nullptr))
     {
         NX_LOG( lit("Failed to pull messages in NotificationProducer. endpoint %1, result code %2").
             arg(QString::fromLatin1(asyncWrapper->syncWrapper()->endpoint())).

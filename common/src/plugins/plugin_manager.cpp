@@ -20,43 +20,6 @@
 #include "camera_plugin.h"
 
 
-class PluginManagerWrapper
-{
-public:
-    PluginManagerWrapper()
-    :
-        m_pluginManager( NULL )
-    {
-    }
-
-    ~PluginManagerWrapper()
-    {
-        delete m_pluginManager.load();
-        m_pluginManager.store(NULL);
-    }
-
-    PluginManager* getPluginManager( const QString& pluginDir )
-    {
-        if( !m_pluginManager.load() )
-        {
-            PluginManager* newInstance = new PluginManager( pluginDir );
-            if( !m_pluginManager.testAndSetOrdered( NULL, newInstance ) )
-                delete newInstance;
-            //else
-            //    newInstance->loadPlugins();
-        }
-        return m_pluginManager.load();
-    }
-
-private:
-    QAtomicPointer<PluginManager> m_pluginManager;
-};
-
-
-Q_GLOBAL_STATIC(PluginManagerWrapper, pluginManagerWrapper);
-
-//static QAtomicPointer<PluginManager> pluginManagerInstance;
-
 PluginManager::PluginManager( const QString& pluginDir )
 :
     m_pluginDir( pluginDir )
@@ -75,12 +38,6 @@ PluginManager::~PluginManager()
 
     //releasing plugins
     std::for_each( m_nxPlugins.begin(), m_nxPlugins.end(), std::mem_fun( &nxpl::PluginInterface::releaseRef ) );
-}
-
-//!Guess what
-PluginManager* PluginManager::instance( const QString& pluginDir )
-{
-    return pluginManagerWrapper()->getPluginManager( pluginDir );
 }
 
 void PluginManager::loadPlugins(

@@ -143,6 +143,7 @@ private:
 
 private:
     void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
+    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera) const;
 private:
 
     mutable QnMutex m_mutex;

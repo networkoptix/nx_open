@@ -179,6 +179,7 @@ QnResource::QnResource():
 
 QnResource::QnResource(const QnResource& right)
 :
+    QObject(),
     m_parentId(right.m_parentId),
     m_name(right.m_name),
     m_url(right.m_url),
@@ -492,11 +493,11 @@ bool QnResource::setParamPhysical(const QString &id, const QString &value) {
     return false;
 }
 
-bool QnResource::setParamsPhysical(const QnCameraAdvancedParamValueList &value, QnCameraAdvancedParamValueList &result)
+bool QnResource::setParamsPhysical(const QnCameraAdvancedParamValueList &valueList, QnCameraAdvancedParamValueList &result)
 {
     bool success = true;
     setParamsBegin();
-    for(const QnCameraAdvancedParamValue &value: value) {
+    for(const QnCameraAdvancedParamValue &value: valueList) {
         if (setParamPhysical(value.id, value.value))
             result << value;
         else

@@ -177,6 +177,17 @@ void QnCameraListModel::setServerIdString(const QString &id) {
     setServerId(QnUuid::fromStringSafe(id));
 }
 
+void QnCameraListModel::refreshThumbnail(int row) {
+    if (!QnCameraThumbnailCache::instance())
+        return;
+
+    if (!hasIndex(row, 0))
+        return;
+
+    QnUuid id = QnUuid(data(index(row, 0), Qn::UuidRole).toUuid());
+    QnCameraThumbnailCache::instance()->refreshThumbnails(QList<QnUuid>() << id);
+}
+
 void QnCameraListModel::refreshThumbnails(int from, int to) {
     if (!QnCameraThumbnailCache::instance())
         return;

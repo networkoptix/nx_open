@@ -49,5 +49,5 @@ ios {
     QMAKE_BUNDLE_DATA += launch_image
 
     QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
-    XCODEBUILD_FLAGS = PROVISIONING_PROFILE=${provisioning_profile_id}
+    XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
 }

@@ -261,6 +261,7 @@ ios {
     DEFINES += ${ios.defines}
     QMAKE_MOC_OPTIONS += -DQ_OS_IOS
     QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
+    XCODEBUILD_FLAGS += -jobs 4
 }
 
 

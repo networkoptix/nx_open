@@ -212,11 +212,28 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid
     return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const {
-    return getCameraFootageData(camera->getId());
+QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnVirtualCameraResourcePtr &camera) const
+{
+    QnMediaServerResourceList result;
+    auto server = toMediaServer(camera->getParentId());
+    if (server)
+        result << server;
+    return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const {
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const 
+{
+    if (camera->isDtsBased())
+        return dtsCamFootageData(camera);
+    else
+        return getCameraFootageData(camera->getId());
+}
+
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const 
+{
+    if (camera->isDtsBased())
+        return dtsCamFootageData(camera);
+
     if (!isCameraHistoryValid(camera))
         return getCameraFootageData(camera);
 
