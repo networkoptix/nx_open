@@ -75,7 +75,7 @@ QString DWCameraProxy::toInnerValue(const QnCameraAdvancedParameter &parameter, 
     if (parameter.dataType == QnCameraAdvancedParameter::DataType::Enumeration) {
         int idx = parameter.getRange().indexOf(value);
         if (idx < 0)
-            return false;
+            return QString();
         innerValue = QString::number(idx);
     } else if (parameter.dataType == QnCameraAdvancedParameter::DataType::Bool) {
         int idx = value == lit("true") ? 1 : 0;

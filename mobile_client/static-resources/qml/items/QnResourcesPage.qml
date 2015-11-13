@@ -45,10 +45,6 @@ QnPage {
         anchors.fill: parent
     }
 
-    QnScrollIndicator {
-        flickable: camerasList
-    }
-
     Rectangle {
         id: loadingDummy
         anchors.fill: parent
@@ -111,7 +107,6 @@ QnPage {
         target: connectionManager
         onInitialResourcesReceived: {
             loadingDummy.opacity = 0.0
-            camerasList.setLoaded()
         }
         onConnectionStateChanged: {
             if (connectionManager.connectionState == QnConnectionManager.Disconnected) {

@@ -33,23 +33,27 @@ namespace
     {
         bool bold;
         int fontSize;
+        int topPadding;
 
         LabelParams(bool initBold
-            , int initFontSize);
+            , int initFontSize
+            , int initTopPadding);
     };
 
     LabelParams::LabelParams(bool initBold
-        , int initFontSize)
+        , int initFontSize
+        , int initTopPadding)
         : bold(initBold)
         , fontSize(initFontSize)
+        , topPadding(initTopPadding)
     {}
 
     /// Array of parameters for label. Indexed by LabelParamIds enum
     const LabelParams kLabelParams[] = 
     {
-        LabelParams(true, 15)        /// For name label
-        , LabelParams(false, 12)     /// For description label
-        , LabelParams(false, 12)     /// For tags label
+        LabelParams(true, 16, 2)        /// For name label
+        , LabelParams(false, 12, 2)     /// For description label
+        , LabelParams(false, 12, 4)     /// For tags label
     };
 
     const QString kEditActionAnchorName = lit("e");
@@ -82,9 +86,6 @@ namespace
         
         , QnProxyLabel *&label
         , const QString &text
-
-        , QnSeparator *&separator
-        , const QColor &separatorColor
         
         , QGraphicsItem *parent
         , QGraphicsLinearLayout *layout
@@ -96,28 +97,25 @@ namespace
         if (text.isEmpty())
         {
             removeWidget(label, layout);
-            removeWidget(separator, layout);
             return insertionIndex;
         }
         
-        if (insertionIndex && !separator) /// Insert separator
-        {
-            separator = new QnSeparator(separatorColor, parent);
-            layout->insertItem(insertionIndex++, separator);
-        }
-        
         const bool noLabel = !label;
+        const LabelParams &params = kLabelParams[labelParamsId];
         if (noLabel)
         {
             label = new QnProxyLabel(parent);
+            label->setIndent(0);
+            label->setMargin(0);
             layout->insertItem(insertionIndex, label);
+            if (insertionIndex > 0 && params.topPadding)
+                layout->setItemSpacing(insertionIndex - 1, params.topPadding);
         }
 
         label->setText(trimmedText);
 
         if (noLabel)
         {
-            const LabelParams &params = kLabelParams[labelParamsId];
             QFont font = label->font();
             font.setBold(params.bold);
             font.setPixelSize(params.fontSize);
@@ -257,9 +255,7 @@ namespace
         QGraphicsLinearLayout *m_layout;
         QnProxyLabel *m_name;
         QnProxyLabel *m_description;
-        QnSeparator *m_descSeparator;
         QnProxyLabel *m_tags;
-        QnSeparator *m_tagsSeparator;        
         QnSeparator * const m_buttonsSeparator;
     };
 
@@ -300,9 +296,7 @@ namespace
         , m_layout(new QGraphicsLinearLayout(Qt::Vertical, this))
         , m_name(nullptr)
         , m_description(nullptr)
-        , m_descSeparator(nullptr)
         , m_tags(nullptr)
-        , m_tagsSeparator(nullptr)
         , m_buttonsSeparator(new QnSeparator(colors.separator, this))
     {   
         setPreferredWidth(kBookmarkFrameWidth);
@@ -319,7 +313,28 @@ namespace
         actionsLayout->addStretch();
         actionsLayout->addItem(editActionLabel);
         
+        enum 
+        {
+            kBorderRadius = 2
+            , kBaseMargin = 14
+            , kHorizontalMargins = kBaseMargin - kBorderRadius
+            , kTopMargin = 9
+            , kBottomMargin = 7
+            , kSeparatorMargin = kBottomMargin
+        };
+
+        setContentsMargins(kBorderRadius, kBorderRadius, kBorderRadius, kBorderRadius);
+
+        m_layout->setSpacing(0);
+        m_layout->setContentsMargins(kHorizontalMargins, kTopMargin
+            , kHorizontalMargins, kBottomMargin);
+
+        m_layout->addStretch(0);
+        m_layout->setItemSpacing(0, kBaseMargin);
+
         m_layout->addItem(m_buttonsSeparator);
+        m_layout->setItemSpacing(1, kSeparatorMargin);
+
         m_layout->addItem(actionsLayout);
         m_layout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
     }
@@ -383,7 +398,7 @@ namespace
             , kTailWidth = 20
             , kHalfTailWidth = kTailWidth / 2
             , kTailOffset = 15
-            , kSpacerHeight = 3
+            , kSpacerHeight = 2
             , kTailDefaultOffsetLeft = kTailOffset + kHalfTailWidth
             , kTailDefaultOffsetRight = kBookmarkFrameWidth - kTailDefaultOffsetLeft
         };
@@ -430,11 +445,6 @@ namespace
         setFrameColor(colors.tooltipBackground);
 
         m_buttonsSeparator->setLineColor(colors.separator);
-        if (m_descSeparator)
-            m_descSeparator->setLineColor(colors.separator);
-        if (m_tagsSeparator)
-            m_tagsSeparator->setLineColor(colors.separator); 
-
         m_bookmark = bookmark;
 
         enum { kFirstPosition = 0 };
@@ -444,17 +454,16 @@ namespace
             , kMaxBodyLength = 512
         };
 
-        QnSeparator *fakeNameSeparator = nullptr;
         int position = renewLabel(kFirstPosition, m_name, elideString(bookmark.name, kMaxHeaderLength)
-            , fakeNameSeparator, colors.separator, this, m_layout, kNameLabelIndex);
+            , this, m_layout, kNameLabelIndex);
         position = renewLabel(position, m_description, elideString(bookmark.description, kMaxBodyLength)
-            , m_descSeparator, colors.separator, this, m_layout, kDescriptionLabelIndex);
+            , this, m_layout, kDescriptionLabelIndex);
 
         enum { kMaxTags = 16 };
         QStringList tagsList;
         for (const auto &tag: bookmark.tags)
         {
-            static const QString tagTemplate = lit("<table cellspacing = \"-1\" cellpadding=\"5\" style = \"margin-left:4; margin-top: 4;float: left;display:inline-block; border-style: solid; border-color: %1;border-width:1;\"><tr><td>%2</td></tr></table>");
+            static const QString tagTemplate = lit("<table cellspacing = \"-1\" cellpadding=\"5\" style = \"margin-top: 4;float: left;display:inline-block; border-style: solid; border-color: %1;border-width:1;\"><tr><td>%2</td></tr></table>");
             tagsList.push_back(tagTemplate.arg(colors.tags.name(QColor::HexRgb), tag));
             if (tagsList.size() >= kMaxTags)
                 break;
@@ -463,7 +472,7 @@ namespace
         static const QString htmlTemplate = lit("<html><body>%1</body></html>");
         const auto tags = (tagsList.empty() ? QString() : htmlTemplate.arg(tagsList.join(lit(""))));
         position = renewLabel(position, m_tags, tags
-            , m_tagsSeparator, colors.separator, this, m_layout, kTagsIndex);
+            , this, m_layout, kTagsIndex);
     }
 
     const QnCameraBookmark &BookmarkToolTipFrame::bookmark() const
