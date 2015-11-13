@@ -68,6 +68,10 @@ private:
     bool canStartBackup(const QnBackupStatusData& data, QString *info);
 
     QString backupPositionToString(qint64 backupTimeMs);
+
+private:
+    void setBackupControlsVisibility(bool visible);
+
 private slots:
    
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
@@ -81,6 +85,7 @@ private slots:
     void at_openBackupSchedule_clicked();
     
     void at_backupTypeComboBoxChange(int index);
+
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;

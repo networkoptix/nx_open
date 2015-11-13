@@ -216,10 +216,15 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
             const bool shouldBeVisible = (model && model->rowCount());
             const bool currentVisible = tableView->isVisible();
             if (currentVisible != shouldBeVisible)
+            {
                 tableView->setVisible(shouldBeVisible);
+                setBackupControlsVisibility(shouldBeVisible);
+            }
         };
 
         tableView->setVisible(false);
+        setBackupControlsVisibility(false);
+
         connect(tableView->model(), &QAbstractItemModel::rowsRemoved, this, onCountChanged);
         connect(tableView->model(), &QAbstractItemModel::rowsInserted, this, onCountChanged);
         connect(tableView->model(), &QAbstractItemModel::modelReset, this, onCountChanged);
@@ -526,6 +531,19 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return error(tr("Apply changes before starting backup."));
 
     return true;
+}
+
+void QnStorageConfigWidget::setBackupControlsVisibility(bool visible)
+{
+    ui->backupStartButton->setVisible(visible);
+    ui->camerasToBackupButton->setVisible(visible);
+    ui->comboBoxBackupType->setVisible(visible);
+    ui->pushButtonSchedule->setVisible(visible);
+    ui->whenToBackupLabel->setVisible(visible);
+
+    ui->backupTimeLabel->setVisible(visible);
+    
+    ui->stackedWidgetBackupInfo->setVisible(visible);
 }
 
 QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
