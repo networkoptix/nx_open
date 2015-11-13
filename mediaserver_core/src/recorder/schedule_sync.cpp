@@ -207,6 +207,14 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                 QIODevice::ReadOnly
             )
         );
+
+        if (!fromFile) {
+            NX_LOG(lit("[Backup::copyFile] From file %1 open failed")
+                        .arg(fromFileFullName),
+                   cl_logWARNING);
+            return CopyError::FileOpenError;
+        }
+
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
         if (!toStorage)
@@ -222,12 +230,16 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
             toStorage->open(
                 newFileName,
-                QIODevice::WriteOnly | QIODevice::Append
+                QIODevice::WriteOnly
             )
         );
 
-        if (!fromFile || !toFile)
+        if (!toFile) {
+            NX_LOG(lit("[Backup::copyFile] To file %1 open failed")
+                        .arg(newFileName),
+                   cl_logWARNING);
             return CopyError::FileOpenError;
+        }
 
         int bitrate = m_schedule.backupBitrate;
         if (bitrate <= 0) // not capped

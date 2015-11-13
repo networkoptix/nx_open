@@ -439,7 +439,8 @@ QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &st
 {
     QnTimePeriod timePeriod;
     QString sUrl = storage->getUrl();
-    QStringList folders = dirName.mid(sUrl.size()).split(getPathSeparator(dirName)).mid(3);
+    QString path = dirName.mid(sUrl.size());
+    QStringList folders = path.split(getPathSeparator(path)).mid(3);
 
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
     for (int i = 0; i < folders.size(); ++i)
@@ -536,7 +537,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
                 {
                     Chunk& prevChunk = *(itr-1);
                     qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION && fi.baseName().indexOf("_") == -1)
+                    if (delta < MAX_FRAME_DURATION && fi.baseName().indexOf("_") == -1/*Old version file*/)
                         prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
                 }
 
