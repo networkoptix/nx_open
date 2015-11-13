@@ -537,7 +537,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
                 {
                     Chunk& prevChunk = *(itr-1);
                     qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION)
+                    if (delta < MAX_FRAME_DURATION && fi.baseName().indexOf("_") == -1/*Old version file*/)
                         prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
                 }
 
