@@ -6,7 +6,7 @@
 #if 1
 
 #include <fcntl.h>
-#ifdef __linux__
+#ifndef __WIN32
 #include <poll.h>
 #include <unistd.h>
 #include <sys/uio.h>

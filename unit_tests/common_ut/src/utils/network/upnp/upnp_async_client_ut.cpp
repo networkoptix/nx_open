@@ -2,7 +2,7 @@
 
 #include <common/common_globals.h>
 
-#include <gtest.h>
+#include <gtest/gtest.h>
 #include <future>
 
 namespace nx_upnp {

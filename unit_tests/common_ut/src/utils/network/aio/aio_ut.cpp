@@ -44,12 +44,12 @@ TEST(aio, post)
 TEST(aio, socketPolledNotification)
 {
     TCPSocket socket(false);
-    std::atomic<bool> handlerCalledFlag = false;
+    std::atomic<bool> handlerCalledFlag(false);
     DummyEventHandler evHandler(
         [&handlerCalledFlag](Pollable*, aio::EventType) {
             handlerCalledFlag = true;
         });
-    std::atomic<bool> socketAddedFlag = false;
+    std::atomic<bool> socketAddedFlag(false);
 
     QnMutex mtx;
     aio::AIOThread<Pollable> aioThread(&mtx);
@@ -86,13 +86,13 @@ public:
 TEST(aio, DISABLED_pollsetError)
 {
     TCPSocket socket(false);
-    std::atomic<bool> handlerCalledFlag = false;
+    std::atomic<bool> handlerCalledFlag(false);
     DummyEventHandler evHandler(
         [&handlerCalledFlag](Pollable*, aio::EventType et) {
             ASSERT_EQ(aio::etError, et);
             handlerCalledFlag = true;
         });
-    std::atomic<bool> socketAddedFlag = false;
+    std::atomic<bool> socketAddedFlag(false);
 
     QnMutex mtx;
     aio::detail::AIOThread<Pollable, TestPollSet> aioThread(&mtx);
