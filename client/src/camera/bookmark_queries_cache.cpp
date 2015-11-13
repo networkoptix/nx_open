@@ -47,44 +47,44 @@ void QnBookmarkQueriesCache::clearQueries()
 bool QnBookmarkQueriesCache::updateQuery(const QnVirtualCameraResourcePtr &camera
     , const QnCameraBookmarkSearchFilter &filter)
 {
-    const auto callback = [this, filter](QnCameraBookmarkSearchFilter &oldFilter)
+    const auto needUpdateFunctor = [this, filter](QnCameraBookmarkSearchFilter &oldFilter)
     {
         const bool textUpdated = updateFilterText(oldFilter, filter.text);
         const bool windowUpdated = updateFilterTimeWindow(oldFilter, filter.startTimeMs, filter.endTimeMs);
         return (textUpdated || windowUpdated);
     };
 
-    return updateDataImpl(camera, callback);
+    return updateDataImpl(camera, needUpdateFunctor);
 }
 
 bool QnBookmarkQueriesCache::updateQueryTimeWindow(const QnVirtualCameraResourcePtr &camera
     , qint64 startTimeMs
     , qint64 endTimeMs)
 {
-    const auto callback = [this, startTimeMs, endTimeMs](QnCameraBookmarkSearchFilter &filter)
+    const auto needUpdateFunctor = [this, startTimeMs, endTimeMs](QnCameraBookmarkSearchFilter &filter)
         { return updateFilterTimeWindow(filter, startTimeMs, endTimeMs); };
 
-    return updateDataImpl(camera, callback);
+    return updateDataImpl(camera, needUpdateFunctor);
 }
 
 bool QnBookmarkQueriesCache::updateQueryFilterText(const QnVirtualCameraResourcePtr &camera
     , const QString &text)
 {
-    const auto callback = [this, text](QnCameraBookmarkSearchFilter &filter)
+    const auto needUpdateFunctor = [this, text](QnCameraBookmarkSearchFilter &filter)
         { return updateFilterText(filter, text); };
 
-    return updateDataImpl(camera, callback);
+    return updateDataImpl(camera, needUpdateFunctor);
 }
 
 bool QnBookmarkQueriesCache::updateDataImpl(const QnVirtualCameraResourcePtr &camera
-    , const QueryFilterCallback &callback)
+    , const NeedUpdateFilterFunctor &needUpdateFunctor)
 {
-    if (!callback || !camera)
+    if (!needUpdateFunctor || !camera)
         return false;
 
     const auto query = getQuery(camera);
     auto filter = query->filter();
-    if (!callback(filter))
+    if (!needUpdateFunctor(filter))
         return false;
 
     query->setFilter(filter);

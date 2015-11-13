@@ -45,10 +45,10 @@ public:
         , const QString &text);
 
 private:
-    typedef std::function<bool (QnCameraBookmarkSearchFilter &filter)> QueryFilterCallback;
+    typedef std::function<bool (QnCameraBookmarkSearchFilter &filter)> NeedUpdateFilterFunctor;
     
     bool updateDataImpl(const QnVirtualCameraResourcePtr &camera
-        , const QueryFilterCallback &callback);
+        , const NeedUpdateFilterFunctor &needUpdateFunctor);
 
 private:
     typedef std::map<QnVirtualCameraResourcePtr, QnCameraBookmarksQueryPtr> QueriesMap;

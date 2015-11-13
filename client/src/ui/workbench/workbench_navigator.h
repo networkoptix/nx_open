@@ -231,8 +231,6 @@ private:
 
     QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
-    void updateBookmarkQueries();
-
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;

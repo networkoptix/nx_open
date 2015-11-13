@@ -418,9 +418,7 @@ void QnWorkbenchNavigator::initialize() {
         {
             const auto layoutItemData = item->data();
             const auto id = layoutItemData.resource.id;
-            const auto resource = qnResPool->getResourceById(QnUuid(id));
-            return (resource ? resource.dynamicCast<QnVirtualCameraResource>()
-                : QnVirtualCameraResourcePtr());
+            return qnResPool->getResourceById<QnVirtualCameraResource>(id);
         };
 
         const auto processLayoutItem = [this, extractCamera](QnWorkbenchItem *item)
@@ -1087,11 +1085,6 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 void QnWorkbenchNavigator::resetCurrentBookmarkQuery()
 {
     setCurrentBookmarkQuery(QnCameraBookmarksQueryPtr());
-}
-
-void QnWorkbenchNavigator::updateBookmarkQueries()
-{
-    m_bookmarkQueries.clearQueries();
 }
 
 void QnWorkbenchNavigator::setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query)
