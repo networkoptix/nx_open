@@ -3,7 +3,7 @@
 #include <common/common_globals.h>
 #include <api/global_settings.h>
 
-#include <gtest.h>
+#include <gtest/gtest.h>
 #include <queue>
 
 namespace nx_upnp {

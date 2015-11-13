@@ -11,6 +11,7 @@
 #include <mutex>
 #include <set>
 
+#include <utils/common/stoppable.h>
 #include <utils/network/abstract_socket.h>
 #include <utils/network/socket_factory.h>
 #include <utils/network/socket_common.h>

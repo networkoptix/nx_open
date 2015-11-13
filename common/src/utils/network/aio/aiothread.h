@@ -30,6 +30,57 @@ namespace detail {
 
 template<class SocketType, class PollSetType> class AIOThreadImpl;
 
+enum class TaskType
+{
+    tAdding,
+    tChangingTimeout,
+    tRemoving,
+    //!Call functor in aio thread
+    tCallFunc,
+    //!Cancel \a tCallFunc tasks
+    tCancelPostedCalls,
+    tAll
+};
+
+
+//!Used as userdata in PollSet. One \a AIOEventHandlingData object corresponds to pair (\a socket, \a eventType)
+template<class SocketType>
+class AIOEventHandlingData
+{
+public:
+    std::atomic<int> beingProcessed;
+    std::atomic<int> markedForRemoval;
+    AIOEventHandler<SocketType>* eventHandler;
+    //!0 means no timeout
+    unsigned int timeout;
+    qint64 updatedPeriodicTaskClock;
+
+    AIOEventHandlingData(AIOEventHandler<SocketType>* _eventHandler)
+    :
+        beingProcessed(0),
+        markedForRemoval(0),
+        eventHandler(_eventHandler),
+        timeout(0),
+        updatedPeriodicTaskClock(0)
+    {
+    }
+};
+
+template<class SocketType>
+class AIOEventHandlingDataHolder
+{
+public:
+    //!Why the fuck do we need shared_ptr inside object instanciated on heap?
+    std::shared_ptr<AIOEventHandlingData<SocketType>> data;
+
+    AIOEventHandlingDataHolder(AIOEventHandler<SocketType>* _eventHandler)
+    :
+        data(new AIOEventHandlingData<SocketType>(_eventHandler))
+    {
+    }
+};
+
+
 /*!
     This class is intended for use only with aio::AIOService
     \todo make it nested in aio::AIOService?
@@ -374,57 +425,6 @@ private:
     AIOThreadImplType* m_impl;
 };
 
-
-
-
-enum class TaskType
-{
-    tAdding,
-    tChangingTimeout,
-    tRemoving,
-    //!Call functor in aio thread
-    tCallFunc,
-    //!Cancel \a tCallFunc tasks
-    tCancelPostedCalls,
-    tAll
-};
-
-//!Used as userdata in PollSet. One \a AIOEventHandlingData object corresponds to pair (\a socket, \a eventType)
-template<class SocketType>
-class AIOEventHandlingData
-{
-public:
-    std::atomic<int> beingProcessed;
-    std::atomic<int> markedForRemoval;
-    AIOEventHandler<SocketType>* eventHandler;
-    //!0 means no timeout
-    unsigned int timeout;
-    qint64 updatedPeriodicTaskClock;
-
-    AIOEventHandlingData(AIOEventHandler<SocketType>* _eventHandler)
-    :
-        beingProcessed(0),
-        markedForRemoval(0),
-        eventHandler(_eventHandler),
-        timeout(0),
-        updatedPeriodicTaskClock(0)
-    {
-    }
-};
-
-template<class SocketType>
-class AIOEventHandlingDataHolder
-{
-public:
-    //!Why the fuck do we need shared_ptr inside object instanciated on heap?
-    std::shared_ptr<AIOEventHandlingData<SocketType>> data;
-
-    AIOEventHandlingDataHolder(AIOEventHandler<SocketType>* _eventHandler)
-    :
-        data(new AIOEventHandlingData<SocketType>(_eventHandler))
-    {
-    }
-};
 
 
 template<class SocketType, class PollSetType>
