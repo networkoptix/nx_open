@@ -69,9 +69,6 @@ private:
 
     QString backupPositionToString(qint64 backupTimeMs);
 
-private:
-    void setBackupControlsVisibility(bool visible);
-
 private slots:
    
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);

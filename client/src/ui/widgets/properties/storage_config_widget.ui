@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>539</height>
+    <height>525</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -160,75 +160,135 @@
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="backupTimeLabel"/>
-   </item>
-   <item>
-    <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
-     <property name="currentIndex">
-      <number>0</number>
+    <widget class="QWidget" name="backupControls" native="true">
+     <property name="autoFillBackground">
+      <bool>false</bool>
      </property>
-     <widget class="QWidget" name="backupPreparePage">
-      <layout class="QVBoxLayout" name="verticalLayout_5">
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>1000</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QLabel" name="backupWarningLabel">
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_6">
+      <item>
+       <widget class="QLabel" name="backupTimeLabel"/>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <widget class="QWidget" name="backupPreparePage">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>1000</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="backupWarningLabel">
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="backupProgressPage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_5">
-         <property name="text">
-          <string>Backup progress</string>
-         </property>
+        <widget class="QWidget" name="backupProgressPage">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Backup progress</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QProgressBar" name="progressBarBackup">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="backupStopButton">
+              <property name="text">
+               <string>Cancel</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7">
-         <item>
-          <widget class="QProgressBar" name="progressBarBackup">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="value">
-            <number>0</number>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="backupStopButton">
-           <property name="text">
-            <string>Cancel</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-      </layout>
-     </widget>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="camerasToBackupButton">
+          <property name="text">
+           <string notr="true">&lt;Cameras to Backup...&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="backupHSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="whenToBackupLabel">
+          <property name="text">
+           <string>When to Backup</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBoxBackupType"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButtonSchedule">
+          <property name="text">
+           <string>Schedule...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="backupStartButton">
+          <property name="text">
+           <string>Start Backup Now</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -252,58 +312,10 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>400</height>
+       <height>4000</height>
       </size>
      </property>
     </spacer>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout_5">
-     <item>
-      <widget class="QPushButton" name="camerasToBackupButton">
-       <property name="text">
-        <string notr="true">&lt;Cameras to Backup...&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="backupHSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QLabel" name="whenToBackupLabel">
-       <property name="text">
-        <string>When to Backup</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QComboBox" name="comboBoxBackupType"/>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButtonSchedule">
-       <property name="text">
-        <string>Schedule...</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="backupStartButton">
-       <property name="text">
-        <string>Start Backup Now</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item>
     <widget class="QLabel" name="storagesWarningLabel">
