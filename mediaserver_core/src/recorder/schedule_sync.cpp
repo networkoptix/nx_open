@@ -230,7 +230,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
             toStorage->open(
                 newFileName,
-                QIODevice::WriteOnly | QIODevice::Append
+                QIODevice::WriteOnly
             )
         );
 
