@@ -219,11 +219,14 @@ private:
     Qn::CameraBackupQualities m_defaultQuality;
 };
 
-
-
+const auto watchValidator = [](const QnResourcePtr &resource)
+{
+    return (resource && resource.dynamicCast<QnVirtualCameraResource>());
+};
 
 QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/):
-    base_type(parent)
+    base_type(watchValidator, tr("There are no cameras to backup"), parent)
+
     , m_delegate(nullptr)
     , m_customColumnDelegate(new QnBackupCamerasResourceModelDelegate(this))
 {

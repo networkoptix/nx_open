@@ -67,46 +67,55 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
-QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
-    base_type(parent), 
-    QnWorkbenchContextAware(parent),
-    m_urlsShown(true),
-    m_scope(scope)
-{
-    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
-
-    /* Create top-level nodes. */
-    foreach(Qn::NodeType t, m_rootNodeTypes) {
-        m_rootNodes[t] = new QnResourcePoolModelNode(this, t);
-        m_allNodes.append(m_rootNodes[t]);
-    }
-
+QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent)
     
-    Qn::NodeType parentNodeType = scope == FullScope ? Qn::RootNode : Qn::BastardNode;
-    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+    : base_type(parent) 
+    , QnWorkbenchContextAware(parent)
 
-    foreach(Qn::NodeType t, m_rootNodeTypes)
-        if (t != rootNodeType && t != parentNodeType)
-            m_rootNodes[t]->setParent(m_rootNodes[parentNodeType]);
+    , m_rootNodes()
+    , m_nodes()
+    , m_rootNodeTypes()
+    , m_resourceNodeByResource()
+    , m_recorderHashByResource()
+    , m_itemNodeByUuid()
+    , m_itemNodesByResource()
+    , m_systemNodeBySystemName()
+    , m_allNodes()
+    , m_customColumnDelegate()
+    , m_urlsShown(true)
+    , m_scope(scope)
 
-    /* Connect to context. */
-    connect(resourcePool(),     &QnResourcePool::resourceAdded,                     this,   &QnResourcePoolModel::at_resPool_resourceAdded, Qt::QueuedConnection);
-    connect(resourcePool(),     &QnResourcePool::resourceRemoved,                   this,   &QnResourcePoolModel::at_resPool_resourceRemoved, Qt::QueuedConnection);
-    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
-    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
-    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
-    connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
-    connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
-    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
+    , m_watchValidator()
+    , m_watchedResourcesCount(0)
 
-    QnResourceList resources = resourcePool()->getResources(); 
+{
+    init(scope);
+}
 
-    rebuildTree();
+QnResourcePoolModel::QnResourcePoolModel(const WatcherResourceValidator &validator
+    , Scope scope
+    , QObject *parent)
+    
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
 
-    /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
-    foreach(const QnResourcePtr &resource, resources)
-        at_resPool_resourceAdded(resource);
+    , m_rootNodes()
+    , m_nodes()
+    , m_rootNodeTypes()
+    , m_resourceNodeByResource()
+    , m_recorderHashByResource()
+    , m_itemNodeByUuid()
+    , m_itemNodesByResource()
+    , m_systemNodeBySystemName()
+    , m_allNodes()
+    , m_customColumnDelegate()
+    , m_urlsShown(true)
+    , m_scope(scope)
 
+    , m_watchValidator(validator)
+    , m_watchedResourcesCount(0)
+{
+    init(scope);
 }
 
 QnResourcePoolModel::~QnResourcePoolModel() {
@@ -131,6 +140,43 @@ QnResourcePoolModel::~QnResourcePoolModel() {
        because they will be removed recursively starting from root nodes. */
 }
 
+void QnResourcePoolModel::init(Scope scope)
+{
+    m_rootNodeTypes << Qn::LocalNode << Qn::UsersNode << Qn::ServersNode << Qn::OtherSystemsNode << Qn::RootNode << Qn::BastardNode;
+
+    /* Create top-level nodes. */
+    foreach(Qn::NodeType t, m_rootNodeTypes) {
+        m_rootNodes[t] = new QnResourcePoolModelNode(this, t);
+        addNode(m_rootNodes[t]);
+    }
+
+
+    Qn::NodeType parentNodeType = scope == FullScope ? Qn::RootNode : Qn::BastardNode;
+    Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
+
+    foreach(Qn::NodeType t, m_rootNodeTypes)
+        if (t != rootNodeType && t != parentNodeType)
+            m_rootNodes[t]->setParent(m_rootNodes[parentNodeType]);
+
+    /* Connect to context. */
+    connect(resourcePool(),     &QnResourcePool::resourceAdded,                     this,   &QnResourcePoolModel::at_resPool_resourceAdded, Qt::QueuedConnection);
+    connect(resourcePool(),     &QnResourcePool::resourceRemoved,                   this,   &QnResourcePoolModel::at_resPool_resourceRemoved, Qt::QueuedConnection);
+    connect(snapshotManager(),  &QnWorkbenchLayoutSnapshotManager::flagsChanged,    this,   &QnResourcePoolModel::at_snapshotManager_flagsChanged);
+    connect(accessController(), &QnWorkbenchAccessController::permissionsChanged,   this,   &QnResourcePoolModel::at_accessController_permissionsChanged);
+    connect(context(),          &QnWorkbenchContext::userChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
+    connect(qnCommon,           &QnCommonModule::systemNameChanged,                 this,   &QnResourcePoolModel::at_commonModule_systemNameChanged);
+    connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
+    connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
+
+    QnResourceList resources = resourcePool()->getResources(); 
+
+    rebuildTree();
+
+    /* It is important to connect before iterating as new resources may be added to the pool asynchronously. */
+    foreach(const QnResourcePtr &resource, resources)
+        at_resPool_resourceAdded(resource);
+}
+
 QnResourcePtr QnResourcePoolModel::resource(const QModelIndex &index) const {
     return data(index, Qn::ResourceRole).value<QnResourcePtr>();
 }
@@ -146,7 +192,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
             nodeType = Qn::EdgeNode;
 
         pos = m_resourceNodeByResource.insert(resource, new QnResourcePoolModelNode(this, resource, nodeType));
-        m_allNodes.append(*pos);
+        addNode(*pos);
     }
     return *pos;
 }
@@ -156,7 +202,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(Qn::NodeType nodeType, const 
     if (!m_nodes[nodeType].contains(key)) {
         QnResourcePoolModelNode* node = new QnResourcePoolModelNode(this, uuid, nodeType);
         m_nodes[nodeType].insert(key, node);
-        m_allNodes.append(node);
+        addNode(node);
         return node;
     }
     return m_nodes[nodeType][key];
@@ -166,7 +212,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnUuid &uuid) {
     QHash<QnUuid, QnResourcePoolModelNode *>::iterator pos = m_itemNodeByUuid.find(uuid);
     if(pos == m_itemNodeByUuid.end()) {
         pos = m_itemNodeByUuid.insert(uuid, new QnResourcePoolModelNode(this, uuid));
-        m_allNodes.append(*pos);
+        addNode(*pos);
     }
     return *pos;
 }
@@ -184,12 +230,12 @@ QnResourcePoolModelNode *QnResourcePoolModel::node(const QnResourcePtr &resource
         return m_recorderHashByResource[resource][groupId];
 
     QnResourcePoolModelNode* recorder = new QnResourcePoolModelNode(this, Qn::RecorderNode, groupName);
-    if (m_scope != UsersScope)
-        recorder->setParent(m_resourceNodeByResource[resource]);
-    else
-        recorder->setParent(m_rootNodes[Qn::BastardNode]);
+
+    recorder->setParent(m_scope != UsersScope 
+        ? m_resourceNodeByResource[resource] : m_rootNodes[Qn::BastardNode]);
+
     m_recorderHashByResource[resource][groupId] = recorder;
-    m_allNodes.append(recorder);
+    addNode(recorder);
     return recorder;
 }
 
@@ -199,12 +245,12 @@ QnResourcePoolModelNode *QnResourcePoolModel::systemNode(const QString &systemNa
         return node;
 
     node = new QnResourcePoolModelNode(this, Qn::SystemNode, systemName);
-    if (m_scope == FullScope)
-        node->setParent(m_rootNodes[Qn::OtherSystemsNode]);
-    else
-        node->setParent(m_rootNodes[Qn::BastardNode]);
+
+    node->setParent(m_scope == FullScope 
+        ? m_rootNodes[Qn::OtherSystemsNode] : m_rootNodes[Qn::BastardNode]);
+
     m_systemNodeBySystemName[systemName] = node;
-    m_allNodes.append(node);
+    addNode(node);
     return node;
 }
 
@@ -245,11 +291,13 @@ void QnResourcePoolModel::removeNode(Qn::NodeType nodeType, const QnUuid &uuid, 
 
 void QnResourcePoolModel::deleteNode(QnResourcePoolModelNode *node) {
     Q_ASSERT(m_allNodes.contains(node));
+    checkWatchedNode(node, false);
     m_allNodes.removeOne(node);
     foreach (QnResourcePoolModelNode* existing, m_allNodes)
         if (existing->parent() == node)
-            existing->setParent(NULL);
+            existing->setParent(nullptr);
 
+    disconnect(node, nullptr, this, nullptr);
     delete node;
 }
 
@@ -343,6 +391,11 @@ void QnResourcePoolModel::setUrlsShown(bool urlsShown) {
 
 QnResourcePoolModelCustomColumnDelegate* QnResourcePoolModel::customColumnDelegate() const {
     return m_customColumnDelegate.data();
+}
+
+int QnResourcePoolModel::watchedResourcesCount()
+{
+    return m_watchedResourcesCount;
 }
 
 void QnResourcePoolModel::setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate) {
@@ -700,6 +753,56 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_itemNodesByResource.remove(resource);
     m_recorderHashByResource.remove(resource);
     Q_ASSERT(!m_resourceNodeByResource.contains(resource));
+}
+
+void QnResourcePoolModel::addNode(QnResourcePoolModelNode *node)
+{
+    connect(node, &QnResourcePoolModelNode::bastardStateUpdated, this
+        , [this, node]() { nodeBastardStateUpdated(node); });
+
+    connect(node, &QnResourcePoolModelNode::resourceChanged, this
+        , [this, node](const QnResourcePtr &prevResource) { nodeResourceChanged(node, prevResource); });
+
+    m_allNodes.append(node);
+    checkWatchedNode(node, true);
+}
+
+void QnResourcePoolModel::nodeBastardStateUpdated(QnResourcePoolModelNode *node)
+{
+    if (!node || !m_watchValidator || !m_watchValidator(node->resource()))
+        return;
+
+    m_watchedResourcesCount += (node->isBastard() ? -1 : 1);
+    emit watchedResourcesCountChanged();
+}
+
+void QnResourcePoolModel::nodeResourceChanged(QnResourcePoolModelNode *node
+    , const QnResourcePtr &prevResource)
+{
+    if (!node)
+        return;
+
+    const bool wasWatched = m_watchValidator && m_watchValidator(prevResource);
+    const bool watched = m_watchValidator && m_watchValidator(node->resource());
+
+    if (wasWatched == watched)
+        return;
+
+    m_watchedResourcesCount += (wasWatched ? -1 : 1);
+    emit watchedResourcesCountChanged();
+}
+
+void QnResourcePoolModel::checkWatchedNode(QnResourcePoolModelNode *node
+    , bool added)
+{
+    if (!m_watchValidator)
+        return;
+
+    if (!m_watchValidator || !node || node->isBastard() || !m_watchValidator(node->resource()))
+        return;
+
+    m_watchedResourcesCount += (added ? 1 : -1);
+    emit watchedResourcesCountChanged();
 }
 
 

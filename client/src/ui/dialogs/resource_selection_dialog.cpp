@@ -24,6 +24,13 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
+
+    enum 
+    {
+        kMainPageIndex = 0
+        , kEmptyResourcesPage = 1
+    };
+
     class QnColoringProxyModel: public QIdentityProxyModel {
     public:
         QnColoringProxyModel(QnResourceSelectionDialogDelegate* delegate, QObject *parent = 0):
@@ -52,6 +59,7 @@ namespace {
 // -------------------------------------------------------------------------- //
 QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWidget *parent):
     base_type(parent),
+    m_watchValidator(),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -64,6 +72,7 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(SelectionTarget target, QWi
 
 QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     base_type(parent),
+    m_watchValidator(),
     m_resourceModel(NULL),
     m_delegate(NULL),
     m_thumbnailManager(NULL),
@@ -74,12 +83,30 @@ QnResourceSelectionDialog::QnResourceSelectionDialog(QWidget *parent):
     init();
 }
 
-void QnResourceSelectionDialog::init() {
+QnResourceSelectionDialog::QnResourceSelectionDialog(const QnResourcePoolModel::WatcherResourceValidator &validator
+    , const QString &emptyResourcesMessage
+    , QWidget *parent):
+
+    base_type(parent),
+    m_watchValidator(validator),
+    m_resourceModel(NULL),
+    m_delegate(NULL),
+    m_thumbnailManager(NULL),
+    m_target(CameraResourceTarget),
+    m_screenshotIndex(0),
+    m_updating(false)
+{
+    init(emptyResourcesMessage);
+}
+
+void QnResourceSelectionDialog::init(const QString &emptyResourcesMassage) {
 
     ui.reset(new Ui::ResourceSelectionDialog);
     ui->setupUi(this);
 
     setHelpTopic(ui->resourcesWidget->treeView(), Qn::Forced_Empty_Help);
+
+    ui->emptyDevicesLabel->setText(emptyResourcesMassage);
 
     switch (m_target) {
     case UserResourceTarget:
@@ -120,7 +147,19 @@ void QnResourceSelectionDialog::initModel() {
         break;
     }
 
-    m_resourceModel = new QnResourcePoolModel(scope, this);
+    m_resourceModel = new QnResourcePoolModel(m_watchValidator, scope, this);
+
+    if (m_watchValidator)
+    {
+        connect(m_resourceModel, &QnResourcePoolModel::watchedResourcesCountChanged, this, [this]()
+        {
+            ui->stackedWidget->setCurrentIndex(m_resourceModel->watchedResourcesCount() != 0 
+                ? kMainPageIndex : kEmptyResourcesPage);
+        });
+    }
+    ui->stackedWidget->setCurrentIndex(!m_watchValidator 
+        || m_resourceModel->watchedResourcesCount() ? kMainPageIndex : kEmptyResourcesPage);
+
 
     connect(m_resourceModel, &QnResourcePoolModel::dataChanged, this, &QnResourceSelectionDialog::at_resourceModel_dataChanged);
 

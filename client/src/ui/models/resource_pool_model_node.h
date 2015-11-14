@@ -64,9 +64,6 @@ public:
 
     bool isBastard() const ;
 
-    void setBastard(bool bastard);
-
-
     const QList<QnResourcePoolModelNode *> &children() const;
 
     QnResourcePoolModelNode *child(int index) ;
@@ -88,12 +85,19 @@ public:
     bool isModified() const;
 
     void setModified(bool modified) ;
+
+signals:
+    void bastardStateUpdated();
+    void resourceChanged(const QnResourcePtr &prevResourceValue);
+
 protected:
     void removeChildInternal(QnResourcePoolModelNode *child) ;
     void addChildInternal(QnResourcePoolModelNode *child);
     void changeInternal();
 
 private:
+    void setBastard(bool bastard);
+
     /** Recalculated 'bastard' state for the node. */
     bool calculateBastard() const;
 

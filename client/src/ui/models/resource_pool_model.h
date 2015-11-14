@@ -37,6 +37,13 @@ public:
     };
 
     explicit QnResourcePoolModel(Scope scope = FullScope, QObject *parent = NULL);
+
+    /// Creates model that notifies if count of visible watched resources is changed
+    typedef std::function<bool (const QnResourcePtr &resource)> WatcherResourceValidator;
+    explicit QnResourcePoolModel(const WatcherResourceValidator &validator
+        , Scope scope = FullScope
+        , QObject *parent = NULL);
+
     virtual ~QnResourcePoolModel();
 
     virtual QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
@@ -63,7 +70,15 @@ public:
 
     QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
     void setCustomColumnDelegate(QnResourcePoolModelCustomColumnDelegate *columnDelegate);
+
+    int watchedResourcesCount();
+
+signals:
+    void watchedResourcesCountChanged();
+
 private:
+    void init(Scope scope);
+
     QnResourcePoolModelNode *node(const QnResourcePtr &resource);
     QnResourcePoolModelNode *node(const QnUuid &uuid);
     QnResourcePoolModelNode *node(const QModelIndex &index) const;
@@ -83,6 +98,18 @@ private:
 
     /** Fully rebuild resources tree. */
     void rebuildTree();
+
+    ///
+
+    void addNode(QnResourcePoolModelNode *node);
+    
+    void checkWatchedNode(QnResourcePoolModelNode *node
+        , bool added);
+
+    void nodeResourceChanged(QnResourcePoolModelNode *node
+        , const QnResourcePtr &prevResource);
+
+    void nodeBastardStateUpdated(QnResourcePoolModelNode *node);
 
 private slots:
     void at_resPool_resourceAdded(const QnResourcePtr &resource);
@@ -155,6 +182,9 @@ private:
 
     /** Narrowed scope for displaying the limited set of nodes. */
     Scope m_scope;
+
+    WatcherResourceValidator m_watchValidator;
+    int m_watchedResourcesCount;
 };
 
 #endif // QN_RESOURCE_POOL_MODEL_H
