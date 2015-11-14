@@ -71,7 +71,8 @@ private:
     APPLY(GetCatalogError) \
     APPLY(NoBackupStorageError) \
     APPLY(FromStorageError) \
-    APPLY(FileOpenError) \
+    APPLY(SourceFileError) \
+    APPLY(TargetFileError) \
     APPLY(ChunkError) \
     APPLY(NoError) \
     APPLY(Interrupted)

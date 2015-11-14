@@ -204,10 +204,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!fromFile) {
-            NX_LOG(lit("[Backup::copyFile] From file %1 open failed")
+            NX_LOG(lit("[Backup::copyFile] Source file %1 open failed")
                         .arg(fromFileFullName),
                    cl_logWARNING);
-            return CopyError::FileOpenError;
+            return CopyError::SourceFileError;
         }
 
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
@@ -230,10 +230,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!toFile) {
-            NX_LOG(lit("[Backup::copyFile] To file %1 open failed")
+            NX_LOG(lit("[Backup::copyFile] Target file %1 open failed")
                         .arg(newFileName),
                    cl_logWARNING);
-            return CopyError::FileOpenError;
+            return CopyError::TargetFileError;
         }
 
         int bitrate = m_schedule.backupBitrate;
@@ -267,7 +267,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                             .arg(newFileName),
                         cl_logDEBUG1
                     );
-                    continue;
+                    return CopyError::TargetFileError;
                 }
                 fileSize -= writeSize;
                 qint64 now = qnSyncTime->currentMSecsSinceEpoch();
@@ -331,10 +331,11 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
             if (err != CopyError::NoError) {
                 NX_LOG(
                     lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
-                    cl_logDEBUG1
+                    cl_logWARNING
                 );
                 if (err == CopyError::NoBackupStorageError || 
-                    err == CopyError::FromStorageError) {
+                    err == CopyError::FromStorageError ||
+                    err == CopyError::TargetFileError) {
                     return QnServer::BackupResultCode::Failed;
                 } else if (err == CopyError::Interrupted) {
                     return QnServer::BackupResultCode::Cancelled;
