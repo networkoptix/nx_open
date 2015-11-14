@@ -390,6 +390,7 @@ void DeviceFileCatalog::setLastSyncTime(int64_t time)
     QnMutexLocker lk(&m_mutex);
     m_lastSyncTime = time;
     qnServerDb->setLastBackupTime(
+        m_storagePool,
         qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
         m_catalog,
         m_lastSyncTime
@@ -402,6 +403,7 @@ int64_t DeviceFileCatalog::getLastSyncTime() const
     if (m_lastSyncTime == 0)
     {
         m_lastSyncTime = qnServerDb->getLastBackupTime(
+            m_storagePool,
             qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
             m_catalog
         );

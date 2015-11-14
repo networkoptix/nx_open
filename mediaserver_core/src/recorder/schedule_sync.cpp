@@ -51,13 +51,6 @@ qint64 QnScheduleSync::findLastSyncPointUnsafe() const
         result = chunkKey.chunk.startTimeMs;
         NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(result), cl_logDEBUG2);
 
-        auto fromCatalog = qnNormalStorageMan->getFileCatalog(
-            chunkKey.cameraID,
-            chunkKey.catalog
-        );
-        if (!fromCatalog)
-            continue;
-
         auto toCatalog = qnBackupStorageMan->getFileCatalog(
             chunkKey.cameraID,
             chunkKey.catalog
