@@ -254,8 +254,7 @@ private:
         auto writeHeaderTimestamp = [](const QString &fileName, int64_t timestamp)
         {
             QFile file(fileName);
-            if (!file.isOpen())
-                file.open(QIODevice::ReadWrite);
+            file.open(QIODevice::ReadWrite);
             if (!file.isOpen()) {
                 qDebug() << "Write header %1 failed";
                 return;
