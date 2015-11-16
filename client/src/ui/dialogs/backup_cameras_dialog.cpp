@@ -225,7 +225,7 @@ const auto watchValidator = [](const QnResourcePtr &resource)
 };
 
 QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/):
-    base_type(watchValidator, tr("There are no devices for backup"), parent)
+    base_type(watchValidator, tr("There are no cameras to backup"), parent)
 
     , m_delegate(nullptr)
     , m_customColumnDelegate(new QnBackupCamerasResourceModelDelegate(this))
