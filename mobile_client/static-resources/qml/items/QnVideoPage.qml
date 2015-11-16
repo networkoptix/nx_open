@@ -201,6 +201,7 @@ QnPage {
 
         QnLiveVideoNavigation {
             id: liveVideoNavigation
+            mediaPlayer: player
 
             readonly property real timelinePosition: -1
             readonly property bool timelineDragging: false
