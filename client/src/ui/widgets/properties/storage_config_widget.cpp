@@ -97,8 +97,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->setupUi(this);
  
     ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("Realtime mode"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("Manual only"), Qn::Backup_Manual);
+    ui->comboBoxBackupType->addItem(tr("In realtime"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("On demand"), Qn::Backup_Manual);
 
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);
@@ -525,7 +525,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
         return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
     }))
-        return error(tr("Select at least one camera to backup"));
+        return error(tr("Select at least one camera with archive to backup"));
 
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
@@ -563,7 +563,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 
     //TODO: #GDM discuss texts
     QString backedUpTo = reply.backupTimeMs > 0
-        ? tr("Archive is backup up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        ? tr("Archive backup is created up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
         : tr("Backup was never started.");
     ui->backupTimeLabel->setText(backedUpTo);
 
