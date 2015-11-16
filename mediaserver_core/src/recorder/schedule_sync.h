@@ -5,7 +5,6 @@
 #include <atomic>
 #include <vector>
 #include <map>
-#include <utility>
 #include <boost/optional.hpp>
 
 #include <common/common_globals.h>
@@ -61,12 +60,12 @@ public:
     virtual void stop() override;
     int interrupt();
 
-    void updateLastSyncPoint();
+    void updateLastSyncChunk();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
 private:
-    std::pair<qint64, qint64> findLastSyncPointUnsafe() const; // (startTime, endTime)
+    DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
@@ -129,7 +128,7 @@ private:
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;
-    std::atomic<qint64>     m_syncTimePoint;
+    qint64                  m_syncTimePoint;
     std::atomic<qint64>     m_syncEndTimePoint;
     QnMutex                 m_syncPointMutex;
 

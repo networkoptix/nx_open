@@ -24,7 +24,8 @@ QnScheduleSync::QnScheduleSync()
       m_interrupted(false),
       m_failReported(false),
       m_curDow(ec2::backup::Never),
-      m_syncTimePoint(0)
+      m_syncTimePoint(0),
+      m_syncEndTimePoint(0)
 {
 }
 
@@ -33,28 +34,30 @@ QnScheduleSync::~QnScheduleSync()
     stop();
 }
 
-void QnScheduleSync::updateLastSyncPoint()
+void QnScheduleSync::updateLastSyncChunk()
 {
     QnMutexLocker lock(&m_syncPointMutex);
-    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
-    NX_LOG(lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint.load()), cl_logDEBUG2);
+    auto chunk = findLastSyncChunkUnsafe();
+    m_syncTimePoint = chunk.startTimeMs;
+    m_syncEndTimePoint = chunk.endTimeMs();
+    NX_LOG(lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint), cl_logDEBUG2);
 }
 
-std::pair<qint64, qint64> QnScheduleSync::findLastSyncPointUnsafe() const
+DeviceFileCatalog::Chunk QnScheduleSync::findLastSyncChunkUnsafe() const
 {
-    qint64 resultStartMs = 0;
-    qint64 resultEndMs = 0;
-    qint64 prevResultStartMs = 0;
-    qint64 prevResultEndMs = 0;
+    DeviceFileCatalog::Chunk resultChunk;
+    DeviceFileCatalog::Chunk prevResultChunk;
+    resultChunk.startTimeMs = resultChunk.durationMs 
+                            = prevResultChunk.startTimeMs 
+                            = prevResultChunk.durationMs = 0;
 
-    while (auto chunkVector = getOldestChunk(resultStartMs)) {
+    while (auto chunkVector = getOldestChunk(resultChunk.startTimeMs)) {
         auto chunkKey = (*chunkVector)[0];
-        prevResultStartMs = resultStartMs;
-        resultStartMs = chunkKey.chunk.startTimeMs;
-        prevResultEndMs = resultEndMs;
-        resultEndMs = chunkKey.chunk.endTimeMs();
+        prevResultChunk = resultChunk;
+        resultChunk = chunkKey.chunk;
 
-        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultStartMs), cl_logDEBUG2);
+        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultChunk.startTimeMs), 
+               cl_logDEBUG2);
 
         auto toCatalog = qnBackupStorageMan->getFileCatalog(
             chunkKey.cameraID,
@@ -63,13 +66,12 @@ std::pair<qint64, qint64> QnScheduleSync::findLastSyncPointUnsafe() const
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < resultStartMs) {
-            resultStartMs = prevResultStartMs;
-            resultEndMs = prevResultEndMs;
+        if (toCatalog->getLastSyncTime() < resultChunk.startTimeMs) {
+            resultChunk = prevResultChunk;
             break;
         }
     }
-    return std::make_pair(resultStartMs, resultEndMs);
+    return resultChunk;
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -319,7 +321,9 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
     QnMutexLocker lock(&m_syncPointMutex);
-    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
+    auto chunk = findLastSyncChunkUnsafe();
+    m_syncTimePoint = chunk.startTimeMs;
+    m_syncEndTimePoint = chunk.endTimeMs();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
@@ -330,7 +334,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
             m_syncEndTimePoint = (*chunkKeyVector)[0].chunk.endTimeMs();
-            NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint.load()),
+            NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint),
                    cl_logDEBUG2);
         }
         for (const auto &chunkKey : *chunkKeyVector) {
@@ -518,10 +522,10 @@ void QnScheduleSync::run()
             m_syncing = false;
 
             if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
-                emit backupFinished(m_syncTimePoint, result);
+                emit backupFinished(m_syncEndTimePoint, result);
                 m_failReported = true;
             } else if (result != QnServer::BackupResultCode::Failed) {
-                emit backupFinished(m_syncTimePoint, result);
+                emit backupFinished(m_syncEndTimePoint, result);
                 m_failReported = false; 
             }
         }
