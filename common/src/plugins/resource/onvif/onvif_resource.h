@@ -254,6 +254,10 @@ protected:
 
     virtual void fetchAndSetCameraSettings();
 
+    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
+        return CameraDiagnostics::NoErrorResult();
+    }
+
 private:
     void setMaxFps(int f);
 

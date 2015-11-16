@@ -21,8 +21,13 @@ QnPlSonyResource::QnPlSonyResource()
 }
 
 QnPlSonyResource::~QnPlSonyResource() {
-    if( m_inputMonitorHttpClient )
-        m_inputMonitorHttpClient->terminate();
+    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
+    {
+        QMutexLocker lk(&m_inputPortMutex);
+        inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
+    }
+    if (inputMonitorHttpClient)
+        inputMonitorHttpClient->terminate();
 }
 
 CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
@@ -119,11 +124,10 @@ CameraDiagnostics::Result QnPlSonyResource::updateResourceCapabilities()
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result QnPlSonyResource::initInternal()
+CameraDiagnostics::Result QnPlSonyResource::customInitialization(
+    const CapabilitiesResp& /*capabilitiesResponse*/)
 {
-    const CameraDiagnostics::Result result = QnPlOnvifResource::initInternal();
-    if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
-        return result;
+    CameraDiagnostics::Result result = CameraDiagnostics::NoErrorResult();
 
     //if no input, exiting
     if( !hasCameraCapabilities(Qn::RelayInputCapability) )
@@ -141,8 +145,6 @@ CameraDiagnostics::Result QnPlSonyResource::initInternal()
         NX_LOG( lit("Failed to execute /command/system.cgi?AlarmData=on on Sony camera %1. http status %2").
             arg(getHostAddress()).arg(status), cl_logDEBUG1 );
     }
-
-    //startInputPortMonitoring();
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -193,15 +195,14 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
 void QnPlSonyResource::stopInputPortMonitoringAsync()
 {
-    nx_http::AsyncHttpClientPtr inputMonitorHttpClient = m_inputMonitorHttpClient;
+    nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
         QMutexLocker lk( &m_inputPortMutex );
-        if( !m_inputMonitorHttpClient )
-            return;
-        m_inputMonitorHttpClient.reset();
+        inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
     }
     //calling terminate with m_inputPortMutex locked can lead to dead-lock with onMonitorResponseReceived method, called from http event thread
-    inputMonitorHttpClient->terminate();
+    if (inputMonitorHttpClient)
+        inputMonitorHttpClient->terminate();
 }
 
 bool QnPlSonyResource::isInputPortMonitored() const
@@ -278,9 +279,21 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
     }
 }
 
-void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr /*httpClient*/ )
+void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient )
 {
-    //TODO/IMPL reconnect
+    QMutexLocker lk(&m_inputPortMutex);
+    
+    if (m_inputMonitorHttpClient != httpClient)
+        return;
+
+    if (!httpClient->response() || 
+        httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
+    {
+        return;
+    }
+
+    //restoring connection
+    m_inputMonitorHttpClient->doGet(m_inputMonitorHttpClient->url());
 }
 
 #endif //ENABLE_ONVIF
