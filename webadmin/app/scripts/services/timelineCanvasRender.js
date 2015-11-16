@@ -1,19 +1,17 @@
 'use strict';
 
 /***
- * TimelineRender is a set of function, which draws timeline based on it's state, described by positionProvider, recordsProvider, scaleManager
+ * TimelineRender is a set of function, which draws timeline based on it's state, described by recordsProvider, scaleManager
  * @param canvas
- * @param positionProvider
  * @param recordsProvider
  * @param scaleManager
  * @param timelineConfig
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsProvider, scaleManager, animationState, debugSettings){
+function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleManager, animationState, debugSettings){
 
     this.canvas = canvas;
-    this.positionProvider = positionProvider;
     this.recordsProvider = recordsProvider;
     this.scaleManager = scaleManager;
     this.animationState = animationState;
@@ -574,11 +572,11 @@ function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsP
 
     // !!! Draw and position for timeMarker
     function drawTimeMarker(context){
-        if(!self.positionProvider || self.positionProvider.liveMode){
+        if(self.scaleManager.liveMode || !self.scaleManager.playedPosition){
             return;
         }
 
-        drawMarker(context, self.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
+        drawMarker(context, self.scaleManager.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
     }
 
     function drawPointerMarker(context, mouseX){
@@ -773,9 +771,6 @@ function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsP
         context.fillText(fps, 5, timelineConfig.markerDateFont.size);
 
     }
-    this.setPositionProvider = function(positionProvider){
-        this.positionProvider = positionProvider;
-    };
     this.setRecordsProvider = function(recordsProvider){
         this.recordsProvider = recordsProvider;
     };

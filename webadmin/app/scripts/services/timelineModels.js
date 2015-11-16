@@ -941,7 +941,7 @@ ScaleManager.prototype.watchPlaying = function(date, liveMode){
         return;
     }
     var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
-    if(targetPoint>1){
+    if(targetPoint > 1){
         targetPoint = 0.5;
     }
     if(liveMode){
@@ -967,6 +967,9 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
 };
 
 ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
+    this.playedPosition = playing;
+    this.liveMode = liveMode;
+
     if(this.anchorDate == playing){
         return;
     }
