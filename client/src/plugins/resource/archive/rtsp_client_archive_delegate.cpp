@@ -59,7 +59,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0),
-    m_lockedTime(AV_NOPTS_VALUE)
+    m_footageDirty(false)
 {
     m_rtpDataBuffer = new quint8[MAX_RTP_BUFFER_SIZE];
     m_flags |= Flag_SlowSource;
@@ -96,8 +96,7 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
         /* Ignore other cameras changes. */
         if (camera != m_camera)
             return;
-
-        checkMinTimeFromOtherServer(m_camera);
+        m_footageDirty = true;
     });
 }
 
@@ -165,7 +164,6 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     qint64 startTime = otherRtspSession.startTime();
     if (startTime != qint64(AV_NOPTS_VALUE) && startTime != DATETIME_NOW)
     {
-        QnMutexLocker lock( &m_timeMutex );
         if (startTime < *result || *result == qint64(AV_NOPTS_VALUE))
             *result = startTime;
     }
@@ -177,18 +175,24 @@ bool checkGlobalMinTime(const ArchiveTimeCheckInfo& checkInfo)
     return true;
 }
 
-void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera)
+void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, bool forceReload)
 {
     if (!camera) {
-        QnMutexLocker lock( &m_timeMutex );
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
 
     QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera);
+    QSet<QnUuid> footageServers;
+    for (const auto &server: mediaServerList)
+        footageServers << server->getId();
+
+    if (!forceReload && footageServers == m_footageServers)
+        return; // use current value
+    m_footageServers = std::move(footageServers);
+
     /* Check if no archive available on any server. */
     if (mediaServerList.isEmpty()) {
-        QnMutexLocker lock( &m_timeMutex );
         m_globalMinArchiveTime = qint64(AV_NOPTS_VALUE);
         return;
     }
@@ -199,7 +203,6 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     for (const auto &server: mediaServerList)
         checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
     QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
-    QnMutexLocker lock( &m_timeMutex );
     if ((otherMinTime != qint64(AV_NOPTS_VALUE)) && (currentMinTime == qint64(AV_NOPTS_VALUE) || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else
@@ -254,7 +257,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         if (m_server == 0 || m_server->getStatus() == Qn::Offline) 
         {
             if (m_isMultiserverAllowed && m_globalMinArchiveTime == qint64(AV_NOPTS_VALUE))
-                checkMinTimeFromOtherServer(m_camera);
+                checkMinTimeFromOtherServer(m_camera, true);
             return false;
         }
     }
@@ -265,9 +268,9 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        lockTime(startTime());
+        m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
         if (m_isMultiserverAllowed)
-            checkMinTimeFromOtherServer(m_camera);
+            checkMinTimeFromOtherServer(m_camera, true);
 
         qint64 endTime = m_position;
         if (m_forcedEndTime)
@@ -279,7 +282,6 @@ bool QnRtspClientArchiveDelegate::openInternal() {
             m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
             m_rtspSession.stop();
-        unlockTime();
     }
     else {
         m_rtspSession.stop();
@@ -341,24 +343,11 @@ void QnRtspClientArchiveDelegate::close()
     m_parsers.clear();
 }
 
-void QnRtspClientArchiveDelegate::lockTime(qint64 value)
-{
-    QnMutexLocker lock( &m_timeMutex );
-    m_lockedTime = value;
-}
-
-void QnRtspClientArchiveDelegate::unlockTime()
-{
-    QnMutexLocker lock( &m_timeMutex );
-    m_lockedTime = qint64(AV_NOPTS_VALUE);
-}
-
 qint64 QnRtspClientArchiveDelegate::startTime() const
 {
-    QnMutexLocker lock( &m_timeMutex );
-    if(m_lockedTime != qint64(AV_NOPTS_VALUE))
-        return m_lockedTime;
-    qint64 result = m_globalMinArchiveTime != qint64(AV_NOPTS_VALUE) ? m_globalMinArchiveTime : m_rtspSession.startTime();
+    qint64 result = m_globalMinArchiveTime;
+    if (result == qint64(AV_NOPTS_VALUE))
+        result = m_rtspSession.startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
@@ -392,6 +381,12 @@ void QnRtspClientArchiveDelegate::reopen()
 
 QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 {
+    if (m_footageDirty) {
+        if (m_isMultiserverAllowed)
+            checkMinTimeFromOtherServer(m_camera, false);
+        m_footageDirty = false;
+    }
+
     QnAbstractMediaDataPtr result = getNextDataInternal();
     if (!result && !m_blockReopening)
         result = getNextDataInternal(); // try again in case of RTSP reconnect
