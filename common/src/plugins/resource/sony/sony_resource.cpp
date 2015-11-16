@@ -173,9 +173,18 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
 
     requestUrl.setPath( lit("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
     m_inputMonitorHttpClient = nx_http::AsyncHttpClient::create();
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(responseReceived(nx_http::AsyncHttpClientPtr)),          this, SLOT(onMonitorResponseReceived(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(someMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),  this, SLOT(onMonitorMessageBodyAvailable(nx_http::AsyncHttpClientPtr)),    Qt::DirectConnection );
-    connect( m_inputMonitorHttpClient.get(), SIGNAL(done(nx_http::AsyncHttpClientPtr)),                      this, SLOT(onMonitorConnectionClosed(nx_http::AsyncHttpClientPtr)),        Qt::DirectConnection );
+    connect(
+        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
+        this, &QnPlSonyResource::onMonitorResponseReceived,
+        Qt::DirectConnection );
+    connect(
+        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable,
+        this, &QnPlSonyResource::onMonitorMessageBodyAvailable,
+        Qt::DirectConnection );
+    connect(
+        m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::done,
+        this, &QnPlSonyResource::onMonitorConnectionClosed,
+        Qt::DirectConnection );
     m_inputMonitorHttpClient->setTotalReconnectTries( AsyncHttpClient::UNLIMITED_RECONNECT_TRIES );
     m_inputMonitorHttpClient->setUserName( auth.user() );
     m_inputMonitorHttpClient->setUserPassword( auth.password() );
