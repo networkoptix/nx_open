@@ -9,7 +9,6 @@
 
 #include <client/client_globals.h>
 
-#include <ui/models/resource_pool_model.h>
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/workbench/workbench_context_aware.h>
 #include "utils/common/id.h"
@@ -34,13 +33,7 @@ public:
     };
 
     explicit QnResourceSelectionDialog(SelectionTarget target, QWidget *parent = NULL);
-    
     explicit QnResourceSelectionDialog(QWidget *parent = NULL);
-    
-    explicit QnResourceSelectionDialog(const QnResourcePoolModel::WatcherResourceValidator &validator
-        , const QString &emptyResourcesMessage
-        , QWidget *parent = NULL);
-
     ~QnResourceSelectionDialog();
 
     QnResourceList selectedResources() const;
@@ -62,13 +55,10 @@ private slots:
     QModelIndex itemIndexAt(const QPoint &pos) const;
     void updateThumbnail(const QModelIndex &index);
 private:
-    void init(const QString &emptyResourcesMassage = QString());
+    void init();
     void initModel();
-
 private:
     QScopedPointer<Ui::ResourceSelectionDialog> ui;
-    
-    const QnResourcePoolModel::WatcherResourceValidator m_watchValidator;
     QnResourcePoolModel *m_resourceModel;
     QnResourceSelectionDialogDelegate* m_delegate;
     QnCameraThumbnailManager *m_thumbnailManager;

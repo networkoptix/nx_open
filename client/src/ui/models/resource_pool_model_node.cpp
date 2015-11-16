@@ -163,13 +163,11 @@ void QnResourcePoolModelNode::setResource(const QnResourcePtr &resource) {
         if (m_model->m_itemNodesByResource.contains(m_resource))
             m_model->m_itemNodesByResource[m_resource].removeOne(this);
 
-    const auto prevResource = m_resource;
     m_resource = resource;
 
     if(m_resource && (m_type == Qn::ItemNode || m_type == Qn::VideoWallItemNode))
         m_model->m_itemNodesByResource[m_resource].push_back(this);
 
-    emit resourceChanged(m_resource);
     update();
 }
 
@@ -381,7 +379,6 @@ void QnResourcePoolModelNode::setBastard(bool bastard) {
         return;
 
     m_bastard = bastard;
-    emit bastardStateUpdated();
 
     if(m_parent) {
         if(m_bastard) {
