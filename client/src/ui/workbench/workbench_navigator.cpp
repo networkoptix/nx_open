@@ -206,7 +206,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
         if (!m_currentWidget)
             return;
 
-        const auto camera = m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>();
+        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
 
         m_bookmarkQueries.updateQueryFilterText(camera, text);
         m_bookmarkAggregation->clear();
@@ -476,7 +476,7 @@ void QnWorkbenchNavigator::initialize() {
 
         const auto startTimeMs = qMax(m_timeSlider->minimum(), windowStart);
         const auto endTimeMs = qMin(m_timeSlider->maximum(), windowEnd);
-        const auto camera = m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>();
+        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
         m_bookmarkQueries.updateQueryTimeWindow(camera, startTimeMs, endTimeMs);
     });
 
@@ -1044,7 +1044,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
         m_bookmarkAggregation->clear();
 
-        const auto camera = m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>();
+        /* For non-cameras widgets query will be properly reset here. */
+        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
         setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
     }
 
