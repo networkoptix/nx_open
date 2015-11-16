@@ -159,7 +159,7 @@ angular.module('webadminApp')
                         function(){
                             var activeDate = (new Date()).getTime();
                             scope.scaleManager.setAnchorDateAndPoint(activeDate,1);
-                            scope.scaleManager.watchPlaying();
+                            scope.scaleManager.watchPlaying(activeDate, true);
                         },
                         function(){},
                         function(val){
@@ -180,6 +180,18 @@ angular.module('webadminApp')
                     scope.playHandler(!scope.positionProvider.playing);
                 }
 
+                function timelineClick(mouseX){
+                    scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
+                    var date = scope.scaleManager.screenCoordinateToDate(mouseX);
+
+                    var lastMinute = scope.scaleManager.lastMinute();
+                    if(date > lastMinute){
+                        goToLive ();
+                    }else {
+                        scope.positionHandler(date);
+                        scope.scaleManager.watchPlaying(date);
+                    }
+                }
 
                 // Disable watching for playing position during any animations
                 var stopDelay = null;
@@ -196,18 +208,6 @@ angular.module('webadminApp')
                 }
 
 
-                function timelineClick(mouseX){
-                    scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
-                    var date = scope.scaleManager.screenCoordinateToDate(mouseX);
-
-                    var lastMinute = scope.scaleManager.lastMinute();
-                    if(date > lastMinute){
-                        goToLive ();
-                    }else {
-                        scope.positionHandler(date);
-                        scope.scaleManager.watchPlaying(date);
-                    }
-                }
                 /**
                  * Scrolling functions
                  */

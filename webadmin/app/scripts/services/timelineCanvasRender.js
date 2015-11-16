@@ -10,7 +10,7 @@
  * @param animationState
  * @param debugEventsMode
  */
-function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsProvider, scaleManager, animationState, debugSettings ){
+function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsProvider, scaleManager, animationState, debugSettings){
 
     this.canvas = canvas;
     this.positionProvider = positionProvider;
@@ -653,6 +653,13 @@ function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsP
 
 
 
+    var scrollLeftEnablingTimer = null;
+    var ableToScrollLeft = false;
+
+    var scrollRightEnablingTimer = null;
+    var ableToScrollRight = false;
+
+
     function drawOrCheckScrollButtons(context, mouseX, mouseY){
 
         var canScrollRight = self.scaleManager.canScroll(false);
@@ -665,10 +672,41 @@ function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsP
 
         if(context) {
             if (canScrollLeft) {
-                drawScrollButton(context, true, mouseOverLeftScrollButton);
+                if(ableToScrollLeft) {
+                    drawScrollButton(context, true, mouseOverLeftScrollButton);
+                }else{
+                    if(!scrollLeftEnablingTimer) {
+                        scrollLeftEnablingTimer = setTimeout(function () {
+                            scrollLeftEnablingTimer = null;
+                            ableToScrollLeft = true;
+                        }, timelineConfig.animationDuration);
+                    }
+                }
+            }else{
+                ableToScrollLeft = false;
+                if(scrollLeftEnablingTimer){
+                    clearTimeout(scrollLeftEnablingTimer);
+                    scrollLeftEnablingTimer = null;
+                }
             }
+
             if (canScrollRight) {
-                drawScrollButton(context, false, mouseOverRightScrollButton);
+                if(ableToScrollRight) {
+                    drawScrollButton(context, false, mouseOverRightScrollButton);
+                }else{
+                    if(!scrollRightEnablingTimer) {
+                        scrollRightEnablingTimer = setTimeout(function () {
+                            scrollRightEnablingTimer = null;
+                            ableToScrollRight = true;
+                        }, timelineConfig.animationDuration);
+                    }
+                }
+            }else{
+                ableToScrollRight = false;
+                if(scrollRightEnablingTimer){
+                    clearTimeout(scrollRightEnablingTimer);
+                }
+                scrollRightEnablingTimer = null;
             }
         }
         return {
@@ -785,16 +823,16 @@ function TimelineCanvasRender(canvas, timelineConfig, positionProvider, recordsP
             eventsRow: false
         };
 
-        var scrollbar = drawOrCheckScrollBar(null, mouseX, mouseY);
-        _.extend(result, scrollbar);
-        if(result.scrollbar){
-            return result;
-        }
-
         var buttons = drawOrCheckScrollButtons(null, mouseX, mouseY);
         _.extend(result, buttons);
         if(result.leftButton || result.rightButton)
         {
+            return result;
+        }
+
+        var scrollbar = drawOrCheckScrollBar(null, mouseX, mouseY);
+        _.extend(result, scrollbar);
+        if(result.scrollbar){
             return result;
         }
 

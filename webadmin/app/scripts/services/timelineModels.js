@@ -853,7 +853,7 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initial
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
-};
+}
 
 ScaleManager.prototype.updateTotalInterval = function(){
     //Calculate maxmxPerPixel
@@ -923,6 +923,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
 
 ScaleManager.prototype.stopWatching = function(){
+    console.log("stopWatching");
     this.watchPlayingPosition = false;
     this.wasForcedToStopWatchPlaying = true;
 };
@@ -931,9 +932,10 @@ ScaleManager.prototype.releaseWatching = function(){
     this.wasForcedToStopWatchPlaying = false;
 };
 
-ScaleManager.prototype.watchPlaying = function(date){
+ScaleManager.prototype.watchPlaying = function(date, liveMode){
     this.watchPlayingPosition = true;
     this.wasForcedToStopWatchPlaying = false;
+    this.watchedLiveMode = liveMode;
 
     if(!date){
         return;
@@ -941,6 +943,9 @@ ScaleManager.prototype.watchPlaying = function(date){
     var targetPoint = this.dateToScreenCoordinate(date) / this.viewportWidth;
     if(targetPoint>1){
         targetPoint = 0.5;
+    }
+    if(liveMode){
+        targetPoint = 1;
     }
     this.setAnchorDateAndPoint(date, targetPoint);
 };
@@ -957,26 +962,26 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     }
 
     if(liveMode && targetPoint > 1 && this.end - this.visibleEnd < this.stickToLiveMs ){
-        this.watchPlaying(date);
+        this.watchPlaying(date, liveMode);
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(date,liveMode,end){
-    if(this.anchorDate == date){
+ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
+    if(this.anchorDate == playing){
         return;
     }
 
-    if(date > this.end && liveMode){
-        this.setEnd(date);
-    }else if(end>this.end){
+    if(playing > this.end && liveMode){
+        this.setEnd(playing);
+    }else if(end > this.end){
         this.setEnd(end);
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(date,liveMode);
+        this.checkWatchPlaying(playing,liveMode);
     }
     if(this.watchPlayingPosition){
-        this.setAnchorDateAndPoint(date, liveMode?1:this.anchorPoint);
+        this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
     }
 };
 
