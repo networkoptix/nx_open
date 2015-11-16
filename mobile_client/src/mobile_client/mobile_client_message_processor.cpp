@@ -37,7 +37,7 @@ void QnMobileClientMessageProcessor::resetResources(const QnResourceList &resour
 }
 
 void QnMobileClientMessageProcessor::updateMainServerApiUrl() {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+    QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)
         return;
 
