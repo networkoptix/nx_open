@@ -5,6 +5,7 @@
 #include <atomic>
 #include <vector>
 #include <map>
+#include <utility>
 #include <boost/optional.hpp>
 
 #include <common/common_globals.h>
@@ -65,7 +66,7 @@ public:
     virtual void run() override;
 
 private:
-    qint64 findLastSyncPointUnsafe() const;
+    std::pair<qint64, qint64> findLastSyncPointUnsafe() const; // (startTime, endTime)
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
@@ -129,6 +130,7 @@ private:
 
     QnServerBackupSchedule  m_schedule;
     std::atomic<qint64>     m_syncTimePoint;
+    std::atomic<qint64>     m_syncEndTimePoint;
     QnMutex                 m_syncPointMutex;
 
     SyncDataMap           m_syncData;

@@ -36,20 +36,25 @@ QnScheduleSync::~QnScheduleSync()
 void QnScheduleSync::updateLastSyncPoint()
 {
     QnMutexLocker lock(&m_syncPointMutex);
-    m_syncTimePoint = findLastSyncPointUnsafe();
+    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
     NX_LOG(lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint.load()), cl_logDEBUG2);
 }
 
-qint64 QnScheduleSync::findLastSyncPointUnsafe() const
+std::pair<qint64, qint64> QnScheduleSync::findLastSyncPointUnsafe() const
 {
-    qint64 result = 0;
-    qint64 prevResult = 0;
+    qint64 resultStartMs = 0;
+    qint64 resultEndMs = 0;
+    qint64 prevResultStartMs = 0;
+    qint64 prevResultEndMs = 0;
 
-    while (auto chunkVector = getOldestChunk(result)) {
+    while (auto chunkVector = getOldestChunk(resultStartMs)) {
         auto chunkKey = (*chunkVector)[0];
-        prevResult = result;
-        result = chunkKey.chunk.startTimeMs;
-        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(result), cl_logDEBUG2);
+        prevResultStartMs = resultStartMs;
+        resultStartMs = chunkKey.chunk.startTimeMs;
+        prevResultEndMs = resultEndMs;
+        resultEndMs = chunkKey.chunk.endTimeMs();
+
+        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultStartMs), cl_logDEBUG2);
 
         auto toCatalog = qnBackupStorageMan->getFileCatalog(
             chunkKey.cameraID,
@@ -58,12 +63,13 @@ qint64 QnScheduleSync::findLastSyncPointUnsafe() const
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < result) {
-            result = prevResult;
+        if (toCatalog->getLastSyncTime() < resultStartMs) {
+            resultStartMs = prevResultStartMs;
+            resultEndMs = prevResultEndMs;
             break;
         }
     }
-    return result;
+    return std::make_pair(resultStartMs, resultEndMs);
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -313,7 +319,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
     QnMutexLocker lock(&m_syncPointMutex);
-    m_syncTimePoint = findLastSyncPointUnsafe();
+    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
@@ -323,6 +329,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         }
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
+            m_syncEndTimePoint = (*chunkKeyVector)[0].chunk.endTimeMs();
             NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint.load()),
                    cl_logDEBUG2);
         }
@@ -404,7 +411,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
-    ret.backupTimeMs = m_syncTimePoint;
+    ret.backupTimeMs = m_syncEndTimePoint;
     {
         QnMutexLocker lk(&m_syncDataMutex);
         auto syncDataSize = (double)m_syncData.size();
