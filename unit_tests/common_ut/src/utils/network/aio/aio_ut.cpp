@@ -85,7 +85,7 @@ public:
 
 TEST(aio, DISABLED_pollsetError)
 {
-    TCPSocket socket(false);
+    UDPSocket socket(false);
     std::atomic<bool> handlerCalledFlag(false);
     DummyEventHandler evHandler(
         [&handlerCalledFlag](Pollable*, aio::EventType et) {
