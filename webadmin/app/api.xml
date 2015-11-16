@@ -750,13 +750,13 @@
                                 </value>
                             </values>
                         </param>
-						<param>
-							<name>id</name>
-							<description>Server unique ID</description>
+                        <param>
+                            <name>id</name>
+                            <description>Server unique ID</description>
                             <optional>true</optional>
-							<values/>
-						</param>
-					</params>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
                         <caption>Returns storages list data formatted in a requested format. If id parameter is specified, the list contais only that server storages.</caption>
                     </result>
@@ -1375,7 +1375,7 @@
                 </function>
                 <function>
                     <name>rebuildArchive</name>
-                    <description>Start or stop server archive rebuilding.</description>
+                    <description>Start or stop server archive rebuilding, also can report this process status.</description>
                     <method>GET</method>
                     <params>
                         <param>
