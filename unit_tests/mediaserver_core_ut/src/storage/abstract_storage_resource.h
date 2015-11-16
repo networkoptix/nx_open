@@ -59,6 +59,10 @@ namespace test
                 new QnFileDeletor
             );
 
+            pluginManager = std::unique_ptr<PluginManager>(
+                new PluginManager
+            );
+
 #ifndef _WIN32
             platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(
                 new QnPlatformAbstraction
@@ -101,6 +105,7 @@ namespace test
         std::unique_ptr<QnResourcePool>     resourcePool;
         std::unique_ptr<QnLongRunnablePool> runnablePool;
         std::unique_ptr<QnCommonModule>     commonModule;
+        std::unique_ptr<PluginManager>      pluginManager;
         QnResourceStatusDictionary          rdict;
 
 #ifndef _WIN32
