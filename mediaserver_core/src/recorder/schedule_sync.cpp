@@ -333,7 +333,8 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         }
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
-            m_syncEndTimePoint = (*chunkKeyVector)[0].chunk.endTimeMs();
+            m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), 
+                                      m_syncEndTimePoint.load());
             NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint),
                    cl_logDEBUG2);
         }
