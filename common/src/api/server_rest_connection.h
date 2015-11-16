@@ -12,6 +12,7 @@
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
 * It class can be used either for client and server side.
 * Class calls callback methods from IO thread. So, caller code should be thread-safe.
+* Client MUST NOT make requests in callbacks as it will cause a deadlock.
 */
 
 namespace rest 
