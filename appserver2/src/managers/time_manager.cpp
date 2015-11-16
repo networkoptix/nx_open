@@ -376,7 +376,7 @@ namespace ec2
 
     ApiTimeData TimeSynchronizationManager::getTimeInfo() const
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         ApiTimeData result;
         result.value = getSyncTimeNonSafe();
         result.isPrimaryTimeServer = m_usedTimeSyncInfo.timePriorityKey == m_localTimePriorityKey;
@@ -617,7 +617,7 @@ namespace ec2
 
     void TimeSynchronizationManager::setContext(const ResourceContext& resCtx)
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         m_resCtx = resCtx;
     }
 
