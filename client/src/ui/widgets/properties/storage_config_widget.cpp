@@ -93,6 +93,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , m_backupSchedule()
     , m_backupCancelled(false)
     , m_updating(false)
+    , m_backupTypeLastIndex(0)
 {
     ui->setupUi(this);
  
@@ -248,9 +249,25 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
     tableView->setMouseTracking(true);
 }
 
-void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) {
-    m_backupSchedule.backupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->itemData(index).toInt());
-    ui->pushButtonSchedule->setEnabled(m_backupSchedule.backupType == Qn::Backup_Schedule);
+void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index) 
+{
+    const auto currentBackupType = static_cast<Qn::BackupType>(ui->comboBoxBackupType->itemData(index).toInt());
+    
+    m_backupSchedule.backupType = currentBackupType;
+    ui->pushButtonSchedule->setEnabled(currentBackupType == Qn::Backup_Schedule);
+    ui->backupTimeLabel->setVisible(currentBackupType != Qn::Backup_RealTime);
+
+    if (index != m_backupTypeLastIndex)
+    {
+        if (currentBackupType == Qn::Backup_RealTime)
+        {
+            QMessageBox::warning(this, tr("Warning")
+                , tr("Previous footage will not be backed up!"), QMessageBox::Ok);
+        }
+
+        m_backupTypeLastIndex = index;
+    }
+
     emit hasChangesChanged();
 }
 
@@ -261,7 +278,8 @@ void QnStorageConfigWidget::loadDataToUi() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
-    ui->comboBoxBackupType->setCurrentIndex(ui->comboBoxBackupType->findData(m_backupSchedule.backupType));    
+    m_backupTypeLastIndex = ui->comboBoxBackupType->findData(m_backupSchedule.backupType);
+    ui->comboBoxBackupType->setCurrentIndex(m_backupTypeLastIndex);    
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -515,7 +533,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return error(tr("Backup is already in progress."));
 
     if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-        return error(tr("Manual backup is available only in Schedule or Manual mode."));
+        return error(tr("In Realtime mode all data is backed up on continuously"));
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
         return storage.isWritable && storage.isUsed && storage.isBackup;
