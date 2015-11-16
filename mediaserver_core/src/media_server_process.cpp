@@ -67,6 +67,7 @@
 
 #include <platform/platform_abstraction.h>
 
+#include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/acti/acti_resource_searcher.h>
 #include <plugins/resource/avi/avi_resource.h>
@@ -1782,8 +1783,10 @@ void MediaServerProcess::run()
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
 
+    CommonPluginContainer pluginContainer;
+
     //Initializing plugin manager
-    PluginManager pluginManager;
+    PluginManager pluginManager(QString(), &pluginContainer);
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;

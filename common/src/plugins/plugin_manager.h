@@ -19,6 +19,7 @@
 #include <utils/thread/mutex.h>
 
 #include "plugin_api.h"
+#include "plugin_container_api.h"
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -48,7 +49,9 @@ public:
         AllPlugins = QtPlugin | NxPlugin
     };
 
-    PluginManager( const QString& pluginDir = QString() );
+    PluginManager(
+        const QString& pluginDir = QString(),
+        nxpl::PluginContainer* const pluginContainer = nullptr);
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
@@ -98,6 +101,7 @@ signals:
 
 private:
     const QString m_pluginDir;
+    nxpl::PluginContainer* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
     mutable QnMutex m_mutex;
