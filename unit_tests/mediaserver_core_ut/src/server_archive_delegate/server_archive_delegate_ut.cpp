@@ -247,12 +247,29 @@ private:
         QFile testFile_1("://1445529661948_77158.mkv");
         QFile testFile_2("://1445529880231_64712.mkv");
 
-        testFile_1.open(QIODevice::ReadOnly);
-        testFile_2.open(QIODevice::ReadOnly);
-
         int64_t startTimeMs = 1445529661948;
         const int duration_1 = 77158;
         const int duration_2 = 64712;
+
+        auto writeHeaderTimestamp = [](const QString &fileName, int64_t timestamp)
+        {
+            QFile file(fileName);
+            if (!file.isOpen())
+                file.open(QIODevice::ReadWrite);
+            if (!file.isOpen()) {
+                qDebug() << "Write header %1 failed";
+                return;
+            }
+            file.seek(522);
+            auto buf = file.read(11);
+            if (memcmp(buf.constData(), "START_TIMED", 11) != 0) {
+                qDebug() << "Write header wrong offset %1";
+                return;
+            }
+            file.seek(522 + 11 + 2);
+            file.write(QString::number(timestamp).toLatin1().constData());
+            file.close();
+        };
 
         auto copyFile = [&](const QString& root, const QString &quality)
         {
@@ -266,11 +283,14 @@ private:
                                                                lit("/"));
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             QDir(root).mkpath(pathString);
+            QString fullFileName = closeDirPath(root) + closeDirPath(pathString) 
+                                                      + fileName;
             if (curDuration == duration_1)
-                testFile_1.copy(closeDirPath(root) + closeDirPath(pathString) + fileName);
+                testFile_1.copy(fullFileName);
             else
-                testFile_2.copy(closeDirPath(root) + closeDirPath(pathString) + fileName);
+                testFile_2.copy(fullFileName);
 
+            writeHeaderTimestamp(fullFileName, curStartTime);
             m_timeLine.addTimePeriod(curStartTime, curDuration);
             return curStartTime + curDuration;
         };
