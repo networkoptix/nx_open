@@ -254,18 +254,19 @@ private:
         auto writeHeaderTimestamp = [](const QString &fileName, int64_t timestamp)
         {
             QFile file(fileName);
+            file.setPermissions(QFile::ReadOther | QFile::WriteOther);
             file.open(QIODevice::ReadWrite);
             if (!file.isOpen()) {
                 qDebug() << "Write header %1 failed";
                 return;
             }
-            file.seek(522);
+            file.seek(0x219);
             auto buf = file.read(11);
             if (memcmp(buf.constData(), "START_TIMED", 11) != 0) {
                 qDebug() << "Write header wrong offset %1";
                 return;
             }
-            file.seek(522 + 11 + 2);
+            file.seek(0x219 + 0xd);
             file.write(QString::number(timestamp).toLatin1().constData());
             file.close();
         };
