@@ -113,29 +113,10 @@ stop_watchdog() {
     echo "OK"
 }
 
-kill_ms_if_high_mem_usage() {
-    MSERVER_PID="`pidof $BIN_NAME`"
-
-    if [ -z "$MSERVER_PID" ]; then
-        exit 0
-    fi
-
-    MEM_USAGE=`cat /proc/$MSERVER_PID/status | grep VmRSS | cut -d: -f2 | tr -d "\t " | cut -d "k" -f 1`
-
-    if [ "$MEM_USAGE" -gt 89000 ]; then
-        kill -FPE $MSERVER_PID
-    fi
-}
-
-KILL_IF_HIGH_MEM_USAGE=0
-
 run_watchdog() {
     while true
     do
         start
-        if [ ! -z "$KILL_IF_HIGH_MEM_USAGE" ]; then
-            kill_ms_if_high_mem_usage
-        fi
         sleep 20
     done
 }
