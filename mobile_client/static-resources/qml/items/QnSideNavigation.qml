@@ -127,7 +127,7 @@ QnNavigationDrawer {
                     x: dp(16)
                     height: dp(48)
                     verticalAlignment: Text.AlignVCenter
-                    text: qsTr("© %1 %2").arg((new Date()).getFullYear()).arg(applicationInfo.organizationName)
+                    text: "© %1 %2".arg((new Date()).getFullYear()).arg(applicationInfo.organizationName)
                     font.pixelSize: sp(13)
                     color: QnTheme.sideNavigationCopyright
                 }
