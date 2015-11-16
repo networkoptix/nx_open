@@ -329,6 +329,9 @@ protected:
     virtual bool isInputPortMonitored() const;
 
 private:
+    void resetCameraInfoDiskFlags() const;
+
+private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
