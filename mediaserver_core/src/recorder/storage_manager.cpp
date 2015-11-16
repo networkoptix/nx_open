@@ -1641,7 +1641,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     if (!result) {
         if (!m_warnSended && m_firstStorageTestDone) {
             qWarning() << "No storage available for recording";
-            emit noStoragesAvailable();
+            bool doEmit = m_role == QnServer::StoragePool::Normal ||
+                          (m_role == QnServer::StoragePool::Backup && 
+                           scheduleSync()->getStatus().state != 
+                                    Qn::BackupState::BackupState_InProgress);
+            if (doEmit)
+                emit noStoragesAvailable();
             m_warnSended = true;
         }
     }
