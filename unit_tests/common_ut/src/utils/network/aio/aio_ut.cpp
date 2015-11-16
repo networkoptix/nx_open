@@ -43,7 +43,7 @@ TEST(aio, post)
 
 TEST(aio, socketPolledNotification)
 {
-    TCPSocket socket(false);
+    UDPSocket socket(false);
     std::atomic<bool> handlerCalledFlag(false);
     DummyEventHandler evHandler(
         [&handlerCalledFlag](Pollable*, aio::EventType) {
