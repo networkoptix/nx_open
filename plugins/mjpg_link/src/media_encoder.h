@@ -28,6 +28,7 @@ class MediaEncoder
 public:
     MediaEncoder(
         CameraManager* const cameraManager,
+        nxpl::PluginContainer* const pluginContainer,
         int encoderNumber );
     virtual ~MediaEncoder();
 
@@ -61,6 +62,7 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
+    nxpl::PluginContainer* const m_pluginContainer;
     std::unique_ptr<StreamReader> m_streamReader;
     int m_encoderNumber;
     QSize m_resolution;

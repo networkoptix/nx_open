@@ -23,7 +23,6 @@
 #include <functional>
 #include <memory>
 
-#include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
 #include <utils/thread/mutex.h>
 #include <QtCore/QThread>
@@ -33,6 +32,7 @@
 
 #include "ilp_empty_packet.h"
 #include "motion_data_picture.h"
+#include "plugin.h"
 
 
 static const nxcip::UsecUTCTimestamp USEC_IN_MS = 1000;
@@ -42,6 +42,7 @@ static const int MAX_FRAME_SIZE = 4*1024*1024;
 
 StreamReader::StreamReader(
     nxpt::CommonRefManager* const parentRefManager,
+    nxpl::PluginContainer* const pluginContainer,
     const nxcip::CameraInfo& cameraInfo,
     float fps,
     int encoderNumber )
@@ -55,7 +56,8 @@ StreamReader::StreamReader(
     m_prevFrameClock( -1 ),
     m_frameDurationMSec( 0 ),
     m_terminated( false ),
-    m_isInGetNextData( 0 )
+    m_isInGetNextData( 0 ),
+    m_timeProvider(pluginContainer->getTimeProvider())
 {
     setFps( fps );
 
@@ -68,6 +70,7 @@ StreamReader::StreamReader(
 StreamReader::~StreamReader()
 {
     assert( m_isInGetNextData == 0 );
+    m_timeProvider->releaseRef();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
@@ -275,7 +278,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
     m_videoPacket.reset( new ILPVideoPacket(
         &m_allocator,
         0,
-        QDateTime::currentMSecsSinceEpoch() * USEC_IN_MS,
+        m_timeProvider->millisSinceEpoch()  * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0 ) );
     m_videoPacket->resizeBuffer( jpgFrame.size() );
@@ -285,7 +288,7 @@ void StreamReader::gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame )
 
 bool StreamReader::waitForNextFrameTime()
 {
-    const qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    const qint64 currentTime = m_timeProvider->millisSinceEpoch();
     if( m_prevFrameClock != -1 &&
         !((m_prevFrameClock > currentTime) || (currentTime - m_prevFrameClock > m_frameDurationMSec)) ) //system time changed
     {
@@ -309,6 +312,6 @@ bool StreamReader::waitForNextFrameTime()
             }
         }
     }
-    m_prevFrameClock = QDateTime::currentMSecsSinceEpoch();
+    m_prevFrameClock = m_timeProvider->millisSinceEpoch();
     return true;
 }

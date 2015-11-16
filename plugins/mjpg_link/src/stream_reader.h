@@ -15,6 +15,7 @@
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
+#include <plugins/plugin_container_api.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/http/multipart_content_parser.h>
 #include <utils/memory/cyclic_allocator.h>
@@ -30,6 +31,7 @@ class StreamReader
 public:
     StreamReader(
         nxpt::CommonRefManager* const parentRefManager,
+        nxpl::PluginContainer* const pluginContainer,
         const nxcip::CameraInfo& cameraInfo,
         float fps,
         int encoderNumber );
@@ -74,6 +76,7 @@ private:
     QnMutex m_mutex;
     CyclicAllocator m_allocator;
     std::atomic<int> m_isInGetNextData;
+    nxpl::TimeProvider* m_timeProvider;
  
     int doRequest( nx_http::HttpClient* const httpClient );
     void gotJpegFrame( const nx_http::ConstBufferRefType& jpgFrame );

@@ -17,7 +17,9 @@ class DiscoveryManager
     public nxcip::CameraDiscoveryManager
 {
 public:
-    DiscoveryManager();
+    DiscoveryManager(
+        nxpt::CommonRefManager* const refManager,
+        nxpl::PluginContainer* const pluginContainer);
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -50,6 +52,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
+    nxpl::PluginContainer* const m_pluginContainer;
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H
