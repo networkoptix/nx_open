@@ -583,17 +583,22 @@ QString QnSecurityCamResource::getDefaultGroupName() const
     SAFE(return m_groupName);
 }
 
+void QnSecurityCamResource::resetCameraInfoDiskFlags() const
+{
+    for (auto it = m_cameraInfoSavedToDisk.begin(); 
+         it != m_cameraInfoSavedToDisk.end();
+         ++it) {
+        it->second = false;
+    }
+}
+
 void QnSecurityCamResource::setGroupName(const QString& value) {
     {
         QnMutexLocker locker( &m_mutex );
         if(m_groupName == value)
             return;
         m_groupName = value;
-        for (auto it = m_cameraInfoSavedToDisk.begin(); 
-             it != m_cameraInfoSavedToDisk.end();
-             ++it) {
-            it->second = false;
-        }
+        resetCameraInfoDiskFlags();
     }
     emit groupNameChanged(::toSharedPointer(this));
 }
@@ -610,11 +615,7 @@ void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
     }
     {
         QnMutexLocker lk(&m_mutex);
-        for (auto it = m_cameraInfoSavedToDisk.begin(); 
-             it != m_cameraInfoSavedToDisk.end();
-             ++it) {
-            it->second = false;
-        }
+        resetCameraInfoDiskFlags();
     }
     emit groupNameChanged(::toSharedPointer(this));
 }
@@ -629,11 +630,7 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
         if(m_groupId == value)
             return;
         m_groupId = value;
-        for (auto it = m_cameraInfoSavedToDisk.begin(); 
-             it != m_cameraInfoSavedToDisk.end();
-             ++it) {
-            it->second = false;
-        }
+        resetCameraInfoDiskFlags();
     }
     emit groupIdChanged(::toSharedPointer(this));   
 
@@ -646,11 +643,7 @@ QString QnSecurityCamResource::getModel() const {
 void QnSecurityCamResource::setModel(const QString &model) {
     QnMutexLocker lk(&m_mutex);
     m_model = model;
-    for (auto it = m_cameraInfoSavedToDisk.begin(); 
-         it != m_cameraInfoSavedToDisk.end();
-         ++it) {
-        it->second = false;
-    }
+    resetCameraInfoDiskFlags();
 }
 
 QString QnSecurityCamResource::getFirmware() const {
