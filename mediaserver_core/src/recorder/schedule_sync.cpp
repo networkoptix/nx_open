@@ -36,25 +36,25 @@ QnScheduleSync::~QnScheduleSync()
 void QnScheduleSync::updateLastSyncPoint()
 {
     QnMutexLocker lock(&m_syncPointMutex);
-    m_syncTimePoint = findLastSyncPointUnsafe();
+    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
+    NX_LOG(lit("[Backup] GetLastSyncPoint: %1").arg(m_syncTimePoint.load()), cl_logDEBUG2);
 }
 
-qint64 QnScheduleSync::findLastSyncPointUnsafe() const
+std::pair<qint64, qint64> QnScheduleSync::findLastSyncPointUnsafe() const
 {
-    qint64 result = 0;
-    qint64 prevResult = 0;
+    qint64 resultStartMs = 0;
+    qint64 resultEndMs = 0;
+    qint64 prevResultStartMs = 0;
+    qint64 prevResultEndMs = 0;
 
-    while (auto chunkVector = getOldestChunk(result)) {
+    while (auto chunkVector = getOldestChunk(resultStartMs)) {
         auto chunkKey = (*chunkVector)[0];
-        prevResult = result;
-        result = chunkKey.chunk.startTimeMs;
+        prevResultStartMs = resultStartMs;
+        resultStartMs = chunkKey.chunk.startTimeMs;
+        prevResultEndMs = resultEndMs;
+        resultEndMs = chunkKey.chunk.endTimeMs();
 
-        auto fromCatalog = qnNormalStorageMan->getFileCatalog(
-            chunkKey.cameraID,
-            chunkKey.catalog
-        );
-        if (!fromCatalog)
-            continue;
+        NX_LOG(lit("[Backup] Next chunk from DB: %1").arg(resultStartMs), cl_logDEBUG2);
 
         auto toCatalog = qnBackupStorageMan->getFileCatalog(
             chunkKey.cameraID,
@@ -63,12 +63,13 @@ qint64 QnScheduleSync::findLastSyncPointUnsafe() const
         if (!toCatalog)
             continue;
 
-        if (toCatalog->getLastSyncTime() < result) {
-            result = prevResult;
+        if (toCatalog->getLastSyncTime() < resultStartMs) {
+            resultStartMs = prevResultStartMs;
+            resultEndMs = prevResultEndMs;
             break;
         }
     }
-    return result;
+    return std::make_pair(resultStartMs, resultEndMs);
 }
 
 QnScheduleSync::ChunkKey QnScheduleSync::getOldestChunk(
@@ -209,10 +210,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!fromFile) {
-            NX_LOG(lit("[Backup::copyFile] From file %1 open failed")
+            NX_LOG(lit("[Backup::copyFile] Source file %1 open failed")
                         .arg(fromFileFullName),
                    cl_logWARNING);
-            return CopyError::FileOpenError;
+            return CopyError::SourceFileError;
         }
 
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
@@ -235,10 +236,10 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         );
 
         if (!toFile) {
-            NX_LOG(lit("[Backup::copyFile] To file %1 open failed")
+            NX_LOG(lit("[Backup::copyFile] Target file %1 open failed")
                         .arg(newFileName),
                    cl_logWARNING);
-            return CopyError::FileOpenError;
+            return CopyError::TargetFileError;
         }
 
         int bitrate = m_schedule.backupBitrate;
@@ -272,7 +273,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                             .arg(newFileName),
                         cl_logDEBUG1
                     );
-                    continue;
+                    return CopyError::TargetFileError;
                 }
                 fileSize -= writeSize;
                 qint64 now = qnSyncTime->currentMSecsSinceEpoch();
@@ -316,26 +317,32 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
+    NX_LOG("[Backup] Starting...", cl_logDEBUG2);
     QnMutexLocker lock(&m_syncPointMutex);
-    m_syncTimePoint = findLastSyncPointUnsafe();
+    std::tie(m_syncTimePoint, m_syncEndTimePoint) = findLastSyncPointUnsafe();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
         if (!chunkKeyVector) {
+            NX_LOG("[Backup] chunks ended, backup done", cl_logDEBUG2);
             break;
         }
         else {
             m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
+            m_syncEndTimePoint = (*chunkKeyVector)[0].chunk.endTimeMs();
+            NX_LOG(lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint.load()),
+                   cl_logDEBUG2);
         }
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
             if (err != CopyError::NoError) {
                 NX_LOG(
                     lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
-                    cl_logDEBUG1
+                    cl_logWARNING
                 );
                 if (err == CopyError::NoBackupStorageError || 
-                    err == CopyError::FromStorageError) {
+                    err == CopyError::FromStorageError ||
+                    err == CopyError::TargetFileError) {
                     return QnServer::BackupResultCode::Failed;
                 } else if (err == CopyError::Interrupted) {
                     return QnServer::BackupResultCode::Cancelled;
@@ -404,7 +411,7 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnBackupStatusData ret;
     ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
                                         Qn::BackupState_None;
-    ret.backupTimeMs = m_syncTimePoint;
+    ret.backupTimeMs = m_syncEndTimePoint;
     {
         QnMutexLocker lk(&m_syncDataMutex);
         auto syncDataSize = (double)m_syncData.size();
