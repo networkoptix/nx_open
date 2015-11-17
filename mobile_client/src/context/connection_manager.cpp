@@ -21,6 +21,8 @@ namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
 
+    enum { invalidHandle = -1 };
+
     bool isCompatibleProducts(const QString &product1, const QString &product2) {
         return  product1.isEmpty() ||
                 product2.isEmpty() ||
@@ -50,6 +52,7 @@ public:
     QUrl url;
     bool suspended;
     QTimer *suspendTimer;
+    int connectionHandle;
 };
 
 QnConnectionManager::QnConnectionManager(QObject *parent) :
@@ -118,6 +121,7 @@ QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager *pare
     , q_ptr(parent)
     , suspended(false)
     , suspendTimer(new QTimer(this))
+    , connectionHandle(invalidHandle)
 {
     enum { suspendInterval = 2 * 60 * 1000 };
     suspendTimer->setInterval(suspendInterval);
@@ -168,11 +172,16 @@ void QnConnectionManagerPrivate::doConnect() {
     qnCommon->updateRunningInstanceGuid();
 
     QnEc2ConnectionRequestResult *result = new QnEc2ConnectionRequestResult(this);
-    QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
     connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this, [this, result]() {
         result->deleteLater();
+
+        if (connectionHandle != result->handle())
+            return;
+
+        connectionHandle = invalidHandle;
 
         ec2::ErrorCode errorCode = ec2::ErrorCode(result->status());
 
