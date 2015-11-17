@@ -417,16 +417,6 @@ namespace ec2
                     if( !synchronizingByCurrentServer )
                     {
                         const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime;
-                        using namespace std::placeholders;
-                        //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
-                        if( !m_terminated )
-                        {
-                            if( m_broadcastSysTimeTaskID )
-                                TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
-                            m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                                std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                                0 );
-                        }
                         lk.unlock();
                         WhileExecutingDirectCall callGuard( this );
                         emit timeChanged( curSyncTime );
@@ -643,19 +633,6 @@ namespace ec2
                 QnDbManager::instance(),
                 TIME_DELTA_PARAM_NAME,
                 QByteArray::number(QDateTime::currentMSecsSinceEpoch() - curSyncTime) ) ) );
-        if( m_peerType == Qn::PT_Server )
-        {
-            using namespace std::placeholders;
-            //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
-            if( !m_terminated )
-            {
-                if( m_broadcastSysTimeTaskID )
-                    TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
-                m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                    std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                    0 );
-            }
-        }
         lock->unlock();
         {
             WhileExecutingDirectCall callGuard( this );
@@ -974,16 +951,6 @@ namespace ec2
                         millisFromEpoch,
                         m_localTimePriorityKey,
                         MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS );
-
-                    if( !m_terminated )
-                    {
-                        if( m_broadcastSysTimeTaskID )
-                            TimerManager::instance()->deleteTimer( m_broadcastSysTimeTaskID );
-                        using namespace std::placeholders;
-                        m_broadcastSysTimeTaskID = TimerManager::instance()->addTimer(
-                            std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
-                            0 );
-                    }
                 }
             }
             else
