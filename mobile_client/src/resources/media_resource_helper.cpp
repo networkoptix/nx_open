@@ -82,7 +82,8 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_transcodingSupported(true),
     m_transcodingProtocol(transcodingProtocol),
     m_nativeProtocol(nativeStreamProtocol),
-    m_maxTextureSize(std::numeric_limits<int>::max())
+    m_maxTextureSize(std::numeric_limits<int>::max()),
+    m_maxNativeResolution(0)
 {
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
     updateStardardResolutions();
@@ -357,6 +358,9 @@ int QnMediaResourceHelper::maximumResolution() const {
             maxResolution = int(m_maxTextureSize * ar);
     }
 
+    if (m_maxNativeResolution > 0)
+        maxResolution = qMin(maxResolution, m_maxNativeResolution * m_camera->getVideoLayout()->size().height());
+
     return maxResolution;
 }
 
@@ -436,6 +440,8 @@ void QnMediaResourceHelper::updateMediaStreams() {
     bool nativeSupported = false;
     bool mjpegSupported = false;
 
+    m_maxNativeResolution = 0;
+
     for (const CameraMediaStreamInfo &info: supportedStreams.streams) {
         if (info.transcodingRequired)
             transcodingSupported = true;
@@ -448,6 +454,8 @@ void QnMediaResourceHelper::updateMediaStreams() {
 
         nativeSupported |= hasNative;
         mjpegSupported |= hasMjpeg;
+
+        m_maxNativeResolution = qMax(m_maxNativeResolution, sizeFromResolutionString(info.resolution).height());
 
         if (hasNative || hasMjpeg) {
             if (nativeStreamIndex(info.resolution) != -1)

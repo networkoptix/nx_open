@@ -103,6 +103,7 @@ private:
     Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
     int m_maxTextureSize;
+    int m_maxNativeResolution;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H
