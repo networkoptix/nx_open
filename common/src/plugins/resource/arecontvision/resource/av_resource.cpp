@@ -310,7 +310,7 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     m_zoneSite = zone_size;
     setMotionMaskPhysical(0);
 
-    m_channelCount = isPanoramic() ? 4 : 1;
+    m_channelCount = getVideoLayout(0)->channelCount();
     m_dualsensor = isDualSensor();
 
     return CameraDiagnostics::NoErrorResult();
