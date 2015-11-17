@@ -740,10 +740,18 @@ namespace ec2
             clientPtr.get(), &nx_http::AsyncHttpClient::done,
             this,
             [this, peerID, requestSendClock]( nx_http::AsyncHttpClientPtr clientPtr ) {
+                const qint64 rtt = m_monotonicClock.elapsed() - requestSendClock;
+                {
+                    //saving rtt
+                    QMutexLocker lk(&m_mutex);
+                    auto peerIter = m_peersToSendTimeSyncTo.find(peerID);
+                    if (peerIter != m_peersToSendTimeSyncTo.end())
+                        peerIter->second.rttMillis = rtt;
+                }
                 timeSyncRequestDone(
                     peerID,
                     std::move(clientPtr),
-                    m_monotonicClock.elapsed() - requestSendClock);
+                    rtt);
             },
             Qt::DirectConnection );
 
@@ -756,6 +764,10 @@ namespace ec2
                 timeSyncInfo.toString() );
         }
         clientPtr->addAdditionalHeader( Qn::PEER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray() );
+        if (peerIter->second.rttMillis)
+            clientPtr->addAdditionalHeader(
+                Qn::RTT_MS_HEADER_NAME,
+                nx_http::StringType::number(peerIter->second.rttMillis.get()));
 
         clientPtr->setUserName( peerIter->second.authData.userName );
         if( peerIter->second.authData.password )

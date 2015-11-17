@@ -31,9 +31,16 @@ int QnTimeSyncRestHandler::executeGet(
     if (timeSyncHeaderIter != connection->request().headers.end())
     {
         boost::optional<qint64> rttMillis;
-        StreamSocketInfo sockInfo;
-        if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
-            rttMillis = sockInfo.rttVar;
+        auto rttHeaderIter = connection->request().headers.find(Qn::RTT_MS_HEADER_NAME);
+        if (rttHeaderIter != connection->request().headers.end())
+            rttMillis = rttHeaderIter->second.toLongLong();
+
+        if (!rttMillis)
+        {
+            StreamSocketInfo sockInfo;
+            if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
+                rttMillis = sockInfo.rttVar;
+        }
         TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
             peerGuid->second,
             timeSyncHeaderIter->second,
