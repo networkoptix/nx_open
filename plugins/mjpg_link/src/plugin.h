@@ -41,7 +41,7 @@ public:
     virtual void setSettings(const nxpl::Setting* settings, int count) override;
 
     //!Implementation of nxpl::Plugin2::setPluginContainer
-    virtual void setPluginContainer(nxpl::PluginContainer* pluginContainer) override;
+    virtual void setPluginContainer(nxpl::PluginInterface* pluginContainer) override;
 
     nxpt::CommonRefManager* refManager();
 

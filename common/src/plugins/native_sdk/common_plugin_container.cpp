@@ -8,9 +8,9 @@
 #include <utils/common/synctime.h>
 
 
-CommonPluginContainer::~CommonPluginContainer()
-{
-}
+CommonPluginContainer::CommonPluginContainer() : m_refCount(1) {}
+
+CommonPluginContainer::~CommonPluginContainer() {}
 
 void* CommonPluginContainer::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
@@ -19,4 +19,14 @@ void* CommonPluginContainer::queryInterface(const nxpl::NX_GUID& interfaceID)
         return static_cast<nxpl::TimeProvider*>(qnSyncTime);
     }
     return NULL;
+}
+
+unsigned int CommonPluginContainer::addRef()
+{
+    return ++m_refCount;
+}
+
+unsigned int CommonPluginContainer::releaseRef() 
+{
+    return --m_refCount;
 }

@@ -51,7 +51,7 @@ public:
 
     PluginManager(
         const QString& pluginDir = QString(),
-        nxpl::PluginContainer* const pluginContainer = nullptr);
+        nxpl::PluginInterface* const pluginContainer = nullptr);
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
@@ -101,7 +101,7 @@ signals:
 
 private:
     const QString m_pluginDir;
-    nxpl::PluginContainer* const m_pluginContainer;
+    nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
     mutable QnMutex m_mutex;
