@@ -61,7 +61,7 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList &cameras);
     
-    void applyFilter(bool clearBookmarksCache);
+    void applyFilter();
 
     void sort(int column
         , Qt::SortOrder order);
@@ -140,7 +140,7 @@ void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList 
     m_cameras = cameras;
 }
 
-void QnSearchBookmarksModel::Impl::applyFilter(bool clearBookmarksCache)
+void QnSearchBookmarksModel::Impl::applyFilter()
 {
     if (m_cameras.empty())
         m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
@@ -212,10 +212,14 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     , int role)
 {
     const int row = index.row();
-    if ((row >= m_bookmarks.size()) || (role != Qt::DisplayRole))
+    if ((row >= m_bookmarks.size()) || ((role != Qt::DisplayRole) && (role != Qn::CameraBookmarkRole)))
         return QVariant();
 
     const QnCameraBookmark &bookmark = m_bookmarks.at(row);
+
+    if (role == Qn::CameraBookmarkRole)
+        return QVariant::fromValue(bookmark);
+
     switch(index.column())
     {
     case kName:
@@ -256,9 +260,9 @@ QnSearchBookmarksModel::~QnSearchBookmarksModel()
 {
 }
 
-void QnSearchBookmarksModel::applyFilter(bool clearBookmarksCache)
+void QnSearchBookmarksModel::applyFilter()
 {
-    m_impl->applyFilter(clearBookmarksCache);
+    m_impl->applyFilter();
 }
 
 void QnSearchBookmarksModel::setDates(const QDate &start

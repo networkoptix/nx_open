@@ -339,6 +339,9 @@ Item {
             QnPlaybackController {
                 id: playbackController
 
+                property bool resumeOnActivate: false
+                property bool resumeAtLive: false
+
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
@@ -350,14 +353,25 @@ Item {
                     if (paused)
                         mediaPlayer.pause()
                     else
-                        mediaPlayer.play(timeline.position)
+                        mediaPlayer.play(resumeAtLive ? -1 : timeline.position)
                 }
 
                 Connections {
                     target: Qt.application
                     onStateChanged: {
-                        if (Qt.application.state != Qt.ApplicationActive)
+                        if (Qt.application.state != Qt.ApplicationActive) {
+                            if (!playbackController.paused) {
+                                playbackController.resumeAtLive = mediaPlayer.atLive
+                                playbackController.resumeOnActivate = true
+                            }
                             playbackController.paused = true
+                        } else if (Qt.application.state == Qt.ApplicationActive) {
+                            if (playbackController.resumeOnActivate) {
+                                playbackController.paused = false
+                                playbackController.resumeOnActivate = false
+                                playbackController.resumeAtLive = false
+                            }
+                        }
                     }
                 }
             }

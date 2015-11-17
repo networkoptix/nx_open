@@ -40,8 +40,6 @@ Item {
         topMargin: spacing
         bottomMargin: spacing
 
-        onContentXChanged: console.log("contentx = " + contentX)
-
         model: QnCameraListModel {
             id: camerasModel
             showOffline: settings.showOfflineCameras

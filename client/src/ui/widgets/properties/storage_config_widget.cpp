@@ -601,8 +601,7 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
         &&  !hasChanges()   
         &&  any_of(m_model->storages(), [isMainPool](const QnStorageModelInfo &info) {
                 return info.isWritable 
-                    && info.isBackup != isMainPool 
-                    && info.isUsed;
+                    && info.isBackup != isMainPool;
             });
 
     if (isMainPool) {
