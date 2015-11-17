@@ -30,9 +30,7 @@ protected:
 
     void startServer()
     {
-        server = std::make_unique< SocketServer >(
-                    false, SocketFactory::nttAuto );
-
+        server = std::make_unique< SocketServer >( false );
         EXPECT_TRUE( server->bind( address ) );
         EXPECT_TRUE( server->listen() );
     }

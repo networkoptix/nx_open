@@ -113,7 +113,8 @@ class UdtSocketProfileServer : public UdtSocketProfile {
 public:
     UdtSocketProfileServer( const ServerConfig& config ) :
         server_socket_(SocketFactory::createStreamServerSocket(
-            false, config.tcp ? SocketFactory::nttDisabled : SocketFactory::nttEnabled)),
+            false, config.tcp ? SocketFactory::NatTraversalType::nttDisabled
+                              : SocketFactory::NatTraversalType::nttEnabled)),
         address_(config.address),
         port_(config.port),
         current_conn_size_(0),

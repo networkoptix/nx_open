@@ -17,7 +17,7 @@ TestHttpServer::TestHttpServer()
             nullptr,
             &m_httpMessageDispatcher,
             false,
-            SocketFactory::nttDisabled ) );
+            SocketFactory::NatTraversalType::nttDisabled ) );
 }
 
 TestHttpServer::~TestHttpServer()

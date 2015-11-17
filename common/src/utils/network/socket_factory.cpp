@@ -7,85 +7,128 @@
 
 #include "mixed_tcp_udt_server_socket.h"
 #include "system_socket.h"
+#include "udt_socket.h"
 #include "ssl_socket.h"
 
+#include "utils/common/cpp14.h"
 
 std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket(
     NatTraversalType natTraversalRequired )
 {
     switch( natTraversalRequired )
     {
-        case nttAuto:
-        case nttEnabled:
+        case NatTraversalType::nttAuto:
+        case NatTraversalType::nttEnabled:
             return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( true ) );
 
-        case nttDisabled:
+        case NatTraversalType::nttDisabled:
             return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( false ) );
     };
 
     return std::unique_ptr< AbstractDatagramSocket >();
 }
 
+static std::unique_ptr< AbstractStreamSocket > streamSocket(
+        SocketFactory::NatTraversalType nttType,
+        SocketFactory::SocketType socketType )
+{
+    switch( socketType )
+    {
+        case SocketFactory::SocketType::Default:
+            //TODO: #mux NattStreamSocket when it's ready
+            // fall into TCP for now
+
+        case SocketFactory::SocketType::Tcp:
+            switch( nttType )
+            {
+                case SocketFactory::NatTraversalType::nttAuto:
+                case SocketFactory::NatTraversalType::nttEnabled:
+                    return std::make_unique< TCPSocket >( true );
+
+                case SocketFactory::NatTraversalType::nttDisabled:
+                    return std::make_unique< TCPSocket >( false );
+
+                default:
+                    return nullptr;
+            }
+
+        case SocketFactory::SocketType::Udt:
+            switch( nttType )
+            {
+                case SocketFactory::NatTraversalType::nttAuto:
+                case SocketFactory::NatTraversalType::nttEnabled:
+                    return std::make_unique< UdtStreamSocket >( true );
+
+                case SocketFactory::NatTraversalType::nttDisabled:
+                    return std::make_unique< UdtStreamSocket >( false );
+
+                default:
+                    return nullptr;
+            }
+            break;
+
+        default:
+            return nullptr;
+    };
+}
+
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
-    AbstractStreamSocket* result = nullptr;
-    switch( natTraversalRequired )
-    {
-        case nttAuto:
-        case nttEnabled:
-            //TODO #ak nat_traversal MUST be enabled explicitly by instanciating some singletone
-            result = new TCPSocket( true ); //new HybridStreamSocket();  //that's where hole punching kicks in
-            break;
-        //case nttEnabled:
-        //    result = new UdtStreamSocket();   //TODO #ak does it make sense to use UdtStreamSocket only? - yes, but with different SocketFactory::NatTraversalType value
-        //    break;
-        case nttDisabled:
-            result = new TCPSocket( false );
-            break;
-    }
-
-    if( !result )
-        return nullptr;
+    auto result = streamSocket( natTraversalRequired,
+                                s_enforsedStreamSocketType );
 
 #ifdef ENABLE_SSL
-    if (sslRequired)
-        result = new QnSSLSocket(result, false);
+    if( result && sslRequired )
+        result.reset( new QnSSLSocket( result.release(), false ) );
 #endif
     
-    return std::unique_ptr< AbstractStreamSocket >( result );
+    return std::move( result );
+}
+
+static std::unique_ptr< AbstractStreamServerSocket > streamServerSocket(
+        SocketFactory::NatTraversalType nttType,
+        SocketFactory::SocketType socketType )
+{
+    static_cast< void >( nttType );
+    switch( socketType )
+    {
+        case SocketFactory::SocketType::Default:
+            //TODO: #mux NattStreamSocket when it's ready
+            // fall into TCP for now
+
+        case SocketFactory::SocketType::Tcp:
+            return std::make_unique< TCPServerSocket >();
+
+        case SocketFactory::SocketType::Udt:
+            return std::make_unique< UdtStreamServerSocket >();
+
+        default:
+            return nullptr;
+    };
 }
 
 std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
-    AbstractStreamServerSocket* serverSocket = nullptr;
-    switch( natTraversalRequired )
-    {
-        case nttAuto:
-        case nttEnabled:
-            //TODO #ak cloud_acceptor
-            serverSocket = new TCPServerSocket();
-            //serverSocket = new MixedTcpUdtServerSocket();
-            break;
-        //case nttEnabled:
-        //    serverSocket = new UdtStreamServerSocket();
-        //    break;
-        case nttDisabled:
-            serverSocket = new TCPServerSocket();
-            break;
-    }
-
-    assert(serverSocket);
-    if( !serverSocket )
-        return nullptr;
+    auto result = streamServerSocket( natTraversalRequired,
+                                      s_enforsedStreamSocketType );
 
 #ifdef ENABLE_SSL
-    if( sslRequired )
-        serverSocket = new SSLServerSocket(serverSocket, true);
+    if( result && sslRequired )
+        result.reset( new SSLServerSocket( result.release(), false ) );
 #endif // ENABLE_SSL
 
-    return std::unique_ptr< AbstractStreamServerSocket >( serverSocket );
+    return std::move( result );
 }
+
+void SocketFactory::enforseStreamSocketType( SocketType type )
+{
+    s_enforsedStreamSocketType = type;
+}
+
+std::atomic< SocketFactory::SocketType >
+    SocketFactory::s_enforsedStreamSocketType(
+        SocketFactory::SocketType::Default );

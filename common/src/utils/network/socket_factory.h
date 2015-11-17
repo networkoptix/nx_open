@@ -6,8 +6,9 @@
 #ifndef SOCKET_FACTORY_H
 #define SOCKET_FACTORY_H
 
-#include "abstract_socket.h"
+#include <atomic>
 
+#include "abstract_socket.h"
 
 //!Contains factory methods for creating sockets
 /*!
@@ -16,27 +17,37 @@
 class SocketFactory
 {
 public:
-    // TODO: #Elric #enum
-    enum NatTraversalType
+    enum class NatTraversalType
     {
         nttAuto,
         nttEnabled,
-        //!Using this value causes TCP protocol to be used for stream-orientied sockets
         nttDisabled
     };
 
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket(
-            NatTraversalType natTraversalRequired = nttAuto );
+            NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
 
     /*!
         \param sslRequired If \a true than it is guaranteed that returned object can be safely cast to \a AbstractEncryptedStreamSocket
     */
     static std::unique_ptr< AbstractStreamSocket > createStreamSocket(
         bool sslRequired = false,
-        NatTraversalType natTraversalRequired = nttAuto );
+        NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
+
     static std::unique_ptr< AbstractStreamServerSocket > createStreamServerSocket(
         bool sslRequired = false,
-        NatTraversalType natTraversalRequired = nttAuto );
+        NatTraversalType natTraversalRequired = NatTraversalType::nttAuto );
+
+    enum class SocketType
+    {
+        Default,    ///< production mode
+        Tcp,        ///< \class TcpSocket and \class TcpServerSocket
+        Udt,        ///< \class UdtSocket and \class UdtServerSocket
+    };
+
+    /*! Enforses factory to produce certain sockets
+     *  \note DEBUG use ONLY! */
+    static void enforseStreamSocketType( SocketType type );
 
 private:
     SocketFactory();
@@ -44,6 +55,8 @@ private:
     SocketFactory& operator=( const SocketFactory& );
 
     ~SocketFactory();
+
+    static std::atomic< SocketType > s_enforsedStreamSocketType;
 };
 
 #endif  //SOCKET_FACTORY_H
