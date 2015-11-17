@@ -14,6 +14,9 @@
 #include "core/resource/network_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
 
+#define UT_DEBUG 1
+#define uDebug() if (!UT_DEBUG) (void)(0); else qDebug()
+
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int USEC_IN_MSEC = 1000;
@@ -282,6 +285,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
+    uDebug() << "find data for time: " << m_currentChunk.endTimeMs();
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
@@ -313,6 +317,9 @@ begin_label:
         do {
             if (!getNextChunk(chunk, chunkCatalog))
             {
+                uDebug() << lit("getNextChunk() for %1 %2 returned false")
+                                .arg(chunk.startTimeMs)
+                                .arg(chunk.endTimeMs());
                 if (m_reverseMode) {
                     data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
@@ -357,6 +364,7 @@ begin_label:
         // Switch quality on I-frame (slow switching without seek) check
         if (m_newQualityTmpData && m_newQualityTmpData->timestamp <= data->timestamp)
         {
+            uDebug() << "Switching quality";
             m_currentChunk = m_newQualityChunk;
             m_currentChunkCatalog[m_newQualityCatalog->getStoragePool()] = m_newQualityCatalog;
             data = m_newQualityTmpData;
@@ -452,6 +460,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_aviDelegate->close();
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url, QnServer::StoragePool::Both));
 
+    uDebug() << lit("Switching to chunk %1").arg(url);
+    
     bool rez = m_aviDelegate->open(m_fileRes);
     if (rez)
         m_aviDelegate->setAudioChannel(m_selectedAudioChannel);
