@@ -20,6 +20,22 @@ QnPage {
     QtObject {
         id: d
         property var videoNavigation: navigationLoader.item
+        readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
+                                              connectionManager.connectionState == QnConnectionManager.Disconnected
+        readonly property bool cameraOffline: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+
+        onServerOfflineChanged: {
+            if (serverOffline) {
+                exitFullscreen()
+                navigationLoader.opacity = 0.0
+                navigationBarTint.opacity = 0.0
+                toolBar.opacity = 1.0
+            } else {
+                navigationLoader.opacity = 1.0
+                navigationBarTint.opacity = 1.0
+            }
+        }
     }
 
     Rectangle {
@@ -92,6 +108,8 @@ QnPage {
     QnScalableVideo {
         id: video
 
+        visible: dummyLoader.status != Loader.Ready
+
         anchors.fill: parent
         anchors.topMargin: -toolBar.fullHeight
         anchors.bottomMargin: -navigationBarPlaceholder.realHeight
@@ -115,6 +133,64 @@ QnPage {
 
         function bindScreenshotSource() {
             screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
+        }
+    }
+
+    Loader {
+        id: dummyLoader
+
+        sourceComponent: d.serverOffline || d.cameraOffline || d.cameraUnauthorized ? dummyComponent : undefined
+
+        y: parent.height / 6
+        anchors.horizontalCenter: parent.horizontalCenter
+    }
+
+    Component {
+        id: dummyComponent
+
+        Column {
+            id: videoDummy
+
+            Image {
+                width: dp(136)
+                height: dp(136)
+
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                source: {
+                    if (d.serverOffline)
+                        return "qrc:///images/server_offline_1.png"
+                    else if (d.cameraUnauthorized)
+                        return "qrc:///images/camera_locked_1.png"
+                    else if (d.cameraOffline)
+                        return "qrc:///images/camera_offline_1.png"
+                    else
+                        return ""
+                }
+            }
+
+            Text {
+                height: dp(96)
+                color: QnTheme.cameraStatus
+
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: sp(32)
+                font.weight: Font.Normal
+
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                text: {
+                    if (d.serverOffline)
+                        return qsTr("Server offline")
+                    else if (d.cameraUnauthorized)
+                        return qsTr("Authentication\nrequired")
+                    else if (d.cameraOffline)
+                        return qsTr("Camera offline")
+                    else
+                        return ""
+                }
+            }
         }
     }
 

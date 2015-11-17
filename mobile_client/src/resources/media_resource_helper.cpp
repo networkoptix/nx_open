@@ -125,6 +125,8 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
                 emit rotationChanged();
 
         });
+        connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
+
         at_resource_parentIdChanged(camera);
         updateMediaStreams();
 
@@ -133,9 +135,17 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
         emit resolutionChanged();
         emit rotationChanged();
+        emit resourceStatusChanged();
     }
 
     updateUrl();
+}
+
+Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const {
+    if (!m_camera)
+        return Qn::NotDefined;
+
+    return m_camera->getStatus();
 }
 
 QUrl QnMediaResourceHelper::mediaUrl() const {

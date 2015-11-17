@@ -11,6 +11,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
@@ -22,6 +23,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
 
     Q_ENUMS(Protocol)
+    Q_ENUMS(Qn::ResourceStatus)
 
     typedef Connective<QObject> base_type;
 
@@ -37,6 +39,8 @@ public:
 
     QString resourceId() const;
     void setResourceId(const QString &id);
+
+    Qn::ResourceStatus resourceStatus() const;
 
     QUrl mediaUrl() const;
 
@@ -61,6 +65,7 @@ public:
 
 signals:
     void resourceIdChanged();
+    void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
     void resolutionsChanged();
