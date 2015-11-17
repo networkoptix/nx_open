@@ -139,7 +139,7 @@ QnPage {
     Loader {
         id: dummyLoader
 
-        sourceComponent: d.serverOffline || d.cameraOffline || d.cameraUnauthorized ? dummyComponent : undefined
+        sourceComponent: player.atLive && (d.serverOffline || d.cameraOffline || d.cameraUnauthorized) ? dummyComponent : undefined
 
         y: parent.height / 6
         anchors.horizontalCenter: parent.horizontalCenter
