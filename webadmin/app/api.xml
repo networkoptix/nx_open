@@ -1375,14 +1375,27 @@
                 </function>
                 <function>
                     <name>rebuildArchive</name>
-                    <description>Start or stop server archive rebuilding, also can report this process status.</description>
+                    <description>Start or stop the server archive rebuilding, also can report this process status.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>action</name>
-                            <description>'start', 'stop' or '0' value.</description>
+                            <description>What to do and what to report about the server archive rebuild.</description>
                             <optional>true</optional>
-                            <values/>
+                            <values>
+                                <value>
+                                    <name>start</name>
+                                    <description>Start server archive rebuild.</description>
+                                </value>
+                                <value>
+                                    <name>stop</name>
+                                    <description>Stop rebuild.</description>
+                                </value>
+                                <value>
+                                    <name>0, empty value or no parameter</name>
+                                    <description>Report server archive rebuild status</description>
+                                </value>
+                            </values>
                         </param>
                         <param>
                             <name>mainPool</name>
@@ -1392,8 +1405,36 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Rebuild progress if no input parameter specified or XML with OK message or
-                        error code.</caption>
+                        <caption>Rebuild progress status or an error code.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>backupControl</name>
+                    <description>Start or stop the recorded data backup process, also can report this process status.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>action</name>
+                            <description>What to do and what to report about the backup process.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>start</name>
+                                    <description>Start backup just now.</description>
+                                </value>
+                                <value>
+                                    <name>stop</name>
+                                    <description>Stop backup.</description>
+                                </value>
+                                <value>
+                                    <name>0, empty value or no parameter</name>
+                                    <description>Report the backup process status.</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Bakcup process progress status or an error code.</caption>
                     </result>
                 </function>
                 <function>
