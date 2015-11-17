@@ -13,14 +13,12 @@ namespace nxpl
 
     class TimeProvider;
 
+    //!Enables plugin to query specific callback interface from plugin host
     class PluginContainer
-    :
-        public nxpl::PluginInterface
     {
     public:
-        virtual ~PluginContainer() {}
-
-        virtual nxpl::TimeProvider* getTimeProvider() = 0;
+        virtual ~PluginContainer() {} 
+        virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) = 0;
     };
 
 

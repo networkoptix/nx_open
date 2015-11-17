@@ -40,12 +40,11 @@ static const nxcip::UsecUTCTimestamp USEC_IN_SEC = 1000*1000;
 static const nxcip::UsecUTCTimestamp NSEC_IN_USEC = 1000;
 static const int MAX_FRAME_SIZE = 4*1024*1024;
 
-StreamReader::StreamReader(
-    nxpt::CommonRefManager* const parentRefManager,
-    nxpl::PluginContainer* const pluginContainer,
-    const nxcip::CameraInfo& cameraInfo,
-    float fps,
-    int encoderNumber )
+StreamReader::StreamReader(nxpt::CommonRefManager* const parentRefManager,
+                           nxpl::TimeProvider *const timeProvider,
+                           const nxcip::CameraInfo& cameraInfo,
+                           float fps,
+                           int encoderNumber )
 :
     m_refManager( parentRefManager ),
     m_cameraInfo( cameraInfo ),
@@ -57,8 +56,9 @@ StreamReader::StreamReader(
     m_frameDurationMSec( 0 ),
     m_terminated( false ),
     m_isInGetNextData( 0 ),
-    m_timeProvider(pluginContainer->getTimeProvider())
+    m_timeProvider(timeProvider)
 {
+    assert(m_timeProvider);
     setFps( fps );
 
     using namespace std::placeholders;

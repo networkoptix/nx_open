@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <plugins/plugin_api.h>
+#include <plugins/plugin_container_api.h>
 
 
 class DiscoveryManager;
@@ -49,7 +50,7 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     std::unique_ptr<DiscoveryManager> m_discoveryManager;
-    nxpl::PluginContainer* m_pluginContainer;
+    nxpl::TimeProvider *m_timeProvider;
 };
 
 #endif  //IMAGE_LIBRARY_PLUGIN_H
