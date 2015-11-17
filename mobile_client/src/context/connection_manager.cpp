@@ -62,6 +62,7 @@ QnConnectionManager::QnConnectionManager(QObject *parent) :
     connect(qnCommon, &QnCommonModule::systemNameChanged, this, &QnConnectionManager::systemNameChanged);
     connect(qnClientMessageProcessor, &QnMobileClientMessageProcessor::initialResourcesReceived, this, &QnConnectionManager::initialResourcesReceived);
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionOpened, this, &QnConnectionManager::connectionStateChanged);
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::connectionClosed, this, &QnConnectionManager::connectionStateChanged);
 }
 
 QnConnectionManager::~QnConnectionManager() {

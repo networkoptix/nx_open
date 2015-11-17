@@ -13,6 +13,17 @@ QnPage {
 
     property alias searchActive: searchItem.opened
 
+    QtObject {
+        id: d
+
+        property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting && !loadingDummy.visible
+
+        onServerOfflineChanged: {
+            if (serverOffline)
+                searchItem.close()
+        }
+    }
+
     Connections {
         target: menuBackButton
         onClicked: {
@@ -36,13 +47,64 @@ QnPage {
                 sideNavigation.enabled = true
             }
         }
-        visible: pageStatus == Stack.Active || pageStatus == Stack.Activating
+        visible: (pageStatus == Stack.Active || pageStatus == Stack.Activating)
         Keys.forwardTo: resourcesPage
+
+        enabled: !d.serverOffline && !loadingDummy.visible
+        opacity: !d.serverOffline ? 1.0 : 0.2
+        Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
     QnCameraFlow {
         id: camerasList
         anchors.fill: parent
+        anchors.topMargin: offlineWarning.height
+    }
+
+    Rectangle {
+        id: offlineWarning
+
+        width: parent.width
+        height: d.serverOffline ? dp(40) : 0
+
+        clip: true
+        anchors.horizontalCenter: parent.horizontalCenter
+
+        color: QnTheme.attentionBackground
+
+        Behavior on height {
+            enabled: activePage
+            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+        }
+
+        Text {
+            id: warningText
+            anchors.horizontalCenter: parent.horizontalCenter
+            // Two lines below are the hack to prevent text from moving when the header changes its size
+            anchors.verticalCenter: parent.bottom
+            anchors.verticalCenterOffset: -dp(20)
+            font.pixelSize: sp(16)
+            font.weight: Font.DemiBold
+            text: qsTr("Server offline")
+            color: QnTheme.windowText
+        }
+    }
+
+    Rectangle {
+        id: offlineDimmer
+        anchors.fill: parent
+        anchors.topMargin: offlineWarning.height
+        color: QnTheme.offlineDimmer
+
+        Behavior on opacity { NumberAnimation { duration: 200 } }
+        opacity: d.serverOffline ? 1.0 : 0.0
+
+        visible: opacity > 0
+
+        MouseArea {
+            anchors.fill: parent
+            // Block mouse events
+        }
     }
 
     Rectangle {
@@ -50,6 +112,7 @@ QnPage {
         anchors.fill: parent
         color: QnTheme.windowBackground
         Behavior on opacity { NumberAnimation { duration: 200 } }
+        visible: opacity > 0
 
         Column {
             anchors.centerIn: parent

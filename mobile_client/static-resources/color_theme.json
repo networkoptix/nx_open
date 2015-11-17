@@ -159,6 +159,7 @@
         "scrollIndicator" :     "palette.base.color_9",
         "playPause" :           "palette.contrast.color_13",
         "playPauseBackground" : "#32171c1f",
-        "navigationPanelBackground" : "palette.base.color_3"
+        "navigationPanelBackground" : "palette.base.color_3",
+        "offlineDimmer" :       "#cc171c1f"
     }
 }
