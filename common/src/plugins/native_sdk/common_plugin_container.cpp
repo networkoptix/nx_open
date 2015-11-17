@@ -16,6 +16,7 @@ void* CommonPluginContainer::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
     if (memcmp(&interfaceID, &nxpl::IID_TimeProvider, sizeof(nxpl::IID_TimeProvider)) == 0)
     {
+        qnSyncTime->addRef();
         return static_cast<nxpl::TimeProvider*>(qnSyncTime);
     }
     return NULL;
