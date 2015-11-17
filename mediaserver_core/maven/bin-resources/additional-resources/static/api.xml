@@ -1392,7 +1392,7 @@
                                     <description>Stop rebuild.</description>
                                 </value>
                                 <value>
-                                    <name>0, empty value or no parameter</name>
+                                    <name>any other value or no parameter</name>
                                     <description>Report server archive rebuild status</description>
                                 </value>
                             </values>
@@ -1427,7 +1427,7 @@
                                     <description>Stop backup.</description>
                                 </value>
                                 <value>
-                                    <name>0, empty value or no parameter</name>
+                                    <name>any other value or no parameter</name>
                                     <description>Report the backup process status.</description>
                                 </value>
                             </values>
