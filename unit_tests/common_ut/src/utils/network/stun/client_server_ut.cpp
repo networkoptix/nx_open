@@ -55,7 +55,8 @@ TEST_F( StunClientServerTest, Connectivity )
     client.openConnection(
         connected.pusher(), indicated.pusher(), disconnected.pusher() );
 
-    ASSERT_EQ( connected.pop(), SystemError::connectionRefused );
+    auto r = connected.pop();
+    ASSERT_TRUE( r == SystemError::connectionRefused || r == SystemError::timedOut );
     EXPECT_TRUE( connected.isEmpty() );
     EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
@@ -90,7 +91,8 @@ TEST_F( StunClientServerTest, RequestResponse )
         client.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
-        ASSERT_EQ( result.first, SystemError::connectionRefused );
+        ASSERT_TRUE( result.first == SystemError::connectionRefused ||
+                     result.first == SystemError::timedOut );
     }
 
     startServer();

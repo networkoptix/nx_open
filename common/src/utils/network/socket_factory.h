@@ -45,9 +45,10 @@ public:
         Udt,        ///< \class UdtSocket and \class UdtServerSocket
     };
 
-    /*! Enforses factory to produce certain sockets
+    /*! Enforces factory to produce certain sockets
      *  \note DEBUG use ONLY! */
-    static void enforseStreamSocketType( SocketType type );
+    static void enforceStreamSocketType( SocketType type );
+    static bool isStreamSocketTypeEnforced();
 
 private:
     SocketFactory();
@@ -56,7 +57,7 @@ private:
 
     ~SocketFactory();
 
-    static std::atomic< SocketType > s_enforsedStreamSocketType;
+    static std::atomic< SocketType > s_enforcedStreamSocketType;
 };
 
 #endif  //SOCKET_FACTORY_H

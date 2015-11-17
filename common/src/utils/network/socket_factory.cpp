@@ -77,7 +77,7 @@ std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     SocketFactory::NatTraversalType natTraversalRequired )
 {
     auto result = streamSocket( natTraversalRequired,
-                                s_enforsedStreamSocketType );
+                                s_enforcedStreamSocketType );
 
 #ifdef ENABLE_SSL
     if( result && sslRequired )
@@ -114,7 +114,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
     SocketFactory::NatTraversalType natTraversalRequired )
 {
     auto result = streamServerSocket( natTraversalRequired,
-                                      s_enforsedStreamSocketType );
+                                      s_enforcedStreamSocketType );
 
 #ifdef ENABLE_SSL
     if( result && sslRequired )
@@ -124,11 +124,16 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
     return std::move( result );
 }
 
-void SocketFactory::enforseStreamSocketType( SocketType type )
+void SocketFactory::enforceStreamSocketType( SocketType type )
 {
-    s_enforsedStreamSocketType = type;
+    s_enforcedStreamSocketType = type;
+}
+
+bool SocketFactory::isStreamSocketTypeEnforced()
+{
+    return s_enforcedStreamSocketType != SocketType::Default;
 }
 
 std::atomic< SocketFactory::SocketType >
-    SocketFactory::s_enforsedStreamSocketType(
+    SocketFactory::s_enforcedStreamSocketType(
         SocketFactory::SocketType::Default );

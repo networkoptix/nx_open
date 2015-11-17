@@ -53,6 +53,8 @@ protected:
         AbstractStreamSocket* connectionPtr = connection.get();
         m_connections.push_back( std::move(connection) );
         ASSERT_TRUE( connectionPtr->setNonBlockingMode( true ) );
+        ASSERT_TRUE( connectionPtr->setRecvTimeout( 500 ) );
+        ASSERT_TRUE( connectionPtr->setSendTimeout( 500 ) );
         connectionPtr->connectAsync(
             SocketAddress(QString::fromLatin1("ya.ru"), nx_http::DEFAULT_HTTP_PORT),
             std::bind( &SocketHostNameResolveTest::onConnectionComplete, this, connectionPtr, std::placeholders::_1 ) );
@@ -155,6 +157,9 @@ TEST( Socket, ServerSocketAsyncCancellation )
 
 TEST( Socket, HostNameResolve1 )
 {
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
     std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
     SystemError::ErrorCode connectErrorCode = SystemError::noError;
     std::condition_variable cond;
@@ -162,6 +167,8 @@ TEST( Socket, HostNameResolve1 )
     bool done = false;
     HostAddress resolvedAddress;
     ASSERT_TRUE( connection->setNonBlockingMode( true ) );
+    ASSERT_TRUE( connection->setRecvTimeout( 500 ) );
+    ASSERT_TRUE( connection->setSendTimeout( 500 ) );
     connection->connectAsync(
         SocketAddress(QString::fromLatin1("ya.ru"), 80),
         [&connectErrorCode, &done, &resolvedAddress, &cond, &mutex, &connection](SystemError::ErrorCode errorCode) mutable {
@@ -183,6 +190,9 @@ TEST( Socket, HostNameResolve1 )
 
 TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 {
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
     HostAddress resolvedAddress;
 
     m_startedConnectionsCount = CONCURRENT_CONNECTIONS;
@@ -279,6 +289,8 @@ TEST( Socket, BadHostNameResolve )
         std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
         int iBak = i;
         ASSERT_TRUE( connection->setNonBlockingMode( true ) );
+        ASSERT_TRUE( connection->setRecvTimeout( 500 ) );
+        ASSERT_TRUE( connection->setSendTimeout( 500 ) );
         connection->connectAsync(
             SocketAddress( QString::fromLatin1( "hx.hz" ), nx_http::DEFAULT_HTTP_PORT ),
             [&i, iBak]

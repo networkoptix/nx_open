@@ -14,6 +14,9 @@
 
 TEST(RandomOnlineEndpointSelector, common)
 {
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
     for (int i = 0; i < 20; ++i)
     {
         std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;

@@ -18,13 +18,13 @@ int main( int argc, char **argv )
     for( int i = 0; i < argc; ++i )
     {
         std::string arg( argv[ i ] );
-        if( arg == "--enfoce-socket-tcp" ) {
-            SocketFactory::enforseStreamSocketType( SocketFactory::SocketType::Tcp );
+        if( arg == "--enforce-socket-tcp" ) {
+            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
             std::cout << "### Enforced socket type: TCP ###" << std::endl;
             continue;
         }
-        if( arg == "--enfoce-socket-udt" ) {
-            SocketFactory::enforseStreamSocketType( SocketFactory::SocketType::Udt );
+        if( arg == "--enforce-socket-udt" ) {
+            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
             std::cout << "### Enforced socket type: UDT ###" << std::endl;
             continue;
         }
