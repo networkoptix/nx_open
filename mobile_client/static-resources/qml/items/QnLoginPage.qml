@@ -38,9 +38,42 @@ QnPage {
         }
     }
 
+    Item {
+        id: warning
+
+        width: parent.width
+        height: warningRect.height + dp(8)
+
+        Rectangle {
+            id: warningRect
+
+            width: parent.width
+            height: _showWarning ? dp(40) : 0
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            color: QnTheme.attentionBackground
+
+            Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
+
+            Text {
+                id: warningText
+                anchors.horizontalCenter: parent.horizontalCenter
+                // Two lines below are the hack to prevent text from moving when the header changes its size
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -dp(20)
+                font.pixelSize: sp(16)
+                font.weight: Font.DemiBold
+                color: QnTheme.windowText
+            }
+        }
+    }
+
     QnFlickable {
         id: flickable
         anchors.fill: parent
+        anchors.topMargin: warning.height
+        topMargin: dp(16)
         leftMargin: dp(16)
         rightMargin: dp(16)
         bottomMargin: dp(16)
@@ -52,28 +85,6 @@ QnPage {
             id: content
             width: parent.width - flickable.leftMargin - flickable.rightMargin
             spacing: dp(24)
-
-            Rectangle {
-                id: warningRect
-                height: _showWarning ? dp(40) : 1
-                width: loginPage.width
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: _showWarning ? QnTheme.attentionBackground : "transparent"
-                clip: true
-
-                Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
-
-                Text {
-                    id: warningText
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    // Two lines below are the hack to prevent text from moving when the header changes its size
-                    anchors.verticalCenter: parent.top
-                    anchors.verticalCenterOffset: dp(20)
-                    font.pixelSize: sp(16)
-                    font.weight: Font.DemiBold
-                    color: QnTheme.windowText
-                }
-            }
 
             Row {
                 width: parent.width
