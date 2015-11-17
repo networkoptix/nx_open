@@ -253,7 +253,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
         NX_LOG( deadLockMsg, cl_logALWAYS );
         std::cerr<<deadLockMsg.toStdString()<<std::endl;
-        assert( false );
+        //assert( false );
         return;
     }
 
@@ -319,7 +319,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
-            assert( false );
+            //assert( false );
         }
     }
 
