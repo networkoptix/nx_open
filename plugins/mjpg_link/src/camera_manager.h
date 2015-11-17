@@ -20,7 +20,9 @@ class CameraManager
     public nxcip::BaseCameraManager2
 {
 public:
-    CameraManager( const nxcip::CameraInfo& info );
+    CameraManager(
+        const nxcip::CameraInfo& info,
+        nxpl::PluginContainer* const pluginContainer);
     virtual ~CameraManager();
 
     //!Implementation of nxpl::PluginInterface::queryInterface
@@ -69,6 +71,7 @@ private:
     */
     nxpt::ScopedRef<HttpLinkPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
+    nxpl::PluginContainer* const m_pluginContainer;
     unsigned int m_capabilities;
     std::unique_ptr<MediaEncoder> m_encoder;
 };

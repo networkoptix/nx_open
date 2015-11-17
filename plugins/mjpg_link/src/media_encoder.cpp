@@ -14,10 +14,12 @@ static const double MAX_FPS = 30;
 
 MediaEncoder::MediaEncoder(
     CameraManager* const cameraManager,
+    nxpl::PluginContainer* const pluginContainer,
     int encoderNumber )
 :
     m_refManager( cameraManager->refManager() ),
     m_cameraManager( cameraManager ),
+    m_pluginContainer( pluginContainer ),
     m_encoderNumber( encoderNumber ),
     m_currentFps( MAX_FPS )
 {
@@ -129,6 +131,7 @@ nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
     if( !m_streamReader.get() )
         m_streamReader.reset( new StreamReader(
             &m_refManager,
+            m_pluginContainer,
             m_cameraManager->info(),
             m_currentFps,
             m_encoderNumber ) );
