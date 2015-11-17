@@ -156,7 +156,7 @@ namespace ec2
         void processTimeSyncInfoHeader(
             const QnUuid& peerID,
             const nx_http::StringType& serializedTimeSync,
-            AbstractStreamSocket* sock );
+            boost::optional<qint64> requestRttMillis);
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -291,7 +291,8 @@ namespace ec2
         void synchronizeWithPeer( const QnUuid& peerID );
         void timeSyncRequestDone(
             const QnUuid& peerID,
-            nx_http::AsyncHttpClientPtr clientPtr );
+            nx_http::AsyncHttpClientPtr clientPtr,
+            qint64 requestRttMillis);
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
         void syncTimeWithAllKnownServers(QMutexLocker* const lock);
         void onBeforeSendingTransaction(

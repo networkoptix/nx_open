@@ -28,11 +28,17 @@ int QnTimeSyncRestHandler::executeGet(
     if( peerGuid == connection->request().headers.end() )
         return nx_http::StatusCode::badRequest;
     auto timeSyncHeaderIter = connection->request().headers.find( TIME_SYNC_HEADER_NAME );
-    if( timeSyncHeaderIter != connection->request().headers.end() )
+    if (timeSyncHeaderIter != connection->request().headers.end())
+    {
+        boost::optional<qint64> rttMillis;
+        StreamSocketInfo sockInfo;
+        if (connection->socket() && connection->socket()->getConnectionStatistics(&sockInfo))
+            rttMillis = sockInfo.rttVar;
         TimeSynchronizationManager::instance()->processTimeSyncInfoHeader(
             peerGuid->second,
             timeSyncHeaderIter->second,
-            connection->socket().data() );
+            rttMillis);
+    }
 
     //sending our time synchronization information to remote peer
     connection->response()->headers.emplace(

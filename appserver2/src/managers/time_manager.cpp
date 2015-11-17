@@ -539,26 +539,13 @@ namespace ec2
     void TimeSynchronizationManager::processTimeSyncInfoHeader(
         const QnUuid& peerID,
         const nx_http::StringType& serializedTimeSync,
-        AbstractStreamSocket* sock )
+        boost::optional<qint64> rttMillis)
     {
-        //taking into account tcp connection round trip time
-        unsigned int rttMillis = 0;
-        StreamSocketInfo sockInfo;
-        if( sock && sock->getConnectionStatistics( &sockInfo ) )
-            rttMillis = sockInfo.rttVar;
-
         TimeSyncInfo remotePeerTimeSyncInfo;
         if( !remotePeerTimeSyncInfo.fromString( serializedTimeSync ) )
             return;
 
         Q_ASSERT( remotePeerTimeSyncInfo.timePriorityKey.seed > 0 );
-
-        //TODO #ak following condition should be removed. Placed for debug purpose only
-        if( rttMillis > MAX_RTT_TIME_MS )
-        {
-            NX_LOG( lit( "%1. Received rtt of %2 ms" ).arg( Q_FUNC_INFO ).arg( rttMillis ), cl_logWARNING );
-            rttMillis = MAX_DESIRED_TIME_DRIFT_MS;
-        }
 
         QMutexLocker lk( &m_mutex );
         const auto localTimePriorityBak = m_localTimePriorityKey.toUInt64();
@@ -566,9 +553,9 @@ namespace ec2
             &lk,
             peerID,
             m_monotonicClock.elapsed(),
-            remotePeerTimeSyncInfo.syncTime + rttMillis / 2,
+            remotePeerTimeSyncInfo.syncTime + (rttMillis ? (rttMillis.get() / 2) : 0),
             remotePeerTimeSyncInfo.timePriorityKey,
-            rttMillis );
+            rttMillis ? rttMillis.get() : MAX_DESIRED_TIME_DRIFT_MS);
         if (m_localTimePriorityKey.toUInt64() != localTimePriorityBak)
             handleLocalTimePriorityKeyChange(&lk);
     }
@@ -591,8 +578,9 @@ namespace ec2
 
         //time difference between this server and remote one is not that great
         const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
-        const bool maxTimeDriftExceeded =
-            (std::abs( timeDifference ) >= std::max<qint64>( timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS ));
+        const auto effectiveTimeErrorEstimation =
+            std::max<qint64>(timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS);
+        const bool maxTimeDriftExceeded = std::abs(timeDifference) >= effectiveTimeErrorEstimation;
         const bool needAdjustClockDueToLargeDrift =
             //taking drift into account if both servers have time with same key
             (remotePeerTimePriorityKey == m_usedTimeSyncInfo.timePriorityKey) &&
@@ -606,11 +594,24 @@ namespace ec2
             return; //not applying time
         }
 
-        NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, peer's sync time (%2), "
-            "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
-            arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-            arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
-            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
+        //printing sync time change reason to the log
+        if (remotePeerTimePriorityKey <= m_usedTimeSyncInfo.timePriorityKey &&
+            needAdjustClockDueToLargeDrift)
+        {
+            NX_LOG(QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, peer's sync time (%2). "
+                "Accepting peer's synchronized time due to large drift (%3 ms, fault %4)").
+                arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
+                arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logINFO);
+        }
+        else
+        {
+            NX_LOG( QString::fromLatin1("TimeSynchronizationManager. Received sync time update from peer %1, peer's sync time (%2), "
+                "peer's time priority key 0x%3. Local peer id %4, used priority key 0x%5. Accepting peer's synchronized time").
+                arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
+                arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(qnCommon->moduleGUID().toString()).
+                arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
+        }
+
         //taking new synchronization data
         m_usedTimeSyncInfo = TimeSyncInfo(
             localMonotonicClock,
@@ -734,11 +735,15 @@ namespace ec2
         Q_ASSERT( !peerIter->second.httpClient );
         clientPtr = nx_http::AsyncHttpClient::create();
         using namespace std::placeholders;
+        const auto requestSendClock = m_monotonicClock.elapsed();
         connect(
             clientPtr.get(), &nx_http::AsyncHttpClient::done,
             this,
-            [this, peerID]( nx_http::AsyncHttpClientPtr clientPtr ) {
-                timeSyncRequestDone(peerID, std::move(clientPtr));
+            [this, peerID, requestSendClock]( nx_http::AsyncHttpClientPtr clientPtr ) {
+                timeSyncRequestDone(
+                    peerID,
+                    std::move(clientPtr),
+                    m_monotonicClock.elapsed() - requestSendClock);
             },
             Qt::DirectConnection );
 
@@ -781,7 +786,8 @@ namespace ec2
 
     void TimeSynchronizationManager::timeSyncRequestDone(
         const QnUuid& peerID,
-        nx_http::AsyncHttpClientPtr clientPtr )
+        nx_http::AsyncHttpClientPtr clientPtr,
+        qint64 requestRttMillis)
     {
         if( clientPtr->response() &&
             clientPtr->response()->statusLine.statusCode == nx_http::StatusCode::ok )
@@ -794,7 +800,7 @@ namespace ec2
                 processTimeSyncInfoHeader(
                     peerID,
                     timeSyncHeaderIter->second,
-                    sock.data() );
+                    requestRttMillis);
             }
         }
 
