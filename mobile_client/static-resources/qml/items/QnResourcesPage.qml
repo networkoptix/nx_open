@@ -66,7 +66,7 @@ QnPage {
                 height: dp(56)
                 verticalAlignment: Qt.AlignVCenter
 
-                text: connectionManager.connectionState == QnConnectionManager.Connecting ? qsTr("Connecting...") : qsTr("Loading...")
+                text: connectionManager.connectionState == QnConnectionManager.Connected ? qsTr("Loading...") : qsTr("Connecting...")
                 font.pixelSize: sp(32)
                 color: QnTheme.loadingText
             }
