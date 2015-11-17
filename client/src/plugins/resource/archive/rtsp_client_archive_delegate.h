@@ -60,8 +60,6 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
-
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
@@ -75,6 +73,7 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
+    void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, bool forceReload);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
