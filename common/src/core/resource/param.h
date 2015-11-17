@@ -46,9 +46,6 @@ namespace Qn
     static const QString IO_PORT_DISPLAY_NAMES_PARAM_NAME = lit("ioDisplayName");
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
 
-    /* Whether statistics gathering is allowed on the current server. */
-    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
-
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");
     static const QString CPU_MODEL_NAME = lit("cpuModelName");
