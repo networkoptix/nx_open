@@ -150,7 +150,7 @@ private:
 
     QnFrameScaler::DownscaleFactor findScaleFactor(int width, int height, int fitWidth, int fitHeight);
     QnFrameScaler::DownscaleFactor determineScaleFactor(
-        QnAbstractRenderer* render,
+        QSet<QnAbstractRenderer*> renderList,
         int channelNumber, 
         int srcWidth, 
         int srcHeight, 

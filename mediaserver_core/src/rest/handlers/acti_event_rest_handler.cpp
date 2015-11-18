@@ -22,9 +22,9 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
     Q_ASSERT( path.indexOf("api/camera_event") != -1 );
 
     QStringList pathParts = path.split('/');
-    if( pathParts.size() < 3 )
+    if( pathParts.size() < 4 )
         return nx_http::StatusCode::badRequest; //missing resource id 
-    QnUuid resourceID(pathParts[2]);
+    QnUuid resourceID(pathParts[3]);
 
     QnResourcePtr res = QnResourcePool::instance()->getResourceById(resourceID);
     if( !res )
