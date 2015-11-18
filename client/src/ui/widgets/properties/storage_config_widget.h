@@ -43,6 +43,7 @@ protected:
 
     virtual void setReadOnlyInternal(bool readOnly) override;
     virtual void showEvent(QShowEvent *event) override;
+    virtual void hideEvent(QHideEvent *event) override;
 
 private:
     /** Load initial storages data from resource pool. */
@@ -87,6 +88,7 @@ private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
+    QTimer* m_updateStatusTimer;
 
     struct StoragePool
     {

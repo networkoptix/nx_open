@@ -59,6 +59,7 @@ namespace {
 
 
     const qint64 minDeltaForMessageMs = 1000ll * 3600 * 24;
+    const qint64 updateStatusTimeoutMs = 5 * 1000;
 
 } // anonymous namespace
 
@@ -88,6 +89,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , ui(new Ui::StorageConfigWidget())
     , m_server()
     , m_model(new QnStorageListModel())
+    , m_updateStatusTimer(new QTimer(this))
     , m_mainPool()
     , m_backupPool()
     , m_backupSchedule()
@@ -137,6 +139,11 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
         updateRebuildInfo();
     });
 
+    m_updateStatusTimer->setInterval(updateStatusTimeoutMs);
+    connect(m_updateStatusTimer, &QTimer::timeout, this, [this] {
+        qnServerStorageManager->checkStoragesStatus(m_server);
+    });
+
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
 
     retranslateUi();
@@ -160,8 +167,13 @@ void QnStorageConfigWidget::setReadOnlyInternal( bool readOnly ) {
 
 void QnStorageConfigWidget::showEvent( QShowEvent *event ) {
     base_type::showEvent(event);
-    if (m_server)
-        qnServerStorageManager->checkBackupStatus(m_server);
+    m_updateStatusTimer->start();
+    qnServerStorageManager->checkStoragesStatus(m_server);
+}
+
+void QnStorageConfigWidget::hideEvent( QHideEvent *event ) {
+    base_type::hideEvent(event);
+    m_updateStatusTimer->stop();
 }
 
 bool QnStorageConfigWidget::hasChanges() const {
