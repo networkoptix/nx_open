@@ -1164,11 +1164,12 @@ int QnRtspConnectionProcessor::composePlay()
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 
     {
-        d->dataProcessor->lockDataQueue();
+        auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
+            copySize = d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 
         if (copySize == 0) {
@@ -1186,7 +1187,7 @@ int QnRtspConnectionProcessor::composePlay()
             }
         }
 
-        d->dataProcessor->unlockDataQueue();
+        dataQueueLock.unlock();
         quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
         d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
         d->dataProcessor->setLiveQuality(d->quality);
@@ -1302,17 +1303,16 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
             if (d->liveMode == Mode_Live)
             {
-                d->dataProcessor->lockDataQueue();
+                auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+                QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
+                d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
-
-                d->dataProcessor->unlockDataQueue();
             }
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;

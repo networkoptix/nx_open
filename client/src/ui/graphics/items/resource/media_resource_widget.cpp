@@ -868,10 +868,12 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region) {
-    Q_UNUSED(channel)
+    QPoint channelOffset = channelGridOffset(channel);
+
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
-    qreal offset = xStep * 0.1;
+    qreal xOffset = channelOffset.x() + 0.1;
+    qreal yOffset = channelOffset.y();
     qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
@@ -880,6 +882,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     font.setBold(true);
     painter->setFont(font);
 
+    /* Zero sensitivity is skipped as there should not be painted zeros */
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
         auto rects = region.getRectsBySens(sensitivity);
         if (rects.isEmpty())
@@ -890,8 +893,8 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
-            int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
+            qreal x = rect.left(), y = rect.top();
+            painter->drawStaticText((x + xOffset) * xStep , (y + yOffset) * yStep , m_sensStaticText[sensitivity]);
         }
     }
 }
@@ -1621,13 +1624,7 @@ void QnMediaResourceWidget::updateBookmarksVisibility() {
     if (!m_bookmarksOverlayWidget)
         return;
 
-    auto visibility = Invisible;
-    if (m_bookmarksQuery) {
-        if (options().testFlag(DisplayInfo))
-            visibility = Visible;
-        else
-            visibility = AutoVisible;
-    }
+    const auto visibility = (m_bookmarksQuery ? Visible : Invisible);
     setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 

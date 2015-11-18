@@ -43,6 +43,7 @@ protected:
 
     virtual void setReadOnlyInternal(bool readOnly) override;
     virtual void showEvent(QShowEvent *event) override;
+    virtual void hideEvent(QHideEvent *event) override;
 
 private:
     /** Load initial storages data from resource pool. */
@@ -68,6 +69,7 @@ private:
     bool canStartBackup(const QnBackupStatusData& data, QString *info);
 
     QString backupPositionToString(qint64 backupTimeMs);
+
 private slots:
    
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
@@ -81,10 +83,12 @@ private slots:
     void at_openBackupSchedule_clicked();
     
     void at_backupTypeComboBoxChange(int index);
+
 private:
     QScopedPointer<Ui::StorageConfigWidget> ui;
     QnMediaServerResourcePtr m_server;
     QScopedPointer<QnStorageListModel> m_model;
+    QTimer* m_updateStatusTimer;
 
     struct StoragePool
     {
@@ -102,4 +106,7 @@ private:
     void setupGrid(QTableView* tableView, bool isMainPool);
     void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;
     bool hasStoragesChanges(const QnStorageModelInfoList &storages) const;
+
+private:
+    int m_backupTypeLastIndex;
 };

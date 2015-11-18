@@ -390,6 +390,7 @@ void DeviceFileCatalog::setLastSyncTime(int64_t time)
     QnMutexLocker lk(&m_mutex);
     m_lastSyncTime = time;
     qnServerDb->setLastBackupTime(
+        m_storagePool,
         qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
         m_catalog,
         m_lastSyncTime
@@ -402,6 +403,7 @@ int64_t DeviceFileCatalog::getLastSyncTime() const
     if (m_lastSyncTime == 0)
     {
         m_lastSyncTime = qnServerDb->getLastBackupTime(
+            m_storagePool,
             qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(), 
             m_catalog
         );
@@ -537,7 +539,7 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
                 {
                     Chunk& prevChunk = *(itr-1);
                     qint64 delta = chunk.startTimeMs - prevChunk.endTimeMs();
-                    if (delta < MAX_FRAME_DURATION && fi.baseName().indexOf("_") == -1/*Old version file*/)
+                    if (delta < MAX_FRAME_DURATION && !fi.baseName().contains("_") /*Old version file*/)
                         prevChunk.durationMs = chunk.startTimeMs - prevChunk.startTimeMs;
                 }
 

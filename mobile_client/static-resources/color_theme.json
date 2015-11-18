@@ -51,21 +51,24 @@
 
     "window" : {
         "background" :      "palette.base.color_5",
-        "text" :            "palette.contrast.color_13"
+        "text" :            "palette.contrast.color_13",
+        "accent" :          "palette.accent.color_5",
+        "accentText" :      "palette.contrast.color_13"
     },
 
     "button" : {
         "background" :              "palette.base.color_9",
-        "accentBackground" :        "palette.accent.color_5",
+        "accentBackground" :        "window.accent",
         "attentionBackground" :     "palette.attention.color_2",
-        "text" :                    "palette.contrast.color_13"
+        "text" :                    "window.text",
+        "accentText" :              "window.accentText"
     },
 
     "input" : {
         "border" :              "palette.base.color_10",
-        "borderActive" :        "palette.accent.color_5",
+        "borderActive" :        "window.accent",
         "placeholder" :         "palette.base.color_10",
-        "text" :                "palette.contrast.color_13",
+        "text" :                "window.text",
         "borderError" :         "palette.attention.color_1",
         "borderActiveError" :   "palette.attention.color_2",
         "textError" :           "palette.attention.color_2",
@@ -80,7 +83,7 @@
 
     "list" : {
         "sectionText" :     "palette.contrast.color_1",
-        "text" :            "palette.contrast.color_13",
+        "text" :            "window.text",
         "subText" :         "palette.contrast.color_2",
         "separator" :       "palette.base.color_4"
     },
@@ -89,7 +92,7 @@
         "background" :              "palette.base.color_7",
         "backgroundActive" :        "palette.base.color_9",
         "backgroundIncompatible" :  "palette.base.color_6",
-        "activeMark" :              "palette.accent.color_5",
+        "activeMark" :              "window.accent",
         "incompatibleMark" :        "palette.attention.color_2"
     },
 
@@ -97,7 +100,7 @@
         "background" :      "palette.base.color_8",
         "copyright" :       "palette.base.color_15",
         "splitter" :        "palette.base.color_10",
-        "section" :         "palette.accent.color_5"
+        "section" :         "window.accent"
     },
 
     "popupMenu" : {
@@ -109,13 +112,13 @@
         "background" :          "palette.contrast.color_11",
         "text" :                "palette.base.color_1",
         "titleText" :           "palette.base.color_1",
-        "selectedBackground":   "palette.accent.color_5",
-        "selectedText" :        "palette.contrast.color_13"
+        "selectedBackground":   "window.accent",
+        "selectedText" :        "window.accentText"
     },
 
     "cameras" : {
         "background" :          "palette.base.color_4",
-        "text" :                "palette.contrast.color_13",
+        "text" :                "window.text",
         "offlineText" :         "palette.base.color_11",
         "recordingIndicator" :  "#d70000",
         "offlineBackground" :   "palette.base.color_7",
@@ -126,8 +129,8 @@
     },
 
     "toast" : {
-        "background" :      "palette.accent.color_5",
-        "text" :            "window.text"
+        "background" :      "window.accent",
+        "text" :            "window.accentText"
     },
 
     "timeline" : {
@@ -156,6 +159,8 @@
         "scrollIndicator" :     "palette.base.color_9",
         "playPause" :           "palette.contrast.color_13",
         "playPauseBackground" : "#32171c1f",
-        "navigationPanelBackground" : "palette.base.color_3"
+        "navigationPanelBackground" : "palette.base.color_3",
+        "offlineDimmer" :       "#cc171c1f",
+        "cameraStatus" :        "palette.base.color_13"
     }
 }

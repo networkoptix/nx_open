@@ -60,18 +60,19 @@ public:
     virtual void stop() override;
     int interrupt();
 
-    void updateLastSyncPoint();
+    void updateLastSyncChunk();
     QnBackupStatusData getStatus() const;
     virtual void run() override;
 
 private:
-    qint64 findLastSyncPointUnsafe() const;
+    DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
     APPLY(NoBackupStorageError) \
     APPLY(FromStorageError) \
-    APPLY(FileOpenError) \
+    APPLY(SourceFileError) \
+    APPLY(TargetFileError) \
     APPLY(ChunkError) \
     APPLY(NoError) \
     APPLY(Interrupted)
@@ -127,7 +128,8 @@ private:
     ec2::backup::DayOfWeek  m_curDow;
 
     QnServerBackupSchedule  m_schedule;
-    std::atomic<qint64>     m_syncTimePoint;
+    qint64                  m_syncTimePoint;
+    std::atomic<qint64>     m_syncEndTimePoint;
     QnMutex                 m_syncPointMutex;
 
     SyncDataMap           m_syncData;

@@ -1,6 +1,8 @@
 #include "crash_reporter.h"
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
@@ -81,10 +83,11 @@ CrashReporter::~CrashReporter()
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
     const auto admin = qnResPool->getAdministrator();
-    if (!admin) return false;
+    if (!admin) 
+        return false;
 
-    const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
-    if (!Ec2StaticticsReporter::isAllowed(msManager))
+    
+    if (!qnGlobalSettings->isStatisticsAllowed())
     {
         NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
         return false;
