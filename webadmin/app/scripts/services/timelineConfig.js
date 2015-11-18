@@ -53,7 +53,7 @@ function TimelineConfig(){
         minMarkWidth: 1, // Minimum width for visible mark
 
         zoomSpeed: 0.025, // Zoom speed for dblclick
-        zoomAccuracy: 0.01,
+        zoomAccuracyMs: 1000,
         slowZoomSpeed: 0.01, // Zoom speed for holding buttons
         maxVerticalScrollForZoom: 250, // value for adjusting zoom
         maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -99,8 +99,8 @@ function TimelineConfig(){
         lineWidth: 1,
 
         chunkHeight:30/110, // %    //Height for event line
-        minChunkWidth: -1,
-        minPixelsPerLevel: 3,
+        minChunkWidth: 0,
+        minPixelsPerLevel: 1,
         chunksBgColor:[34,57,37],
         exactChunkColor: [58,145,30],
         loadingChunkColor: [0,255,255,0.3],

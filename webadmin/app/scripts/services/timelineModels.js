@@ -826,11 +826,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracy, lastMinuteInterval, minPixelsPerLevel){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
-    this.zoomAccuracy = zoomAccuracy;
+    this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
 
@@ -935,7 +935,6 @@ ScaleManager.prototype.releaseWatching = function(){
 ScaleManager.prototype.watchPlaying = function(date, liveMode){
     this.watchPlayingPosition = true;
     this.wasForcedToStopWatchPlaying = false;
-    this.watchedLiveMode = liveMode;
 
     if(!date){
         return;
@@ -1121,7 +1120,8 @@ ScaleManager.prototype.canScroll = function(left){
         return this.visibleStart != this.start;
     }
 
-    return this.visibleEnd != this.end;
+    return this.visibleEnd != this.end
+        && !(this.watchPlayingPosition && this.liveMode);
 };
 
 ScaleManager.prototype.scroll = function(value){
@@ -1205,25 +1205,19 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
 };
 
 ScaleManager.prototype.çheckZoomOut = function(){
-    return this.zoom() < this.fullZoomOutValue() - this.zoomAccuracy;
+    var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
+    return invisibleInterval > this.zoomAccuracyMs;
 };
 ScaleManager.prototype.çheckZoomIn = function(){
-    return this.zoom() > this.fullZoomInValue() + this.zoomAccuracy;
+    return this.zoom() > this.fullZoomInValue();
 };
+
 ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (from 0 to 1)
     if(typeof(zoomValue)=="undefined"){
         return this.msToZoom(this.msPerPixel);
     }
+
     this.msPerPixel = this.zoomToMs(zoomValue);
-
-    /* Make it sticky */
-    if(zoomValue - this.fullZoomInValue() < this.zoomAccuracy){
-        this.msPerPixel = this.minMsPerPixel;
-    }
-
-    if(this.fullZoomOutValue()-zoomValue  < this.zoomAccuracy){
-        this.msPerPixel = this.maxMsPerPixel;
-    }
 
     this.updateCurrentInterval();
 };

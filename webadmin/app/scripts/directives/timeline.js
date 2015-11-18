@@ -66,7 +66,7 @@ angular.module('webadminApp')
                     timelineConfig.initialInterval,
                     100,
                     timelineConfig.stickToLiveMs,
-                    timelineConfig.zoomAccuracy,
+                    timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel); //Init boundariesProvider
 
@@ -358,8 +358,6 @@ angular.module('webadminApp')
                         return false;
                     }
 
-
-
                     //Find final levels for this zoom and run animation:
                     var newTargetLevels = scope.scaleManager.targetLevels(zoomTarget);
                     if(levelsChanged(newTargetLevels, animationState.targetLevels)){
@@ -470,6 +468,7 @@ angular.module('webadminApp')
 
                 var zoomByWheelTarget = 0;
                 function zoomByWheel(pixels){
+
                     if(window.jscd.touch ) {
                         zoomByWheelTarget = scope.scaleManager.zoom() - pixels / timelineConfig.maxVerticalScrollForZoomWithTouch;
                     }else{
