@@ -70,7 +70,6 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
             moduleFinder->start();
             break;
         case Qt::ApplicationSuspended:
-        case Qt::ApplicationInactive:
             moduleFinder->pleaseStop();
             break;
         default:
