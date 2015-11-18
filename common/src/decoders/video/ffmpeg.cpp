@@ -59,7 +59,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
     m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
     m_forcedMtDecoding(false),
-    m_prevTimestamp(false)
+    m_prevTimestamp(false),
+    m_spsFound(false)
 {
     m_mtDecoding = mtDecoding;
 
@@ -266,6 +267,7 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //m_context->flags2 |= CODEC_FLAG2_FAST;
     m_motionMap.clear();
     m_frame->data[0] = 0;
+    m_spsFound = false;
 }
 
 void CLFFmpegVideoDecoder::setOutPictureSize( const QSize& /*outSize*/ )
@@ -441,7 +443,11 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 sps.decodeBuffer(curPtr + nalLen, end);
                 sps.deserialize();
                 processNewResolutionIfChanged(data, sps.getWidth(), sps.getHeight());
+                m_spsFound = true;
             }
+
+            if (!m_spsFound)
+                return false; // no sps has found yet. skip frame
         }
         else if (data->context && data->context->ctx())
         {
