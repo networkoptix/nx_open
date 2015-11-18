@@ -84,8 +84,6 @@ namespace nxpl
         }
     };
 
-    class PluginContainer;
-
     // {E53CF93D-61D3-4261-9D25-9B7B3F3A812B}
     static const NX_GUID IID_Plugin = { 0xe5, 0x3c, 0xf9, 0x3d, 0x61, 0xd3, 0x42, 0x61, 0x9d, 0x25, 0x9b, 0x7b, 0x3f, 0x3a, 0x81, 0x2b };
 
@@ -126,7 +124,7 @@ namespace nxpl
             "Plugin container" is a process that loaded plugin.
             This reference can be used to access some data and functionality of the container
         */
-        virtual void setPluginContainer( nxpl::PluginContainer* pluginContainer ) = 0;
+        virtual void setPluginContainer( nxpl::PluginInterface* pluginContainer ) = 0;
     };
 
     //!Type of plugin entry-point function
