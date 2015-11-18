@@ -19,6 +19,7 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/long_runnable.h>
+#include <camera/bookmark_queries_cache.h>
 
 class QAction;
 
@@ -206,7 +207,8 @@ protected slots:
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
-    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks);
+    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks
+        , bool immediately);
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
@@ -222,6 +224,12 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
     void updateBookmarkTags();
+
+    void resetCurrentBookmarkQuery();
+
+    void setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query);
+
+    QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -272,7 +280,10 @@ private:
     QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
-    QnCameraBookmarksQueryPtr m_bookmarkQuery;
+    
+    QnBookmarkQueriesCache m_bookmarkQueries;
+    QnCameraBookmarksQueryPtr m_currentQuery;
+
     QScopedPointer<QnCameraBookmarkAggregation> m_bookmarkAggregation;
     QnPendingOperation *m_sliderBookmarksRefreshOperation;
 

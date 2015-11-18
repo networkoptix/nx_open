@@ -15,6 +15,7 @@
 #include "api/model/api_ioport_data.h"
 
 #include <mutex>
+#include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -253,8 +254,8 @@ public:
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
 
-    bool isCameraInfoSavedToDisk() const;
-    void setCameraInfoSavedToDisk();
+    bool isCameraInfoSavedToDisk(int pool) const;
+    void setCameraInfoSavedToDisk(int pool);
 
 public slots:
     virtual void inputPortListenerAttached();
@@ -328,6 +329,9 @@ protected:
     virtual bool isInputPortMonitored() const;
 
 private:
+    void resetCameraInfoDiskFlags() const;
+
+private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
     int m_recActionCnt;
@@ -348,7 +352,7 @@ private:
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
 
-    bool m_cameraInfoSavedToDisk;
+    mutable std::map<int, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

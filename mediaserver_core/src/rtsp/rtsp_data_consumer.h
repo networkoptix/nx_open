@@ -11,6 +11,7 @@
 #include "utils/media/externaltimesource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"
+#include "camera/video_camera.h"
 
 class QnRtspConnectionProcessor;
 
@@ -38,9 +39,8 @@ public:
     virtual void putData(const QnAbstractDataPacketPtr& data);
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
-    int copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq);
-    void lockDataQueue();
-    void unlockDataQueue();
+    int copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq);
+    QnMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
 
     virtual qint64 getDisplayedTime() const;

@@ -7,11 +7,13 @@
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
+#include "utils/network/http/asynchttpclient.h"
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
 * It class can be used either for client and server side.
 * Class calls callback methods from IO thread. So, caller code should be thread-safe.
+* Client MUST NOT make requests in callbacks as it will cause a deadlock.
 */
 
 namespace rest 
@@ -54,11 +56,12 @@ namespace rest
 
         struct Request 
         {
-            Request(): method(HttpMethod::Unknown) {}
+            Request(): method(HttpMethod::Unknown), authType(nx_http::AsyncHttpClient::authBasicAndDigest) {}
             bool isValid() const { return method != HttpMethod::Unknown && url.isValid(); }
 
             HttpMethod method;
             QUrl url;
+            nx_http::AsyncHttpClient::AuthType authType;
             nx_http::HttpHeaders headers;
             nx_http::StringType contentType;
             nx_http::StringType messageBody;

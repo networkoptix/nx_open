@@ -66,8 +66,7 @@ QnSecurityCamResource::QnSecurityCamResource():
         &m_mutex ),
     m_cachedIsIOModule(
         [this]()->bool{ return getProperty(Qn::IO_CONFIG_PARAM_NAME).toInt() > 0; },
-        &m_mutex ),
-    m_cameraInfoSavedToDisk(false)
+        &m_mutex )
 {
     addFlags(Qn::live_cam);
 
@@ -95,14 +94,20 @@ QnMediaServerResourcePtr QnSecurityCamResource::getParentServer() const {
     return getParentResource().dynamicCast<QnMediaServerResource>();
 }
 
-bool QnSecurityCamResource::isCameraInfoSavedToDisk() const
+bool QnSecurityCamResource::isCameraInfoSavedToDisk(int pool) const
 {
-    SAFE(return m_cameraInfoSavedToDisk);
+    QnMutexLocker lk(&m_mutex);
+    auto resultIt = m_cameraInfoSavedToDisk.find(pool);
+    if (resultIt == m_cameraInfoSavedToDisk.cend()) {
+        m_cameraInfoSavedToDisk.emplace(pool, false);
+        return false;
+    }
+    return m_cameraInfoSavedToDisk[pool];
 }
 
-void QnSecurityCamResource::setCameraInfoSavedToDisk()
+void QnSecurityCamResource::setCameraInfoSavedToDisk(int pool)
 {
-    SAFE(m_cameraInfoSavedToDisk = true);
+    SAFE(m_cameraInfoSavedToDisk[pool] = true);
 }
 
 bool QnSecurityCamResource::isGroupPlayOnly() const {
@@ -578,13 +583,22 @@ QString QnSecurityCamResource::getDefaultGroupName() const
     SAFE(return m_groupName);
 }
 
+void QnSecurityCamResource::resetCameraInfoDiskFlags() const
+{
+    for (auto it = m_cameraInfoSavedToDisk.begin(); 
+         it != m_cameraInfoSavedToDisk.end();
+         ++it) {
+        it->second = false;
+    }
+}
+
 void QnSecurityCamResource::setGroupName(const QString& value) {
     {
         QnMutexLocker locker( &m_mutex );
         if(m_groupName == value)
             return;
         m_groupName = value;
-        m_cameraInfoSavedToDisk = false;
+        resetCameraInfoDiskFlags();
     }
     emit groupNameChanged(::toSharedPointer(this));
 }
@@ -599,7 +613,10 @@ void QnSecurityCamResource::setUserDefinedGroupName( const QString& value )
             return;
         (*userAttributesLock)->groupName = value;
     }
-    SAFE(m_cameraInfoSavedToDisk = false);
+    {
+        QnMutexLocker lk(&m_mutex);
+        resetCameraInfoDiskFlags();
+    }
     emit groupNameChanged(::toSharedPointer(this));
 }
 
@@ -613,7 +630,7 @@ void QnSecurityCamResource::setGroupId(const QString& value) {
         if(m_groupId == value)
             return;
         m_groupId = value;
-        m_cameraInfoSavedToDisk = false;
+        resetCameraInfoDiskFlags();
     }
     emit groupIdChanged(::toSharedPointer(this));   
 
@@ -626,7 +643,7 @@ QString QnSecurityCamResource::getModel() const {
 void QnSecurityCamResource::setModel(const QString &model) {
     QnMutexLocker lk(&m_mutex);
     m_model = model;
-    m_cameraInfoSavedToDisk = false;
+    resetCameraInfoDiskFlags();
 }
 
 QString QnSecurityCamResource::getFirmware() const {

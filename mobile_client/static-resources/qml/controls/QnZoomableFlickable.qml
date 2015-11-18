@@ -220,10 +220,33 @@ Item {
         }
 
         MouseArea {
+            readonly property real zoomFactor: 1.1
+            readonly property real wheelStep: 120
+
             anchors.fill: parent
 
             onClicked: rootItem.clicked()
             onDoubleClicked: rootItem.doubleClicked()
+
+            onWheel: {
+                var cx = wheel.x + flick.contentX - flick.leftMargin
+                var cy = wheel.y + flick.contentY - flick.topMargin
+
+                var scale = wheel.angleDelta.y / wheelStep * zoomFactor
+                if (scale < 0)
+                    scale = 1 / -scale
+
+                var w = flick.contentWidth * scale
+                var h = flick.contentHeight * scale
+
+                if (w > maxContentWidth)
+                    scale = maxContentWidth / flick.contentWidth
+                if (h > maxContentHeight)
+                    scale = Math.max(scale, maxContentHeight / flick.contentHeight)
+
+                flick.resizeContent(flick.contentWidth * scale, flick.contentHeight * scale, Qt.point(cx, cy))
+                flick.animateToBounds()
+            }
         }
     }
 }

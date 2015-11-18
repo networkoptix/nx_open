@@ -24,6 +24,7 @@ FocusScope {
     property color activeColor: showError ? QnTheme.inputBorderActiveError : QnTheme.inputBorderActive
     property color textColor: showError ? QnTheme.inputTextError : QnTheme.inputText
     property color placeholderColor: showError ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
+    property color cursorColor: activeColor
 
     signal accepted()
     signal editingFinished()
@@ -137,6 +138,20 @@ FocusScope {
                     var right = rect.x + rect.width
                     if (right > flickable.contentX + flickable.width)
                         flickable.contentX = right - flickable.width
+                }
+
+                cursorDelegate: Rectangle {
+                    id: cursor
+                    width: dp(1)
+                    color: textField.cursorColor
+
+                    Timer {
+                        interval: 500
+                        running: textInput.cursorVisible
+                        repeat: true
+                        onTriggered: cursor.visible = !cursor.visible
+                        onRunningChanged: cursor.visible = running
+                    }
                 }
             }
         }

@@ -54,11 +54,9 @@ Item {
 
         Image {
             id: thumbnail
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
+            anchors.fill: parent
             fillMode: Qt.KeepAspectRatio
-            sourceSize.width: parent.width
-            sourceSize.height: parent.height
+            asynchronous: true
             visible: !d.offline && status == Image.Ready
         }
     }

@@ -154,6 +154,7 @@ namespace ec2
         //AbstractResourceManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeResource );
 
+        registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>( restProcessorPool, ApiCommand::getStatusList );
 
         //AbstractMediaServerManager::getServers
         registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
