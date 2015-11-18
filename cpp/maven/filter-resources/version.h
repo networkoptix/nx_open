@@ -82,7 +82,7 @@
 #define VER_COMPANYNAME_STR             "${company.name}"
 #define VER_FILEDESCRIPTION_STR         "${product.display.title}"
 #define VER_INTERNALNAME_STR            "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2013 Network Optix"
+#define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2016 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR        VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"

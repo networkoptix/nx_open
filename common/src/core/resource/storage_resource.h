@@ -20,6 +20,8 @@ public:
 
     virtual QString getUniqueId() const;
 
+    QnMediaServerResourcePtr getParentServer() const;
+
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;

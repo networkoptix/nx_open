@@ -31,6 +31,8 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
     addPage(StorageManagmentPage, m_storagesPage, tr("Storage Management"));
     addPage(StatisticsPage, m_statisticsPage, tr("Storage Analytics"));
 
+    /* Handling scenario when user closed the dialog and reopened it again. */
+    connect(this, &QnGenericTabbedDialog::dialogClosed, m_statisticsPage, &QnRecordingStatisticsWidget::resetForecast);
 
     connect(m_webPageButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(Qn::WebClientAction, m_server);

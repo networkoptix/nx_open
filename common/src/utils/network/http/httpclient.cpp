@@ -12,13 +12,10 @@ namespace nx_http
 {
     HttpClient::HttpClient()
     :
-        m_asyncHttpClient( nx_http::AsyncHttpClient::create() ),
         m_done( false ),
         m_terminated( false )
     {
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection );
+        instanciateHttpClient();
     }
 
     HttpClient::~HttpClient()
@@ -125,6 +122,14 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void HttpClient::instanciateHttpClient()
+    {
+        m_asyncHttpClient = nx_http::AsyncHttpClient::create();
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection);
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection);
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection);
+    }
+
     template<typename AsyncClientFunc>
         bool HttpClient::doRequest(AsyncClientFunc func)
     {
@@ -140,8 +145,8 @@ namespace nx_http
                 m_asyncHttpClient->terminate();
                 m_asyncHttpClient.reset();
             }
-            m_asyncHttpClient = nx_http::AsyncHttpClient::create();
-            
+            instanciateHttpClient();
+
             //TODO #ak setting up attributes
             for (const auto& keyValue: m_additionalHeaders)
                 m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
@@ -157,10 +162,6 @@ namespace nx_http
                 m_asyncHttpClient->setUserName(m_userName.get());
             if (m_userPassword)
                 m_asyncHttpClient->setUserPassword(m_userPassword.get());
-
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection);
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection);
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection);
         }
 
         func(m_asyncHttpClient.get());

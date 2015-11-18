@@ -1,6 +1,7 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
+#include <atomic>
 #include <utils/common/uuid.h>
 #include <utils/network/rtpsession.h>
 #include <utils/network/ffmpeg_rtp_parser.h>
@@ -59,8 +60,6 @@ public:
     void setMultiserverAllowed(bool value);
 
     void setPlayNowModeAllowed(bool value);
-
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
@@ -74,11 +73,10 @@ private:
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnVirtualCameraResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
+    void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, bool forceReload);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
-    void lockTime(qint64 value);
-    void unlockTime();
 private:
     QnMutex m_mutex;
     RTPSession m_rtspSession;
@@ -104,7 +102,7 @@ private:
     qint64 m_lastMinTimeTime;
 
     QnTimePeriod m_serverTimePeriod;
-    qint64 m_globalMinArchiveTime; // min archive time between all servers
+    std::atomic<qint64> m_globalMinArchiveTime; // min archive time between all servers
 
     qint64 m_forcedEndTime;
     bool m_isMultiserverAllowed;
@@ -121,8 +119,9 @@ private:
         QString password;
         QnUuid videowall;
     } m_auth;
-    mutable QnMutex m_timeMutex;
-    qint64 m_lockedTime;
+    
+    QSet<QnUuid> m_footageServers;
+    std::atomic<bool> m_footageDirty;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

@@ -1038,11 +1038,13 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
     return tran.commit();
 }
 
-bool QnServerDb::setLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog, qint64 timestampMs)
+bool QnServerDb::setLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId, 
+                                   QnServer::ChunksCatalog catalog, qint64 timestampMs)
 {
     QSqlQuery updQuery(m_sdb);
-    updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (camera_id, catalog, timestamp) \
-                     VALUES (:camera_id, :catalog, :timestamp)");
+    updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (pool, camera_id, catalog, timestamp) \
+                     VALUES (:pool, :camera_id, :catalog, :timestamp)");
+    updQuery.addBindValue((int) pool);
     updQuery.addBindValue(QnSql::serialized_field(cameraId));
     updQuery.addBindValue((int) catalog);
     updQuery.addBindValue(timestampMs);
@@ -1052,12 +1054,15 @@ bool QnServerDb::setLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatal
     return result;
 }
 
-qint64 QnServerDb::getLastBackupTime(const QnUuid& cameraId, QnServer::ChunksCatalog catalog) const
+qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId, 
+                                     QnServer::ChunksCatalog catalog) const
 {
     qint64 result = 0;
 
     QSqlQuery query(m_sdb);
-    query.prepare("SELECT timestamp FROM last_backup_time WHERE camera_id = :camera_id AND catalog = :catalog");
+    query.prepare("SELECT timestamp FROM last_backup_time "
+                  "WHERE pool = :pool AND camera_id = :camera_id AND catalog = :catalog");
+    query.addBindValue((int) pool);
     query.addBindValue(QnSql::serialized_field(cameraId));
     query.addBindValue((int) catalog);
     if (query.exec()) {

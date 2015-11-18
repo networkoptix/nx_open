@@ -14,13 +14,11 @@
 #include <utils/common/delayed.h>
 
 namespace {
+    /** Delay between requests when the rebuild is running. */ 
     const int updateRebuildStatusDelayMs = 500;
 
     /** Delay between requests when the backup is running. */ 
     const int updateBackupStatusDelayMs = 500;
-
-    /** Regular check if backup was started. */
-    const int updateBackupRegularStatusDelayMs = 10 * 60* 1000;
 
     void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
         storage->setFreeSpace(spaceInfo.freeSpace);
@@ -70,26 +68,23 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
     : base_type(parent)    
 {
 
-    auto handleServerChanged = [this](const QnResourcePtr &resource) {
-        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-        Q_ASSERT_X(server, Q_FUNC_INFO, "We should be connected to servers only");
-
-        sendArchiveRebuildRequest(server, QnServerStoragesPool::Main);
-        sendArchiveRebuildRequest(server, QnServerStoragesPool::Backup);
-        sendBackupRequest(server);
+    auto getServerForResource = [](const QnResourcePtr &resource) -> QnMediaServerResourcePtr {
+        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+            return server;
+        if (QnStorageResourcePtr storage = resource.dynamicCast<QnStorageResource>())
+            return storage->getParentServer();
+        return QnMediaServerResourcePtr();
     };
 
-    auto handleStorageChanged = [this, handleServerChanged](const QnResourcePtr &resource) {
-        QnStorageResourcePtr storage = resource.dynamicCast<QnStorageResource>();
-        Q_ASSERT_X(storage, Q_FUNC_INFO, "We should be connected to storages only");
-        if (QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(storage->getParentId()))
-            handleServerChanged(server);
+    auto checkStoragesStatusInternal = [this, getServerForResource](const QnResourcePtr &resource) {
+        checkStoragesStatus(getServerForResource(resource));
     };
 
-    auto resourceAdded = [this, handleServerChanged, handleStorageChanged](const QnResourcePtr &resource) {
+
+    auto resourceAdded = [this, checkStoragesStatusInternal](const QnResourcePtr &resource) {
         if (const QnStorageResourcePtr &storage = resource.dynamicCast<QnStorageResource>()) {
-            connect(storage, &QnResource::statusChanged, this, handleStorageChanged);
-            handleStorageChanged(storage);
+            connect(storage, &QnResource::statusChanged, this, checkStoragesStatusInternal);
+            checkStoragesStatusInternal(storage);
             return;
         }
 
@@ -99,15 +94,15 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
 
         m_serverInfo.insert(server, ServerInfo());
 
-        connect(server,   &QnMediaServerResource::statusChanged,  this,   handleServerChanged);
-        connect(server,   &QnMediaServerResource::apiUrlChanged,  this,   handleServerChanged);
-        handleServerChanged(server);
+        connect(server,   &QnMediaServerResource::statusChanged,  this,   checkStoragesStatusInternal);
+        connect(server,   &QnMediaServerResource::apiUrlChanged,  this,   checkStoragesStatusInternal);
+        checkStoragesStatus(server);
     };
 
-    auto resourceRemoved = [this, handleStorageChanged](const QnResourcePtr &resource) {
+    auto resourceRemoved = [this, checkStoragesStatusInternal](const QnResourcePtr &resource) {
         if (const QnStorageResourcePtr &storage = resource.dynamicCast<QnStorageResource>()) {
             disconnect(storage, nullptr, this, nullptr);
-            handleStorageChanged(storage);
+            checkStoragesStatusInternal(storage);
             return;
         }
 
@@ -119,18 +114,11 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         disconnect(server, nullptr, this, nullptr);
     };
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this, resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, resourceRemoved);
+    connect(qnResPool, &QnResourcePool::resourceAdded,      this, resourceAdded);
+    connect(qnResPool, &QnResourcePool::resourceRemoved,    this, resourceRemoved);
 
     for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
         resourceAdded(server);
-
-    QTimer *updateBackupTimer = new QTimer(this);
-    updateBackupTimer->setInterval(updateBackupRegularStatusDelayMs);
-    connect(updateBackupTimer, &QTimer::timeout, this, [this]{
-        for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
-            sendBackupRequest(server);
-    });
 }
 
 QnServerStorageManager::~QnServerStorageManager() {
@@ -186,7 +174,12 @@ bool QnServerStorageManager::cancelBackupServerStorages( const QnMediaServerReso
     return sendBackupRequest(server, Qn::BackupAction_Cancel);
 }
 
-void QnServerStorageManager::checkBackupStatus( const QnMediaServerResourcePtr &server ) {
+void QnServerStorageManager::checkStoragesStatus( const QnMediaServerResourcePtr &server ) {
+    if (!isServerValid(server))
+        return;
+
+    sendArchiveRebuildRequest(server, QnServerStoragesPool::Main);
+    sendArchiveRebuildRequest(server, QnServerStoragesPool::Backup);
     sendBackupRequest(server);
 }
 

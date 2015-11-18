@@ -1,5 +1,8 @@
 #include "storage_resource.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+
+#include <core/resource/media_server_resource.h>
+
 #include "utils/common/log.h"
 
 QnStorageResource::QnStorageResource():
@@ -11,12 +14,18 @@ QnStorageResource::QnStorageResource():
     m_writed(0.0),
     m_writedCoeff(1.0)
 {
+    addFlags(Qn::remote);
     setStatus(Qn::Offline);
 }
 
 QnStorageResource::~QnStorageResource()
 {
 }
+
+QnMediaServerResourcePtr QnStorageResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
 
 void QnStorageResource::setSpaceLimit(qint64 value)
 {

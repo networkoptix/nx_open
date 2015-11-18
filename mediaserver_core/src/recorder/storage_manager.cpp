@@ -222,7 +222,7 @@ public:
             }
             m_scanTasks.removeFirst(1);
             assert(qnBackupStorageMan->scheduleSync());
-            qnBackupStorageMan->scheduleSync()->updateLastSyncPoint();
+            qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
         }
     }
 };
@@ -1471,7 +1471,7 @@ void QnStorageManager::writeCameraInfoFiles()
                 if (!resource)
                     continue;
                 auto camResource = resource.dynamicCast<QnSecurityCamResource>();
-                if (!camResource || camResource->isCameraInfoSavedToDisk())
+                if (!camResource || camResource->isCameraInfoSavedToDisk((int) m_role))
                     continue;
 
                 auto path = paths[i] + cameraUniqueId + separator + lit("info.txt");
@@ -1490,7 +1490,7 @@ void QnStorageManager::writeCameraInfoFiles()
                             << "groupName="   << camResource->getGroupName().toLatin1().constData()       << std::endl
                     ).str().c_str()
                 ); 
-                camResource->setCameraInfoSavedToDisk();
+                camResource->setCameraInfoSavedToDisk((int) m_role);
             } // for catalogs
         } // for qualities
     } // for storages
@@ -1641,7 +1641,12 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
     if (!result) {
         if (!m_warnSended && m_firstStorageTestDone) {
             qWarning() << "No storage available for recording";
-            emit noStoragesAvailable();
+            bool doEmit = m_role == QnServer::StoragePool::Normal ||
+                          (m_role == QnServer::StoragePool::Backup && 
+                           scheduleSync()->getStatus().state != 
+                                    Qn::BackupState::BackupState_InProgress);
+            if (doEmit)
+                emit noStoragesAvailable();
             m_warnSended = true;
         }
     }
