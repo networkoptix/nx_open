@@ -24,7 +24,8 @@ class SocketAddress;
 */
 class QnMulticastModuleFinder : public QnLongRunnable {
     Q_OBJECT
-    public:
+
+public:
     //!Creates socket and binds it to random unused udp port
     /*!
         One must call \a isValid after object instantiation to check whether it has been initialized successfully
@@ -59,6 +60,7 @@ class QnMulticastModuleFinder : public QnLongRunnable {
 
 public slots:
     virtual void pleaseStop() override;
+
 private slots:
     void at_moduleInformationChanged();
 signals:
@@ -71,12 +73,15 @@ private:
     bool processDiscoveryRequest(UDPSocket *udpSocket);
     bool processDiscoveryResponse(UDPSocket *udpSocket);
     void updateInterfaces();
+    void clearInterfaces();
     RevealResponse* getCachedValue(const quint8* buffer, const quint8* bufferEnd);
+
 private:
     mutable QnMutex m_mutex;
+    bool m_clientMode;
     aio::PollSet m_pollSet;
     QHash<QHostAddress, UDPSocket*> m_clientSockets;
-    UDPSocket *m_serverSocket;
+    QScopedPointer<UDPSocket> m_serverSocket;
     const unsigned int m_pingTimeoutMillis;
     const unsigned int m_keepAliveMultiply;
     quint64 m_prevPingClock;
