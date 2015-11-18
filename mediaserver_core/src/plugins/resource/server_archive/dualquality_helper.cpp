@@ -154,22 +154,25 @@ void QnDualQualityHelper::findDataForTime(
                                 backupCatalogAlt->findFileIndex(chunkAlt.endTimeMs(), 
                                                                 findMethod));
 
-                    bool isNormalNextTooFar = nextNormalChunkAlt.startTimeMs != -1 &&
-                        nextNormalChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
-                        chunk.startTimeMs > time && !usePreciseFind;
+                    bool isNormalNextTooFar = nextNormalChunkAlt.startTimeMs == -1 || 
+                        (nextNormalChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
+                         chunk.startTimeMs > time && !usePreciseFind);
 
-                    bool isBackupNextTooFar = nextBackupChunkAlt.startTimeMs != -1 &&
-                        nextBackupChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
-                        chunk.startTimeMs > time && !usePreciseFind;
+                    bool isBackupNextTooFar = nextBackupChunkAlt.startTimeMs == -1 || 
+                        (nextBackupChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
+                         chunk.startTimeMs > time && !usePreciseFind);
 
                     bool isGapToNextTooLarge = isNormalNextTooFar && isBackupNextTooFar;
 
                     if (isGapToNextTooLarge)
-                        return; // It is data hole, but altChunk cover very right edge before hole. Ignore it.
+                        return; // It is data hole, but altChunk cover very right edge 
+                                // before hole. Ignore it.
 
                     bool altEOFReached = 
-                        nextNormalChunkAlt.startTimeMs == chunkAlt.startTimeMs &&
-                        nextBackupChunkAlt.startTimeMs == chunkAlt.startTimeMs;
+                        (nextNormalChunkAlt.startTimeMs == -1 || 
+                         nextNormalChunkAlt.startTimeMs == chunkAlt.startTimeMs) &&
+                        (nextBackupChunkAlt.startTimeMs == -1 || 
+                         nextBackupChunkAlt.startTimeMs == chunkAlt.startTimeMs);
 
                     if (altEOFReached)
                         return; // EOF reached
@@ -188,11 +191,11 @@ void QnDualQualityHelper::findDataForTime(
                         prevBackupChunkAlt = backupCatalogAlt->chunkAt(
                                 backupCatalogAlt->findFileIndex(chunkAlt.startTimeMs-1, 
                                                                 findMethod));
-                    bool isNormalTooFar = prevNormalChunkAlt.startTimeMs != -1 &&
+                    bool isNormalTooFar = prevNormalChunkAlt.startTimeMs == -1 ||
                          prevNormalChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
                          chunk.endTimeMs() < time;
 
-                    bool isBackupTooFar = prevBackupChunkAlt.startTimeMs != -1 &&
+                    bool isBackupTooFar = prevBackupChunkAlt.startTimeMs == -1 ||
                          prevBackupChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
                          chunk.endTimeMs() < time;
 
@@ -206,7 +209,10 @@ void QnDualQualityHelper::findDataForTime(
             // alternate quality matched better
             if (timeDistance != INT64_MAX && chunkAlt.containsTime(chunk.startTimeMs)) {
                 uDebug() << lit("Alt Chunk truncated at %1").arg(chunk.startTimeMs);
-                chunkAlt.truncate(chunk.startTimeMs); // truncate to start of the next chunk of the required quality (if next chunk of requested quality is exists)
+                chunkAlt.truncate(chunk.startTimeMs); // truncate to start of the next 
+                                                      // chunk of the required quality 
+                                                      // (if next chunk of requested 
+                                                      //  quality is exists)
             }
 
             catalog = catalogAlt;
