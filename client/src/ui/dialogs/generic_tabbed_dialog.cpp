@@ -53,6 +53,7 @@ void QnGenericTabbedDialog::reject() {
     if (!forcefullyClose())
         return;
     base_type::reject();
+    emit dialogClosed();
 }
 
 void QnGenericTabbedDialog::accept() {
@@ -61,6 +62,7 @@ void QnGenericTabbedDialog::accept() {
 
     applyChanges();
     base_type::accept();
+    emit dialogClosed();
 }
 
 bool QnGenericTabbedDialog::forcefullyClose()  {

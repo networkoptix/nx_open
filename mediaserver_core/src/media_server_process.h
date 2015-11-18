@@ -84,6 +84,11 @@ private:
     void saveAdminPswdHash();
     bool isStopping() const;
 
+    /** 
+     * Fix statistics allowed flag by value, set in the installer.
+     * Note that installer value will override the existing one.
+     */
+    void updateStatisticsAllowedSettings();
 private:
     int m_argc;
     char** m_argv;

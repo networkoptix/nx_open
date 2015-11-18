@@ -7,6 +7,7 @@
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/common/ldap.h>
+#include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>
 #include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
@@ -266,6 +267,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
+
+    qRegisterMetaType<QnOptionalBool>();
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

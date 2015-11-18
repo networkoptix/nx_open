@@ -10,6 +10,7 @@
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
+#include <utils/common/optional.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -25,6 +26,9 @@ class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSet
 public:
     QnGlobalSettings(QObject *parent = NULL);
     virtual ~QnGlobalSettings();
+
+    void synchronizeNow();
+
 
     QSet<QString> disabledVendorsSet() const;
     QString disabledVendors() const;
@@ -45,14 +49,15 @@ public:
     QnLdapSettings ldapSettings() const;
     void setLdapSettings(const QnLdapSettings &settings);
 
-    void synchronizeNow();
-    QnUserResourcePtr getAdminUser();
-
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
 
     Qn::CameraBackupQualities defaultBackupQualities() const;
     void setDefauldBackupQualities(Qn::CameraBackupQualities value);
+
+    bool isStatisticsAllowedDefined() const;
+    bool isStatisticsAllowed() const;
+    void setStatisticsAllowed(bool value);
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -60,8 +65,15 @@ signals:
     void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
+    void statisticsAllowedChanged();
 
 private:
+    typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
+
+    AdaptorList initEmailAdaptors();
+    AdaptorList initLdapAdaptors();
+    AdaptorList initMiscAdaptors();
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
@@ -72,6 +84,7 @@ private:
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
     QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_defaultBackupQualitiesAdaptor;
+    QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
@@ -94,7 +107,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
 
 
-    QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
+    AdaptorList m_allAdaptors;
 
     mutable QnMutex m_mutex;
     QnUserResourcePtr m_admin;

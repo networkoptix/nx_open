@@ -1139,6 +1139,9 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         for(const QnUserResourcePtr &user: users)
             messageProcessor->updateResource(user);
+
+        /* Here the admin user must exist, global settings also. */
+        updateStatisticsAllowedSettings();
     }
 
     {
@@ -1206,6 +1209,28 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         propertyDictionary->saveParams(m_mediaServer->getId());
     }
 }
+
+
+void MediaServerProcess::updateStatisticsAllowedSettings() {
+    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+
+    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
+    if (confStats.isNull()) 
+        return;
+
+    {   /* Security check */
+        const auto admin = qnResPool->getAdministrator();
+        Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+        if (!admin) 
+            return;
+    }
+
+    qnGlobalSettings->setStatisticsAllowed(confStats.toBool());
+    qnGlobalSettings->synchronizeNow();
+    MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
+    MSSettings::roSettings()->sync();
+}
+
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
@@ -1955,13 +1980,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-        const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
-        if (!confStats.isNull()) // if present
-        {
-            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(confStats.toBool()));
-            MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
-            MSSettings::roSettings()->sync();
-        }
+
 
         propertyDictionary->saveParams(server->getId());
 

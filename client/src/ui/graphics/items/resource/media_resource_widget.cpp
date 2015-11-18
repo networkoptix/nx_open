@@ -1624,13 +1624,7 @@ void QnMediaResourceWidget::updateBookmarksVisibility() {
     if (!m_bookmarksOverlayWidget)
         return;
 
-    auto visibility = Invisible;
-    if (m_bookmarksQuery) {
-        if (options().testFlag(DisplayInfo))
-            visibility = Visible;
-        else
-            visibility = AutoVisible;
-    }
+    const auto visibility = (m_bookmarksQuery ? Visible : Invisible);
     setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 

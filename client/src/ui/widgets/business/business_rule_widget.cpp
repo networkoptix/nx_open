@@ -81,8 +81,8 @@ void QnBusinessRuleWidget::retranslateUi() {
     ));
     
     ui->actionResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("<Select at least one device>"),
-        tr("<Select at least one camera>")
+        tr("Select at least one device"),
+        tr("Select at least one camera")
     ));
 }
 
