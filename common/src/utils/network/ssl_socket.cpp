@@ -1337,12 +1337,24 @@ bool QnSSLSocket::enableClientEncryption()
     return doClientHandshake();
 }
 
-void QnSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+void QnSSLSocket::cancelIOAsync(
+    aio::EventType eventType,
+    std::function<void()> cancellationDoneHandler)
 {
-    Q_D( const QnSSLSocket );
-    d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
-    if( waitForRunningHandlerCompletion )
-        d->async_ssl_ptr->Clear();
+    Q_D(const QnSSLSocket);
+    d->wrappedSocket->cancelIOAsync(
+        eventType,
+        [cancellationDoneHandler, d](){
+            d->async_ssl_ptr->Clear();
+            cancellationDoneHandler();
+        });
+}
+
+void QnSSLSocket::cancelIOSync(aio::EventType eventType)
+{
+    Q_D(const QnSSLSocket);
+    d->wrappedSocket->cancelIOSync(eventType);
+    d->async_ssl_ptr->Clear();
 }
 
 void QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
@@ -1483,14 +1495,24 @@ int QnMixedSSLSocket::send( const void* buffer, unsigned int bufferLen )
         return d->wrappedSocket->send(buffer, bufferLen);
 }
 
-//!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-void QnMixedSSLSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+void QnMixedSSLSocket::cancelIOAsync(
+    aio::EventType eventType,
+    std::function<void()> cancellationDoneHandler)
 {
-    Q_D( QnMixedSSLSocket );
-    if( d->useSSL )
-        QnSSLSocket::cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    Q_D(QnMixedSSLSocket);
+    if (d->useSSL)
+        QnSSLSocket::cancelIOAsync(eventType, std::move(cancellationDoneHandler));
     else
-        d->wrappedSocket->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+        d->wrappedSocket->cancelIOAsync(eventType, cancellationDoneHandler);
+}
+
+void QnMixedSSLSocket::cancelIOSync(aio::EventType eventType)
+{
+    Q_D(QnMixedSSLSocket);
+    if (d->useSSL)
+        QnSSLSocket::cancelIOSync(eventType);
+    else
+        d->wrappedSocket->cancelIOSync(eventType);
 }
 
 void QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )

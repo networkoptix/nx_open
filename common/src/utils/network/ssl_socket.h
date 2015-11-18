@@ -69,8 +69,10 @@ public:
     bool doServerHandshake();
     bool doClientHandshake();
 
-    //!Implementation of \a AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
 protected:
     enum IOMode
@@ -119,8 +121,10 @@ public:
     virtual int recv( void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send( const void* buffer, unsigned int bufferLen ) override;
 
-    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion ) override;
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl

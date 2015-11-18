@@ -276,42 +276,38 @@ public:
             timeoutMs );
     }
 
-    void cancelAsyncIO( const aio::EventType eventType, bool waitForRunningHandlerCompletion )
+    void cancelIOAsync(
+        const aio::EventType eventType,
+        std::function<void()> cancelledHandler = std::function<void()>())
     {
+        const bool inAIOThread = m_socket->impl()->aioThread.load() == QThread::currentThread();
+        
+        //TODO #ak put resolving cancellation and stop polling into asynchronous pipeline
+        assert(false);  //TODO #ak this method is not working at the moment
+        
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, waitForRunningHandlerCompletion);
+            nx::SocketGlobals::addressResolver().cancel(this, false);
 
-         ++this->m_socket->impl()->terminated;
-        if (waitForRunningHandlerCompletion)
-        {
-            QMutex mtx;
-            QWaitCondition cond;
-            bool done = false;
-            nx::SocketGlobals::aioService().dispatch(
-                this->m_socket,
-                [this, &mtx, &cond, &done, eventType]() {
-                    stopPollingSocket(this->m_socket, eventType);
-                    QMutexLocker lk(&mtx);
-                    done = true;
-                    cond.wakeAll();
-                });
-
-            QMutexLocker lk(&mtx);
-            while(!done)
-                cond.wait(lk.mutex());
-        }
-        else
-        {
-            nx::SocketGlobals::aioService().dispatch(
-                this->m_socket,
-                [this, eventType]() {
-                    stopPollingSocket(this->m_socket, eventType);
-                } );
-        }
-        --this->m_socket->impl()->terminated;
+        ++this->m_socket->impl()->terminated;  //no new async calls can be scheduled while terminated is non-zero
+        nx::SocketGlobals::aioService().dispatch(
+            this->m_socket,
+            [this, eventType, cancelledHandler, inAIOThread]() mutable {
+                stopPollingSocket(this->m_socket, eventType);
+                --this->m_socket->impl()->terminated;
+                //TODO #ak if cancel called within aio thread, 
+                //  cancelledHandler will be called within cancel call what can be unexpected
+                if (!cancelledHandler)
+                    return;
+                if (inAIOThread)
+                    this->m_socket->impl()->aioThread.load()->post(
+                        m_socket,
+                        std::move(cancelledHandler));   //avoiding calling handler within calling func
+                else
+                    cancelledHandler();
+            });
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, waitForRunningHandlerCompletion);
+            nx::SocketGlobals::addressResolver().cancel(this, false);
 
         std::atomic_thread_fence(std::memory_order_acquire);
         if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
@@ -324,11 +320,57 @@ public:
                 ++m_connectSendAsyncCallCounter;
             if (eventType == aio::etTimedOut || eventType == aio::etNone)
                 ++m_registerTimerCallCounter;
+                
+            //TODO #ak cancelledHandler ???
+        }
+    }
+
+    void cancelIOSync(const aio::EventType eventType)
+    {
+        const bool inAIOThread = m_socket->impl()->aioThread.load() == QThread::currentThread();
+
+        //TODO #ak put resolving cancellation and stop polling into asynchronous pipeline
+        //TODO #ak probably, it make sense to break this method to sync and async ones
+
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            nx::SocketGlobals::addressResolver().cancel(this, true);
+
+        if (inAIOThread)
+        {
+            stopPollingSocket(this->m_socket, eventType);
         }
         else
         {
-            //TODO #ak AIO engine does not support truly async cancellation yet
-            assert( waitForRunningHandlerCompletion );
+            ++this->m_socket->impl()->terminated;  //no new async calls can be scheduled while terminated is non-zero
+            std::promise<bool> ioCancelledPromise;
+            auto ioCancelledFuture = ioCancelledPromise.get_future();
+            nx::SocketGlobals::aioService().dispatch(
+                this->m_socket,
+                [this, &ioCancelledPromise, eventType]() {
+                    stopPollingSocket(this->m_socket, eventType);
+                    ioCancelledPromise.set_value(true);
+                });
+
+            ioCancelledFuture.wait();
+            --this->m_socket->impl()->terminated;
+        }
+
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            nx::SocketGlobals::addressResolver().cancel(this, true);
+
+        std::atomic_thread_fence(std::memory_order_acquire);
+        if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
+        {
+            //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+            //  avoiding unnecessary removeFromWatch calls in eventTriggered
+            Q_ASSERT(this->m_socket->impl()->aioThread.load() == QThread::currentThread());
+
+            if (eventType == aio::etRead || eventType == aio::etNone)
+                ++m_recvAsyncCallCounter;
+            if (eventType == aio::etWrite || eventType == aio::etNone)
+                ++m_connectSendAsyncCallCounter;
+            if (eventType == aio::etTimedOut || eventType == aio::etNone)
+                ++m_registerTimerCallCounter;
         }
     }
 
@@ -645,7 +687,9 @@ private:
     }
 
     //!Call this from within aio thread only
-    void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
+    void stopPollingSocket(
+        SocketType* sock,
+        const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
         nx::SocketGlobals::aioService().cancelPostedCalls(sock, true);

@@ -196,8 +196,11 @@ public:
     //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
     void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
-
+    void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler);
+    //!Implementation of AbstractCommunicatingSocket::cancelIOSync
+    void cancelIOSync(aio::EventType eventType);
 
     void shutdown();
     virtual void close() override;

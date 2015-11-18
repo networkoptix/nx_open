@@ -814,13 +814,24 @@ bool UdtStreamSocket::reopen() {
     return impl_->Reopen();
 }
 
-void UdtStreamSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )  {
-    return m_aioHelper->cancelAsyncIO(eventType, waitForRunningHandlerCompletion);
+void UdtStreamSocket::cancelIOAsync(
+    aio::EventType eventType,
+    std::function<void()> cancellationDoneHandler)
+{
+    return m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+}
+
+void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
+{
+    return m_aioHelper->cancelIOSync(eventType);
 }
 
 void UdtStreamSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion ) {
     m_aioHelper->terminateAsyncIO();
-    m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
+    if (waitForRunningHandlerCompletion)
+        m_aioHelper->cancelIOSync(aio::etNone);
+    else
+        m_aioHelper->cancelIOAsync(aio::etNone, std::function<void()>());
 }
 
 void UdtStreamSocket::postImpl( std::function<void()>&& handler )

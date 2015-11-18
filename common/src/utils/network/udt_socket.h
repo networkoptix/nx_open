@@ -101,7 +101,12 @@ public:
     //  What's difference between foreign address with peer address 
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) override;
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler) override;
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIOBlocking
+    virtual void cancelIOSync(aio::EventType eventType) override;
     //!Implementation of AbstractSocket::terminateAsyncIO
     virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 

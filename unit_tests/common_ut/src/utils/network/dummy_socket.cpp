@@ -121,8 +121,13 @@ SocketAddress DummySocket::getForeignAddress() const
     return m_remotePeerAddress;
 }
 
-void DummySocket::cancelAsyncIO( aio::EventType /*eventType*/,
-                                 bool /*waitForRunningHandlerCompletion*/ )
+void DummySocket::cancelIOAsync(
+    aio::EventType /*eventType*/,
+    std::function<void()> /*cancellationDoneHandler*/)
+{
+}
+
+void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
 {
 }
 

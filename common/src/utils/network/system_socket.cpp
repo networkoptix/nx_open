@@ -553,7 +553,10 @@ CommunicatingSocket::~CommunicatingSocket()
 void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
 {
     m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
-    m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
+    if (waitForRunningHandlerCompletion)
+        m_aioHelper->cancelIOSync(aio::etNone);
+    else
+        m_aioHelper->cancelIOAsync(aio::etNone, std::function<void()>());
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
@@ -763,9 +766,16 @@ void CommunicatingSocket::shutdown()
 #endif
 }
 
-void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+void CommunicatingSocket::cancelIOAsync(
+    aio::EventType eventType,
+    std::function<void()> cancellationDoneHandler)
 {
-    m_aioHelper->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
+}
+
+void CommunicatingSocket::cancelIOSync(aio::EventType eventType)
+{
+    m_aioHelper->cancelIOSync(eventType);
 }
 
 void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
