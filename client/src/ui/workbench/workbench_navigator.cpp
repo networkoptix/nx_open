@@ -1044,9 +1044,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
         m_bookmarkAggregation->clear();
 
-        /* For non-cameras widgets query will be properly reset here. */
-        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
-        setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
+        if (bookmarksModeEnabled())
+        {
+            /* For non-cameras widgets query will be properly reset here. */
+            const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
+            setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
+        }
+
     }
 
     m_pausedOverride = false;
