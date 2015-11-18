@@ -141,7 +141,7 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
         return false;
 
     const auto &bookmark = bookmarkVariant.value<QnCameraBookmark>();
-    const QnResourcePtr resource = qnResPool->getResourceByUniqueId<QnResource>(bookmark.cameraId);
+    const QnResourcePtr resource = qnResPool->getResourceByUniqueId(bookmark.cameraId);
 
     if (!resource)
         return false;
