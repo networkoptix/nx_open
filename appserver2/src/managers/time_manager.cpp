@@ -233,6 +233,8 @@ namespace ec2
     static const int MIN_GET_TIME_ERROR_MS = 100;
     //!once per this interval we check if local OS time has been changed
     static const int SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS = 10 * MILLIS_PER_SEC;
+    //!this coefficient applied to request round-trip time when comparing sync time from different servers
+    static const int SYNC_TIME_DRIFT_MAX_ERROR_COEFF = 5;
 
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC > 0, "MIN_INTERNET_SYNC_TIME_PERIOD_SEC MUST be > 0!" );
     static_assert( MIN_INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SEC,
@@ -579,7 +581,7 @@ namespace ec2
         //time difference between this server and remote one is not that great
         const auto timeDifference = remotePeerSyncTime - getSyncTimeNonSafe();
         const auto effectiveTimeErrorEstimation =
-            std::max<qint64>(timeErrorEstimation * 2, MIN_GET_TIME_ERROR_MS);
+            std::max<qint64>(timeErrorEstimation * SYNC_TIME_DRIFT_MAX_ERROR_COEFF, MIN_GET_TIME_ERROR_MS);
         const bool maxTimeDriftExceeded = std::abs(timeDifference) >= effectiveTimeErrorEstimation;
         const bool needAdjustClockDueToLargeDrift =
             //taking drift into account if both servers have time with same key
@@ -952,14 +954,14 @@ namespace ec2
 
                 if( llabs(getSyncTimeNonSafe() - millisFromEpoch) > MAX_SYNC_VS_INTERNET_TIME_DRIFT_MS )
                 {
-                    //considering time synchronized time as inaccurate, even if it is marked as received from internet
+                    //TODO #ak use rtt here instead of constant?
+                    //considering synchronized time as inaccurate, even if it is marked as received from internet
                     m_localTimePriorityKey.sequence = m_usedTimeSyncInfo.timePriorityKey.sequence + 1;
                 }
 
                 if( (llabs(curLocalTime - millisFromEpoch) > MAX_LOCAL_SYSTEM_TIME_DRIFT_MS) ||
                     (localTimePriorityKeyBak != m_localTimePriorityKey) )
                 {
-                    //sending broadcastPeerSystemTime tran, new sync time will be broadcasted along with it
                     m_localSystemTimeDelta = millisFromEpoch - m_monotonicClock.elapsed();
 
                     remotePeerTimeSyncUpdate(
