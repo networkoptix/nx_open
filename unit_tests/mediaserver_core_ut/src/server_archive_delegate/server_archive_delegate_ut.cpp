@@ -287,6 +287,7 @@ private:
             QDir(root).mkpath(pathString);
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString) 
                                                       + fileName;
+            qDebug() << fullFileName;
             if (curDuration == duration_1)
                 testFile_1.copy(fullFileName);
             else

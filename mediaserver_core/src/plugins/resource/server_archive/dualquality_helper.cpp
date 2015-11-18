@@ -50,177 +50,300 @@ void QnDualQualityHelper::findDataForTime(
     bool                                preciseFind
 )
 {
-    bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
-    m_alreadyOnAltChunk = false;
-
     DeviceFileCatalogPtr normalCatalog = (m_quality == MEDIA_Quality_Low ? 
                                           m_catalogLow[QnServer::StoragePool::Normal] : 
                                           m_catalogHi[QnServer::StoragePool::Normal]);
 
+    DeviceFileCatalogPtr normalCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+                                          m_catalogHi[QnServer::StoragePool::Normal] : 
+                                          m_catalogLow[QnServer::StoragePool::Normal]);
+
     DeviceFileCatalogPtr backupCatalog = (m_quality == MEDIA_Quality_Low ? 
                                           m_catalogLow[QnServer::StoragePool::Backup] : 
                                           m_catalogHi[QnServer::StoragePool::Backup]);
-    if (normalCatalog == 0 && backupCatalog == 0)
-        return; // no data in archive
-    
-    DeviceFileCatalog::TruncableChunk normalChunk; 
-    if (normalCatalog)
-        normalChunk = normalCatalog->chunkAt(normalCatalog->findFileIndex(time, 
-                                                                          findMethod));
-    DeviceFileCatalog::TruncableChunk backupChunk; 
-    if (backupCatalog)
-        backupChunk = backupCatalog->chunkAt(backupCatalog->findFileIndex(time, 
-                                                                          findMethod));
-    if (normalChunk.startTimeMs == -1 && backupChunk.startTimeMs == -1)
+
+    DeviceFileCatalogPtr backupCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+                                          m_catalogHi[QnServer::StoragePool::Backup] : 
+                                          m_catalogLow[QnServer::StoragePool::Backup]);
+
+    int findEps = (m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : 
+                                                    SECOND_STREAM_FIND_EPS);
+    SearchStack searchStack;
+
+    searchStack.emplace(normalCatalog);
+    searchStack.emplace(normalCatalogAlt);
+    searchStack.emplace(backupCatalog);
+    searchStack.emplace(backupCatalogAlt);
+
+    findDataForTimeHelper(
+        time, 
+        chunk, 
+        catalog, 
+        findMethod, 
+        preciseFind, 
+        searchStack,
+        -1, // There is no previous distance yet
+        findEps
+    );
+}
+
+void QnDualQualityHelper::findDataForTimeHelper(
+    const qint64                        time,
+    DeviceFileCatalog::TruncableChunk   &resultChunk,
+    DeviceFileCatalogPtr                &resultCatalog,
+    DeviceFileCatalog::FindMethod       findMethod,
+    bool                                preciseFind,
+    SearchStack                         &searchStack,
+    int                                 previousDistance,
+    int                                 findEps
+)
+{
+    if (searchStack.empty())
         return;
+    
+    DeviceFileCatalogPtr currentCatalog = searchStack.top();
+    searchStack.pop();
 
-    bool normalBetter = normalChunk.startTimeMs != -1 && (backupChunk.startTimeMs == -1 ||
-            calcDistanceHelper(normalChunk, time, findMethod) <= 
-            calcDistanceHelper(backupChunk, time, findMethod));
+    if (!currentCatalog)
+        findDataForTimeHelper(
+            time, 
+            resultChunk, 
+            resultCatalog, 
+            findMethod, 
+            preciseFind,
+            searchStack,
+            previousDistance,
+            findEps
+        );
 
-    if (normalBetter) {
-        chunk = normalChunk;
-        catalog = normalCatalog;
+    DeviceFileCatalog::TruncableChunk currentChunk = currentCatalog->chunkAt(
+        currentCatalog->findFileIndex(time, findMethod)
+    );
+    
+    if (currentChunk.startTimeMs == -1)
+        findDataForTimeHelper(
+            time, 
+            resultChunk, 
+            resultCatalog, 
+            findMethod, 
+            preciseFind,
+            searchStack,
+            previousDistance,
+            findEps
+        );
+
+    qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
+    if (previousDistance == -1 || (previousDistance != -1 && currentDistance < previousDistance) ||
+                                  ((currentDistance - previousDistance) < findEps && !preciseFind))
+    {
+        resultChunk = currentChunk;
+        resultCatalog = currentCatalog;
+
+        findDataForTimeHelper(
+            time, 
+            resultChunk, 
+            resultCatalog, 
+            findMethod, 
+            preciseFind,
+            searchStack,
+            currentDistance,
+            findEps
+        );
     }
-    else {
-        chunk = backupChunk;
-        catalog = backupCatalog;
-    }
-
-    qint64 timeDistance = calcDistanceHelper(chunk, time, findMethod);
-    if (timeDistance > 0) {
-        DeviceFileCatalogPtr normalCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
-                                              m_catalogHi[QnServer::StoragePool::Normal] : 
-                                              m_catalogLow[QnServer::StoragePool::Normal]);
-
-        DeviceFileCatalogPtr backupCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
-                                              m_catalogHi[QnServer::StoragePool::Backup] : 
-                                              m_catalogLow[QnServer::StoragePool::Backup]);
-        if (normalCatalogAlt == 0 && backupCatalogAlt == 0)
-            return; 
-        
-        DeviceFileCatalog::TruncableChunk normalChunkAlt; 
-        if (normalCatalogAlt)
-            normalChunkAlt = normalCatalogAlt->chunkAt(
-                    normalCatalogAlt->findFileIndex(time, findMethod));
-
-        DeviceFileCatalog::TruncableChunk backupChunkAlt; 
-        if (backupCatalogAlt)
-            backupChunkAlt = backupCatalogAlt->chunkAt(
-                    backupCatalogAlt->findFileIndex(time, findMethod));
-
-        if (normalChunkAlt.startTimeMs == -1 && backupChunkAlt.startTimeMs == -1)
-            return;
-
-        bool normalBetterAlt = normalChunkAlt.startTimeMs != -1 && 
-             (backupChunkAlt.startTimeMs == -1 ||
-                calcDistanceHelper(normalChunkAlt, time, findMethod) <= 
-                calcDistanceHelper(backupChunkAlt, time, findMethod));
-
-        DeviceFileCatalog::TruncableChunk chunkAlt;
-        DeviceFileCatalogPtr catalogAlt;
-
-        if (normalBetterAlt) {
-            catalogAlt = normalCatalogAlt;
-            chunkAlt = normalChunkAlt;
-        }
-        else {
-            catalogAlt = backupCatalogAlt;
-            chunkAlt = backupChunkAlt;
-        }
-
-        qint64 timeDistanceAlt = calcDistanceHelper(chunkAlt, time, findMethod);
-        int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : 
-                                                       SECOND_STREAM_FIND_EPS;
-
-        if (timeDistance - timeDistanceAlt > findEps || 
-            (timeDistance > timeDistanceAlt && usePreciseFind)) 
-        {
-            if (timeDistanceAlt == 0) 
-            {
-                // if recording hole, alt quality chunk may be slightly longer then primary. 
-                // So, distance to such chunk still 0.
-                // prevent change quality, if such chunk rest very low
-                if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && 
-                    chunkAlt.endTimeMs()-time < findEps) 
-                {
-                    DeviceFileCatalog::Chunk nextNormalChunkAlt;
-                    if (normalCatalogAlt)
-                        nextNormalChunkAlt = normalCatalogAlt->chunkAt(
-                                normalCatalogAlt->findFileIndex(chunkAlt.endTimeMs(), 
-                                                                findMethod));
-                    DeviceFileCatalog::Chunk nextBackupChunkAlt; 
-                    nextBackupChunkAlt = backupCatalogAlt->chunkAt(
-                                backupCatalogAlt->findFileIndex(chunkAlt.endTimeMs(), 
-                                                                findMethod));
-
-                    bool isNormalNextTooFar = nextNormalChunkAlt.startTimeMs == -1 || 
-                        (nextNormalChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
-                         chunk.startTimeMs > time && !usePreciseFind);
-
-                    bool isBackupNextTooFar = nextBackupChunkAlt.startTimeMs == -1 || 
-                        (nextBackupChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
-                         chunk.startTimeMs > time && !usePreciseFind);
-
-                    bool isGapToNextTooLarge = isNormalNextTooFar && isBackupNextTooFar;
-
-                    if (isGapToNextTooLarge)
-                        return; // It is data hole, but altChunk cover very right edge 
-                                // before hole. Ignore it.
-
-                    bool altEOFReached = 
-                        (nextNormalChunkAlt.startTimeMs == -1 || 
-                         nextNormalChunkAlt.startTimeMs == chunkAlt.startTimeMs) &&
-                        (nextBackupChunkAlt.startTimeMs == -1 || 
-                         nextBackupChunkAlt.startTimeMs == chunkAlt.startTimeMs);
-
-                    if (altEOFReached)
-                        return; // EOF reached
-                }
-                else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && 
-                         time - chunkAlt.startTimeMs < findEps)
-                {
-                    DeviceFileCatalog::Chunk prevNormalChunkAlt;
-                    if (normalCatalogAlt)
-                        prevNormalChunkAlt = normalCatalogAlt->chunkAt(
-                                normalCatalogAlt->findFileIndex(chunkAlt.startTimeMs-1, 
-                                                                findMethod));
-
-                    DeviceFileCatalog::Chunk prevBackupChunkAlt;
-                    if (backupCatalogAlt)
-                        prevBackupChunkAlt = backupCatalogAlt->chunkAt(
-                                backupCatalogAlt->findFileIndex(chunkAlt.startTimeMs-1, 
-                                                                findMethod));
-                    bool isNormalTooFar = prevNormalChunkAlt.startTimeMs == -1 ||
-                         prevNormalChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
-                         chunk.endTimeMs() < time;
-
-                    bool isBackupTooFar = prevBackupChunkAlt.startTimeMs == -1 ||
-                         prevBackupChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
-                         chunk.endTimeMs() < time;
-
-                    bool isPrevAltTooFar = isNormalTooFar && isBackupTooFar;
-
-                    if (isPrevAltTooFar)
-                        return;
-                }
-            }
-
-            // alternate quality matched better
-            if (timeDistance != INT64_MAX && chunkAlt.containsTime(chunk.startTimeMs)) {
-                uDebug() << lit("Alt Chunk truncated at %1").arg(chunk.startTimeMs);
-                chunkAlt.truncate(chunk.startTimeMs); // truncate to start of the next 
-                                                      // chunk of the required quality 
-                                                      // (if next chunk of requested 
-                                                      //  quality is exists)
-            }
-
-            catalog = catalogAlt;
-            chunk = chunkAlt;
-            m_alreadyOnAltChunk = true;
-        }
+    else 
+    {
+        findDataForTimeHelper(
+            time, 
+            resultChunk, 
+            resultCatalog, 
+            findMethod, 
+            preciseFind,
+            searchStack,
+            previousDistance,
+            findEps
+        );
     }
 }
+
+//void QnDualQualityHelper::findDataForTime(
+//    const qint64                        time,
+//    DeviceFileCatalog::TruncableChunk   &chunk,
+//    DeviceFileCatalogPtr                &catalog,
+//    DeviceFileCatalog::FindMethod       findMethod,
+//    bool                                preciseFind
+//)
+//{
+//    bool usePreciseFind = m_alreadyOnAltChunk || preciseFind;
+//    m_alreadyOnAltChunk = false;
+//
+//    DeviceFileCatalogPtr normalCatalog = (m_quality == MEDIA_Quality_Low ? 
+//                                          m_catalogLow[QnServer::StoragePool::Normal] : 
+//                                          m_catalogHi[QnServer::StoragePool::Normal]);
+//
+//    DeviceFileCatalogPtr backupCatalog = (m_quality == MEDIA_Quality_Low ? 
+//                                          m_catalogLow[QnServer::StoragePool::Backup] : 
+//                                          m_catalogHi[QnServer::StoragePool::Backup]);
+//    if (normalCatalog == 0 && backupCatalog == 0)
+//        return; // no data in archive
+//    
+//    DeviceFileCatalog::TruncableChunk normalChunk; 
+//    if (normalCatalog)
+//        normalChunk = normalCatalog->chunkAt(normalCatalog->findFileIndex(time, 
+//                                                                          findMethod));
+//    DeviceFileCatalog::TruncableChunk backupChunk; 
+//    if (backupCatalog)
+//        backupChunk = backupCatalog->chunkAt(backupCatalog->findFileIndex(time, 
+//                                                                          findMethod));
+//    if (normalChunk.startTimeMs == -1 && backupChunk.startTimeMs == -1)
+//        return;
+//
+//    bool normalBetter = normalChunk.startTimeMs != -1 && (backupChunk.startTimeMs == -1 ||
+//            calcDistanceHelper(normalChunk, time, findMethod) <= 
+//            calcDistanceHelper(backupChunk, time, findMethod));
+//
+//    if (normalBetter) {
+//        chunk = normalChunk;
+//        catalog = normalCatalog;
+//    }
+//    else {
+//        chunk = backupChunk;
+//        catalog = backupCatalog;
+//    }
+//
+//    qint64 timeDistance = calcDistanceHelper(chunk, time, findMethod);
+//    if (timeDistance > 0) {
+//        DeviceFileCatalogPtr normalCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+//                                              m_catalogHi[QnServer::StoragePool::Normal] : 
+//                                              m_catalogLow[QnServer::StoragePool::Normal]);
+//
+//        DeviceFileCatalogPtr backupCatalogAlt = (m_quality == MEDIA_Quality_Low ? 
+//                                              m_catalogHi[QnServer::StoragePool::Backup] : 
+//                                              m_catalogLow[QnServer::StoragePool::Backup]);
+//        if (normalCatalogAlt == 0 && backupCatalogAlt == 0)
+//            return; 
+//        
+//        DeviceFileCatalog::TruncableChunk normalChunkAlt; 
+//        if (normalCatalogAlt)
+//            normalChunkAlt = normalCatalogAlt->chunkAt(
+//                    normalCatalogAlt->findFileIndex(time, findMethod));
+//
+//        DeviceFileCatalog::TruncableChunk backupChunkAlt; 
+//        if (backupCatalogAlt)
+//            backupChunkAlt = backupCatalogAlt->chunkAt(
+//                    backupCatalogAlt->findFileIndex(time, findMethod));
+//
+//        if (normalChunkAlt.startTimeMs == -1 && backupChunkAlt.startTimeMs == -1)
+//            return;
+//
+//        bool normalBetterAlt = normalChunkAlt.startTimeMs != -1 && 
+//             (backupChunkAlt.startTimeMs == -1 ||
+//                calcDistanceHelper(normalChunkAlt, time, findMethod) <= 
+//                calcDistanceHelper(backupChunkAlt, time, findMethod));
+//
+//        DeviceFileCatalog::TruncableChunk chunkAlt;
+//        DeviceFileCatalogPtr catalogAlt;
+//
+//        if (normalBetterAlt) {
+//            catalogAlt = normalCatalogAlt;
+//            chunkAlt = normalChunkAlt;
+//        }
+//        else {
+//            catalogAlt = backupCatalogAlt;
+//            chunkAlt = backupChunkAlt;
+//        }
+//
+//        qint64 timeDistanceAlt = calcDistanceHelper(chunkAlt, time, findMethod);
+//        int findEps = m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : 
+//                                                       SECOND_STREAM_FIND_EPS;
+//
+//        if (timeDistance - timeDistanceAlt > findEps || 
+//            (timeDistance > timeDistanceAlt && usePreciseFind)) 
+//        {
+//            if (timeDistanceAlt == 0) 
+//            {
+//                // if recording hole, alt quality chunk may be slightly longer then primary. 
+//                // So, distance to such chunk still 0.
+//                // prevent change quality, if such chunk rest very low
+//                if (findMethod == DeviceFileCatalog::OnRecordHole_NextChunk && 
+//                    chunkAlt.endTimeMs()-time < findEps) 
+//                {
+//                    DeviceFileCatalog::Chunk nextNormalChunkAlt;
+//                    if (normalCatalogAlt)
+//                        nextNormalChunkAlt = normalCatalogAlt->chunkAt(
+//                                normalCatalogAlt->findFileIndex(chunkAlt.endTimeMs(), 
+//                                                                findMethod));
+//                    DeviceFileCatalog::Chunk nextBackupChunkAlt; 
+//                    nextBackupChunkAlt = backupCatalogAlt->chunkAt(
+//                                backupCatalogAlt->findFileIndex(chunkAlt.endTimeMs(), 
+//                                                                findMethod));
+//
+//                    bool isNormalNextTooFar = nextNormalChunkAlt.startTimeMs == -1 || 
+//                        (nextNormalChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
+//                         chunk.startTimeMs > time && !usePreciseFind);
+//
+//                    bool isBackupNextTooFar = nextBackupChunkAlt.startTimeMs == -1 || 
+//                        (nextBackupChunkAlt.startTimeMs > chunkAlt.endTimeMs() + findEps && 
+//                         chunk.startTimeMs > time && !usePreciseFind);
+//
+//                    bool isGapToNextTooLarge = isNormalNextTooFar && isBackupNextTooFar;
+//
+//                    if (isGapToNextTooLarge)
+//                        return; // It is data hole, but altChunk cover very right edge 
+//                                // before hole. Ignore it.
+//
+//                    bool altEOFReached = 
+//                        (nextNormalChunkAlt.startTimeMs == -1 || 
+//                         nextNormalChunkAlt.startTimeMs == chunkAlt.startTimeMs) &&
+//                        (nextBackupChunkAlt.startTimeMs == -1 || 
+//                         nextBackupChunkAlt.startTimeMs == chunkAlt.startTimeMs);
+//
+//                    if (altEOFReached)
+//                        return; // EOF reached
+//                }
+//                else if (findMethod == DeviceFileCatalog::OnRecordHole_PrevChunk && 
+//                         time - chunkAlt.startTimeMs < findEps)
+//                {
+//                    DeviceFileCatalog::Chunk prevNormalChunkAlt;
+//                    if (normalCatalogAlt)
+//                        prevNormalChunkAlt = normalCatalogAlt->chunkAt(
+//                                normalCatalogAlt->findFileIndex(chunkAlt.startTimeMs-1, 
+//                                                                findMethod));
+//
+//                    DeviceFileCatalog::Chunk prevBackupChunkAlt;
+//                    if (backupCatalogAlt)
+//                        prevBackupChunkAlt = backupCatalogAlt->chunkAt(
+//                                backupCatalogAlt->findFileIndex(chunkAlt.startTimeMs-1, 
+//                                                                findMethod));
+//                    bool isNormalTooFar = prevNormalChunkAlt.startTimeMs == -1 ||
+//                         prevNormalChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
+//                         chunk.endTimeMs() < time;
+//
+//                    bool isBackupTooFar = prevBackupChunkAlt.startTimeMs == -1 ||
+//                         prevBackupChunkAlt.endTimeMs() < chunk.endTimeMs() + findEps &&
+//                         chunk.endTimeMs() < time;
+//
+//                    bool isPrevAltTooFar = isNormalTooFar && isBackupTooFar;
+//
+//                    if (isPrevAltTooFar)
+//                        return;
+//                }
+//            }
+//
+//            // alternate quality matched better
+//            if (timeDistance != INT64_MAX && chunkAlt.containsTime(chunk.startTimeMs)) {
+//                uDebug() << lit("Alt Chunk truncated at %1").arg(chunk.startTimeMs);
+//                chunkAlt.truncate(chunk.startTimeMs); // truncate to start of the next 
+//                                                      // chunk of the required quality 
+//                                                      // (if next chunk of requested 
+//                                                      //  quality is exists)
+//            }
+//
+//            catalog = catalogAlt;
+//            chunk = chunkAlt;
+//            m_alreadyOnAltChunk = true;
+//        }
+//    }
+//}
 
 //void QnDualQualityHelper::findDataForTimeHelper(
 //    const qint64                        time,
