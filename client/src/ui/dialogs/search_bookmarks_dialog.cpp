@@ -23,6 +23,8 @@
 class QnSearchBookmarksDialog::Impl : public QObject
     , public QnWorkbenchContextAware
 {
+    Q_DECLARE_TR_FUNCTIONS(Impl)
+
 public:
     Impl(QDialog *owner);
 
