@@ -14,8 +14,7 @@
 #include "core/resource/network_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
 
-#define UT_DEBUG 1
-#define uDebug() if (!UT_DEBUG) (void)(0); else qDebug()
+#define uDebug() if (0) (void)(0); else qDebug()
 
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;

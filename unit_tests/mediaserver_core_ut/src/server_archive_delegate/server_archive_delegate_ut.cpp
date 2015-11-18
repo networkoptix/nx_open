@@ -246,6 +246,8 @@ private:
 
         QFile testFile_1("://1445529661948_77158.mkv");
         QFile testFile_2("://1445529880231_64712.mkv");
+        //QFile testFile_1("F:\\develop\\dumps\\hi_dw.mkv");
+        //QFile testFile_2("F:\\develop\\dumps\\hi_dw.mkv");
 
         int64_t startTimeMs = 1445529661948;
         const int duration_1 = 77158;
@@ -522,9 +524,9 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     while(1) {
         data = archiveDelegate.getNextData();
         if (data)
-            testHelper.getTimeLine().checkTime(data->timestamp/1000);
+            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
+            //testHelper.getTimeLine().checkTime(data->timestamp/1000);
         else
             break;
-            //ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
     } 
 }

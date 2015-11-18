@@ -26,14 +26,14 @@ public:
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
 private:
-    void findDataForTimeHelper(
-        const qint64                        time,
-        DeviceFileCatalog::TruncableChunk   &resultChunk,
-        DeviceFileCatalogPtr                &resultCatalog,
-        DeviceFileCatalog::FindMethod       findMethod,
-        bool                                preciseFind,
-        QnServer::StoragePool               storageManager
-    );
+    //void findDataForTimeHelper(
+    //    const qint64                        time,
+    //    DeviceFileCatalog::TruncableChunk   &resultChunk,
+    //    DeviceFileCatalogPtr                &resultCatalog,
+    //    DeviceFileCatalog::FindMethod       findMethod,
+    //    bool                                preciseFind,
+    //    QnServer::StoragePool               storageManager
+    //);
 
     static int64_t calcDistanceHelper(
         const DeviceFileCatalog::Chunk  &chunk,
