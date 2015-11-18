@@ -23,7 +23,7 @@ QnPlSonyResource::QnPlSonyResource()
 QnPlSonyResource::~QnPlSonyResource() {
     nx_http::AsyncHttpClientPtr inputMonitorHttpClient;
     {
-        QMutexLocker lk(&m_inputPortMutex);
+        QnMutexLocker lk(&m_inputPortMutex);
         inputMonitorHttpClient = std::move(m_inputMonitorHttpClient);
     }
     if (inputMonitorHttpClient)
@@ -281,7 +281,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
 
 void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk(&m_inputPortMutex);
+    QnMutexLocker lk(&m_inputPortMutex);
     
     if (m_inputMonitorHttpClient != httpClient)
         return;
