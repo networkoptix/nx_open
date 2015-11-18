@@ -268,7 +268,7 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PanicMode)
 
     enum ConnectionRole {
-        CR_Default,
+        CR_Default,         /// In client this flag is sufficient to receive both archive and live video
         CR_LiveVideo,
         CR_SecondaryLiveVideo,
         CR_Archive 

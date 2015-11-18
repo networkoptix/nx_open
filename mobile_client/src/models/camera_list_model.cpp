@@ -237,7 +237,14 @@ bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &rig
     QString leftAddress = left.data(Qn::IpAddressRole).toString();
     QString rightAddress = right.data(Qn::IpAddressRole).toString();
 
-    return naturalStringLess(leftAddress, rightAddress);
+    res = naturalStringCompare(leftAddress, rightAddress);
+    if (res != 0)
+        return res < 0;
+
+    QString leftId = left.data(Qn::UuidRole).toString();
+    QString rightId = right.data(Qn::UuidRole).toString();
+
+    return leftId < rightId;
 }
 
 bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {

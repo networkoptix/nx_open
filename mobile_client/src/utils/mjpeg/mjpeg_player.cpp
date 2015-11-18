@@ -1,8 +1,11 @@
 #include "mjpeg_player.h"
 
+#include <limits>
+
 #include <QtMultimedia/QAbstractVideoSurface>
 #include <QtMultimedia/QVideoSurfaceFormat>
 #include <QtCore/QElapsedTimer>
+#include <QtOpenGL/qgl.h>
 
 #include <utils/common/delayed.h>
 #include "mjpeg_session.h"
@@ -29,6 +32,8 @@ public:
 
     bool reconnectOnPlay;
 
+    int maxTextureSize;
+
     QnMjpegPlayerPrivate(QnMjpegPlayer *parent);
 
     void setState(QnMjpegPlayer::PlaybackState state);
@@ -48,7 +53,9 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , position(0)
     , timestamp(0)
     , reconnectOnPlay(false)
+    , maxTextureSize(std::numeric_limits<int>::max())
 {
+    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 }
 
 void QnMjpegPlayerPrivate::setState(QnMjpegPlayer::PlaybackState state) {
@@ -78,6 +85,9 @@ void QnMjpegPlayerPrivate::processFrame() {
 
     if (frameTimer.isValid())
         presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);
+
+    if (image.width() > maxTextureSize || image.height() > maxTextureSize)
+        image = image.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
 
     QVideoFrame frame(image);
     if (videoSurface) {

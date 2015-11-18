@@ -41,6 +41,14 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(ui->autoSettingsCheckBox,       &QCheckBox::stateChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
     retranslateUi();
+
+    /* Let suggest these options are changes so rare, so we can safely drop unsaved changes. */
+    connect(qnGlobalSettings, &QnGlobalSettings::disabledVendorsChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);   
+    connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged,        this,   &QnSystemSettingsWidget::loadDataToUi);   
+    connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);   
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);   
+    
+    /* Statistics checkbox has a lot of reasons to be recalculated, let it behave inconsistently for a while. */
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget() {
@@ -60,37 +68,33 @@ void QnSystemSettingsWidget::retranslateUi() {
 
 
 void QnSystemSettingsWidget::loadDataToUi() {
-    QnGlobalSettings *settings = QnGlobalSettings::instance();
-
-    QSet<QString> disabledVendors = settings->disabledVendorsSet();
-    bool discoveryEnabled = (!disabledVendors.contains(lit("all")) && !disabledVendors.contains(lit("all=partial"))) || settings->isServerAutoDiscoveryEnabled();
-    bool discoveryFullEnabled = disabledVendors.isEmpty() && settings->isServerAutoDiscoveryEnabled();
+    QSet<QString> disabledVendors = qnGlobalSettings->disabledVendorsSet();
+    bool discoveryEnabled = (!disabledVendors.contains(lit("all")) && !disabledVendors.contains(lit("all=partial"))) || qnGlobalSettings->isServerAutoDiscoveryEnabled();
+    bool discoveryFullEnabled = disabledVendors.isEmpty() && qnGlobalSettings->isServerAutoDiscoveryEnabled();
     ui->autoDiscoveryCheckBox->setCheckState(discoveryEnabled ? (discoveryFullEnabled ? Qt::Checked : Qt::PartiallyChecked)
                                                               : Qt::Unchecked);
-    ui->auditTrailCheckBox->setChecked(settings->isAuditTrailEnabled());
+    ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
 
-    ui->autoSettingsCheckBox->setChecked(settings->isCameraSettingsOptimizationEnabled());
+    ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
 
-    ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getResources<QnMediaServerResource>()));
+    ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getAllServers()));
 }
 
 void QnSystemSettingsWidget::applyChanges() {
     if (!hasChanges())
         return;
-
-    QnGlobalSettings *settings = QnGlobalSettings::instance();
-    
+   
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked) {
-        settings->setDisabledVendors(QString());
-        settings->setServerAutoDiscoveryEnabled(true);
+        qnGlobalSettings->setDisabledVendors(QString());
+        qnGlobalSettings->setServerAutoDiscoveryEnabled(true);
     } else if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked) {
-        settings->setDisabledVendors(lit("all=partial"));
-        settings->setServerAutoDiscoveryEnabled(false);
+        qnGlobalSettings->setDisabledVendors(lit("all=partial"));
+        qnGlobalSettings->setServerAutoDiscoveryEnabled(false);
     }
 
-    settings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
-    settings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
+    qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
+    qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
     ui->settingsWarningLabel->setVisible(false);
 
     const auto servers = qnResPool->getResources<QnMediaServerResource>();
@@ -107,17 +111,15 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     if (isReadOnly())
         return false;
 
-    QnGlobalSettings *settings = QnGlobalSettings::instance();
-
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Checked
-        && !settings->disabledVendors().isEmpty())
+        && !qnGlobalSettings->disabledVendors().isEmpty())
         return true;
     
     if (ui->autoDiscoveryCheckBox->checkState() == Qt::CheckState::Unchecked
-        && !settings->disabledVendors().contains(lit("all")) )  //MUST not overwrite "all" with "all=partial"
+        && !qnGlobalSettings->disabledVendors().contains(lit("all")) )  //MUST not overwrite "all" with "all=partial"
         return true;
 
-    if (settings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
+    if (qnGlobalSettings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
         return true;
 
     const auto servers = qnResPool->getResources<QnMediaServerResource>();
@@ -125,7 +127,7 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
         return true;
 
-    if (ui->auditTrailCheckBox->isChecked() != settings->isAuditTrailEnabled())
+    if (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
         return true;
 
     return false;

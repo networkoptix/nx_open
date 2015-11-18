@@ -504,13 +504,17 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
-    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
-        return Qn::DisabledAction;
-
     // Export selection
     if (m_centralItemRequired) {
+        
+        const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
+        
+        /// If parameters contain periods it means we need current selected item
+        if (containsAvailablePeriods && !context()->workbench()->item(Qn::CentralRole))
+            return Qn::DisabledAction;
+
         QnResourcePtr resource = parameters.resource();
-        if(resource->flags() & Qn::sync) {
+        if(containsAvailablePeriods && resource && resource->flags().testFlag(Qn::sync)) {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;

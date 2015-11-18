@@ -11,6 +11,7 @@ QnStorageResource::QnStorageResource():
     m_writed(0.0),
     m_writedCoeff(1.0)
 {
+    addFlags(Qn::remote);
     setStatus(Qn::Offline);
 }
 

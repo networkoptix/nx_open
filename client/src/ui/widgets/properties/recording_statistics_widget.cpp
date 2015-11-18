@@ -234,8 +234,6 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     ui->gridEvents->addAction(m_clipboardAction);
     ui->gridEvents->addAction(m_exportAction);
 
-    ui->loadingProgressBar->hide();
-
     connect(m_clipboardAction,      &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
     connect(m_exportAction,         &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
     connect(headers->comboBox(),    QnComboboxCurrentIndexChanged,          this,   &QnRecordingStatisticsWidget::updateData);
@@ -296,7 +294,6 @@ void QnRecordingStatisticsWidget::updateData() {
         ui->gridEvents->setDisabled(true);
         ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
     }
     else {
         requestFinished(); // just clear grid
@@ -389,7 +386,6 @@ void QnRecordingStatisticsWidget::requestFinished()
     ui->gridEvents->setDisabled(false);
     at_forecastParamsChanged();
     setCursor(Qt::ArrowCursor);
-    ui->loadingProgressBar->hide();
 }
 
 void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
@@ -489,17 +485,7 @@ void QnRecordingStatisticsWidget::at_forecastParamsChanged()
 
     bool fcEnabled = ui->checkBoxForecast->isChecked();
     ui->extraSpaceSlider->setEnabled(fcEnabled);
-    for (int i = 0; i < ui->gridLayoutForecast->count(); ++i)
-        //for (const auto& object: ui->gridLayoutForecast->getItemPosition() ())
-    {
-        QWidget* object = ui->gridLayoutForecast->itemAt(i)->widget();
-        if (QSlider* slider = dynamic_cast<QSlider*>(object))
-            slider->setEnabled(fcEnabled);
-        else if (QLabel* label = dynamic_cast<QLabel*>(object))
-            label->setEnabled(fcEnabled);
-        else if (QDoubleSpinBox* spinbox = dynamic_cast<QDoubleSpinBox*>(object))
-            spinbox->setEnabled(fcEnabled);
-    }
+    ui->forecastControlWidget->setEnabled(fcEnabled);
 
     if (ui->checkBoxForecast->isChecked()) 
     {
