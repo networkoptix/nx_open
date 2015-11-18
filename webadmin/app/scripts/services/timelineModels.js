@@ -897,7 +897,7 @@ ScaleManager.prototype.updateCurrentInterval = function(){
     this.anchorDate = this.bound(this.start, Math.round(this.anchorDate), this.end);
 
 
-    this.visibleStart = Math.round(this.anchorDate - this.msPerPixel  * this.viewportWidth * this.anchorPoint);
+    this.visibleStart = Math.round(this.anchorDate - this.msPerPixel * this.viewportWidth * this.anchorPoint);
     this.visibleEnd = Math.round(this.anchorDate + this.msPerPixel  * this.viewportWidth * (1 - this.anchorPoint));
 
 
@@ -1085,11 +1085,24 @@ ScaleManager.prototype.alignStart = function(level){ // Align start by the grid 
 ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid using level
     return level.interval.alignToFuture(this.visibleEnd);
 };
+
+ScaleManager.prototype.getTotalTimelineWidth = function(){
+    return this.viewportWidth / this.getRelativeWidth();
+};
+
+ScaleManager.prototype.coordinateToDate = function(coordinate){
+    return Math.round((this.end - this.start) * coordinate / this.getTotalTimelineWidth() + this.start);
+};
+ScaleManager.prototype.dateToCoordinate = function(date){
+    return Math.round(this.getTotalTimelineWidth() * (date - this.start) / (this.end - this.start));
+};
+
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
-    return Math.round(this.viewportWidth * (date - this.visibleStart) / (this.visibleEnd - this.visibleStart));
+    return this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart);
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
-    return Math.round(this.visibleStart + coordinate / this.viewportWidth * (this.visibleEnd - this.visibleStart));
+
+    return this.coordinateToDate(coordinate + this.dateToCoordinate(this.visibleStart));
 };
 
 // Some function for scroll support
@@ -1102,7 +1115,7 @@ ScaleManager.prototype.getRelativeCenter = function(){
     return ((this.visibleStart + this.visibleEnd) / 2 - this.start) / (this.end - this.start);
 };
 ScaleManager.prototype.getRelativeWidth = function(){
-    return (this.visibleEnd - this.visibleStart) / (this.end - this.start);
+    return this.msPerPixel * this.viewportWidth / (this.end - this.start);
 };
 
 
@@ -1128,12 +1141,12 @@ ScaleManager.prototype.scroll = function(value){
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
-    return this.bound(0,this.scroll() +pixels / this.viewportWidth * this.getRelativeWidth(),1);
+    return this.bound(0,this.scroll() + pixels / this.getTotalTimelineWidth(),1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scroll(this.scroll() +  pixels / this.viewportWidth * this.getRelativeWidth() );
+    this.scroll(this.scroll() +  pixels / this.getTotalTimelineWidth() );
 };
 
 
