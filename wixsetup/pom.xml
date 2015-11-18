@@ -215,7 +215,7 @@
 
                     <execution>
                         <id>pack</id>
-                        <phase>package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>exec</goal>
                         </goals>
@@ -246,7 +246,7 @@
                 <executions>
                     <execution>
                         <id>client-update-package</id>
-                        <phase>prepare-package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -260,7 +260,7 @@
                     </execution>	
                     <execution>
                         <id>pack-debug-all</id>
-                        <phase>prepare-package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -273,7 +273,7 @@
                     </execution>
                     <execution>
                         <id>pack-debug-apps</id>
-                        <phase>prepare-package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
@@ -287,7 +287,7 @@
 
                     <execution>
                         <id>server-update-package</id>
-                        <phase>prepare-package</phase>
+                        <phase>verify</phase>
                         <goals>
                             <goal>single</goal>
                         </goals>
