@@ -750,15 +750,55 @@
                                 </value>
                             </values>
                         </param>
-						<param>
-							<name>id</name>
-							<description>Server unique ID</description>
+                        <param>
+                            <name>id</name>
+                            <description>Server unique ID</description>
                             <optional>true</optional>
-							<values/>
-						</param>
-					</params>
+                            <values/>
+                        </param>
+                    </params>
                     <result>
                         <caption>Returns storages list data formatted in a requested format. If id parameter is specified, the list contais only that server storages.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>getStatusList</name>
+                    <description>Read current status values for camers, servers and storages.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value: 'json'</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>universal binary json data format</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>json data format</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>xml data format</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>CSV data format. In case of hierarchical structure only
+                                        top level data will be provided</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>id</name>
+                            <description>Object unique ID</description>
+                            <optional>true</optional>
+                            <values/>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Returns objects status list data formatted in a requested format. If id parameter is specified, the list contais only one object with that id or nothing, if there is no such object found.</caption>
                     </result>
                 </function>
             </functions>
@@ -1335,14 +1375,27 @@
                 </function>
                 <function>
                     <name>rebuildArchive</name>
-                    <description>Start or stop server archive rebuilding.</description>
+                    <description>Start or stop the server archive rebuilding, also can report this process status.</description>
                     <method>GET</method>
                     <params>
                         <param>
                             <name>action</name>
-                            <description>'start', 'stop' or '0' value.</description>
+                            <description>What to do and what to report about the server archive rebuild.</description>
                             <optional>true</optional>
-                            <values/>
+                            <values>
+                                <value>
+                                    <name>start</name>
+                                    <description>Start server archive rebuild.</description>
+                                </value>
+                                <value>
+                                    <name>stop</name>
+                                    <description>Stop rebuild.</description>
+                                </value>
+                                <value>
+                                    <name>any other value or no parameter</name>
+                                    <description>Report server archive rebuild status</description>
+                                </value>
+                            </values>
                         </param>
                         <param>
                             <name>mainPool</name>
@@ -1352,8 +1405,36 @@
                         </param>
                     </params>
                     <result>
-                        <caption>Rebuild progress if no input parameter specified or XML with OK message or
-                        error code.</caption>
+                        <caption>Rebuild progress status or an error code.</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>backupControl</name>
+                    <description>Start or stop the recorded data backup process, also can report this process status.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>action</name>
+                            <description>What to do and what to report about the backup process.</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>start</name>
+                                    <description>Start backup just now.</description>
+                                </value>
+                                <value>
+                                    <name>stop</name>
+                                    <description>Stop backup.</description>
+                                </value>
+                                <value>
+                                    <name>any other value or no parameter</name>
+                                    <description>Report the backup process status.</description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Bakcup process progress status or an error code.</caption>
                     </result>
                 </function>
                 <function>
@@ -1779,27 +1860,27 @@
                         <param>
                             <name>timestamp</name>
                             <description>Event date and time. It could be either UTC milliseconds or human readible date and time at ISO 8601 format.
-							If eventTimestamp is absent, current server date and time is used.
-							</description>
+                                         If eventTimestamp is absent, current server date and time is used.
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>source</name>
                             <description> External device name. It could be used as a filter at business rules to math different action with different devices.
-							              Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
-							</description>
+                                          Also, user could see device name in the notifications panel. For instance: 'POS terminal 5'.
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>caption</name>
                             <description> Short event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>description</name>
                             <description> Long event description. It could be used as a filter at business rules to math different action with different events.
-							</description>
+                            </description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -1822,7 +1903,7 @@
                         <param>
                             <name>state</name>
                             <description> Generic events can be used either with long actions like 'do recording' or instant actions like 'send email'. If you are going to use long actions with Generic events, this parameter should be filled.
-							</description>
+                            </description>
                             <optional>true</optional>
                             <values>
                                 <value>

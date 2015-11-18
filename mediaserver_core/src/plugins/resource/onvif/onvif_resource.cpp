@@ -582,6 +582,29 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     fetchRelayInputInfo( capabilitiesResponse );
 
+    QnIOPortDataList allPorts = getRelayOutputList();
+
+    if (capabilitiesResponse.Capabilities &&
+        capabilitiesResponse.Capabilities->Device &&
+        capabilitiesResponse.Capabilities->Device->IO &&
+        capabilitiesResponse.Capabilities->Device->IO->InputConnectors &&
+        *capabilitiesResponse.Capabilities->Device->IO->InputConnectors > 0)
+    {
+        for (
+            int i = 1;
+            i <= *capabilitiesResponse.Capabilities->Device->IO->InputConnectors;
+            ++i)
+        {
+            QnIOPortData inputPort;
+            inputPort.portType = Qn::PT_Input;
+            inputPort.id = lit("%1").arg(i);
+            inputPort.inputName = tr("Input %1").arg(i);
+            allPorts.emplace_back(std::move(inputPort));
+        }
+    }
+
+    setIOPorts(std::move(allPorts));
+
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
 
@@ -607,6 +630,10 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             setCustomAspectRatio(ar);
         }
     }
+    
+    const auto customInitResult = customInitialization(capabilitiesResponse);
+    if (customInitResult.errorCode != CameraDiagnostics::ErrorCode::noError)
+        return customInitResult;
 
     saveParams();
 
@@ -1340,7 +1367,7 @@ QnIOPortDataList QnPlOnvifResource::getRelayOutputList() const
         QnIOPortData value;
         value.portType = Qn::PT_Output;
         value.id = data;
-        value.outputName = tr("Otput %1").arg(data);
+        value.outputName = tr("Output %1").arg(data);
         result.push_back(value);
     }
     return result;

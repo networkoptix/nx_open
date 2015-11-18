@@ -85,6 +85,7 @@ namespace nx_http
 
         template<typename AsyncClientFunc>
             bool doRequest(AsyncClientFunc func);
+        void instanciateHttpClient();
 
     private slots:
         void onResponseReceived();

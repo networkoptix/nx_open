@@ -31,8 +31,9 @@ public:
     virtual int getMaxOnvifRequestTries() const override { return 5; }
 
 protected:
+    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& capabilitiesResponse) override;
+
     virtual CameraDiagnostics::Result updateResourceCapabilities() override;
-    virtual CameraDiagnostics::Result initInternal() override;
     virtual bool startInputPortMonitoringAsync( std::function<void(bool)>&& completionHandler ) override;
     virtual void stopInputPortMonitoringAsync() override;
     virtual bool isInputPortMonitored() const override;

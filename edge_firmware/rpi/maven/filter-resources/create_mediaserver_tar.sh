@@ -154,7 +154,6 @@ cp -R ./opt $BUILD_DIR
 
 
 #additional platform specific files
-cp -R ./var $BUILD_DIR
 cp -R ./root $BUILD_DIR
 mkdir -p $BUILD_DIR/root/tools/nx
 cp ./opt/networkoptix/$MODULE_NAME/etc/mediaserver.conf $BUILD_DIR/root/tools/nx
@@ -162,9 +161,9 @@ if [ ! "$CUSTOMIZATION" == "networkoptix" ]; then
     mv -f $BUILD_DIR/etc/init.d/networkoptix-$MODULE_NAME $BUILD_DIR/etc/init.d/$CUSTOMIZATION-$MODULE_NAME
     cp -Rf $BUILD_DIR/opt/networkoptix/* $BUILD_DIR/opt/$CUSTOMIZATION
     rm -Rf $BUILD_DIR/opt/networkoptix/
-fi 
+fi
 
-if [[ "${box}" == "bpi" ]]; then 
+if [[ "${box}" == "bpi" ]]; then
     cp -f /usr/local/raspberrypi-tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/arm-linux-gnueabihf/lib/libstdc++.s* $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/lib
 fi
 
@@ -173,7 +172,7 @@ chmod -R 755 $BUILD_DIR/$PREFIX_DIR/$MODULE_NAME/var/scripts
 
 #building package
 pushd $BUILD_DIR
-  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root ./var
+  tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc ./root
   cp $PACKAGE_NAME ${project.build.directory}
 popd
 

@@ -266,6 +266,11 @@ protected:
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values);
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value);
     virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
+
+    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
+        return CameraDiagnostics::NoErrorResult();
+    }
+
 private:
     void setMaxFps(int f);
 
