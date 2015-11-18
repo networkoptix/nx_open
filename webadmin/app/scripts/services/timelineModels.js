@@ -1087,9 +1087,8 @@ ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid usin
 };
 
 ScaleManager.prototype.getTotalTimelineWidth = function(){
-    return this.viewportWidth / this.getRelativeWidth();
+    return Math.round(this.viewportWidth / this.getRelativeWidth());
 };
-
 ScaleManager.prototype.coordinateToDate = function(coordinate){
     return Math.round((this.end - this.start) * coordinate / this.getTotalTimelineWidth() + this.start);
 };
