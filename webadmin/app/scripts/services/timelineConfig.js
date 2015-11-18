@@ -57,7 +57,7 @@ function TimelineConfig(){
         slowZoomSpeed: 0.01, // Zoom speed for holding buttons
         maxVerticalScrollForZoom: 250, // value for adjusting zoom
         maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
-        animationDuration: 300, // 300, // 200-400 for smooth animation
+        animationDuration: 400, // 300, // 200-400 for smooth animation
 
         levelsSettings:{
             labels:{
@@ -99,7 +99,8 @@ function TimelineConfig(){
         lineWidth: 1,
 
         chunkHeight:30/110, // %    //Height for event line
-        minChunkWidth: 1,
+        minChunkWidth: -1,
+        minPixelsPerLevel: 3,
         chunksBgColor:[34,57,37],
         exactChunkColor: [58,145,30],
         loadingChunkColor: [0,255,255,0.3],

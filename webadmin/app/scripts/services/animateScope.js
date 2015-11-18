@@ -24,6 +24,9 @@ angular.module('webadminApp')
         }
 
         Animation.prototype.interpolate = function(start,stop,time,duration, dependency) {
+            if(duration == 0 || time >= duration){
+                return stop;
+            }
             switch(dependency){
                 case "smooth":
                     return this.smooth(start,stop,time,duration);
@@ -38,23 +41,18 @@ angular.module('webadminApp')
         };
 
         Animation.prototype.linear = function(start,stop,time,duration){
-            if(time > duration) {
-                time = duration;
-            }
             var result = start + (stop-start)*time/duration;
-            if(isNaN(result)){
+            if(Number.isNaN(result)){
                 console.error('linear-error',result,start,stop,time,duration);
+                throw "Animation value is not a number";
             }
-            return  result;
+            return result;
         };
         Animation.prototype.smooth = function(start,stop,time,duration){
-            if(time > duration) {
-                time = duration;
-            }
             var delta = (Math.sin(time/duration * Math.PI - Math.PI / 2) + 1)/2;
-            var result =start + (stop - start) *delta;
+            var result =start + (stop - start) * delta;
             if(Number.isNaN(result)){
-               console.error("animation isNaN");
+                throw "Animation value is not a number";
             }
             return  result;
         };
@@ -73,9 +71,6 @@ angular.module('webadminApp')
          * x(t) = x0 + (stop-start)* (2* time/duration - (time/duration)^2)
          */
         Animation.prototype.dryResistance = function(start,stop,time,duration){
-            if(time > duration) {
-                time = duration;
-            }
             var proportion = time/duration;
             var delta = proportion * (2 - proportion);
             var result =start + (stop - start) * delta;
@@ -83,9 +78,6 @@ angular.module('webadminApp')
         };
 
         Animation.prototype.fading = function(start,stop,time,duration){
-            if(time > duration) {
-                time = duration;
-            }
             var delta = Math.sin(time/duration * Math.PI / 2);
             return  start + (stop - start) *delta;
         };
@@ -102,7 +94,7 @@ angular.module('webadminApp')
             this.scope[this.value] = this.interpolate(this.initialValue, this.targetValue, time, this.duration,this.dependency);
 
             this.deferred.notify(this.scope[this.value]);
-            this.isFinished = time > this.duration;
+            this.isFinished = time >= this.duration;
 
             if(this.isFinished){
                 this.deferred.resolve(this.scope[this.value]);
@@ -192,6 +184,10 @@ angular.module('webadminApp')
                 if(typeof(duration) === 'undefined')
                 {
                     duration = defaultDuration;
+                }
+
+                if(Number.isNaN(value)){
+                    throw "Animation target is not a number";
                 }
 
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there

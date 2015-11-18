@@ -67,7 +67,8 @@ angular.module('webadminApp')
                     100,
                     timelineConfig.stickToLiveMs,
                     timelineConfig.zoomAccuracy,
-                    timelineConfig.lastMinuteDuration); //Init boundariesProvider
+                    timelineConfig.lastMinuteDuration,
+                    timelineConfig.minPixelsPerLevel); //Init boundariesProvider
 
                 var animationState = {
                     targetLevels : scope.scaleManager.levels,
@@ -104,30 +105,21 @@ angular.module('webadminApp')
                 }
 
                 // !!! Render everything: updating function
-                var lastPlayedPosition = 0;
+                scope.lastPlayedPosition = 0;
                 function render(){
                     if(scope.positionProvider) {
-                        var duration = timelineConfig.animationDuration;
-                        if(Math.abs(lastPlayedPosition - scope.positionProvider.playedPosition) > 2 * duration ){
-                            if(!animateScope.animating(scope, 'jumpingPosition')) {
-                                animateScope.progress(scope, 'jumpingPosition', "smooth", duration).then(
-                                    function () {
-                                        lastPlayedPosition = scope.positionProvider.playedPosition;
-                                    },
-                                    function () {
-                                    },
-                                    function (val) {
-                                        var activeDate = lastPlayedPosition + val * (scope.positionProvider.playedPosition - lastPlayedPosition);
-                                        scope.scaleManager.tryToSetLiveDate(activeDate, scope.positionProvider.liveMode, (new Date()).getTime());
-                                    });
-                            }
-                        }else{
-                            scope.scaleManager.tryToSetLiveDate(scope.positionProvider.playedPosition,scope.positionProvider.liveMode,(new Date()).getTime());
-                            lastPlayedPosition = scope.positionProvider.playedPosition;
+                        var duration = Math.min(timelineConfig.animationDuration, Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition));
+                        var largeJump = Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition) > 2 * timelineConfig.animationDuration;
+                        if(!largeJump || !animateScope.animating(scope, 'lastPlayedPosition')) { // Large jump
+                            animateScope.animate(scope, 'lastPlayedPosition', scope.positionProvider.playedPosition, largeJump?'smooth':'linear', duration).then(
+                                function () {
+                                },
+                                function () {
+                                },
+                                function (value) {
+                                    scope.scaleManager.tryToSetLiveDate(value, scope.positionProvider.liveMode, (new Date()).getTime());
+                                });
                         }
-
-
-
                     }
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
@@ -203,7 +195,7 @@ angular.module('webadminApp')
                 function timelineClick(mouseX){
                     scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
                     var date = scope.scaleManager.screenCoordinateToDate(mouseX);
-                    lastPlayedPosition = date;
+                    scope.lastPlayedPosition = date;
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){
                         goToLive ();

@@ -826,11 +826,12 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS,initialWidth,stickToLiveMs,zoomAccuracy,lastMinuteInterval){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracy, lastMinuteInterval, minPixelsPerLevel){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracy = zoomAccuracy;
+    this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
 
     this.levels = {
@@ -923,7 +924,6 @@ ScaleManager.prototype.updateCurrentInterval = function(){
 
 
 ScaleManager.prototype.stopWatching = function(){
-    console.log("stopWatching");
     this.watchPlayingPosition = false;
     this.wasForcedToStopWatchPlaying = true;
 };
@@ -1062,7 +1062,8 @@ ScaleManager.prototype.calcLevels = function(msPerPixel) {
 
         levels.events = {index:i,level:level};
 
-        if (pixelsPerLevel <= 1) {
+        if (pixelsPerLevel <= this.minPixelsPerLevel) {
+            // minMsPerPixel
             break;
         }
     }
@@ -1086,21 +1087,17 @@ ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid usin
     return level.interval.alignToFuture(this.visibleEnd);
 };
 
-ScaleManager.prototype.getTotalTimelineWidth = function(){
-    return Math.round(this.viewportWidth / this.getRelativeWidth());
-};
 ScaleManager.prototype.coordinateToDate = function(coordinate){
-    return Math.round((this.end - this.start) * coordinate / this.getTotalTimelineWidth() + this.start);
+    return this.start + coordinate * this.msPerPixel;
 };
 ScaleManager.prototype.dateToCoordinate = function(date){
-    return Math.round(this.getTotalTimelineWidth() * (date - this.start) / (this.end - this.start));
+    return  (date - this.start) / this.msPerPixel;
 };
 
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
     return this.dateToCoordinate(date) - this.dateToCoordinate(this.visibleStart);
 };
 ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
-
     return this.coordinateToDate(coordinate + this.dateToCoordinate(this.visibleStart));
 };
 
@@ -1140,12 +1137,12 @@ ScaleManager.prototype.scroll = function(value){
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
-    return this.bound(0,this.scroll() + pixels / this.getTotalTimelineWidth(),1);
+    return this.bound(0,this.scroll() + pixels * this.getRelativeWidth() / this.viewportWidth,1);
 };
 
 ScaleManager.prototype.scrollByPixels = function(pixels){
     //scroll right or left by relative value - move anchor date
-    this.scroll(this.scroll() +  pixels / this.getTotalTimelineWidth() );
+    this.scroll(this.getScrollByPixelsTarget(pixels));
 };
 
 
