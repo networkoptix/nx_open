@@ -9,7 +9,7 @@
 #include <plugins/camera_plugin.h>
 
 #include <plugins/plugin_tools.h>
-
+#include <plugins/plugin_container_api.h>
 
 //!Represents defined (in settings) image directories as cameras with dts archive storage
 class DiscoveryManager
@@ -17,9 +17,8 @@ class DiscoveryManager
     public nxcip::CameraDiscoveryManager
 {
 public:
-    DiscoveryManager(
-        nxpt::CommonRefManager* const refManager,
-        nxpl::PluginContainer* const pluginContainer);
+    DiscoveryManager(nxpt::CommonRefManager* const refManager,
+                     nxpl::TimeProvider *const timeProvider);
 
     //!Implementation of nxpl::PluginInterface::queryInterface
     virtual void* queryInterface( const nxpl::NX_GUID& interfaceID ) override;
@@ -52,7 +51,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    nxpl::PluginContainer* const m_pluginContainer;
+    nxpl::TimeProvider *const m_timeProvider;
 };
 
 #endif  //ILP_DISCOVERY_MANAGER_H

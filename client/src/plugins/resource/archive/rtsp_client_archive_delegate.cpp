@@ -154,7 +154,7 @@ struct ArchiveTimeCheckInfo
     qint64* result;
 };
 
-void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
+void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
     RTPSession otherRtspSession;
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
@@ -167,12 +167,6 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         if (startTime < *result || *result == qint64(AV_NOPTS_VALUE))
             *result = startTime;
     }
-}
-
-bool checkGlobalMinTime(const ArchiveTimeCheckInfo& checkInfo)
-{
-    checkInfo.owner->checkMinTimeFromOtherServer(checkInfo.camera, checkInfo.server, checkInfo.result);
-    return true;
 }
 
 void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, bool forceReload)
@@ -202,7 +196,11 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
     qint64 otherMinTime  = qint64(AV_NOPTS_VALUE);
     for (const auto &server: mediaServerList)
         checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
-    QtConcurrent::blockingFilter(checkList, checkGlobalMinTime);
+    QtConcurrent::blockingFilter(checkList, [](const ArchiveTimeCheckInfo& checkInfo) 
+    {
+            checkInfo.owner->checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
+            return true;
+    });
     if ((otherMinTime != qint64(AV_NOPTS_VALUE)) && (currentMinTime == qint64(AV_NOPTS_VALUE) || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else

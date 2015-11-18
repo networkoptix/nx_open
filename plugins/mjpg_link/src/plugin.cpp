@@ -23,7 +23,7 @@ static HttpLinkPlugin* httpLinkPluginInstance = NULL;
 HttpLinkPlugin::HttpLinkPlugin()
 :
     m_refManager( this ),
-    m_pluginContainer( nullptr )
+    m_timeProvider(nullptr)
 {
     httpLinkPluginInstance = this;
 }
@@ -44,7 +44,7 @@ void* HttpLinkPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
         if (!m_discoveryManager)
             m_discoveryManager.reset(new DiscoveryManager(
                 &m_refManager,
-                m_pluginContainer));
+                m_timeProvider));
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
@@ -86,9 +86,10 @@ void HttpLinkPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*
 {
 }
 
-void HttpLinkPlugin::setPluginContainer(nxpl::PluginContainer* pluginContainer)
+void HttpLinkPlugin::setPluginContainer(nxpl::PluginInterface* pluginContainer)
 {
-    m_pluginContainer = pluginContainer;
+    m_timeProvider = static_cast<nxpl::TimeProvider *>(
+            pluginContainer->queryInterface(nxpl::IID_TimeProvider));
 }
 
 nxpt::CommonRefManager* HttpLinkPlugin::refManager()

@@ -22,7 +22,7 @@
 
 PluginManager::PluginManager(
     const QString& pluginDir,
-    nxpl::PluginContainer* const pluginContainer)
+    nxpl::PluginInterface* const pluginContainer)
 :
     m_pluginDir( pluginDir ),
     m_pluginContainer( pluginContainer )
