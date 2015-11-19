@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.Display;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.graphics.Color;
 import android.content.res.Resources;
 import android.content.res.Configuration;
@@ -138,5 +139,21 @@ public class QnWindowUtils {
 
     public static boolean isPhone() {
         return (QtNative.activity().getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) < Configuration.SCREENLAYOUT_SIZE_LARGE;
+    }
+
+    public static void setKeepScreenOn(final boolean keepScreenOn) {
+        final Activity activity = QtNative.activity();
+        activity.runOnUiThread(new Runnable() {
+            boolean mkeepScreenOn = keepScreenOn;
+            Activity mActivity = activity;
+
+            @Override public void run() {
+                Window window = mActivity.getWindow();
+                if (mkeepScreenOn)
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                else
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            }
+        });
     }
 }

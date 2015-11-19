@@ -437,14 +437,21 @@ void QnWorkbenchNavigator::initialize() {
         connect(layout, &QnWorkbenchLayout::itemAdded, this, processLayoutItem);
 
         connect(layout, &QnWorkbenchLayout::itemRemoved, this
-            , [this, extractCamera](QnWorkbenchItem *item)
+            , [this, layout, extractCamera](QnWorkbenchItem *item)
         {
             const auto camera = extractCamera(item);
             if (!camera)
                 return;
 
+            int sameCamerasCount = 0;
+            for (auto layoutItem: layout->items())
+            {
+                if (extractCamera(layoutItem) == camera)
+                    ++sameCamerasCount;
+            }
+
             const auto query = m_bookmarkQueries.getQuery(camera);
-            if (query == m_currentQuery)
+            if ((query == m_currentQuery) && !sameCamerasCount)
                 resetCurrentBookmarkQuery();
 
             m_bookmarkQueries.removeQuery(camera);
