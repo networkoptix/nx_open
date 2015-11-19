@@ -27,16 +27,16 @@ public:
         maxResolution.rwidth() = maxResolution.width() / 64 * 64;
         maxResolution.rheight() = maxResolution.height() / 32 * 32;
 
-        m_streamParam.insert("image_left", 0);
-        m_streamParam.insert("image_right", maxResolution.width());
+        this->m_streamParam.insert("image_left", 0);
+        this->m_streamParam.insert("image_right", maxResolution.width());
 
-        m_streamParam.insert("image_top", 0);
-        m_streamParam.insert("image_bottom", maxResolution.height());
+        this->m_streamParam.insert("image_top", 0);
+        this->m_streamParam.insert("image_bottom", maxResolution.height());
 
-        m_streamParam.insert("streamID", random(1, 32000));
+        this->m_streamParam.insert("streamID", random(1, 32000));
 
-        m_streamParam.insert("resolution", QLatin1String("full"));
-        m_streamParam.insert("Quality", QLatin1String("11"));
+        this->m_streamParam.insert("resolution", QLatin1String("full"));
+        this->m_streamParam.insert("Quality", QLatin1String("11"));
 
         QObject::connect(
             res.data(), &QnResource::initializedChanged,
@@ -46,22 +46,23 @@ public:
 
     QSize getMaxSensorSize() const
     {
-        int val_w = getResource()->getProperty(lit("MaxSensorWidth")).toInt();
-        int val_h = getResource()->getProperty(lit("MaxSensorHeight")).toInt();
+        int val_w = this->getResource()->getProperty(lit("MaxSensorWidth")).toInt();
+        int val_h = this->getResource()->getProperty(lit("MaxSensorHeight")).toInt();
         return (val_w && val_h) ? QSize(val_w, val_h) : QSize(0, 0);
     }
 
     virtual void pleaseReopenStream() override
     {
-        QMutexLocker mtx(&m_mutex);
-        QnLiveStreamParams params = getLiveParams();
+        QMutexLocker mtx(&this->m_mutex);
+        QnLiveStreamParams params = this->getLiveParams();
         QString resolution;
-        if (getRole() == Qn::CR_LiveVideo)
+        if (this->getRole() == Qn::CR_LiveVideo)
             resolution = QLatin1String("full");
         else
             resolution = QLatin1String("half");
 
-        QnPlAreconVisionResourcePtr avRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+        QnResourcePtr res = this->getResource();
+        QnPlAreconVisionResourcePtr avRes = res.staticCast<QnPlAreconVisionResource>();
         Qn::StreamQuality q = params.quality;
         switch (q)
         {
@@ -69,48 +70,48 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", QLatin1String("full"));
 
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("Quality"), 19); // panoramic
                 else
-                    m_streamParam.insert("Quality", 19);
+                    this->m_streamParam.insert("Quality", 19);
                 break;
 
             case Qn::QualityHigh:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", QLatin1String("full"));
 
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("Quality"), 16); // panoramic
                 else
-                    m_streamParam.insert("Quality", 16);
+                    this->m_streamParam.insert("Quality", 16);
                 break;
 
             case Qn::QualityNormal:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", QLatin1String("full"));
 
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("Quality"), 13); // panoramic
                 else
-                    m_streamParam.insert("Quality", 13);
+                    this->m_streamParam.insert("Quality", 13);
                 break;
 
             case Qn::QualityLow:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    m_streamParam.insert("resolution", QLatin1String("half"));
+                    this->m_streamParam.insert("resolution", QLatin1String("half"));
 
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("Quality"), 15); // panoramic
                 else
-                    m_streamParam.insert("Quality", 10);
+                    this->m_streamParam.insert("Quality", 10);
                 break;
 
 
@@ -118,12 +119,12 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    m_streamParam.insert("resolution", QLatin1String("half"));
+                    this->m_streamParam.insert("resolution", QLatin1String("half"));
 
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("Quality"), 1); // panoramic
                 else
-                    m_streamParam.insert("Quality", 1);
+                    this->m_streamParam.insert("Quality", 1);
                 break;
 
             default:
@@ -135,7 +136,7 @@ public:
     {
         if (resource->isInitialized())
         {
-            QMutexLocker lock(&m_needUpdateMtx);
+            QMutexLocker lock(&this->m_needUpdateMtx);
             m_needUpdateParams = true;
         }
     }
