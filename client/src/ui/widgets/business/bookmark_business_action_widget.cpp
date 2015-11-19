@@ -22,23 +22,19 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
 
     connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
 
-    connect(ui->tagsLineEdit, &QLineEdit::textChanged, this, &QnBookmarkBusinessActionWidget::paramsChanged);
+    connect(ui->tagsLineEdit, &QLineEdit::textChanged,      this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnBookmarkBusinessActionWidget::paramsChanged);
-    connect(ui->durationSpinBox, QnSpinboxIntValueChanged, this, &QnBookmarkBusinessActionWidget::paramsChanged);
+    connect(ui->durationSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
 }
 
 QnBookmarkBusinessActionWidget::~QnBookmarkBusinessActionWidget()
 {}
 
 void QnBookmarkBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->tagsLineEdit);
-
-    if (ui->durationWidget->isVisible()) {
-        setTabOrder(ui->tagsLineEdit, ui->durationSpinBox);
-        setTabOrder(ui->durationSpinBox, after);
-    } else {
-        setTabOrder(ui->tagsLineEdit, after);
-    }
+    setTabOrder(before, ui->fixedDurationCheckBox);
+    setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
+    setTabOrder(ui->durationSpinBox, ui->tagsLineEdit);
+    setTabOrder(ui->tagsLineEdit, after);
 }
 
 void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {

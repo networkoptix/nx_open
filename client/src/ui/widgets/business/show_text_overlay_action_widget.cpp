@@ -20,25 +20,24 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
-
-    connect(ui->tagsLineEdit, &QLineEdit::textChanged, this, &QnShowTextOverlayActionWidget::paramsChanged);
-    connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnShowTextOverlayActionWidget::paramsChanged);
-    connect(ui->durationSpinBox, QnSpinboxIntValueChanged, this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
+    connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
+    
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
 }
 
 QnShowTextOverlayActionWidget::~QnShowTextOverlayActionWidget()
 {}
 
 void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->tagsLineEdit);
-
-    if (ui->durationWidget->isVisible()) {
-        setTabOrder(ui->tagsLineEdit, ui->durationSpinBox);
-        setTabOrder(ui->durationSpinBox, after);
-    } else {
-        setTabOrder(ui->tagsLineEdit, after);
-    }
+    setTabOrder(before, ui->fixedDurationCheckBox);
+    setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
+    setTabOrder(ui->durationSpinBox, ui->customTextCheckBox);
+    setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
+    setTabOrder(ui->customTextEdit, after);
 }
 
 void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -55,11 +54,14 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusinessRuleViewModel
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
-        ui->tagsLineEdit->setText(model->actionParams().tags);
+        const auto params = model->actionParams();
 
-        ui->fixedDurationCheckBox->setChecked(model->actionParams().durationMs > 0);
+        ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
         if (ui->fixedDurationCheckBox->isChecked())
-            ui->durationSpinBox->setValue(model->actionParams().durationMs / msecPerSecond);
+            ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
+
+        ui->customTextCheckBox->setChecked(!params.text.isEmpty());
+        ui->customTextEdit->setPlainText(params.text);
     }
 }
 
@@ -70,7 +72,9 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnBusinessActionParameters params = model()->actionParams();
-    params.tags = ui->tagsLineEdit->text();
+
     params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
+    params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
+
     model()->setActionParams(params);
 }

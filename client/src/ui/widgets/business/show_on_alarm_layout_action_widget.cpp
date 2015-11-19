@@ -3,14 +3,25 @@
 
 #include <business/business_action_parameters.h>
 
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/style/resource_icon_cache.h>
+
 #include <utils/common/scoped_value_rollback.h>
-#include <ui/workaround/widgets_signals_workaround.h>
+
 
 namespace {
 
-    enum {
-        msecPerSecond = 1000
-    };
+    QnUserResourceList usersFromIds(const std::vector<QnUuid> &ids) {
+        QnUserResourceList result;
+        for (const QnUuid &id: ids) {
+            if (QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(id))
+                result << user;
+        }  
+        return result;
+    }
 
 }
 
@@ -20,25 +31,17 @@ QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->fixedDurationCheckBox, &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
-
-    connect(ui->tagsLineEdit, &QLineEdit::textChanged, this, &QnShowOnAlarmLayoutActionWidget::paramsChanged);
-    connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnShowOnAlarmLayoutActionWidget::paramsChanged);
-    connect(ui->durationSpinBox, QnSpinboxIntValueChanged, this, &QnShowOnAlarmLayoutActionWidget::paramsChanged);
+    connect(ui->forceOpenCheckBox,  &QCheckBox::clicked,    this,   &QnShowOnAlarmLayoutActionWidget::paramsChanged);
+    connect(ui->selectUsersButton,  &QPushButton::clicked,  this,   &QnShowOnAlarmLayoutActionWidget::selectUsers);
 }
 
 QnShowOnAlarmLayoutActionWidget::~QnShowOnAlarmLayoutActionWidget()
 {}
 
 void QnShowOnAlarmLayoutActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->tagsLineEdit);
-
-    if (ui->durationWidget->isVisible()) {
-        setTabOrder(ui->tagsLineEdit, ui->durationSpinBox);
-        setTabOrder(ui->durationSpinBox, after);
-    } else {
-        setTabOrder(ui->tagsLineEdit, after);
-    }
+    setTabOrder(before, ui->selectUsersButton);
+    setTabOrder(ui->selectUsersButton, ui->forceOpenCheckBox);
+    setTabOrder(ui->forceOpenCheckBox, after);    
 }
 
 void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -47,20 +50,52 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField)) {
-        bool hasToggleState = QnBusiness::hasToggleState(model->eventType());
-        ui->fixedDurationCheckBox->setEnabled(hasToggleState);
-        if (!hasToggleState)
-            ui->fixedDurationCheckBox->setChecked(true);
-    }
-
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
-        ui->tagsLineEdit->setText(model->actionParams().tags);
-
-        ui->fixedDurationCheckBox->setChecked(model->actionParams().durationMs > 0);
-        if (ui->fixedDurationCheckBox->isChecked())
-            ui->durationSpinBox->setValue(model->actionParams().durationMs / msecPerSecond);
+        ui->forceOpenCheckBox->setChecked(model->actionParams().forced);
+        updateUsersButtonText();
     }
+}
+
+void QnShowOnAlarmLayoutActionWidget::selectUsers() {
+    if (!model() || m_updating)
+        return;
+    
+    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::UserResourceTarget, this);
+    dialog.setSelectedResources(usersFromIds(model()->actionParams().additionalResources));
+    if (dialog.exec() != QDialog::Accepted)
+        return;
+
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+        
+        std::vector<QnUuid> userIds;
+        for (const QnUserResourcePtr &user: dialog.selectedResources().filtered<QnUserResource>())
+            userIds.push_back(user->getId());        
+
+        QnBusinessActionParameters params = model()->actionParams();
+        params.additionalResources = userIds;
+        model()->setActionParams(params);
+    }
+
+    updateUsersButtonText();
+}
+
+
+void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText() {
+    QnUserResourceList users = model() 
+        ? usersFromIds(model()->actionParams().additionalResources)
+        : QnUserResourceList();
+
+    QString title;
+    if (users.size() == 1) 
+        title = users.first()->getName();
+    else if (users.isEmpty()) 
+        title = tr("<All Users>");
+    else
+        title = tr("%n User(s)", "", users.size());
+
+    ui->selectUsersButton->setText(title);
+    ui->selectUsersButton->setIcon(qnResIconCache->icon(QnResourceIconCache::User));
 }
 
 void QnShowOnAlarmLayoutActionWidget::paramsChanged() {
@@ -70,7 +105,6 @@ void QnShowOnAlarmLayoutActionWidget::paramsChanged() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     QnBusinessActionParameters params = model()->actionParams();
-    params.tags = ui->tagsLineEdit->text();
-    params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
+    params.forced = ui->forceOpenCheckBox->isChecked();
     model()->setActionParams(params);
 }

@@ -22,7 +22,9 @@ public:
 protected slots:
     virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
 
-private slots:
+private:
+    void selectUsers();
+    void updateUsersButtonText();
     void paramsChanged();
 
 private:
