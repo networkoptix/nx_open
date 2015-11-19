@@ -33,8 +33,6 @@ namespace {
 QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     using namespace QnBusiness;
 
-    /* Do not use 'default' keyword! 
-     * Warning should be raised on unknown enumeration values. */
     switch(value) {
     case UndefinedAction:           return QString();
     case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -57,8 +55,16 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case PlaySoundAction:           return tr("Repeat sound");
     case PlaySoundOnceAction:       return tr("Play sound");
     case SayTextAction:             return tr("Speak");
-    default:                        return tr("Unknown (%1)").arg(static_cast<int>(value));
+    case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
+    case ShowTextOverlayAction:     return tr("Show text overlay");
+    case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
+
+    default:        
+        break;
     }
+
+    Q_ASSERT_X(false, Q_FUNC_INFO, "All enumeration values must be handled here");
+    return tr("Unknown (%1)").arg(static_cast<int>(value));
 }
 
 QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value) {

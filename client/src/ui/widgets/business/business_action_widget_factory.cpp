@@ -27,7 +27,14 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
         return new QnSayTextBusinessActionWidget(parent);
     case QnBusiness::BookmarkAction:
         return new QnBookmarkBusinessActionWidget(parent);
+    case QnBusiness::ExecutePtzPresetAction:
+        break;  //TODO: #rvasilenko #ptz
+    case QnBusiness::ShowTextOverlayAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        break;  //TODO: #GDM #actions
     default:
-        return new QnEmptyBusinessActionWidget(parent);
+        break;
     }
+
+    return new QnEmptyBusinessActionWidget(parent);
 }

@@ -57,9 +57,9 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
         ui->tagsLineEdit->setText(model->actionParams().tags);
 
-        ui->fixedDurationCheckBox->setChecked(model->actionParams().bookmarkDuration > 0);
+        ui->fixedDurationCheckBox->setChecked(model->actionParams().durationMs > 0);
         if (ui->fixedDurationCheckBox->isChecked())
-            ui->durationSpinBox->setValue(model->actionParams().bookmarkDuration / msecPerSecond);
+            ui->durationSpinBox->setValue(model->actionParams().durationMs / msecPerSecond);
     }
 }
 
@@ -71,6 +71,6 @@ void QnBookmarkBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params = model()->actionParams();
     params.tags = ui->tagsLineEdit->text();
-    params.bookmarkDuration = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
+    params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
     model()->setActionParams(params);
 }

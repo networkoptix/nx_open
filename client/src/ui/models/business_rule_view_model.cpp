@@ -777,6 +777,12 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return !m_actionParams.soundUrl.isEmpty();
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
+        case QnBusiness::ExecutePtzPresetAction:
+            return false; //TODO: #rvasilenko #ptz
+        case QnBusiness::ShowTextOverlayAction:
+            return !m_actionParams.text.isEmpty();
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            break;  // Just check cameras here
         default:
             break;
         }
@@ -895,6 +901,11 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
             return tr("Enter Text");
         return text;
     }
+    case QnBusiness::ExecutePtzPresetAction:
+        break;  //TODO: #rvasilenko #ptz
+    case QnBusiness::ShowTextOverlayAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        break;  //TODO: #GDM #actions
     default:
         break;
     }

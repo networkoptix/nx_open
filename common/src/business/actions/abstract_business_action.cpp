@@ -25,6 +25,9 @@ namespace QnBusiness {
         case CameraOutputOnceAction:
         case BookmarkAction:
         case CameraRecordingAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return true;
 
         default:
@@ -45,6 +48,9 @@ namespace QnBusiness {
         case PlaySoundOnceAction:
         case PlaySoundAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case SendMailAction:
@@ -71,6 +77,9 @@ namespace QnBusiness {
         case PanicRecordingAction:
         case PlaySoundAction:
         case BookmarkAction:
+        case ExecutePtzPresetAction:     //TODO: #rvasilenko #ptz
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return true;
 
         default:
@@ -84,7 +93,13 @@ namespace QnBusiness {
 
         switch (actionType) {
         case BookmarkAction:
-            return parameters.bookmarkDuration <= 0;
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
+            return parameters.durationMs <= 0;
+
+        case ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
+            break;
+
         default:
             break;
         }
@@ -105,7 +120,11 @@ namespace QnBusiness {
             << ShowPopupAction
             << PlaySoundAction
             << PlaySoundOnceAction
-            << SayTextAction;
+            << SayTextAction
+            << ExecutePtzPresetAction
+            << ShowTextOverlayAction
+            << ShowOnAlarmLayoutAction            
+            ;
         return result;
     }
 }

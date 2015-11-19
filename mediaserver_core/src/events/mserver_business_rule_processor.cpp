@@ -259,7 +259,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     if (!camera)
         return false;
 
-    int fixedDurationMs = action->getParams().bookmarkDuration;
+    int fixedDurationMs = action->getParams().durationMs;
 
     auto runningKey = guidFromArbitraryData(action->getBusinessRuleId().toRfc4122() + camera->getId().toRfc4122());
 

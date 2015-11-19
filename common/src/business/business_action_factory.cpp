@@ -68,7 +68,7 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::PlaySoundOnceAction:
         case QnBusiness::PlaySoundAction:
         case QnBusiness::SayTextAction:
-            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+            break;
 
         case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
         case QnBusiness::CameraOutputOnceAction:    return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
@@ -76,7 +76,16 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
         case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
+
+        case QnBusiness::ExecutePtzPresetAction:
+            break;  //TODO: #rvasilenko #ptz
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            break;  //TODO: #GDM #actions
+
         default: 
-            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+            break;
     }
+
+    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
 }

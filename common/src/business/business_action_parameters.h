@@ -4,6 +4,8 @@
 #include <business/business_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 
+#include <utils/common/uuid.h>
+
 struct QnBusinessActionParameters {
     QnBusinessActionParameters();
 
@@ -34,7 +36,17 @@ struct QnBusinessActionParameters {
 
     // Bookmark
     QString tags;
-    int bookmarkDuration;
+
+    // Generic text: Show Text Overlay
+    QString text;
+
+    // Generic duration: Bookmark, Show Text Overlay, Alarm Layout?
+    int durationMs;
+
+    // Generic additional resources List: Show On Alarm Layout - users
+    std::vector<QnUuid> additionalResources;
+
+    //ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
 
     /** 
      * \returns                        Whether all parameters have default values. 
@@ -43,7 +55,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(bookmarkDuration)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
