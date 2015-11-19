@@ -5,6 +5,7 @@ import com.networkoptix.qml 1.0
 import "../main.js" as Main
 import "../controls"
 import "../icons"
+import ".."
 
 QnPage {
     id: resourcesPage
@@ -13,14 +14,28 @@ QnPage {
 
     property alias searchActive: searchItem.opened
 
-    QtObject {
+    QnObject {
         id: d
 
-        property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting && !loadingDummy.visible
+        readonly property bool serverOffline: connectionManager.connectionState === QnConnectionManager.Connecting && !loadingDummy.visible
+        property bool serverOfflineWarningVisible: false
 
         onServerOfflineChanged: {
-            if (serverOffline)
+            if (!serverOffline)
+                serverOfflineWarningVisible = false
+        }
+
+        Timer {
+            id: offlineWarningDelay
+
+            interval: 20 * 1000
+            repeat: false
+            running: d.serverOffline
+
+            onTriggered: {
                 searchItem.close()
+                d.serverOfflineWarningVisible = true
+            }
         }
     }
 
@@ -50,8 +65,8 @@ QnPage {
         visible: (pageStatus == Stack.Active || pageStatus == Stack.Activating)
         Keys.forwardTo: resourcesPage
 
-        enabled: !d.serverOffline && !loadingDummy.visible
-        opacity: !d.serverOffline ? 1.0 : 0.2
+        enabled: !d.serverOfflineWarningVisible && !loadingDummy.visible
+        opacity: !d.serverOfflineWarningVisible ? 1.0 : 0.2
         Behavior on opacity { NumberAnimation { duration: 200 } }
     }
 
@@ -65,7 +80,7 @@ QnPage {
         id: offlineWarning
 
         width: parent.width
-        height: d.serverOffline ? dp(40) : 0
+        height: d.serverOfflineWarningVisible ? dp(40) : 0
 
         clip: true
         anchors.horizontalCenter: parent.horizontalCenter
@@ -97,7 +112,7 @@ QnPage {
         color: QnTheme.offlineDimmer
 
         Behavior on opacity { NumberAnimation { duration: 200 } }
-        opacity: d.serverOffline ? 1.0 : 0.0
+        opacity: d.serverOfflineWarningVisible ? 1.0 : 0.0
 
         visible: opacity > 0
 
@@ -129,7 +144,7 @@ QnPage {
                 height: dp(56)
                 verticalAlignment: Qt.AlignVCenter
 
-                text: connectionManager.connectionState == QnConnectionManager.Connected ? qsTr("Loading...") : qsTr("Connecting...")
+                text: connectionManager.connectionState === QnConnectionManager.Connected ? qsTr("Loading...") : qsTr("Connecting...")
                 font.pixelSize: sp(32)
                 color: QnTheme.loadingText
             }
@@ -172,7 +187,7 @@ QnPage {
             loadingDummy.opacity = 0.0
         }
         onConnectionStateChanged: {
-            if (connectionManager.connectionState == QnConnectionManager.Disconnected) {
+            if (connectionManager.connectionState === QnConnectionManager.Disconnected) {
                 loadingDummy.opacity = 1.0
             }
         }
