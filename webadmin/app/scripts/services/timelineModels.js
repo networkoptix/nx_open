@@ -871,7 +871,7 @@ ScaleManager.prototype.setStart = function(start){// Update the begining end of 
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
-    var needZoomOut = !this.çheckZoomOut();
+    var needZoomOut = !this.checkZoomOut();
     this.end = end;
     this.updateTotalInterval();
     if(needZoomOut){
@@ -1087,10 +1087,10 @@ ScaleManager.prototype.alignEnd = function(level){ // Align end by the grid usin
 };
 
 ScaleManager.prototype.coordinateToDate = function(coordinate){
-    return this.start + coordinate * this.msPerPixel;
+    return Math.round(this.start + coordinate * this.msPerPixel);
 };
 ScaleManager.prototype.dateToCoordinate = function(date){
-    return  (date - this.start) / this.msPerPixel;
+    return  Math.round((date - this.start) / this.msPerPixel);
 };
 
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
@@ -1204,11 +1204,11 @@ ScaleManager.prototype.targetLevels = function(zoomTarget){
     return this.calcLevels(msPerPixel);
 };
 
-ScaleManager.prototype.çheckZoomOut = function(){
+ScaleManager.prototype.checkZoomOut = function(){
     var invisibleInterval = (this.end - this.start) - (this.visibleEnd-this.visibleStart);
     return invisibleInterval > this.zoomAccuracyMs;
 };
-ScaleManager.prototype.çheckZoomIn = function(){
+ScaleManager.prototype.checkZoomIn = function(){
     return this.zoom() > this.fullZoomInValue();
 };
 

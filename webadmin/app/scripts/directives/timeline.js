@@ -106,21 +106,50 @@ angular.module('webadminApp')
 
                 // !!! Render everything: updating function
                 scope.lastPlayedPosition = 0;
-                function render(){
+                var nextPlayedPosition = 0;
+
+                function stopAnimatingMove(){
+                    var animation = animateScope.animating(scope, 'lastPlayedPosition');
+                    if(animation){
+                        animation.breakAnimation();
+                    }
+                }
+                function updatePosition(){
                     if(scope.positionProvider) {
-                        var duration = Math.min(timelineConfig.animationDuration, Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition));
-                        var largeJump = Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition) > 2 * timelineConfig.animationDuration;
-                        if(!largeJump || !animateScope.animating(scope, 'lastPlayedPosition')) { // Large jump
-                            animateScope.animate(scope, 'lastPlayedPosition', scope.positionProvider.playedPosition, largeJump?'smooth':'linear', duration).then(
-                                function () {
-                                },
-                                function () {
-                                },
+
+                        if(nextPlayedPosition ){
+                            stopAnimatingMove();
+
+                            if(scope.positionProvider.liveMode || nextPlayedPosition == scope.positionProvider.playedPosition){
+                                scope.lastPlayedPosition = nextPlayedPosition;
+                                scope.scaleManager.tryToSetLiveDate(nextPlayedPosition, scope.positionProvider.liveMode, (new Date()).getTime());
+                                nextPlayedPosition = 0;
+                            }else{
+                                return; // ignore changes until played position wasn't changed
+                            }
+                        }
+
+                        var intervalMs = Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition);
+                        var duration = Math.min(timelineConfig.animationDuration, intervalMs);
+                        var largeJump = intervalMs > 2 * timelineConfig.animationDuration;
+
+                        if(intervalMs == 0){
+                            return;
+                        }
+                        if (!largeJump || !animateScope.animating(scope, 'lastPlayedPosition')) { // Large jump
+                            animateScope.animate(scope, 'lastPlayedPosition', scope.positionProvider.playedPosition, largeJump ? 'smooth' : 'linear', duration).then(
+                                function () {},
+                                function () {},
                                 function (value) {
                                     scope.scaleManager.tryToSetLiveDate(value, scope.positionProvider.liveMode, (new Date()).getTime());
                                 });
                         }
                     }
+                }
+                function render(){
+
+                    updatePosition();
+
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
@@ -193,15 +222,17 @@ angular.module('webadminApp')
                 }
 
                 function timelineClick(mouseX){
-                    scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
+                    delayWatchingPlayingPosition();
+                    stopAnimatingMove();
+
                     var date = scope.scaleManager.screenCoordinateToDate(mouseX);
-                    scope.lastPlayedPosition = date;
+                    scope.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
+                    nextPlayedPosition = date;
                     var lastMinute = scope.scaleManager.lastMinute();
                     if(date > lastMinute){
                         goToLive ();
                     }else {
                         scope.positionHandler(date);
-                        scope.scaleManager.watchPlaying(date);
                     }
                 }
 
@@ -440,8 +471,8 @@ angular.module('webadminApp')
                 }
 
                 function checkZoomButtons(){
-                    scope.disableZoomOut = !scope.scaleManager.çheckZoomOut();
-                    scope.disableZoomIn =  !scope.scaleManager.çheckZoomIn();
+                    scope.disableZoomOut = !scope.scaleManager.checkZoomOut();
+                    scope.disableZoomIn =  !scope.scaleManager.checkZoomIn();
                 }
 
                 function fullZoomOut(){

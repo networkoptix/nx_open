@@ -572,7 +572,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
     // !!! Draw and position for timeMarker
     function drawTimeMarker(context){
-        if(self.scaleManager.liveMode || !self.scaleManager.playedPosition){
+        if(!self.scaleManager.playedPosition || self.scaleManager.end - self.scaleManager.playedPosition < self.scaleManager.stickToLiveMs){
             return;
         }
 
@@ -600,14 +600,15 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var height = timelineConfig.markerHeight * self.canvas.height;
 
         // Line
+        context.lineWidth = timelineConfig.timeMarkerLineWidth;
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
         var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
 
         context.beginPath();
-        context.moveTo(coordinate + 0.5, top);
-        context.lineTo(coordinate + 0.5, Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height));
+        context.moveTo(0.5 + coordinate, top);
+        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height));
         context.stroke();
 
         var startCoord = coordinate - timelineConfig.markerWidth /2;
@@ -623,9 +624,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         // Triangle
         context.beginPath();
-        context.moveTo(coordinate + timelineConfig.markerTriangleHeight * self.canvas.height + 0.5, height);
-        context.lineTo(coordinate + 0.5, height + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(coordinate - timelineConfig.markerTriangleHeight * self.canvas.height + 0.5, height);
+        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height);
+        context.lineTo(0.5 + coordinate, height + timelineConfig.markerTriangleHeight * self.canvas.height);
+        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height);
         context.closePath();
         context.fill();
 
@@ -670,13 +671,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         if(context) {
             if (canScrollLeft) {
-                if(ableToScrollLeft) {
+                if(ableToScrollLeft || true) {
                     drawScrollButton(context, true, mouseOverLeftScrollButton);
                 }else{
                     if(!scrollLeftEnablingTimer) {
                         scrollLeftEnablingTimer = setTimeout(function () {
                             scrollLeftEnablingTimer = null;
-                            ableToScrollLeft = true;
+                            //ableToScrollLeft = true;
                         }, timelineConfig.animationDuration);
                     }
                 }
@@ -689,13 +690,13 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             }
 
             if (canScrollRight) {
-                if(ableToScrollRight) {
+                if(ableToScrollRight || true) {
                     drawScrollButton(context, false, mouseOverRightScrollButton);
                 }else{
                     if(!scrollRightEnablingTimer) {
                         scrollRightEnablingTimer = setTimeout(function () {
                             scrollRightEnablingTimer = null;
-                            ableToScrollRight = true;
+                            //ableToScrollRight = true;
                         }, timelineConfig.animationDuration);
                     }
                 }
@@ -719,7 +720,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         context.fillStyle = active? blurColor(timelineConfig.scrollButtonsActiveColor,1):blurColor(timelineConfig.scrollButtonsColor,1);
 
-        var startCoordinate = left?0: self.canvas.width - timelineConfig.scrollButtonsWidth;
+        var startCoordinate = left ? 0: self.canvas.width - timelineConfig.scrollButtonsWidth;
         var height = timelineConfig.scrollButtonsHeight * self.canvas.height;
 
         context.fillRect(startCoordinate, self.canvas.height - height, timelineConfig.scrollButtonsWidth, height );
@@ -760,11 +761,11 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         };
     }
     var getFps = null;
-    function calcAndDrawFPS(context){
+    function calcAndDrawFPS(context, mouseX, mouseY){
         if(!getFps){
             getFps = FpsCalculator();
         }
-        var fps = "fps: " + getFps();
+        var fps = "fps: " + getFps();// + ' (' + mouseX + ',' + mouseY + ') ' + self.scaleManager.dateToScreenCoordinate(self.scaleManager.screenCoordinateToDate(mouseX));
 
         context.font = formatFont(timelineConfig.markerDateFont);
         context.fillStyle = blurColor(timelineConfig.pointerMarkerTextColor, 0.7);
@@ -783,7 +784,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         drawLabels(context);
 
         if(debugSettings.allowDebug){
-            calcAndDrawFPS(context);
+            calcAndDrawFPS(context, mouseX, mouseY);
         }
 
 

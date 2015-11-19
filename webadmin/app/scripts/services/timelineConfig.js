@@ -51,9 +51,10 @@ function TimelineConfig(){
         lastMinuteAnimationMs:100,
         lastMinuteTextureSize:10,
         minMarkWidth: 1, // Minimum width for visible mark
+        smoothMoveLength: 3, //Minimum move of timeline which requires smooth moving
 
         zoomSpeed: 0.025, // Zoom speed for dblclick
-        zoomAccuracyMs: 1000,
+        zoomAccuracyMs: 5000, // 5 seconds - accuracy for zoomout
         slowZoomSpeed: 0.01, // Zoom speed for holding buttons
         maxVerticalScrollForZoom: 250, // value for adjusting zoom
         maxVerticalScrollForZoomWithTouch: 5000, // value for adjusting zoom
@@ -119,6 +120,7 @@ function TimelineConfig(){
         timeMarkerTextColor: [12,21,23],
         pointerMarkerColor: [12,21,23], // Mouse pointer marker color
         pointerMarkerTextColor: [255,255,255],
+        timeMarkerLineWidth: 1,
         markerDateFont:{
             size:15,
             weight:400,
