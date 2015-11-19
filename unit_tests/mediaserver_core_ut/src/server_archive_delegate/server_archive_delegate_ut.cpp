@@ -29,7 +29,7 @@ const QString hqFolder("hi_quality");
 
 class TestHelper
 {
-   static const int DEFAULT_TIME_GAP_MS = 5001;
+   static const int DEFAULT_TIME_GAP_MS = 15001;
 
 public:
     TestHelper(QStringList &&paths, int fileCount)
@@ -532,7 +532,6 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     qDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
     archiveDelegate.setQuality(MEDIA_Quality_Low, true);
     archiveDelegate.seek(0, true);
-    testHelper.getTimeLine().setTimeGapMs(15001);
     testHelper.getTimeLine().reset();
 
     while(1) 

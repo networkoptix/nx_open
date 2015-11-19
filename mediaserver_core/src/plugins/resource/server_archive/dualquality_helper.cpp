@@ -66,24 +66,24 @@ void QnDualQualityHelper::findDataForTime(
                                           m_catalogHi[QnServer::StoragePool::Backup] : 
                                           m_catalogLow[QnServer::StoragePool::Backup]);
 
-    int findEps = (m_quality == MEDIA_Quality_Low ? FIRST_STREAM_FIND_EPS : 
-                                                    SECOND_STREAM_FIND_EPS);
     SearchStack searchStack;
 
-    searchStack.emplace(normalCatalog);
-    searchStack.emplace(normalCatalogAlt);
-    searchStack.emplace(backupCatalog);
     searchStack.emplace(backupCatalogAlt);
+    searchStack.emplace(backupCatalog);
+    searchStack.emplace(normalCatalogAlt);
+    searchStack.emplace(normalCatalog);
+
+    bool usePreciseFind = preciseFind || m_alreadyOnAltChunk; 
+    m_alreadyOnAltChunk = false;
 
     findDataForTimeHelper(
         time, 
         chunk, 
         catalog, 
         findMethod, 
-        preciseFind, 
+        usePreciseFind,
         searchStack,
-        -1, // There is no previous distance yet
-        findEps
+        -1 // There is no previous distance yet
     );
 }
 
@@ -94,11 +94,10 @@ void QnDualQualityHelper::findDataForTimeHelper(
     DeviceFileCatalog::FindMethod       findMethod,
     bool                                preciseFind,
     SearchStack                         &searchStack,
-    qint64                              previousDistance,
-    int                                 findEps
+    qint64                              previousDistance
 )
 {
-    if (searchStack.empty())
+    if (searchStack.empty() || previousDistance == 0)
         return;
     
     DeviceFileCatalogPtr currentCatalog = searchStack.top();
@@ -112,8 +111,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance,
-            findEps
+            previousDistance
         );
 
     DeviceFileCatalog::TruncableChunk currentChunk = currentCatalog->chunkAt(
@@ -128,14 +126,13 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance,
-            findEps
+            previousDistance
         );
-
+    
     qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
-    if (previousDistance == -1 || currentDistance <= previousDistance + findEps)
+    if (previousDistance == -1)
     {
-        resultChunk = currentChunk;
+        resultChunk   = currentChunk;
         resultCatalog = currentCatalog;
 
         return findDataForTimeHelper(
@@ -145,18 +142,35 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            currentDistance,
-            qMax(0ll, findEps - currentDistance)
+            currentDistance
         );
     }
-    else 
+
+    int findEps = 0;
+
+    if (!preciseFind)
     {
-        if (resultChunk.containsTime(currentChunk.startTimeMs) && currentDistance != INT64_MAX)
+        QnServer::ChunksCatalog currentQuality  = currentCatalog->getRole();
+        QnServer::ChunksCatalog previousQuality = resultCatalog->getRole();
+
+        if (currentQuality == QnServer::LowQualityCatalog)
+            findEps = FIRST_STREAM_FIND_EPS;
+        else
+            findEps = SECOND_STREAM_FIND_EPS;
+    }
+
+    if (currentDistance < previousDistance + findEps)
+    {
+        if (currentChunk.containsTime(resultChunk.startTimeMs) && previousDistance != INT64_MAX)
         {
-            uDebug() << lit("Truncating chunk %1 to %2").arg(resultChunk.startTimeMs)
-                                                        .arg(currentChunk.startTimeMs);
-            resultChunk.truncate(currentChunk.startTimeMs);
+            uDebug() << lit("Truncating chunk %1 to %2").arg(currentChunk.startTimeMs)
+                                                        .arg(resultChunk.startTimeMs);
+            currentChunk.truncate(resultChunk.startTimeMs);
         }
+
+        resultChunk = currentChunk;
+        resultCatalog = currentCatalog;
+        m_alreadyOnAltChunk = true;
 
         return findDataForTimeHelper(
             time, 
@@ -165,8 +179,19 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance,
-            findEps
+            currentDistance
+        );
+    }
+    else
+    {
+        return findDataForTimeHelper(
+            time, 
+            resultChunk, 
+            resultCatalog, 
+            findMethod, 
+            preciseFind,
+            searchStack,
+            previousDistance
         );
     }
 }

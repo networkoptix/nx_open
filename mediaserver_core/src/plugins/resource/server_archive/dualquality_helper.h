@@ -38,8 +38,7 @@ private:
         DeviceFileCatalog::FindMethod       findMethod,
         bool                                preciseFind,
         SearchStack                         &searchStack,
-        qint64                              previousDistance,
-        int                                 findEps
+        qint64                              previousDistance
     );
 
     static int64_t calcDistanceHelper(
