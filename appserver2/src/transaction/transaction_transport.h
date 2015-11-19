@@ -1,6 +1,7 @@
 #ifndef __TRANSACTION_TRANSPORT_H__
 #define __TRANSACTION_TRANSPORT_H__
 
+#include <chrono>
 #include <deque>
 
 #include <QByteArray>
@@ -57,8 +58,6 @@ class QnTransactionTransport
 public:
     static const char* TUNNEL_MULTIPART_BOUNDARY;
     static const char* TUNNEL_CONTENT_TYPE;
-    static const int TCP_KEEPALIVE_TIMEOUT = 5*1000;
-    static const int KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE = 3;
 
     //not using Qt signal/slot because it is undefined in what thread this object lives and in what thread TimerSynchronizationManager lives
     typedef std::function<void(QnTransactionTransport*, const nx_http::HttpHeaders&)> HttpChunkExtensonHandler;
@@ -304,6 +303,9 @@ private:
     int m_waiterCount;
     QWaitCondition m_cond;
     std::function<void ()> m_ttFinishCallback;
+    std::chrono::milliseconds m_tcpKeepAliveTimeout;
+    int m_keepAliveProbeCount;
+    std::chrono::milliseconds m_idleConnectionTimeout;
 
 private:
     void default_initializer();
