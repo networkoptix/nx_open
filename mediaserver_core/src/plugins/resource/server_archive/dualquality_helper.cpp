@@ -159,7 +159,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findEps = SECOND_STREAM_FIND_EPS;
     }
 
-    if (currentDistance < previousDistance + findEps)
+    if (previousDistance > currentDistance + findEps)
     {
         if (currentChunk.containsTime(resultChunk.startTimeMs) && previousDistance != INT64_MAX)
         {
