@@ -14,7 +14,7 @@
 #include "core/resource/resource_fwd.h"
 #include "media_streamdataprovider.h"
 #include <core/resource/resource_media_layout.h>
-
+#include <utils/common/safe_direct_connection.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;
@@ -127,7 +127,7 @@ private:
 #endif
     QSize m_videoResolutionByChannelNumber[CL_MAX_CHANNELS];
     int m_softMotionLastChannel;
-    QnConstResourceVideoLayoutPtr m_layout;
+    std::atomic<int> m_videoChannels;
     QnPhysicalCameraResourcePtr m_cameraRes;
     bool m_isPhysicalResource;
     simd128i *m_motionMaskBinData[CL_MAX_CHANNELS];
