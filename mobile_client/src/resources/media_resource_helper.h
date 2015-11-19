@@ -63,6 +63,8 @@ public:
 
     int rotation() const;
 
+    Q_INVOKABLE void updateUrl();
+
 signals:
     void resourceIdChanged();
     void resourceStatusChanged();
@@ -83,7 +85,6 @@ private:
 private:
     void updateStardardResolutions();
     void setUrl(const QUrl &url);
-    void updateUrl();
     int nativeStreamIndex(const QString &resolution) const;
     QString resolutionString(int resolution) const;
     QString currentResolutionString() const;

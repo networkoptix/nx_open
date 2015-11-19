@@ -61,8 +61,6 @@ QnObject {
                 updatePosition()
             }
 
-            onSourceChanged: console.log(source)
-
             onPlaybackStateChanged: {
                 // A workaround for inconsistent playbackState changes of Qt MediaPlayer
                 if (playbackState == MediaPlayer.PlayingState && d.paused)
@@ -91,7 +89,6 @@ QnObject {
             source: resourceHelper.mediaUrl
 
             onPositionChanged: updatePosition()
-            onSourceChanged: console.log(source)
             reconnectOnPlay: atLive
 
             readonly property bool hasTimestamp: true
@@ -105,6 +102,8 @@ QnObject {
 
         screenSize: Qt.size(mainWindow.width, mainWindow.height)
         resourceId: player.resourceId
+
+        onMediaUrlChanged: console.log(mediaUrl)
     }
 
     QnCameraChunkProvider {

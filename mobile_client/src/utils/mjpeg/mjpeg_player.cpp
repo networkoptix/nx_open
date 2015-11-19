@@ -261,8 +261,6 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     d->session->setUrl(url);
     d->session->stop();
     d->session->start();
-
-    emit sourceChanged();
 }
 
 void QnMjpegPlayer::setVideoSurface(QAbstractVideoSurface *videoSurface) {

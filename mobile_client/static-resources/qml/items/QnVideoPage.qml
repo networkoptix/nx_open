@@ -8,6 +8,7 @@ import com.networkoptix.qml 1.0
 
 import "../main.js" as Main
 import "../controls"
+import ".."
 
 QnPage {
     id: videoPlayer
@@ -17,13 +18,16 @@ QnPage {
     property string resourceId
     property string initialScreenshot
 
-    QtObject {
+    QnObject {
         id: d
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
         readonly property bool cameraOffline: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
         readonly property bool cameraUnauthorized: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+
+        property bool resumeOnActivate: false
+        property bool resumeAtLive: false
 
         onServerOfflineChanged: {
             if (serverOffline) {
@@ -34,6 +38,30 @@ QnPage {
             } else {
                 navigationLoader.opacity = 1.0
                 navigationBarTint.opacity = 1.0
+            }
+        }
+
+        Connections {
+            target: Qt.application
+            onStateChanged: {
+                if (!Main.isMobile())
+                    return
+
+                if (Qt.application.state != Qt.ApplicationActive) {
+                    if (!d.videoNavigation.paused) {
+                        d.resumeAtLive = player.atLive
+                        d.resumeOnActivate = true
+                        d.videoNavigation.paused = true
+                    }
+                } else if (Qt.application.state == Qt.ApplicationActive) {
+                    if (d.resumeOnActivate) {
+                        if (d.resumeAtLive)
+                            player.resourceHelper.updateUrl()
+                        d.videoNavigation.paused = false
+                        d.resumeOnActivate = false
+                        d.resumeAtLive = false
+                    }
+                }
             }
         }
     }
@@ -273,7 +301,14 @@ QnPage {
                     video.clearScreenshotSource()
             }
 
-            onPausedChanged: setKeepScreenOn(!paused)
+            onPausedChanged: {
+                setKeepScreenOn(!paused)
+
+                if (paused)
+                    mediaPlayer.pause()
+                else
+                    mediaPlayer.play(d.resumeAtLive ? -1 : timelinePosition)
+            }
         }
     }
 
@@ -284,8 +319,17 @@ QnPage {
             id: liveVideoNavigation
             mediaPlayer: player
 
+            property bool paused: false
+
             readonly property real timelinePosition: -1
             readonly property bool timelineDragging: false
+
+            onPausedChanged: {
+                if (paused)
+                    mediaPlayer.pause()
+                else
+                    mediaPlayer.playLive()
+            }
         }
     }
 
