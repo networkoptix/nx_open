@@ -35,6 +35,10 @@ namespace {
     QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #endif
 
+    enum {
+        mjpegQuality = 4 // picked as the best balance between traffic and picture quality
+    };
+
     QString protocolName(QnMediaResourceHelper::Protocol protocol) {
         switch (protocol) {
         case QnMediaResourceHelper::Webm:   return lit("webm");
@@ -221,8 +225,10 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
 
-    if (protocol == Mjpeg)
+    if (protocol == Mjpeg) {
         query.addQueryItem(lit("ct"), lit("false"));
+        query.addQueryItem(lit("quality"), QString::number(mjpegQuality));
+    }
 
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
