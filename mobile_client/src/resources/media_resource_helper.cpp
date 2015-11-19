@@ -21,6 +21,7 @@
 #include "utils/network/http/httptypes.h"
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
+#include <ui/texture_size_helper.h>
 
 namespace {
 
@@ -86,10 +87,9 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_transcodingSupported(true),
     m_transcodingProtocol(transcodingProtocol),
     m_nativeProtocol(nativeStreamProtocol),
-    m_maxTextureSize(std::numeric_limits<int>::max()),
+    m_maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
     m_maxNativeResolution(0)
 {
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
     updateStardardResolutions();
     connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
     connect(this, &QnMediaResourceHelper::rotationChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
