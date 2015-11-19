@@ -22,7 +22,8 @@ class SocketServer
 
 public:
     SocketServer( bool sslRequired,
-                  SocketFactory::NatTraversalType natTraversalRequired )
+                  SocketFactory::NatTraversalType natTraversalRequired
+                    = SocketFactory::NatTraversalType::nttAuto )
     :
         base_type( sslRequired, natTraversalRequired )
     {

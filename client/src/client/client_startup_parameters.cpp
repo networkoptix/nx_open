@@ -80,6 +80,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &strVideoWallGuid, "--videowall");
     addParserParam(commandLineParser, &strVideoWallItemGuid, "--videowall-instance");
     addParserParam(commandLineParser, &result.lightMode, "--light-mode", lit("full"));
+    addParserParam(commandLineParser, &result.enforceSocketType, "--enforce-socket");
 
     commandLineParser.parse(argc, argv, stderr, QnCommandLineParser::RemoveParsedParameters);
 

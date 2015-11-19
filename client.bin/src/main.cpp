@@ -281,6 +281,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     PluginManager pluginManager;
 
+    auto enforceSocketType = startupParams.enforceSocketType.toLower();
+    if( enforceSocketType == lit("tcp") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+    else
+    if( enforceSocketType == lit("udt") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+
     /* Dev mode. */
     if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5) 
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */

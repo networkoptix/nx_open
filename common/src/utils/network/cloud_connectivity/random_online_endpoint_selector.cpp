@@ -47,7 +47,8 @@ void RandomOnlineEndpointSelector::selectBestEndpont(
     //trying to establish connection to any endpoint and return first one that works
     for (auto& endpoint: endpoints)
     {
-        auto sock = SocketFactory::createStreamSocket(false, SocketFactory::nttDisabled);
+        auto sock = SocketFactory::createStreamSocket(
+                    false, SocketFactory::NatTraversalType::nttDisabled);
         if (!sock->setNonBlockingMode(true) ||
             !sock->setSendTimeout(CONNECT_TIMEOUT_MS))
         {

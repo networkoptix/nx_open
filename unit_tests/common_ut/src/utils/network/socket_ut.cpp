@@ -155,6 +155,9 @@ TEST( Socket, ServerSocketAsyncCancellation )
 
 TEST( Socket, HostNameResolve1 )
 {
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
     std::unique_ptr<AbstractStreamSocket> connection( SocketFactory::createStreamSocket() );
     SystemError::ErrorCode connectErrorCode = SystemError::noError;
     std::condition_variable cond;
@@ -183,6 +186,9 @@ TEST( Socket, HostNameResolve1 )
 
 TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
 {
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
     HostAddress resolvedAddress;
 
     m_startedConnectionsCount = CONCURRENT_CONNECTIONS;

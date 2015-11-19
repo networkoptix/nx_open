@@ -8,23 +8,22 @@
 #include <QCoreApplication>
 
 #include <utils/common/log.h>
-
+#include <utils/network/socket_factory.cpp>
 
 int main( int argc, char **argv )
 {
-#if 0
-    QCoreApplication app( argc, argv );
-
-    cl_log.create(
-        "C:\\tmp\\ut\\log_file",
-        10*1024*1024,
-        25,
-        QnLogLevel::cl_logDEBUG2 );
-#endif
-
     //QnLog::initLog("DEBUG2");
 
-    ::testing::InitGoogleTest(&argc, argv);
-    const int result = RUN_ALL_TESTS();
-    return result;
+    ::testing::InitGoogleTest( &argc, argv );
+    for( int i = 0; i < argc; ++i )
+    {
+        std::string arg( argv[ i ] );
+        if( arg == "--enforce-socket=tcp" )
+            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+        else
+        if( arg == "--enforce-socket=udt" )
+            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+    }
+
+    return RUN_ALL_TESTS();
 }

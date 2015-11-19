@@ -117,7 +117,7 @@ void AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
         case State::disconnected: {
             // estabilish new connection
             m_connectingSocket = SocketFactory::createStreamSocket(
-                        m_useSsl, SocketFactory::nttDisabled );
+                        m_useSsl, SocketFactory::NatTraversalType::nttDisabled );
 
             auto onComplete = [ this ]( SystemError::ErrorCode code )
                 { onConnectionComplete( code ); };

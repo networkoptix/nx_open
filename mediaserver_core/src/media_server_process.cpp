@@ -2831,6 +2831,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     bool disableCrashHandler = false;
 #endif
     QString engineVersion;
+    QString enforceSocketType;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2859,6 +2860,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("This help message"), true);
     commandLineParser.addParameter(&engineVersion, "--override-version", NULL,
         lit("Force the other engine version"), QString());
+    commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
+        lit("Enforces stream socket type (TCP, UDT)"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2884,6 +2887,14 @@ int MediaServerProcess::main(int argc, char* argv[])
         commandLineParser.print(stream);
         return 0;
     }
+
+
+    const auto enforceSocketTypeLower = enforceSocketType.toLower();
+    if( enforceSocketTypeLower == lit("tcp") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+    else
+    if( enforceSocketTypeLower == lit("udt") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
 
     if( !configFilePath.isEmpty() )
         MSSettings::initializeROSettingsFromConfFile( configFilePath );
