@@ -143,11 +143,13 @@ QnObject {
     }
 
     function playLive() {
-        d.dirty = true
         play(-1)
     }
 
     function play(pos) {
+        if (pos && (pos != d.position || pos == -1))
+            d.dirty = true
+
         d.paused = false
 
         if (!d.dirty) {
@@ -167,6 +169,8 @@ QnObject {
             timelinePositionRequest(d.position)
             if (!playing)
                 d.mediaPlayer.play()
+
+            d.dirty = false
             return
         }
 
