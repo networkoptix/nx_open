@@ -76,7 +76,11 @@ bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
 
 void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 {
-    originalDuration = durationMs;
+    if (!isTruncated)
+    {
+        originalDuration = durationMs;
+        isTruncated = true;
+    }
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 

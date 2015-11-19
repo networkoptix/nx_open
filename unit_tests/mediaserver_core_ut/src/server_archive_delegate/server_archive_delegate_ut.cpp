@@ -29,7 +29,8 @@ const QString hqFolder("hi_quality");
 
 class TestHelper
 {
-    static const int DEFAULT_TIME_GAP_MS = 500;
+   static const int DEFAULT_TIME_GAP_MS = 5001;
+
 public:
     TestHelper(QStringList &&paths, int fileCount)
         : m_storageUrls(std::move(paths)),
@@ -41,7 +42,7 @@ public:
         createStorages();
         loadMedia();
     }
-    
+
     ~TestHelper()
     {
         recursiveClean(qApp->applicationDirPath() + "/tmp");
@@ -103,6 +104,11 @@ public:
             addTimePeriod(TimePeriod(startTime, duration));
         }
 
+        void setTimeGapMs(int timeGap)
+        {
+            m_timeGapMs = timeGap;
+        }
+
         void addTimePeriod(const TimePeriod &period)
         {
             TimePeriod newPeriod = period;
@@ -137,6 +143,8 @@ public:
                if (period.startTimeMs < m_timePoint)
                    m_timePoint = period.startTimeMs;
             }
+
+            m_permTimePoint = m_timePoint;
         }
 
         bool checkTime(int64_t time)
@@ -152,20 +160,6 @@ public:
                                  m_timePoint)
                      << "time: " << time << " m_time: " << m_timePoint
                      << " diff: " << std::abs(time - m_timePoint);
-            //if (time < m_currentIt->startTimeMs || time > m_currentIt->durationMs +
-            //                                              m_currentIt->startTimeMs) {
-            //    if (time > m_timePoint) {
-            //        ++m_currentIt;
-            //        if (m_currentIt == m_timeLine.cend())
-            //            return true;
-            //        m_timePoint = m_currentIt->startTimeMs;
-            //        if (time < m_currentIt->startTimeMs || time > m_currentIt->durationMs +
-            //                                                      m_currentIt->startTimeMs) {
-            //            --m_currentIt;
-            //            return false;
-            //        }
-            //    }
-            //}
 
             if (std::abs(time - m_timePoint) > m_timeGapMs) {
                 if (time > m_timePoint && m_currentIt->startTimeMs + 
@@ -188,20 +182,23 @@ public:
             return true;
         }
 
-        void finalize()
+        void reset()
         {
             m_currentIt = m_timeLine.begin();
+            m_timePoint = m_permTimePoint;
         }
 
     private:
-        TimePeriodList m_timeLine;
-        TimePeriodListIterator m_currentIt;
-        int64_t m_timePoint;
-        int m_timeGapMs;
+        TimePeriodList          m_timeLine;
+        TimePeriodListIterator  m_currentIt;
+        int64_t                 m_timePoint;
+        int64_t                 m_permTimePoint;
+        int                     m_timeGapMs;
     };
 
 public:
     TimeLine &getTimeLine() {return m_timeLine;}
+
     void print() const 
     {
         qDebug() << lit("We have %1 files, %2 time periods")
@@ -233,7 +230,7 @@ private:
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<int> normalStartDistMs(5500, 7000);
-        std::uniform_int_distribution<int> holeStartDistMs(10000, 25000);
+        std::uniform_int_distribution<int> holeStartDistMs(20000, 55000);
         std::uniform_int_distribution<int> normalOrHoleDist(1, 5);
         std::uniform_int_distribution<int> durationDist(0, 1);
 
@@ -246,8 +243,6 @@ private:
 
         QFile testFile_1("://1445529661948_77158.mkv");
         QFile testFile_2("://1445529880231_64712.mkv");
-        //QFile testFile_1("F:\\develop\\dumps\\hi_dw.mkv");
-        //QFile testFile_2("F:\\develop\\dumps\\hi_dw.mkv");
 
         int64_t startTimeMs = 1445529661948;
         const int duration_1 = 77158;
@@ -276,7 +271,7 @@ private:
         auto copyFile = [&](const QString& root, const QString &quality)
         {
             int curDuration = durationDist(gen) == 0 ? duration_1 : duration_2;
-            bool isHole = normalOrHoleDist(gen) == 1 ? true : false;
+            bool isHole = normalOrHoleDist(gen) <= 3 ? true : false;
             int64_t curStartTime = isHole ? holeStartDistMs(gen) + startTimeMs : 
                                             normalStartDistMs(gen) + startTimeMs;
             QString fileName = lit("%1_%2.mkv").arg(curStartTime).arg(curDuration);
@@ -307,7 +302,6 @@ private:
             }
             startTimeMs = newTime;
         }
-        m_timeLine.finalize();
     }
 
     void createStorages()
@@ -414,7 +408,7 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     timeLine.addTimePeriod(45, 15);
     timeLine.addTimePeriod(30, 20);
 
-    timeLine.finalize();
+    timeLine.reset();
 
     ASSERT_TRUE(timeLine.checkTime(0));
     ASSERT_TRUE(timeLine.checkTime(2));
@@ -509,7 +503,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 2);
+    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
     testHelper.print();
 
     QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
@@ -519,14 +513,33 @@ TEST(ServerArchiveDelegate_playback_test, Main)
 
     QnServerArchiveDelegate archiveDelegate;
     archiveDelegate.open(cameraResource);
+    archiveDelegate.setQuality(MEDIA_Quality_High, true);
     archiveDelegate.seek(0, true);
 
+    qDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
+    testHelper.getTimeLine().reset();
+
     QnAbstractMediaDataPtr data;
-    while(1) {
+    while(1) 
+    {
         data = archiveDelegate.getNextData();
         if (data)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
-            //testHelper.getTimeLine().checkTime(data->timestamp/1000);
+        else
+            break;
+    } 
+
+    qDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
+    archiveDelegate.setQuality(MEDIA_Quality_Low, true);
+    archiveDelegate.seek(0, true);
+    testHelper.getTimeLine().setTimeGapMs(15001);
+    testHelper.getTimeLine().reset();
+
+    while(1) 
+    {
+        data = archiveDelegate.getNextData();
+        if (data)
+            ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
         else
             break;
     } 

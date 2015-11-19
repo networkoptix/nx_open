@@ -94,7 +94,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     DeviceFileCatalog::FindMethod       findMethod,
     bool                                preciseFind,
     SearchStack                         &searchStack,
-    int                                 previousDistance,
+    qint64                              previousDistance,
     int                                 findEps
 )
 {
@@ -105,7 +105,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     searchStack.pop();
 
     if (!currentCatalog)
-        findDataForTimeHelper(
+        return findDataForTimeHelper(
             time, 
             resultChunk, 
             resultCatalog, 
@@ -121,7 +121,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     );
     
     if (currentChunk.startTimeMs == -1)
-        findDataForTimeHelper(
+        return findDataForTimeHelper(
             time, 
             resultChunk, 
             resultCatalog, 
@@ -133,13 +133,12 @@ void QnDualQualityHelper::findDataForTimeHelper(
         );
 
     qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
-    if (previousDistance == -1 || (previousDistance != -1 && currentDistance < previousDistance) ||
-                                  ((currentDistance - previousDistance) < findEps && !preciseFind))
+    if (previousDistance == -1 || currentDistance <= previousDistance + findEps)
     {
         resultChunk = currentChunk;
         resultCatalog = currentCatalog;
 
-        findDataForTimeHelper(
+        return findDataForTimeHelper(
             time, 
             resultChunk, 
             resultCatalog, 
@@ -147,12 +146,19 @@ void QnDualQualityHelper::findDataForTimeHelper(
             preciseFind,
             searchStack,
             currentDistance,
-            findEps
+            qMax(0ll, findEps - currentDistance)
         );
     }
     else 
     {
-        findDataForTimeHelper(
+        if (resultChunk.containsTime(currentChunk.startTimeMs) && currentDistance != INT64_MAX)
+        {
+            uDebug() << lit("Truncating chunk %1 to %2").arg(resultChunk.startTimeMs)
+                                                        .arg(currentChunk.startTimeMs);
+            resultChunk.truncate(currentChunk.startTimeMs);
+        }
+
+        return findDataForTimeHelper(
             time, 
             resultChunk, 
             resultCatalog, 

@@ -38,7 +38,7 @@ private:
         DeviceFileCatalog::FindMethod       findMethod,
         bool                                preciseFind,
         SearchStack                         &searchStack,
-        int                                 previousDistance,
+        qint64                              previousDistance,
         int                                 findEps
     );
 
