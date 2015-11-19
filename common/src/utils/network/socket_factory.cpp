@@ -126,7 +126,17 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
 
 void SocketFactory::enforceStreamSocketType( SocketType type )
 {
+    QString typeStr;
+    switch (type)
+    {
+        case SocketType::Default:   typeStr = lit( "Default" ); break;
+        case SocketType::Tcp:       typeStr = lit( "TCP" );     break;
+        case SocketType::Udt:       typeStr = lit( "UDT" );     break;
+    }
+
     s_enforcedStreamSocketType = type;
+    qWarning() << ">>> SocketFactory::enforceStreamSocketType("
+               << typeStr << ") <<<";
 }
 
 bool SocketFactory::isStreamSocketTypeEnforced()

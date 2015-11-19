@@ -134,7 +134,7 @@ public:
     }
 
     UdtStreamSocket( bool natTraversal );
-    UdtStreamSocket( bool natTraversal, detail::UdtSocketImpl* impl );
+    UdtStreamSocket( detail::UdtSocketImpl* impl );
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;

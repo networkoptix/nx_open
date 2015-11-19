@@ -606,38 +606,9 @@ bool UdtConnector::Connect( const SocketAddress& remoteAddress, int timeouts )
         DEBUG_(TRACE_("UDT::connect",impl_->udt_handler()));
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
-    } else {
-        if( nbk_sock ) {
-            impl_->state_ = UdtSocketImpl::ESTABLISHING;
-            return true;
-        }
     }
-    // Using epoll will ensure that it is correct with any value for the file descriptor. 
-    UdtEpollHandlerHelper epoll_fd(
-        UDT::epoll_create(EPOLL_SIZE),
-        impl_->udt_handler());
-    int write_ev = UDT_EPOLL_OUT;
-    ret = UDT::epoll_add_usock(epoll_fd.epoll_fd,impl_->udt_handler(),&write_ev);
-    VERIFY_(ret ==0,"UDT::epoll_add_ssock",impl_->udt_handler());
-
-    std::set<UDTSOCKET> write_fd;
-    // Waiting on epoll set
-    ret = UDT::epoll_wait(epoll_fd.epoll_fd,NULL,&write_fd,timeouts,NULL,NULL);
-    
-    if( ret < 0 ) {
-        DEBUG_(TRACE_("UDT::epoll_wait",impl_->udt_handler()));
-        SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
-        return false;
-    } else {
-        if( ret == 0 )  {
-            SystemError::setLastErrorCode( SystemError::timedOut );
-            return false; // Timeout
-        } else {
-            Q_ASSERT(ret == 1);
-            impl_->state_ = UdtSocketImpl::ESTABLISHED;
-            return true;
-        }
-    }
+    impl_->state_ = nbk_sock ? UdtSocketImpl::ESTABLISHING : UdtSocketImpl::ESTABLISHED;
+    return true;
 }
 
 class UdtAcceptor {
@@ -861,10 +832,10 @@ UdtStreamSocket::UdtStreamSocket( bool natTraversal )
     impl_->Open();
 }
 
-UdtStreamSocket::UdtStreamSocket( bool natTraversal, detail::UdtSocketImpl* impl )
+UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
 :
     UdtSocket(impl),
-    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
+    m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, false))
 {
 }
 
@@ -996,8 +967,10 @@ UdtStreamServerSocket::UdtStreamServerSocket()
     impl_->Open();
 }
 
-UdtStreamServerSocket::~UdtStreamServerSocket(){}
-
+UdtStreamServerSocket::~UdtStreamServerSocket()
+{
+    m_aioHelper->terminate();
+}
 
 // ========================================================
 // PollSet implementation
