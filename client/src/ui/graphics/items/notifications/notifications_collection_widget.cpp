@@ -215,8 +215,8 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *
     setLayout(layout);
 
     QnWorkbenchNotificationsHandler *handler = this->context()->instance<QnWorkbenchNotificationsHandler>();
-    connect(handler,    &QnWorkbenchNotificationsHandler::businessActionAdded,      this,   &QnNotificationsCollectionWidget::showBusinessAction);
-    connect(handler,    &QnWorkbenchNotificationsHandler::businessActionRemoved,    this,   &QnNotificationsCollectionWidget::hideBusinessAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::notificationAdded,      this,   &QnNotificationsCollectionWidget::showBusinessAction);
+    connect(handler,    &QnWorkbenchNotificationsHandler::notificationRemoved,    this,   &QnNotificationsCollectionWidget::hideBusinessAction);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventAdded,   this,   &QnNotificationsCollectionWidget::showSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);

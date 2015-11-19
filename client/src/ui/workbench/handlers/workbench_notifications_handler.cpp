@@ -69,10 +69,7 @@ void QnWorkbenchNotificationsHandler::clear() {
     emit cleared();
 }
 
-void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusinessActionPtr &businessAction) {
-//    if (businessAction->actionType() != QnBusiness::ShowPopup)
-//        return;
-
+void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction) {
     //TODO: #GDM #Business check if camera is visible to us
     QnBusiness::UserGroup userGroup = businessAction->getParams().userGroup;
     if (userGroup == QnBusiness::AdminOnly
@@ -92,11 +89,22 @@ void QnWorkbenchNotificationsHandler::addBusinessAction(const QnAbstractBusiness
     if (!context()->user())
         return;
 
-    const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction; // TODO: #GDM #Business also PlaySoundOnceAction?
-    if (!soundAction && !m_adaptor->isAllowed(eventType))
+    bool alwaysNotify = false;
+    switch (businessAction->actionType()) {
+    case QnBusiness::PlaySoundAction:
+    //case QnBusiness::PlaySoundOnceAction: -- handled outside without notification
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        //TODO: #GDM #Business check if camera is visible to us
+        alwaysNotify = true;
+        break;
+    default:
+        break;
+    }
+
+    if (!alwaysNotify && !m_adaptor->isAllowed(eventType))
         return;
 
-    emit businessActionAdded(businessAction);
+    emit notificationAdded(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message) {
@@ -263,8 +271,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed() {
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction) {
     switch (businessAction->actionType()) {
     case QnBusiness::ShowPopupAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
     {
-        addBusinessAction(businessAction);
+        addNotification(businessAction);
         break;
     }
     case QnBusiness::PlaySoundOnceAction:
@@ -280,10 +289,10 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
     {
         switch (businessAction->getToggleState()) {
         case QnBusiness::ActiveState:
-            addBusinessAction(businessAction);
+            addNotification(businessAction);
             break;
         case QnBusiness::InactiveState:
-            emit businessActionRemoved(businessAction);
+            emit notificationRemoved(businessAction);
             break;
         default:
             break;

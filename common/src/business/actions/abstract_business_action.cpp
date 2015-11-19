@@ -57,6 +57,7 @@ namespace QnBusiness {
             return true;
 
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
             return false;
         }
     }
@@ -70,6 +71,8 @@ namespace QnBusiness {
         case ShowPopupAction:
         case PlaySoundOnceAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case CameraOutputAction:
@@ -77,14 +80,14 @@ namespace QnBusiness {
         case PanicRecordingAction:
         case PlaySoundAction:
         case BookmarkAction:
-        case ExecutePtzPresetAction:     //TODO: #rvasilenko #ptz
         case ShowTextOverlayAction:
-        case ShowOnAlarmLayoutAction:
             return true;
 
         default:
-            return false;
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            break;
         }
+        return false;
     }
 
     bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters) {
@@ -94,11 +97,7 @@ namespace QnBusiness {
         switch (actionType) {
         case BookmarkAction:
         case ShowTextOverlayAction:
-        case ShowOnAlarmLayoutAction:
             return parameters.durationMs <= 0;
-
-        case ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
-            break;
 
         default:
             break;

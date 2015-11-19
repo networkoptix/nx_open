@@ -8,6 +8,8 @@
 #include <ui/widgets/business/play_sound_business_action_widget.h>
 #include <ui/widgets/business/say_text_business_action_widget.h>
 #include <ui/widgets/business/bookmark_business_action_widget.h>
+#include <ui/widgets/business/show_text_overlay_action_widget.h>
+#include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
@@ -30,8 +32,9 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
     case QnBusiness::ExecutePtzPresetAction:
         break;  //TODO: #rvasilenko #ptz
     case QnBusiness::ShowTextOverlayAction:
+        return new QnShowTextOverlayActionWidget(parent);
     case QnBusiness::ShowOnAlarmLayoutAction:
-        break;  //TODO: #GDM #actions
+        return new QnShowOnAlarmLayoutActionWidget(parent);
     default:
         break;
     }

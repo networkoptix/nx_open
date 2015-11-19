@@ -19,6 +19,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , text()
     , durationMs(0)
     , additionalResources()
+    , forced(false)
 {}
 
 

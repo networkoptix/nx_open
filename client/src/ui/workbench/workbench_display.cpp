@@ -257,7 +257,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Connect to context. */
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(), SIGNAL(businessActionAdded(const QnAbstractBusinessActionPtr &)), this, SLOT(at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &)));
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded, 
+        this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);

@@ -40,11 +40,14 @@ struct QnBusinessActionParameters {
     // Generic text: Show Text Overlay
     QString text;
 
-    // Generic duration: Bookmark, Show Text Overlay, Alarm Layout?
+    // Generic duration: Bookmark, Show Text Overlay
     int durationMs;
 
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
+
+    // Alarm Layout - if it must be opened immediately
+    bool forced;
 
     //ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
 
@@ -55,7 +58,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
