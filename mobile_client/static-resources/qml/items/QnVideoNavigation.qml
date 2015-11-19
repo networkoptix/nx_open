@@ -17,6 +17,8 @@ Item {
     readonly property real timelinePosition: timeline.position
     readonly property bool timelineAtLive: timeline.stickToEnd
 
+    readonly property alias paused: playbackController.paused
+
     width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined

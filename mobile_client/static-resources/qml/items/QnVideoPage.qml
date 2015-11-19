@@ -253,7 +253,10 @@ QnPage {
 
         Component.onCompleted: {
             sourceComponent = accessRightsHelper.canViewArchive ? navigationComponent : liveNavigationComponent
+            setKeepScreenOn(true)
         }
+
+        Component.onDestruction: setKeepScreenOn(false)
     }
 
     Component {
@@ -269,6 +272,8 @@ QnPage {
                 else if (player.playing)
                     video.clearScreenshotSource()
             }
+
+            onPausedChanged: setKeepScreenOn(!paused)
         }
     }
 
