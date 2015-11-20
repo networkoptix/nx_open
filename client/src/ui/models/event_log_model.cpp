@@ -36,34 +36,39 @@ public:
         , m_sortOrder(Qt::DescendingOrder)
         , m_size(0)
     {
-        static bool firstCall = true;
-        if (firstCall) {
+        if (m_eventTypeToLexOrder.isEmpty() && m_actionTypeToLexOrder.isEmpty())
             initStaticData();
-            firstCall = false;
-        }
     }
 
     void initStaticData()
     {
         // event types to lex order
-        QMap<QString, int> events;
-        for (int i = 0; i < 256; ++i) {
-            events.insert(QnBusinessStringsHelper::eventName(QnBusiness::EventType(i)), i);
-            m_eventTypeToLexOrder[i] = 255; // put undefined events to the end of the list
+        int maxType = 0;
+        QMap<QString, int> eventTypes;
+        for (auto eventType: QnBusiness::allEvents()) {
+            eventTypes.insert(QnBusinessStringsHelper::eventName(eventType), eventType);
+            if (maxType < eventType)
+                maxType = eventType;
         }
+
+        m_eventTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined events to the end of the list
         int count = 0;
-        for(QMap<QString, int>::const_iterator itr = events.begin(); itr != events.end(); ++itr)
-            m_eventTypeToLexOrder[itr.value()] = count++;
+        for (int eventType: eventTypes)
+            m_eventTypeToLexOrder[eventType] = count++;
 
         // action types to lex order
-        QMap<QString, int> actions;
-        for (int i = 0; i < 256; ++i) {
-            actions.insert(QnBusinessStringsHelper::actionName(QnBusiness::ActionType(i)), i);
-            m_actionTypeToLexOrder[i] = 255; // put undefined actions to the end of the list
+        maxType = 0;
+        QMap<QString, int> actionTypes;
+        for (auto actionType: QnBusiness::allActions()) {
+            actionTypes.insert(QnBusinessStringsHelper::actionName(actionType), actionType);
+            if (maxType < actionType)
+                maxType = actionType;
         }
+
+        m_actionTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined actions to the end of the list
         count = 0;
-        for(QMap<QString, int>::const_iterator itr = actions.begin(); itr != actions.end(); ++itr)
-            m_actionTypeToLexOrder[itr.value()] = count++;
+        for (int actionType: actionTypes)
+            m_eventTypeToLexOrder[actionType] = count++;
     }
 
     void setSort(int column, Qt::SortOrder order)
@@ -109,7 +114,7 @@ public:
      */
     static int toLexEventType(QnBusiness::EventType eventType)
     {
-        return m_eventTypeToLexOrder[((int) eventType) & 0xff];
+        return m_eventTypeToLexOrder[eventType];
     }
 
     /*
@@ -117,7 +122,7 @@ public:
      */
     static int toLexActionType(QnBusiness::ActionType actionType)
     {
-        return m_actionTypeToLexOrder[((int) actionType) & 0xff];
+        return m_actionTypeToLexOrder[actionType];
     }
 
     inline QnBusinessActionData& at(int row)
@@ -211,12 +216,12 @@ private:
     QVector<QnBusinessActionDataListPtr> m_events;
     QVector<QnLightBusinessActionP> m_records;
     int m_size;
-    static int m_eventTypeToLexOrder[256]; // TODO: #Elric evil statics. Make non-static.
-    static int m_actionTypeToLexOrder[256];
+    static QVector<int> m_eventTypeToLexOrder; // TODO: #Elric evil statics. Make non-static.
+    static QVector<int> m_actionTypeToLexOrder;
 };
 
-int QnEventLogModel::DataIndex::m_eventTypeToLexOrder[256];
-int QnEventLogModel::DataIndex::m_actionTypeToLexOrder[256];
+QVector<int> QnEventLogModel::DataIndex::m_eventTypeToLexOrder;
+QVector<int> QnEventLogModel::DataIndex::m_actionTypeToLexOrder;
 
 
 // -------------------------------------------------------------------------- //
