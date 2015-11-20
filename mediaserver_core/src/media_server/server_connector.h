@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <utils/thread/mutex.h>
 #include <utils/common/singleton.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 class QnModuleFinder;
 struct QnModuleInformation;

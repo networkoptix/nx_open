@@ -9,7 +9,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_globals.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
 

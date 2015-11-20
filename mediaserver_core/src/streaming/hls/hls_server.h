@@ -10,7 +10,7 @@
 #include <utils/thread/wait_condition.h>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/network/http/httpstreamreader.h>
+#include <nx/network/http/httpstreamreader.h>
 #include <network/tcp_connection_processor.h>
 
 #include "camera/video_camera.h"

@@ -3,7 +3,7 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 namespace {
     const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));

@@ -2,8 +2,8 @@
 
 #include <utils/common/cpp14.h>
 #include <utils/thread/sync_queue.h>
-#include <utils/network/system_socket.h>
-#include <utils/network/udt_socket.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/udt_socket.h>
 
 #include <udt.h>
 #include <thread>

@@ -7,8 +7,8 @@
 #include "proxy_sender_connection_processor.h"
 #include "utils/common/log.h"
 #include "utils/common/synctime.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/http/auth_tools.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "universal_tcp_listener.h"
 

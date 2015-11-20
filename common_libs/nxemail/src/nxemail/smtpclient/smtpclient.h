@@ -21,8 +21,8 @@
 
 #include <QObject>
 
-#include <utils/network/socket.h>
-#include <utils/network/http/linesplitter.h>
+#include <nx/network/socket.h>
+#include <nx/network/http/linesplitter.h>
 
 #include "mimemessage.h"
 

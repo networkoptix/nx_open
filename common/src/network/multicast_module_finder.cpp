@@ -10,8 +10,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 
-#include <utils/network/socket.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/socket.h>
+#include <nx/network/system_socket.h>
 
 #include "common/common_module.h"
 #include "module_information.h"

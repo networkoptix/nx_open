@@ -13,7 +13,7 @@
 #include <utils/common/app_info.h>
 #include <utils/common/log.h>
 #include <utils/common/sync_call.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "cdb_nonce_fetcher.h"
 #include "cloud/cloud_connection_manager.h"

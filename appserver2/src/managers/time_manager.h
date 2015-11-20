@@ -20,8 +20,8 @@
 #include <utils/common/id.h>
 #include <utils/common/timermanager.h>
 #include <utils/common/singleton.h>
-#include <utils/network/time/abstract_accurate_time_fetcher.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/time/abstract_accurate_time_fetcher.h>
+#include <nx/network/http/httptypes.h>
 
 #include "nx_ec/data/api_data.h"
 #include "transaction/transaction.h"

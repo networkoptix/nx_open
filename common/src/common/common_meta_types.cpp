@@ -2,8 +2,8 @@
 
 #include <QtCore/QMetaType>
 
-#include <utils/network/mac_address.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/mac_address.h>
+#include <nx/network/socket_common.h>
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/common/ldap.h>

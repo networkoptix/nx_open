@@ -11,7 +11,7 @@
 
 #include <utils/common/uuid.h>
 #include <utils/common/util.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"

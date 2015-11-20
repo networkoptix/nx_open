@@ -4,7 +4,7 @@
 #include <api/app_server_connection.h>
 
 #include "utils/common/id.h"
-#include "utils/network/nettools.h" /* For resolveAddress. */
+#include <nx/network/nettools.h> /* For resolveAddress. */
 
 #include <business/business_aggregation_info.h>
 #include <business/events/reasoned_business_event.h>

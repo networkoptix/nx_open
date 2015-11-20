@@ -14,7 +14,7 @@
 #endif
 
 #include <utils/common/log.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 int QnCrashServerHandler::executeGet(

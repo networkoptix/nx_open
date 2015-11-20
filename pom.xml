@@ -384,6 +384,7 @@
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
                 <module>common_libs/nxemail</module>
+                <module>common_libs/nx_network</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->
@@ -845,7 +846,7 @@
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
-            </properties>            
+            </properties>
             <modules>
                 <module>client.core</module>
                 <module>mobile_client</module>

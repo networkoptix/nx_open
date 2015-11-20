@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include <utils/network/pcp/sender.h>
-#include <utils/network/pcp/listener.h>
+#include <nx/network/pcp/sender.h>
+#include <nx/network/pcp/listener.h>
 
 using namespace pcp;
 

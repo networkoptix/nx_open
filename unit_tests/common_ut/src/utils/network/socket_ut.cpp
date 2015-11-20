@@ -15,10 +15,10 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <utils/network/dns_resolver.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/socket_global.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/dns_resolver.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/system_socket.h>
 
 #include "socket_test_helper.h"
 

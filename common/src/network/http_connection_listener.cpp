@@ -5,7 +5,7 @@
 
 #include "network/tcp_connection_priv.h"
 #include "utils/common/log.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "common/common_module.h"
 
 

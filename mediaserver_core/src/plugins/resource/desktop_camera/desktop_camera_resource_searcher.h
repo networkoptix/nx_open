@@ -6,7 +6,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 
 #include <utils/common/singleton.h>
 

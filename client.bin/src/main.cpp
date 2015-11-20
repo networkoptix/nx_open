@@ -58,7 +58,7 @@ extern "C"
 
 #include <utils/common/log.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/http/http_mod_manager.h>
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
@@ -80,7 +80,7 @@ extern "C"
 
 #include "api/session_manager.h"
 #include "ui/actions/action_manager.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
@@ -118,7 +118,7 @@ extern "C"
 #include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
-#include <utils/network/socket_global.h>
+#include <nx/network/socket_global.h>
 
 #ifdef Q_OS_MAC
 #include "ui/workaround/mac_utils.h"

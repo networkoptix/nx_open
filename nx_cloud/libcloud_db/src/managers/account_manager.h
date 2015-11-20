@@ -12,7 +12,7 @@
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/db/db_manager.h>
-#include <utils/network/buffer.h>
+#include <nx/network/buffer.h>
 
 #include "access_control/auth_types.h"
 #include "cache.h"

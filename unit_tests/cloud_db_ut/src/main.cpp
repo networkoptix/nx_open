@@ -8,8 +8,8 @@
 #include <QCoreApplication>
 
 #include <utils/common/log.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/auth_tools.h>
 
 
 int main( int argc, char **argv )

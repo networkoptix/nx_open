@@ -10,8 +10,8 @@
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/singleton.h>
-#include <utils/network/netstate.h>
-#include <utils/network/nettools.h>
+#include <nx/network/netstate.h>
+#include <nx/network/nettools.h>
 
 #include <api/model/manual_camera_seach_reply.h>
 

@@ -2,7 +2,7 @@
 
 #include <common/common_globals.h>
 #include <utils/common/log.h>
-#include <utils/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/cc/custom_stun.h>
 
 namespace nx {
 namespace hpm {

@@ -20,8 +20,8 @@
 #include <utils/common/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
-#include "utils/network/compat_poll.h"
-#include "utils/network/socket.h"
+#include <nx/network/compat_poll.h>
+#include <nx/network/socket.h>
 
 class QnTcpListener;
 static const int IO_TIMEOUT = 1000 * 1000;

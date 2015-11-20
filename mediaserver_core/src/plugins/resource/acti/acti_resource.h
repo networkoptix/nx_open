@@ -11,9 +11,9 @@
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/request_param.h"
 #include "utils/common/timermanager.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/simple_http_client.h"
-#include <utils/network/http/multipartcontentparser.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/multipartcontentparser.h>
 
 
 class QnActiPtzController;

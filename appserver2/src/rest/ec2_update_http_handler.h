@@ -14,7 +14,7 @@
 #include <common/common_module.h>
 
 #include <rest/server/request_handler.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/common/model_functions.h>
 #include <transaction/transaction.h>
 

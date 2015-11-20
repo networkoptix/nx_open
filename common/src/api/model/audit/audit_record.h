@@ -6,7 +6,7 @@
 #include <utils/common/model_functions_fwd.h>
 #include "auth_session.h"
 #include "utils/common/latin1_array.h"
-#include "utils/network/http/qnbytearrayref.h"
+#include <nx/network/http/qnbytearrayref.h>
 
 struct QnAuditRecord
 {

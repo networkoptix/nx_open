@@ -13,7 +13,7 @@
 #include <utils/common/settings.h>
 #include <utils/db/types.h>
 #include <utils/email/email.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 
 namespace nx {

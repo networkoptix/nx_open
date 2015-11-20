@@ -11,7 +11,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 namespace CameraDiagnostics

@@ -4,7 +4,7 @@
 
 #include <utils/common/uuid.h>
 
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/string.h"
 #include "utils/common/log.h"
 

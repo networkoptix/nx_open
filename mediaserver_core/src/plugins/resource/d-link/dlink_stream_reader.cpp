@@ -6,7 +6,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "core/datapacket/video_data_packet.h"
 

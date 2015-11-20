@@ -6,7 +6,7 @@
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 

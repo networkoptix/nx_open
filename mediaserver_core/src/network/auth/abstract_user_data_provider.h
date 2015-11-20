@@ -11,7 +11,7 @@
 #include <QtCore/QByteArray>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 class AbstractUserDataProvider

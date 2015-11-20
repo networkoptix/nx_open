@@ -7,7 +7,7 @@
 
 #include <http/custom_headers.h>
 #include <rest/server/rest_connection_processor.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "managers/time_manager.h"
 

@@ -7,10 +7,10 @@
 #define cloud_db_base_http_handler_h
 
 #include <utils/common/cpp14.h>
-#include <utils/network/http/buffer_source.h>
-#include <utils/network/http/server/abstract_fusion_request_handler.h>
-#include <utils/network/http/server/abstract_http_request_handler.h>
-#include <utils/network/http/server/http_server_connection.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/server/http_server_connection.h>
 
 #include <cloud_db_client/src/data/types.h>
 

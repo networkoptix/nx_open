@@ -12,9 +12,9 @@
 
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/nettools.h>
-#include <utils/network/ping.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/nettools.h>
+#include <nx/network/ping.h>
 
 #include "core/resource/resource_command_processor.h"
 #include "core/resource/resource_command.h"

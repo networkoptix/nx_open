@@ -17,7 +17,7 @@
 #include <cdb/account_manager.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "version.h"
 

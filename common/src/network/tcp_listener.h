@@ -7,8 +7,8 @@
 
 #include "utils/common/long_runnable.h"
 
-#include <utils/network/http/httptypes.h>
-#include <utils/network/abstract_socket.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/abstract_socket.h>
 
 
 class TCPSocket;

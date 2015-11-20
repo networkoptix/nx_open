@@ -6,7 +6,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/sleep.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "isd_resource.h"
 

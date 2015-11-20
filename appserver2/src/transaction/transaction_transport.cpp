@@ -12,13 +12,13 @@
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>
-#include <utils/network/http/base64_decoder_filter.h>
+#include <nx/network/http/base64_decoder_filter.h>
 
 #include "transaction_message_bus.h"
 #include "utils/common/log.h"
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
-#include "utils/network/socket_factory.h"
+#include <nx/network/socket_factory.h>
 #include "transaction_log.h"
 #include <transaction/chunked_transfer_encoder.h>
 #include "common/common_module.h"

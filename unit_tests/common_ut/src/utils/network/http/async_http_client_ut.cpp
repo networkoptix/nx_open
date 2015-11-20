@@ -15,11 +15,11 @@
 #include <common/common_globals.h>
 #include <utils/common/cpp14.h>
 #include <utils/media/custom_output_stream.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/multipart_content_parser.h>
-#include <utils/network/http/server/http_stream_socket_server.h>
-#include <utils/network/http/test_http_server.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/http/test_http_server.h>
 
 #include "repeating_buffer_sender.h"
 

@@ -13,8 +13,8 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
-#include "utils/network/module_finder.h"
-#include "utils/network/multicast_module_finder.h"
+#include <nx/network/module_finder.h>
+#include <nx/network/multicast_module_finder.h>
 #include "core/resource/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"

@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "utils/common/log.h"
 #include "utils/common/byte_array.h"
 #include "utils/common/systemerror.h"

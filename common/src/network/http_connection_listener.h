@@ -8,7 +8,7 @@
 #include "network/tcp_listener.h"
 #include "network/tcp_connection_processor.h"
 
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 class QnHttpConnectionListener;
 

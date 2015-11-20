@@ -13,7 +13,7 @@
 #include "nx_ec/data/api_lock_data.h"
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 #include "transaction_transport.h"
 #include <transaction/transaction_log.h>
 #include "runtime_transaction_log.h"

@@ -13,7 +13,7 @@
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include "utils/common/log.h"
 #include "utils/media/ffmpeg_helper.h"
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include "version.h"
 
 namespace

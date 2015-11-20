@@ -14,8 +14,8 @@
 #include <utils/common/log.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/async_http_client_reply.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/async_http_client_reply.h>
 
 namespace {
 

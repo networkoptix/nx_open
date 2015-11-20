@@ -26,8 +26,8 @@
 #include <utils/common/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/socket_global.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
 #include "utils/common/timermanager.h"
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"

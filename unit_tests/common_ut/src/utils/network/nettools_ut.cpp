@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/network/nettools.h>
+#include <nx/network/nettools.h>
 
 #include <QTextStream>
 

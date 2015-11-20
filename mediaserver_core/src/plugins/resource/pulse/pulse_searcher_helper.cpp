@@ -1,10 +1,10 @@
 #ifdef ENABLE_PULSE_CAMERA
 
 #include "pulse_searcher_helper.h"
-#include "utils/network/nettools.h"
-#include "utils/network/system_socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
 #include "utils/common/sleep.h"
-#include "utils/network/mac_address.h"
+#include <nx/network/mac_address.h>
 #include "../pulse/pulse_resource.h"
 
 

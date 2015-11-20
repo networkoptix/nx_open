@@ -12,10 +12,10 @@
 #include <gtest/gtest.h>
 
 #include <common/common_globals.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/server/http_stream_socket_server.h>
-#include <utils/network/http/test_http_server.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/http/test_http_server.h>
 
 namespace nx_http {
 

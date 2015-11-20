@@ -9,7 +9,7 @@
 
 #include <utils/thread/mutex.h>
 
-#include <utils/network/system_socket.h>
+#include <nx/network/system_socket.h>
 
 #include "onvif_resource.h"
 #include "utils/common/log.h"

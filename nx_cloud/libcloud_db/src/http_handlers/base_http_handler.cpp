@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <utils/common/cpp14.h>
-#include <utils/network/http/buffer_source.h>
+#include <nx/network/http/buffer_source.h>
 
 
 namespace nx {

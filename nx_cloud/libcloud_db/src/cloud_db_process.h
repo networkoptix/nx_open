@@ -14,8 +14,8 @@
 
 #include <utils/common/stoppable.h>
 #include <utils/db/db_manager.h>
-#include <utils/network/connection_server/multi_address_server.h>
-#include <utils/network/http/server/http_stream_socket_server.h>
+#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
 
 #include "settings.h"
 

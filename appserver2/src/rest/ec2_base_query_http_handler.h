@@ -15,7 +15,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"
 #include "request_params.h"

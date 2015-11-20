@@ -13,7 +13,7 @@
 #include "utils/common/log.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
-#include "utils/network/compat_poll.h"
+#include <nx/network/compat_poll.h>
 
 #include "core/resource/network_resource.h"
 #include "core/resource/resource_media_layout.h"

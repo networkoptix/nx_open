@@ -115,6 +115,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
+                ${root.dir}/common_libs/nx_network/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
@@ -140,13 +141,13 @@ android: {
 #   QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
 #   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
 #   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
-# 
+#
 #   # Make sure moc files compile
 #   QMAKE_CXXFLAGS += -fpermissive
-# 
+#
 #   # Replace slashes in paths with backslashes
 #   OBJECTS_DIR ~= s,/,\\,g
-# 
+#
 #   # Work around CreateProcess limit on arg size
 #   QMAKE_AR_CMD = \
 #     del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\

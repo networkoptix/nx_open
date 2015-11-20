@@ -13,7 +13,7 @@
 #include <utils/common/model_functions.h>
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include "utils/common/delayed.h"
 
 namespace {

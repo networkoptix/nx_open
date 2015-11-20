@@ -15,8 +15,8 @@
 
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
-#include <utils/network/buffer.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/buffer.h>
+#include <nx/network/http/httptypes.h>
 
 #include "streaming_chunk_cache_key.h"
 

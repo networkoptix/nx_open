@@ -2,7 +2,7 @@
 
 #include "testcamera_resource_searcher.h"
 #include "testcamera_resource.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "testcamera_const.h"

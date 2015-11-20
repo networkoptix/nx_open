@@ -5,7 +5,7 @@
 
 #include <lib_cloud_db_main.h>
 
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 
 int main( int argc, char* argv[] )

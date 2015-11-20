@@ -6,7 +6,7 @@
 #include "get_system_name_rest_handler.h"
 
 #include <common/common_module.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 int QnGetSystemNameRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)

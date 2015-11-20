@@ -16,9 +16,9 @@
 #include "utils/common/timermanager.h"
 #include "utils/common/uuid.h"
 #include "utils/common/singleton.h"
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include "utils/thread/mutex.h"
-#include "utils/network/auth_restriction_list.h"
+#include <nx/network/auth_restriction_list.h>
 
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"

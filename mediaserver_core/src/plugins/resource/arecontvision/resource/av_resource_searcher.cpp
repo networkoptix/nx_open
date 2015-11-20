@@ -6,14 +6,14 @@
 
 #include "av_resource.h"
 #include "../tools/AVJpegHeader.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 
 #include "plugins/resource/mdns/mdns_resource_searcher.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 #define CL_BROAD_CAST_RETRY 1
 

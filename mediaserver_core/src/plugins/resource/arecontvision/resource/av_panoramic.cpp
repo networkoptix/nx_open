@@ -1,7 +1,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <utils/common/log.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 #include "core/resource/resource_media_layout.h"

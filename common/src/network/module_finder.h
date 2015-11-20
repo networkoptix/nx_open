@@ -7,7 +7,7 @@
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/singleton.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 #include <core/resource/resource_fwd.h>
 
 #include "module_information.h"

@@ -14,7 +14,7 @@
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
-#include <utils/network/socket.h>
+#include <nx/network/socket.h>
 
 
 //!Reads/writes random data to/from connection
