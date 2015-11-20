@@ -96,12 +96,18 @@ public:
     public:
         TimeLine(int timeGapMs) 
             : m_timePoint(std::numeric_limits<int64_t>::max()),
-              m_timeGapMs(timeGapMs)
+              m_timeGapMs(timeGapMs),
+              m_reverse(false)
         {}
 
         void addTimePeriod(int64_t startTime, int duration)
         {
             addTimePeriod(TimePeriod(startTime, duration));
+        }
+
+        void setReverseMode(bool value)
+        {
+            m_reverse = value;
         }
 
         void setTimeGapMs(int timeGap)
@@ -152,6 +158,9 @@ public:
             if (m_currentIt == m_timeLine.cend())
                 return true;
 
+            if (time < m_timePoint && !m_reverse || time > m_timePoint && m_reverse)
+                return false;
+
             qDebug() << "current time period: (" 
                      << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
                      << lit("%1 left to the end ) ")
@@ -194,6 +203,7 @@ public:
         int64_t                 m_timePoint;
         int64_t                 m_permTimePoint;
         int                     m_timeGapMs;
+        bool                    m_reverse;
     };
 
 public:
