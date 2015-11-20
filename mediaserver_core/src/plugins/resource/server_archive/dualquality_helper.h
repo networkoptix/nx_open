@@ -10,6 +10,8 @@
 
 #include <stack>
 
+#define uDebug() if (1) (void)(0); else qDebug()
+
 class QnDualQualityHelper
 {
 public:

@@ -14,8 +14,6 @@
 #include "core/resource/network_resource.h"
 #include "plugins/resource/avi/avi_resource.h"
 
-#define uDebug() if (0) (void)(0); else qDebug()
-
 static const qint64 MOTION_LOAD_STEP = 1000ll * 3600;
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int USEC_IN_MSEC = 1000;
@@ -153,6 +151,7 @@ void QnServerArchiveDelegate::close()
 
     m_currentChunkCatalog[QnServer::StoragePool::Normal].clear();
     m_currentChunkCatalog[QnServer::StoragePool::Backup].clear();
+    m_currentChunk = DeviceFileCatalog::Chunk();
 
     m_aviDelegate->close();
 
@@ -447,8 +446,10 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
 
 bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
-    if (newChunk.startTimeMs == -1)
+    if (newChunk.startTimeMs == -1) {
+        uDebug() << "newChunk.startTimeMs == -1. SwitchToChunk is returning false";
         return false;
+    }
     m_currentChunk = newChunk;
     
     m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;

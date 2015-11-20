@@ -161,7 +161,7 @@ public:
             if (time < m_timePoint && !m_reverse || time > m_timePoint && m_reverse)
                 return false;
 
-            qDebug() << "current time period: (" 
+            uDebug() << "current time period: (" 
                      << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
                      << lit("%1 left to the end ) ")
                             .arg(m_currentIt->startTimeMs + 
@@ -211,20 +211,20 @@ public:
 
     void print() const 
     {
-        qDebug() << lit("We have %1 files, %2 time periods")
+        uDebug() << lit("We have %1 files, %2 time periods")
                         .arg(m_fileCount)
                         .arg(m_timeLine.m_timeLine.size());
 
         qint64 prevStartTime;
         int prevDuration;
-        qDebug() << "Time periods details: ";
+        uDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin(); 
              it != m_timeLine.m_timeLine.cend(); 
              ++it) {
-            qDebug() << it->startTimeMs << " " << it->durationMs;
+            uDebug() << it->startTimeMs << " " << it->durationMs;
             if (it != m_timeLine.m_timeLine.cbegin()) {
-                qDebug() << "\tGap from previous: " 
+                uDebug() << "\tGap from previous: " 
                          << it->startTimeMs - (prevStartTime + prevDuration) << "ms (" 
                          << (it->startTimeMs - (prevStartTime + prevDuration))/1000
                          << "s )";
@@ -264,13 +264,13 @@ private:
             file.setPermissions(QFile::ReadOther | QFile::WriteOther);
             file.open(QIODevice::ReadWrite);
             if (!file.isOpen()) {
-                qDebug() << "Write header %1 failed";
+                uDebug() << "Write header %1 failed";
                 return;
             }
             file.seek(0x219);
             auto buf = file.read(11);
             if (memcmp(buf.constData(), "START_TIMED", 11) != 0) {
-                qDebug() << "Write header wrong offset %1";
+                uDebug() << "Write header wrong offset %1";
                 return;
             }
             file.seek(0x219 + 0xd);
@@ -292,7 +292,7 @@ private:
             QDir(root).mkpath(pathString);
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString) 
                                                       + fileName;
-            qDebug() << fullFileName;
+            uDebug() << fullFileName;
             if (curDuration == duration_1)
                 testFile_1.copy(fullFileName);
             else
@@ -526,7 +526,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     archiveDelegate.setQuality(MEDIA_Quality_High, true);
     archiveDelegate.seek(0, true);
 
-    qDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
+    uDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
@@ -539,7 +539,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             break;
     } 
 
-    qDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
+    uDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
     archiveDelegate.setQuality(MEDIA_Quality_Low, true);
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();
