@@ -154,6 +154,8 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::PlaySoundOnceAction:
     case QnBusiness::PlaySoundAction:
     case QnBusiness::SayTextAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
 
     default:
