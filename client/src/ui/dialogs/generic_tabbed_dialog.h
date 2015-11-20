@@ -50,6 +50,10 @@ public:
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
+
+signals:
+    void dialogClosed();
+
 protected:
     struct Page {
         int key;

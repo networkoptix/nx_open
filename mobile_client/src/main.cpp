@@ -3,6 +3,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
+#include <QtQuick/QQuickWindow>
 
 #include <time.h>
 
@@ -14,8 +15,6 @@
 #include "core/resource/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
 #include "utils/common/log.h"
-#include "utils/network/module_finder.h"
-#include "utils/network/multicast_module_finder.h"
 
 #include "context/context.h"
 #include "mobile_client/mobile_client_module.h"
@@ -25,6 +24,7 @@
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
 #include "ui/window_utils.h"
+#include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
@@ -74,12 +74,14 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
-    QScopedPointer<QObject> mainWindow(mainComponent.create());
+    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+
+    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     if (mainWindow) {
-        mainWindow->setProperty("width", 480);
-        mainWindow->setProperty("height", 800);
+        mainWindow->setWidth(480);
+        mainWindow->setHeight(800);
     }
 #endif
 
@@ -113,10 +115,6 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
-
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, false));
-    moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
-    moduleFinder->start();
 
     int result = runUi(application);
 

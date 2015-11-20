@@ -263,7 +263,6 @@ void QnRecordingStatisticsWidget::setServer(const QnMediaServerResourcePtr &serv
     if (m_server == server)
         return;
     m_server = server;
-    // loadDataToUi() is called from the dialog
 }
 
 void QnRecordingStatisticsWidget::loadDataToUi() {
@@ -320,6 +319,11 @@ void QnRecordingStatisticsWidget::updateColors() {
     ui->labelForecastColor->setAutoFillBackground(true);
     ui->labelForecastColor->update();
 }
+
+void QnRecordingStatisticsWidget::resetForecast() {
+    ui->checkBoxForecast->setChecked(false);
+}
+
 
 void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
 {

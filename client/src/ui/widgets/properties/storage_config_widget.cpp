@@ -59,6 +59,7 @@ namespace {
 
 
     const qint64 minDeltaForMessageMs = 1000ll * 3600 * 24;
+    const qint64 updateStatusTimeoutMs = 5 * 1000;
 
 } // anonymous namespace
 
@@ -88,6 +89,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , ui(new Ui::StorageConfigWidget())
     , m_server()
     , m_model(new QnStorageListModel())
+    , m_updateStatusTimer(new QTimer(this))
     , m_mainPool()
     , m_backupPool()
     , m_backupSchedule()
@@ -137,9 +139,15 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
         updateRebuildInfo();
     });
 
+    m_updateStatusTimer->setInterval(updateStatusTimeoutMs);
+    connect(m_updateStatusTimer, &QTimer::timeout, this, [this] {
+        qnServerStorageManager->checkStoragesStatus(m_server);
+    });
+
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
 
     retranslateUi();
+    updateBackupWidgetsVisibility();
 }
 
 void QnStorageConfigWidget::retranslateUi() {
@@ -160,8 +168,13 @@ void QnStorageConfigWidget::setReadOnlyInternal( bool readOnly ) {
 
 void QnStorageConfigWidget::showEvent( QShowEvent *event ) {
     base_type::showEvent(event);
-    if (m_server)
-        qnServerStorageManager->checkBackupStatus(m_server);
+    m_updateStatusTimer->start();
+    qnServerStorageManager->checkStoragesStatus(m_server);
+}
+
+void QnStorageConfigWidget::hideEvent( QHideEvent *event ) {
+    base_type::hideEvent(event);
+    m_updateStatusTimer->stop();
 }
 
 bool QnStorageConfigWidget::hasChanges() const {
@@ -194,6 +207,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
     m_model->addStorage(item);  /// Adds or updates storage model data
     updateColumnWidth();
+    updateBackupWidgetsVisibility();
 
     emit hasChangesChanged();
 }
@@ -207,30 +221,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
     QnStoragesPoolFilterModel* filterModel = new QnStoragesPoolFilterModel(isMainPool, this);
     filterModel->setSourceModel(m_model.data());
     tableView->setModel(filterModel);
-    
-    if (!isMainPool)
-    {
-        // Hides table when data model is empty
-        const auto onCountChanged = [this, tableView]()
-        {
-            const auto model = tableView->model();
-            const bool shouldBeVisible = (model && model->rowCount());
-            const bool currentVisible = tableView->isVisible();
-            if (currentVisible != shouldBeVisible)
-            {
-                tableView->setVisible(shouldBeVisible);
-                ui->backupControls->setVisible(shouldBeVisible);
-            }
-        };
 
-        tableView->setVisible(false);
-        ui->backupControls->setVisible(false);
-
-        connect(tableView->model(), &QAbstractItemModel::rowsRemoved, this, onCountChanged);
-        connect(tableView->model(), &QAbstractItemModel::rowsInserted, this, onCountChanged);
-        connect(tableView->model(), &QAbstractItemModel::modelReset, this, onCountChanged);
-    }
-    
     tableView->resizeColumnsToContents();
     tableView->horizontalHeader()->setSectionsClickable(false);
     tableView->horizontalHeader()->setStretchLastSection(false);
@@ -295,6 +286,7 @@ void QnStorageConfigWidget::loadStoragesFromResources() {
     m_model->setStorages(storages);
 
     updateColumnWidth();
+    updateBackupWidgetsVisibility();
 }
 
 void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
@@ -312,12 +304,14 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
         record.isBackup = !record.isBackup;
         m_model->updateStorage(record);
         updateColumnWidth();
+        updateBackupWidgetsVisibility();
     }
     else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
         if (record.isExternal)
             m_model->removeStorage(record);
         updateColumnWidth();
+        updateBackupWidgetsVisibility();
     }
 
     emit hasChangesChanged();
@@ -565,6 +559,17 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
     } 
 
     return result;
+}
+
+void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
+    using boost::algorithm::any_of;
+
+    bool shouldBeVisible = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
+        return info.isBackup;
+    });
+
+    ui->backupStoragesGroupBox->setVisible(shouldBeVisible);
+    ui->backupControls->setVisible(shouldBeVisible);
 }
 
 

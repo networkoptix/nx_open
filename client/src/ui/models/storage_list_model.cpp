@@ -300,6 +300,10 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
         if (other.url == data.url)
             return false;
 
+        /* Do not count storages from another pool. */
+        if (other.isBackup != data.isBackup)
+            return false;
+
         if (!other.isWritable)
             return false;
 

@@ -43,3 +43,7 @@ int navigationBarHeight() {
 bool isPhone() {
     return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone;
 }
+
+void setKeepScreenOn(bool keepScreenOn) {
+    [[UIApplication sharedApplication] setIdleTimerDisabled:(keepScreenOn ? YES : NO)];
+}

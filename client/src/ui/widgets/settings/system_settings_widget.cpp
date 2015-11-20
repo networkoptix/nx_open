@@ -5,12 +5,10 @@
 
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource/general_attribute_pool.h>
-#include <core/resource/media_server_resource.h>
-
-#include <ec2_statictics_reporter.h>
+//#include <core/resource_management/resource_pool.h>
+//#include <core/resource_management/resource_properties.h>
+// #include <core/resource/general_attribute_pool.h>
+// #include <core/resource/media_server_resource.h>
 
 #include <ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
@@ -46,9 +44,8 @@ QnSystemSettingsWidget::QnSystemSettingsWidget(QWidget *parent):
     connect(qnGlobalSettings, &QnGlobalSettings::disabledVendorsChanged,            this,   &QnSystemSettingsWidget::loadDataToUi);   
     connect(qnGlobalSettings, &QnGlobalSettings::serverAutoDiscoveryChanged,        this,   &QnSystemSettingsWidget::loadDataToUi);   
     connect(qnGlobalSettings, &QnGlobalSettings::auditTrailEnableChanged,           this,   &QnSystemSettingsWidget::loadDataToUi);   
-    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);   
-    
-    /* Statistics checkbox has a lot of reasons to be recalculated, let it behave inconsistently for a while. */
+    connect(qnGlobalSettings, &QnGlobalSettings::cameraSettingsOptimizationChanged, this,   &QnSystemSettingsWidget::loadDataToUi);
+    connect(qnGlobalSettings, &QnGlobalSettings::statisticsAllowedChanged,          this,   &QnSystemSettingsWidget::loadDataToUi);
 }
 
 QnSystemSettingsWidget::~QnSystemSettingsWidget() {
@@ -78,7 +75,7 @@ void QnSystemSettingsWidget::loadDataToUi() {
     ui->autoSettingsCheckBox->setChecked(qnGlobalSettings->isCameraSettingsOptimizationEnabled());
     ui->settingsWarningLabel->setVisible(false);
 
-    ui->statisticsReportCheckBox->setChecked(ec2::Ec2StaticticsReporter::isAllowed(qnResPool->getAllServers()));
+    ui->statisticsReportCheckBox->setChecked(qnGlobalSettings->isStatisticsAllowed());
 }
 
 void QnSystemSettingsWidget::applyChanges() {
@@ -95,16 +92,9 @@ void QnSystemSettingsWidget::applyChanges() {
 
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
     qnGlobalSettings->setCameraSettingsOptimizationEnabled(ui->autoSettingsCheckBox->isChecked());
+    qnGlobalSettings->setStatisticsAllowed(ui->statisticsReportCheckBox->isChecked());
+
     ui->settingsWarningLabel->setVisible(false);
-
-    const auto servers = qnResPool->getResources<QnMediaServerResource>();
-    bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
-
-    if (!ec2::Ec2StaticticsReporter::isDefined(servers)
-        || ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed) {
-        ec2::Ec2StaticticsReporter::setAllowed(servers, ui->statisticsReportCheckBox->isChecked());
-        propertyDictionary->saveParamsAsync(idListFromResList(servers));
-    }
 }
 
 bool QnSystemSettingsWidget::hasChanges() const  {
@@ -122,9 +112,11 @@ bool QnSystemSettingsWidget::hasChanges() const  {
     if (qnGlobalSettings->isCameraSettingsOptimizationEnabled() != ui->autoSettingsCheckBox->isChecked())
         return true;
 
-    const auto servers = qnResPool->getResources<QnMediaServerResource>();
-    bool statisticsReportAllowed = ec2::Ec2StaticticsReporter::isAllowed(servers);
-    if (ui->statisticsReportCheckBox->isChecked() != statisticsReportAllowed)
+    /* Always mark as 'has changes' if we have not still decided to allow the statistics. */
+    if (!qnGlobalSettings->isStatisticsAllowedDefined())
+        return true;
+
+    if (qnGlobalSettings->isStatisticsAllowed() != ui->statisticsReportCheckBox->isChecked())
         return true;
 
     if (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())

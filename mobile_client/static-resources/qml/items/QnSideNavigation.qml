@@ -123,15 +123,6 @@ QnNavigationDrawer {
                     onClicked: Main.openSettings()
                 }
 
-                Text {
-                    x: dp(16)
-                    height: dp(48)
-                    verticalAlignment: Text.AlignVCenter
-                    text: "© %1 %2".arg((new Date()).getFullYear()).arg(applicationInfo.organizationName)
-                    font.pixelSize: sp(13)
-                    color: QnTheme.sideNavigationCopyright
-                }
-
                 Item {
                     width: parent.width
                     height: navigationBarPlaceholder.height + dp(8)
