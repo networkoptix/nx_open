@@ -77,6 +77,12 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
         return;
     }
 
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
+        QnUserResourceList users = qnResPool->getResources<QnUserResource>(businessAction->getParams().additionalResources);
+        if (!users.isEmpty() && !users.contains(context()->user()))
+            return;
+    }  
+
     QnBusinessEventParameters params = businessAction->getRuntimeParams();
     QnBusiness::EventType eventType = params.eventType;
 
@@ -91,12 +97,12 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
     bool alwaysNotify = false;
     switch (businessAction->actionType()) {
+    case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::PlaySoundAction:
     //case QnBusiness::PlaySoundOnceAction: -- handled outside without notification
-    case QnBusiness::ShowOnAlarmLayoutAction:
-        //TODO: #GDM #Business check if camera is visible to us
         alwaysNotify = true;
         break;
+              
     default:
         break;
     }
