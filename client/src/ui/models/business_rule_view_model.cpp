@@ -780,7 +780,6 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         case QnBusiness::ExecutePtzPresetAction:
             return false; //TODO: #rvasilenko #ptz
         case QnBusiness::ShowTextOverlayAction:
-            return !m_actionParams.text.isEmpty();
         case QnBusiness::ShowOnAlarmLayoutAction:
             break;  // Just check cameras here
         default:
