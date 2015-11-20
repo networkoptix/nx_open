@@ -17,6 +17,7 @@
 #include <business/actions/abstract_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/camera_output_business_action.h>
+#include <business/actions/ptzpreset_business_action.h>
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/request_param.h>

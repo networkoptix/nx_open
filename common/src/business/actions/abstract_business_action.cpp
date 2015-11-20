@@ -70,6 +70,7 @@ namespace QnBusiness {
         case ShowPopupAction:
         case PlaySoundOnceAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
             return false;
 
         case CameraOutputAction:
@@ -77,7 +78,6 @@ namespace QnBusiness {
         case PanicRecordingAction:
         case PlaySoundAction:
         case BookmarkAction:
-        case ExecutePtzPresetAction:     //TODO: #rvasilenko #ptz
         case ShowTextOverlayAction:
         case ShowOnAlarmLayoutAction:
             return true;
@@ -96,9 +96,6 @@ namespace QnBusiness {
         case ShowTextOverlayAction:
         case ShowOnAlarmLayoutAction:
             return parameters.durationMs <= 0;
-
-        case ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
-            break;
 
         default:
             break;

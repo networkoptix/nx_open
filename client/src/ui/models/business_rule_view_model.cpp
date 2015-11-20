@@ -778,7 +778,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
         case QnBusiness::SayTextAction:
             return !m_actionParams.sayText.isEmpty();
         case QnBusiness::ExecutePtzPresetAction:
-            return false; //TODO: #rvasilenko #ptz
+            return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
+                    m_actionResources.size() == 1 &&
+                   !m_actionParams.presetId.isEmpty();
         case QnBusiness::ShowTextOverlayAction:
             return !m_actionParams.text.isEmpty();
         case QnBusiness::ShowOnAlarmLayoutAction:
@@ -902,7 +904,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
         return text;
     }
     case QnBusiness::ExecutePtzPresetAction:
-        break;  //TODO: #rvasilenko #ptz
+        return QnExecPtzPresetPolicy::getText(resources, detailed);
     case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
         break;  //TODO: #GDM #actions

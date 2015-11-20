@@ -46,7 +46,8 @@ struct QnBusinessActionParameters {
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
 
-    //ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
+    // exec PTZ preset action
+    QString presetId;
 
     /** 
      * \returns                        Whether all parameters have default values. 
@@ -55,7 +56,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(presetId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

@@ -11,6 +11,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
+#include "actions/ptzpreset_business_action.h"
 
 QVector<QnUuid> toIdList(const QnResourceList& list)
 {
@@ -76,9 +77,8 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
         case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
-
-        case QnBusiness::ExecutePtzPresetAction:
-            break;  //TODO: #rvasilenko #ptz
+        case QnBusiness::ExecutePtzPresetAction:    return QnAbstractBusinessActionPtr(new QnPtzPresetBusinessAction(runtimeParams));
+            
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
             break;  //TODO: #GDM #actions
