@@ -3,6 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <atomic>
 #include <map>
 
 #include <QtCore/QElapsedTimer>
