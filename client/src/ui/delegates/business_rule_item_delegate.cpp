@@ -22,6 +22,10 @@
 
 #include <utils/app_server_notification_cache.h>
 
+namespace {
+    enum { comboBoxMaxVisibleItems = 100 };
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnSelectResourcesDialogButton ------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +204,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     case QnBusiness::EventColumn:
     {
         QComboBox* comboBox = new QComboBox(parent);
+        comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
         for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
             comboBox->addItem(QnBusinessStringsHelper::eventName(eventType), eventType);
         }
@@ -209,6 +214,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
     {
         bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
         QComboBox* comboBox = new QComboBox(parent);
+        comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
         for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
             if (instantOnly && !QnBusiness::canBeInstant(actionType))
                 continue;
