@@ -69,8 +69,8 @@ void QnDualQualityHelper::findDataForTime(
     SearchStack searchStack;
 
     searchStack.emplace(backupCatalogAlt);
-    searchStack.emplace(backupCatalog);
     searchStack.emplace(normalCatalogAlt);
+    searchStack.emplace(backupCatalog);
     searchStack.emplace(normalCatalog);
 
     bool usePreciseFind = preciseFind || m_alreadyOnAltChunk; 
@@ -154,9 +154,9 @@ void QnDualQualityHelper::findDataForTimeHelper(
         QnServer::ChunksCatalog previousQuality = resultCatalog->getRole();
 
         if (currentQuality == QnServer::LowQualityCatalog)
-            findEps = FIRST_STREAM_FIND_EPS;
-        else
             findEps = SECOND_STREAM_FIND_EPS;
+        else
+            findEps = FIRST_STREAM_FIND_EPS;
     }
 
     if (previousDistance > currentDistance + findEps)
