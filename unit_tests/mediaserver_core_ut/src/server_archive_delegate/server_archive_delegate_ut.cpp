@@ -27,6 +27,31 @@ const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
 const QString hqFolder("hi_quality");
 
+bool recursiveClean(const QString &path) 
+{
+    QDir dir(path);
+    QFileInfoList entryList = dir.entryInfoList(
+            QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, 
+            QDir::DirsFirst); 
+
+    for (auto &entry : entryList) {
+        auto tmp = entry.absoluteFilePath();
+        if (entry.isDir()) {
+             if (!recursiveClean(entry.absoluteFilePath()))
+                return false;
+        } 
+        else if (entry.isFile()) {
+            QFile f(entry.absoluteFilePath());
+            f.setPermissions(QFile::ReadOther | QFile::WriteOther);
+            auto result = f.remove();
+            if (!result)
+                return false;
+        }
+    }
+    dir.rmpath(path);
+    return true;
+};
+
 class TestHelper
 {
    static const int DEFAULT_TIME_GAP_MS = 15001;
@@ -37,16 +62,12 @@ public:
           m_timeLine(DEFAULT_TIME_GAP_MS),
           m_fileCount(fileCount)
     {
-        recursiveClean(qApp->applicationDirPath() + "/tmp");
         generateTestData();
         createStorages();
         loadMedia();
     }
 
-    ~TestHelper()
-    {
-        recursiveClean(qApp->applicationDirPath() + "/tmp");
-    }
+    ~TestHelper() {}
 
     struct TimePeriod
     {
@@ -350,31 +371,6 @@ private:
         }
     }
 
-
-    bool recursiveClean(const QString &path) const
-    {
-        QDir dir(path);
-        QFileInfoList entryList = dir.entryInfoList(
-                QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, 
-                QDir::DirsFirst); 
-
-        for (auto &entry : entryList) {
-            auto tmp = entry.absoluteFilePath();
-            if (entry.isDir()) {
-                 if (!recursiveClean(entry.absoluteFilePath()))
-                    return false;
-            } 
-            else if (entry.isFile()) {
-                QFile f(entry.absoluteFilePath());
-                f.setPermissions(QFile::ReadOther | QFile::WriteOther);
-                auto result = f.remove();
-                if (!result)
-                    return false;
-            }
-        }
-        dir.rmpath(path);
-        return true;
-    };
  private:
     QStringList m_storageUrls;
     TimeLine m_timeLine;
@@ -382,6 +378,10 @@ private:
     std::vector<QnStorageResourcePtr> m_storages;
 };
 
+TEST(ServerArchiveDelegate_playback_test, Clean_before)
+{
+    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
+}
 
 TEST(ServerArchiveDelegate_playback_test, TestHelper)
 {
@@ -462,7 +462,6 @@ static int lockmgr(void **mtx, enum AVLockOp op)
 
 static void ffmpegInit()
 {
-    //avcodec_init();
     av_register_all();
 
     if(av_lockmgr_register(lockmgr) != 0)
@@ -552,4 +551,9 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         else
             break;
     } 
+}
+
+TEST(ServerArchiveDelegate_playback_test, Clean_after)
+{
+    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
 }
