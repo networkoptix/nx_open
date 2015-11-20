@@ -2,7 +2,7 @@
 
 #include "cpul_tftp_dataprovider.h"
 
-#include <utils/thread/mutex.h>
+#include <QtCore/QMutex>
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
@@ -54,8 +54,6 @@ m_prevDataReadResult(CameraDiagnostics::ErrorCode::noError)
 
     QnPlAreconVisionResourcePtr avRes = res.dynamicCast<QnPlAreconVisionResource>();
 
-    m_panoramic = avRes->isPanoramic();
-    m_dualsensor = avRes->isDualSensor();
     m_model = avRes->getModel();
     m_tftp_client = 0;
 }
@@ -68,7 +66,7 @@ AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
 
 CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamConnection()
 {
-    QnMutexLocker lk( &m_mutex );
+    QMutexLocker lk( &m_mutex );
     return m_prevDataReadResult;
 }
 
@@ -83,141 +81,54 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
             return metadata;
     }
 
+    QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+
+    const bool h264 = isH264();
+    bool resolutionFULL = m_streamParam.value("resolution").toString() == QLatin1String("full");
+    int quality = 0;
+    QSize selectedResolution;
     QString request;
-
-
-    int left;
-    int top;
-    int right;
-    int bottom;
-
-    int width;
-    int height;
-
-    int quality;
-
-    bool resolutionFULL;
-    int streamID;
-
-    int bitrate = 0;
-
-    bool h264 =  isH264();
-
     {
-            QnMutexLocker mutex( &m_mutex );
-
-            if (!m_streamParam.contains("Quality") || !m_streamParam.contains("resolution") ||
-                !m_streamParam.contains("image_left") || !m_streamParam.contains("image_top") ||
-                !m_streamParam.contains("image_right") || !m_streamParam.contains("image_bottom") ||
-                (h264 && !m_streamParam.contains("streamID")))
-            {
-                NX_LOG("Error!!! parameter is missing in stream params.", cl_logERROR);
-                //return QnAbstractMediaDataPtr(0);
-            }
-
-            // =========
-            left = m_streamParam.value("image_left").toInt();
-            top = m_streamParam.value("image_top").toInt();
-            right = m_streamParam.value("image_right").toInt();
-            bottom = m_streamParam.value("image_bottom").toInt();
-
-            if (m_dualsensor && m_black_white) //3130 || 3135
-            {
-                right = right/3*2;
-                bottom = bottom/3*2;
-
-                right = right/32*32;
-                bottom = bottom/16*16;
-
-                right = qMin(1280, right);
-                bottom = qMin(1024, bottom);
-
-            }
-
-            //right = 1280;
-            //bottom = 1024;
-
-            //right/=2;
-            //bottom/=2;
-
-            width = right - left;
-            height = bottom - top;
-
-            if (m_last_cam_width==0)
-                m_last_cam_width = width;
-
-            if (m_last_cam_height==0)
-                m_last_cam_height= height;
-
-            quality = m_streamParam.value("Quality").toInt();
-            //quality = getQuality();
-
-            resolutionFULL = (m_streamParam.value("resolution").toString() == QLatin1String("full"));
-
-            streamID = 0;
-            if (h264)
-            {
-                if (width!=m_last_width || height!=m_last_height || m_last_resolution!=resolutionFULL)
-                {
-                    // if this is H.264 and if we changed image size, we need to request I frame.
-                    // camera itself shoud end I frame. but just in case.. to be on the save side...
-
-                    m_last_resolution = resolutionFULL;
-                    m_last_width = width;
-                    m_last_height = height;
-
-                    setNeedKeyData();
-                }
-
-                streamID = m_streamParam.value("streamID").toInt();
-                //bitrate = m_streamParam.value("Bitrate").toInt();
-                bitrate = getBitrateMbps();
-            }
-            // =========
-
+        QMutexLocker lk(&m_mutex);
+        request = netRes->generateRequestString(
+            m_streamParam,
+            h264,
+            resolutionFULL,
+            m_black_white,
+            &quality,
+            &selectedResolution);
     }
-
-    if (h264)
-        quality=37-quality; // for H.264 it's not quality; it's qp
-
-    if (!h264)
-        request += QLatin1String("image");
-    else
-        request += QLatin1String("h264");
-
-    request += QLatin1String("?res=");
-    if (resolutionFULL)
-        request += QLatin1String("full");
-    else
-        request += QLatin1String("half");
-
-    request += QLatin1String(";x0=") + QString::number(left)
-             + QLatin1String(";y0=") + QString::number(top)
-             + QLatin1String(";x1=") + QString::number(right)
-             + QLatin1String(";y1=") + QString::number(bottom);
-
-    if (!h264)
-        request += QLatin1String(";quality=");
-    else
-        request += QLatin1String(";qp=");
-
-    request += QString::number(quality) + QLatin1String(";doublescan=0") + QLatin1String(";ssn=") + QString::number(streamID);
-
-    //h264?res=full;x0=0;y0=0;x1=1600;y1=1184;qp=27;doublescan=0;iframe=0;ssn=574;netasciiblksize1450
-    //request = "image?res=full;x0=0;y0=0;x1=800;y1=600;quality=10;doublescan=0;ssn=4184;";
-
     if (h264)
     {
         if (needKeyData())
             request += QLatin1String(";iframe=1;");
         else
             request += QLatin1String(";iframe=0;");
-
-        if (bitrate)
-            request += QLatin1String("bitrate=") + QString::number(bitrate) + QLatin1Char(';');
     }
 
-    QnPlAreconVisionResourcePtr netRes = getResource().dynamicCast<QnPlAreconVisionResource>();
+
+    if (m_last_cam_width == 0)
+        m_last_cam_width = selectedResolution.width();
+    if (m_last_cam_height == 0)
+        m_last_cam_height = selectedResolution.height();
+
+    if (h264)
+    {
+        if (selectedResolution.width() != m_last_width ||
+            selectedResolution.height() != m_last_height ||
+            m_last_resolution != resolutionFULL)
+        {
+            // if this is H.264 and if we changed image size, we need to request I frame.
+            // camera itself shoud end I frame. but just in case.. to be on the safe side...
+
+            m_last_resolution = resolutionFULL;
+            m_last_width = selectedResolution.width();
+            m_last_height = selectedResolution.height();
+
+            setNeedKeyData();
+        }
+    }
+
     if (m_tftp_client == 0 || m_tftp_client->getHostAddress() != netRes->getHostAddress()) {
         delete m_tftp_client;
         m_tftp_client = new CLSimpleTFTPClient(netRes->getHostAddress(),  m_timeout, 3);
@@ -259,7 +170,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     int readed = m_tftp_client->read(request, img);
     {
-        QnMutexLocker lk( &m_mutex );
+        QMutexLocker lk( &m_mutex );
         m_prevDataReadResult = m_tftp_client->prevIOResult();
     }
 
@@ -417,52 +328,9 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
 QnMetaDataV1Ptr AVClientPullSSTFTPStreamreader::getCameraMetadata()
 {
-    QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QString mdresult;
-    if (!getResource()->getParamPhysical(lit("mdresult"), mdresult))
-        return QnMetaDataV1Ptr(0);
-
-    if (mdresult == lit("no motion"))
-        return motion; // no motion detected
-
-
-    const QnPlAreconVisionResource* avRes = dynamic_cast<QnPlAreconVisionResource*>(getResource().data());
-    int zones = avRes->totalMdZones() == 1024 ? 32 : 8;
-
-    QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
-    if (md.size() < zones*zones)
-        return QnMetaDataV1Ptr(0);
-
-    int pixelZoneSize = avRes->getZoneSite() * 32;
-    if (pixelZoneSize == 0)
-        return QnMetaDataV1Ptr(0);
-
-    QVariant maxSensorWidth = getResource()->getProperty(lit("MaxSensorWidth"));
-    QVariant maxSensorHight = getResource()->getProperty(lit("MaxSensorHeight"));
-    
-    QRect imageRect(0, 0, maxSensorWidth.toInt(), maxSensorHight.toInt());
-    QRect zeroZoneRect(0, 0, pixelZoneSize, pixelZoneSize);
-
-    for (int x = 0; x < zones; ++x)
-    {
-        for (int y = 0; y < zones; ++y)
-        {
-            int index = y*zones + x;
-            QString m = md.at(index) ;
-
-
-            if (m == lit("00") || m == lit("0"))
-                continue;
-
-            QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
-
-            motion->mapMotion(imageRect, currZoneRect);
-
-        }
-    }
-
-    //motion->m_duration = META_DATA_DURATION_MS * 1000 ;
-    motion->m_duration = 1000*1000*1000; // 1000 sec 
+    auto motion = static_cast<QnPlAreconVisionResource*>(getResource().data())->getCameraMetadata();
+    if (!motion)
+        return motion;
     filterMotionByMask(motion);
     return motion;
 }

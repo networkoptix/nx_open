@@ -1658,6 +1658,10 @@ void MediaServerProcess::run()
 
     qnCommon->setModuleGUID(serverGuid());
 
+    qnCommon->setArecontRTSPEnabled(settings->value(
+        nx_ms_conf::ARECONT_RTSP_ENABLED,
+        nx_ms_conf::DEFAULT_ARECONT_RTSP_ENABLED).toBool());
+
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
     bool isLocal = isLocalAppServer(appserverHostString);

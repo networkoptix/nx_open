@@ -7,8 +7,10 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
+#include "utils/network/http/asynchttpclient.h"
 #include "utils/network/simple_http_client.h"
 #include "core/datapacket/media_data_packet.h"
+
 
 class QDomElement;
 
@@ -54,11 +56,31 @@ public:
 
     virtual void setIframeDistance(int frames, int timems); // sets the distance between I frames
 
+    virtual bool setRelayOutputState(
+        const QString& ouputID,
+        bool activate,
+        unsigned int autoResetTimeoutMS) override;
+
     //virtual QnMediaInfo getMediaInfo() const;
 
     int totalMdZones() const;
     bool isH264() const;
     int getZoneSite() const;
+
+    QnMetaDataV1Ptr getCameraMetadata();
+    QString generateRequestString(
+        const QHash<QByteArray, QVariant>& streamParam,
+        bool h264,
+        bool resolutionFULL,
+        bool blackWhite,
+        int* const outQuality,
+        QSize* const outResolution);
+
+    static QnPlAreconVisionResource* createResourceByName(const QString &name);
+    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
+
+    static bool isPanoramic(QnResourceTypePtr resType);
+
 protected:
     virtual CameraDiagnostics::Result initInternal() override;
 
@@ -69,11 +91,10 @@ protected:
     virtual bool setParamPhysical(const QString &id, const QString &value) override;
 
     virtual void setMotionMaskPhysical(int channel) override;
-public:
-    static QnPlAreconVisionResource* createResourceByName(const QString &name);
-    static QnPlAreconVisionResource* createResourceByTypeId(QnUuid rt);
+    virtual bool startInputPortMonitoringAsync(std::function<void(bool)>&& completionHandler) override;
+    virtual void stopInputPortMonitoringAsync() override;
 
-    static bool isPanoramic(QnResourceTypePtr resType);
+    virtual bool isRTSPSupported() const;
 
 protected:
     QString m_description;
@@ -81,6 +102,14 @@ protected:
 private:
     int m_totalMdZones;
     int m_zoneSite;
+    int m_channelCount;
+    int m_prevMotionChannel;
+    bool m_dualsensor;
+    bool m_inputPortState;
+    nx_http::AsyncHttpClientPtr m_relayInputClient;
+
+    bool getParamPhysical2(int channel, const QString& name, QVariant &val);
+    void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
 };
 
 typedef QnSharedResourcePointer<QnPlAreconVisionResource> QnPlAreconVisionResourcePtr;
