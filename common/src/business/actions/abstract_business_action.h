@@ -39,7 +39,8 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessAction();
-    QnBusiness::ActionType actionType() const { return m_actionType; }
+
+    QnBusiness::ActionType actionType() const;
 
     /**
      * Resource depend of action type.

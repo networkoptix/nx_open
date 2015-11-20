@@ -48,7 +48,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
-#include <ui/graphics/items/overlays/bookmarks_overlay_widget.h>
+#include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -77,6 +77,21 @@
 
 namespace 
 {
+    QString makeP(const QString &text
+        , int pixelSize
+        , bool isBold = false
+        , bool isItalic = false)
+    {
+        static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %2px; font-weight: %3; font-style: %4; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%1</p>");
+
+        if (text.isEmpty())
+            return QString();
+
+        const QString boldValue = (isBold ? lit("bold") : lit("normal"));
+        const QString italicValue (isItalic ? lit("italic") : lit("normal"));
+        return kPTag.arg(text, QString::number(pixelSize), boldValue, italicValue);
+    }
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -163,10 +178,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
     , m_bookmarks()
-    , m_bookmarksOverlayWidget(nullptr)
+    , m_compositeTextOverlay(new QnCompositeTextOverlay())
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
     , m_ioLicenceStatusHelper() /// Will be created only for IO modules
+    , m_colors()
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -260,10 +276,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
-    if (m_camera) {
-        m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
-        addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
-    }
+
+    addOverlayWidget(m_compositeTextOverlay, Visible, true, true);
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
@@ -322,6 +336,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
+
+    m_compositeTextOverlay->init(m_camera);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget() {
@@ -930,6 +946,16 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     emit dewarpingParamsChanged();
 }
 
+void QnMediaResourceWidget::setColors(const QnMediaResourceWidgetColors &colors)
+{
+    m_colors = colors;
+}
+
+QnMediaResourceWidgetColors QnMediaResourceWidget::colors() const
+{
+    return m_colors;
+}
+
 float QnMediaResourceWidget::visualAspectRatio() const {
     if (!resource())
         return base_type::visualAspectRatio();
@@ -1335,6 +1361,8 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     } else {
         resumeHomePtzController();
     }
+
+    updateBookmarksMode();
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1584,8 +1612,12 @@ void QnMediaResourceWidget::updateBookmarksFilter() {
 }
 
 void QnMediaResourceWidget::updateBookmarksMode() {
-    bool enable = navigator()->bookmarksModeEnabled() && !m_camera.isNull();
+    const bool isLive = (m_display && m_display->camDisplay() 
+        ? m_display->camDisplay()->isRealTimeSource() : false);
 
+    bool enable = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
+
+    updateBookmarksVisibility();
     if (!m_bookmarksQuery.isNull() == enable)
         return;
 
@@ -1605,11 +1637,9 @@ void QnMediaResourceWidget::updateBookmarksMode() {
 }
 
 void QnMediaResourceWidget::updateBookmarks() {
-    if (!m_bookmarksOverlayWidget)
-        return;
 
     if (!m_bookmarksQuery) {
-        m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
+        m_compositeTextOverlay->resetModeData(QnCompositeTextOverlay::kBookmarksMode);
         return;
     }
 
@@ -1620,15 +1650,36 @@ void QnMediaResourceWidget::updateBookmarks() {
     const auto cached = m_bookmarksQuery->cachedBookmarks();
     const auto bookmarks = getBookmarksAtPosition(cached, time);
 
-    m_bookmarksOverlayWidget->setBookmarks(bookmarks);
+    const auto makeTextItemData = [this](const QnCameraBookmarkList &bookmarks)
+    {
+        static QnHtmlTextItemOptions options = QnHtmlTextItemOptions(
+            m_colors.bookmarkColors.background, false, 4, 8, 250);
+
+        static const auto kBookTemplate = lit("<html><body>%1%2</body></html>");
+
+        QnOverlayTextItemDataList data;
+        for (const auto bookmark: bookmarks)
+        {
+            const auto bookmarkHtml = kBookTemplate.arg(
+                makeP(bookmark.name, 16, true)
+                , makeP(bookmark.description, 12));
+
+            data.push_back(QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options));
+
+        }
+        return data;
+    };
+
+    m_compositeTextOverlay->setModeData(QnCompositeTextOverlay::kBookmarksMode
+        , makeTextItemData(bookmarks));
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {
-    if (!m_bookmarksOverlayWidget)
-        return;
 
-    const auto visibility = (m_bookmarksQuery ? Visible : Invisible);
-    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
+    const auto mode = (m_bookmarksQuery ? QnCompositeTextOverlay::kBookmarksMode 
+        : QnCompositeTextOverlay::kTextAlaramsMode);
+
+    m_compositeTextOverlay->setMode(mode);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const {

@@ -167,6 +167,10 @@ QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
 }
 
+QnBusiness::ActionType QnAbstractBusinessAction::actionType() const {
+    return m_actionType; 
+}
+
 void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
     m_resources = resources;
 }

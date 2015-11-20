@@ -27,11 +27,13 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
-class QnBookmarksOverlayWidget;
+class QnCompositeTextOverlay;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
     typedef QnResourceWidget base_type;
+
+    Q_PROPERTY(QnMediaResourceWidgetColors colors READ colors WRITE setColors NOTIFY colorsChanged);
 
 public:
     static const Button ScreenshotButton    = static_cast<Button>(0x008);
@@ -124,11 +126,16 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    void setColors(const QnMediaResourceWidgetColors &colors);
+
+    QnMediaResourceWidgetColors colors() const;
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
+    void colorsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -267,13 +274,15 @@ private:
 
     QnCameraBookmarkList m_bookmarks;
     QnCameraBookmarksQueryPtr m_bookmarksQuery;
-    QnBookmarksOverlayWidget *m_bookmarksOverlayWidget;
+    QnCompositeTextOverlay *m_compositeTextOverlay;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
+
+    QnMediaResourceWidgetColors m_colors;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

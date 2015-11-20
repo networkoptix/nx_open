@@ -138,6 +138,12 @@ QnBookmarkColors::QnBookmarkColors()
 {
 }
 
+QnMediaResourceWidgetColors::QnMediaResourceWidgetColors()
+    : resourceWidgetColors()
+    , bookmarkColors()
+{
+}
+
 QnLicensesListModelColors::QnLicensesListModelColors() {
     normal = QColor(255, 255, 255, 255);
     warning = QColor(Qt::yellow);
