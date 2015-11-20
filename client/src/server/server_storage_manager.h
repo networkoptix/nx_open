@@ -31,7 +31,9 @@ public:
 
     bool backupServerStorages(const QnMediaServerResourcePtr &server);
     bool cancelBackupServerStorages(const QnMediaServerResourcePtr &server);
-    void checkBackupStatus(const QnMediaServerResourcePtr &server);
+
+    /** Force check all storage status data (space, rebuild, backup) */
+    void checkStoragesStatus(const QnMediaServerResourcePtr &server);
 
     void saveStorages(const QnStorageResourceList &storages);
     void deleteStorages(const ec2::ApiIdDataList &ids);

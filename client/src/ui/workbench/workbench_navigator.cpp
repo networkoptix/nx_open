@@ -74,6 +74,8 @@ extern "C"
 #include "plugins/resource/archive/abstract_archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
+#include <utils/common/delayed.h>
+
 namespace {
 
     const int cameraHistoryRetryTimeoutMs = 5 * 1000;
@@ -435,14 +437,21 @@ void QnWorkbenchNavigator::initialize() {
         connect(layout, &QnWorkbenchLayout::itemAdded, this, processLayoutItem);
 
         connect(layout, &QnWorkbenchLayout::itemRemoved, this
-            , [this, extractCamera](QnWorkbenchItem *item)
+            , [this, layout, extractCamera](QnWorkbenchItem *item)
         {
             const auto camera = extractCamera(item);
             if (!camera)
                 return;
 
+            int sameCamerasCount = 0;
+            for (auto layoutItem: layout->items())
+            {
+                if (extractCamera(layoutItem) == camera)
+                    ++sameCamerasCount;
+            }
+
             const auto query = m_bookmarkQueries.getQuery(camera);
-            if (query == m_currentQuery)
+            if ((query == m_currentQuery) && !sameCamerasCount)
                 resetCurrentBookmarkQuery();
 
             m_bookmarkQueries.removeQuery(camera);
@@ -758,6 +767,7 @@ void QnWorkbenchNavigator::addSyncedWidget(QnMediaResourceWidget *widget) {
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods();
     updateHistoryForCamera(widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>());
+    updateLines();
 }
 
 void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
@@ -788,6 +798,7 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     updateCurrentWidget();
     if (workbench() && !workbench()->isInLayoutChangeProcess())
         updateSyncedPeriods(); /* Full rebuild on widget removing. */
+    updateLines();
 }
 
 QnResourceWidget *QnWorkbenchNavigator::currentWidget() const {
@@ -1044,9 +1055,13 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
         m_bookmarkAggregation->clear();
 
-        /* For non-cameras widgets query will be properly reset here. */
-        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
-        setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
+        if (bookmarksModeEnabled())
+        {
+            /* For non-cameras widgets query will be properly reset here. */
+            const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
+            setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
+        }
+
     }
 
     m_pausedOverride = false;
@@ -1066,8 +1081,11 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
         m_timeSlider->finishAnimations();
 
     if(m_currentMediaWidget) {
-        QMetaObject::invokeMethod(this, "updatePlaying", Qt::QueuedConnection); // TODO: #Elric evil hacks...
-        QMetaObject::invokeMethod(this, "updateSpeed", Qt::QueuedConnection);
+        executeDelayed([this] {
+            //TODO: #rvasilenko why should we make these delayed calls at all?
+            updatePlaying();
+            updateSpeed();
+        });
     }
 
     updateLocalOffset();
@@ -1362,22 +1380,19 @@ void QnWorkbenchNavigator::updateLines() {
 
     bool isZoomed = display()->widget(Qn::ZoomedRole) != NULL;
 
-    auto syncedCameras = [this]() {
-        QnVirtualCameraResourceList result;
-        for(const QnResourceWidget *widget: m_syncedWidgets) {
-            if (!widget->resource())
-                continue;
-            if (QnVirtualCameraResourcePtr camera = widget->resource().dynamicCast<QnVirtualCameraResource>())
-                result << camera;
-        }
-        if (QnVirtualCameraResourcePtr camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>())
-            result << camera;
-        return result;
-    };
-
     if(m_currentWidgetFlags & WidgetSupportsPeriods) {
+
+        /* Get the list of all resources, that potentially can be displayed on timeline. */
+        auto syncedCameras = [this]() {
+            QSet<QnResourcePtr> resources; /* Removing duplicates */
+            for (QnResourceWidget* widget: m_syncedWidgets)
+                resources.insert(widget->resource());
+            resources.insert(m_currentWidget->resource());
+            return QnResourceList(resources.toList()).filtered<QnVirtualCameraResource>();        
+        }();
+
         m_timeSlider->setLineVisible(CurrentLine, true);
-        m_timeSlider->setLineVisible(SyncedLine, !isZoomed);
+        m_timeSlider->setLineVisible(SyncedLine, !isZoomed && syncedCameras.size() > 1);
 
         m_timeSlider->setLineComment(CurrentLine, m_currentWidget->resource()->getName());
         m_timeSlider->setLineComment(SyncedLine, QnDeviceDependentStrings::getNameFromSet(
@@ -1385,7 +1400,7 @@ void QnWorkbenchNavigator::updateLines() {
                 tr("All Devices"),
                 tr("All Cameras"),
                 tr("All IO Modules")
-                ), syncedCameras()
+                ), syncedCameras
             ));
     } else {
         m_timeSlider->setLineVisible(CurrentLine, false);

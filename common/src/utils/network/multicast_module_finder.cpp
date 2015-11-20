@@ -38,6 +38,7 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
 :
+    m_clientMode(clientOnly),
     m_serverSocket(nullptr),
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
     m_keepAliveMultiply(keepAliveMultiply == 0 ? defaultKeepAliveMultiply : keepAliveMultiply),
@@ -49,20 +50,12 @@ QnMulticastModuleFinder::QnMulticastModuleFinder(
     m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
     m_cachedResponse(MAX_CACHE_SIZE_BYTES)
 {
-    if (!clientOnly) {
-        m_serverSocket = new UDPSocket();
-        m_serverSocket->setReuseAddrFlag(true);
-        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
-    }
     connect(qnCommon, &QnCommonModule::moduleInformationChanged, this, &QnMulticastModuleFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }
 
 QnMulticastModuleFinder::~QnMulticastModuleFinder() {
     stop();
-
-    qDeleteAll(m_clientSockets);
-    m_clientSockets.clear();
-    delete m_serverSocket;
+    clearInterfaces();
 }
 
 bool QnMulticastModuleFinder::isValid() const {
@@ -118,7 +111,27 @@ void QnMulticastModuleFinder::updateInterfaces() {
     for (const QHostAddress &address: addressesToRemove) {
         UDPSocket *socket = m_clientSockets.take(address);
         m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
+        if (m_serverSocket)
+            m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), address.toString());
     }
+}
+
+void QnMulticastModuleFinder::clearInterfaces() {
+    QnMutexLocker lk(&m_mutex);
+
+    if (m_serverSocket) {
+        for (auto it = m_clientSockets.begin(); it != m_clientSockets.end(); ++it)
+            m_serverSocket->leaveGroup(m_multicastGroupAddress.toString(), it.key().toString());
+
+        m_pollSet.remove(m_serverSocket->implementationDelegate(), aio::etRead);
+        m_serverSocket.reset();
+    }
+
+    for (UDPSocket *socket: m_clientSockets) {
+        m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
+        delete socket;
+    }
+    m_clientSockets.clear();
 }
 
 void QnMulticastModuleFinder::pleaseStop() {
@@ -224,12 +237,17 @@ void QnMulticastModuleFinder::run() {
     initSystemThreadId();
     NX_LOG(lit("QnMulticastModuleFinder started"), cl_logDEBUG1);
 
-
     QByteArray revealRequest = RevealRequest::serialize();
 
-    //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
-    if (m_serverSocket) {
-        if (!m_pollSet.add(m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket))
+    if (!m_clientMode) {
+        QnMutexLocker lk(&m_mutex);
+
+        m_serverSocket.reset(new UDPSocket());
+        m_serverSocket->setReuseAddrFlag(true);
+        m_serverSocket->bind(SocketAddress(HostAddress::anyHost, m_multicastGroupPort));
+
+        //TODO #ak currently PollSet is designed for internal usage in aio, that's why we have to use socket->implementationDelegate()
+        if (!m_pollSet.add(m_serverSocket->implementationDelegate(), aio::etRead, m_serverSocket.data()))
             Q_ASSERT(false);
     }
 
@@ -282,18 +300,14 @@ void QnMulticastModuleFinder::run() {
 
             UDPSocket* udpSocket = static_cast<UDPSocket*>(it.userData());
 
-            if (udpSocket == m_serverSocket)
+            if (udpSocket == m_serverSocket.data())
                 processDiscoveryRequest(udpSocket);
             else
                 processDiscoveryResponse(udpSocket);
         }
     }
 
-    QnMutexLocker lk( &m_mutex );
-    for (UDPSocket *socket: m_clientSockets)
-        m_pollSet.remove(socket->implementationDelegate(), aio::etRead);
-    if (m_serverSocket)
-        m_pollSet.remove(m_serverSocket->implementationDelegate(), aio::etRead);
+    clearInterfaces();
 
     NX_LOG(lit("QnMulticastModuleFinder stopped"), cl_logDEBUG1);
 }

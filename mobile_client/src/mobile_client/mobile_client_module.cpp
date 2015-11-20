@@ -13,6 +13,8 @@
 #include "mobile_client/mobile_client_settings.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/app_info.h"
+#include "utils/network/module_finder.h"
+#include "utils/network/multicast_module_finder.h"
 #include "core/resource/mobile_client_camera_factory.h"
 #include "mobile_client/mobile_client_message_processor.h"
 #include "watchers/user_watcher.h"
@@ -56,8 +58,27 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
 
     QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+
+    QnModuleFinder *moduleFinder = new QnModuleFinder(true, false);
+    common->store<QnModuleFinder>(moduleFinder);
+    moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
+    moduleFinder->start();
+
+    connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {
+        switch (state) {
+        case Qt::ApplicationActive:
+            moduleFinder->start();
+            break;
+        case Qt::ApplicationSuspended:
+            moduleFinder->pleaseStop();
+            break;
+        default:
+            break;
+        }
+    });
 }
 
 QnMobileClientModule::~QnMobileClientModule() {
+    disconnect(qApp, nullptr, this, nullptr);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
 }

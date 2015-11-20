@@ -15,7 +15,7 @@
 #include <QtGui/QImageWriter>
 
 #include <api/network_proxy_factory.h>
-#include <ec2_statictics_reporter.h>
+#include <api/global_settings.h>
 
 #include <business/business_action_parameters.h>
 
@@ -135,6 +135,7 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
+#include <utils/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 
@@ -2377,8 +2378,8 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
     if (servers.isEmpty())
         return;
 
-    /* Check if user already made a decision. */
-    if (ec2::Ec2StaticticsReporter::isDefined(servers))
+    /* Check if user has already made a decision. */
+    if (qnGlobalSettings->isStatisticsAllowedDefined())
         return;
 
     /* User cannot disable statistics collecting, so don't make him sorrow. */
@@ -2399,8 +2400,8 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
            "If you would like to disable this feature you can do so in the System Settings dialog.")
            );
 
-    ec2::Ec2StaticticsReporter::setAllowed(servers, true);
-    propertyDictionary->saveParamsAsync(idListFromResList(servers));
+    qnGlobalSettings->setStatisticsAllowed(true);
+    qnGlobalSettings->synchronizeNow();
 }
 
 
