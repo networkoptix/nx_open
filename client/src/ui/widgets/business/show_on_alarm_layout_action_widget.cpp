@@ -15,12 +15,7 @@
 namespace {
 
     QnUserResourceList usersFromIds(const std::vector<QnUuid> &ids) {
-        QnUserResourceList result;
-        for (const QnUuid &id: ids) {
-            if (QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(id))
-                result << user;
-        }  
-        return result;
+        return qnResPool->getResources<QnUserResource>(ids);
     }
 
 }
