@@ -88,7 +88,7 @@ QString QnStorageResource::getUniqueId() const
 float QnStorageResource::bitrate() const
 {
     float rez = 0;
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrateMbps();
     return rez;
@@ -96,13 +96,13 @@ float QnStorageResource::bitrate() const
 
 void QnStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers << provider;
 }
 
 void QnStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
 #endif

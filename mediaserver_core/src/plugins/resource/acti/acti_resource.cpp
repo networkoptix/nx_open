@@ -370,7 +370,7 @@ bool QnActiResource::SetupAudioInput()
     if (!isAudioSupported())
         return true;
     bool value = isAudioEnabled();
-    QMutexLocker lock(&m_audioCfgMutex);
+    QnMutexLocker lock(&m_audioCfgMutex);
     if (value == m_audioInputOn)
         return true;
     CLHttpStatus status;

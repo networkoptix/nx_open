@@ -69,7 +69,7 @@ int Settings::keepAliveProbeCount() const
 
 void Settings::loadParams( std::map<QString, QVariant> confParams )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_confParams = std::move( confParams );
 }
 
