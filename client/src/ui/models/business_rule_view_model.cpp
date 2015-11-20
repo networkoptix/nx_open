@@ -104,7 +104,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
-        item->setData(!QnBusiness::couldBeInstant(actionType), ProlongedActionRole);
+        item->setData(!QnBusiness::canBeInstant(actionType), ProlongedActionRole);
         
         QList<QStandardItem *> row;
         row << item;
@@ -394,7 +394,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
             fields |= QnBusiness::EventStateField;
         }
 
-        if (!QnBusiness::couldBeInstant(m_actionType)) {
+        if (!QnBusiness::canBeInstant(m_actionType)) {
             m_actionType = QnBusiness::ShowPopupAction;
             fields |= QnBusiness::ActionTypeField | QnBusiness::ActionResourcesField | QnBusiness::ActionParamsField;
         } else if (isActionProlonged() && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {

@@ -90,7 +90,7 @@ namespace QnBusiness {
         return false;
     }
 
-    bool couldBeInstant(ActionType actionType) {
+    bool canBeInstant(ActionType actionType) {
         switch(actionType) {
         case CameraOutputOnceAction:
         case SendMailAction:

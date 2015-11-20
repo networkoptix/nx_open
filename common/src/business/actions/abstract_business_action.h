@@ -19,7 +19,7 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
-    bool couldBeInstant(ActionType actionType);
+    bool canBeInstant(ActionType actionType);
     bool supportsDuration(ActionType actionType);
 
     bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
