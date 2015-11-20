@@ -274,6 +274,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnUuid ruleId = businessAction->getBusinessRuleId();
     QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree());
 
+    //TODO: #GDM code duplication
     QnVirtualCameraResourceList targetCameras;
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());

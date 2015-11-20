@@ -15,6 +15,8 @@ public:
     virtual ~QnWorkbenchAlarmLayoutHandler();
 
 private:
-    void openCamerasInAlarmLayout(const QnVirtualCameraResourceList &cameras);
+    void openCamerasInAlarmLayout(const QnVirtualCameraResourceList &cameras, bool switchToLayout);
+
+    QnWorkbenchLayout* findOrCreateAlarmLayout();
 
 };
