@@ -783,7 +783,7 @@ namespace ec2
                 const qint64 rtt = m_monotonicClock.elapsed() - requestSendClock;
                 {
                     //saving rtt
-                    QMutexLocker lk(&m_mutex);
+                    QnMutexLocker lk(&m_mutex);
                     auto peerIter = m_peersToSendTimeSyncTo.find(peerID);
                     if (peerIter != m_peersToSendTimeSyncTo.end())
                         peerIter->second.rttMillis = rtt;

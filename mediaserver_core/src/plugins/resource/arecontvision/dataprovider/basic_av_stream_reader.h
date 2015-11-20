@@ -2,6 +2,8 @@
 #ifndef BASIC_AV_STREAM_READER_H
 #define BASIC_AV_STREAM_READER_H
 
+#ifdef ENABLE_ARECONT
+
 #include <utils/common/util.h>
 #include <utils/thread/mutex.h>
 
@@ -159,5 +161,7 @@ private:
     bool m_needUpdateParams;
     mutable QnMutex m_needUpdateMtx;
 };
+
+#endif  //ENABLE_ARECONT
 
 #endif  //BASIC_AV_STREAM_READER_H
