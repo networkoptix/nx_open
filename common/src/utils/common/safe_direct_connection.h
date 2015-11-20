@@ -12,8 +12,9 @@
 #include <type_traits>
 
 #include <QtCore/QObject>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #include "functor_proxy_helper.h"
 #include "singleton.h"
@@ -121,8 +122,8 @@ namespace Qn
             }
         };
 
-        mutable QMutex m_mutex;
-        QWaitCondition m_cond;
+        mutable QnMutex m_mutex;
+        QnWaitCondition m_cond;
         //!map<receiver, counter>
         std::map<EnableSafeDirectConnection::ID, ReceiverContext> m_receivers;
 

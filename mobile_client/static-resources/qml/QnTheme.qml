@@ -12,6 +12,7 @@ QtObject {
     property color buttonAccentBackground
     property color buttonAttentionBackground
     property color buttonText
+    property color buttonAccentText
 
     property color inputBorder
     property color inputBorderActive
@@ -85,6 +86,8 @@ QtObject {
     property color playPause
     property color playPauseBackground
     property color navigationPanelBackground
+    property color offlineDimmer
+    property color cameraStatus
 
     function loadColors() {
         windowBackground        = colorTheme.color("window.background")
@@ -93,6 +96,7 @@ QtObject {
         buttonAccentBackground  = colorTheme.color("button.accentBackground")
         buttonAttentionBackground = colorTheme.color("button.attentionBackground")
         buttonText              = colorTheme.color("button.text")
+        buttonAccentText        = colorTheme.color("button.accentText")
         inputBorder             = colorTheme.color("input.border")
         inputBorderActive       = colorTheme.color("input.borderActive")
         inputText               = colorTheme.color("input.text")
@@ -154,6 +158,8 @@ QtObject {
         playPause               = colorTheme.color("other.playPause")
         playPauseBackground     = colorTheme.color("other.playPauseBackground")
         navigationPanelBackground = colorTheme.color("other.navigationPanelBackground")
+        offlineDimmer           = colorTheme.color("other.offlineDimmer")
+        cameraStatus            = colorTheme.color("other.cameraStatus")
     }
 
     function transparent(color, opacity) {

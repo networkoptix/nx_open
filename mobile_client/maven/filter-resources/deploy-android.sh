@@ -12,13 +12,9 @@ BUILD_TYPE=
 SIGN=
 SOURCE_APK=
 if [[ "${build.configuration}" == "release" ]]; then
-    if [[ "${skip.sign}" != "true" ]]; then
-        BUILD_TYPE=--release
-        SIGN="--sign ${google.keystore} ${google.alias} --storepass ${google.storepass} --keypass ${google.keypass}"
-        SOURCE_APK=apk/bin/QtApp-release-signed.apk
-    else
-        SOURCE_APK=apk/bin/QtApp-debug.apk
-    fi
+    BUILD_TYPE=--release
+    SIGN="--sign ${google.keystore} ${google.alias} --storepass ${google.storepass} --keypass ${google.keypass}"
+    SOURCE_APK=apk/bin/QtApp-release-signed.apk
 
     if [[ "${beta}" == "true" ]]; then
         APK_SUFFIX="beta"
@@ -29,7 +25,6 @@ else
     SOURCE_APK=apk/bin/QtApp-debug.apk
     APK_SUFFIX="debug"
 fi
-
 TARGET_APK=revamped-${installer.name}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
 
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET

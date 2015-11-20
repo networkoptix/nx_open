@@ -1,6 +1,6 @@
 #include "test_ldap_rest_handler.h"
 
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include "utils/common/ldap.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "ldap/ldap_manager.h"

@@ -17,7 +17,7 @@
 
 #include <utils/common/log.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
 #include "http/custom_headers.h"

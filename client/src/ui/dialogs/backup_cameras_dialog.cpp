@@ -74,7 +74,7 @@ public:
         parent->layout()->addWidget(initDefaultValueWidget(parent));
 
         QHBoxLayout* layout = new QHBoxLayout(m_buttonsPage);
-        QLabel* label = new QLabel(tr("Set quality:"), parent);
+        QLabel* label = new QLabel(tr("What to backup:"), parent);
         layout->addWidget(label);
 
         for (int i = 0; i < Qn::CameraBackup_Default; ++i) {
@@ -168,8 +168,8 @@ private:
         placeholder->setAutoFillBackground(true);
         
         const QString hint = QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("Select devices to setup backup quality"),
-            tr("Select cameras to setup backup quality")
+            tr("Select devices to setup backup"),
+            tr("Select cameras to setup backup")
             );
 
         m_hintPage = new QLabel(hint, placeholder);
@@ -263,7 +263,7 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/):
 QString QnBackupCamerasDialog::qualitiesToString(Qn::CameraBackupQualities qualities) {
     switch (qualities) {
     case Qn::CameraBackup_Disabled:
-        return tr("Disabled", "Cameras Backup");
+        return tr("Nothing", "Cameras Backup");
     case Qn::CameraBackup_LowQuality:
         return tr("Low", "Cameras Backup");
     case Qn::CameraBackup_HighQuality:

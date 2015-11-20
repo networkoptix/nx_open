@@ -6,7 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/network/module_information.h>
+#include <network/module_information.h>
 
 class QnMergeSystemsTool : public QObject, public QnWorkbenchContextAware {
     Q_OBJECT

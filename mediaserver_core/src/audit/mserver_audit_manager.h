@@ -2,6 +2,9 @@
 #define __MSERVER_AUDIT_MANAGER_H__
 
 #include <QElapsedTimer>
+
+#include <utils/thread/mutex.h>
+
 #include "audit/audit_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"
 
@@ -15,7 +18,7 @@ protected:
     virtual int updateAuditRecordInternal(int internalId, const QnAuditRecord& record) override;
 private:
     //QHash<QnUuid, qint64> m_knownSessions;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 #endif // __MSERVER_AUDIT_MANAGER_H__

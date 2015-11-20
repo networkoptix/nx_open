@@ -1,8 +1,6 @@
 
 #include "resource_widget_renderer.h"
 
-#include <QtCore/QMutexLocker>
-
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>

@@ -17,6 +17,8 @@ Item {
     readonly property real timelinePosition: timeline.position
     readonly property bool timelineAtLive: timeline.stickToEnd
 
+    property alias paused: playbackController.paused
+
     width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
@@ -345,21 +347,6 @@ Item {
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)
 
                 gripTickVisible: timeline.startBound > 0
-
-                onPausedChanged: {
-                    if (paused)
-                        mediaPlayer.pause()
-                    else
-                        mediaPlayer.play(timeline.position)
-                }
-
-                Connections {
-                    target: Qt.application
-                    onStateChanged: {
-                        if (Qt.application.state != Qt.ApplicationActive)
-                            playbackController.paused = true
-                    }
-                }
             }
 
             Rectangle {

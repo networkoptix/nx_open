@@ -551,7 +551,7 @@ Qn::AuthResult  QnLdapManager::realm(QString* realm) const
     QString uriString = settings.uri.toString();
     *realm = QString();
 
-    QMutexLocker _lock(&m_realmCacheMutex);
+    QnMutexLocker _lock(&m_realmCacheMutex);
     if (m_realmCache.find(uriString) == m_realmCache.end() ) {
         LdapSession session(settings);
         if (!session.connect())

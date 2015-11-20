@@ -14,6 +14,7 @@ class QnClientStorageResource
 {
     Q_OBJECT
 
+    typedef QnStorageResource base_type;
 public:
     enum StorageFlags {
         ReadOnly        = 0x1,

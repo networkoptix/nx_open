@@ -2,7 +2,7 @@
 
 #include <QtCore/QCoreApplication>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include "common/common_module.h"

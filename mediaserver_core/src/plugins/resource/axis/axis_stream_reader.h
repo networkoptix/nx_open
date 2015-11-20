@@ -4,7 +4,7 @@
 #ifdef ENABLE_AXIS
 
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/multicodec_rtp_reader.h"
+#include "network/multicodec_rtp_reader.h"
 #include "core/resource/resource_media_layout.h"
 
 class QnAxisStreamReader: public CLServerPushStreamReader

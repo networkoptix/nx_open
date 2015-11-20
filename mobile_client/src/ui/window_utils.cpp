@@ -20,4 +20,8 @@ bool isPhone() {
     return false;
 }
 
+void setKeepScreenOn(bool keepScreenOn) {
+    Q_UNUSED(keepScreenOn)
+}
+
 #endif

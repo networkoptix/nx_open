@@ -235,7 +235,7 @@ void QnEventLogDialog::updateData()
     }
 
     ui->dateEditFrom->setDateRange(QDate(2000,1,1), ui->dateEditTo->date());
-    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date());
+    ui->dateEditTo->setDateRange(ui->dateEditFrom->date(), QDateTime::currentDateTime().date().addMonths(1)); // 1 month forward should cover all local timezones diffs.
 
     m_updateDisabled = false;
     m_dirty = false;

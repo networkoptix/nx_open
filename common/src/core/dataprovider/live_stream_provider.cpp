@@ -8,6 +8,7 @@
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
+#include "utils/common/safe_direct_connection.h"
 
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
@@ -40,6 +41,7 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
     m_totalAudioFrames(0),
     m_softMotionRole(Qn::CR_Default),
     m_softMotionLastChannel(0),
+    m_videoChannels(1),
     m_framesSincePrevMediaStreamCheck(CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES+1),
     m_owner(0)
 {
@@ -53,14 +55,19 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     m_role = Qn::CR_LiveVideo;
     m_timeSinceLastMetaData.restart();
-    m_layout = QnConstResourceVideoLayoutPtr();
     m_cameraRes = res.dynamicCast<QnPhysicalCameraResource>();
     Q_ASSERT(m_cameraRes);
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
-    m_layout = m_cameraRes->getVideoLayout();
+    m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
     m_isPhysicalResource = res.dynamicCast<QnPhysicalCameraResource>();
     m_resolutionCheckTimer.invalidate();
+
+    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
+        m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+    });
+
 }
+
 
 void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
 {
@@ -69,6 +76,7 @@ void QnLiveStreamProvider::setOwner(QnAbstractVideoCamera* owner)
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
 {
+    directDisconnectAll();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i) 
         qFreeAligned(m_motionMaskBinData[i]);
 }
@@ -186,7 +194,7 @@ void QnLiveStreamProvider::updateSoftwareMotion()
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
     if (m_cameraRes->getMotionType() == Qn::MT_SoftwareGrid && getRole() == roleForMotionEstimation())
     {
-        for (int i = 0; i < m_layout->channelCount(); ++i)
+        for (int i = 0; i < m_videoChannels; ++i)
         {
             QnMotionRegion region = m_cameraRes->getMotionRegion(i);
             m_motionEstimation[i].setMotionMask(region);
@@ -251,7 +259,7 @@ bool QnLiveStreamProvider::needMetaData()
     {
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
         if (getRole() == roleForMotionEstimation()) {
-            for (int i = 0; i < m_layout->channelCount(); ++i)
+            for (int i = 0; i < m_videoChannels; ++i)
             {
                 bool rez = m_motionEstimation[i].existsMetadata();
                 if (rez) {

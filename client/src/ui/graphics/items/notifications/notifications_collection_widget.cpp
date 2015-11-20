@@ -302,15 +302,22 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree()));
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
 
+    Qn::NotificationLevel level = QnNotificationLevels::notificationLevel(eventType);
+
     const bool soundAction = businessAction->actionType() == QnBusiness::PlaySoundAction;
     if (soundAction) {
         QString soundUrl = businessAction->getParams().soundUrl;
         m_itemsByLoadingSound.insert(soundUrl, item);
         context()->instance<QnAppServerNotificationCache>()->downloadFile(soundUrl);
-        item->setNotificationLevel(Qn::CommonNotification);
-    } else {
-        item->setNotificationLevel(QnNotificationLevels::notificationLevel(eventType));
-    }
+        level = Qn::CommonNotification;
+    } else if (eventType == QnBusiness::BackupFinishedEvent) {
+        QnBusiness::EventReason reason = static_cast<QnBusiness::EventReason>(params.reasonCode);
+        if (reason == QnBusiness::BackupFailed)
+            level = Qn::CriticalNotification;
+    }    
+    
+    item->setNotificationLevel(level);
+    
 
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 

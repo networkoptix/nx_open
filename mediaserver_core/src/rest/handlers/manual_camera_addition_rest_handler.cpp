@@ -8,15 +8,15 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <api/model/manual_camera_seach_reply.h>
+#include "audit/audit_manager.h"
+
 #include <core/resource_management/resource_discovery_manager.h>
+#include "core/resource/network_resource.h"
+#include <network/tcp_connection_priv.h>
+#include "rest/server/rest_connection_processor.h"
 
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/network/tcp_connection_priv.h>
 #include <utils/serialization/json_functions.h>
-#include "audit/audit_manager.h"
-#include "rest/server/rest_connection_processor.h"
-#include "core/resource/network_resource.h"
-
 
 class ManualSearchThreadPoolHolder
 {

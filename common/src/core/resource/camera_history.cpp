@@ -196,7 +196,7 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
             emit cameraHistoryChanged(camera);
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId) const {
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers) const {
     QnMutexLocker lock(&m_mutex);
 
     QnMediaServerResourceList result;
@@ -204,7 +204,7 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid
         const auto &data = itr.value();
         if (std::find(data.cbegin(), data.cend(), cameraId) != data.cend()) {
             QnMediaServerResourcePtr server = toMediaServer(itr.key());
-            if (server)
+            if (server && (!filterOnlineServers || server->getStatus() == Qn::Online))
                 result << server;
         }
     }
@@ -221,12 +221,12 @@ QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnVirtual
     return result;
 }
 
-QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const 
+QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, bool filterOnlineServers) const 
 {
     if (camera->isDtsBased())
         return dtsCamFootageData(camera);
     else
-        return getCameraFootageData(camera->getId());
+        return getCameraFootageData(camera->getId(), filterOnlineServers);
 }
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const 

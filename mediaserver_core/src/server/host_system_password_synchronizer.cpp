@@ -14,8 +14,6 @@
 #include <stdlib.h>
 #endif
 
-#include <QtCore/QMutexLocker>
-
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -36,7 +34,7 @@ HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
 void HostSystemPasswordSynchronizer::syncLocalHostRootPasswordWithAdminIfNeeded( const QnUserResourcePtr& user )
 {
 #ifdef __linux__
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if( QnAppInfo::armBox() == "bpi" || QnAppInfo::armBox() == "nx1" )
     {

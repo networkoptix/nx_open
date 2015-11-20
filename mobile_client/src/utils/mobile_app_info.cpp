@@ -10,3 +10,7 @@ QString QnMobileAppInfo::productName() const {
     return QnAppInfo::productNameLong();
 }
 
+QString QnMobileAppInfo::organizationName() const {
+    return QnAppInfo::organizationName();
+}
+

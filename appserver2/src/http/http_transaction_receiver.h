@@ -1,16 +1,11 @@
-/**********************************************************
-* 8 may 2015
-* a.kolesnikov
-***********************************************************/
-
 #ifndef HTTP_TRANSACTION_RECEIVER_H
 #define HTTP_TRANSACTION_RECEIVER_H
 
 #include <core/dataconsumer/abstract_data_consumer.h>
 #include <rest/server/request_handler.h>
-#include <utils/network/tcp_connection_processor.h>
-#include <utils/network/tcp_listener.h>
 
+#include <network/tcp_connection_processor.h>
+#include <network/tcp_listener.h>
 
 namespace ec2
 {

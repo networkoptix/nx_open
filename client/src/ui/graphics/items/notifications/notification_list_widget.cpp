@@ -216,7 +216,7 @@ void QnNotificationListWidget::tick(int deltaMSecs) {
         ItemData* data = m_itemDataByItem[item];
         delete data;
 
-        int level = static_cast<int>(item->notificationLevel());
+        Qn::NotificationLevel level = item->notificationLevel();
         if (level == m_itemNotificationLevel)
             itemNotificationLevelChange = true;
 

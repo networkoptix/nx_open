@@ -34,8 +34,7 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include "utils/network/tcp_connection_priv.h"
-
+#include "network/tcp_connection_priv.h"
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 

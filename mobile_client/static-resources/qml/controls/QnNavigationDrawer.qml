@@ -52,12 +52,11 @@ Rectangle {
     // Internal
 
     default property alias data: contentItem.data
-    readonly property real expandedFraction: 0.78  // How big fraction of the screen realesatate that is covered by an open menu
     readonly property real _scaleFactor: _rootItem.width / 320 // Note, this should really be application global
     readonly property int _pullThreshold: panel.width/2
     readonly property int _slideDuration: 260
     readonly property int _collapsedX: _rightEdge ? _rootItem.width :  - panel.width
-    readonly property int _expandedWidth: expandedFraction * _rootItem.width
+    readonly property int _expandedWidth: Math.min(Math.min(_rootItem.width, _rootItem.height) - dp(56), dp(56 * 6))
     readonly property int _expandedX: _rightEdge ? _rootItem.width - width : 0
     readonly property bool _rightEdge: position === Qt.RightEdge
     readonly property int _minimumX:  _rightEdge ?  _rootItem.width - panel.width : -panel.width

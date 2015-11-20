@@ -25,7 +25,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include "utils/network/http/asynchttpclient.h"
-#include "utils/network/networkoptixmodulerevealcommon.h"
+#include "network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
 #include "api/server_rest_connection.h"
 

@@ -116,6 +116,7 @@ private:
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;
+    bool m_spsFound;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

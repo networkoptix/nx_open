@@ -5,7 +5,7 @@
 #include <core/resource/media_server_resource.h>
 
 QnClientStorageResource::QnClientStorageResource()
-    : QnStorageResource()
+    : base_type()
     , m_freeSpace(QnStorageResource::UnknownSize)
     , m_totalSpace(QnStorageResource::UnknownSize)
     , m_writable(false)
@@ -37,7 +37,7 @@ QnClientStorageResource::~QnClientStorageResource()
 {}
 
 void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByteArray>& modifiedFields ) {
-    QnResource::updateInner(other, modifiedFields);
+    base_type::updateInner(other, modifiedFields);
 
     QnClientStorageResource* localOther = dynamic_cast<QnClientStorageResource*>(other.data());
 
