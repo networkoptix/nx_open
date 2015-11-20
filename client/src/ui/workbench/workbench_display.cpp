@@ -17,7 +17,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
-#include <utils/common/variant_timer.h>
+#include <utils/common/delayed.h>
 #include <utils/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
@@ -144,6 +144,12 @@ namespace {
     /** The amount that is added to maximal Z value each time a move to front
      * operation is performed. */
     const qreal zStep = 1.0;
+
+    /** How often splashes should be painted on items when notification appears.  */
+    const int splashPeriodMs = 500;
+
+    /** How long splashes should be painted on items when notification appears.  */
+    const int splashTotalLengthMs = 1000;
 
     enum {
         ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
@@ -1997,25 +2003,16 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (!resource)
         return;
 
-    // TODO: #Elric copypasta
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
-    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
-    if(thumbnailed)
+    if (workbench()->currentLayout()->isSearchLayout())
         return;
 
-    int type = businessAction->getRuntimeParams().eventType;
-
-    at_notificationTimer_timeout(resource, type);
-    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
-    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
+    for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+        executeDelayed([this, resource, businessAction]{
+            showSplashOnResource(resource, businessAction);
+        }, timeMs);
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, const QVariant &type) {
-    at_notificationTimer_timeout(resource.value<QnResourcePtr>(), type.toInt());
-}
-
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
+void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction) {
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
@@ -2034,7 +2031,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
+        splashItem->setColor(
+            withAlpha(
+                QnNotificationLevel::notificationColor(QnNotificationLevel::valueOf(businessAction)),
+                128));
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);
