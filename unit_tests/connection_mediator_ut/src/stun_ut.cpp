@@ -27,7 +27,7 @@ protected:
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
         , mediaserverApi( &cloudData, &stunMessageDispatcher )
         , listeningPeerPool( &cloudData, &stunMessageDispatcher )
-        , server( false, SocketFactory::nttDisabled )
+        , server( false, SocketFactory::NatTraversalType::nttDisabled )
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
@@ -67,7 +67,7 @@ TEST_F( StunCustomTest, Ping )
     mediaserverApi.expect_pingServer( BAD_ADDRESS, SERVER_ID, false );
 
     SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-    ASSERT_TRUE( client.sendRequest( std::move( request ), waiter.pusher() ) );
+    client.sendRequest( std::move( request ), waiter.pusher() );
 
     const auto result = waiter.pop();
     ASSERT_EQ( result.first, SystemError::noError );
@@ -97,7 +97,7 @@ TEST_F( StunCustomTest, BindConnect )
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );
+        msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );
@@ -111,7 +111,7 @@ TEST_F( StunCustomTest, BindConnect )
         request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );
+        msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );
@@ -127,7 +127,7 @@ TEST_F( StunCustomTest, BindConnect )
         request.newAttribute< stun::cc::attrs::HostName >( "WrongHost" );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );
+        msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );

@@ -3,16 +3,17 @@
 #include <QtCore/QElapsedTimer>
 #include <QList>
 #include <QByteArray>
-#include "utils/gzip/gzip_compressor.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "universal_request_processor_p.h"
-#include "utils/common/synctime.h"
-#include "common/common_module.h"
-#include "http/custom_headers.h"
-#include "utils/network/flash_socket/types.h"
+
 #include "audit/audit_manager.h"
-#include <utils/common/model_functions.h>
+#include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
+#include "http/custom_headers.h"
+#include "network/tcp_connection_priv.h"
+#include "universal_request_processor_p.h"
+#include <utils/common/model_functions.h>
+#include "utils/common/synctime.h"
+#include "utils/gzip/gzip_compressor.h"
+#include "utils/network/flash_socket/types.h"
 
 static const int AUTH_TIMEOUT = 60 * 1000;
 //static const int AUTHORIZED_TIMEOUT = 60 * 1000;

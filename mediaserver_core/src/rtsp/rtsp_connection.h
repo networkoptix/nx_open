@@ -3,8 +3,8 @@
 
 #include <QtNetwork/QHostAddress>
 #include <utils/thread/mutex.h>
-#include "utils/network/ffmpeg_sdp.h"
-#include "utils/network/tcp_connection_processor.h"
+#include "network/ffmpeg_sdp.h"
+#include "network/tcp_connection_processor.h"
 #include <core/resource/resource_fwd.h>
 #include "core/datapacket/media_data_packet.h"
 #include "rtsp/rtsp_encoder.h"

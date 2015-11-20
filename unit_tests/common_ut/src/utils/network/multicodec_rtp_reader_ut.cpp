@@ -25,8 +25,8 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
-#include <utils/network/multicodec_rtp_reader.h>
-#include <utils/network/rtpsession.h>
+#include <network/multicodec_rtp_reader.h>
+#include <network/rtpsession.h>
 #include <utils/network/http/httpclient.h>
 
 #include "file_socket.h"

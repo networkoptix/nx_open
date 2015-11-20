@@ -2,7 +2,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include "utils/network/module_finder.h"
+#include "network/module_finder.h"
 
 QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
     QObject(parent)

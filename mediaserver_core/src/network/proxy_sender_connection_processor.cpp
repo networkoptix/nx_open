@@ -1,20 +1,18 @@
-
 #include "common/common_globals.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
-#include "proxy_sender_connection_processor.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
 #include "network/universal_request_processor_p.h"
-#include "utils/network/http/auth_tools.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/tcp_listener.h"
+#include "proxy_sender_connection_processor.h"
 #include "utils/common/log.h"
-#include "utils/network/http/asynchttpclient.h"
 #include "utils/common/synctime.h"
+#include "utils/network/http/asynchttpclient.h"
+#include "utils/network/http/auth_tools.h"
 
 #include "universal_tcp_listener.h"
 
 #include <QtCore/QElapsedTimer>
-
 
 static const int SOCKET_TIMEOUT = 1000 * 5;
 static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;

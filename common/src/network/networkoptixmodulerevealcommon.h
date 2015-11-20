@@ -9,7 +9,7 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QMetaType>
 
-#include <utils/network/module_information.h>
+#include "module_information.h"
 
 //!This request is sent by host which tries to find other modules
 class RevealRequest

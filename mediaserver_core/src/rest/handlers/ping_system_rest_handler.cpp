@@ -4,11 +4,11 @@
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
 
-#include "utils/network/module_information.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/module_finder.h"
+#include "network/module_information.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/app_info.h"
-#include "utils/network/module_finder.h"
+#include "utils/network/simple_http_client.h"
 
 //#define START_LICENSES_DEBUG
 

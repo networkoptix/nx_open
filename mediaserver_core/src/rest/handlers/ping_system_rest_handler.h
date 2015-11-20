@@ -2,7 +2,7 @@
 #define PING_SYSTEM_REST_HANDLER_H
 
 #include <rest/server/json_rest_handler.h>
-#include <utils/network/module_information.h>
+#include <network/module_information.h>
 
 class QnPingSystemRestHandler : public QnJsonRestHandler {
     Q_OBJECT

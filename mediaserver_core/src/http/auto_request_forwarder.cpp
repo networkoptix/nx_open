@@ -17,7 +17,7 @@
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
-#include <utils/network/rtpsession.h>
+#include <network/rtpsession.h>
 
 #include "streaming/streaming_params.h"
 

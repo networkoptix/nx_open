@@ -1,5 +1,5 @@
 #include "rebuild_archive_rest_handler.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <media_server/serverutil.h>

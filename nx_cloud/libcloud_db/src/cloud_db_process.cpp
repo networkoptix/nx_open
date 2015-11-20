@@ -157,7 +157,7 @@ int CloudDBProcess::executeApplication()
             &authenticationManager,
             &httpMessageDispatcher,
             false,  //TODO #ak enable ssl when it works properly
-            SocketFactory::nttDisabled );
+            SocketFactory::NatTraversalType::nttDisabled );
 
         if( !multiAddressHttpServer.bind(httpAddrToListenList) )
             return 3;

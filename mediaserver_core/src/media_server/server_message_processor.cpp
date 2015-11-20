@@ -20,7 +20,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
-#include "utils/network/router.h"
+#include "network/router.h"
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"

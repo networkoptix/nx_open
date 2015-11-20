@@ -11,7 +11,7 @@
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
 #include <utils/common/uuid.h>
-#include <utils/network/module_information.h>
+#include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
 
 class QnResourceDataPool;

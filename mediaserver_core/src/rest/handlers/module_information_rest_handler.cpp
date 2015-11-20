@@ -2,8 +2,8 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <utils/network/tcp_connection_priv.h>
-#include <utils/network/module_information.h>
+#include <network/tcp_connection_priv.h>
+#include <network/module_information.h>
 #include <utils/common/model_functions.h>
 #include <common/common_module.h>
 

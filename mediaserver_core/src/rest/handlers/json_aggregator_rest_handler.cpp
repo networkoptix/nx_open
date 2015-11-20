@@ -1,6 +1,6 @@
 #include "json_aggregator_rest_handler.h"
 
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 #include "rest/server/rest_connection_processor.h"

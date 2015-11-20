@@ -114,8 +114,8 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
 #include <utils/network/socket_global.h>

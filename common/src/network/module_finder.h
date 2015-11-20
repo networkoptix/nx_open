@@ -7,9 +7,10 @@
 #include <QtNetwork/QHostAddress>
 
 #include <utils/common/singleton.h>
-#include <utils/network/module_information.h>
 #include <utils/network/socket_common.h>
 #include <core/resource/resource_fwd.h>
+
+#include "module_information.h"
 
 class QnMulticastModuleFinder;
 class QnDirectModuleFinder;

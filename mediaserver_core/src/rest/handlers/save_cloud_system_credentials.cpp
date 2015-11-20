@@ -1,8 +1,3 @@
-/**********************************************************
-* Sep 21, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "save_cloud_system_credentials.h"
 
 #include <cdb/connection.h>
@@ -12,8 +7,7 @@
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
 #include <utils/common/sync_call.h>
-#include <utils/network/tcp_connection_priv.h>
-
+#include <network/tcp_connection_priv.h>
 
 int QnSaveCloudSystemCredentialsHandler::executeGet(
     const QString& /*path*/,
