@@ -14,6 +14,8 @@
 
 #include <utils/serialization/json.h>
 
+#include "../fusion_request_result.h"
+
 
 namespace nx_http {
 namespace detail {
@@ -35,6 +37,19 @@ protected:
         std::unique_ptr<nx_http::AbstractMsgBodySource> )> m_completionHandler;
     Qn::SerializationFormat m_outputDataFormat;
     nx_http::Method::ValueType m_requestMethod;
+
+    void requestCompleted(FusionRequestResult result)
+    {
+        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
+        if (result.resultCode != FusionRequestErrorClass::noError)
+            outputMsgBody = std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(result));
+
+        requestCompleted(
+            result.httpStatusCode(),
+            std::move(outputMsgBody));
+    }
 
     //!Call this method after request has been processed
     void requestCompleted(
@@ -161,33 +176,39 @@ public:
         \note This overload is for requests returning something
     */
     void requestCompleted(
-        nx_http::StatusCode::Value statusCode,
+        FusionRequestResult result,
         Output outputData = Output() )
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
 
-        if( statusCode / 100 == nx_http::StatusCode::ok / 100 ) //success
+        if (result.resultCode == FusionRequestErrorClass::noError)
         {
             //requests returning some data MUST be issues with GET method
-            Q_ASSERT( m_requestMethod == nx_http::Method::GET ); 
+            Q_ASSERT(m_requestMethod == nx_http::Method::GET);
 
             //serializing outputData
             nx::Buffer serializedData;
-            if( serializeToAnyFusionFormat( outputData, m_outputDataFormat, &serializedData ) )
+            if (serializeToAnyFusionFormat(outputData, m_outputDataFormat, &serializedData))
             {
                 outputMsgBody = std::make_unique<nx_http::BufferSource>(
-                    Qn::serializationFormatToHttpContentType( m_outputDataFormat ),
-                    std::move( serializedData ) );
+                    Qn::serializationFormatToHttpContentType(m_outputDataFormat),
+                    std::move(serializedData));
             }
             else
             {
-                statusCode = nx_http::StatusCode::internalServerError;
+                result.resultCode = FusionRequestErrorClass::internalError;
+                result.errorDetail = FusionRequestResult::ecResponseSerializationError;
             }
         }
 
+        if (result.resultCode != FusionRequestErrorClass::noError)
+            outputMsgBody = std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(result));
+
         BaseFusionRequestHandler::requestCompleted(
-            statusCode,
-            std::move(outputMsgBody) );
+            result.httpStatusCode(),
+            std::move(outputMsgBody));
     }
 };
 
@@ -238,7 +259,11 @@ private:
                     : request.messageBody,
                 &inputData ) )
         {
-            this->requestCompleted( nx_http::StatusCode::badRequest );
+            FusionRequestResult result(
+                FusionRequestErrorClass::badRequest,
+                FusionRequestResult::ecDeserializationError,
+                QString()); //TODO #ak error message
+            this->requestCompleted(std::move(result));
             return;
         }
 

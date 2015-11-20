@@ -59,6 +59,11 @@ namespace nx_http
         return true;
     }
 
+    nx_http::Response* AbstractHttpRequestHandler::response()
+    {
+        return m_responseMsg.response;
+    }
+
     void AbstractHttpRequestHandler::requestDone(
         //size_t reqID,
         const nx_http::StatusCode::Value statusCode,
