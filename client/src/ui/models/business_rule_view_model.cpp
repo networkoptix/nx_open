@@ -33,6 +33,7 @@
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
+    const int defaultActionDuration = 5000;
 }
 
 namespace QnBusiness {
@@ -103,7 +104,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
-        item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
+        item->setData(!QnBusiness::couldBeInstant(actionType), ProlongedActionRole);
         
         QList<QStandardItem *> row;
         row << item;
@@ -379,16 +380,27 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
         fields |= QnBusiness::EventResourcesField;
     }
 
-    if (!QnBusiness::hasToggleState(m_eventType) && m_eventState != QnBusiness::UndefinedState){
-        m_eventState = QnBusiness::UndefinedState;
-        fields |= QnBusiness::EventStateField;
-    } else if (QnBusiness::hasToggleState(m_eventType) && !QnBusiness::hasToggleState(m_actionType)) {
-        m_eventState = allowedEventStates(m_eventType).first();
-        fields |= QnBusiness::EventStateField;
-    }
-    if (!QnBusiness::hasToggleState(m_eventType) && QnBusiness::hasToggleState(m_actionType)) {
-        m_actionType = QnBusiness::ShowPopupAction;
-        fields |= QnBusiness::ActionTypeField | QnBusiness::ActionResourcesField | QnBusiness::ActionParamsField;
+    if (QnBusiness::hasToggleState(m_eventType)) {
+        if (!isActionProlonged()) {
+            const auto allowedStates = allowedEventStates(m_eventType);
+            if (!allowedStates.contains(m_eventState)) {
+                m_eventState = allowedStates.first();
+                fields |= QnBusiness::EventStateField;
+            }
+        }
+    } else {
+        if (m_eventState != QnBusiness::UndefinedState) {
+            m_eventState = QnBusiness::UndefinedState;
+            fields |= QnBusiness::EventStateField;
+        }
+
+        if (!QnBusiness::couldBeInstant(m_actionType)) {
+            m_actionType = QnBusiness::ShowPopupAction;
+            fields |= QnBusiness::ActionTypeField | QnBusiness::ActionResourcesField | QnBusiness::ActionParamsField;
+        } else if (isActionProlonged() && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {
+            m_actionParams.durationMs = defaultActionDuration;
+            fields |= QnBusiness::ActionParamsField;
+        }
     }
 
     updateActionTypesModel();

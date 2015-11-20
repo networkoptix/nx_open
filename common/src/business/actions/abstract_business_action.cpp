@@ -90,6 +90,32 @@ namespace QnBusiness {
         return false;
     }
 
+    bool couldBeInstant(ActionType actionType) {
+        switch(actionType) {
+        case CameraOutputOnceAction:
+        case SendMailAction:
+        case DiagnosticsAction:
+        case ShowPopupAction:
+        case PlaySoundOnceAction:
+        case SayTextAction:
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    bool supportsDuration(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return true;
+        default:
+            return false;
+        }
+    }
+
     bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters) {
         if (!hasToggleState(actionType))
             return false;
