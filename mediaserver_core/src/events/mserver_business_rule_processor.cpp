@@ -208,7 +208,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         case QnBusiness::ExecutePtzPresetAction:
-            result = executePtzAction(action.dynamicCast<QnPtzPresetBusinessAction>(), res);
+            result = executePtzAction(action, res);
             break;
         default:
             break;
@@ -238,7 +238,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     return true;
 }
 
-bool QnMServerBusinessRuleProcessor::executePtzAction(const QnPtzPresetBusinessActionPtr& action, const QnResourcePtr& resource )
+bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& resource )
 {
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
