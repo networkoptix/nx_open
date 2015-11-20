@@ -118,12 +118,24 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnNetworkResourceList resList = qnResPool->getResources<QnNetworkResource>(action->getResources());
-    if (resList.isEmpty()) {
+    QnNetworkResourceList resources;
+
+    switch (action->actionType()) {
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::ShowTextOverlayAction:
+        /* These actions should be executed once for the whole resources list, not one-by-one */
+        //TODO: #rvasilenko Possibly this may be implemented more correct way
+        break;
+    default:
+        resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
+        break;
+    }
+    
+    if (resources.isEmpty()) {
         executeAction(action, QnResourcePtr());
     }
     else {
-        for(const QnResourcePtr& res: resList)
+        for(const QnResourcePtr& res: resources)
             executeAction(action, res);
     }
 }
@@ -154,8 +166,6 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::PlaySoundOnceAction:
     case QnBusiness::PlaySoundAction:
     case QnBusiness::SayTextAction:
-    case QnBusiness::ShowOnAlarmLayoutAction:
-    case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
 
     default:
