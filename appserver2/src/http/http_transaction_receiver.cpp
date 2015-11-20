@@ -6,7 +6,7 @@
 #include "http_transaction_receiver.h"
 
 #include <rest/server/rest_connection_processor.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include "http/custom_headers.h"
 #include "transaction/transaction_message_bus.h"

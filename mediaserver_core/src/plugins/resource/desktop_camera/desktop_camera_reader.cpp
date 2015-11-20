@@ -5,7 +5,7 @@
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
 #include "utils/common/log.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 

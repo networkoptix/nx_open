@@ -9,7 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
 #include <http/custom_headers.h>
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
 

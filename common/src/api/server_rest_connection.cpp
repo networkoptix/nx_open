@@ -11,7 +11,7 @@
 #include <nx_ec/data/api_data.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 #include <http/custom_headers.h>
 #include "utils/network/http/httptypes.h"
 #include <utils/network/http/asynchttpclient.h>

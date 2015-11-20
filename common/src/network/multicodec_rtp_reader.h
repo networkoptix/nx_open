@@ -12,7 +12,8 @@
 #include "utils/camera/camera_diagnostics.h"
 #include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
-#include "utils/network/rtpsession.h"
+
+#include "network/rtpsession.h"
 
 #include <business/business_fwd.h>
 #include "rtp_stream_parser.h"

@@ -1,7 +1,7 @@
 #ifndef QN_FILE_CONNECTION_PROCESSOR_H
 #define QN_FILE_CONNECTION_PROCESSOR_H
 
-#include "utils/network/tcp_connection_processor.h"
+#include "network/tcp_connection_processor.h"
 
 class QnFileConnectionProcessorPrivate;
 

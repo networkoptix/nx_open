@@ -10,8 +10,9 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 
-#include "socket.h"
-#include "system_socket.h"
+#include <utils/network/socket.h>
+#include <utils/network/system_socket.h>
+
 #include "common/common_module.h"
 #include "module_information.h"
 #include "utils/common/cryptographic_hash.h"

@@ -1,11 +1,12 @@
-#include "tcp_listener.h"
-#include "socket.h"
-#include "utils/common/log.h"
+#include <atomic>
+
 #include "tcp_connection_processor.h"
+#include "tcp_listener.h"
 
 #include <utils/common/log.h>
 #include <utils/common/systemerror.h>
-#include <atomic>
+
+#include "utils/network/socket.h"
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 

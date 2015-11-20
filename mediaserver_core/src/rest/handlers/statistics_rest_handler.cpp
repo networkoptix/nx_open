@@ -1,7 +1,7 @@
 #include "statistics_rest_handler.h"
 
 #include "utils/common/util.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "platform/platform_abstraction.h"
 #include "api/model/statistics_reply.h"
 

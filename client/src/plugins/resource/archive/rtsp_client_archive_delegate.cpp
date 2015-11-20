@@ -27,8 +27,8 @@ extern "C"
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/network/rtp_stream_parser.h>
-#include <utils/network/ffmpeg_sdp.h>
+#include <network/rtp_stream_parser.h>
+#include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
 #include "http/custom_headers.h"
 #include "common/common_module.h"
