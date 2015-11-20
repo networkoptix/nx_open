@@ -1999,17 +1999,27 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
-    if (!resource)
-        return;
-
     if (workbench()->currentLayout()->isSearchLayout())
         return;
+    
+    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+    QnBusiness::EventType eventType = params.eventType;
 
-    for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
-        executeDelayed([this, resource, businessAction]{
-            showSplashOnResource(resource, businessAction);
-        }, timeMs);
+    QSet<QnResourcePtr> targetResources;
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) 
+        targetResources.unite(qnResPool->getResources<QnResource>(businessAction->getResources()).toSet());
+    
+    if (eventType >= QnBusiness::UserDefinedEvent) 
+        targetResources.unite(qnResPool->getResources<QnResource>(params.metadata.cameraRefs).toSet());
+
+    if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId))
+        targetResources.insert(resource);
+    
+    for (const QnResourcePtr &resource: targetResources)
+        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+            executeDelayed([this, resource, businessAction]{
+                showSplashOnResource(resource, businessAction);
+            }, timeMs);
 }
 
 void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction) {
