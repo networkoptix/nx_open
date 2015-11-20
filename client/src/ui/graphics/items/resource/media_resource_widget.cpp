@@ -1160,7 +1160,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     bool isPreviewSearchLayout = item() 
         && item()->layout() 
-        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+        && item()->layout()->isSearchLayout();
 
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)

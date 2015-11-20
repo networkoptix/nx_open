@@ -526,7 +526,7 @@ void QnMainWindow::updateHelpTopic() {
             setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
             return;
         }
-        if (layout->data().contains(Qn::LayoutSearchStateRole)) {
+        if (layout->isSearchLayout()) {
             setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
             return;
         }
