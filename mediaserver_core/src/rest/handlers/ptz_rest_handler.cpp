@@ -2,7 +2,7 @@
 
 #include <utils/serialization/json_functions.h>
 #include <utils/serialization/lexical.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>

@@ -11,7 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/network/http/httpstreamreader.h>
-#include <utils/network/tcp_connection_processor.h>
+#include <network/tcp_connection_processor.h>
 
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"

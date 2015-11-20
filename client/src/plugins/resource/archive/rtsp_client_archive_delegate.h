@@ -3,8 +3,8 @@
 
 #include <atomic>
 #include <utils/common/uuid.h>
-#include <utils/network/rtpsession.h>
-#include <utils/network/ffmpeg_rtp_parser.h>
+#include <network/rtpsession.h>
+#include <network/ffmpeg_rtp_parser.h>
 
 #include <core/resource/resource_media_layout.h>
 

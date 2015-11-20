@@ -5,10 +5,10 @@
 #include <utils/thread/wait_condition.h>
 #include <QtCore/QElapsedTimer>
 
-#include "utils/network/tcp_listener.h"
-#include "utils/network/tcp_connection_processor.h"
-#include "utils/network/http/httptypes.h"
+#include "network/tcp_listener.h"
+#include "network/tcp_connection_processor.h"
 
+#include <utils/network/http/httptypes.h>
 
 class QnHttpConnectionListener;
 

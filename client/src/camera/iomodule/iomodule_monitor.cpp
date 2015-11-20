@@ -5,7 +5,7 @@
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
-#include "utils/network/router.h"
+#include "network/router.h"
 #include "api/app_server_connection.h"
 
 namespace {

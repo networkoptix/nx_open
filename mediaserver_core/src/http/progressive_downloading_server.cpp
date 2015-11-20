@@ -13,8 +13,8 @@
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
 #include <utils/fs/file.h>
-#include <utils/network/tcp_connection_priv.h>
-#include <utils/network/tcp_listener.h>
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"

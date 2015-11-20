@@ -2,9 +2,9 @@
 #ifdef ENABLE_DESKTOP_CAMERA
 
 #include "desktop_camera_registrator.h"
-#include "utils/network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
 #include "nx_ec/data/api_statistics.h"
 
 class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate

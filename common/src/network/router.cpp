@@ -12,7 +12,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <utils/network/module_finder.h>
+#include "network/module_finder.h"
 
 QnRouter::QnRouter(QnModuleFinder *moduleFinder, QObject *parent) :
     QObject(parent),

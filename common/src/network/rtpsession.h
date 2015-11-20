@@ -9,8 +9,6 @@
 
 #include <QAuthenticator>
 
-#include "socket.h"
-
 extern "C"
 {
     #include <libavformat/avformat.h>
@@ -19,10 +17,12 @@ extern "C"
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrl>
-#include "../common/threadqueue.h"
+#include "utils/common/threadqueue.h"
 #include "utils/camera/camera_diagnostics.h"
 #include "network/client_authenticate_helper.h"
-#include "http/httptypes.h"
+
+#include <utils/network/socket.h>
+#include <utils/network/http/httptypes.h>
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
