@@ -108,7 +108,7 @@ private:
     bool m_inputPortState;
     nx_http::AsyncHttpClientPtr m_relayInputClient;
 
-    bool getParamPhysical2(int channel, const QString& name, QVariant &val);
+    bool getParamPhysical2(int channel, const QString& name, QString &val);
     void inputPortStateRequestDone(nx_http::AsyncHttpClientPtr client);
 };
 

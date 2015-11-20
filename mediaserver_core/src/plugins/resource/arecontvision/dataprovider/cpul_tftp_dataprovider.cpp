@@ -2,7 +2,7 @@
 
 #include "cpul_tftp_dataprovider.h"
 
-#include <QtCore/QMutex>
+#include <utils/thread/mutex.h>
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
@@ -66,7 +66,7 @@ AVClientPullSSTFTPStreamreader::~AVClientPullSSTFTPStreamreader()
 
 CameraDiagnostics::Result AVClientPullSSTFTPStreamreader::diagnoseMediaStreamConnection()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     return m_prevDataReadResult;
 }
 
@@ -89,7 +89,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     QSize selectedResolution;
     QString request;
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         request = netRes->generateRequestString(
             m_streamParam,
             h264,
@@ -170,7 +170,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
 
     int readed = m_tftp_client->read(request, img);
     {
-        QMutexLocker lk( &m_mutex );
+        QnMutexLocker lk( &m_mutex );
         m_prevDataReadResult = m_tftp_client->prevIOResult();
     }
 

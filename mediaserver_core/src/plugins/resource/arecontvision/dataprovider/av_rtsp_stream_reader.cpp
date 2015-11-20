@@ -37,7 +37,7 @@ CameraDiagnostics::Result QnArecontRtspStreamReader::openStreamInternal(
 
     QString requestStr;
     {
-        QMutexLocker lk(&m_mutex);
+        QnMutexLocker lk(&m_mutex);
         requestStr = res->generateRequestString(
             m_streamParam,
             res->isH264(),

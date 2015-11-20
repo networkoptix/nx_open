@@ -3,6 +3,7 @@
 #define BASIC_AV_STREAM_READER_H
 
 #include <utils/common/util.h>
+#include <utils/thread/mutex.h>
 
 #include "../resource/av_resource.h"
 
@@ -35,8 +36,8 @@ public:
 
         this->m_streamParam.insert("streamID", random(1, 32000));
 
-        this->m_streamParam.insert("resolution", QLatin1String("full"));
-        this->m_streamParam.insert("Quality", QLatin1String("11"));
+        this->m_streamParam.insert("resolution", lit("full"));
+        this->m_streamParam.insert("Quality", lit("11"));
 
         QObject::connect(
             res.data(), &QnResource::initializedChanged,
@@ -53,7 +54,7 @@ public:
 
     virtual void pleaseReopenStream() override
     {
-        QMutexLocker mtx(&this->m_mutex);
+        QnMutexLocker mtx(&this->m_mutex);
         QnLiveStreamParams params = this->getLiveParams();
         QString resolution;
         if (this->getRole() == Qn::CR_LiveVideo)
@@ -70,10 +71,10 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    this->m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", lit("full"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), 19); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(19)); // panoramic
                 else
                     this->m_streamParam.insert("Quality", 19);
                 break;
@@ -82,10 +83,10 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    this->m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", lit("full"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), 16); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(16)); // panoramic
                 else
                     this->m_streamParam.insert("Quality", 16);
                 break;
@@ -94,10 +95,10 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    this->m_streamParam.insert("resolution", QLatin1String("full"));
+                    this->m_streamParam.insert("resolution", lit("full"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), 13); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(13)); // panoramic
                 else
                     this->m_streamParam.insert("Quality", 13);
                 break;
@@ -106,10 +107,10 @@ public:
                 if (avRes->isPanoramic())
                     avRes->setParamPhysicalAsync(lit("resolution"), resolution);
                 else
-                    this->m_streamParam.insert("resolution", QLatin1String("half"));
+                    this->m_streamParam.insert("resolution", lit("half"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), 15); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(15)); // panoramic
                 else
                     this->m_streamParam.insert("Quality", 10);
                 break;
@@ -122,7 +123,7 @@ public:
                     this->m_streamParam.insert("resolution", QLatin1String("half"));
 
                 if (avRes->isPanoramic())
-                    avRes->setParamPhysicalAsync(lit("Quality"), 1); // panoramic
+                    avRes->setParamPhysicalAsync(lit("Quality"), QString::number(1)); // panoramic
                 else
                     this->m_streamParam.insert("Quality", 1);
                 break;
@@ -136,7 +137,7 @@ public:
     {
         if (resource->isInitialized())
         {
-            QMutexLocker lock(&this->m_needUpdateMtx);
+            QnMutexLocker lock(&this->m_needUpdateMtx);
             m_needUpdateParams = true;
         }
     }
@@ -145,7 +146,7 @@ public:
     {
         bool needUpdate = false;
         {
-            QMutexLocker lock(&m_needUpdateMtx);
+            QnMutexLocker lock(&m_needUpdateMtx);
             needUpdate = m_needUpdateParams;
             m_needUpdateParams = false;
         }
@@ -156,7 +157,7 @@ public:
 
 private:
     bool m_needUpdateParams;
-    mutable QMutex m_needUpdateMtx;
+    mutable QnMutex m_needUpdateMtx;
 };
 
 #endif  //BASIC_AV_STREAM_READER_H

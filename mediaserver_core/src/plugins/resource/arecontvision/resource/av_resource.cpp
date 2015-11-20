@@ -14,6 +14,7 @@
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
 #include <utils/common/synctime.h>
+#include <utils/common/timermanager.h>
 #include <utils/network/http/httpclient.h>
 #include <utils/network/nettools.h>
 #include <utils/network/ping.h>
@@ -399,7 +400,7 @@ bool QnPlAreconVisionResource::isH264() const
 QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
 {
     QnMetaDataV1Ptr motion(new QnMetaDataV1());
-    QVariant mdresult;
+    QString mdresult;
     if (m_channelCount == 1)
     {
         if (!getParamPhysical(QLatin1String("mdresult"), mdresult))
@@ -415,13 +416,13 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
             m_prevMotionChannel = 0;
     }
 
-    if (mdresult.toString() == QLatin1String("no motion"))
+    if (mdresult == lit("no motion"))
         return motion; // no motion detected
 
 
     int zones = totalMdZones() == 1024 ? 32 : 8;
 
-    QStringList md = mdresult.toString().split(QLatin1Char(' '), QString::SkipEmptyParts);
+    QStringList md = mdresult.split(L' ', QString::SkipEmptyParts);
     if (md.size() < zones*zones)
         return QnMetaDataV1Ptr(0);
 
@@ -443,7 +444,7 @@ QnMetaDataV1Ptr QnPlAreconVisionResource::getCameraMetadata()
             QString m = md.at(index);
 
 
-            if (m == QLatin1String("00") || m == QLatin1String("0"))
+            if (m == lit("00") || m == lit("0"))
                 continue;
 
             QRect currZoneRect = zeroZoneRect.translated(x*pixelZoneSize, y*pixelZoneSize);
@@ -789,7 +790,7 @@ bool QnPlAreconVisionResource::isAbstractResource() const
     return getTypeId() == baseTypeId;
 }
 
-bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QVariant &val)
+bool QnPlAreconVisionResource::getParamPhysical2(int channel, const QString& name, QString &val)
 {
     m_mutex.lock();
     m_mutex.unlock();
