@@ -179,7 +179,7 @@ public:
         /**
          * Execute given PTZ preset.
          * Parameters:
-         * - preset id or tour id? //TODO: #rvasilenko #ptz
+         * (resourceId, presetId)
          */
         ExecutePtzPresetAction  = 12,
 

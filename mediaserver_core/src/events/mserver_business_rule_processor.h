@@ -33,6 +33,7 @@ private:
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
     bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource);
     bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource);
+    bool executePtzAction(const QnPtzPresetBusinessActionPtr& action, const QnResourcePtr& resource );
 
 private:
     class SendEmailAggregationKey

@@ -92,7 +92,8 @@ namespace QnBusiness {
 
     bool canBeInstant(ActionType actionType) {
         switch(actionType) {
-        case CameraOutputOnceAction:
+        case ExecutePtzPresetAction:
+		case CameraOutputOnceAction:
         case SendMailAction:
         case DiagnosticsAction:
         case ShowPopupAction:
@@ -123,6 +124,7 @@ namespace QnBusiness {
         switch (actionType) {
         case BookmarkAction:
         case ShowTextOverlayAction:
+		case ShowOnAlarmLayoutAction:
             return parameters.durationMs <= 0;
 
         default:

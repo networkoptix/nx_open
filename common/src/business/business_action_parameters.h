@@ -50,7 +50,8 @@ struct QnBusinessActionParameters {
     // Alarm Layout - if it must be opened immediately
     bool forced;
 
-    //ExecutePtzPresetAction:  //TODO: #rvasilenko #ptz
+    // exec PTZ preset action
+    QString presetId;
 
     /** 
      * \returns                        Whether all parameters have default values. 
@@ -59,7 +60,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

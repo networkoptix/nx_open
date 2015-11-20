@@ -10,6 +10,7 @@
 #include <ui/widgets/business/bookmark_business_action_widget.h>
 #include <ui/widgets/business/show_text_overlay_action_widget.h>
 #include <ui/widgets/business/show_on_alarm_layout_action_widget.h>
+#include <ui/widgets/business/ptz_preset_business_action_widget.h>
 
 QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
     switch (actionType) {
@@ -30,7 +31,7 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBu
     case QnBusiness::BookmarkAction:
         return new QnBookmarkBusinessActionWidget(parent);
     case QnBusiness::ExecutePtzPresetAction:
-        break;  //TODO: #rvasilenko #ptz
+        return new QnExecPtzPresetBusinessActionWidget(parent);
     case QnBusiness::ShowTextOverlayAction:
         return new QnShowTextOverlayActionWidget(parent);
     case QnBusiness::ShowOnAlarmLayoutAction:

@@ -91,6 +91,17 @@ QString QnCameraOutputPolicy::getText(const QnResourceList &resources, const boo
     return genericCameraText<QnCameraOutputPolicy>(cameras, detailed, tr("%1 have no output relays", "", invalid), invalid);
 }
 
+bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
+    return  camera->hasPtzCapabilities(Qn::PresetsPtzCapability) &&
+           !camera->hasPtzCapabilities(Qn::VirtualPtzCapability);
+}
+
+QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bool detailed) {
+    QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
+    int invalid = invalidResourcesCount<QnExecPtzPresetPolicy>(cameras);
+    return genericCameraText<QnExecPtzPresetPolicy>(cameras, detailed, tr("%1 have no ptz presets", "", invalid), invalid);
+}
+
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
     return !camera->isScheduleDisabled() && camera->hasMotion();
 }

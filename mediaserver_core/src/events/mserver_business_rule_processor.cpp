@@ -43,6 +43,9 @@
 #include "core/resource/camera_history.h"
 #include <utils/common/synctime.h>
 
+#include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/abstract_ptz_controller.h>
+
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
     const QString tpEventLogoFilename(lit("eventLogoFilename"));
@@ -204,6 +207,9 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
+        case QnBusiness::ExecutePtzPresetAction:
+            result = executePtzAction(action.dynamicCast<QnPtzPresetBusinessAction>(), res);
+            break;
         default:
             break;
         }
@@ -230,6 +236,18 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     mediaServer->setPanicMode(val);
     propertyDictionary->saveParams(mediaServer->getId());
     return true;
+}
+
+bool QnMServerBusinessRuleProcessor::executePtzAction(const QnPtzPresetBusinessActionPtr& action, const QnResourcePtr& resource )
+{
+    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (!camera)
+        return false;
+
+    QnPtzControllerPtr controller = qnPtzPool->controller(camera);
+    if (!controller)
+        return false;
+    return controller->activatePreset(action->getParams().presetId, 1.0);
 }
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res)
