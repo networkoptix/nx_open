@@ -158,7 +158,8 @@
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "Cellinx|STH795"
             ],
             "onvifPtzPresetsEnabled": true
         },

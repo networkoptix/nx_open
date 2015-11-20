@@ -222,11 +222,12 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
+    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
+    {
         NX_LOG(QString::fromLatin1("QnMulticastModuleFinder. Ignoring %1 (%2) with different customization %3 on local address %4").
             arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
-
-    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
+    }
 
     emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
 
