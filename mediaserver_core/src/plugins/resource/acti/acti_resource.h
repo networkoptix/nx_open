@@ -160,7 +160,7 @@ private:
     int m_outputCount;
     int m_inputCount;
     bool m_inputMonitored;
-    QMutex m_audioCfgMutex;
+    QnMutex m_audioCfgMutex;
     boost::optional<bool> m_audioInputOn;
 };
 

@@ -1,7 +1,7 @@
 #ifndef __UNIVERSAL_REQUEST_PROCESSOR_P_H__
 #define __UNIVERSAL_REQUEST_PROCESSOR_P_H__
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "universal_tcp_listener.h"
 
 class QnUniversalRequestProcessorPrivate: public QnTCPConnectionProcessorPrivate

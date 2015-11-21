@@ -1,7 +1,7 @@
 #include "utils/network/socket.h"
 #include "rtsp_h264_encoder.h"
 #include "utils/media/nalUnits.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 
 QnRtspH264Encoder::QnRtspH264Encoder():
     m_currentData(0),

@@ -1,15 +1,17 @@
 #ifndef __AUDIT_MANAGER_H__
 #define __AUDIT_MANAGER_H__
 
-#include <QMutex>
+#include <atomic>
+
 #include <QTimer>
 #include <QElapsedTimer>
+
+#include <utils/thread/mutex.h>
 
 #include "audit_manager_fwd.h"
 #include "api/model/audit/audit_record.h"
 #include "api/model/audit/auth_session.h"
 #include "recording/time_period.h"
-#include <atomic>
 
 class QnAuditManager: public QObject
 {
@@ -94,7 +96,7 @@ private:
 
     QMap<QnUuid, AuditConnection> m_openedConnections;
 
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QTimer m_timer;
     std::atomic<bool> m_enabled;
     QElapsedTimer m_sessionCleanupTimer;

@@ -5,7 +5,7 @@
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
 #include "http/custom_headers.h"
-#include "utils/network/router.h"
+#include "network/router.h"
 #include "api/app_server_connection.h"
 
 namespace {
@@ -40,7 +40,7 @@ QnIOModuleMonitor::QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera):
 
 bool QnIOModuleMonitor::open()
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     m_httpClient.reset();
 
     auto httpClient = nx_http::AsyncHttpClient::create();
@@ -85,7 +85,7 @@ bool QnIOModuleMonitor::open()
 void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
     Q_ASSERT( httpClient );
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
 
     if (httpClient != m_httpClient)
         return;
@@ -112,7 +112,7 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
 void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
     Q_ASSERT( httpClient );
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if (httpClient == m_httpClient) {
         const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
         m_multipartContentParser->processData(msgBodyBuf);
@@ -121,7 +121,7 @@ void QnIOModuleMonitor::at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClient
 
 void QnIOModuleMonitor::at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
-    QMutexLocker lk( &m_mutex );
+    QnMutexLocker lk( &m_mutex );
     if (httpClient == m_httpClient) {
         m_httpClient.reset();
         emit connectionClosed();

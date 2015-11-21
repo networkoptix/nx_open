@@ -12,6 +12,9 @@
 
 #include <QtCore/QThread>
 
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 #include "aioservice.h"
 #include "../abstract_socket.h"
 #include "../host_address_resolver.h"
@@ -239,19 +242,19 @@ public:
 
         if (waitForRunningHandlerCompletion)
         {
-            QMutex mtx;
-            QWaitCondition cond;
+            QnMutex mtx;
+            QnWaitCondition cond;
             bool done = false;
             aio::AIOService::instance()->dispatch(
                 this->m_socket,
                 [this, &mtx, &cond, &done, eventType]() {
                     stopPollingSocket(this->m_socket, eventType);
-                    QMutexLocker lk(&mtx);
+                    QnMutexLocker lk(&mtx);
                     done = true;
                     cond.wakeAll();
                 });
 
-            QMutexLocker lk(&mtx);
+            QnMutexLocker lk(&mtx);
             while(!done)
                 cond.wait(lk.mutex());
         }

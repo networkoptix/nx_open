@@ -4,32 +4,34 @@
 #include <QtCore/QTimer>
 #include <QTextStream>
 
-#include "remote_ec_connection.h"
-#include "utils/common/systemerror.h"
-#include "ec2_connection.h"
-#include "common/common_module.h"
-
-#include <transaction/transaction_transport.h>
-
 #include "api/app_server_connection.h"
 #include "api/runtime_info_manager.h"
-#include "nx_ec/data/api_server_alive_data.h"
-#include "utils/common/log.h"
-#include "utils/common/synctime.h"
-#include "utils/network/module_finder.h"
-#include "nx_ec/data/api_server_alive_data.h"
+
+#include "common/common_module.h"
+#include "ec2_connection.h"
 #include "ec_connection_notification_manager.h"
-#include "nx_ec/data/api_camera_data.h"
+#include "managers/time_manager.h"
+#include "network/module_finder.h"
+#include "remote_ec_connection.h"
+#include "settings.h"
+
 #include "nx_ec/data/api_camera_data_ex.h"
+#include "nx_ec/data/api_camera_data.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
-#include "managers/time_manager.h"
+#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_server_alive_data.h"
+
+#include "transaction/runtime_transaction_log.h"
+#include <transaction/transaction_transport.h>
 
 #include <utils/common/checked_cast.h>
+#include "utils/common/log.h"
+#include "utils/common/synctime.h"
+#include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"
-#include "transaction/runtime_transaction_log.h"
-#include "settings.h"
+
 
 
 namespace ec2

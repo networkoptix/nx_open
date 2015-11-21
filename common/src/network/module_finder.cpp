@@ -125,13 +125,13 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
     connect(messageProcessor, &QnCommonMessageProcessor::remotePeerFound,
             this, [this](const ec2::ApiPeerAliveData &data)
     {
-       QMutexLocker lk(&m_connectedPeersMutex);
+       QnMutexLocker lk(&m_connectedPeersMutex);
        m_connectedPeers.insert(data.peer.id);
     });
     connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost,
             this, [this](const ec2::ApiPeerAliveData &data)
     {
-       QMutexLocker lk(&m_connectedPeersMutex);
+       QnMutexLocker lk(&m_connectedPeersMutex);
        m_connectedPeers.remove(data.peer.id);
     });
 }
@@ -372,7 +372,7 @@ void QnModuleFinder::at_timer_timeout() {
         QnUuid id = m_idByAddress.value(address);
         QSet<QUrl> ignoredUrls = ignoredUrlsForServer(id);
         {
-            QMutexLocker lk(&m_connectedPeersMutex);
+            QnMutexLocker lk(&m_connectedPeersMutex);
             if (m_connectedPeers.contains(id))
                 continue;
         }
