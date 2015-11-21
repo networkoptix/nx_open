@@ -25,7 +25,7 @@ private slots:
     void paramsChanged();
     void updateComboboxItems(const QString& presetId);
 private:
-    void setupPtzController(const QnResourcePtr& camera);
+    void setupPtzController(const QnVirtualCameraResourcePtr& camera);
 private:
     QScopedPointer<Ui::ExecPtzPresetBusinessActionWidget> ui;
     QnPtzControllerPtr m_ptzController;

@@ -243,11 +243,13 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (!camera)
         return false;
+    if (camera->getDewarpingParams().enabled)
+        return broadcastBusinessAction(action); // execute action on a client side
 
     QnPtzControllerPtr controller = qnPtzPool->controller(camera);
     if (!controller)
         return false;
-    return controller->activatePreset(action->getParams().presetId, 1.0);
+    return controller->activatePreset(action->getParams().presetId, QnAbstractPtzController::MaxPtzSpeed);
 }
 
 bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res)

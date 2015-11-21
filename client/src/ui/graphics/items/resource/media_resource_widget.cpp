@@ -72,6 +72,8 @@
 #include <utils/common/collection.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
+#include <api/common_message_processor.h>
+#include <business/actions/abstract_business_action.h>
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -215,6 +217,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         filter.text = text;
         m_bookmarksQuery->setFilter(filter);
     });
+
+    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived,
+            this, [this](const QnAbstractBusinessActionPtr &businessAction)
+    {
+        if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
+            return;
+        const auto &actionParams = businessAction->getParams();
+        if (actionParams.actionResourceId != m_resource->toResource()->getId())
+            return;
+        if (m_ptzController)
+            m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
+    });
+
 
     {
         /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */

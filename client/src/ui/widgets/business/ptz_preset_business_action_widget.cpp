@@ -14,6 +14,7 @@
 #include "core/ptz/fallback_ptz_controller.h"
 #include "core/ptz/preset_ptz_controller.h"
 #include "core/ptz/activity_ptz_controller.h"
+#include "ui/fisheye/fisheye_ptz_controller.h"
 
 QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -55,12 +56,21 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusinessRuleVie
         updateComboboxItems(model->actionParams().presetId);
 }
 
-void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnResourcePtr& camera)
+void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCameraResourcePtr& camera)
 {
     if (m_ptzController)
         disconnect(m_ptzController.data(), nullptr, this, nullptr);
 
-    m_ptzController = qnPtzPool->controller(camera);
+    QnPtzControllerPtr fisheyeController;
+    fisheyeController.reset(new QnFisheyePtzController(camera), &QObject::deleteLater);
+    fisheyeController.reset(new QnPresetPtzController(fisheyeController));
+
+    if (QnPtzControllerPtr serverController = qnPtzPool->controller(camera)) {
+        serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
+        m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
+    } else {
+        m_ptzController = fisheyeController; 
+    }
 
     connect(m_ptzController.data(), &QnAbstractPtzController::changed, this, [this](Qn::PtzDataFields fields) {
         if (fields & Qn::PresetsPtzField)

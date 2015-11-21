@@ -61,7 +61,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     m_limits.minFov = 0.0;
     m_limits.maxFov = 1.0;
 
-    SpeedLimits defaultLimits(-1.0, 1.0);
+    SpeedLimits defaultLimits(-QnAbstractPtzController::MaxPtzSpeed, QnAbstractPtzController::MaxPtzSpeed);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
     QnResourceData data = qnCommon->dataPool()->data(resource);

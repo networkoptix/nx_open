@@ -22,7 +22,7 @@ namespace {
 
     int toActiZoomSpeed(qreal zoomSpeed) {
 #if 0
-        zoomSpeed = qBound(-1.0, zoomSpeed, 1.0);
+        zoomSpeed = qBound(-1.0, zoomSpeed, QnAbstractPtzController::MaxPtzSpeed);
         if(qFuzzyIsNull(zoomSpeed)) {
             return 0;
         } else {
@@ -42,7 +42,7 @@ namespace {
     }
 
     int toActiPanTiltSpeed(qreal panTiltSpeed) {
-        panTiltSpeed = qBound(-1.0, panTiltSpeed, 1.0);
+        panTiltSpeed = qBound(-QnAbstractPtzController::MaxPtzSpeed, panTiltSpeed, QnAbstractPtzController::MaxPtzSpeed);
         if(qFuzzyIsNull(panTiltSpeed)) {
             return 0;
         } else {
