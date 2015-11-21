@@ -186,29 +186,29 @@ void QnMServerBusinessRuleProcessor::onRemoveResource(const QnResourcePtr &resou
     qnServerDb->removeLogForRes(resource->getId());
 }
 
-bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
+bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
-    bool result = QnBusinessRuleProcessor::executeActionInternal(action, res);
+    bool result = QnBusinessRuleProcessor::executeActionInternal(action);
     if (!result) {
         switch(action->actionType())
         {
         case QnBusiness::SendMailAction:
             return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
         case QnBusiness::BookmarkAction:
-            result = executeBookmarkAction(action, res);
+            result = executeBookmarkAction(action);
             break;
         case QnBusiness::CameraOutputAction:
         case QnBusiness::CameraOutputOnceAction:
-            result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>(), res);
+            result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
             break;
         case QnBusiness::CameraRecordingAction:
-            result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>(), res);
+            result = executeRecordingAction(action.dynamicCast<QnRecordingBusinessAction>());
             break;
         case QnBusiness::PanicRecordingAction:
             result = executePanicAction(action.dynamicCast<QnPanicBusinessAction>());
             break;
         case QnBusiness::ExecutePtzPresetAction:
-            result = executePtzAction(action, res);
+            result = executePtzAction(action);
             break;
         default:
             break;
@@ -216,7 +216,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
     }
     
     if (result)
-        qnServerDb->saveActionToDB(action, res);
+        qnServerDb->saveActionToDB(action);
 
     return result;
 }
@@ -238,9 +238,9 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
     return true;
 }
 
-bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& resource )
+bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
     if (camera->getDewarpingParams().enabled)
@@ -252,10 +252,10 @@ bool QnMServerBusinessRuleProcessor::executePtzAction(const QnAbstractBusinessAc
     return controller->activatePreset(action->getParams().presetId, QnAbstractPtzController::MaxPtzSpeed);
 }
 
-bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res)
+bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBusinessActionPtr& action)
 {
     Q_ASSERT(action);
-    QnSecurityCamResourcePtr camera = res.dynamicCast<QnSecurityCamResource>();
+    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //Q_ASSERT(camera);
     bool rez = false;
     if (camera) {
@@ -273,9 +273,10 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource) {
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action) 
+{
     Q_ASSERT(action);
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
+    auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     if (!camera)
         return false;
 
@@ -317,8 +318,9 @@ QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();
 }
 
-bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource )
+bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBusinessActionPtr& action)
 {
+    auto resource = qnResPool->getResourceById(action->getParams().actionResourceId);
     if( !resource )
     {
         NX_LOG( lit("Received BA_CameraOutput with no resource reference. Ignoring..."), cl_logWARNING );

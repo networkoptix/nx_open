@@ -112,8 +112,12 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 {
     if (needProxyAction(action, res))
         doProxyAction(action, res);
-    else
-        executeActionInternal(action, res);
+    else {
+        auto actionCopy = QnBusinessActionFactory::cloneAction(action);
+        if (res)
+            actionCopy->getParams().actionResourceId = res->getId();
+        executeActionInternal(actionCopy);
+    }
 }
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
@@ -140,8 +144,9 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
 }
 
-bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
+bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
+    QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
     if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
