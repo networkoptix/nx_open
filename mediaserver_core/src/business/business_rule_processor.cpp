@@ -307,7 +307,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
         return QnAbstractBusinessActionPtr();
 
 
-    if (rule->aggregationPeriod() == 0)
+    if (rule->aggregationPeriod() == 0 || !QnBusiness::allowsAggregation(rule->actionType()))
         return QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
     QString eventKey = rule->getUniqueId();
