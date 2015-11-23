@@ -1,16 +1,20 @@
 #include "workbench_layout_snapshot_manager.h"
+
 #include <cassert>
 
 #include <api/app_server_connection.h>
-#include <utils/common/warnings.h>
-#include <utils/common/checked_cast.h>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "workbench_context.h"
-#include "workbench_layout_snapshot_storage.h"
-#include "workbench_layout_synchronizer.h"
-#include "workbench_layout.h"
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_storage.h>
+#include <ui/workbench/workbench_layout_synchronizer.h>
+#include <ui/workbench/workbench_layout.h>
+
+#include <utils/common/warnings.h>
+#include <utils/common/checked_cast.h>
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutReplyProcessor
@@ -55,10 +59,6 @@ QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
     m_flagsByLayout.clear();
 }
 
-ec2::AbstractECConnectionPtr QnWorkbenchLayoutSnapshotManager::connection2() const {
-    return QnAppServerConnectionFactory::getConnection2();
-}
-
 bool QnWorkbenchLayoutSnapshotManager::isFile(const QnLayoutResourcePtr &resource) {
     return resource && (resource->flags() & Qn::url) && !resource->getUrl().isEmpty();
 }
@@ -97,6 +97,10 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayou
 }
 
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags) {
+
+    if (flags.testFlag(Qn::ResourceIsChanged) || flags.testFlag(Qn::ResourceIsBeingSaved))
+        Q_ASSERT_X(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
+
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
     if(pos == m_flagsByLayout.end()) {
         pos = m_flagsByLayout.insert(resource, flags);
@@ -133,7 +137,7 @@ int QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourceList &resources
             synchronizer->submit();
 
     //TODO: #GDM SafeMode
-    int handle = connection2()->getLayoutManager()->save(resources, replyProcessor, &QnWorkbenchLayoutReplyProcessor::processReply );
+    int handle = QnAppServerConnectionFactory::getConnection2()->getLayoutManager()->save(resources, replyProcessor, &QnWorkbenchLayoutReplyProcessor::processReply );
 
     foreach(const QnLayoutResourcePtr &resource, resources)
         setFlags(resource, flags(resource) | Qn::ResourceIsBeingSaved);
@@ -259,6 +263,8 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
+    if (!accessController()->hasPermissions(resource, Qn::SavePermission))
+        return;
     setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
