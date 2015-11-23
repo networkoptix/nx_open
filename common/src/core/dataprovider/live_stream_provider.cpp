@@ -64,6 +64,8 @@ QnLiveStreamProvider::QnLiveStreamProvider(const QnResourcePtr& res):
 
     Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, [this](const QnResourcePtr&) {
         m_videoChannels = m_cameraRes->getVideoLayout()->channelCount();
+        QnMutexLocker mtx( &m_livemutex );
+        updateSoftwareMotion();
     });
 
 }
