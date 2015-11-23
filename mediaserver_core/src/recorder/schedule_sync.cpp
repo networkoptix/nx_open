@@ -218,11 +218,21 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::SourceFileError;
         }
 
+        auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
+            return storage->getFreeSpace() > storage->getSpaceLimit();
+        };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(
+            nullptr,
+            optimalRootBackupPred
+        );
+
         if (!toStorage) {
             qnBackupStorageMan->clearSpace(true);
-            toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+            toStorage = qnBackupStorageMan->getOptimalStorageRoot(
+                nullptr,
+                optimalRootBackupPred
+            );
             if (!toStorage)
                 return CopyError::NoBackupStorageError;
         }
