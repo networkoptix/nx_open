@@ -42,6 +42,8 @@ private:
 
     bool isBinaryExportSupported() const;
 
+    QnMediaResourceWidget *extractMediaWidget(const QnActionParameters &parameters);
+
 private slots:
     void at_exportTimeSelectionAction_triggered();
 

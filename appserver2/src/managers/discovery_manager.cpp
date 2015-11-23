@@ -1,7 +1,7 @@
 #include "discovery_manager.h"
 
-#include "utils/network/module_finder.h"
-#include "utils/network/direct_module_finder.h"
+#include "network/module_finder.h"
+#include "network/direct_module_finder.h"
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 

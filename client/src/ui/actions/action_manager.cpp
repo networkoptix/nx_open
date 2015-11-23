@@ -1675,7 +1675,7 @@ QnActionManager::QnActionManager(QObject *parent):
         separator();
 
     factory(Qn::ExportTimeSelectionAction).
-        flags(Qn::Slider | Qn::SingleTarget).
+        flags(Qn::Slider | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Export Selected Area...")).
         requiredPermissions(Qn::ExportPermission).
         condition(new QnExportActionCondition(true, this));

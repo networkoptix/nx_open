@@ -4,6 +4,7 @@
 #include <limits>
 
 #include <QtCore/QUrlQuery>
+#include <QtOpenGL/qgl.h>
 
 #include "api/app_server_connection.h"
 #include "api/network_proxy_factory.h"
@@ -20,19 +21,24 @@
 #include "utils/network/http/httptypes.h"
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
+#include <ui/texture_size_helper.h>
 
 namespace {
 
 #if defined(Q_OS_IOS)
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #elif defined(Q_OS_ANDROID)
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #else
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #endif
+
+    enum {
+        mjpegQuality = 4 // picked as the best balance between traffic and picture quality
+    };
 
     QString protocolName(QnMediaResourceHelper::Protocol protocol) {
         switch (protocol) {
@@ -80,9 +86,11 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_nativeStreamIndex(1),
     m_transcodingSupported(true),
     m_transcodingProtocol(transcodingProtocol),
-    m_nativeProtocol(nativeStreamProtocol)
+    m_nativeProtocol(nativeStreamProtocol),
+    m_maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
+    m_maxNativeResolution(0)
 {
-    setStardardResolutions();
+    updateStardardResolutions();
     connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
     connect(this, &QnMediaResourceHelper::rotationChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
 }
@@ -107,6 +115,7 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
         m_camera = camera;
 
         m_nativeProtocol = nativeStreamProtocol;
+        m_resolution = qnSettings->lastUsedQuality();
 
         connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
         connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
@@ -121,18 +130,27 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
                 emit rotationChanged();
 
         });
+        connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
+
         at_resource_parentIdChanged(camera);
         updateMediaStreams();
 
         emit resourceIdChanged();
         emit resourceNameChanged();
 
-        m_resolution = qnSettings->lastUsedQuality();
         emit resolutionChanged();
         emit rotationChanged();
+        emit resourceStatusChanged();
     }
 
     updateUrl();
+}
+
+Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const {
+    if (!m_camera)
+        return Qn::NotDefined;
+
+    return m_camera->getStatus();
 }
 
 QUrl QnMediaResourceHelper::mediaUrl() const {
@@ -207,8 +225,10 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
 
-    if (protocol == Mjpeg)
+    if (protocol == Mjpeg) {
         query.addQueryItem(lit("ct"), lit("false"));
+        query.addQueryItem(lit("quality"), QString::number(mjpegQuality));
+    }
 
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
@@ -230,11 +250,14 @@ int QnMediaResourceHelper::nativeStreamIndex(const QString &resolution) const {
 }
 
 QString QnMediaResourceHelper::resolutionString(int resolution) const {
+    if (resolution <= 0)
+        return QString();
+
     return lit("%1x%2").arg(int(sensorAspectRatio() * resolution)).arg(resolution);
 }
 
 QString QnMediaResourceHelper::currentResolutionString() const {
-    return m_resolution > 0 ? resolutionString(m_resolution) : optimalResolution();
+    return resolutionString(m_resolution > 0 ? m_resolution : optimalResolution());
 }
 
 QString QnMediaResourceHelper::resourceName() const {
@@ -318,17 +341,33 @@ void QnMediaResourceHelper::setScreenSize(const QSize &size) {
         updateUrl();
 }
 
-QString QnMediaResourceHelper::optimalResolution() const {
+int QnMediaResourceHelper::optimalResolution() const {
     if (!m_transcodingSupported)
-        return QString();
+        return 0;
 
     if (m_screenSize.isEmpty())
-        return QString();
+        return 0;
 
     int maxHeight = qMax(m_screenSize.width(), m_screenSize.height());
     auto it = qUpperBound(m_standardResolutions.begin(), m_standardResolutions.end(), maxHeight);
-    int resolution = it == m_standardResolutions.end() ? m_standardResolutions.last() : *it;
-    return resolutionString(resolution);
+    return it == m_standardResolutions.end() ? m_standardResolutions.last() : *it;
+}
+
+int QnMediaResourceHelper::maximumResolution() const {
+    int maxResolution = std::numeric_limits<int>::max();
+
+    qreal ar = aspectRatio();
+    if (!qFuzzyIsNull(ar)) {
+        if (ar > 1)
+            maxResolution = int(m_maxTextureSize / ar);
+        else
+            maxResolution = int(m_maxTextureSize * ar);
+    }
+
+    if (m_maxNativeResolution > 0)
+        maxResolution = qMin(maxResolution, m_maxNativeResolution * m_camera->getVideoLayout()->size().height());
+
+    return maxResolution;
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
@@ -407,6 +446,8 @@ void QnMediaResourceHelper::updateMediaStreams() {
     bool nativeSupported = false;
     bool mjpegSupported = false;
 
+    m_maxNativeResolution = 0;
+
     for (const CameraMediaStreamInfo &info: supportedStreams.streams) {
         if (info.transcodingRequired)
             transcodingSupported = true;
@@ -420,14 +461,29 @@ void QnMediaResourceHelper::updateMediaStreams() {
         nativeSupported |= hasNative;
         mjpegSupported |= hasMjpeg;
 
+        m_maxNativeResolution = qMax(m_maxNativeResolution, sizeFromResolutionString(info.resolution).height());
+
         if (hasNative || hasMjpeg) {
             if (nativeStreamIndex(info.resolution) != -1)
                 continue;
             m_nativeResolutions.insert(info.encoderIndex, info.resolution);
         }
     }
-    if (m_nativeResolutions.size() < 2 && !m_nativeResolutions.isEmpty()) /* primary and secondary streams */
-        m_nativeStreamIndex = m_nativeResolutions.firstKey();
+
+    if (!m_nativeResolutions.isEmpty()) {
+        if (m_nativeResolutions.size() < 2) { /* primary and secondary streams */
+            m_nativeStreamIndex = m_nativeResolutions.firstKey();
+        } else {
+            int maxResolution = maximumResolution();
+            for (auto it = m_nativeResolutions.begin(); it != m_nativeResolutions.end(); /* no inc */) {
+                QSize size = sizeFromResolutionString(it.value());
+                if (size.height() > maxResolution)
+                    it = m_nativeResolutions.erase(it);
+                else
+                    ++it;
+            }
+        }
+    }
 
     if (mjpegSupported && !nativeSupported)
         m_nativeProtocol = Mjpeg;
@@ -436,6 +492,10 @@ void QnMediaResourceHelper::updateMediaStreams() {
 
     if (m_transcodingSupported != transcodingSupported) {
         m_transcodingSupported = transcodingSupported;
+
+        if (m_transcodingSupported)
+            updateStardardResolutions();
+
         emit resolutionsChanged();
         emit aspectRatioChanged();
         emit resolutionChanged();
@@ -444,6 +504,10 @@ void QnMediaResourceHelper::updateMediaStreams() {
         emit resolutionsChanged();
         emit resolutionChanged();
         emit aspectRatioChanged();
+    } else {
+        updateStardardResolutions();
+        emit resolutionsChanged();
+        emit resolutionChanged();
     }
 
     updateUrl();
@@ -456,10 +520,21 @@ void QnMediaResourceHelper::at_resource_parentIdChanged(const QnResourcePtr &res
     updateUrl();
 }
 
-void QnMediaResourceHelper::setStardardResolutions() {
-    m_standardResolutions.append(240);
-    m_standardResolutions.append(360);
-    m_standardResolutions.append(480);
-    m_standardResolutions.append(720);
-    m_standardResolutions.append(1080);
+void QnMediaResourceHelper::updateStardardResolutions() {
+    m_standardResolutions.clear();
+
+    int maxResolution = maximumResolution();
+
+    for (int resolution: { 240, 360, 480, 720, 1080 }) {
+        if (resolution <= maxResolution)
+            m_standardResolutions.append(resolution);
+    }
+
+    if (!m_transcodingSupported)
+        return;
+
+    maxResolution = m_standardResolutions.last();
+
+    if (m_resolution > 0 && m_resolution > maxResolution)
+        m_resolution = maxResolution;
 }

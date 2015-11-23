@@ -17,7 +17,7 @@
 
 #include <utils/common/collection.h>
 #include <utils/common/string.h>
-#include <utils/network/module_finder.h>
+#include <network/module_finder.h>
 
 namespace {
 

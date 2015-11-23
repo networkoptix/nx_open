@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"

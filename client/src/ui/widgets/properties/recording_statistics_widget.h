@@ -35,6 +35,10 @@ public:
 
     QnMediaServerResourcePtr server() const;
     void setServer(const QnMediaServerResourcePtr &server);
+
+    /** Clean 'forecast' state. */
+    void resetForecast();
+
 private:
     void updateData();
     void updateColors();

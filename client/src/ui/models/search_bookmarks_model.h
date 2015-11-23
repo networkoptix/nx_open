@@ -23,7 +23,7 @@ public:
 
     virtual ~QnSearchBookmarksModel();
 
-    void applyFilter(bool clearBookmarksCache);
+    void applyFilter();
 
     void setDates(const QDate &start
         , const QDate &finish);
@@ -38,6 +38,7 @@ public:
     
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
+    /// TODO: #ynikitenkov Refactor to use proxy model
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
     QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;

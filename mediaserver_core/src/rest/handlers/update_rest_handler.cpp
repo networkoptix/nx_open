@@ -4,7 +4,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <managers/updates_manager.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <media_server/server_update_tool.h>
 #include <utils/update/update_utils.h>
 #include <utils/common/log.h>

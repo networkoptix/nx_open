@@ -20,6 +20,8 @@ public:
 
     virtual QString getUniqueId() const;
 
+    QnMediaServerResourcePtr getParentServer() const;
+
     void setStorageBitrateCoeff(float value);
     void setSpaceLimit(qint64 value);
     qint64 getSpaceLimit() const;
@@ -86,7 +88,7 @@ private:
     std::atomic<float> m_storageBitrateCoeff;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    mutable QnMutex m_bitrateMtx;
     bool    m_isBackup;
     double  m_writed;
     double  m_writedCoeff;

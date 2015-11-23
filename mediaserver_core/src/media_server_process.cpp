@@ -67,6 +67,7 @@
 
 #include <platform/platform_abstraction.h>
 
+#include <plugins/native_sdk/common_plugin_container.h>
 #include <plugins/plugin_manager.h>
 #include <plugins/resource/acti/acti_resource_searcher.h>
 #include <plugins/resource/avi/avi_resource.h>
@@ -149,18 +150,19 @@
 
 #include <rtsp/rtsp_connection.h>
 
+#include <network/module_finder.h>
+#include <network/multicodec_rtp_reader.h>
+#include <network/router.h>
+
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/sleep.h>
+#include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
-#include <utils/common/util.h>
 #include <utils/common/system_information.h>
-#include <utils/network/multicodec_rtp_reader.h>
+#include <utils/common/util.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
-#include <utils/common/ssl_gen_cert.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -1138,6 +1140,9 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
         for(const QnUserResourcePtr &user: users)
             messageProcessor->updateResource(user);
+
+        /* Here the admin user must exist, global settings also. */
+        updateStatisticsAllowedSettings();
     }
 
     {
@@ -1205,6 +1210,28 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
         propertyDictionary->saveParams(m_mediaServer->getId());
     }
 }
+
+
+void MediaServerProcess::updateStatisticsAllowedSettings() {
+    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+
+    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
+    if (confStats.isNull()) 
+        return;
+
+    {   /* Security check */
+        const auto admin = qnResPool->getAdministrator();
+        Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+        if (!admin) 
+            return;
+    }
+
+    qnGlobalSettings->setStatisticsAllowed(confStats.toBool());
+    qnGlobalSettings->synchronizeNow();
+    MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
+    MSSettings::roSettings()->sync();
+}
+
 
 void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
 {
@@ -1632,6 +1659,10 @@ void MediaServerProcess::run()
 
     qnCommon->setModuleGUID(serverGuid());
 
+    qnCommon->setArecontRTSPEnabled(settings->value(
+        nx_ms_conf::ARECONT_RTSP_ENABLED,
+        nx_ms_conf::DEFAULT_ARECONT_RTSP_ENABLED).toBool());
+
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
     bool isLocal = isLocalAppServer(appserverHostString);
@@ -1782,8 +1813,10 @@ void MediaServerProcess::run()
 
     QnMServerResourceSearcher::initStaticInstance( new QnMServerResourceSearcher() );
 
+    CommonPluginContainer pluginContainer;
+
     //Initializing plugin manager
-    PluginManager pluginManager;
+    PluginManager pluginManager(QString(), &pluginContainer);
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;
@@ -1952,13 +1985,7 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-        const auto confStats = MSSettings::roSettings()->value(Qn::STATISTICS_REPORT_ALLOWED);
-        if (!confStats.isNull()) // if present
-        {
-            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, QnLexical::serialized(confStats.toBool()));
-            MSSettings::roSettings()->remove(Qn::STATISTICS_REPORT_ALLOWED);
-            MSSettings::roSettings()->sync();
-        }
+
 
         propertyDictionary->saveParams(server->getId());
 

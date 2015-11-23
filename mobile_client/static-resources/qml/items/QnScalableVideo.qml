@@ -39,7 +39,7 @@ QnZoomableFlickable {
 
             fillMode: VideoOutput.Stretch
 
-            onSourceRectChanged: content.updateWithVideoSize()
+            onSourceRectChanged: content.updateWithVideoSize(true)
         }
 
         Image {
@@ -59,7 +59,7 @@ QnZoomableFlickable {
                 if (status != Image.Ready)
                     return
 
-                content.updateWithScreenshotSize()
+                content.updateWithScreenshotSize(true)
             }
         }
 
@@ -77,7 +77,7 @@ QnZoomableFlickable {
                 updateWithScreenshotSize()
         }
 
-        function updateSize(w, h) {
+        function updateSize(w, h, saveZoom) {
             if (w <= 0 || h <= 0)
                 return
 
@@ -86,30 +86,38 @@ QnZoomableFlickable {
                 w = h
                 h = tmp
             }
-            var scale = Math.min(zf.width / w, zf.height / h)
+
+            var scale = 1.0
+            if (saveZoom && contentWidth > 0 && contentHeight > 0)
+                scale = Math.min(contentWidth / w, contentHeight / h)
+            else
+                scale = Math.min(zf.width / w, zf.height / h)
+
             w *= scale
             h *= scale
 
             var animate = contentWidth > 0 && contentHeight > 0
-            resizeContent(w, h, false, true)
+            resizeContent(w, h, animate, true)
         }
 
-        function updateWithVideoSize() {
+        function updateWithVideoSize(saveZoom) {
             var w = video.sourceRect.width
+            var h = video.sourceRect.height
 
             if (aspectRatio > 0)
-                w = video.sourceRect.height * aspectRatio
+                w = h * aspectRatio
 
-            content.updateSize(w, video.sourceRect.height)
+            content.updateSize(w, h, saveZoom)
         }
 
-        function updateWithScreenshotSize() {
+        function updateWithScreenshotSize(saveZoom) {
             var w = screenshot.sourceSize.width
+            var h = screenshot.sourceSize.height
 
             if (aspectRatio > 0)
-                w = screenshot.sourceSize.height * aspectRatio
+                w = h * aspectRatio
 
-            content.updateSize(w, screenshot.sourceSize.height)
+            content.updateSize(w, h, saveZoom)
         }
     }
 

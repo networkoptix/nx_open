@@ -263,7 +263,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if (m_camera) {
         m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
         addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
-        updateBookmarksVisibility();
     }
 
     /* Set up overlays */
@@ -868,10 +867,12 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region) {
-    Q_UNUSED(channel)
+    QPoint channelOffset = channelGridOffset(channel);
+
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
-    qreal offset = xStep * 0.1;
+    qreal xOffset = channelOffset.x() + 0.1;
+    qreal yOffset = channelOffset.y();
     qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
@@ -880,6 +881,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     font.setBold(true);
     painter->setFont(font);
 
+    /* Zero sensitivity is skipped as there should not be painted zeros */
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
         auto rects = region.getRectsBySens(sensitivity);
         if (rects.isEmpty())
@@ -890,8 +892,8 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
-            int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
+            qreal x = rect.left(), y = rect.top();
+            painter->drawStaticText((x + xOffset) * xStep , (y + yOffset) * yStep , m_sensStaticText[sensitivity]);
         }
     }
 }
@@ -1051,9 +1053,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
 
     if(changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
         updateCursor();
-
-    if (changedFlags.testFlag(DisplayInfo))
-        updateBookmarksVisibility();
 
     base_type::optionsChangedNotify(changedFlags);
 }
@@ -1614,20 +1613,21 @@ void QnMediaResourceWidget::updateBookmarks() {
         return;
     }
 
-    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->cachedBookmarks(), getUtcCurrentTimeMs()));
+    if (!m_bookmarksQuery->filter().isValid())
+        updateBookmarksFilter();
+
+    const auto time = getUtcCurrentTimeMs();
+    const auto cached = m_bookmarksQuery->cachedBookmarks();
+    const auto bookmarks = getBookmarksAtPosition(cached, time);
+
+    m_bookmarksOverlayWidget->setBookmarks(bookmarks);
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {
     if (!m_bookmarksOverlayWidget)
         return;
 
-    auto visibility = Invisible;
-    if (m_bookmarksQuery) {
-        if (options().testFlag(DisplayInfo))
-            visibility = Visible;
-        else
-            visibility = AutoVisible;
-    }
+    const auto visibility = (m_bookmarksQuery ? Visible : Invisible);
     setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
 }
 

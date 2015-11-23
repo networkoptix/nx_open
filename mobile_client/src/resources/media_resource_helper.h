@@ -11,6 +11,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
+    Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
@@ -22,6 +23,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
 
     Q_ENUMS(Protocol)
+    Q_ENUMS(Qn::ResourceStatus)
 
     typedef Connective<QObject> base_type;
 
@@ -38,6 +40,8 @@ public:
     QString resourceId() const;
     void setResourceId(const QString &id);
 
+    Qn::ResourceStatus resourceStatus() const;
+
     QUrl mediaUrl() const;
 
     QString resourceName() const;
@@ -51,8 +55,6 @@ public:
     QSize screenSize() const;
     void setScreenSize(const QSize &size);
 
-    QString optimalResolution() const;
-
     Protocol protocol() const;
 
     qreal aspectRatio() const;
@@ -61,8 +63,11 @@ public:
 
     int rotation() const;
 
+    Q_INVOKABLE void updateUrl();
+
 signals:
     void resourceIdChanged();
+    void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
     void resolutionsChanged();
@@ -78,12 +83,13 @@ private:
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
 
 private:
-    void setStardardResolutions();
+    void updateStardardResolutions();
     void setUrl(const QUrl &url);
-    void updateUrl();
     int nativeStreamIndex(const QString &resolution) const;
     QString resolutionString(int resolution) const;
     QString currentResolutionString() const;
+    int optimalResolution() const;
+    int maximumResolution() const;
 
 private:
     QnVirtualCameraResourcePtr m_camera;
@@ -97,6 +103,8 @@ private:
     bool m_transcodingSupported;
     Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
+    int m_maxTextureSize;
+    int m_maxNativeResolution;
 };
 
 #endif // MEDIA_RESOURCE_HELPER_H

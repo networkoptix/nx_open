@@ -86,6 +86,9 @@ namespace nx_ms_conf
     //!If set to \a true, EC DB is opened in read-only mode. So, any data modification operation except license activation will fail
     static const QLatin1String EC_DB_READ_ONLY( "ecDbReadOnly" );
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
+
+    static const QLatin1String ARECONT_RTSP_ENABLED("arecontRtspEnabled");
+    static const QLatin1String DEFAULT_ARECONT_RTSP_ENABLED("false");
 }
 
 /*!

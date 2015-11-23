@@ -1,6 +1,6 @@
 #include "default_tcp_connection_processor.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
 
 QnDefaultTcpConnectionProcessor::QnDefaultTcpConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/): 
     QnTCPConnectionProcessor(socket)

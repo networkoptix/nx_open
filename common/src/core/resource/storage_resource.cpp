@@ -1,5 +1,8 @@
 #include "storage_resource.h"
 #include "core/dataprovider/media_streamdataprovider.h"
+
+#include <core/resource/media_server_resource.h>
+
 #include "utils/common/log.h"
 
 QnStorageResource::QnStorageResource():
@@ -11,12 +14,18 @@ QnStorageResource::QnStorageResource():
     m_writed(0.0),
     m_writedCoeff(1.0)
 {
+    addFlags(Qn::remote);
     setStatus(Qn::Offline);
 }
 
 QnStorageResource::~QnStorageResource()
 {
 }
+
+QnMediaServerResourcePtr QnStorageResource::getParentServer() const {
+    return getParentResource().dynamicCast<QnMediaServerResource>();
+}
+
 
 void QnStorageResource::setSpaceLimit(qint64 value)
 {
@@ -79,7 +88,7 @@ QString QnStorageResource::getUniqueId() const
 float QnStorageResource::bitrate() const
 {
     float rez = 0;
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     for(const QnAbstractMediaStreamDataProvider* provider: m_providers)
         rez += provider->getBitrateMbps();
     return rez;
@@ -87,13 +96,13 @@ float QnStorageResource::bitrate() const
 
 void QnStorageResource::addBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers << provider;
 }
 
 void QnStorageResource::releaseBitrate(QnAbstractMediaStreamDataProvider* provider)
 {
-    QMutexLocker lock(&m_bitrateMtx);
+    QnMutexLocker lock(&m_bitrateMtx);
     m_providers.remove(provider);
 }
 #endif

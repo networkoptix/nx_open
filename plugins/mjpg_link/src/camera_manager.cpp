@@ -10,12 +10,14 @@
 #include "media_encoder.h"
 
 
-CameraManager::CameraManager( const nxcip::CameraInfo& info )
+CameraManager::CameraManager(const nxcip::CameraInfo& info, 
+                             nxpl::TimeProvider *const timeProvider)
 :
     m_refManager( this ),
     m_pluginRef( HttpLinkPlugin::instance() ),
     m_info( info ),
-    m_capabilities( nxcip::BaseCameraManager::nativeMediaStreamCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability )
+    m_capabilities( nxcip::BaseCameraManager::nativeMediaStreamCapability | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability ),
+    m_timeProvider(timeProvider)
 {
 }
 
@@ -67,7 +69,7 @@ int CameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** enc
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
     if( !m_encoder.get() )
-        m_encoder.reset( new MediaEncoder(this, encoderIndex) );
+        m_encoder.reset( new MediaEncoder(this, m_timeProvider, encoderIndex) );
     m_encoder->addRef();
     *encoderPtr = m_encoder.get();
 

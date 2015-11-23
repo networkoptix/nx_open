@@ -7,7 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 #include "http/custom_headers.h"
 #include "utils/common/synctime.h"
 #include "network/authutil.h"

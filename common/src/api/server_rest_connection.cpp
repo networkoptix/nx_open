@@ -11,10 +11,9 @@
 #include <nx_ec/data/api_data.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 #include <http/custom_headers.h>
 #include "utils/network/http/httptypes.h"
-#include <utils/network/http/asynchttpclient.h>
 #include "utils/common/delayed.h"
 
 namespace {
@@ -189,14 +188,13 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
 
     QString user = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
-    auto authType = nx_http::AsyncHttpClient::authBasicAndDigest;
     if (user.isEmpty() || password.isEmpty()) {
         if (QnUserResourcePtr admin = qnResPool->getAdministrator()) 
         {
             // if auth is not known, use admin hash
             user = admin->getName();
             password = QString::fromUtf8(admin->getDigest());
-            authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
+            request.authType = nx_http::AsyncHttpClient::authDigestWithPasswordHash;
         }
     }
     request.url.setUserName(user);
@@ -213,6 +211,7 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
     httpClientCaptured->setResponseReadTimeoutMs( ResponseReadTimeoutMs );
     httpClientCaptured->setSendTimeoutMs( TcpConnectTimeoutMs );
     httpClientCaptured->addRequestHeaders(request.headers);
+    httpClientCaptured->setAuthType(request.authType);
     
     auto requestCompletionFunc = [requestId, callback, this, httpClientCaptured]
     ( nx_http::AsyncHttpClientPtr httpClient ) mutable
