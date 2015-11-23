@@ -23,18 +23,46 @@ QnPage {
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+
+        property bool showOfflineStatus: false
 
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
 
+        Timer {
+            id: offlineStatusDelay
+
+            interval: 20 * 1000
+            repeat: false
+            running: d.serverOffline || d.cameraOffline
+
+            onTriggered: d.showOfflineStatus = true
+        }
+
+        onShowOfflineStatusChanged: updateOfflineDisplay()
+
         onServerOfflineChanged: {
-            if (serverOffline) {
-                exitFullscreen()
-                navigationLoader.opacity = 0.0
-                navigationBarTint.opacity = 0.0
-                toolBar.opacity = 1.0
+            if (!d.serverOffline)
+                d.showOfflineStatus = d.cameraOffline
+        }
+
+        onCameraOfflineChanged: {
+            if (!d.cameraOffline)
+                d.showOfflineStatus = d.serverOffline
+        }
+
+        function updateOfflineDisplay() {
+            if (showOfflineStatus) {
+                if (serverOffline) {
+                    exitFullscreen()
+                    navigationLoader.opacity = 0.0
+                    navigationBarTint.opacity = 0.0
+                    toolBar.opacity = 1.0
+                } else if (cameraOffline) {
+                    showUi()
+                }
             } else {
                 navigationLoader.opacity = 1.0
                 navigationBarTint.opacity = 1.0
@@ -167,7 +195,9 @@ QnPage {
     Loader {
         id: dummyLoader
 
-        sourceComponent: player.atLive && (d.serverOffline || d.cameraOffline || d.cameraUnauthorized) ? dummyComponent : undefined
+        visible: d.cameraUnauthorized || (d.showOfflineStatus && (d.serverOffline || d.cameraOffline))
+
+        sourceComponent: visible ? dummyComponent : undefined
 
         y: parent.height / 6
         anchors.horizontalCenter: parent.horizontalCenter
