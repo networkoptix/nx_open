@@ -32,9 +32,10 @@
 #include <ui/help/help_topics.h>
 #include <ui/workaround/gl_widget_factory.h>
 
+#include <network/module_finder.h>
+#include <network/networkoptixmodulerevealcommon.h>
+
 #include <utils/applauncher_utils.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/networkoptixmodulerevealcommon.h>
 #include <utils/common/url.h>
 
 #include "plugins/resource/avi/avi_resource.h"
@@ -46,7 +47,6 @@
 #include "ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h"
 
 #include <utils/connection_diagnostics_helper.h>
-
 
 #include "compatibility.h"
 #include <utils/common/app_info.h>

@@ -61,6 +61,11 @@ namespace nx_http
         terminate();
     }
 
+    AbstractStreamSocket* AsyncHttpClient::socket()
+    {
+        return m_socket.data();
+    }
+    
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;

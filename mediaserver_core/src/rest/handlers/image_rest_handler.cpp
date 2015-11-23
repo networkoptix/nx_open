@@ -14,7 +14,7 @@ extern "C"
 
 #include <QtCore/QBuffer>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include <utils/math/math.h>
 #include "core/resource/network_resource.h"
 #include <core/resource/camera_resource.h>

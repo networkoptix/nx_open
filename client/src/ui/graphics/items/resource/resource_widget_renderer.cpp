@@ -1,8 +1,6 @@
 
 #include "resource_widget_renderer.h"
 
-#include <QtCore/QMutexLocker>
-
 #include <camera/gl_renderer.h>
 #include <utils/common/warnings.h>
 #include <utils/common/performance.h>
@@ -172,6 +170,9 @@ bool QnResourceWidgetRenderer::isHardwareDecoderUsed(int channel) const
 
 QnMetaDataV1Ptr QnResourceWidgetRenderer::lastFrameMetadata(int channel) const
 {
+    if (m_channelRenderers.size() <= static_cast<size_t>(channel))
+        return QnMetaDataV1Ptr();
+
     const RenderingTools& ctx = m_channelRenderers[channel];
     return ctx.renderer ? ctx.renderer->lastFrameMetadata() : QnMetaDataV1Ptr();
 }

@@ -151,19 +151,20 @@
 
 #include <rtsp/rtsp_connection.h>
 
+#include <network/module_finder.h>
+#include <network/multicodec_rtp_reader.h>
+#include <network/router.h>
+
 #include <utils/common/command_line_parser.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/log.h>
 #include <utils/common/sleep.h>
+#include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
-#include <utils/common/util.h>
 #include <utils/common/system_information.h>
-#include <utils/network/multicodec_rtp_reader.h>
+#include <utils/common/util.h>
 #include <utils/network/simple_http_client.h>
 #include <utils/network/ssl_socket.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
-#include <utils/common/ssl_gen_cert.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -1718,6 +1719,10 @@ void MediaServerProcess::run()
     qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
 
     qnCommon->setModuleGUID(serverGuid());
+
+    qnCommon->setArecontRTSPEnabled(settings->value(
+        nx_ms_conf::ARECONT_RTSP_ENABLED,
+        nx_ms_conf::DEFAULT_ARECONT_RTSP_ENABLED).toBool());
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();

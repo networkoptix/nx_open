@@ -5,9 +5,10 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/multicast_module_finder.h>
-#include <utils/network/direct_module_finder.h>
+
+#include "module_finder.h"
+#include "multicast_module_finder.h"
+#include "direct_module_finder.h"
 
 namespace {
     const int checkInterval = 3000;

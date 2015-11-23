@@ -2,17 +2,20 @@
 
 #include <QtCore/QTimer>
 
-#include <utils/common/model_functions.h>
-#include <utils/common/log.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/async_http_client_reply.h>
-#include <utils/network/networkoptixmodulerevealcommon.h>
-#include <rest/server/json_rest_result.h>
 #include <common/common_module.h>
+
+#include <network/module_information.h>
+#include <network/networkoptixmodulerevealcommon.h>
+
 #include <nx_ec/ec_proto_version.h>
-#include <utils/network/module_information.h>
+#include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/log.h>
+
+#include <utils/common/model_functions.h>
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/network/http/async_http_client_reply.h>
 
 namespace {
 

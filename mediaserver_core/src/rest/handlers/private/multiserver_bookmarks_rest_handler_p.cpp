@@ -14,12 +14,13 @@
 
 #include <rest/helpers/bookmarks_request_helper.h>
 
+#include <network/router.h>
+
 #include <utils/common/model_functions.h>
-#include <utils/network/router.h>
+#include <utils/network/http/asynchttpclient.h>
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
-#include <utils/network/http/asynchttpclient.h>
 
 namespace {
     static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =

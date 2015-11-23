@@ -5,6 +5,7 @@
 
 #include "core/resource/storage_resource.h"
 #include "plugins/storage/third_party/third_party_storage.h"
+#include <utils/thread/mutex.h>
 
 class QnThirdPartyStorageResource
     : public QnStorageResource
@@ -69,7 +70,7 @@ private:
     );
 private:
     StoragePtrType                      m_storage;
-    mutable QMutex                      m_mutex;
+    mutable QnMutex                      m_mutex;
     bool                                m_valid;
 }; // QnThirdPartyStorageResource
 

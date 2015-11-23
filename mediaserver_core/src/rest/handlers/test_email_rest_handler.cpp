@@ -3,7 +3,7 @@
 #include <api/model/test_email_settings_reply.h>
 
 #include <nxemail/email_manager_impl.h>
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/email/email.h>
 #include <nxemail/email_manager_impl.h>
 

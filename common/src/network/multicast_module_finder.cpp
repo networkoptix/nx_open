@@ -10,8 +10,9 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 
-#include "socket.h"
-#include "system_socket.h"
+#include <utils/network/socket.h>
+#include <utils/network/system_socket.h>
+
 #include "common/common_module.h"
 #include "module_information.h"
 #include "utils/common/cryptographic_hash.h"
@@ -226,11 +227,12 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
     if (response->type != QnModuleInformation::nxMediaServerId() && response->type != QnModuleInformation::nxECId())
         return true;
 
+    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
+    {
         NX_LOGX(lit("Ignoring %1 (%2) with different customization %3 on local address %4").
             arg(response->type).arg(remoteEndpoint.toString()).arg(response->customization).arg(udpSocket->getLocalAddress().toString()), cl_logDEBUG2);
-
-    if (!m_compatibilityMode && response->customization.compare(qnProductFeatures().customizationName, Qt::CaseInsensitive) != 0)
         return false;
+    }
 
     emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
 

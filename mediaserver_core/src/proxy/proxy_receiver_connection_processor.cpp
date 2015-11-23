@@ -1,7 +1,7 @@
 
 #include "proxy_receiver_connection_processor.h"
 #include "network/universal_request_processor_p.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
 
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate

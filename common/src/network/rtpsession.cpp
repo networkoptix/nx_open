@@ -13,22 +13,24 @@
 #include "rtp_stream_parser.h"
 
 #include <QtCore/QFile>
-#include <utils/common/uuid.h>
-#include <utils/network/rtsp/rtsp_types.h>
+
+#include "http/custom_headers.h"
+#include "tcp_connection_priv.h"
+#include "tcp_connection_processor.h"
 
 #include "utils/common/log.h"
-#include "utils/common/util.h"
-#include "utils/common/systemerror.h"
-#include "utils/network/http/httptypes.h"
 #include "utils/common/sleep.h"
-#include "tcp_connection_processor.h"
-#include "simple_http_client.h"
-#include "utils/media/bitStream.h"
 #include "utils/common/synctime.h"
-#include "tcp_connection_priv.h"
-#include "http/custom_headers.h"
-#include "version.h"
+#include "utils/common/systemerror.h"
+#include "utils/common/util.h"
+#include <utils/common/uuid.h>
+#include "utils/media/bitStream.h"
 
+#include "utils/network/http/httptypes.h"
+#include <utils/network/rtsp/rtsp_types.h>
+#include "utils/network/simple_http_client.h"
+
+#include "version.h"
 
 #define DEFAULT_RTP_PORT 554
 #define RESERVED_TIMEOUT_TIME (5*1000)

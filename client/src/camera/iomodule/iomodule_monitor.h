@@ -1,6 +1,8 @@
 #ifndef __IOMODULE_MONITOR_H_
 #define __IOMODULE_MONITOR_H_
 
+#include <utils/thread/mutex.h>
+
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"
 #include "utils/network/http/asynchttpclient.h"
@@ -23,7 +25,7 @@ private slots:
     void at_MonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient );
     void at_MonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient );
 private:
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnSecurityCamResourcePtr m_camera;
     nx_http::AsyncHttpClientPtr m_httpClient;
     std::shared_ptr<nx_http::MultipartContentParser> m_multipartContentParser;

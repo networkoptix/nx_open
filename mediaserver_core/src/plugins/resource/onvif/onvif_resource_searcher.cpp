@@ -13,6 +13,9 @@
 
 #include "onvif_resource.h"
 #include "onvif_resource_information_fetcher.h"
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
+#include "common/common_module.h"
 
 bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 {
@@ -152,23 +155,30 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(const QUrl& ur
         QString manufacturer = resource->getVendor();
         QString modelName = resource->getModel();
 
-        if (NameHelper::instance().isSupported(modelName))
-            return resList;
-
-        if (OnvifResourceInformationFetcher::ignoreCamera(manufacturer, modelName))
-            return resList;
-        if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName)) {
-            qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << modelName;
-            return resList;
-        }
-
-
-        int modelNamePos = modelName.indexOf(QLatin1String(" "));
-        if (modelNamePos >= 0)
+        QString shortModel = modelName;
+        if (modelName.startsWith(manufacturer))
+            shortModel = modelName.mid(manufacturer.length()).trimmed();
+        QnResourceData resourceData = qnCommon->dataPool()->data(manufacturer, shortModel);
+        const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
+        if (!forceOnvif) 
         {
-            modelName = modelName.mid(modelNamePos+1);
             if (NameHelper::instance().isSupported(modelName))
                 return resList;
+
+            if (OnvifResourceInformationFetcher::ignoreCamera(manufacturer, modelName))
+                return resList;
+
+            if (OnvifResourceInformationFetcher::isModelSupported(manufacturer, modelName)) {
+                qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << modelName;
+                return resList;
+            }
+            int modelNamePos = modelName.indexOf(QLatin1String(" "));
+            if (modelNamePos >= 0)
+            {
+                modelName = modelName.mid(modelNamePos+1);
+                if (NameHelper::instance().isSupported(modelName))
+                    return resList;
+            }
         }
 
         OnvifResourceInformationFetcher fetcher;

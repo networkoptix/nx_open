@@ -263,7 +263,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     if (m_camera) {
         m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
         addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
-        updateBookmarksVisibility();
     }
 
     /* Set up overlays */
@@ -1055,9 +1054,6 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & (DisplayMotion | DisplayMotionSensitivity | ControlZoomWindow))
         updateCursor();
 
-    if (changedFlags.testFlag(DisplayInfo))
-        updateBookmarksVisibility();
-
     base_type::optionsChangedNotify(changedFlags);
 }
 
@@ -1617,7 +1613,14 @@ void QnMediaResourceWidget::updateBookmarks() {
         return;
     }
 
-    m_bookmarksOverlayWidget->setBookmarks(getBookmarksAtPosition(m_bookmarksQuery->cachedBookmarks(), getUtcCurrentTimeMs()));
+    if (!m_bookmarksQuery->filter().isValid())
+        updateBookmarksFilter();
+
+    const auto time = getUtcCurrentTimeMs();
+    const auto cached = m_bookmarksQuery->cachedBookmarks();
+    const auto bookmarks = getBookmarksAtPosition(cached, time);
+
+    m_bookmarksOverlayWidget->setBookmarks(bookmarks);
 }
 
 void QnMediaResourceWidget::updateBookmarksVisibility() {

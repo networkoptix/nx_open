@@ -17,6 +17,8 @@ Item {
     readonly property real timelinePosition: timeline.position
     readonly property bool timelineAtLive: timeline.stickToEnd
 
+    property alias paused: playbackController.paused
+
     width: parent ? parent.width : 0
     height: navigator.height + navigationPanel.height
     anchors.bottom: parent ? parent.bottom : undefined
@@ -339,41 +341,12 @@ Item {
             QnPlaybackController {
                 id: playbackController
 
-                property bool resumeOnActivate: false
-                property bool resumeAtLive: false
-
                 anchors.verticalCenter: timeline.top
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)
 
                 gripTickVisible: timeline.startBound > 0
-
-                onPausedChanged: {
-                    if (paused)
-                        mediaPlayer.pause()
-                    else
-                        mediaPlayer.play(resumeAtLive ? -1 : timeline.position)
-                }
-
-                Connections {
-                    target: Qt.application
-                    onStateChanged: {
-                        if (Qt.application.state != Qt.ApplicationActive) {
-                            if (!playbackController.paused) {
-                                playbackController.resumeAtLive = mediaPlayer.atLive
-                                playbackController.resumeOnActivate = true
-                            }
-                            playbackController.paused = true
-                        } else if (Qt.application.state == Qt.ApplicationActive) {
-                            if (playbackController.resumeOnActivate) {
-                                playbackController.paused = false
-                                playbackController.resumeOnActivate = false
-                                playbackController.resumeAtLive = false
-                            }
-                        }
-                    }
-                }
             }
 
             Rectangle {
