@@ -20,6 +20,8 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , durationMs(0)
     , additionalResources()
     , forced(true)
+    , presetId()
+    , useSource(false)
 {}
 
 

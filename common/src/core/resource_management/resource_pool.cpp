@@ -30,7 +30,7 @@ namespace {
 QnResourcePool::QnResourcePool(QObject *parent) :
     QObject(parent),
     m_resourcesMtx(QnMutex::Recursive),
-    m_tranInProgress(false)    
+    m_tranInProgress(false)
 {
     invalidateCache();
 }
@@ -63,7 +63,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
     if (m_tranInProgress)
         m_tmpResources << resource;
     else
-        addResources(QnResourceList() << resource); 
+        addResources(QnResourceList() << resource);
 }
 
 void QnResourcePool::addResources(const QnResourceList &resources)
@@ -169,7 +169,7 @@ void QnResourcePool::removeResources(const QnResourceList &resources)
         //const QString& uniqueId = resource->getUniqueId();
         //if( m_resources.remove(uniqueId) != 0 )
         //    removedResources.append(resource);
-        
+
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
         QnUuid resId = resource->getId();
         QHash<QnUuid, QnResourcePtr>::iterator resIter = m_resources.find(resId);
@@ -235,6 +235,28 @@ QnResourceList QnResourcePool::getResources() const
     return m_resources.values();
 }
 
+QnResourceList QnResourcePool::getResources(const QVector<QnUuid>& idList) const {
+    QnMutexLocker locker( &m_resourcesMtx );
+    QnResourceList result;
+    for (const auto& id: idList) {
+        const auto itr = m_resources.find(id);
+        if (itr != m_resources.end())
+            result.push_back(itr.value());
+    }
+    return result;
+}
+
+ QnResourceList QnResourcePool::getResources(const std::vector<QnUuid>& idList) const {
+    QnMutexLocker locker(&m_resourcesMtx);
+    QnResourceList result;
+    for (const auto& id: idList) {
+        const auto itr = m_resources.find(id);
+        if (itr != m_resources.end())
+            result.push_back(itr.value());
+    }
+    return result;
+}
+
 QnResourcePtr QnResourcePool::getResourceById(const QnUuid &id) const {
     QnMutexLocker locker( &m_resourcesMtx );
 
@@ -271,7 +293,7 @@ QnNetworkResourcePtr QnResourcePool::getNetResourceByPhysicalId(const QString &p
 QnResourcePtr QnResourcePool::getResourceByParam(const QString &key, const QString &value) const
 {
     QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources) 
+    for (const QnResourcePtr &resource: m_resources)
     {
         if (resource->getProperty(key) == value)
             return resource;
@@ -293,12 +315,12 @@ QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString &mac)
     return QnNetworkResourcePtr(0);
 }
 
-QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const 
+QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras) const
 {
     QnUuid parentId = mServer ? mServer->getId() : QnUuid();
     QnVirtualCameraResourceList result;
     QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources) 
+    for (const QnResourcePtr &resource: m_resources)
     {
         if (ignoreDesktopCameras && resource->hasFlags(Qn::desktop_camera))
             continue;
@@ -322,7 +344,7 @@ QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) co
 {
     QnResourceList result;
     QnMutexLocker locker( &m_resourcesMtx );
-    for (const QnResourcePtr &resource: m_resources) 
+    for (const QnResourcePtr &resource: m_resources)
         if (resource->getParentId() == parentId)
             result << resource;
 
@@ -332,7 +354,7 @@ QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) co
 QnResourceList QnResourcePool::getAllResourceByTypeName(const QString &typeName) const
 {
     QnResourceList result;
-    
+
     const QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(typeName);
     if (!resType)
         return result;
@@ -437,7 +459,7 @@ QnUserResourcePtr QnResourcePool::getAdministrator() const {
     if (m_adminResource)
         return m_adminResource;
 
-    for(const QnResourcePtr &resource: m_resources) 
+    for(const QnResourcePtr &resource: m_resources)
     {
         QnUserResourcePtr user = resource.dynamicCast<QnUserResource>();
         if (user && user->isAdmin()) {
@@ -595,7 +617,7 @@ void QnResourcePool::ensureCache() const {
     QnMutexLocker lk( &m_resourcesMtx );
     if (m_cache.valid)
         return;
-    
+
     m_cache.containsIoModules = boost::algorithm::any_of(getResources<QnVirtualCameraResource>(), [](const QnVirtualCameraResourcePtr &device) {
         return device->isIOModule() && !device->hasVideo(nullptr);
     });

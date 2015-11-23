@@ -72,7 +72,7 @@ public:
     }
 
     void setSort(int column, Qt::SortOrder order)
-    { 
+    {
         if ((Column) column == m_sortCol) {
             m_sortOrder = order;
             return;
@@ -84,8 +84,8 @@ public:
         updateIndex();
     }
 
-    void setEvents(const QVector<QnBusinessActionDataListPtr>& events) 
-    { 
+    void setEvents(const QVector<QnBusinessActionDataListPtr>& events)
+    {
         m_events = events;
         m_size = 0;
         for (int i = 0; i < events.size(); ++i)
@@ -210,7 +210,7 @@ public:
     }
 
 private:
-    QnEventLogModel *m_parent; 
+    QnEventLogModel *m_parent;
     Column m_sortCol;
     Qt::SortOrder m_sortOrder;
     QVector<QnBusinessActionDataListPtr> m_events;
@@ -276,8 +276,8 @@ void QnEventLogModel::clear() {
 }
 
 QModelIndex QnEventLogModel::index(int row, int column, const QModelIndex &parent) const {
-    return hasIndex(row, column, parent) 
-        ? createIndex(row, column, (void*)0) 
+    return hasIndex(row, column, parent)
+        ? createIndex(row, column, (void*)0)
         : QModelIndex();
 }
 
@@ -288,14 +288,14 @@ QModelIndex QnEventLogModel::parent(const QModelIndex &) const {
 bool QnEventLogModel::hasVideoLink(const QnBusinessActionData &action)
 {
     QnBusiness::EventType eventType = action.eventParams.eventType;
-    if (action.hasFlags(QnBusinessActionData::MotionExists)) 
+    if (action.hasFlags(QnBusinessActionData::MotionExists))
     {
         if (eventType == QnBusiness::CameraMotionEvent)
             return true;
     }
-    else if (eventType >= QnBusiness::UserDefinedEvent) 
+    else if (eventType >= QnBusiness::UserDefinedEvent)
     {
-        for (const QnUuid& id: action.eventParams.metadata.cameraRefs) 
+        for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
         {
             if (qnResPool->getResourceById(id))
                 return true;
@@ -318,16 +318,16 @@ QVariant QnEventLogModel::foregroundData(const Column& column, const QnBusinessA
 }
 
 QVariant QnEventLogModel::mouseCursorData(const Column& column, const QnBusinessActionData &action) {
-    if (column == DescriptionColumn && hasVideoLink(action)) 
+    if (column == DescriptionColumn && hasVideoLink(action))
         return QVariant::fromValue<int>(Qt::PointingHandCursor);
     return QVariant();
 }
 
 QnResourcePtr QnEventLogModel::getResource(const Column &column, const QnBusinessActionData &action) const {
     switch(column) {
-    case EventCameraColumn: 
+    case EventCameraColumn:
         return getResourceById(action.eventParams.eventResourceId);
-    case ActionCameraColumn: 
+    case ActionCameraColumn:
         return getResourceById(action.actionParams.actionResourceId);
     default:
         break;
@@ -353,10 +353,10 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
 QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
     QnUuid resId;
     switch(column) {
-    case EventCameraColumn: 
+    case EventCameraColumn:
         resId = action.eventParams.eventResourceId;
         break;
-    case ActionCameraColumn: 
+    case ActionCameraColumn:
         {
             QnBusiness::ActionType actionType = action.actionType;
             if (actionType == QnBusiness::SendMailAction) {
@@ -489,11 +489,11 @@ QnResourceList QnEventLogModel::resourcesForPlayback(const QModelIndex &index) c
         return QnResourceList();
     const QnBusinessActionData &action = m_index->at(index.row());
     if (action.hasFlags(QnBusinessActionData::MotionExists)) {
-        QnResourcePtr resource = eventResource(index.row());
+        QnResourcePtr resource = qnResPool->getResourceById(action.eventParams.eventResourceId);
         if (resource)
             result << resource;
     }
-    result << qnResPool->getResources<QnResource>(action.eventParams.metadata.cameraRefs);
+    result << qnResPool->getResources(action.eventParams.metadata.cameraRefs);
     return result;
 }
 
@@ -574,7 +574,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
         QString url = motionUrl(column, action);
         if (url.isEmpty())
             return text;
-        else 
+        else
             return lit("<a href=\"%1\">%2</a>").arg(url, text);
     }
     case Qn::HelpTopicIdRole:
@@ -590,7 +590,7 @@ QnBusiness::EventType QnEventLogModel::eventType(int row) const {
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return action.eventParams.eventType;
-    } 
+    }
     return QnBusiness::UndefinedEvent;
 }
 
@@ -598,7 +598,7 @@ QnResourcePtr QnEventLogModel::eventResource(int row) const {
     if (row >= 0) {
         const QnBusinessActionData& action = m_index->at(row);
         return qnResPool->getResourceById(action.eventParams.eventResourceId);
-    } 
+    }
     return QnResourcePtr();
 }
 

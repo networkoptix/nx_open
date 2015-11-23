@@ -51,9 +51,9 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
     const auto messageProcessor = QnClientMessageProcessor::instance();
 
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this, [this](const QnAbstractBusinessActionPtr &businessAction) {
-        if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction) 
+        if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
             return;
-        
+
         if (!context()->user())
             return;
 
@@ -64,13 +64,13 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
         //TODO: #GDM code duplication
         QnBusinessEventParameters params = businessAction->getRuntimeParams();
         QnBusiness::EventType eventType = params.eventType;
-        QnVirtualCameraResourceList targetCameras;
-        if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
-            targetCameras << qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
-        }
-        if (eventType >= QnBusiness::UserDefinedEvent) {
+
+        QnVirtualCameraResourceList targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
+        if (businessAction->getParams().useSource) {
+            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(params.eventResourceId))
+                targetCameras << sourceCamera;
             targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
-        } 
+        }
 
         if (!targetCameras.isEmpty())
             openCamerasInAlarmLayout(targetCameras, businessAction->getParams().forced);
@@ -78,18 +78,18 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
 
 }
 
-QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler() 
+QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler()
 {}
 
 void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCameraResourceList &cameras, bool switchToLayout ) {
     auto layout = findOrCreateAlarmLayout();
     if (!layout)
         return;
-    
+
     for (const QnVirtualCameraResourcePtr &camera: cameras) {
         if (!layout->items(camera->getUniqueId()).isEmpty())
             continue;
-        
+
         QnLayoutItemData data;
         data.resource.id = camera->getId();
         data.resource.path = camera->getUniqueId();
@@ -97,15 +97,15 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
         data.flags = Qn::PendingGeometryAdjustment;
 
         QString forcedRotation = camera->getProperty(QnMediaResource::rotationKey());
-        if (!forcedRotation.isEmpty()) 
+        if (!forcedRotation.isEmpty())
             data.rotation = forcedRotation.toInt();
-        
+
         if (layout->resource())
             layout->resource()->addItem(data);
     }
 
     if (switchToLayout)
-        workbench()->setCurrentLayout(layout);   
+        workbench()->setCurrentLayout(layout);
 }
 
 QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {

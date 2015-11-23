@@ -27,6 +27,7 @@ QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(QWidget *parent
     ui->setupUi(this);
 
     connect(ui->forceOpenCheckBox,  &QCheckBox::clicked,    this,   &QnShowOnAlarmLayoutActionWidget::paramsChanged);
+    connect(ui->useSourceCheckBox,  &QCheckBox::clicked,    this,   &QnShowOnAlarmLayoutActionWidget::paramsChanged);
     connect(ui->selectUsersButton,  &QPushButton::clicked,  this,   &QnShowOnAlarmLayoutActionWidget::selectUsers);
 }
 
@@ -36,7 +37,8 @@ QnShowOnAlarmLayoutActionWidget::~QnShowOnAlarmLayoutActionWidget()
 void QnShowOnAlarmLayoutActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
     setTabOrder(before, ui->selectUsersButton);
     setTabOrder(ui->selectUsersButton, ui->forceOpenCheckBox);
-    setTabOrder(ui->forceOpenCheckBox, after);    
+    setTabOrder(ui->forceOpenCheckBox, ui->useSourceCheckBox);
+    setTabOrder(ui->useSourceCheckBox, after);
 }
 
 void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
@@ -47,6 +49,7 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
         ui->forceOpenCheckBox->setChecked(model->actionParams().forced);
+        ui->useSourceCheckBox->setChecked(model->actionParams().useSource);
         updateUsersButtonText();
     }
 }
@@ -54,7 +57,7 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
 void QnShowOnAlarmLayoutActionWidget::selectUsers() {
     if (!model() || m_updating)
         return;
-    
+
     QnResourceSelectionDialog dialog(QnResourceSelectionDialog::UserResourceTarget, this);
     dialog.setSelectedResources(usersFromIds(model()->actionParams().additionalResources));
     if (dialog.exec() != QDialog::Accepted)
@@ -62,10 +65,10 @@ void QnShowOnAlarmLayoutActionWidget::selectUsers() {
 
     {
         QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
-        
+
         std::vector<QnUuid> userIds;
         for (const QnUserResourcePtr &user: dialog.selectedResources().filtered<QnUserResource>())
-            userIds.push_back(user->getId());        
+            userIds.push_back(user->getId());
 
         QnBusinessActionParameters params = model()->actionParams();
         params.additionalResources = userIds;
@@ -77,14 +80,14 @@ void QnShowOnAlarmLayoutActionWidget::selectUsers() {
 
 
 void QnShowOnAlarmLayoutActionWidget::updateUsersButtonText() {
-    QnUserResourceList users = model() 
+    QnUserResourceList users = model()
         ? usersFromIds(model()->actionParams().additionalResources)
         : QnUserResourceList();
 
     QString title;
-    if (users.size() == 1) 
+    if (users.size() == 1)
         title = users.first()->getName();
-    else if (users.isEmpty()) 
+    else if (users.isEmpty())
         title = tr("<All Users>");
     else
         title = tr("%n User(s)", "", users.size());
@@ -101,5 +104,6 @@ void QnShowOnAlarmLayoutActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params = model()->actionParams();
     params.forced = ui->forceOpenCheckBox->isChecked();
+    params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);
 }

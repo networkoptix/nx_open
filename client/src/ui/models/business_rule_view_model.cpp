@@ -41,7 +41,7 @@ namespace QnBusiness {
     QList<Columns> allColumns() {
         static QList<Columns> result;
         if (result.isEmpty()) {
-            result 
+            result
                 << ModifiedColumn
                 << DisabledColumn
                 << EventColumn
@@ -102,11 +102,11 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
         m_eventTypesModel->appendRow(row);
     }
 
-    for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {      
+    for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
         QStandardItem *item = new QStandardItem(QnBusinessStringsHelper::actionName(actionType));
         item->setData(actionType);
         item->setData(!QnBusiness::canBeInstant(actionType), ProlongedActionRole);
-        
+
         QList<QStandardItem *> row;
         row << item;
         m_actionTypesModel->appendRow(row);
@@ -247,8 +247,8 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             QnBusinessActionParameters params = m_actionParams;
 
             // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
-            // This code will fail silently if someone changes the header. Please write it properly.           
-            params.userGroup = (QnBusiness::UserGroup)value.toInt(); 
+            // This code will fail silently if someone changes the header. Please write it properly.
+            params.userGroup = (QnBusiness::UserGroup)value.toInt();
             setActionParams(params);
             break;
         }
@@ -804,8 +804,22 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
                     m_actionResources.size() == 1 &&
                    !m_actionParams.presetId.isEmpty();
         case QnBusiness::ShowTextOverlayAction:
-        case QnBusiness::ShowOnAlarmLayoutAction:
             break;  // Just check cameras here
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            {
+                /* Check if some cameras are selected directly */
+                if (!QnBusiness::filteredResources<QnVirtualCameraResource>(m_actionResources).isEmpty())
+                    return true;
+
+                if (m_actionParams.useSource) {
+                    /* Always valid for generic events. */
+                    if (m_eventType >= QnBusiness::UserDefinedEvent)
+                        return true;
+                    return requiresCameraResource(m_eventType);
+                }
+
+                return false;
+            }
         default:
             break;
         }
@@ -853,7 +867,7 @@ QString QnBusinessRuleViewModel::getSourceText(const bool detailed) const {
         return QnCameraMotionPolicy::getText(resources, detailed);
     else if (m_eventType == QnBusiness::CameraInputEvent)
         return QnCameraInputPolicy::getText(resources, detailed);
-    
+
     if (!QnBusiness::isResourceRequired(m_eventType)) {
         return tr("<System>");
     } else if (resources.size() == 1) {
@@ -934,20 +948,20 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
 
     //TODO: #GDM #Business check all variants or resource requirements: userResource, serverResource
-    if (!QnBusiness::requiresCameraResource(m_actionType)) 
+    if (!QnBusiness::requiresCameraResource(m_actionType))
         return tr("<System>");
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    if (cameras.size() == 1) 
+    if (cameras.size() == 1)
         return getResourceName(cameras.first());
-    
+
     if (cameras.isEmpty())
         return QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("Select at least one device"),
             tr("Select at least one camera")
         );
-    
-    return QnDeviceDependentStrings::getNumericName(cameras);  
+
+    return QnDeviceDependentStrings::getNumericName(cameras);
 }
 
 QString QnBusinessRuleViewModel::getAggregationText() const {

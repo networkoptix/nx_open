@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>322</width>
-    <height>64</height>
+    <height>87</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,6 +48,13 @@
      </property>
      <property name="flat">
       <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCheckBox" name="useSourceCheckBox">
+     <property name="text">
+      <string>Also show source camera (if any)</string>
      </property>
     </widget>
    </item>

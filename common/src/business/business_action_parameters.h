@@ -9,7 +9,7 @@
 struct QnBusinessActionParameters {
     QnBusinessActionParameters();
 
-    /** Additional parameter for event log convenience. Does not filled when the action really occurs. */   
+    /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
     // Play Sound
@@ -17,7 +17,7 @@ struct QnBusinessActionParameters {
 
     // Email
     QString emailAddress;
- 
+
     // Popups and System Health
     QnBusiness::UserGroup userGroup;
 
@@ -31,7 +31,7 @@ struct QnBusinessActionParameters {
     QString relayOutputId;
     int relayAutoResetTimeout;
     QString inputPortId;
-    
+
     // Say Text
     QString sayText;
 
@@ -53,14 +53,17 @@ struct QnBusinessActionParameters {
     // exec PTZ preset action
     QString presetId;
 
-    /** 
-     * \returns                        Whether all parameters have default values. 
+    // Alarm Layout - if the source resource should also be used
+    bool useSource;
+
+    /**
+     * \returns                        Whether all parameters have default values.
      */
     bool isDefault() const;
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
