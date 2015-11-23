@@ -1,5 +1,4 @@
-#ifndef MOBILE_CLIENT_MODULE_H
-#define MOBILE_CLIENT_MODULE_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -9,5 +8,3 @@ public:
     QnMobileClientModule(QObject *parent = NULL);
     ~QnMobileClientModule();
 };
-
-#endif // MOBILE_CLIENT_MODULE_H
