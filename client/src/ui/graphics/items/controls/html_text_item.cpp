@@ -14,15 +14,10 @@ namespace
         kDefaultItemWidth = 250
         , kDefaultPadding = 8
     };
-
-//    const int maximumCaptionLength = 64;
-//    const int maximumDescriptionLength = 256;
-//    const int radius = 4;
-//    const int captionFontSize = 16;
-//    const int descriptionFontSize = 12;
 }
 
 ///
+
 QnHtmlTextItemOptions::QnHtmlTextItemOptions()
     : backgroundColor()
     , maxWidth(kDefaultItemWidth)
@@ -129,9 +124,6 @@ QnHtmlTextItem::QnHtmlTextItem(const QString &html
     : base_type(parent)
     , d_ptr(new QnHtmlTextItemPrivate(options, this))
 {
-   // const auto policy = (options.autosize ? QSizePolicy::Maximum : QSizePolicy::Fixed);
-    const auto policy = QSizePolicy::Maximum;
-    setSizePolicy(policy, policy);
     setHtml(html);
 }
 

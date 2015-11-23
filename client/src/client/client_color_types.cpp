@@ -141,6 +141,7 @@ QnBookmarkColors::QnBookmarkColors()
 QnMediaResourceWidgetColors::QnMediaResourceWidgetColors()
     : resourceWidgetColors()
     , bookmarkColors()
+    , textOverlayItemColor(0, 0, 0, 128)
 {
 }
 

@@ -3,6 +3,8 @@
 
 #include <api/common_message_processor.h>
 
+#include <utils/common/string.h>
+
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 
@@ -18,7 +20,13 @@
 
 namespace
 {
-    QString makeP(const QString &text
+    enum 
+    {
+        kCaptionMaxLength = 128
+        , kDescriptionMaxLength = 256
+    };
+
+    QString makePTag(const QString &text
         , int pixelSize
         , bool isBold = false
         , bool isItalic = false)
@@ -207,20 +215,23 @@ void QnCompositeTextOverlay::initTextMode()
         if (actionParams.text.isEmpty())
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, true);
-            const auto desciption = QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n"));
+            const auto caption = elideString(
+                QnBusinessStringsHelper::eventAtResource(runtimeParams, true), kCaptionMaxLength);
+
+            const auto desciption = elideString(
+                QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
             static const auto kComplexHtml = lit("<html><body>%1%2</body></html>");
-            text = kComplexHtml.arg(makeP(caption, 16, true)
-                , makeP(desciption, 13));
+            text = kComplexHtml.arg(makePTag(caption, 16, true)
+                , makePTag(desciption, 13));
         }
         else
         {
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            text = kTextHtml.arg(actionParams.text);
+            text = elideString(kTextHtml.arg(actionParams.text), kDescriptionMaxLength);
         }
 
-        const QnHtmlTextItemOptions options(QColor(0, 0, 0, 0x80), true, 2, 12, 250);
+        const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true, 2, 12, 250);
 
         const QnOverlayTextItemData data(actionId, text, options, timeout);
         addModeData(QnCompositeTextOverlay::kTextAlaramsMode, data);
@@ -267,7 +278,7 @@ void QnCompositeTextOverlay::setColors(const QnMediaResourceWidgetColors &colors
 {
     m_colors = colors;
 
-    /// Updates colors on current items
+    // TODO: #ynikitenkov Update colors on current items
     const auto tmp = m_data[m_currentMode];
     resetModeData(m_currentMode);
     setModeData(m_currentMode, tmp);
@@ -373,8 +384,8 @@ QnCompositeTextOverlay::InnerDataContainer QnCompositeTextOverlay::makeTextItemD
     for (const auto bookmark: bookmarks)
     {
         const auto bookmarkHtml = kBookTemplate.arg(
-            makeP(bookmark.name, 16, true)
-            , makeP(bookmark.description, 12));
+            makePTag(bookmark.name, 16, true)
+            , makePTag(bookmark.description, 12));
 
         const auto itemData = QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options);
         data.push_back(InnerData(timestamp, itemData));

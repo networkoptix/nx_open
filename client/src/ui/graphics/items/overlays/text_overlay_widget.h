@@ -15,7 +15,6 @@ struct QnOverlayTextItemData
     QString text;
     QnHtmlTextItemOptions itemOptions;
     int timeout;
-    qint64 innerTimestamp;      /// Used to filter outdated
 
     QnOverlayTextItemData(const QnUuid &initId
         , const QString &initText

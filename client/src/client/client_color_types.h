@@ -184,8 +184,10 @@ struct QnMediaResourceWidgetColors
 
     QnBookmarkColors bookmarkColors;
 
+    QColor textOverlayItemColor;
+
 };
-#define QnMediaResourceWidgetColors_Fields (resourceWidgetColors)(bookmarkColors)
+#define QnMediaResourceWidgetColors_Fields (resourceWidgetColors)(bookmarkColors)(textOverlayItemColor)
 
 
 struct QnLicensesListModelColors {
