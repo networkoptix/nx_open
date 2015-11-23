@@ -208,10 +208,7 @@ private:
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
 
-    void updateBookmarksMode();
-    void updateBookmarksFilter();
-    void updateBookmarks();
-    void updateBookmarksVisibility();
+    void updateCompositeOverlayMode();
 
     qint64 getDisplayTimeUsec() const;
     qint64 getUtcCurrentTimeUsec() const;
@@ -272,8 +269,6 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarksQueryPtr m_bookmarksQuery;
     QnCompositeTextOverlay *m_compositeTextOverlay;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
