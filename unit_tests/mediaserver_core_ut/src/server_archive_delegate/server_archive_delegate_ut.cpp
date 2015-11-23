@@ -529,8 +529,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
-    while(1) 
-    {
+    while(1) {
         data = archiveDelegate.getNextData();
         if (data)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
@@ -543,8 +542,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();
 
-    while(1) 
-    {
+    while(1) {
         data = archiveDelegate.getNextData();
         if (data)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
