@@ -20,7 +20,7 @@
 
 
 //!Asynchronously scans specified ip address range for specified port to be opened and listening
-class QnIpRangeCheckerAsync
+class NX_NETWORK_API QnIpRangeCheckerAsync
 :
     public QObject,
     public QnStoppable,

@@ -25,7 +25,7 @@ namespace nx_http
     /*!
         \warning Message body is read ascynhronously to some internal buffer
     */
-    class HttpClient
+    class NX_NETWORK_API HttpClient
     :
         public QObject,
         public QnStoppable

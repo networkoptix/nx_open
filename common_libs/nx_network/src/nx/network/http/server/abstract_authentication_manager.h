@@ -12,10 +12,9 @@
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 
-
 namespace nx_http
 {
-    class AbstractAuthenticationManager
+    class NX_NETWORK_API AbstractAuthenticationManager
     {
     public:
         virtual ~AbstractAuthenticationManager() {}

@@ -43,7 +43,7 @@ namespace AuthMethod
 /*!
     \note By default, \a AuthMethod::http, \a AuthMethod::cookie and \a AuthMethod::videowall authorization methods are allowed fo every url
 */
-class QnAuthMethodRestrictionList
+class NX_NETWORK_API QnAuthMethodRestrictionList
 {
 public:
     QnAuthMethodRestrictionList();

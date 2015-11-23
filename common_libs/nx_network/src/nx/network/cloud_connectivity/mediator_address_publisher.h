@@ -8,7 +8,7 @@
 namespace nx {
 namespace cc {
 
-class MediatorAddressPublisher
+class NX_NETWORK_API MediatorAddressPublisher
 {
 public:
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;

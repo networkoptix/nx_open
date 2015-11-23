@@ -26,7 +26,7 @@
 namespace nx_upnp {
 
 //!Receives discovered devices info
-class SearchHandler
+class NX_NETWORK_API SearchHandler
 {
 public:
     virtual ~SearchHandler() {}
@@ -53,7 +53,7 @@ public:
     \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity
     \note this class is single-tone
 */
-class DeviceSearcher
+class NX_NETWORK_API DeviceSearcher
 :
     public QObject,
     public TimerEventHandler,
@@ -187,7 +187,7 @@ private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
 };
 
-class SearchAutoHandler
+class NX_NETWORK_API SearchAutoHandler
         : public SearchHandler
 {
 public:

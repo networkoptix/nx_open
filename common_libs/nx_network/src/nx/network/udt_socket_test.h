@@ -34,7 +34,7 @@
 // For analyzing, only very simple statistic will be output on the screen. So, some third party analyzing program should be used , like netstat.
 // I have no idea for the analyzing right now, and I will continue exploring on this thing. 
 
-class UdtSocketProfile {
+class NX_NETWORK_API UdtSocketProfile {
 public:
     virtual bool run() = 0;
     virtual void quit() =0;
@@ -42,6 +42,6 @@ public:
 };
 
 class QCoreApplication;
-std::unique_ptr<UdtSocketProfile> createUdtSocketProfile( const QCoreApplication& app );
+std::unique_ptr<UdtSocketProfile> NX_NETWORK_API createUdtSocketProfile( const QCoreApplication& app );
 
 #endif // __UDT_SOCKET_TEST_H__

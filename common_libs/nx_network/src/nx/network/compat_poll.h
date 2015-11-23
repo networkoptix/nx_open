@@ -39,7 +39,7 @@ typedef nx_pollfd pollfd;
 #endif
 
 typedef int (WINAPI *PollFuncType)( pollfd /*fdarray*/[], ULONG /*nfds*/, INT /*timeout*/ );
-PollFuncType getPollFuncAddress();
+PollFuncType NX_NETWORK_API getPollFuncAddress();
 
 #define poll getPollFuncAddress()
 

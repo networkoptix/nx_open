@@ -18,7 +18,7 @@
 namespace nx_http
 {
     //!This class is to manage all modifications to HTTP request/response
-    class HttpModManager
+    class NX_NETWORK_API HttpModManager
     :
         public Singleton<HttpModManager>
     {

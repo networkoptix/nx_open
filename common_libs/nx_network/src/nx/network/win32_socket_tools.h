@@ -12,7 +12,7 @@
 /*!
     \return ERROR_SUCCESS on success, otherwise - error code
 */
-DWORD GetTcpRow(
+DWORD NX_NETWORK_API GetTcpRow(
     u_short localPort,
     u_short remotePort,
     MIB_TCP_STATE state,
@@ -21,7 +21,7 @@ DWORD GetTcpRow(
 /*!
     \return ERROR_SUCCESS on success, otherwise - error code
 */
-DWORD readTcpStat(
+DWORD NX_NETWORK_API readTcpStat(
     PMIB_TCPROW row,
     StreamSocketInfo* const sockInfo );
 

@@ -23,7 +23,7 @@ enum class ResultCode
 };
 
 //!Description of error occured in some cloud connectivity operation
-class ErrorDescription
+class NX_NETWORK_API ErrorDescription
 {
 public:
     ResultCode resultCode;

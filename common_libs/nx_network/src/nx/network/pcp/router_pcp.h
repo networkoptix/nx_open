@@ -8,7 +8,7 @@
 
 namespace pcp {
 
-class Router
+class NX_NETWORK_API Router
 {
 public:
     Router(const HostAddress& address);

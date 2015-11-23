@@ -15,7 +15,6 @@
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
 
-
 namespace nx_http
 {
     class HttpStreamSocketServer;

@@ -20,9 +20,12 @@
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
         <global.libs>-ludt</global.libs>
+		<ffmpeg.libs/>
         <!--Specific os libs used-->
-        <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lsigar -lSecur32</windows.oslibs>
-        <linux.oslibs>-lssl -lsigar -lswscale -lquazip</linux.oslibs>
+        <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm -lssleay32 -llibeay32</windows.oslibs>
+		<windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs>-lsigar -lswscale -lquazip</linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation -lcrypto -lssl -lz -framework QtConcurrent -lsigar-universal64-macosx</mac.oslibs>
         <android.oslibs>-lssl -lcrypto -lz</android.oslibs>
         <!--Global defines-->
@@ -33,7 +36,7 @@
         <mac.defines/>
         <android.defines/>
         <ios.defines/>
-        <buildLib>sharedlib</buildLib>
+        <buildLib>sharedLib</buildLib>
     </properties>
 
     <dependencies>

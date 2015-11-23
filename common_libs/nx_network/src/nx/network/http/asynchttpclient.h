@@ -39,7 +39,7 @@ namespace nx_http
         \todo keep-alive connection support
         \todo Ability to suspend message body receiving
     */
-    class AsyncHttpClient
+    class NX_NETWORK_API AsyncHttpClient
     :
         public QObject,
         public std::enable_shared_from_this<AsyncHttpClient>
@@ -245,7 +245,7 @@ namespace nx_http
 
 
     //!Smart pointer for \a AsyncHttpClient
-    class AsyncHttpClientPtr
+    class NX_NETWORK_API AsyncHttpClientPtr
     {
         typedef void (AsyncHttpClientPtr::*bool_type)() const;
         void this_type_does_not_support_comparisons() const {}
@@ -353,20 +353,20 @@ namespace nx_http
         \note It is strongly recommended to use this for downloading only small files (e.g., camera params).
             For real files better to use \a nx_http::AsyncHttpClient directly
     */
-    void downloadFileAsync(
+    void NX_NETWORK_API downloadFileAsync(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
 
     //!Calls previous function and waits for completion
-    SystemError::ErrorCode downloadFileSync(
+    SystemError::ErrorCode NX_NETWORK_API downloadFileSync(
         const QUrl& url,
         int* const statusCode,
         nx_http::BufferType* const msgBody );
 
     //!Same as downloadFileAsync but provide contentType at callback
-    void downloadFileAsyncEx(
+    void NX_NETWORK_API downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),

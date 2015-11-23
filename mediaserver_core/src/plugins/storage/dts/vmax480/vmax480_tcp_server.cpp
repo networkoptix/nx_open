@@ -9,7 +9,7 @@
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "vmax480_stream_fetcher.h"
-#include <nx/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 
 static const int UUID_LEN = 38;

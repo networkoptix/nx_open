@@ -18,7 +18,7 @@ namespace cc {
     Implements client-side nat traversal logic
     \note Uses MediatorConnection to talk to the mediator
 */
-class CloudConnector
+class NX_NETWORK_API CloudConnector
 :
     public QnStoppableAsync,
     public Singleton<CloudConnector>    //really singleton?

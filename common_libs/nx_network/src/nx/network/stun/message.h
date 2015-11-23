@@ -50,7 +50,7 @@ enum MethodType
     userMethod //!< Starting value for custom STUN methods
 };
 
-class Header
+class NX_NETWORK_API Header
 {
 public:
     Header();
@@ -102,13 +102,13 @@ namespace attrs
         unknownReserved     = 0xFFFF,
     };
 
-    struct Attribute
+    struct NX_NETWORK_API Attribute
     {
         virtual int getType() const = 0;
         virtual ~Attribute() {}
     };
 
-    struct XorMappedAddress : Attribute
+    struct NX_NETWORK_API XorMappedAddress : Attribute
     {
         static const int TYPE = xorMappedAddress;
 
@@ -141,7 +141,7 @@ namespace attrs
         } address;  //!< address in host byte order
     };
 
-    struct BufferedValue
+    struct NX_NETWORK_API BufferedValue
     {
         BufferedValue( nx::Buffer buffer_ = nx::Buffer() );
         const Buffer& getBuffer() const; //!< Value to serialize
@@ -151,7 +151,7 @@ namespace attrs
         Buffer buffer;
     };
 
-    struct UserName : Attribute, BufferedValue
+    struct NX_NETWORK_API UserName : Attribute, BufferedValue
     {
         static const int TYPE = userName;
 
@@ -159,7 +159,7 @@ namespace attrs
         virtual int getType() const override { return TYPE; }
     };
 
-    struct ErrorDescription : Attribute, BufferedValue
+    struct NX_NETWORK_API ErrorDescription : Attribute, BufferedValue
     {
         static const int TYPE = errorCode;
 
@@ -175,7 +175,7 @@ namespace attrs
         nx::String reason;  //!< utf8 string, limited to 127 characters
     };
 
-    struct FingerPrint : Attribute
+    struct NX_NETWORK_API FingerPrint : Attribute
     {
         static const int TYPE = fingerPrint;
 
@@ -188,7 +188,7 @@ namespace attrs
     };
 
 
-    struct MessageIntegrity : Attribute, BufferedValue
+    struct NX_NETWORK_API MessageIntegrity : Attribute, BufferedValue
     {
         static const int TYPE = messageIntegrity;
         static const int SIZE = 20;
@@ -197,7 +197,7 @@ namespace attrs
         virtual int getType() const override { return TYPE; }
     };
 
-    struct Nonce : Attribute, BufferedValue
+    struct NX_NETWORK_API Nonce : Attribute, BufferedValue
     {
         static const int TYPE = nonce;
 
@@ -205,7 +205,7 @@ namespace attrs
         virtual int getType() const override { return TYPE; }
     };
 
-    struct Unknown : Attribute, BufferedValue
+    struct NX_NETWORK_API Unknown : Attribute, BufferedValue
     {
         static const int TYPE = unknown;
 
@@ -217,7 +217,7 @@ namespace attrs
     };
 }
 
-class Message
+class NX_NETWORK_API Message
 {
 public:
     typedef std::map<int, std::unique_ptr<attrs::Attribute> > AttributesMap;

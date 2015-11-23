@@ -10,7 +10,7 @@ namespace nx_http
         Input: http multipart content stream.
         Output: separate content frames
     */
-    class MultipartContentParser
+    class NX_NETWORK_API MultipartContentParser
     :
         public AbstractByteStreamFilter
     {

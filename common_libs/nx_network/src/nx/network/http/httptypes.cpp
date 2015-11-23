@@ -261,14 +261,10 @@ namespace nx_http
         }
     }
 
-
-    namespace Method
-    {
-        const StringType GET( "GET" );
-        const StringType HEAD( "HEAD" );
-        const StringType POST( "POST" );
-        const StringType PUT( "PUT" );
-    }
+    const StringType Method::GET( "GET" );
+    const StringType Method::HEAD( "HEAD" );
+    const StringType Method::POST( "POST" );
+    const StringType Method::PUT( "PUT" );
 
     //namespace Version
     //{

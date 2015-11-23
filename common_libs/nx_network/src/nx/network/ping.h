@@ -9,7 +9,7 @@
   */
 #define CL_MAX_PING_PACKET 1024 
 
-class QN_EXPORT CLPing
+class NX_NETWORK_API CLPing
 {
 public:
     CLPing();

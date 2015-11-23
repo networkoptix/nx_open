@@ -14,7 +14,7 @@
     Output: decoded string
     \note Currently, all source buffers are decoded independently. //TODO #ak make stream decoder of this
 */
-class Base64DecoderFilter
+class NX_NETWORK_API Base64DecoderFilter
 :
     public AbstractByteStreamFilter
 {

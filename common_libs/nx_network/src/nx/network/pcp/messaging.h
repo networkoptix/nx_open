@@ -47,7 +47,7 @@ enum class ResultCode : quint8
     EXCESSIVE_REMOTE_PEERS,
 };
 
-struct RequestHeader
+struct NX_NETWORK_API RequestHeader
 {
     quint8      version;
     Opcode      opcode;
@@ -56,10 +56,10 @@ struct RequestHeader
     QByteArray  clientIp;
 };
 
-QDataStream& operator<<(QDataStream& stream, const RequestHeader& data);
-QDataStream& operator>>(QDataStream& stream, RequestHeader& data);
+NX_NETWORK_API QDataStream& operator<<(QDataStream& stream, const RequestHeader& data);
+NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, RequestHeader& data);
 
-struct ResponseHeadeer
+struct NX_NETWORK_API NX_NETWORK_API ResponseHeadeer
 {
     quint8      version;
     Opcode      opcode;
@@ -69,10 +69,10 @@ struct ResponseHeadeer
     quint32     epochTime;
 };
 
-QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data);
-QDataStream& operator>>(QDataStream& stream, ResponseHeadeer& data);
+NX_NETWORK_API QDataStream& operator<<(QDataStream& stream, const ResponseHeadeer& data);
+NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, ResponseHeadeer& data);
 
-struct MapMessage
+struct NX_NETWORK_API MapMessage
 {
     QByteArray  nonce;
     quint8      protocol;
@@ -82,10 +82,10 @@ struct MapMessage
     QByteArray  externalIp;
 };
 
-QDataStream& operator<<(QDataStream& stream, const MapMessage& data);
-QDataStream& operator>>(QDataStream& stream, MapMessage& data);
+NX_NETWORK_API QDataStream& operator<<(QDataStream& stream, const MapMessage& data);
+NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, MapMessage& data);
 
-struct PeerMessage
+struct NX_NETWORK_API PeerMessage
 {
     QByteArray  nonce;
     quint8      protocol;
@@ -98,10 +98,10 @@ struct PeerMessage
     QByteArray  remoteIp;
 };
 
-QDataStream& operator<<(QDataStream& stream, const PeerMessage& data);
-QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
+NX_NETWORK_API QDataStream& operator<<(QDataStream& stream, const PeerMessage& data);
+NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, PeerMessage& data);
 
-QByteArray makeRandomNonce();
+QByteArray NX_NETWORK_API makeRandomNonce();
 
 } // namespace pcp
 

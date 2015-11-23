@@ -20,7 +20,7 @@ namespace nx_http
         static const int done = 2;
     };
 
-    class MessageSerializer
+    class NX_NETWORK_API MessageSerializer
     {
     public:
         MessageSerializer();

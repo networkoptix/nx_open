@@ -8,7 +8,7 @@
 #include "asynchttpclient.h"
 
 
-class QnAsyncHttpClientReply : public QObject {
+class NX_NETWORK_API QnAsyncHttpClientReply : public QObject {
     Q_OBJECT
 public:
     explicit QnAsyncHttpClientReply(const nx_http::AsyncHttpClientPtr &client, QObject *parent = 0);

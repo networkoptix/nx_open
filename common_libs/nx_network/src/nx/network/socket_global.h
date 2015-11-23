@@ -7,7 +7,7 @@
 
 namespace nx {
 
-class SocketGlobals
+class NX_NETWORK_API SocketGlobals
 {
 public:
     inline static

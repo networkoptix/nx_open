@@ -29,7 +29,7 @@ template<class SocketType> class BaseAsyncSocketImplHelper;
 /**
  *   Base class representing basic communication endpoint
  */
-class Socket
+class NX_NETWORK_API Socket
 :
     public Pollable
 {
@@ -157,7 +157,7 @@ template<class SocketType> class AsyncSocketImplHelper;
 /**
  *   Socket which is able to connect, send, and receive
  */
-class CommunicatingSocket
+class NX_NETWORK_API CommunicatingSocket
 :
     public Socket
 {
@@ -213,7 +213,7 @@ private:
 /**
  *   TCP socket for communication with other TCP sockets
  */
-class TCPSocket
+class NX_NETWORK_API TCPSocket
 :
     public AbstractCommunicatingSocketImplementationDelegate<AbstractStreamSocket, CommunicatingSocket>
 {
@@ -261,7 +261,7 @@ private:
 /**
  *   TCP socket class for servers
  */
-class TCPServerSocket
+class NX_NETWORK_API TCPServerSocket
 :
     public AbstractSocketImplementationEmbeddingDelegate<AbstractStreamServerSocket, Socket>
 {
@@ -297,7 +297,7 @@ private:
 /**
   *   UDP socket class
   */
-class UDPSocket
+class NX_NETWORK_API UDPSocket
 :
     public AbstractCommunicatingSocketImplementationDelegate<AbstractDatagramSocket, CommunicatingSocket>
 {

@@ -27,7 +27,7 @@ namespace nx_http
         \note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes 
             infinite content-length (even when identity encoding is used)
     */
-    class HttpStreamReader
+    class NX_NETWORK_API HttpStreamReader
     {
     public:
         // TODO: #Elric #enum

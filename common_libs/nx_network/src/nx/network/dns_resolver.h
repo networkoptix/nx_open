@@ -17,7 +17,7 @@ namespace nx {
 /*!
     \note Thread-safe
 */
-class DnsResolver
+class NX_NETWORK_API DnsResolver
 :
     public QnLongRunnable
 {

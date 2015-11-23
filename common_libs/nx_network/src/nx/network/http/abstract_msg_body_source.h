@@ -20,7 +20,7 @@ namespace nx_http
             specified number of bytes is fetched using \a AbstractMsgBodySource::readAsync.
         Otherwise, data is fetched until empty buffer is received or error occurs
     */
-    class AbstractMsgBodySource
+    class NX_NETWORK_API AbstractMsgBodySource
     {
     public:
         virtual ~AbstractMsgBodySource() {}

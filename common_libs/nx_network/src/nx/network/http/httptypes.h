@@ -53,12 +53,13 @@ namespace nx_http
     /*!
         \return < 0, if \a one < \a two. 0 if \a one == \a two. > 0 if \a one > \a two
     */
-    int strcasecmp( const StringType& one, const StringType& two );
+    int NX_NETWORK_API strcasecmp( const StringType& one, const StringType& two );
 
     /************************************************************************/
     /* Comparator for case-insensitive comparison in STL assos. containers  */
     /************************************************************************/
-    struct ci_less : std::binary_function<QByteArray, QByteArray, bool>
+    struct NX_NETWORK_API ci_less 
+		: std::binary_function<QByteArray, QByteArray, bool>
     {
         // case-independent (ci) compare_less binary function
         bool operator() (const QByteArray& c1, const QByteArray& c2) const {
@@ -77,16 +78,19 @@ namespace nx_http
         This is convinient method for simplify transition from QHttp
         \return Value of header \a headerName (if found), empty string otherwise
     */
-    StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
+    StringType NX_NETWORK_API getHeaderValue( const HttpHeaders& headers, const StringType& headerName );
 
     //!convenient function for inserting or replacing header
     /*!
         \return iterator of added element
     */
-    HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
-    HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader );
+    HttpHeaders::iterator NX_NETWORK_API insertOrReplaceHeader( 
+		HttpHeaders* const headers, const HttpHeader& newHeader );
 
-    void removeHeader( HttpHeaders* const headers, const StringType& headerName );
+    HttpHeaders::iterator NX_NETWORK_API insertHeader(
+		HttpHeaders* const headers, const HttpHeader& newHeader );
+
+    void NX_NETWORK_API removeHeader( HttpHeaders* const headers, const StringType& headerName );
 
 
 
@@ -184,15 +188,17 @@ namespace nx_http
 
 
     //!Parses \a data and saves header name and data to \a *headerName and \a *headerValue
-    bool parseHeader(
+    bool NX_NETWORK_API parseHeader(
         StringType* const headerName,
         StringType* const headerValue,
         const ConstBufferRefType& data );
-    bool parseHeader(
+    
+	bool NX_NETWORK_API parseHeader(
         ConstBufferRefType* const headerName,
         ConstBufferRefType* const headerValue,
         const ConstBufferRefType& data );
-    HttpHeader parseHeader( const ConstBufferRefType& data );
+
+    HttpHeader NX_NETWORK_API parseHeader( const ConstBufferRefType& data );
 
     namespace StatusCode
     {
@@ -227,22 +233,23 @@ namespace nx_http
             serviceUnavailable = 503
         };
 
-        StringType toString( Value );
-        StringType toString( int );
+        NX_NETWORK_API StringType toString( Value );
+        NX_NETWORK_API StringType toString( int );
     };
 
-    namespace Method
+    class NX_NETWORK_API Method
     {
+	public:
         typedef StringType ValueType;
     
-        extern const StringType GET;
-        extern const StringType HEAD;
-        extern const StringType POST;
-        extern const StringType PUT;
-    }
+        static const StringType GET;
+        static const StringType HEAD;
+        static const StringType POST;
+        static const StringType PUT;
+    };
 
     //!Represents string like HTTP/1.1, RTSP/1.0
-    class MimeProtoVersion
+    class NX_NETWORK_API MimeProtoVersion
     {
     public:
         StringType protocol;
@@ -266,7 +273,7 @@ namespace nx_http
     static const MimeProtoVersion http_1_0 = { "HTTP", "1.0" };
     static const MimeProtoVersion http_1_1 = { "HTTP", "1.1" };
 
-    class RequestLine
+    class NX_NETWORK_API RequestLine
     {
     public:
         StringType method;
@@ -279,7 +286,7 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
     };
 
-    class StatusLine
+    class NX_NETWORK_API StatusLine
     {
     public:
         MimeProtoVersion version;
@@ -292,9 +299,9 @@ namespace nx_http
         void serialize( BufferType* const dstBuffer ) const;
     };
 
-    void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
+    void NX_NETWORK_API serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer );
 
-    class Request
+    class NX_NETWORK_API Request
     {
     public:
         RequestLine requestLine;
@@ -312,7 +319,7 @@ namespace nx_http
         BufferType getCookieValue(const BufferType& name) const;
     };
 
-    class Response
+    class NX_NETWORK_API Response
     {
     public:
         StatusLine statusLine;
@@ -337,10 +344,10 @@ namespace nx_http
             response
         };
 
-        QLatin1String toString( Value val );
+        QLatin1String NX_NETWORK_API toString( Value val );
     }
 
-    class Message
+    class NX_NETWORK_API Message
     {
     public:
         MessageType::Value type;
@@ -370,7 +377,7 @@ namespace nx_http
     namespace header
     {
         //!Parses string "name1=val1; name2=val2; ...". ; separator can be specified
-        void parseDigestAuthParams(
+        void NX_NETWORK_API parseDigestAuthParams(
             const ConstBufferRefType& authenticateParamsStr,
             QMap<BufferType, BufferType>* const params,
             char sep = ',' );
@@ -385,13 +392,13 @@ namespace nx_http
                 digest
             };
 
-            const char* toString( Value val );
-            Value fromString( const char* str );
-            Value fromString( const ConstBufferRefType& str );
+            NX_NETWORK_API const char* toString( Value val );
+            NX_NETWORK_API Value fromString( const char* str );
+            NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
         }
 
         //!Login/password to use in http authorization
-        class UserCredentials
+        class NX_NETWORK_API UserCredentials
         {
         public:
             StringType userid;
@@ -399,7 +406,7 @@ namespace nx_http
         };
 
         //!rfc2617, section 2
-        class BasicCredentials
+        class NX_NETWORK_API BasicCredentials
         :
             public UserCredentials
         {
@@ -409,7 +416,7 @@ namespace nx_http
         };
 
         //!rfc2617, section 3.2.2
-        class DigestCredentials
+        class NX_NETWORK_API DigestCredentials
         :
             public UserCredentials
         {
@@ -421,7 +428,7 @@ namespace nx_http
         };
 
         //!Authorization header ([rfc2616, 14.8], rfc2617)
-        class Authorization
+        class NX_NETWORK_API Authorization
         {
         public:
             static const StringType NAME;
@@ -453,7 +460,7 @@ namespace nx_http
         };
 
         //!Convenient class for generating Authorization header with Basic authentication method
-        class BasicAuthorization
+        class NX_NETWORK_API BasicAuthorization
         :
             public Authorization
         {
@@ -461,7 +468,7 @@ namespace nx_http
             BasicAuthorization( const StringType& userName, const StringType& userPassword );
         };
 
-        class DigestAuthorization
+        class NX_NETWORK_API DigestAuthorization
         :
             public Authorization
         {
@@ -473,7 +480,7 @@ namespace nx_http
         };
 
         //![rfc2616, 14.47]
-        class WWWAuthenticate
+        class NX_NETWORK_API WWWAuthenticate
         {
         public:
             static const StringType NAME;
@@ -494,7 +501,7 @@ namespace nx_http
         static const StringType ANY_CODING( "*" );
 
         //![rfc2616, 14.3]
-        class AcceptEncodingHeader
+        class NX_NETWORK_API AcceptEncodingHeader
         {
         public:
             AcceptEncodingHeader( const nx_http::StringType& strValue );
@@ -512,7 +519,7 @@ namespace nx_http
         /*!
             \note Boundaries are inclusive
         */
-        class RangeSpec
+        class NX_NETWORK_API RangeSpec
         {
         public:
             quint64 start;
@@ -526,7 +533,7 @@ namespace nx_http
         };
 
         //![rfc2616, 14.35]
-        class Range
+        class NX_NETWORK_API Range
         {
         public:
             Range();
@@ -549,7 +556,7 @@ namespace nx_http
         };
 
         //![rfc2616, 14.16]
-        class ContentRange
+        class NX_NETWORK_API ContentRange
         {
         public:
             //!By default, bytes
@@ -564,7 +571,7 @@ namespace nx_http
         };
 
         //![rfc2616, 14.45]
-        class Via
+        class NX_NETWORK_API Via
         {
         public:
             class ProxyEntry
@@ -595,7 +602,7 @@ namespace nx_http
         chunk-ext-name = token
         chunk-ext-val  = token | quoted-string
     */
-    class ChunkHeader
+    class NX_NETWORK_API ChunkHeader
     {
     public:
         size_t chunkSize;
@@ -617,9 +624,9 @@ namespace nx_http
     };
 
     //!Returns common value for User-Agent header
-    StringType userAgentString();
+    StringType NX_NETWORK_API userAgentString();
     //!Returns common value for Server header
-    StringType serverString();
+    StringType NX_NETWORK_API serverString();
 }
 
 #endif  //HTTPTYPES_H

@@ -18,7 +18,7 @@ namespace nx {
 namespace cc {
 
 //!Selects any endpoint that accepts tcp connections
-class RandomOnlineEndpointSelector
+class NX_NETWORK_API RandomOnlineEndpointSelector
 :
     public AbstractEndpointSelector
 {

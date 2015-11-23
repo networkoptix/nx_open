@@ -14,7 +14,7 @@
 /*!
     All factory methods return object created new operator \a new
 */
-class SocketFactory
+class NX_NETWORK_API SocketFactory
 {
 public:
     enum class NatTraversalType

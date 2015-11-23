@@ -42,14 +42,14 @@ namespace aio
         \note If multiple event occured on same socket each event will be presented separately
         \note Polling same socket with two \a PollSet instances results in undefined behavior
     */
-    class PollSet
+    class NX_NETWORK_API PollSet
     {
     public:
         /*!
             Using iterator in other thread than \a poll() results in undefined behavour.
             \note If element, iterator is pointing to, has been removed, it is still safe to increment iterator
         */
-        class const_iterator
+        class NX_NETWORK_API const_iterator
         {
             friend class PollSet;
 

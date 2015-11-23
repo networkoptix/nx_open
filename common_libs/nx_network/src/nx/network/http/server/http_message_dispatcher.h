@@ -25,7 +25,7 @@ namespace nx_http
             std::unique_ptr<nx_http::AbstractMsgBodySource> )
         > HttpRequestCompletionFunc;
 
-    class MessageDispatcher
+    class NX_NETWORK_API MessageDispatcher
     {
     public:
         MessageDispatcher();

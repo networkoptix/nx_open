@@ -24,7 +24,7 @@ namespace nx {
 namespace cc {
 
 //!Retrieves url to the specified cloud module
-class CloudModuleEndPointFetcher
+class NX_NETWORK_API CloudModuleEndPointFetcher
 {
 public:
     CloudModuleEndPointFetcher(

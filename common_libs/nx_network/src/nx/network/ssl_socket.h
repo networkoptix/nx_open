@@ -18,7 +18,7 @@ typedef struct bio_st BIO; /* This one is from OpenSSL, which we don't want to i
 class QnSSLSocketPrivate;
 class QnMixedSSLSocketPrivate;
 
-class QnSSLSocket
+class NX_NETWORK_API QnSSLSocket
 :
     public AbstractSocketImplementationDelegate<AbstractEncryptedStreamSocket, std::function<AbstractStreamSocket*()>>
 {
@@ -112,7 +112,7 @@ private:
     Auto detects whether remote side uses SSL and delegates calls to \a QnSSLSocket or to system socket
     \note Can only be used on server side for accepting connections
 */
-class QnMixedSSLSocket: public QnSSLSocket
+class NX_NETWORK_API QnMixedSSLSocket: public QnSSLSocket
 {
 public:
     QnMixedSSLSocket(AbstractStreamSocket* wrappedSocket);
@@ -137,7 +137,7 @@ private:
 };
 
 
-class SSLServerSocket
+class NX_NETWORK_API SSLServerSocket
 :
     public AbstractSocketImplementationDelegate<AbstractStreamServerSocket, std::function<AbstractStreamServerSocket*()>>
 {

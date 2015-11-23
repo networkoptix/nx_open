@@ -45,6 +45,10 @@
 #      include <net/route.h>
 #      include <netinet/if_ether.h>
 #   endif
+#elif defined(Q_OS_WIN)
+#	include <winsock2.h>
+#	include <ws2tcpip.h>
+#	include <iphlpapi.h>
 #endif
 
 /*

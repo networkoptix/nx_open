@@ -11,7 +11,7 @@
 
 namespace nx_upnp {
 
-class PortMapper
+class NX_NETWORK_API PortMapper
         : SearchAutoHandler
         , TimerEventHandler
 {

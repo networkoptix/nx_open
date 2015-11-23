@@ -22,7 +22,7 @@ namespace nx_http
     /*!
         \note Class methods are not thread-safe
     */
-    class AbstractHttpRequestHandler
+    class NX_NETWORK_API AbstractHttpRequestHandler
     {
     public:
         AbstractHttpRequestHandler();

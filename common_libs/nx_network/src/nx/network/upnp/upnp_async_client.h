@@ -9,7 +9,7 @@
 namespace nx_upnp {
 
 //! UPnP SOAP based client
-class AsyncClient
+class NX_NETWORK_API AsyncClient
 {   
 public:
     enum Protocol { TCP, UDP };

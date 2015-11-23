@@ -21,7 +21,7 @@
 namespace nx_http
 {
     //!This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first
-    class AuthInfoCache
+    class NX_NETWORK_API AuthInfoCache
     {
     public:
         class AuthorizationCacheItem

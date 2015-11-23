@@ -17,7 +17,7 @@ namespace cc {
     Receives incoming \a connection_requested indications and creates cloud tunnel
     \note Uses MediatorConnection to talk to the mediator
 */
-class CloudAcceptor
+class NX_NETWORK_API CloudAcceptor
 :
     public QnStoppableAsync
 {

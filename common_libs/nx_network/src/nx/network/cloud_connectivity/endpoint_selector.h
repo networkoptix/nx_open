@@ -19,7 +19,7 @@ namespace nx {
 namespace cc {
 
 //!Selects endpoint that is "best" due to some logic
-class AbstractEndpointSelector
+class NX_NETWORK_API AbstractEndpointSelector
 {
 public:
     virtual ~AbstractEndpointSelector() {}
@@ -33,7 +33,7 @@ public:
         std::function<void(nx_http::StatusCode::Value, SocketAddress)> handler) = 0;
 };
 
-class RandomEndpointSelector
+class NX_NETWORK_API RandomEndpointSelector
 :
     public AbstractEndpointSelector
 {

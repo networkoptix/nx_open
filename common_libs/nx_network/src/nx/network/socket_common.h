@@ -28,7 +28,7 @@ namespace nx { class DnsResolver; }
 /*!
     \note Not using QHostAddress because QHostAddress can trigger dns name lookup which depends on Qt sockets which we do not want to use
 */
-class HostAddress
+class NX_NETWORK_API HostAddress
 {
 public:
     //!Creates 0.0.0.0 address
@@ -89,7 +89,7 @@ private:
 };
 
 //!Represents host and port (e.g. 127.0.0.1:1234)
-class SocketAddress
+class NX_NETWORK_API SocketAddress
 {
 public:
     HostAddress address;

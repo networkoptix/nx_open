@@ -11,7 +11,7 @@ namespace cc {
     Listening hostname is reported to the mediator to listen on.
     \todo #ak what listening port should mean in this case?
 */
-class CloudServerSocket
+class NX_NETWORK_API CloudServerSocket
 :
     public AbstractStreamServerSocket
 {

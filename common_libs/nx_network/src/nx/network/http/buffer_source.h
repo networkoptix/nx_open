@@ -11,7 +11,7 @@
 
 namespace nx_http
 {
-    class BufferSource
+    class NX_NETWORK_API BufferSource
     :
         public AbstractMsgBodySource
     {

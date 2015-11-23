@@ -15,7 +15,7 @@
 
 namespace nx_http
 {
-    class HttpStreamSocketServer
+    class NX_NETWORK_API HttpStreamSocketServer
     :
         public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
     {

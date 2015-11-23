@@ -32,25 +32,25 @@ class UdtPollSetConstIteratorImpl;
 // to make C++ compiler happy. 
 
 struct UdtSocketImplPtr : public std::unique_ptr<UdtSocketImpl> {
-    UdtSocketImplPtr( UdtSocketImpl* impl );
-    ~UdtSocketImplPtr();
+    NX_NETWORK_API UdtSocketImplPtr( UdtSocketImpl* impl );
+    NX_NETWORK_API ~UdtSocketImplPtr();
 };
 
 struct UdtPollSetImplPtr : public std::unique_ptr<UdtPollSetImpl> {
-    UdtPollSetImplPtr( UdtPollSetImpl* imp );
-    ~UdtPollSetImplPtr();
+    NX_NETWORK_API UdtPollSetImplPtr( UdtPollSetImpl* imp );
+    NX_NETWORK_API ~UdtPollSetImplPtr();
 };
 
 struct UdtPollSetConstIteratorImplPtr : public std::unique_ptr<UdtPollSetConstIteratorImpl> {
-    UdtPollSetConstIteratorImplPtr( UdtPollSetConstIteratorImpl* imp );
-    UdtPollSetConstIteratorImplPtr();
-    ~UdtPollSetConstIteratorImplPtr();
+    NX_NETWORK_API UdtPollSetConstIteratorImplPtr( UdtPollSetConstIteratorImpl* imp );
+    NX_NETWORK_API UdtPollSetConstIteratorImplPtr();
+    NX_NETWORK_API ~UdtPollSetConstIteratorImplPtr();
 };
 
 }// namespace detail
 
 // Adding a level indirection to make C++ type system happy.
-class UdtSocket {
+class NX_NETWORK_API UdtSocket {
 public:
     UdtSocket();
     ~UdtSocket();
@@ -70,7 +70,7 @@ protected:
 
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
-class UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
+class NX_NETWORK_API UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
 public:
     // AbstractSocket --------------- interface
     virtual bool bind( const SocketAddress& localAddress ) override;
@@ -158,7 +158,7 @@ private:
     Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class UdtStreamServerSocket : public UdtSocket, public AbstractStreamServerSocket  {
+class NX_NETWORK_API UdtStreamServerSocket : public UdtSocket, public AbstractStreamServerSocket  {
 public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
@@ -204,7 +204,7 @@ private:
 };
 
 // Udt poller 
-class UdtPollSet {
+class NX_NETWORK_API UdtPollSet {
 public:
     class const_iterator {
     public:

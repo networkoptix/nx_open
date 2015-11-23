@@ -11,7 +11,7 @@ struct CLSubNetState
     QHostAddress currHostAddress;
 };
 
-class QN_EXPORT CLNetState
+class NX_NETWORK_API CLNetState
 {
     typedef QMap<QString, CLSubNetState> StateMAP;
 public:

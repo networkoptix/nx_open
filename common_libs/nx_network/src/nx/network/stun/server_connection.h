@@ -19,7 +19,7 @@
 namespace nx {
 namespace stun {
 
-class ServerConnection
+class NX_NETWORK_API ServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<
         stun::ServerConnection,

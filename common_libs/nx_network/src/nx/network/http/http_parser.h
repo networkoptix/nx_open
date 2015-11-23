@@ -27,7 +27,7 @@ namespace nx_http
         This class is just a wrapper for use with \a nx_api::BaseStreamProtocolConnection class. 
         \todo get rid of this!
     */
-    class MessageParser
+    class NX_NETWORK_API MessageParser
     {
     public:
         MessageParser();

@@ -16,39 +16,40 @@ namespace nx_http
     //Helper functions for calculating Http digest (rfc2617)
 
     //!Generates Authorization header and adds it to the \a request
-    bool addAuthorization(
+    bool NX_NETWORK_API addAuthorization(
         Request* const request,
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
         const boost::optional<BufferType>& predefinedHA1,
         const header::WWWAuthenticate& wwwAuthenticateHeader );
 
-    BufferType calcHa1(
+    BufferType NX_NETWORK_API calcHa1(
         const StringType& userName,
         const StringType& realm,
         const StringType& userPassword );
     /*!
         Covenience method
     */
-    BufferType calcHa1(
+    BufferType NX_NETWORK_API calcHa1(
         const QString& userName,
         const QString& realm,
         const QString& userPassword );
-    BufferType calcHa1(
+
+    BufferType NX_NETWORK_API calcHa1(
         const char* userName,
         const char* realm,
         const char* userPassword);
 
-    BufferType calcHa2(
+    BufferType NX_NETWORK_API calcHa2(
         const StringType& method,
         const StringType& uri );
 
-    BufferType calcResponse(
+    BufferType NX_NETWORK_API calcResponse(
         const BufferType& ha1,
         const BufferType& nonce,
         const BufferType& ha2 );
 
-    BufferType calcResponseAuthInt(
+    BufferType NX_NETWORK_API calcResponseAuthInt(
         const BufferType& ha1,
         const BufferType& nonce,
         const StringType& nonceCount,
@@ -59,7 +60,7 @@ namespace nx_http
     /*!
         If \a predefinedHA1 is present then it is used. Otherwise, HA1 is calculated based on \a userPassword
     */
-    bool calcDigestResponse(
+    bool NX_NETWORK_API calcDigestResponse(
         const StringType& method,
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
@@ -69,7 +70,7 @@ namespace nx_http
         header::DigestAuthorization* const digestAuthorizationHeader );
 
     //!To be used by server to validate recevied Authorization against known credentials
-    bool validateAuthorization(
+    bool NX_NETWORK_API validateAuthorization(
         const StringType& method,
         const StringType& userName,
         const boost::optional<StringType>& userPassword,
@@ -80,7 +81,7 @@ namespace nx_http
         \param ha1 That's what \a calcHa1 has returned
         \warning ha1.size() + 1 + nonce.size() MUST be divisible by 64! This is requirement of MD5 algorithm
     */
-    BufferType calcIntermediateResponse(
+    BufferType NX_NETWORK_API calcIntermediateResponse(
         const BufferType& ha1,
         const BufferType& nonce);
     /*!
@@ -90,7 +91,7 @@ namespace nx_http
         \param intermediateResponse Calculated with \a calcIntermediateResponse
         \param intermediateResponseNonceLen Length of nonce (bytes) used to generate \a intermediateResponse
     */
-    BufferType calcResponseFromIntermediate(
+    BufferType NX_NETWORK_API calcResponseFromIntermediate(
         const BufferType& intermediateResponse,
         size_t intermediateResponseNonceLen,
         const BufferType& nonceTrailer,

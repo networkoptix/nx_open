@@ -79,7 +79,7 @@ int WINAPI pollOverSelectWin32(
             fdarray[i].revents |= POLLERR;
 
             DWORD errorCode = 0;
-            socklen_t optLen = sizeof(errorCode);
+            int optLen = sizeof(errorCode);
             if( getsockopt( fdarray[i].fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(&errorCode), &optLen ) == 0 )
             {
                 if( errorCode == WSAENOTCONN || errorCode == WSAECONNRESET || errorCode == WSAESHUTDOWN )

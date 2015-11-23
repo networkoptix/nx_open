@@ -22,7 +22,7 @@
 //todo: #ak cancel asynchoronous operations
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
-class AbstractSocket
+class NX_NETWORK_API AbstractSocket
 {
 public:
 #ifdef Q_OS_WIN
@@ -166,7 +166,7 @@ protected:
 };
 
 //!Interface for writing to/reading from socket
-class AbstractCommunicatingSocket
+class NX_NETWORK_API AbstractCommunicatingSocket
 :
     public AbstractSocket
 {
@@ -294,7 +294,7 @@ protected:
     virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
 };
 
-struct StreamSocketInfo
+struct NX_NETWORK_API StreamSocketInfo
 {
     //!round-trip time smoothed variation, millis
     unsigned int rttVar;
@@ -306,7 +306,7 @@ struct StreamSocketInfo
     }
 };
 
-struct KeepAliveOptions
+struct NX_NETWORK_API KeepAliveOptions
 {
     /** timeout, in seconds, with no activity until the first keep-alive
      *  packet is sent */
@@ -325,7 +325,7 @@ struct KeepAliveOptions
 };
 
 //!Interface for connection-orientied sockets
-class AbstractStreamSocket
+class NX_NETWORK_API AbstractStreamSocket
 :
     public AbstractCommunicatingSocket
 {
@@ -380,7 +380,7 @@ public:
 /*!
     In most cases, \a AbstractStreamSocket interface is enough. This one is needed for SMTP/TLS, for example
 */
-class AbstractEncryptedStreamSocket
+class NX_NETWORK_API AbstractEncryptedStreamSocket
 :
     public AbstractStreamSocket
 {
@@ -401,7 +401,7 @@ public:
 /*!
     \note This socket has default recv timeout of 250ms for backward compatibility
 */
-class AbstractStreamServerSocket
+class NX_NETWORK_API AbstractStreamServerSocket
 :
     public AbstractSocket
 {
@@ -452,7 +452,7 @@ static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
 /*!
     In this case \a AbstractCommunicatingSocket::connect() just rememberes remote address to use with \a AbstractCommunicatingSocket::send()
 */
-class AbstractDatagramSocket
+class NX_NETWORK_API AbstractDatagramSocket
 :
     public AbstractCommunicatingSocket
 {

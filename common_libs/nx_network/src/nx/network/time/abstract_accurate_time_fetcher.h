@@ -16,7 +16,7 @@
 
 
 //!Abstract interface for class performing fetching accurate current time from some public server
-class AbstractAccurateTimeFetcher
+class NX_NETWORK_API AbstractAccurateTimeFetcher
 :
     public QnStoppable,
     public QnJoinable

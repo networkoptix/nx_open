@@ -6,7 +6,9 @@
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 
-class QnMacAddress: public boost::equality_comparable<QnMacAddress, boost::less_than_comparable<QnMacAddress> > {
+class NX_NETWORK_API QnMacAddress
+	: public boost::equality_comparable<QnMacAddress, 
+	                                    boost::less_than_comparable<QnMacAddress> > {
 public:
     QnMacAddress();
     explicit QnMacAddress(const unsigned char *mac);
@@ -27,7 +29,7 @@ public:
     bool operator==(const QnMacAddress &other) const;
     bool operator<(const QnMacAddress &other) const;
 
-	friend uint qHash(const QnMacAddress &value);
+	friend uint NX_NETWORK_API qHash(const QnMacAddress &value);
 
 private:
     void init(const QString &mac);

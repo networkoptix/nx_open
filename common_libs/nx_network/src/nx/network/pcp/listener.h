@@ -7,7 +7,7 @@
 
 namespace pcp {
 
-class Listener
+class NX_NETWORK_API Listener
 {
 public:
     struct Events

@@ -23,11 +23,11 @@ enum CLHttpStatus
     CL_TRANSPORT_ERROR = -1
 };
 
-QString toString( CLHttpStatus status );
+QString NX_NETWORK_API toString( CLHttpStatus status );
 
 typedef QSharedPointer<AbstractStreamSocket> TCPSocketPtr;
 
-class CLSimpleHTTPClient
+class NX_NETWORK_API CLSimpleHTTPClient
 {
     // TODO: #Elric #enum
     enum { Basic, Digestaccess };
@@ -132,12 +132,19 @@ private:
 /*!
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
-QByteArray downloadFile(CLHttpStatus& status, const QString& fileName, const QString& host, int port, unsigned int timeout, const QAuthenticator& auth, int capacity = 2000);
+QByteArray NX_NETWORK_API downloadFile(
+	CLHttpStatus& status, const QString& fileName,
+	const QString& host, int port, 
+	unsigned int timeout, const QAuthenticator& auth, 
+	int capacity = 2000);
 
 /*!
     \param timeout Timeout in milliseconds to be used as socket's read and write timeout
 */
-bool uploadFile(const QString& fileName, const QString&  content, const QHostAddress& host, int port, unsigned int timeout, const QAuthenticator& auth);
+bool NX_NETWORK_API uploadFile(
+	const QString& fileName, const QString&  content, 
+	const QHostAddress& host, int port, 
+	unsigned int timeout, const QAuthenticator& auth);
 
 
 

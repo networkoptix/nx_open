@@ -6,11 +6,11 @@
 namespace nx_upnp {
 
 //Helper formaters "urn:schemas-upnp-org:service:ID:VERSION"
-QString toUpnpUrn( const QString& id, const QString& suffix, int version = 1 );
-QString fromUpnpUrn( const QString& urn, const QString& suffix, int version = 1 );
+QString NX_NETWORK_API toUpnpUrn( const QString& id, const QString& suffix, int version = 1 );
+QString NX_NETWORK_API fromUpnpUrn( const QString& urn, const QString& suffix, int version = 1 );
 
 //!Contains some info about discovered UPnP device
-struct DeviceInfo
+struct NX_NETWORK_API DeviceInfo
 {
     QString deviceType;
     QString friendlyName;
@@ -33,7 +33,7 @@ struct DeviceInfo
 };
 
 //!Partial parser for SSDP descrition xml (UPnP Device Architecture 1.1, 2.3)
-class DeviceDescriptionHandler
+class NX_NETWORK_API DeviceDescriptionHandler
     : public QXmlDefaultHandler
 {
 public:

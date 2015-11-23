@@ -19,7 +19,7 @@
 namespace nx {
 namespace stun {
 
-    class MessageParser {
+    class NX_NETWORK_API MessageParser {
     private:
         enum {
             // Header

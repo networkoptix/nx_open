@@ -17,7 +17,7 @@ namespace nx_rtsp
 
     namespace header
     {
-        class Range
+        class NX_NETWORK_API Range
         {
         public:
             static const nx_http::StringType NAME;
@@ -31,7 +31,7 @@ namespace nx_rtsp
         \note for \a now constant \a DATETIME_NOW is returned
         \return \a true if \a startTime and \a endTime were filled with values 
     */
-    bool parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime );
+    bool NX_NETWORK_API parseRangeHeader( const nx_http::StringType& rangeStr, qint64* startTime, qint64* endTime );
 }
 
 #endif  //NX_RTSP_TYPES_H

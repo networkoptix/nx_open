@@ -3,6 +3,12 @@
 namespace nx {
 namespace cc {
 
+bool CloudServerSocket::bind( const SocketAddress& endpoint )
+{
+    //TODO #ak
+    return false;
+}
+
 bool CloudServerSocket::listen( int /*queueLen*/ )
 {
     //TODO #ak

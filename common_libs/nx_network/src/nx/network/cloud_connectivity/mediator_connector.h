@@ -14,7 +14,7 @@ namespace nx {
 namespace nx {
 namespace cc {
 
-class MediatorConnector
+class NX_NETWORK_API MediatorConnector
 {
     MediatorConnector();
     ~MediatorConnector();

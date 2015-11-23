@@ -16,7 +16,7 @@ namespace nx_http
     /*!
         Parses multipart http content (http://en.wikipedia.org/wiki/MIME#Multipart_messages)
     */
-    class MultipartContentParserHelper
+    class NX_NETWORK_API MultipartContentParserHelper
     {
     public:
         // TODO: #Elric #enum

@@ -19,7 +19,7 @@
 /*!
     Result time is accurate to second boundary only
 */
-class TimeProtocolClient
+class NX_NETWORK_API TimeProtocolClient
 :
     public AbstractAccurateTimeFetcher
 {

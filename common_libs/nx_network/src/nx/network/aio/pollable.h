@@ -25,7 +25,7 @@ static const int INVALID_SOCKET = -1;
 typedef CommonSocketImpl<Pollable> PollableImpl;
 
 //!Incapsulates system object that can be polled with \a PollSet
-class Pollable
+class NX_NETWORK_API Pollable
 {
 public:
     /*!

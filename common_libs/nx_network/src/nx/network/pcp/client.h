@@ -9,7 +9,7 @@
 namespace pcp {
 
 /** PCP Mapping information */
-struct Mapping
+struct NX_NETWORK_API Mapping
 {
     SocketAddress internal;
     SocketAddress external;
@@ -20,7 +20,7 @@ struct Mapping
 };
 
 /** PCP Client to work with multiplie network interfaces */
-class Client
+class NX_NETWORK_API Client
 {
 public:
     static Client& instance();

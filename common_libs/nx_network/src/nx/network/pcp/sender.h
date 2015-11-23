@@ -6,7 +6,7 @@
 
 namespace pcp {
 
-class Sender
+class NX_NETWORK_API Sender
 {
 public:
     Sender(const HostAddress& server);
@@ -32,7 +32,8 @@ private:
 };
 
 inline
-QDataStream& operator<<(QDataStream& s, const Sender::EmptyMessage&) { return s; }
+QDataStream& operator<<(QDataStream& s, const Sender::EmptyMessage&)
+{ return s; }
 
 } // namespace pcp
 

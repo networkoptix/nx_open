@@ -57,36 +57,36 @@ namespace attrs
         authorization,
     };
 
-    struct StringAttribute : stun::attrs::Unknown
+    struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
     {
         StringAttribute( int userType, const String& value = String() );
     };
 
-    struct SystemId : StringAttribute
+    struct NX_NETWORK_API SystemId : StringAttribute
     {
         static const int TYPE = systemId;
         SystemId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct ServerId : StringAttribute
+    struct NX_NETWORK_API ServerId : StringAttribute
     {
         static const int TYPE = serverId;
         ServerId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct ClientId : StringAttribute
+    struct NX_NETWORK_API ClientId : StringAttribute
     {
         static const int TYPE = clientId;
         ClientId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct HostName : StringAttribute
+    struct NX_NETWORK_API HostName : StringAttribute
     {
         static const int TYPE = hostName;
         HostName( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct PublicEndpointList : StringAttribute
+    struct NX_NETWORK_API PublicEndpointList : StringAttribute
     {
         static const int TYPE = publicEndpointList;
         PublicEndpointList( const std::list< SocketAddress >& endpoints );

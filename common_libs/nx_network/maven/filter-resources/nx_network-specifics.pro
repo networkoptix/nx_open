@@ -3,6 +3,10 @@ CONFIG += console
 
 INCLUDEPATH += ${root.dir}/common/src/
 
+win* {
+	DEFINES += NX_NETWORK_API=Q_DECL_EXPORT
+}
+
 !win32 {
   ext_debug2.target  = $(DESTDIR)$(TARGET).debug
   ext_debug2.depends = $(DESTDIR)$(TARGET)

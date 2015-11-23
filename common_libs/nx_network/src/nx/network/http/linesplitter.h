@@ -12,7 +12,7 @@
 namespace nx_http
 {
     //!Splits source bytes stream to lines. Accepts any line ending: CR, LF, CRLF
-    class LineSplitter
+    class NX_NETWORK_API LineSplitter
     {
     public:
         LineSplitter();

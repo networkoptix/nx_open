@@ -17,7 +17,7 @@
 
 
 //!Listens simultaneously tcp and udt (udp) ports and accepts connections by both protocols
-class MixedTcpUdtServerSocket
+class NX_NETWORK_API MixedTcpUdtServerSocket
 :
     public AbstractStreamServerSocket
 {

@@ -36,7 +36,7 @@ namespace aio
         \note All methods are thread-safe
         \note All methods are not blocking except \a AIOService::removeFromWatch called with \a waitForRunningHandlerCompletion set to \a true
     */
-    class AIOService
+    class NX_NETWORK_API AIOService
     {
         /*!
             After object instanciation one must call \a isInitialized to check whether instanciation was a success

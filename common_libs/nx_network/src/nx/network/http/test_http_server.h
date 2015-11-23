@@ -15,7 +15,7 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 
 
-class TestHttpServer
+class NX_NETWORK_API TestHttpServer
 {
 public:
     TestHttpServer();

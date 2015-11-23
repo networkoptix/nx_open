@@ -14,7 +14,7 @@ struct CLSubNetState;
 
 typedef QList<quint32> CLIPList;
 
-struct QnInterfaceAndAddr
+struct NX_NETWORK_API QnInterfaceAndAddr
 {
     QnInterfaceAndAddr(QString name_, QHostAddress address_, QHostAddress netMask_, const QNetworkInterface& _netIf)
         : name(name_),
@@ -30,42 +30,42 @@ struct QnInterfaceAndAddr
     QNetworkInterface netIf;
 };
 
-QN_EXPORT QString MACToString(const unsigned char *mac);
+QString NX_NETWORK_API MACToString(const unsigned char *mac);
 
-QN_EXPORT unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
-QN_EXPORT unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
+NX_NETWORK_API unsigned char* MACsToByte(const QString& macs, unsigned char* pbyAddress, const char cSep);
+NX_NETWORK_API unsigned char* MACsToByte2(const QString& macs, unsigned char* pbyAddress);
 
-// returns list of interfaces.
+// returns list of interfaces.rkjybhjdfybtr
 // Set allowItfWithoutAddress to <true> to get list with interfaces without any ip
 typedef QList<QnInterfaceAndAddr> QnInterfaceAndAddrList;
-QList<QnInterfaceAndAddr> getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
+QList<QnInterfaceAndAddr> NX_NETWORK_API getAllIPv4Interfaces(bool allowItfWithoutAddress = false);
 
 // returns list of IPv4 addresses of current machine. Skip 127.0.0.1 and addresses we can't bind to.
-QList<QHostAddress> allLocalAddresses();
+QList<QHostAddress> NX_NETWORK_API allLocalAddresses();
 
 //returns list of all IPV4 QNetworkAddressEntries of current machine; this function takes time; 
-QN_EXPORT QList<QNetworkAddressEntry> getAllIPv4AddressEntries();
+QList<QNetworkAddressEntry> NX_NETWORK_API getAllIPv4AddressEntries();
 
 // return true if succeded 
-QN_EXPORT bool getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
+bool NX_NETWORK_API getNextAvailableAddr(CLSubNetState& state, const CLIPList& lst);
 
-QN_EXPORT void removeARPrecord(const QHostAddress& ip);
+void NX_NETWORK_API removeARPrecord(const QHostAddress& ip);
 
-QN_EXPORT QString getMacByIP(const QString& host, bool net = true);
-QN_EXPORT QString getMacByIP(const QHostAddress& ip, bool net = true);
+QString NX_NETWORK_API getMacByIP(const QString& host, bool net = true);
+QString NX_NETWORK_API getMacByIP(const QHostAddress& ip, bool net = true);
 
-QN_EXPORT QHostAddress getGatewayOfIf(const QString& netIf);
+QHostAddress NX_NETWORK_API getGatewayOfIf(const QString& netIf);
 
 // returns all pingable hosts in the range
-QN_EXPORT QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
+QList<QHostAddress> NX_NETWORK_API pingableAddresses(const QHostAddress& startAddr, const QHostAddress& endAddr, int threads);
 
 //QN_EXPORT bool bindToInterface(QUdpSocket& sock, const QnInterfaceAndAddr& iface, int port = 0, QUdpSocket::BindMode mode = QUdpSocket::DefaultForPlatform);
 
-QN_EXPORT bool isIpv4Address(const QString& addr);
-QN_EXPORT QHostAddress resolveAddress(const QString& addr);
+bool NX_NETWORK_API isIpv4Address(const QString& addr);
+QHostAddress NX_NETWORK_API resolveAddress(const QString& addr);
 
-QN_EXPORT int strEqualAmount(const char* str1, const char* str2);
-QN_EXPORT bool isNewDiscoveryAddressBetter(
+int NX_NETWORK_API strEqualAmount(const char* str1, const char* str2);
+bool NX_NETWORK_API isNewDiscoveryAddressBetter(
     const HostAddress& host,
     const QHostAddress& newAddress,
     const QHostAddress& oldAddress );
@@ -76,7 +76,7 @@ static const int MAC_ADDR_LEN = 18;
         so it MUST NOT be freed!
     \return 0 on success, -1 in case of error. Use errno to get error code
 */
-QN_EXPORT int getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
-QN_EXPORT QString getMacFromPrimaryIF();
+int NX_NETWORK_API getMacFromPrimaryIF(char  MAC_str[MAC_ADDR_LEN], char** host);
+QString NX_NETWORK_API getMacFromPrimaryIF();
 
 #endif //cl_net_tools_1232

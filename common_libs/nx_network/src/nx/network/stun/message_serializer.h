@@ -19,7 +19,7 @@ namespace nx {
 namespace stun {
 
     //!Serializes message to buffer
-    class MessageSerializer
+    class NX_NETWORK_API MessageSerializer
     {
     public:
         //!Set message to serialize

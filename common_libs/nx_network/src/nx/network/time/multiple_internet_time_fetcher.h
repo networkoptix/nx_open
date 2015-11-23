@@ -15,7 +15,7 @@
 
 
 //!Fetches time from multiple time fetchers. If all succeeded than returns mean value
-class MultipleInternetTimeFetcher
+class NX_NETWORK_API MultipleInternetTimeFetcher
 :
     public AbstractAccurateTimeFetcher
 {

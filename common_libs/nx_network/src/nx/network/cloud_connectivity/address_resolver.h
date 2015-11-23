@@ -34,7 +34,7 @@ enum class AddressAttributeType
     nxApiPort,          //!< NX peer (mediaserver) port
 };
 
-struct AddressAttribute
+struct NX_NETWORK_API AddressAttribute
 {
     AddressAttributeType type;
     quint64 value; // TODO: boost::variant ?
@@ -44,7 +44,7 @@ struct AddressAttribute
     QString toString() const;
 };
 
-struct AddressEntry
+struct NX_NETWORK_API AddressEntry
 {
     AddressType type;
     HostAddress host;
@@ -57,7 +57,7 @@ struct AddressEntry
 };
 
 //!Contains peer names, their known addresses and some attributes
-class AddressResolver
+class NX_NETWORK_API AddressResolver
 {
     AddressResolver();
     friend class ::nx::SocketGlobals;

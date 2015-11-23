@@ -17,7 +17,7 @@ namespace nx_http
     /*!
         Pushes message of parsed request to the next filter
     */
-    class HttpMessageStreamParser
+    class NX_NETWORK_API HttpMessageStreamParser
     :
         public AbstractByteStreamFilter
     {
