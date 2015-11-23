@@ -71,6 +71,58 @@ ResultCode httpStatusCodeToResultCode(nx_http::StatusCode::Value statusCode)
     }
 }
 
+
+nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCode)
+{
+    if (resultCode == ResultCode::ok)
+        return nx_http::FusionRequestResult();
+
+    //setting correct error class
+    nx_http::FusionRequestErrorClass requestResultCode = nx_http::FusionRequestErrorClass::noError;
+    switch (resultCode)
+    {
+        case ResultCode::notAuthorized:
+        case ResultCode::forbidden:
+        case ResultCode::badUsername:
+        case ResultCode::badRequest:
+        case ResultCode::invalidNonce:
+        case ResultCode::unknownRealm:
+            requestResultCode = nx_http::FusionRequestErrorClass::unauthorized;
+            break;
+
+        case ResultCode::notFound:
+        case ResultCode::alreadyExists:
+            requestResultCode = nx_http::FusionRequestErrorClass::logicError;
+            break;
+
+        case ResultCode::dbError:
+        case ResultCode::networkError:
+        case ResultCode::serviceUnavailable:
+            requestResultCode = nx_http::FusionRequestErrorClass::ioError;
+            break;
+
+        case ResultCode::notImplemented:
+        case ResultCode::unknownError:
+        default:
+            requestResultCode = nx_http::FusionRequestErrorClass::internalError;
+            break;
+    }
+
+    return nx_http::FusionRequestResult(
+        requestResultCode,
+        static_cast<int>(resultCode),
+        QnLexical::serialized(resultCode));
+}
+
+ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result)
+{
+    if (result.resultCode == nx_http::FusionRequestErrorClass::noError)
+        return ResultCode::ok;
+
+    return static_cast<ResultCode>(result.errorDetail);
+}
+
+
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::notAuthorized, "notAuthorized")

@@ -6,6 +6,7 @@
 #ifndef cloud_db_base_http_handler_h
 #define cloud_db_base_http_handler_h
 
+#include <http/custom_headers.h>
 #include <utils/common/cpp14.h>
 #include <utils/network/http/buffer_source.h>
 #include <utils/network/http/server/abstract_fusion_request_handler.h>
@@ -13,6 +14,7 @@
 #include <utils/network/http/server/http_server_connection.h>
 
 #include <cloud_db_client/src/data/types.h>
+#include <utils/common/model_functions.h>
 
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"
@@ -23,7 +25,6 @@
 
 namespace nx {
 namespace cdb {
-
 namespace detail {
 
 template<typename Input, typename Output>
@@ -71,7 +72,14 @@ protected:
                 this->m_actionType,
                 authzInfo ) )   //using same object since we can move it
         {
-            this->requestCompleted(nx_http::StatusCode::forbidden);
+            nx_http::FusionRequestResult result(
+                nx_http::FusionRequestErrorClass::unauthorized,
+                static_cast<int>(api::ResultCode::forbidden),
+                QString());
+            this->response()->headers.emplace(
+                Qn::API_RESULT_CODE_HEADER_NAME,
+                QnLexical::serialized(api::ResultCode::forbidden).toLatin1());
+            this->requestCompleted(std::move(result));
             return false;
         }
         return true;
@@ -126,7 +134,12 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             [this]( api::ResultCode resultCode, Output outData ) {
-                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move(outData) );
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+                this->requestCompleted(
+                    resultCodeToFusionRequestResult(resultCode),
+                    std::move(outData));
             } );
     }
 
@@ -185,7 +198,10 @@ public:
             AuthorizationInfo( std::move( authInfo ) ),
             std::move( inputData ),
             [this]( api::ResultCode resultCode ) {
-                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+                this->requestCompleted(resultCodeToFusionRequestResult(resultCode));
             } );
     }
 
@@ -238,7 +254,12 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             [this]( api::ResultCode resultCode, Output outData ) {
-                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ), std::move( outData ) );
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+                this->requestCompleted(
+                    resultCodeToFusionRequestResult(resultCode),
+                    std::move(outData));
             } );
     }
 
@@ -291,7 +312,10 @@ public:
         m_requestFunc(
             AuthorizationInfo( std::move( authInfo ) ),
             [this]( api::ResultCode resultCode ) {
-                this->requestCompleted( resultCodeToHttpStatusCode( resultCode ) );
+                this->response()->headers.emplace(
+                    Qn::API_RESULT_CODE_HEADER_NAME,
+                    QnLexical::serialized(resultCode).toLatin1());
+                this->requestCompleted(resultCodeToFusionRequestResult(resultCode));
             } );
     }
 

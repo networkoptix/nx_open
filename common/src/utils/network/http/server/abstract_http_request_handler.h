@@ -57,6 +57,8 @@ namespace nx_http
                 const nx_http::StatusCode::Value statusCode,
                 std::unique_ptr<nx_http::AbstractMsgBodySource> dataSource )> completionHandler ) = 0;
 
+        nx_http::Response* response();
+
     private:
         nx_http::Message m_requestMsg;
         nx_http::Message m_responseMsg;
