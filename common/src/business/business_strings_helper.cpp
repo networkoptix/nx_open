@@ -164,8 +164,9 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case BackupFinishedEvent:
         return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
-        return !params.caption.isEmpty() ? params.caption :
-               !params.description.isEmpty() ? params.description : resourceName;
+        return (!params.caption.isEmpty() ? params.caption
+            : (params.resourceName.isEmpty() ? tr("Generic Event") 
+                : tr("Generic Event at %1").arg(params.resourceName)));
     default:
         break;
     }
@@ -275,7 +276,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     case ServerStartEvent: 
         break;
     case UserDefinedEvent:
-        result += !params.description.isEmpty() ? params.description : params.caption;
+        result += params.description;
         break;
     default:
         break;

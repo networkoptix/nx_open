@@ -306,7 +306,7 @@ struct QnBackupCamerasColors {
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
-    (metatype)(json)
+    (metatype)(json)(eq)
 );
 
 #endif // QN_CLIENT_COLOR_TYPES_H

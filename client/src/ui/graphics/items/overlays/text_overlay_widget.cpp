@@ -35,7 +35,8 @@ bool QnOverlayTextItemData::operator == (const QnOverlayTextItemData &rhs) const
         && (itemOptions.backgroundColor == rhs.itemOptions.backgroundColor)
         && (itemOptions.borderRadius == rhs.itemOptions.borderRadius)
         && (itemOptions.maxWidth == rhs.itemOptions.maxWidth)
-        && (itemOptions.padding == rhs.itemOptions.padding));
+        && (itemOptions.horPadding == rhs.itemOptions.horPadding)
+        && (itemOptions.vertPadding == rhs.itemOptions.vertPadding));
 }
 
 bool QnOverlayTextItemData::operator != (const QnOverlayTextItemData &rhs) const
@@ -160,6 +161,7 @@ void QnTextOverlayWidgetPrivate::setItemsData(const QnOverlayTextItemDataList &d
     for (const auto textItemData: data)
         addItemData(textItemData, false);
 
+
     updatePositions();
 }
 
@@ -202,9 +204,18 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
     d->m_mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     d->m_mainLayout->addStretch();
     d->m_mainLayout->addItem(d->m_scrollArea);
+    d->m_mainLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(d->m_mainLayout);
 
-    setContentsMargins(4, 20, 4, 20);
+    enum 
+    {
+        kDefaultHorMargin = 4 
+        , kDefaultBottomMargin = 27
+        , kDefaultTopMargin = 28
+    };
+
+    setContentsMargins(kDefaultHorMargin, kDefaultTopMargin
+        , kDefaultHorMargin, kDefaultBottomMargin);
 }
 
 QnTextOverlayWidget::~QnTextOverlayWidget() 

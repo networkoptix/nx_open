@@ -9,7 +9,8 @@ struct QnHtmlTextItemOptions
     QColor backgroundColor;
     int maxWidth;
     int borderRadius;
-    int padding;
+    int horPadding;
+    int vertPadding;
     bool autosize;
 
     QnHtmlTextItemOptions();
@@ -17,7 +18,8 @@ struct QnHtmlTextItemOptions
     QnHtmlTextItemOptions(const QColor &initBackgroundColor
         , bool initAutosize
         , int initBorderRadius
-        , int initPadding
+        , int initHorPadding
+        , int initVertPadding
         , int initMaxWidth);
 };
 

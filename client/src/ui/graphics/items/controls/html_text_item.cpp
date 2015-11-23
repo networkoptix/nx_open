@@ -22,7 +22,8 @@ QnHtmlTextItemOptions::QnHtmlTextItemOptions()
     : backgroundColor()
     , maxWidth(kDefaultItemWidth)
     , borderRadius(0)
-    , padding(kDefaultPadding)
+    , horPadding(kDefaultPadding)
+    , vertPadding(kDefaultPadding)
     , autosize(false)
 {
 }
@@ -30,13 +31,15 @@ QnHtmlTextItemOptions::QnHtmlTextItemOptions()
 QnHtmlTextItemOptions::QnHtmlTextItemOptions(const QColor &initBackgroundColor
     , bool initAutosize
     , int initBorderRadius
-    , int initPadding
+    , int initHorPadding
+    , int initVertPadding
     , int initMaxWidth)
 
     : backgroundColor(initBackgroundColor)
     , maxWidth(initMaxWidth)
     , borderRadius(initBorderRadius)
-    , padding(initPadding)
+    , horPadding(initHorPadding)
+    , vertPadding(initVertPadding)
     , autosize(initAutosize)
 {
 }
@@ -72,7 +75,7 @@ QnHtmlTextItemPrivate::QnHtmlTextItemPrivate(const QnHtmlTextItemOptions &option
 void QnHtmlTextItemPrivate::updatePixmap() {
     Q_Q(QnHtmlTextItem);
 
-    const int maxTextWidth = (options.maxWidth - options.padding * 2);
+    const int maxTextWidth = (options.maxWidth - options.horPadding * 2);
 
     static const QFont kDefaultFont = []()
     {
@@ -88,15 +91,14 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     td.setHtml(html);
     
     const auto docWidth = td.documentLayout()->documentSize().width();
+
     if ((docWidth > maxTextWidth) || !options.autosize)
         td.setTextWidth(maxTextWidth);  
-    else
-        td.adjustSize();
 
     td.defaultTextOption().setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
-    pixmap = QPixmap(td.documentLayout()->documentSize().width() + options.padding * 2
-        , td.documentLayout()->documentSize().height() + options.padding * 2);
+    pixmap = QPixmap(td.documentLayout()->documentSize().width() + options.horPadding * 2
+        , td.documentLayout()->documentSize().height() + options.vertPadding * 2);
     pixmap.fill(Qt::transparent);
 
     QPainter painter(&pixmap);
@@ -109,9 +111,8 @@ void QnHtmlTextItemPrivate::updatePixmap() {
         painter.drawRoundedRect(pixmap.rect(), options.borderRadius, options.borderRadius);
     }
 
-    painter.translate(options.padding, options.padding);
+    painter.translate(options.horPadding, options.vertPadding);
     td.drawContents(&painter);
-    painter.restore();
 
     q->resize(QSizeF(pixmap.size()));
     q->update();
