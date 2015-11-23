@@ -38,18 +38,18 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
     /* Start listening to changes. */
-    connect(resourcePool(),  SIGNAL(resourceRemoved(const QnResourcePtr &)), this,   SLOT(at_resourcePool_resourceRemoved(const QnResourcePtr &)));
-    connect(resourcePool(),  SIGNAL(resourceAdded(const QnResourcePtr &)),   this,   SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
+    connect(qnResPool,  &QnResourcePool::resourceRemoved, this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved);
+    connect(qnResPool,  &QnResourcePool::resourceAdded,   this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded);
 
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
-        at_resourcePool_resourceAdded(resource);
+    for(const QnLayoutResourcePtr &layout: qnResPool->getResources<QnLayoutResource>())
+        at_resourcePool_resourceAdded(layout);
 }
 
 QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager() {
-    disconnect(resourcePool(), NULL, this, NULL);
+    disconnect(qnResPool, nullptr, this, nullptr);
 
-    foreach(const QnResourcePtr &resource, context()->resourcePool()->getResources())
-        at_resourcePool_resourceRemoved(resource);
+    for(const QnLayoutResourcePtr &layout: qnResPool->getResources<QnLayoutResource>())
+        at_resourcePool_resourceRemoved(layout);
 
     m_storage->clear();
     m_flagsByLayout.clear();
@@ -186,21 +186,21 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
 }
 
 void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
-    connect(resource.data(),  SIGNAL(itemAdded(const QnLayoutResourcePtr &, const QnLayoutItemData &)),     this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(itemRemoved(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(itemChanged(const QnLayoutResourcePtr &, const QnLayoutItemData &)),   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(nameChanged(const QnResourcePtr &)),                                   this,   SLOT(at_layout_changed(const QnResourcePtr &)));
-    connect(resource.data(),  SIGNAL(lockedChanged(const QnLayoutResourcePtr &)),                           this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(cellAspectRatioChanged(const QnLayoutResourcePtr &)),                  this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(cellSpacingChanged(const QnLayoutResourcePtr &)),                      this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(backgroundImageChanged(const QnLayoutResourcePtr &)),                  this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(backgroundSizeChanged(const QnLayoutResourcePtr &)),                   this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(backgroundOpacityChanged(const QnLayoutResourcePtr &)),                this,   SLOT(at_layout_changed(const QnLayoutResourcePtr &)));
-    connect(resource.data(),  SIGNAL(storeRequested(const QnLayoutResourcePtr &)),                          this,   SLOT(at_layout_storeRequested(const QnLayoutResourcePtr &)));
+    connect(resource,  &QnResource::nameChanged,                    this,   &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource,  &QnLayoutResource::itemAdded,                this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::itemRemoved,              this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::itemChanged,              this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::lockedChanged,            this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::cellAspectRatioChanged,   this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::cellSpacingChanged,       this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::backgroundImageChanged,   this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::backgroundSizeChanged,    this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::backgroundOpacityChanged, this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource,  &QnLayoutResource::storeRequested,           this,   &QnWorkbenchLayoutSnapshotManager::store);
 }
 
 void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource) {
-    disconnect(resource.data(), NULL, this, NULL);
+    disconnect(resource, NULL, this, NULL);
 }
 
 Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::defaultFlags(const QnLayoutResourcePtr &resource) const {
@@ -258,15 +258,11 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
     disconnectFrom(layoutResource);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_storeRequested(const QnLayoutResourcePtr &resource) {
-    store(resource);
-}
-
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
     setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnResourcePtr &resource) {
+void QnWorkbenchLayoutSnapshotManager::at_resource_changed(const QnResourcePtr &resource) {
     if(QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>())
         at_layout_changed(layoutResource);
 }
