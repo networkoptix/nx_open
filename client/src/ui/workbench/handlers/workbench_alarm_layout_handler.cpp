@@ -13,6 +13,8 @@
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
 
+#include <ui/style/skin.h>
+
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout.h>
@@ -125,6 +127,7 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     QnWorkbenchLayout* workbenchAlarmLayout = QnWorkbenchLayout::instance(QnLayoutResourcePtr(alarmLayout));
     if (!workbenchAlarmLayout) {
         workbenchAlarmLayout = new QnWorkbenchLayout(alarmLayout, workbench());
+        workbenchAlarmLayout->setData(Qt::DecorationRole, qnSkin->icon("titlebar/alert.png"));
         workbench()->addLayout(workbenchAlarmLayout);
     }
 

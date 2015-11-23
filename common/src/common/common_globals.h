@@ -572,9 +572,7 @@ public:
         
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        //RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
         RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
-        //RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
         
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
@@ -582,11 +580,9 @@ public:
         AlternateColorRole,                         /**< Use alternate color in painting */
         AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
-        LastItemDataRole,
-
-        StorageInfoDataRole,                        /** return QnStorageModelInfo object at QnStorageConfigWidget */
-        BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
-        TextWidthDataRole,                          /** used in BackupSettings model */
+        StorageInfoDataRole,                        /**< return QnStorageModelInfo object at QnStorageConfigWidget */
+        BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
+        TextWidthDataRole,                          /**< used in BackupSettings model */
 
         RoleCount
     };
