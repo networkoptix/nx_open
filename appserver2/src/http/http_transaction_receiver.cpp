@@ -11,6 +11,7 @@
 #include "http/custom_headers.h"
 #include "transaction/transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
+#include "settings.h"
 
 
 namespace ec2
@@ -99,8 +100,8 @@ namespace ec2
         initSystemThreadId();
 
         if( !d->socket->setRecvTimeout(
-                QnTransactionTransport::TCP_KEEPALIVE_TIMEOUT *
-                QnTransactionTransport::KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) ||
+                Settings::instance()->connectionKeepAliveTimeout().count() * 
+                Settings::instance()->keepAliveProbeCount()) ||
             !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();

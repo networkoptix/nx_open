@@ -6,6 +6,7 @@
 #ifndef NX_EC2_SETTINGS_H
 #define NX_EC2_SETTINGS_H
 
+#include <chrono>
 #include <map>
 
 #include <QMutex>
@@ -23,8 +24,14 @@ class Settings
 {
 public:
     bool dbReadOnly() const;
+
+    //time_sync
     size_t internetSyncTimePeriodSec(size_t defaultValue) const;
     size_t maxInternetTimeSyncRetryPeriodSec(size_t defaultValue) const;
+
+    //transaction connection
+    std::chrono::milliseconds connectionKeepAliveTimeout() const;
+    int keepAliveProbeCount() const;
 
     void loadParams( std::map<QString, QVariant> confParams );
 
