@@ -10,6 +10,25 @@ QnSavedSessionsModel::QnSavedSessionsModel(QObject *parent)
     : QnLoginSessionsModel(parent)
 {
     loadFromSettings();
+
+    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance()) {
+        connect(moduleFinder, &QnModuleFinder::moduleChanged, this, [this, moduleFinder](const QnModuleInformation &moduleInformation) {
+            for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id)) {
+                for (QString id: m_sessionIdByAddress.values(address)) {
+                    auto it = std::find_if(m_savedSessions.begin(), m_savedSessions.end(), [&id](const QnLoginSession &session) -> bool {
+                        return session.id == id;
+                    });
+
+                    if (it == m_savedSessions.end())
+                        continue;
+
+                    it->systemName = moduleInformation.systemName;
+                    QModelIndex idx = index(std::distance(m_savedSessions.begin(), it));
+                    emit dataChanged(idx, idx);
+                }
+            }
+        });
+    }
 }
 
 QnSavedSessionsModel::~QnSavedSessionsModel()
@@ -53,6 +72,8 @@ QString QnSavedSessionsModel::updateSession(
     QString savedId;
 
     if (it != m_savedSessions.end()) {
+        m_sessionIdByAddress.remove(SocketAddress(it->address, it->port), it->id);
+
         it->address = address;
         it->port = port;
         it->user = user;
@@ -73,6 +94,8 @@ QString QnSavedSessionsModel::updateSession(
             QModelIndex index = this->index(row);
             emit dataChanged(index, index);
         }
+
+        m_sessionIdByAddress.insert(SocketAddress(address, port), it->id);
     } else {
         QnLoginSession session;
         session.systemName = systemName;
@@ -86,6 +109,8 @@ QString QnSavedSessionsModel::updateSession(
         beginInsertRows(QModelIndex(), 0, 0);
         m_savedSessions.insert(0, session);
         endInsertRows();
+
+        m_sessionIdByAddress.insert(SocketAddress(session.address, session.port), session.id);
     }
 
     saveToSettings();
@@ -100,6 +125,8 @@ void QnSavedSessionsModel::deleteSession(const QString &id) {
 
     if (it == m_savedSessions.end())
         return;
+
+    m_sessionIdByAddress.remove(SocketAddress(it->address, it->port), it->id);
 
     int row = std::distance(m_savedSessions.begin(), it);
     beginRemoveRows(QModelIndex(), row, row);
@@ -116,6 +143,7 @@ void QnSavedSessionsModel::loadFromSettings() {
     beginResetModel();
 
     m_savedSessions.clear();
+    m_sessionIdByAddress.clear();
 
     for (const QVariant &variant: variantList) {
         QnLoginSession session = QnLoginSession::fromVariant(variant.toMap());
@@ -123,6 +151,7 @@ void QnSavedSessionsModel::loadFromSettings() {
             continue;
 
         m_savedSessions.append(session);
+        m_sessionIdByAddress.insert(SocketAddress(session.address, session.port), session.id);
     }
 
     endResetModel();
