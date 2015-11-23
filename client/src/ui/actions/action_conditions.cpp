@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>

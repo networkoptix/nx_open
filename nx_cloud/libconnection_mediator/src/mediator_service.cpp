@@ -156,7 +156,7 @@ int MediatorProcess::executeApplication()
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset(
-        new MultiAddressServer<stun::SocketServer>( false, SocketFactory::nttDisabled ) );
+        new MultiAddressServer<stun::SocketServer>( false, SocketFactory::NatTraversalType::nttDisabled ) );
 
     if( !m_multiAddressStunServer->bind( stunAddrToListenList ) )
         return 2;

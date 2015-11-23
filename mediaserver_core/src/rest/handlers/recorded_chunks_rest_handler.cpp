@@ -15,7 +15,7 @@
 
 #include "utils/common/util.h"
 #include <utils/fs/file.h>
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include <utils/serialization/json.h>
 #include <utils/serialization/json_functions.h>
 

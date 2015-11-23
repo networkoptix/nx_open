@@ -10,7 +10,7 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
-#include "../media/nalUnits.h"
+#include "utils/media/nalUnits.h"
 #include "rtpsession.h"
 
 class CLH264RtpParser: public QnRtpVideoStreamParser

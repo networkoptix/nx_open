@@ -59,8 +59,8 @@
 #include <utils/common/collection.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 #include <utils/reconnect_helper.h>
 
 #include "compatibility.h"

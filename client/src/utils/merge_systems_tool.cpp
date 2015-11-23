@@ -10,7 +10,7 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
-#include "utils/network/module_finder.h"
+#include "network/module_finder.h"
 #include "utils/common/log.h"
 #include "client/client_settings.h"
 #include "ui/workbench/workbench_context.h"

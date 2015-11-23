@@ -28,4 +28,8 @@ bool isPhone() {
     return QAndroidJniObject::callStaticMethod<jboolean>("com/networkoptix/nxwitness/utils/QnWindowUtils", "isPhone");
 }
 
+void setKeepScreenOn(bool keepScreenOn) {
+    QAndroidJniObject::callStaticMethod<void>("com/networkoptix/nxwitness/utils/QnWindowUtils", "setKeepScreenOn", "(Z)V", keepScreenOn);
+}
+
 #endif

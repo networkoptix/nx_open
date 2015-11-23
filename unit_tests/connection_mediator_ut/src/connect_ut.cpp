@@ -25,7 +25,7 @@ protected:
     ConnectTest()
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
         , listeningPeerPool( &cloud, &stunMessageDispatcher )
-        , server( false, SocketFactory::nttDisabled )
+        , server( false, SocketFactory::NatTraversalType::nttDisabled )
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
@@ -65,7 +65,7 @@ TEST_F( ConnectTest, BindConnect )
         cloud.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, stun::Message > waiter;
-        ASSERT_TRUE( msClient.sendRequest( std::move( request ), waiter.pusher() ) );
+        msClient.sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );

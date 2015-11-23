@@ -15,7 +15,7 @@
 #include "core/resource/media_server_resource.h"
 #include <core/resource/user_resource.h>
 
-#include "utils/network/router.h"
+#include "network/router.h"
 #include <utils/common/model_functions.h>
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/serialization/compressed_time.h"
@@ -24,7 +24,7 @@
 #include "http/custom_headers.h"
 #include "rest/server/rest_connection_processor.h"
 #include <rest/helpers/chunks_request_helper.h>
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_listener.h"
 
 namespace {
     static QString urlPath;

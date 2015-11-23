@@ -24,7 +24,7 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_isConvertMethodInitialized(false),
     m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
     m_startBufferingTime(AV_NOPTS_VALUE),
-    m_audioQueueMutex(QMutex::Recursive),
+    m_audioQueueMutex(QnMutex::Recursive),
     m_blockedTimeValue(AV_NOPTS_VALUE)
 {}
 
@@ -110,7 +110,7 @@ void QnAudioStreamDisplay::clearDeviceBuffer()
 
 void QnAudioStreamDisplay::clearAudioBuffer()
 {
-    QMutexLocker lock(&m_audioQueueMutex);
+    QnMutexLocker lock(&m_audioQueueMutex);
     while (!m_audioQueue.isEmpty())
     {
         m_audioQueue.dequeue();
@@ -123,7 +123,7 @@ void QnAudioStreamDisplay::clearAudioBuffer()
 
 void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
-    QMutexLocker lock(&m_audioQueueMutex);
+    QnMutexLocker lock(&m_audioQueueMutex);
     m_lastAudioTime = data->timestamp;
     m_audioQueue.enqueue(data);
 
@@ -190,7 +190,7 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
 
 void QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
 {
-    QMutexLocker lock(&m_audioQueueMutex);
+    QnMutexLocker lock(&m_audioQueueMutex);
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
     if (data == 0 && !m_audioSound) // do not need to check audio device in case of data=0 and no audio device
@@ -240,7 +240,7 @@ bool QnAudioStreamDisplay::isPlaying() const
 
 void QnAudioStreamDisplay::playCurrentBuffer()
 {
-    QMutexLocker lock(&m_audioQueueMutex);
+    QnMutexLocker lock(&m_audioQueueMutex);
     QnCompressedAudioDataPtr data;
     while (!m_audioQueue.isEmpty() )
     {
@@ -319,7 +319,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
 int QnAudioStreamDisplay::msInQueue() const
 {
-    QMutexLocker lock(&m_audioQueueMutex);
+    QnMutexLocker lock(&m_audioQueueMutex);
     if (m_audioQueue.isEmpty())
         return 0;
 

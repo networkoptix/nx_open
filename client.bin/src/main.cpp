@@ -114,8 +114,8 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
 #include <utils/network/socket_global.h>
@@ -280,6 +280,13 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     nx_http::HttpModManager httpModManager;
 
     PluginManager pluginManager;
+
+    auto enforceSocketType = startupParams.enforceSocketType.toLower();
+    if( enforceSocketType == lit("tcp") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+    else
+    if( enforceSocketType == lit("udt") )
+        SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
 
     /* Dev mode. */
     if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5) 

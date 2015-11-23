@@ -2,7 +2,7 @@
 #define API_MODULE_DATA_H
 
 #include "api_data.h"
-#include <utils/network/module_information.h>
+#include <network/module_information.h>
 
 namespace ec2 {
 

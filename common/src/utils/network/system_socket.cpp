@@ -8,6 +8,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <utils/network/ssl_socket.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -19,8 +21,6 @@
 #endif
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
@@ -1206,8 +1206,8 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
     //TODO #ak add general implementation to Socket class and remove this method
     if (waitForRunningHandlerCompletion)
     {
-        QWaitCondition cond;
-        QMutex mtx;
+        QnWaitCondition cond;
+        QnMutex mtx;
         bool cancelled = false;
 
         m_implDelegate.dispatch(
@@ -1220,12 +1220,12 @@ void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
                 nx::SocketGlobals::aioService().removeFromWatch(
                     static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
 
-                QMutexLocker lk(&mtx);
+                QnMutexLocker lk(&mtx);
                 cancelled = true;
                 cond.wakeAll();
             } );
 
-        QMutexLocker lk(&mtx);
+        QnMutexLocker lk(&mtx);
         while(!cancelled)
             cond.wait(lk.mutex());
     }

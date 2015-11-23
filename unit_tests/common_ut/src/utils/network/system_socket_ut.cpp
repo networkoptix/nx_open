@@ -1,10 +1,21 @@
 #include <gtest/gtest.h>
 
-#include <utils/network/socket_factory.h>
+#include <utils/common/cpp14.h>
+#include <utils/thread/sync_queue.h>
+#include <utils/network/system_socket.h>
+#include <utils/network/udt_socket.h>
 
-TEST(TcpSocket, KeepAliveOptions)
+#include <udt.h>
+#include <thread>
+
+#define ERROR_TEXT SystemError::getLastOSErrorText().toStdString()
+
+TEST( TcpSocket, KeepAliveOptions )
 {
-    const auto socket = SocketFactory::createStreamSocket();
+    if( SocketFactory::isStreamSocketTypeEnforced() )
+        return;
+
+    const auto socket = std::make_unique< TCPSocket >( false );
     boost::optional< KeepAliveOptions > result;
     result.is_initialized();
 
@@ -35,8 +46,145 @@ TEST(TcpSocket, KeepAliveOptions)
 
 TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
 {
-    const auto socket = SocketFactory::createStreamSocket();
+    const auto socket = std::make_unique< TCPSocket >( false );
     boost::optional< KeepAliveOptions > result;
     ASSERT_TRUE( socket->getKeepAlive( &result ) );
     ASSERT_FALSE( static_cast< bool >( result ) );
+}
+
+// Template multitype socket tests to ensure that every common_ut run checks
+// TCP and UDT basic functionality
+
+static const SocketAddress ADDRESS1( QLatin1String( "localhost:12345" ) );
+static const SocketAddress ADDRESS2( QLatin1String( "localhost:12346" ) );
+static const QByteArray MESSAGE( "Ping" );
+static const size_t CLIENT_COUNT( 3 );
+
+template< typename ServerSocket, typename ClientSocket>
+static void socketSimpleSync()
+{
+    std::thread serverThread( []()
+    {
+        auto server = std::make_unique< ServerSocket >();
+        ASSERT_TRUE( server->setNonBlockingMode( false ) );
+        ASSERT_TRUE( server->setReuseAddrFlag( true ) );
+        ASSERT_TRUE( server->bind( ADDRESS1 ) ) << ERROR_TEXT;
+        ASSERT_TRUE( server->listen( CLIENT_COUNT ) ) << ERROR_TEXT;
+
+        for( int i = CLIENT_COUNT; i > 0; --i )
+        {
+            QByteArray buffer( 128, char( 0 ) );
+            std::unique_ptr< AbstractStreamSocket > client( server->accept() );
+            ASSERT_TRUE( client->setNonBlockingMode( false ) );
+            EXPECT_NE( client->recv( buffer.data(), 1024 ), -1 );
+            EXPECT_STREQ( buffer.data(), MESSAGE.data() );
+            EXPECT_EQ( client->recv( buffer.data(), 1024 ), 0 );
+        }
+    } );
+
+    // give the server some time to start
+    std::this_thread::sleep_for( std::chrono::microseconds( 500 ) );
+
+    std::thread clientThread( []()
+    {
+        for( int i = CLIENT_COUNT; i > 0; --i )
+        {
+            auto client = std::make_unique< ClientSocket >( false );
+            EXPECT_TRUE( client->connect( ADDRESS1, 500 ) );
+            EXPECT_EQ( client->send( MESSAGE.data(), MESSAGE.size() + 1 ),
+                       MESSAGE.size() + 1 );
+        }
+    } );
+
+    serverThread.join();
+    clientThread.join();
+}
+
+TEST( TcpSocket, SimpleSync )
+{
+    socketSimpleSync< TCPServerSocket, TCPSocket >();
+}
+
+TEST( UdtSocket, SimpleSync )
+{
+    socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >();
+}
+
+template< typename ServerSocket, typename ClientSocket>
+static void socketSimpleAsync()
+{
+    nx::SyncQueue< SystemError::ErrorCode > serverResults;
+    nx::SyncQueue< SystemError::ErrorCode > clientResults;
+
+    auto server = std::make_unique< ServerSocket >();
+    ASSERT_TRUE( server->setNonBlockingMode( true ) );
+    ASSERT_TRUE( server->setReuseAddrFlag( true ) );
+    ASSERT_TRUE( server->bind( ADDRESS2 ) ) << ERROR_TEXT;
+    ASSERT_TRUE( server->listen( CLIENT_COUNT ) ) << ERROR_TEXT;
+
+    QByteArray serverBuffer;
+    serverBuffer.reserve( 128 );
+    std::unique_ptr< AbstractStreamSocket > client;
+    std::function< void( SystemError::ErrorCode, AbstractStreamSocket* ) > accept
+            = [ & ]( SystemError::ErrorCode code, AbstractStreamSocket* socket )
+    {
+        serverResults.push( code );
+        if( code != SystemError::noError )
+            return;
+
+        client.reset( socket );
+        ASSERT_TRUE( client->setNonBlockingMode( true ) );
+        client->readSomeAsync( &serverBuffer, [ & ]( SystemError::ErrorCode code,
+                                               size_t size )
+        {
+            if( code == SystemError::noError ) {
+                EXPECT_GT( size, 0 );
+                EXPECT_STREQ( serverBuffer.data(), MESSAGE.data() );
+                serverBuffer.resize( 0 );
+            }
+
+            client->terminateAsyncIO( true );
+            server->acceptAsync( accept );
+            serverResults.push( code );
+        } );
+    };
+
+    server->acceptAsync( accept );
+
+    auto testClient = std::make_unique< ClientSocket >( false );
+    ASSERT_TRUE( testClient->setNonBlockingMode( true ) );
+
+    QByteArray clientBuffer;
+    clientBuffer.reserve( 128 );
+    testClient->connectAsync( ADDRESS2, [ & ]( SystemError::ErrorCode code )
+    {
+        EXPECT_EQ( code, SystemError::noError );
+        testClient->sendAsync( MESSAGE, [ & ]( SystemError::ErrorCode code,
+                                               size_t size )
+        {
+            clientResults.push( code );
+            if( code != SystemError::noError )
+                return;
+
+            EXPECT_EQ( code, SystemError::noError );
+            EXPECT_EQ( size, MESSAGE.size() );
+        } );
+    } );
+
+    ASSERT_EQ( serverResults.pop(), SystemError::noError ); // accept
+    ASSERT_EQ( clientResults.pop(), SystemError::noError ); // send
+    ASSERT_EQ( serverResults.pop(), SystemError::noError ); // recv
+
+    testClient->terminateAsyncIO( true );
+    server->terminateAsyncIO( true );
+}
+
+TEST( TcpSocket, SimpleAsync )
+{
+    socketSimpleAsync< TCPServerSocket, TCPSocket >();
+}
+
+TEST( UdtSocket, SimpleAsync )
+{
+    socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >();
 }

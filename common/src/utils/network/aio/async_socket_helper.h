@@ -12,6 +12,9 @@
 
 #include <QtCore/QThread>
 
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 #include "../abstract_socket.h"
 #include "../socket_global.h"
 
@@ -324,6 +327,7 @@ public:
             //TODO #ak cancelledHandler ???
         }
     }
+                    QnMutexLocker lk(&mtx);
 
     void cancelIOSync(const aio::EventType eventType)
     {

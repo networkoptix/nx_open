@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/uuid.h>
-#include <utils/network/module_information.h>
+#include <network/module_information.h>
 
 class QnIncompatibleServerWatcher : public QObject {
     Q_OBJECT

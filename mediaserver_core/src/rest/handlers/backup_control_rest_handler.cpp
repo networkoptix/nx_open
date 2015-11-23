@@ -1,5 +1,5 @@
 #include "backup_control_rest_handler.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/util.h"
 #include "api/model/backup_status_reply.h"
 #include <recorder/schedule_sync.h>
