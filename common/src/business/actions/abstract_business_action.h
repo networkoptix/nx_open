@@ -21,6 +21,7 @@ namespace QnBusiness
     bool hasToggleState(ActionType actionType);
     bool canBeInstant(ActionType actionType);
     bool supportsDuration(ActionType actionType);
+    bool allowsAggregation(ActionType actionType);
 
     bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
 

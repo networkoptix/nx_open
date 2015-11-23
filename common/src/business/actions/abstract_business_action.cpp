@@ -91,20 +91,10 @@ namespace QnBusiness {
     }
 
     bool canBeInstant(ActionType actionType) {
-        switch(actionType) {
-        case ExecutePtzPresetAction:
-		case CameraOutputOnceAction:
-        case SendMailAction:
-        case DiagnosticsAction:
-        case ShowPopupAction:
-        case PlaySoundOnceAction:
-        case SayTextAction:
-        case BookmarkAction:
-        case ShowTextOverlayAction:
+        if (!hasToggleState(actionType))
             return true;
-        default:
-            return false;
-        }
+
+        return supportsDuration(actionType);
     }
 
     bool supportsDuration(ActionType actionType) {
@@ -114,6 +104,16 @@ namespace QnBusiness {
             return true;
         default:
             return false;
+        }
+    }
+
+    bool allowsAggregation(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return false;
+        default:
+            return true;
         }
     }
 

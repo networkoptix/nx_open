@@ -34,6 +34,7 @@
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
     const int defaultActionDuration = 5000;
+    const int defaultAggregationPeriod = 60;
 }
 
 namespace QnBusiness {
@@ -84,7 +85,7 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventType(QnBusiness::CameraDisconnectEvent),
     m_eventState(QnBusiness::UndefinedState),
     m_actionType(QnBusiness::ShowPopupAction),
-    m_aggregationPeriod(60),
+    m_aggregationPeriod(defaultAggregationPeriod),
     m_disabled(false),
     m_system(false),
     m_eventTypesModel(new QStandardItemModel(this)),
@@ -482,6 +483,7 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
     bool userRequired = QnBusiness::requiresUserResource(m_actionType);
 
     bool wasEmailAction = m_actionType == QnBusiness::SendMailAction;
+    bool aggregationWasDisabled = !QnBusiness::allowsAggregation(m_actionType);
 
     m_actionType = value;
     m_modified = true;
@@ -491,16 +493,24 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
             QnBusiness::requiresUserResource(m_actionType) != userRequired)
         fields |= QnBusiness::ActionResourcesField;
 
-    /*
-     *  If action is "send email" default units for aggregation period should be hours, not minutes.
-     *  Works only if aggregation period was not changed from default value.
-     */
-    if (value == QnBusiness::SendMailAction && m_aggregationPeriod == 60) {
-        m_aggregationPeriod = 60*60;
+    if (!QnBusiness::allowsAggregation(m_actionType)) {
+        m_aggregationPeriod = 0;
         fields |= QnBusiness::AggregationField;
-    } else if (wasEmailAction && m_aggregationPeriod == 60*60) {
-        m_aggregationPeriod = 60;
-        fields |= QnBusiness::AggregationField;
+    } else {
+        /*
+         *  If action is "send email" default units for aggregation period should be hours, not minutes.
+         *  Works only if aggregation period was not changed from default value.
+         */
+        if (value == QnBusiness::SendMailAction && m_aggregationPeriod == defaultAggregationPeriod) {
+            m_aggregationPeriod = defaultAggregationPeriod * 60;
+            fields |= QnBusiness::AggregationField;
+        } else if (wasEmailAction && m_aggregationPeriod == defaultAggregationPeriod * 60) {
+            m_aggregationPeriod = defaultAggregationPeriod;
+            fields |= QnBusiness::AggregationField;
+        } else if (aggregationWasDisabled) {
+            m_aggregationPeriod = defaultAggregationPeriod;
+            fields |= QnBusiness::AggregationField;
+        }
     }
 
     if (QnBusiness::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == QnBusiness::UndefinedState) {
