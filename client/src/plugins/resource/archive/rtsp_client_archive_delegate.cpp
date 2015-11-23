@@ -176,7 +176,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnVirtualCam
         return;
     }
 
-    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera);
+    QnMediaServerResourceList mediaServerList = qnCameraHistoryPool->getCameraFootageData(camera, true);
     QSet<QnUuid> footageServers;
     for (const auto &server: mediaServerList)
         footageServers << server->getId();

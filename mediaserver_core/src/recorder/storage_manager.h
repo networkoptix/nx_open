@@ -95,7 +95,7 @@ public:
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
-    void clearSpace();
+    void clearSpace(bool forced=false);
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
@@ -201,6 +201,7 @@ private:
     mutable QnMutex m_mutexRebuild;
     mutable QnMutex m_rebuildStateMtx;
     mutable QnMutex m_localPatches;
+    QnMutex m_clearSpaceMutex;
 
     bool m_storagesStatisticsReady;
     QTimer m_timer;

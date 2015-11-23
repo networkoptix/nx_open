@@ -83,7 +83,7 @@ private:
     QnByteArray m_decodedAudioBuffer;
     qint64 m_startBufferingTime;
     qint64 m_lastAudioTime;
-    mutable QMutex m_audioQueueMutex;
+    mutable QnMutex m_audioQueueMutex;
     qint64 m_blockedTimeValue;
 };
 

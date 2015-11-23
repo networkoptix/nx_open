@@ -88,7 +88,7 @@ private:
     std::atomic<float> m_storageBitrateCoeff;
     QString m_storageType;
     QSet<QnAbstractMediaStreamDataProvider*> m_providers;
-    mutable QMutex m_bitrateMtx;
+    mutable QnMutex m_bitrateMtx;
     bool    m_isBackup;
     double  m_writed;
     double  m_writedCoeff;

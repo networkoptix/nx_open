@@ -3,6 +3,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
+#include <QtQuick/QQuickWindow>
 
 #include <time.h>
 
@@ -23,6 +24,7 @@
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
 #include "ui/window_utils.h"
+#include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
@@ -72,12 +74,14 @@ int runUi(QGuiApplication *application) {
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
-    QScopedPointer<QObject> mainWindow(mainComponent.create());
+    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+
+    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     if (mainWindow) {
-        mainWindow->setProperty("width", 480);
-        mainWindow->setProperty("height", 800);
+        mainWindow->setWidth(480);
+        mainWindow->setHeight(800);
     }
 #endif
 

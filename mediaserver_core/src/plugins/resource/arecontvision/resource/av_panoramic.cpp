@@ -3,12 +3,14 @@
 #include <utils/common/log.h>
 #include <utils/network/http/httptypes.h>
 
+#include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
 #include "core/resource/resource_media_layout.h"
 
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "core/resource_management/resource_properties.h"
+
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -33,8 +35,16 @@ bool QnArecontPanoramicResource::getDescription()
 
 QnAbstractStreamDataProvider* QnArecontPanoramicResource::createLiveDataProvider()
 {
-    NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
-    return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
+    if (isRTSPSupported())
+    {
+        NX_LOG(lit("Arecont panoramic. Creating live RTSP provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        return new QnArecontRtspStreamReader(toSharedPointer());
+    }
+    else
+    {
+        NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        return new AVPanoramicClientPullSSTFTPStreamreader(toSharedPointer());
+    }
 }
 
 bool QnArecontPanoramicResource::getParamPhysicalByChannel(int channel, const QString& name, QString &val)

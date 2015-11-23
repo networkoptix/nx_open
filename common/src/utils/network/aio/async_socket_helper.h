@@ -12,6 +12,9 @@
 
 #include <QtCore/QThread>
 
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 #include "../abstract_socket.h"
 #include "../socket_global.h"
 
@@ -284,19 +287,19 @@ public:
          ++this->m_socket->impl()->terminated;
         if (waitForRunningHandlerCompletion)
         {
-            QMutex mtx;
-            QWaitCondition cond;
+            QnMutex mtx;
+            QnWaitCondition cond;
             bool done = false;
             nx::SocketGlobals::aioService().dispatch(
                 this->m_socket,
                 [this, &mtx, &cond, &done, eventType]() {
                     stopPollingSocket(this->m_socket, eventType);
-                    QMutexLocker lk(&mtx);
+                    QnMutexLocker lk(&mtx);
                     done = true;
                     cond.wakeAll();
                 });
 
-            QMutexLocker lk(&mtx);
+            QnMutexLocker lk(&mtx);
             while(!done)
                 cond.wait(lk.mutex());
         }

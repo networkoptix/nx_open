@@ -58,7 +58,7 @@ QnResourceData QnResourceDataPool::data(const QString& _vendor, const QString& _
    
     QnResourceData result;
     {
-        QMutexLocker lock(&m_cachedDataMtx);
+        QnMutexLocker lock(&m_cachedDataMtx);
         if (!m_cachedResultByKey.contains(key1)) {
             for(auto itr = m_dataByKey.begin(); itr != m_dataByKey.end(); ++itr) {
 			    if (wildcardMatch(itr.key(), key1))
