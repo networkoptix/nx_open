@@ -218,8 +218,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::SourceFileError;
         }
 
-        auto optimalRootBackupPred = [](const QnStorageResourcePtr & /*storage*/) {
-            return false;
+        auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
+            return storage->getFreeSpace() > storage->getSpaceLimit();
         };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(

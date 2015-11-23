@@ -96,7 +96,8 @@ public:
         QnAbstractMediaStreamDataProvider                   *provider,
         std::function<bool(const QnStorageResourcePtr &)>   pred = 
             [](const QnStorageResourcePtr &storage) { 
-                return !storage->hasFlags(Qn::storage_fastscan); 
+                return !storage->hasFlags(Qn::storage_fastscan) ||
+                        storage->getFreeSpace() > storage->getSpaceLimit(); 
             }
     );
 

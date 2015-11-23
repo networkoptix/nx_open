@@ -1610,9 +1610,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getWritableStorages()) {
-        bool validStorage = pred(storage) || 
-                            storage->getFreeSpace() > storage->getSpaceLimit();
-        if (validStorage)
+        if (pred(storage))
             storages << storage;
     }
 
