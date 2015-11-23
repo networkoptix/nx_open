@@ -299,7 +299,7 @@
                                         <replacement>
                                             <token>${project.artifactId}${parsedVersion.majorVersion}</token>
                                             <value>${project.artifactId}</value>
-                                        </replacement>         
+                                        </replacement>
                                         <replacement>
                                             <xpath>//Project/ItemGroup/None[contains(@Include,'.proto')]</xpath>
                                             <token>
@@ -389,7 +389,26 @@
                                             <token><![CDATA[<ClCompile Include="StdAfx.cpp"/>]]></token>
                                             <value><![CDATA[<None Include="StdAfx.cpp"/>]]></value>
                                         </replacement> -->
-
+                                    </replacements>
+                                    <skip>${replace.skip}</skip>
+                                </configuration>                                
+                            </execution>
+                            <execution>
+                                <id>fix-vcxproj-finalname-QMAKE-SUCKS!!!!!!!!!!</id>
+                                <phase>process-resources</phase>
+                                <goals>
+                                    <goal>replace</goal>
+                                </goals>
+                                <configuration>
+                                    <encoding>utf-8</encoding>
+                                    <unescape>no</unescape>
+                                    <ignoreErrors>true</ignoreErrors>
+                                    <file>${project.build.sourceDirectory}/${project.artifactId}-${arch}.vcxproj</file>
+                                    <replacements>
+                                        <replacement>
+                                            <token>${project.artifactId}${parsedVersion.majorVersion}</token>
+                                            <value>${project.artifactId}</value>
+                                        </replacement>
                                     </replacements>
                                     <skip>${replace.skip}</skip>
                                 </configuration>                                
