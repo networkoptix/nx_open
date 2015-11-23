@@ -8,6 +8,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
+#include "utils/common/log.h"
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
@@ -283,7 +284,6 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
-    uDebug() << "find data for time: " << m_currentChunk.endTimeMs();
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
@@ -315,9 +315,6 @@ begin_label:
         do {
             if (!getNextChunk(chunk, chunkCatalog))
             {
-                uDebug() << lit("getNextChunk() for %1 %2 returned false")
-                                .arg(chunk.startTimeMs)
-                                .arg(chunk.endTimeMs());
                 if (m_reverseMode) {
                     data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
                     data->timestamp = INT64_MAX; // EOF reached
@@ -362,7 +359,6 @@ begin_label:
         // Switch quality on I-frame (slow switching without seek) check
         if (m_newQualityTmpData && m_newQualityTmpData->timestamp <= data->timestamp)
         {
-            uDebug() << "Switching quality";
             m_currentChunk = m_newQualityChunk;
             m_currentChunkCatalog[m_newQualityCatalog->getStoragePool()] = m_newQualityCatalog;
             data = m_newQualityTmpData;
@@ -446,10 +442,9 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
 
 bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
-    if (newChunk.startTimeMs == -1) {
-        uDebug() << "newChunk.startTimeMs == -1. SwitchToChunk is returning false";
+    if (newChunk.startTimeMs == -1) 
         return false;
-    }
+    
     m_currentChunk = newChunk;
     
     m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
@@ -460,7 +455,7 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_aviDelegate->close();
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url, QnServer::StoragePool::Both));
 
-    uDebug() << lit("Switching to chunk %1").arg(url);
+    NX_LOG(lit("Switching to chunk %1").arg(url), cl_logDEBUG2);
     
     bool rez = m_aviDelegate->open(m_fileRes);
     if (rez)

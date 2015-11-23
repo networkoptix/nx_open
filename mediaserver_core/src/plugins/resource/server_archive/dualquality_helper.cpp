@@ -6,6 +6,7 @@
 
 #include "recorder/storage_manager.h"
 #include "core/resource/network_resource.h"
+#include "utils/common/log.h"
 
 #include <cmath>
 
@@ -129,9 +130,10 @@ void QnDualQualityHelper::findDataForTimeHelper(
     
     qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
 
-    uDebug() << lit("current time: %4, current chunk: %1, current distance: %2, previous distance: %3")
-                    .arg(currentChunk.startTimeMs).arg(currentDistance).arg(previousDistance)
-                    .arg(time);
+    NX_LOG(lit("current time: %4, current chunk: %1, current distance: %2, previous distance: %3")
+                .arg(currentChunk.startTimeMs).arg(currentDistance).arg(previousDistance)
+                .arg(time),
+           cl_logDEBUG2);
     if (previousDistance == -1)
     {
         resultChunk   = currentChunk;
@@ -164,11 +166,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     if (previousDistance > currentDistance + findEps)
     {
         if (currentChunk.containsTime(resultChunk.startTimeMs) && previousDistance != INT64_MAX)
-        {
-            uDebug() << lit("Truncating chunk %1 to %2").arg(currentChunk.startTimeMs)
-                                                        .arg(resultChunk.startTimeMs);
             currentChunk.truncate(resultChunk.startTimeMs);
-        }
 
         resultChunk = currentChunk;
         resultCatalog = currentCatalog;

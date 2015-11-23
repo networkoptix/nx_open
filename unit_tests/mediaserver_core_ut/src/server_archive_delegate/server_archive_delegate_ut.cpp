@@ -182,14 +182,14 @@ public:
             if (time < m_timePoint && !m_reverse || time > m_timePoint && m_reverse)
                 return false;
 
-            uDebug() << "current time period: (" 
-                     << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
-                     << lit("%1 left to the end ) ")
-                            .arg(m_currentIt->startTimeMs + 
-                                 m_currentIt->durationMs - 
-                                 m_timePoint)
-                     << "time: " << time << " m_time: " << m_timePoint
-                     << " diff: " << std::abs(time - m_timePoint);
+            //qDebug() << "current time period: (" 
+            //         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
+            //         << lit("%1 left to the end ) ")
+            //                .arg(m_currentIt->startTimeMs + 
+            //                     m_currentIt->durationMs - 
+            //                     m_timePoint)
+            //         << "time: " << time << " m_time: " << m_timePoint
+            //         << " diff: " << std::abs(time - m_timePoint);
 
             if (std::abs(time - m_timePoint) > m_timeGapMs) {
                 if (time > m_timePoint && m_currentIt->startTimeMs + 
@@ -232,20 +232,20 @@ public:
 
     void print() const 
     {
-        uDebug() << lit("We have %1 files, %2 time periods")
+        qDebug() << lit("We have %1 files, %2 time periods")
                         .arg(m_fileCount)
                         .arg(m_timeLine.m_timeLine.size());
 
         qint64 prevStartTime;
         int prevDuration;
-        uDebug() << "Time periods details: ";
+        qDebug() << "Time periods details: ";
 
         for (auto it = m_timeLine.m_timeLine.cbegin(); 
              it != m_timeLine.m_timeLine.cend(); 
              ++it) {
-            uDebug() << it->startTimeMs << " " << it->durationMs;
+            qDebug() << it->startTimeMs << " " << it->durationMs;
             if (it != m_timeLine.m_timeLine.cbegin()) {
-                uDebug() << "\tGap from previous: " 
+                qDebug() << "\tGap from previous: " 
                          << it->startTimeMs - (prevStartTime + prevDuration) << "ms (" 
                          << (it->startTimeMs - (prevStartTime + prevDuration))/1000
                          << "s )";
@@ -285,13 +285,13 @@ private:
             file.setPermissions(QFile::ReadOther | QFile::WriteOther);
             file.open(QIODevice::ReadWrite);
             if (!file.isOpen()) {
-                uDebug() << "Write header %1 failed";
+                qDebug() << "Write header %1 failed";
                 return;
             }
             file.seek(0x219);
             auto buf = file.read(11);
             if (memcmp(buf.constData(), "START_TIMED", 11) != 0) {
-                uDebug() << "Write header wrong offset %1";
+                qDebug() << "Write header wrong offset %1";
                 return;
             }
             file.seek(0x219 + 0xd);
@@ -313,7 +313,6 @@ private:
             QDir(root).mkpath(pathString);
             QString fullFileName = closeDirPath(root) + closeDirPath(pathString) 
                                                       + fileName;
-            uDebug() << fullFileName;
             if (curDuration == duration_1)
                 testFile_1.copy(fullFileName);
             else
@@ -525,7 +524,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     archiveDelegate.setQuality(MEDIA_Quality_High, true);
     archiveDelegate.seek(0, true);
 
-    uDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
+    qDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
@@ -537,7 +536,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             break;
     } 
 
-    uDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
+    qDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
     archiveDelegate.setQuality(MEDIA_Quality_Low, true);
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();
