@@ -85,7 +85,7 @@ namespace aio
             bool waitForRunningHandlerCompletion = true )
         {
             QnMutexLocker lk( &m_mutex );
-            removeFromWatchNonSafe( sock, eventType, waitForRunningHandlerCompletion );
+            removeFromWatchNonSafe( &lk, sock, eventType, waitForRunningHandlerCompletion );
         }
 
         //!Register timeout, associated with socket \a sock
@@ -119,16 +119,10 @@ namespace aio
             \warning Currently, there is no way to find out whether call has been posted or being executed currently
         */
         template<class SocketType, class Handler>
-        void post( SocketType* sock, Handler&& handler )
+        void post(SocketType* sock, Handler handler)
         {
             QnMutexLocker lk( &m_mutex );
-
-            //if sock is not still bound to aio thread, binding it
-            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
-            if( !threadToUse )  //socket has not been bound to aio thread yet
-                threadToUse = bindSocketToAioThread( sock );
-            assert( threadToUse );
-            threadToUse->post( sock, std::forward<Handler>(handler) );
+            postNonSafe(&lk, sock, std::move(handler));
         }
 
         //!Calls \a handler in random aio thread
@@ -136,11 +130,7 @@ namespace aio
         void post(Handler handler)
         {
             QnMutexLocker lk(&m_mutex);
-
-            //if sock is not still bound to aio thread, binding it
-            auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
-            assert(threadToUse);
-            threadToUse->post(nullptr, std::move(handler));
+            postNonSafe(&lk, std::move(handler));
         }
 
         //!Call \a handler from within aio thread \a sock is bound to
@@ -148,15 +138,10 @@ namespace aio
             \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a aio::AIOService::post does
         */
         template<class SocketType, class Handler>
-        void dispatch( SocketType* sock, Handler&& handler )
+        void dispatch( SocketType* sock, Handler handler )
         {
             QnMutexLocker lk( &m_mutex );
-            //if sock is not still bound to aio thread, binding it
-            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
-            if( !threadToUse )  //socket has not been bound to aio thread yet
-                threadToUse = bindSocketToAioThread( sock );
-            assert( threadToUse );
-            threadToUse->dispatch( sock, std::forward<Handler>(handler) );
+            dispatchNonSafe(&lk, sock, std::move(handler));
         }
 
         //TODO #ak better remove this method, violates encapsulation
@@ -168,6 +153,7 @@ namespace aio
         */
         template<class SocketType>
         void watchSocketNonSafe(
+            QnMutexLockerBase* const lock,
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
@@ -184,11 +170,14 @@ namespace aio
                     if( !sock->getRecvTimeout( &sockTimeoutMS ) )
                     {
                         //reporting error via event thread
-                        post(sock, std::bind(
-                            &AIOEventHandler<SocketType>::eventTriggered,
-                            eventHandler,
+                        postNonSafe(
+                            lock,
                             sock,
-                            aio::etError));
+                            std::bind(
+                                &AIOEventHandler<SocketType>::eventTriggered,
+                                eventHandler,
+                                sock,
+                                aio::etError));
                         return;
                     }
                 }
@@ -197,11 +186,14 @@ namespace aio
                     if( !sock->getSendTimeout( &sockTimeoutMS ) )
                     {
                         //reporting error via event thread
-                        post(sock, std::bind(
-                            &AIOEventHandler<SocketType>::eventTriggered,
-                            eventHandler,
+                        postNonSafe(
+                            lock,
                             sock,
-                            aio::etError));
+                            std::bind(
+                                &AIOEventHandler<SocketType>::eventTriggered,
+                                eventHandler,
+                                sock,
+                                aio::etError));
                         return;
                     }
                 }
@@ -249,14 +241,24 @@ namespace aio
                 threadToUse = bindSocketToAioThread( sock );
             assert( threadToUse );
 
-            threadToUse->watchSocket( sock, eventToWatch, eventHandler, timeoutMillis.get(), socketAddedToPollHandler );
-            if( !aioHandlingContext.sockets.insert( std::make_pair( sockCtx, std::make_pair( threadToUse, timeoutMillis.get() ) ) ).second )
+            threadToUse->watchSocket(
+                sock,
+                eventToWatch,
+                eventHandler,
+                timeoutMillis.get(),
+                socketAddedToPollHandler );
+            if( !aioHandlingContext.sockets.emplace(
+                    sockCtx,
+                    std::make_pair( threadToUse, timeoutMillis.get() ) ).second )
+            {
                 assert( false );
+            }
         }
 
         //!Same as \a AIOService::removeFromWatch, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
         template<class SocketType>
         void removeFromWatchNonSafe(
+            QnMutexLockerBase* const /*lock*/,
             SocketType* const sock,
             aio::EventType eventType,
             bool waitForRunningHandlerCompletion = true )
@@ -351,6 +353,37 @@ namespace aio
             }
 
             return threadToUse;
+        }
+
+        template<class SocketType, class Handler>
+        void postNonSafe(QnMutexLockerBase* const /*lock*/, SocketType* sock, Handler handler)
+        {
+            //if sock is not still bound to aio thread, binding it
+            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load(std::memory_order_relaxed);
+            if (!threadToUse)  //socket has not been bound to aio thread yet
+                threadToUse = bindSocketToAioThread(sock);
+            assert(threadToUse);
+            threadToUse->post(sock, std::move(handler));
+        }
+
+        template<class Handler>
+        void postNonSafe(QnMutexLockerBase* const /*lock*/, Handler handler)
+        {
+            //if sock is not still bound to aio thread, binding it
+            auto& threadToUse = m_systemSocketAIO.aioThreadPool[rand() % m_systemSocketAIO.aioThreadPool.size()];
+            assert(threadToUse);
+            threadToUse->post(nullptr, std::move(handler));
+        }
+
+        template<class SocketType, class Handler>
+        void dispatchNonSafe(QnMutexLockerBase* const /*lock*/, SocketType* sock, Handler handler)
+        {
+            //if sock is not still bound to aio thread, binding it
+            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load(std::memory_order_relaxed);
+            if (!threadToUse)  //socket has not been bound to aio thread yet
+                threadToUse = bindSocketToAioThread(sock);
+            assert(threadToUse);
+            threadToUse->dispatch(sock, std::move(handler));
         }
     };
 }
