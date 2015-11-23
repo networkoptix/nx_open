@@ -47,6 +47,8 @@ bool QnAuthHelper::UserDigestData::empty() const
 
 
 
+QnAuthHelper* QnAuthHelper::m_instance;
+
 static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH( lit( "Authorization=Digest" ) );
 static const QString TEMP_AUTH_KEY_NAME = lit( "authKey" );

@@ -100,6 +100,10 @@ public:
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 
+    //TODO #ak move these out of here in 2.5
+    void setArecontRTSPEnabled(bool val) { m_arecontRTSPEnabled = val; }
+    bool isArecontRTSPEnabled() const { return m_arecontRTSPEnabled; }
+
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
 
@@ -129,6 +133,7 @@ private:
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
+    bool m_arecontRTSPEnabled;
     qint64 m_systemIdentityTime;
     
     QByteArray m_adminPaswdHash;

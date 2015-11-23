@@ -7,10 +7,10 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>525</height>
+    <height>561</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,1">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
@@ -83,7 +83,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="backupStoragesGroupBox">
      <property name="title">
       <string>Backup Storages</string>
      </property>
@@ -174,7 +174,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="backupPreparePage">
          <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -205,9 +205,6 @@
         </widget>
         <widget class="QWidget" name="backupProgressPage">
          <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QnWordWrappedLabel" name="rebuildStatusLabelBackup" native="true"/>
-          </item>
           <item>
            <widget class="QLabel" name="label_5">
             <property name="text">
@@ -292,19 +289,6 @@
     </widget>
    </item>
    <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <widget class="QLabel" name="storagesWarningLabel">
      <property name="text">
       <string>Unchecking the storage will cause nothing but writing stop.
@@ -319,12 +303,6 @@ It won't deny oldest footage removing from the drive.</string>
    <class>QnTableView</class>
    <extends>QTableView</extends>
    <header location="global">ui/widgets/table_view.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QnStorageRebuildWidget</class>

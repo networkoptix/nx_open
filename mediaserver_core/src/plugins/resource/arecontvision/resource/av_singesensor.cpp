@@ -4,7 +4,9 @@
 
 #include <utils/common/log.h>
 
+#include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"
+
 
 CLArecontSingleSensorResource::CLArecontSingleSensorResource(const QString& name)
 {
@@ -38,8 +40,16 @@ bool CLArecontSingleSensorResource::getDescription()
 
 QnAbstractStreamDataProvider* CLArecontSingleSensorResource::createLiveDataProvider()
 {
-    NX_LOG( lit("Create live provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
-    return new AVClientPullSSTFTPStreamreader(toSharedPointer());
+    if (isRTSPSupported())
+    {
+        NX_LOG(lit("Arecont. Creating live RTSP provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        return new QnArecontRtspStreamReader(toSharedPointer());
+    }
+    else
+    {
+        NX_LOG(lit("Arecont. Create live TFTP provider for camera %1").arg(getHostAddress()), cl_logDEBUG1);
+        return new AVClientPullSSTFTPStreamreader(toSharedPointer());
+    }
 }
 
 #endif

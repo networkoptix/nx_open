@@ -58,10 +58,10 @@ public:
     QnVirtualCameraResourceList getServerFootageCameras(const QnMediaServerResourcePtr &server) const;
 
     /** \return server list where the selected camera has footage. */
-    QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId) const;
+    QnMediaServerResourceList getCameraFootageData(const QnUuid &cameraId, bool filterOnlineServers = false) const;
 
     /** \return server list where the selected camera has footage. */
-    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera) const;
+    QnMediaServerResourceList getCameraFootageData(const QnVirtualCameraResourcePtr &camera, bool filterOnlineServers = false) const;
 
     /**
     * \return                       Server list where camera was archived during specified period.
