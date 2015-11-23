@@ -1014,10 +1014,19 @@ void QnStorageManager::updateCameraHistory()
     return;
 }
 
-void QnStorageManager::clearSpace()
+void QnStorageManager::clearSpace(bool forced)
 {
-    writeCameraInfoFiles();
+    QnMutexLocker lk(&m_clearSpaceMutex);
+    // if Backup on Schedule (or on demand) synchronization routine is 
+    // running at the moment, dont run clearSpace() if it's been triggered by
+    // the timer.
+    bool backupOnAndTimerTriggered = m_role == QnServer::StoragePool::Backup && !forced &&
+                                     scheduleSync()->getStatus().state == 
+                                     Qn::BackupState::BackupState_InProgress;
+    if (backupOnAndTimerTriggered)
+        return;
 
+    writeCameraInfoFiles();
     testOfflineStorages();
 
     // 1. delete old data if cameras have max duration limit

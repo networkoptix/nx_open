@@ -220,8 +220,12 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
-        if (!toStorage)
-            return CopyError::NoBackupStorageError;
+        if (!toStorage) {
+            qnBackupStorageMan->clearSpace(true);
+            toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
+            if (!toStorage)
+                return CopyError::NoBackupStorageError;
+        }
 
         auto newStorageUrl = toStorage->getUrl();
         auto oldSeparator = getPathSeparator(relativeFileName);
