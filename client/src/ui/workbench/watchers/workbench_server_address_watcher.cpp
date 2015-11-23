@@ -2,9 +2,9 @@
 
 #include <api/app_server_connection.h>
 
-#include "utils/network/module_finder.h"
-#include "utils/network/direct_module_finder_helper.h"
-#include "utils/network/module_information.h"
+#include "network/module_finder.h"
+#include "network/direct_module_finder_helper.h"
+#include "network/module_information.h"
 #include "client/client_message_processor.h"
 #include "client/client_settings.h"
 

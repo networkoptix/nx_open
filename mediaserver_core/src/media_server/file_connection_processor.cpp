@@ -1,7 +1,7 @@
 #include <QCache>
 #include <QFileInfo>
 #include "file_connection_processor.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/util.h"
 #include "media_server/serverutil.h"
 #include "utils/gzip/gzip_compressor.h"

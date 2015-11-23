@@ -9,7 +9,6 @@
 #include <utils/common/ldap.h>
 #include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>
-#include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
@@ -70,6 +69,8 @@
 #include <business/business_fwd.h>
 
 #include <licensing/license.h>
+
+#include <network/multicast_module_finder.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>

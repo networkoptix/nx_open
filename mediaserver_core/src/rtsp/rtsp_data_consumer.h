@@ -5,9 +5,9 @@
 #include <QtCore/QElapsedTimer>
 
 #include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "core/datapacket/abstract_data_packet.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 #include "utils/media/externaltimesource.h"
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "utils/common/adaptive_sleep.h"

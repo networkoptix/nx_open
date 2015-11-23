@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/network/rtp_stream_parser.h>
+#include <network/rtp_stream_parser.h>
 
 QnRtspEncoder::QnRtspEncoder()
 {

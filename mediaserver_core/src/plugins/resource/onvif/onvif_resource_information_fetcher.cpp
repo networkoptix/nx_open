@@ -146,12 +146,21 @@ void OnvifResourceInformationFetcher::findResources(const QString& endpoint, con
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
 
-    if (ignoreCamera(info.manufacturer, info.name))
-        return;
 
-    if (isModelSupported(info.manufacturer, info.name)) {
-        //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
-        return;
+    QString shortModel = info.name;
+    if (info.name.startsWith(info.manufacturer))
+        shortModel = info.name.mid(info.manufacturer.length()).trimmed();
+    QnResourceData resourceData = qnCommon->dataPool()->data(info.manufacturer, shortModel);
+    const bool forceOnvif = resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME);
+    if (!forceOnvif) 
+    {
+        if (ignoreCamera(info.manufacturer, info.name))
+            return;
+
+        if (isModelSupported(info.manufacturer, info.name)) {
+            //qDebug() << "OnvifResourceInformationFetcher::findResources: skipping camera " << info.name;
+            return;
+        }
     }
 
     QString manufacturer = info.manufacturer;

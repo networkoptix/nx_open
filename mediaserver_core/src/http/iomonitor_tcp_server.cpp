@@ -2,23 +2,24 @@
 #include "iomonitor_tcp_server.h"
 
 #include <QUrlQuery>
-#include <QWaitCondition>
 #include <QtCore/QCoreApplication>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
 #include <http/custom_headers.h>
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QMutex dataMutex;
-    QMutex waitMutex;
-    QWaitCondition waitCond;
+    QnMutex dataMutex;
+    QnMutex waitMutex;
+    QnWaitCondition waitCond;
     QnIOStateDataList dataToSend;
     QByteArray requestBuffer;
 };
@@ -75,7 +76,7 @@ void QnIOMonitorConnectionProcessor::run()
         d->socket->readSomeAsync( &d->requestBuffer, std::bind( &QnIOMonitorConnectionProcessor::onSomeBytesReadAsync, this, d->socket.data(), _1, _2 ) );
 
         setData(camera->ioStates());
-        QMutexLocker lock(&d->waitMutex);
+        QnMutexLocker lock(&d->waitMutex);
         while (d->socket->isConnected() && camera->getStatus() >= Qn::Online && camera->getParentId() == qnCommon->moduleGUID()) 
         {
             sendMultipartData();
@@ -91,7 +92,7 @@ void QnIOMonitorConnectionProcessor::run()
 void QnIOMonitorConnectionProcessor::at_cameraInitDone(const QnResourcePtr &resource)
 {
     Q_D(QnIOMonitorConnectionProcessor);
-    QMutexLocker lock(&d->waitMutex);
+    QnMutexLocker lock(&d->waitMutex);
     QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
     if (camera && camera->isInitialized()) {
         setData(camera->ioStates());
@@ -104,7 +105,7 @@ void QnIOMonitorConnectionProcessor::onSomeBytesReadAsync( AbstractSocket* sock,
     QN_UNUSED(sock, bytesRead);
 
     Q_D(QnIOMonitorConnectionProcessor);
-    QMutexLocker lock(&d->waitMutex); // just in case to prevent socket simultaneous calls while send / read async
+    QnMutexLocker lock(&d->waitMutex); // just in case to prevent socket simultaneous calls while send / read async
 
     using namespace std::placeholders;
     d->requestBuffer.resize(0);
@@ -122,7 +123,7 @@ void QnIOMonitorConnectionProcessor::at_cameraIOStateChanged(
     QN_UNUSED(resource);
 
     Q_D(QnIOMonitorConnectionProcessor);
-    QMutexLocker lock(&d->waitMutex);
+    QnMutexLocker lock(&d->waitMutex);
     addData(QnIOStateData(inputPortID, value, timestamp));
     d->waitCond.wakeAll();
 }
@@ -131,7 +132,7 @@ void QnIOMonitorConnectionProcessor::sendMultipartData()
 {
     Q_D(QnIOMonitorConnectionProcessor);
     {
-        QMutexLocker lock(&d->dataMutex);
+        QnMutexLocker lock(&d->dataMutex);
         d->response.messageBody = QJson::serialized<QnIOStateDataList>(d->dataToSend);
         d->dataToSend.clear();
     }
@@ -141,14 +142,14 @@ void QnIOMonitorConnectionProcessor::sendMultipartData()
 void QnIOMonitorConnectionProcessor::setData(QnIOStateDataList&& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
-    QMutexLocker lock(&d->dataMutex);
+    QnMutexLocker lock(&d->dataMutex);
     d->dataToSend = value;
 }
 
 void QnIOMonitorConnectionProcessor::addData(QnIOStateData&& value)
 {
     Q_D(QnIOMonitorConnectionProcessor);
-    QMutexLocker lock(&d->dataMutex);
+    QnMutexLocker lock(&d->dataMutex);
     d->dataToSend.push_back(value);
 }
 

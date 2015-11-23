@@ -7,7 +7,7 @@
 #include "utils/network/simple_http_client.h"
 #include "testcamera_resource.h"
 #include "utils/network/socket.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 
 class QnTestCameraStreamReader: public CLServerPushStreamReader
 {

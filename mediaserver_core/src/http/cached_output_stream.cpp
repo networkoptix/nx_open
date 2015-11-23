@@ -5,7 +5,7 @@
 
 #include "cached_output_stream.h"
 
-#include <utils/network/tcp_connection_processor.h>
+#include <network/tcp_connection_processor.h>
 #include <utils/network/socket.h>
 
 

@@ -42,8 +42,6 @@ protected:
     unsigned int m_timeout;
     bool m_black_white; // for dual sensor only 
 
-    bool m_panoramic;
-    bool m_dualsensor;
     QString m_model;
     CLSimpleTFTPClient* m_tftp_client;
     CameraDiagnostics::Result m_prevDataReadResult;

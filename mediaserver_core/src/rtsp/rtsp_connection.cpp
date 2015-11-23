@@ -11,7 +11,7 @@
 #include "libavcodec/avcodec.h"
 
 #include "rtsp_connection.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -20,11 +20,11 @@
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include <utils/common/string.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 #include "recorder/recording_manager.h"
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"
@@ -38,7 +38,7 @@
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>

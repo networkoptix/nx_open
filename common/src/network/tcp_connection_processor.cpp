@@ -4,10 +4,11 @@
 
 #include <utils/common/log.h>
 #include <utils/common/util.h>
+
 #include <utils/network/flash_socket/types.h>
 #include <utils/network/http/httptypes.h>
+#include <utils/network/http/http_mod_manager.h>
 
-#include "http/http_mod_manager.h"
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
 #include "err.h"

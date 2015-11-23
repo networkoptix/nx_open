@@ -1,6 +1,6 @@
 #include "log_level_rest_handler.h"
 
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 
 #include <utils/common/log.h>
 
@@ -8,7 +8,6 @@ namespace {
     const QString idParam = lit("id");
     const QString valueParam = lit("value");
 }
-
 
 int QnLogLevelRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor) {
     QN_UNUSED(path, processor);
