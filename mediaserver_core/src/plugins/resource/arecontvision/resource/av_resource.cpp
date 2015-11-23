@@ -720,15 +720,16 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
 
     m_relayInputClient = nx_http::AsyncHttpClient::create();
     connect(m_relayInputClient.get(), &nx_http::AsyncHttpClient::done,
-            this, &QnPlAreconVisionResource::inputPortStateRequestDone,
+            this, 
+            [this, completionHandler](nx_http::AsyncHttpClientPtr client) {
+                if (completionHandler)
+                    completionHandler(
+                        client->response() &&
+                        client->response()->statusLine.statusCode == nx_http::StatusCode::ok);
+                inputPortStateRequestDone(std::move(client));
+            },
             Qt::DirectConnection);
-    if (!m_relayInputClient->doGet(url))
-        return false;
-
-    if (completionHandler)
-        m_relayInputClient->socket()->post(
-            std::bind(std::move(completionHandler), true));
-    return true;
+    return m_relayInputClient->doGet(url);
 }
 
 void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
