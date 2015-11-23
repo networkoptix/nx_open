@@ -74,7 +74,7 @@ protected:
         {
             nx_http::FusionRequestResult result(
                 nx_http::FusionRequestErrorClass::unauthorized,
-                nx_http::FusionRequestResult::ecNoDetail,
+                static_cast<int>(api::ResultCode::forbidden),
                 QString());
             this->response()->headers.emplace(
                 Qn::API_RESULT_CODE_HEADER_NAME,
