@@ -12,7 +12,6 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource.h>
 #include <core/resource/camera_history.h>
 #include "api/app_server_connection.h"
 
@@ -1014,10 +1013,19 @@ void QnStorageManager::updateCameraHistory()
     return;
 }
 
-void QnStorageManager::clearSpace()
+void QnStorageManager::clearSpace(bool forced)
 {
-    writeCameraInfoFiles();
+    QnMutexLocker lk(&m_clearSpaceMutex);
+    // if Backup on Schedule (or on demand) synchronization routine is 
+    // running at the moment, dont run clearSpace() if it's been triggered by
+    // the timer.
+    bool backupOnAndTimerTriggered = m_role == QnServer::StoragePool::Backup && !forced &&
+                                     scheduleSync()->getStatus().state == 
+                                     Qn::BackupState::BackupState_InProgress;
+    if (backupOnAndTimerTriggered)
+        return;
 
+    writeCameraInfoFiles();
     testOfflineStorages();
 
     // 1. delete old data if cameras have max duration limit
@@ -1585,7 +1593,10 @@ void QnStorageManager::updateStorageStatistics()
     m_warnSended = false;
 }
 
-QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider)
+QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
+    QnAbstractMediaStreamDataProvider                   *provider,
+    std::function<bool(const QnStorageResourcePtr &)>   pred
+)
 {
     QnStorageResourcePtr result;
 
@@ -1599,8 +1610,8 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(QnAbstractMediaStre
 
     QSet<QnStorageResourcePtr> storages;
     for (const auto& storage: getWritableStorages()) {
-        bool validStorage = !storage->hasFlags(Qn::storage_fastscan) || 
-                             storage->getFreeSpace() > storage->getSpaceLimit();
+        bool validStorage = pred(storage) || 
+                            storage->getFreeSpace() > storage->getSpaceLimit();
         if (validStorage)
             storages << storage;
     }

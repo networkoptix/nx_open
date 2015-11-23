@@ -12,6 +12,7 @@
 #include <server/server_globals.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/storage_resource.h>
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
@@ -27,6 +28,7 @@
 #include <future>
 #include <mutex>
 #include <array>
+#include <functional>
 #include "storage_db_pool.h"
 
 class QnAbstractMediaStreamDataProvider;
@@ -91,12 +93,18 @@ public:
     void doMigrateCSVCatalog(QnStorageResourcePtr extraAllowedStorage = QnStorageResourcePtr());
     void partialMediaScan(const DeviceFileCatalogPtr &fileCatalog, const QnStorageResourcePtr &storage, const DeviceFileCatalog::ScanFilter& filter);
     
-    QnStorageResourcePtr getOptimalStorageRoot(QnAbstractMediaStreamDataProvider *provider);
+    QnStorageResourcePtr getOptimalStorageRoot(
+        QnAbstractMediaStreamDataProvider                   *provider,
+        std::function<bool(const QnStorageResourcePtr &)>   pred = 
+            [](const QnStorageResourcePtr &storage) { 
+                return !storage->hasFlags(Qn::storage_fastscan); 
+            }
+    );
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
 
-    void clearSpace();
+    void clearSpace(bool forced=false);
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
     void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
@@ -202,6 +210,7 @@ private:
     mutable QnMutex m_mutexRebuild;
     mutable QnMutex m_rebuildStateMtx;
     mutable QnMutex m_localPatches;
+    QnMutex m_clearSpaceMutex;
 
     bool m_storagesStatisticsReady;
     QTimer m_timer;
