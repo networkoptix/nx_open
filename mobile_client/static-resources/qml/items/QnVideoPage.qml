@@ -25,6 +25,7 @@ QnPage {
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
         readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
         readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
 
@@ -51,6 +52,11 @@ QnPage {
         onCameraOfflineChanged: {
             if (!d.cameraOffline)
                 d.showOfflineStatus = d.serverOffline
+        }
+
+        onFailedChanged: {
+            if (failed)
+                videoNavigation.paused = true
         }
 
         function updateOfflineDisplay() {
@@ -195,7 +201,20 @@ QnPage {
     Loader {
         id: dummyLoader
 
-        visible: d.cameraUnauthorized || (d.showOfflineStatus && (d.serverOffline || d.cameraOffline))
+        visible: {
+            if (d.cameraUnauthorized)
+                return true
+
+            var offline = d.serverOffline || d.cameraOffline
+
+            if (!offline && d.failed)
+                return true
+
+            if (offline && d.showOfflineStatus)
+                return true
+
+            return false
+        }
 
         sourceComponent: visible ? dummyComponent : undefined
 
@@ -222,6 +241,8 @@ QnPage {
                         return "qrc:///images/camera_locked_1.png"
                     else if (d.cameraOffline)
                         return "qrc:///images/camera_offline_1.png"
+                    else if (d.failed)
+                        return "qrc:///images/camera_warning_1.png"
                     else
                         return ""
                 }
@@ -245,6 +266,8 @@ QnPage {
                         return qsTr("Authentication\nrequired")
                     else if (d.cameraOffline)
                         return qsTr("Camera offline")
+                    else if (d.failed)
+                        return qsTr("Can't load video")
                     else
                         return ""
                 }
