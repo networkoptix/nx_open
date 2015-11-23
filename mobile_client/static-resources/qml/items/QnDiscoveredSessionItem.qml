@@ -10,9 +10,10 @@ Rectangle {
     property string systemName
     property string host
     property int port
+    property string version
 
-    width: parent.width
-    height: isCompatible ? dp(79) : dp(103)
+    implicitWidth: parent ? parent.width : dp(200)
+    implicitHeight: isCompatible ? dp(79) : dp(103)
     color: isCompatible ? QnTheme.sessionItemBackground : QnTheme.sessionItemBackgroundIncompatible
     radius: dp(2)
 
@@ -49,7 +50,14 @@ Rectangle {
         }
 
         Text {
-            text: qsTr("incompatible server version")
+            text: {
+                var res = qsTr("incompatible server version")
+                if (version) {
+                    res += ": "
+                    res += version
+                }
+                return res
+            }
             color: QnTheme.sessionItemIncompatibleMark
             font.pixelSize: sp(12)
             font.weight: Font.DemiBold

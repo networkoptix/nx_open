@@ -62,9 +62,8 @@ QnNavigationDrawer {
 
                     width: parent.width
 
-                    model: QnLoginSessionsModel {
+                    model: QnSavedSessionsModel {
                         id: savedSessionsModel
-                        displayMode: QnLoginSessionsModel.ShowSaved
                     }
 
                     QnSessionItem {

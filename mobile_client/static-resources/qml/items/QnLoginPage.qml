@@ -199,15 +199,15 @@ QnPage {
                 id: discoveredSessionRepeater
                 width: parent.width
 
-                model: QnLoginSessionsModel {
+                model: QnDiscoveredSessionsModel {
                     id: discoveredSessionsModel
-                    displayMode: QnLoginSessionsModel.ShowDiscovered
                 }
 
                 QnDiscoveredSessionItem {
                     systemName: model.systemName
                     host: model.address
                     port: model.port
+                    version: model.serverVersion
                 }
             }
         }
