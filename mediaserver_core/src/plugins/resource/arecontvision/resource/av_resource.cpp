@@ -378,9 +378,10 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     const auto emptyOutputDoneHandler = [](SystemError::ErrorCode, int, nx_http::BufferType) {};
 
     if (activate && (autoResetTimeoutMS > 0))
-        return nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
+        nx_http::downloadFileAsync(url, activateWithAutoResetDoneHandler);
     else
-        return nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+        nx_http::downloadFileAsync(url, emptyOutputDoneHandler);
+    return true;
 }
 
 int QnPlAreconVisionResource::totalMdZones() const
@@ -729,7 +730,8 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
                 inputPortStateRequestDone(std::move(client));
             },
             Qt::DirectConnection);
-    return m_relayInputClient->doGet(url);
+    m_relayInputClient->doGet(url);
+    return true;
 }
 
 void QnPlAreconVisionResource::stopInputPortMonitoringAsync()
