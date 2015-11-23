@@ -53,7 +53,6 @@ QString QnSavedSessionsModel::updateSession(
     QString savedId;
 
     if (it != m_savedSessions.end()) {
-        it->id = sessionId;
         it->address = address;
         it->port = port;
         it->user = user;

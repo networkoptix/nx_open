@@ -16,7 +16,14 @@ public:
     const QnLoginSession *session(int row) const override;
 
 public slots:
-    QString updateSession(const QString &sessionId, const QString &address, const int port, const QString &user, const QString &password, const QString &systemName, bool moveTop = false);
+    QString updateSession(
+            const QString &sessionId,
+            const QString &address,
+            const int port,
+            const QString &user,
+            const QString &password,
+            const QString &systemName,
+            bool moveTop = false);
     void deleteSession(const QString &id);
 
 private:
