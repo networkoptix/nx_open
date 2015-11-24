@@ -5,6 +5,7 @@
 #include <core/resource/camera_bookmark.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/model_functions.h>
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
 
 namespace 
@@ -26,23 +27,7 @@ QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
 {
 }
 
-bool QnOverlayTextItemData::operator == (const QnOverlayTextItemData &rhs) const
-{
-    return ((id == rhs.id)
-        && (text == rhs.text)
-        && (timeout == rhs.timeout)
-        && (itemOptions.autosize == rhs.itemOptions.autosize)
-        && (itemOptions.backgroundColor == rhs.itemOptions.backgroundColor)
-        && (itemOptions.borderRadius == rhs.itemOptions.borderRadius)
-        && (itemOptions.maxWidth == rhs.itemOptions.maxWidth)
-        && (itemOptions.horPadding == rhs.itemOptions.horPadding)
-        && (itemOptions.vertPadding == rhs.itemOptions.vertPadding));
-}
-
-bool QnOverlayTextItemData::operator != (const QnOverlayTextItemData &rhs) const
-{
-    return !(*this == rhs);
-}
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), (id)(text)(itemOptions)(timeout));
 
 ///
 
@@ -56,22 +41,22 @@ public:
     
     ~QnTextOverlayWidgetPrivate();
 
-    void resetItemsData();
+    void clear();
 
-    void addItemData(const QnOverlayTextItemData &data
+    void addItem(const QnOverlayTextItemData &data
         , bool updatePos);
 
-    void removeItemData(const QnUuid &id);
+    void removeItem(const QnUuid &id);
 
-    void setItemsData(const QnOverlayTextItemDataList &data);
+    void setItems(const QnOverlayTextItemDataList &data);
 
 private:
     void updatePositions();
 
 private:
-    QGraphicsWidget *m_contentWidget;
-    QnGraphicsScrollArea *m_scrollArea;
-    QGraphicsLinearLayout *m_mainLayout;
+    QGraphicsWidget * const m_contentWidget;
+    QnGraphicsScrollArea * const m_scrollArea;
+    QGraphicsLinearLayout * const m_mainLayout;
 
     typedef QSharedPointer<QnHtmlTextItem> QnHtmlTextItemPtr;
     typedef QPair<QnOverlayTextItemData, QnHtmlTextItemPtr> DataWidgetPair;
@@ -81,24 +66,32 @@ private:
 
 QnTextOverlayWidgetPrivate::QnTextOverlayWidgetPrivate(QnTextOverlayWidget *parent)
     : q_ptr(parent)
-    , m_contentWidget(nullptr)
-    , m_scrollArea(nullptr)
-    , m_mainLayout(nullptr)
+    , m_contentWidget(new QGraphicsWidget(parent))
+    , m_scrollArea(new QnGraphicsScrollArea(parent))
+    , m_mainLayout(new QGraphicsLinearLayout(Qt::Horizontal))
 {
+    m_scrollArea->setContentWidget(m_contentWidget);
+    m_scrollArea->setMinimumWidth(maximumBookmarkWidth);
+    m_scrollArea->setMaximumWidth(maximumBookmarkWidth);
+    m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
+
+    m_mainLayout->addStretch();
+    m_mainLayout->addItem(m_scrollArea);
+    m_mainLayout->setContentsMargins(0, 0, 0, 0);
 }
 
 QnTextOverlayWidgetPrivate::~QnTextOverlayWidgetPrivate()
 {
 }
 
-void QnTextOverlayWidgetPrivate::resetItemsData()
+void QnTextOverlayWidgetPrivate::clear()
 {
     m_items.clear();
 
     updatePositions();
 }
 
-void QnTextOverlayWidgetPrivate::addItemData(const QnOverlayTextItemData &data
+void QnTextOverlayWidgetPrivate::addItem(const QnOverlayTextItemData &data
     , bool updatePos)
 {
     const auto id = data.id;
@@ -122,7 +115,7 @@ void QnTextOverlayWidgetPrivate::addItemData(const QnOverlayTextItemData &data
         Q_Q(QnTextOverlayWidget);
         const auto removeItemFunc = [this, id]()
         {
-            removeItemData(id);
+            removeItem(id);
         };
 
         executeDelayedParented(removeItemFunc, data.timeout, q);
@@ -131,7 +124,7 @@ void QnTextOverlayWidgetPrivate::addItemData(const QnOverlayTextItemData &data
         updatePositions();
 }
 
-void QnTextOverlayWidgetPrivate::removeItemData(const QnUuid &id)
+void QnTextOverlayWidgetPrivate::removeItem(const QnUuid &id)
 {
     if (!m_items.remove(id))
         return;
@@ -139,7 +132,7 @@ void QnTextOverlayWidgetPrivate::removeItemData(const QnUuid &id)
     updatePositions();
 }
 
-void QnTextOverlayWidgetPrivate::setItemsData(const QnOverlayTextItemDataList &data)
+void QnTextOverlayWidgetPrivate::setItems(const QnOverlayTextItemDataList &data)
 {
     bool different = (m_items.size() !=  data.size());
     if (!different)
@@ -156,10 +149,10 @@ void QnTextOverlayWidgetPrivate::setItemsData(const QnOverlayTextItemDataList &d
     if (!different)
         return;
 
-    resetItemsData();
+    clear();
 
     for (const auto textItemData: data)
-        addItemData(textItemData, false);
+        addItem(textItemData, false);
 
 
     updatePositions();
@@ -192,19 +185,6 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
 
     setFlag(QGraphicsItem::ItemClipsChildrenToShape);
     setAcceptedMouseButtons(0);
-
-    d->m_contentWidget = new QGraphicsWidget(this);
-
-    d->m_scrollArea = new QnGraphicsScrollArea(this);
-    d->m_scrollArea->setContentWidget(d->m_contentWidget);
-    d->m_scrollArea->setMinimumWidth(maximumBookmarkWidth);
-    d->m_scrollArea->setMaximumWidth(maximumBookmarkWidth);
-    d->m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-
-    d->m_mainLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-    d->m_mainLayout->addStretch();
-    d->m_mainLayout->addItem(d->m_scrollArea);
-    d->m_mainLayout->setContentsMargins(0, 0, 0, 0);
     setLayout(d->m_mainLayout);
 
     enum 
@@ -222,27 +202,27 @@ QnTextOverlayWidget::~QnTextOverlayWidget()
 {
 }
 
-void QnTextOverlayWidget::resetItemsData()
+void QnTextOverlayWidget::clear()
 {
     Q_D(QnTextOverlayWidget);
-    d->setItemsData(QnOverlayTextItemDataList());
+    d->setItems(QnOverlayTextItemDataList());
 }
 
-void QnTextOverlayWidget::addItemData(const QnOverlayTextItemData &data)
+void QnTextOverlayWidget::addItem(const QnOverlayTextItemData &data)
 {
     Q_D(QnTextOverlayWidget);
-    d->addItemData(data, true);
+    d->addItem(data, true);
 }
 
-void QnTextOverlayWidget::removeItemData(const QnUuid &id)
+void QnTextOverlayWidget::removeItem(const QnUuid &id)
 {
     Q_D(QnTextOverlayWidget);
-    d->removeItemData(id);
+    d->removeItem(id);
 }
 
-void QnTextOverlayWidget::setItemsData(const QnOverlayTextItemDataList &data)
+void QnTextOverlayWidget::setItems(const QnOverlayTextItemDataList &data)
 {
     Q_D(QnTextOverlayWidget);
-    d->setItemsData(data);
+    d->setItems(data);
 }
 

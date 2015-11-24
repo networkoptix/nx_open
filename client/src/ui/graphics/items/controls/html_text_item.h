@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QGraphicsWidget>
 
+#include <utils/common/model_functions_fwd.h>
+
 class QnHtmlTextItemPrivate;
 
 struct QnHtmlTextItemOptions
@@ -22,6 +24,8 @@ struct QnHtmlTextItemOptions
         , int initVertPadding
         , int initMaxWidth);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(QnHtmlTextItemOptions, (eq));
 
 class QnHtmlTextItem : public QGraphicsWidget {
     Q_OBJECT

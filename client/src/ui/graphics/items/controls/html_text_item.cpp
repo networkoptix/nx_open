@@ -4,7 +4,9 @@
 #include <QtGui/QFontMetrics>
 
 #include <core/resource/camera_bookmark.h>
+
 #include <utils/common/string.h>
+#include <utils/common/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
 
 namespace 
@@ -43,6 +45,9 @@ QnHtmlTextItemOptions::QnHtmlTextItemOptions(const QColor &initBackgroundColor
     , autosize(initAutosize)
 {
 }
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq) \
+    , (backgroundColor)(maxWidth)(borderRadius)(horPadding)(vertPadding)(autosize));
 
 ///
 

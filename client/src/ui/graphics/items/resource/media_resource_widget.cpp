@@ -135,7 +135,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
     , m_ioLicenceStatusHelper() /// Will be created only for IO modules
-    , m_colors()
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -884,16 +883,6 @@ void QnMediaResourceWidget::setDewarpingParams(const QnMediaDewarpingParams &par
     emit dewarpingParamsChanged();
 }
 
-void QnMediaResourceWidget::setColors(const QnMediaResourceWidgetColors &colors)
-{
-    m_colors = colors;
-}
-
-QnMediaResourceWidgetColors QnMediaResourceWidget::colors() const
-{
-    return m_colors;
-}
-
 float QnMediaResourceWidget::visualAspectRatio() const {
     if (!resource())
         return base_type::visualAspectRatio();
@@ -1549,7 +1538,7 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
     const bool bookmarksEnabled = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
     const auto mode = (bookmarksEnabled ? QnCompositeTextOverlay::kBookmarksMode 
-        : (isLive ? QnCompositeTextOverlay::kTextAlaramsMode : QnCompositeTextOverlay::kUndefinedMode));
+        : (isLive ? QnCompositeTextOverlay::kTextOutputMode : QnCompositeTextOverlay::kUndefinedMode));
     m_compositeTextOverlay->setMode(mode);
 }
 

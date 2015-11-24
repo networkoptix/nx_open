@@ -7,9 +7,11 @@
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/controls/html_text_item.h>
 
+#include <utils/common/model_functions_fwd.h>
+
 struct QnOverlayTextItemData
 {
-    enum { kNoTimeout = -1 };
+    enum { kInfinite = -1 };
 
     QnUuid id;
     QString text;
@@ -19,12 +21,10 @@ struct QnOverlayTextItemData
     QnOverlayTextItemData(const QnUuid &initId
         , const QString &initText
         , QnHtmlTextItemOptions initItemOptions
-        , int initTimeout = kNoTimeout);
-
-    bool operator == (const QnOverlayTextItemData &rhs) const;
-
-    bool operator != (const QnOverlayTextItemData &rhs) const;
+        , int initTimeout = kInfinite);
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(QnOverlayTextItemData, (eq));
 
 typedef QList<QnOverlayTextItemData> QnOverlayTextItemDataList;
 
@@ -36,13 +36,13 @@ public:
 
     ~QnTextOverlayWidget();
 
-    void resetItemsData();
+    void clear();
 
-    void addItemData(const QnOverlayTextItemData &data);
+    void addItem(const QnOverlayTextItemData &data);
 
-    void removeItemData(const QnUuid &id);
+    void removeItem(const QnUuid &id);
 
-    void setItemsData(const QnOverlayTextItemDataList &data);
+    void setItems(const QnOverlayTextItemDataList &data);
 
 private:
     Q_DECLARE_PRIVATE(QnTextOverlayWidget)

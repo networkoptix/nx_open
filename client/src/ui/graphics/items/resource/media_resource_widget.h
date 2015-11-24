@@ -33,8 +33,6 @@ class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
     typedef QnResourceWidget base_type;
 
-    Q_PROPERTY(QnMediaResourceWidgetColors colors READ colors WRITE setColors NOTIFY colorsChanged);
-
 public:
     static const Button ScreenshotButton    = static_cast<Button>(0x008);
     static const Button MotionSearchButton  = static_cast<Button>(0x010);
@@ -125,10 +123,6 @@ public:
 
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
-
-    void setColors(const QnMediaResourceWidgetColors &colors);
-
-    QnMediaResourceWidgetColors colors() const;
 
 signals:
     void motionSelectionChanged();
@@ -276,8 +270,6 @@ private:
 
     typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
     QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
-
-    QnMediaResourceWidgetColors m_colors;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)
