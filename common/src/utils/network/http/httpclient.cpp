@@ -133,12 +133,16 @@ namespace nx_http
     template<typename AsyncClientFunc>
         bool HttpClient::doRequest(AsyncClientFunc func)
     {
+        QnMutexLocker lk(&m_mutex);
+
         if (m_done)
         {
             m_done = false;
         }
         else
         {
+            lk.unlock();
+
             //have to re-establish connection if previous message has not been read up to the end
             if (m_asyncHttpClient)
             {
@@ -162,14 +166,15 @@ namespace nx_http
                 m_asyncHttpClient->setUserName(m_userName.get());
             if (m_userPassword)
                 m_asyncHttpClient->setUserPassword(m_userPassword.get());
+
+            lk.relock();
         }
 
-        if (!func(m_asyncHttpClient.get()))
-            return false;
+        func(m_asyncHttpClient.get());
 
-        QnMutexLocker lk( &m_mutex );
-        while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )
-            m_cond.wait( lk.mutex() );
+        m_msgBodyBuffer.clear();
+        while (!m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived))
+            m_cond.wait(lk.mutex());
 
         return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
     }

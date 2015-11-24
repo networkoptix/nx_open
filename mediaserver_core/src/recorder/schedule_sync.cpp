@@ -218,10 +218,24 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             return CopyError::SourceFileError;
         }
 
+        auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
+            return storage->getFreeSpace() > storage->getSpaceLimit();
+        };
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
-        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(nullptr);
-        if (!toStorage)
-            return CopyError::NoBackupStorageError;
+        auto toStorage = qnBackupStorageMan->getOptimalStorageRoot(
+            nullptr,
+            optimalRootBackupPred
+        );
+
+        if (!toStorage) {
+            qnBackupStorageMan->clearSpace(true);
+            toStorage = qnBackupStorageMan->getOptimalStorageRoot(
+                nullptr,
+                optimalRootBackupPred
+            );
+            if (!toStorage)
+                return CopyError::NoBackupStorageError;
+        }
 
         auto newStorageUrl = toStorage->getUrl();
         auto oldSeparator = getPathSeparator(relativeFileName);

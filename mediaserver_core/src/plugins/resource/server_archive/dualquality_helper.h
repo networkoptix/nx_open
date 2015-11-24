@@ -8,6 +8,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include <server/server_globals.h>
 
+#include <stack>
+
 class QnDualQualityHelper
 {
 public:
@@ -26,13 +28,17 @@ public:
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
 private:
+    typedef std::stack<DeviceFileCatalogPtr> SearchStack;
+
+private:
     void findDataForTimeHelper(
         const qint64                        time,
         DeviceFileCatalog::TruncableChunk   &resultChunk,
         DeviceFileCatalogPtr                &resultCatalog,
         DeviceFileCatalog::FindMethod       findMethod,
         bool                                preciseFind,
-        QnServer::StoragePool               storageManager
+        SearchStack                         &searchStack,
+        qint64                              previousDistance
     );
 
     static int64_t calcDistanceHelper(
