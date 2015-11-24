@@ -12,7 +12,13 @@
 
 int main( int argc, char **argv )
 {
-    //QnLog::initLog("DEBUG2");
+#if 1
+    cl_log.create(
+        "c:\\tmp\\common_ut.log",
+        50*1024*1024,
+        10,
+        cl_logDEBUG2);
+#endif
 
     ::testing::InitGoogleTest( &argc, argv );
     for( int i = 0; i < argc; ++i )
