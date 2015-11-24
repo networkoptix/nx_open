@@ -14,6 +14,7 @@
 #include <utils/common/app_info.h>
 #include <network/module_finder.h>
 #include <network/multicast_module_finder.h>
+#include <network/router.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 
@@ -64,6 +65,8 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnModuleFinder>(moduleFinder);
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
     moduleFinder->start();
+
+    common->store<QnRouter>(new QnRouter(moduleFinder));
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {
         switch (state) {
