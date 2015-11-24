@@ -18,11 +18,12 @@ QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState,
     
 }
 
-bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const {
-    bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
-    if (!stateOK)
-        return false;
+bool QnCustomBusinessEvent::isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const {
+    return state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
+}
 
+bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const 
+{
     auto unquote = [](const QStringList& dataList) 
     {
         QStringList result;

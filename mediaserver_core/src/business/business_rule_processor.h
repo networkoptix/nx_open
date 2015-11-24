@@ -187,7 +187,8 @@ private:
 
 
     /**
-     * @brief match resources between event and rule
+     * @brief match resources between event and rule. 
+     * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 

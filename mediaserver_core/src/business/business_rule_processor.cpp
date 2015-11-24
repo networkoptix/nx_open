@@ -222,7 +222,7 @@ bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, con
 
 bool QnBusinessRuleProcessor::checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const
 {
-    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams(), rule->actionType()))
+    if (!bEvent->isEventStateMatched(rule->eventState(), rule->actionType()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
@@ -334,9 +334,9 @@ void QnBusinessRuleProcessor::at_timer()
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
     bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
-//    auto resList = rule->eventResourceObjects<QnResource>();
-//    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
+        return false;
+    if (!bEvent->checkEventParams(rule->eventParams()))
         return false;
 
 
