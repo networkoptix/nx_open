@@ -101,7 +101,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     initBookmarksMode();
 
     connect(this, &QnCompositeTextOverlay::modeChanged
-        , this, &QnCompositeTextOverlay::currentModeChanged);
+        , this, &QnCompositeTextOverlay::at_modeChanged);
 }
 
 QnCompositeTextOverlay::~QnCompositeTextOverlay()
@@ -195,7 +195,8 @@ void QnCompositeTextOverlay::initTextMode()
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
-        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId
+        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
+        /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
         const auto &actionParams = businessAction->getParams();
         if (!businessAction->getResources().contains(cameraId))
             return;
@@ -305,7 +306,7 @@ void QnCompositeTextOverlay::setColors(const QnCompositeTextOverlayColors &color
     setModeData(m_currentMode, tmp);
 }
 
-void QnCompositeTextOverlay::currentModeChanged()
+void QnCompositeTextOverlay::at_modeChanged()
 {
     const bool bookmarksEnabled = (mode() == kBookmarksMode);
     if (m_bookmarksQuery.isNull() != bookmarksEnabled)

@@ -26,6 +26,8 @@ struct QnOverlayTextItemData
 
 QN_FUSION_DECLARE_FUNCTIONS(QnOverlayTextItemData, (eq));
 
+#define QnOverlayTextItemData_Fields (id)(text)(itemOptions)(timeout)
+
 typedef QList<QnOverlayTextItemData> QnOverlayTextItemDataList;
 
 class QnTextOverlayWidgetPrivate;
