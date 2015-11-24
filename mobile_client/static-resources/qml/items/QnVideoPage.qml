@@ -218,7 +218,13 @@ QnPage {
 
         sourceComponent: visible ? dummyComponent : undefined
 
-        y: parent.height / 6
+        y: {
+            var minY = (parent.height - height) / 6
+            var maxY = navigationLoader.y - height - dp(56)
+            var y = (parent.height - height) / 2
+
+            return Math.max(minY, Math.min(maxY, y))
+        }
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
