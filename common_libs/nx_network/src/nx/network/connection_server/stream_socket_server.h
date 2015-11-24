@@ -16,18 +16,27 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_common.h>
 
-
-/*!
-    This class introduced to remove cross-includes between stun_server_connection.h and stun_stream_socket_server.h.
-    Better find another solultion and remove this class
-*/
 template<class _ConnectionType>
-    class StreamConnectionHolder
+class StreamConnectionHolder
+{
+    public:
+        typedef _ConnectionType ConnectionType;
+
+        virtual ~StreamConnectionHolder() {}
+
+        virtual void closeConnection(
+            SystemError::ErrorCode closeReason,
+            ConnectionType* connection ) = 0;
+};
+
+template<class _ConnectionType>
+class StreamServerConnectionHolder
+    : public StreamConnectionHolder<_ConnectionType>
 {
 public:
     typedef _ConnectionType ConnectionType;
 
-    virtual ~StreamConnectionHolder()
+    virtual ~StreamServerConnectionHolder()
     {
         //we MUST be sure to remove all connections
         std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
@@ -38,9 +47,9 @@ public:
         connections.clear();
     }
 
-    void closeConnection(
+    virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
-        ConnectionType* connection )
+        ConnectionType* connection ) override
     {
         std::unique_lock<std::mutex> lk( m_mutex );
         m_connections.erase( connection );
@@ -65,10 +74,10 @@ protected:
 template<class CustomServerType, class ConnectionType>
     class StreamSocketServer
 :
-    public StreamConnectionHolder<ConnectionType>,
+    public StreamServerConnectionHolder<ConnectionType>,
     public QnStoppable
 {
-    typedef StreamConnectionHolder<ConnectionType> BaseType;
+    typedef StreamServerConnectionHolder<ConnectionType> BaseType;
 
 #if defined(_MSC_VER)
     typedef typename StreamSocketServer<CustomServerType, ConnectionType> SelfType;

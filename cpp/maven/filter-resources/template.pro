@@ -122,9 +122,11 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 win* {
-	DEFINES += NX_NETWORK_API=Q_DECL_IMPORT
+    DEFINES += NX_NETWORK_API=Q_DECL_IMPORT
+} else {
+    DEFINES += NX_NETWORK_API=
 }
-				
+
 DEPENDPATH *= $${INCLUDEPATH}
 
 PRECOMPILED_HEADER = ${project.build.sourceDirectory}/StdAfx.h

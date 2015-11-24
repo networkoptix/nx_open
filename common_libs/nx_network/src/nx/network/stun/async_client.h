@@ -14,7 +14,7 @@ namespace stun {
 
 //!Connects to STUN server, sends requests, receives responses and indications
 class NX_NETWORK_API AsyncClient
-	: public StreamConnectionHolder<
+    : public StreamConnectionHolder<
 		nx_api::BaseStreamProtocolConnectionEmbeddable<
 			Message,
 			MessageParser,
@@ -66,7 +66,8 @@ public:
     void sendRequest( Message request, RequestHandler requestHandler );
 
     //! \note Required by \a nx_api::BaseServerConnection
-    void closeConnection(SystemError::ErrorCode errorCode, BaseConnectionType*);
+    virtual void closeConnection(SystemError::ErrorCode errorCode,
+                                 BaseConnectionType*) override;
 
     static boost::optional< QString >
         hasError( SystemError::ErrorCode code, const Message& message );
