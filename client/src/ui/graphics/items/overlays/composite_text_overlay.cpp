@@ -197,28 +197,31 @@ void QnCompositeTextOverlay::initTextMode()
 
         /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
         /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
-        const auto &actionParams = businessAction->getParams();
         if (!businessAction->getResources().contains(cameraId))
             return;
 
+        enum { kDefaultInstantActionTimeoutMs = 5000 };
+
+        const auto &actionParams = businessAction->getParams();
         const auto state = businessAction->getToggleState();
-        const bool isInstantAction = (state == QnBusiness::UndefinedState);
+        const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
+        const int timeout = (isInstantAction 
+            ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
+            : QnOverlayTextItemData::kInfinite);
+
         const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
 
-        if (state == QnBusiness::InactiveState)
+        
+        if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            /// qDebug() << "Remove " << actionId; // For future debug
+            // qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
 
-        /// qDebug() << "Added: " << actionId; // For future debug
-        enum { kDefaultInstantActionTimeoutMs = 5000 };
-        const int timeout = (isInstantAction
-            ? (actionParams.durationMs ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
-            : QnOverlayTextItemData::kInfinite);
-
+        // qDebug() << "Added: " << actionId << ":" << isInstantAction 
+        //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum 
         {
