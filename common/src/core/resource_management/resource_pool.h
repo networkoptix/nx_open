@@ -59,6 +59,8 @@ public:
     { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
+    QnResourceList getResources(const QVector<QnUuid>& idList) const;
+    QnResourceList getResources(const std::vector<QnUuid>& idList) const;
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
@@ -159,7 +161,7 @@ public:
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
-    
+
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.

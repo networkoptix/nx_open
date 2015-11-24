@@ -129,7 +129,7 @@ protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
-    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);

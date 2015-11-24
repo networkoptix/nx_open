@@ -11,8 +11,6 @@
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
-#include <camera/camera_bookmarks_manager.h>
-#include <camera/camera_bookmarks_query.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -33,13 +31,11 @@
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
-#include <core/resource/camera_bookmark.h>
 
 #include <plugins/resource/archive/abstract_archive_stream_reader.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
-#include <ui/common/search_query_strategy.h>
 #include <ui/fisheye/fisheye_ptz_controller.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/proxy_label.h>
@@ -48,7 +44,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
-#include <ui/graphics/items/overlays/bookmarks_overlay_widget.h>
+#include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -72,6 +68,8 @@
 #include <utils/common/collection.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
+#include <api/common_message_processor.h>
+#include <business/actions/abstract_business_action.h>
 
 #define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
 
@@ -112,36 +110,6 @@ namespace
         }
     }
 
-    const qint64 bookmarksFilterPrecisionMs = 5 * 60 * 1000;
-
-    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
-        if (positionMs <= 0)
-            return QnCameraBookmarkSearchFilter::invalidFilter();
-
-        QnCameraBookmarkSearchFilter result;
-
-        /* Round the current time to reload bookmarks only once a time. */
-        qint64 mid = positionMs - (positionMs % bookmarksFilterPrecisionMs);
-
-        result.startTimeMs = mid - bookmarksFilterPrecisionMs;
-
-        /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
-        result.endTimeMs = mid + bookmarksFilterPrecisionMs * 2;
-
-        result.text = text;
-
-        return result;
-    }
-
-    //TODO: #GDM #Bookmarks #duplicate code
-    QnCameraBookmarkList getBookmarksAtPosition(const QnCameraBookmarkList &bookmarks, qint64 position) {
-        QnCameraBookmarkList result;
-        std::copy_if(bookmarks.cbegin(), bookmarks.cend(), std::back_inserter(result), [position](const QnCameraBookmark &bookmark) {
-            return bookmark.startTimeMs <= position && position < bookmark.endTimeMs();
-        });
-        return result;
-    }
-
 } // anonymous namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
@@ -162,8 +130,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_ptzController(nullptr)
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
-    , m_bookmarks()
-    , m_bookmarksOverlayWidget(nullptr)
+    , m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator()
+        , [this](){ return getUtcCurrentTimeMs(); }, this))
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
     , m_ioLicenceStatusHelper() /// Will be created only for IO modules
@@ -188,33 +156,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     if (m_camera)
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
-    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateBookmarksMode);
-    connect(navigator(),                &QnWorkbenchNavigator::positionChanged,         this, &QnMediaResourceWidget::updateBookmarksFilter);
+    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    connect(navigator()->bookmarksSearchStrategy(), &QnSearchQueryStrategy::queryUpdated, this, [this](const QString &text){
-        if (!m_bookmarksQuery)
+    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived,
+            this, [this](const QnAbstractBusinessActionPtr &businessAction)
+    {
+        if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
             return;
-
-        auto filter = m_bookmarksQuery->filter();
-        filter.text = text;
-        m_bookmarksQuery->setFilter(filter);
+        const auto &actionParams = businessAction->getParams();
+        if (actionParams.actionResourceId != m_resource->toResource()->getId())
+            return;
+        if (m_ptzController)
+            m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
     });
-
-    {
-        /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
-        QTimer* timer = new QTimer(this);
-        timer->setInterval(bookmarksFilterPrecisionMs / 2);
-        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarksFilter);
-        timer->start();
-    }
-    {
-        /* Update bookmarks text by timer. */
-        QTimer* timer = new QTimer(this);
-        timer->setInterval(1000);
-        connect(timer, &QTimer::timeout, this, &QnMediaResourceWidget::updateBookmarks);
-        timer->start();
-    }
-
 
 
     updateDisplay();
@@ -260,10 +215,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
-    if (m_camera) {
-        m_bookmarksOverlayWidget = new QnBookmarksOverlayWidget();
-        addOverlayWidget(m_bookmarksOverlayWidget, Invisible, true, true);
-    }
+
+    addOverlayWidget(m_compositeTextOverlay, Visible, true, true);
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module)) 
@@ -318,7 +271,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     updateTitleText();
     updateInfoText();
-    updateBookmarksMode();
+    updateCompositeOverlayMode();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -1160,7 +1113,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
 
     bool isPreviewSearchLayout = item() 
         && item()->layout() 
-        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+        && item()->layout()->isSearchLayout();
 
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
@@ -1335,6 +1288,8 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     } else {
         resumeHomePtzController();
     }
+
+    updateCompositeOverlayMode();
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1576,59 +1531,15 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
 }
 
-void QnMediaResourceWidget::updateBookmarksFilter() {
-    if (!m_bookmarksQuery)
-        return;
+void QnMediaResourceWidget::updateCompositeOverlayMode() 
+{
+    const bool isLive = (m_display && m_display->camDisplay() 
+        ? m_display->camDisplay()->isRealTimeSource() : false);
 
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(getUtcCurrentTimeMs(), navigator()->bookmarksSearchStrategy()->query()));
-}
-
-void QnMediaResourceWidget::updateBookmarksMode() {
-    bool enable = navigator()->bookmarksModeEnabled() && !m_camera.isNull();
-
-    if (!m_bookmarksQuery.isNull() == enable)
-        return;
-
-    if (enable) {
-        m_bookmarksQuery = qnCameraBookmarksManager->createQuery();
-
-        connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, &QnMediaResourceWidget::updateBookmarks);
-        updateBookmarksFilter();
-        m_bookmarksQuery->setCamera(m_camera);
-    } else {
-        if (m_bookmarksQuery)
-            disconnect(m_bookmarksQuery, nullptr, this, nullptr);
-        m_bookmarksQuery.clear();
-    }
-    updateBookmarks();
-    updateBookmarksVisibility();
-}
-
-void QnMediaResourceWidget::updateBookmarks() {
-    if (!m_bookmarksOverlayWidget)
-        return;
-
-    if (!m_bookmarksQuery) {
-        m_bookmarksOverlayWidget->setBookmarks(QnCameraBookmarkList());
-        return;
-    }
-
-    if (!m_bookmarksQuery->filter().isValid())
-        updateBookmarksFilter();
-
-    const auto time = getUtcCurrentTimeMs();
-    const auto cached = m_bookmarksQuery->cachedBookmarks();
-    const auto bookmarks = getBookmarksAtPosition(cached, time);
-
-    m_bookmarksOverlayWidget->setBookmarks(bookmarks);
-}
-
-void QnMediaResourceWidget::updateBookmarksVisibility() {
-    if (!m_bookmarksOverlayWidget)
-        return;
-
-    const auto visibility = (m_bookmarksQuery ? Visible : Invisible);
-    setOverlayWidgetVisibility(m_bookmarksOverlayWidget, visibility);
+    const bool bookmarksEnabled = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
+    const auto mode = (bookmarksEnabled ? QnCompositeTextOverlay::kBookmarksMode 
+        : (isLive ? QnCompositeTextOverlay::kTextOutputMode : QnCompositeTextOverlay::kUndefinedMode));
+    m_compositeTextOverlay->setMode(mode);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const {

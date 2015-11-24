@@ -7,7 +7,7 @@ public:
     QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea *parent);
 
     QGraphicsWidget *contentWidget;
-    int contentY;
+    int yOffset;
     qreal contentHeight;
     Qt::Alignment alignment;
     int lineHeight;
@@ -78,7 +78,7 @@ void QnGraphicsScrollArea::wheelEvent(QGraphicsSceneWheelEvent *event) {
         }
 
         int dy = -event->delta() / 120 * d->lineHeight * qApp->wheelScrollLines();
-        d->contentY += dy;
+        d->yOffset -= dy;
         d->fitToBounds();
     }
 
@@ -90,7 +90,7 @@ QnGraphicsScrollAreaPrivate::QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea *p
     : QObject(parent)
     , q_ptr(parent)
     , contentWidget(nullptr)
-    , contentY(0)
+    , yOffset(0)
     , lineHeight(0)
 {
     Q_Q(QnGraphicsScrollArea);
@@ -118,18 +118,22 @@ void QnGraphicsScrollAreaPrivate::fitToBounds() {
 
     auto height = q->size().height();
 
-    if (contentHeight <= height) {
-        if (alignment.testFlag(Qt::AlignBottom))
-            contentY = contentHeight - height;
-        else // do align top
-            contentY = 0;
-    } else {
-        if (contentHeight - contentY < height)
-            contentY = contentHeight - height;
+    const auto maxOffset = (height - contentHeight);
 
-        if (contentY < 0)
-            contentY = 0;
+    if (contentHeight <= height) 
+    {
+        yOffset = 0;
+        contentWidget->setPos(0, alignment.testFlag(Qt::AlignBottom) ? maxOffset : 0);
+    } 
+    else 
+    {
+        if (yOffset > -maxOffset)
+            yOffset = -maxOffset;
+
+        if (yOffset < 0)
+            yOffset = 0;
+
+        contentWidget->setPos(0, maxOffset + yOffset);
     }
 
-    contentWidget->setPos(0, -contentY);
 }

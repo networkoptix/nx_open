@@ -51,6 +51,8 @@
 #include <ui/workbench/handlers/workbench_videowall_handler.h>
 #include <ui/workbench/handlers/workbench_incompatible_servers_action_handler.h>
 #include <ui/workbench/handlers/workbench_resources_settings_handler.h>
+#include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
+
 #include <ui/workbench/watchers/workbench_user_inactivity_watcher.h>
 #include <ui/workbench/watchers/workbench_layout_aspect_ratio_watcher.h>
 #include <ui/workbench/watchers/workbench_ptz_dialog_watcher.h>
@@ -255,6 +257,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchIncompatibleServersActionHandler>();
     context->instance<QnWorkbenchResourcesSettingsHandler>();
     context->instance<QnWorkbenchBookmarksHandler>();
+    context->instance<QnWorkbenchAlarmLayoutHandler>();
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
     context->instance<QnWorkbenchSystemNameWatcher>();
@@ -526,7 +529,7 @@ void QnMainWindow::updateHelpTopic() {
             setHelpTopic(m_scene.data(), Qn::Videowall_Appearance_Help);
             return;
         }
-        if (layout->data().contains(Qn::LayoutSearchStateRole)) {
+        if (layout->isSearchLayout()) {
             setHelpTopic(m_scene.data(), Qn::MainWindow_Scene_PreviewSearch_Help, true);
             return;
         }

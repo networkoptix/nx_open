@@ -743,3 +743,9 @@ void QnWorkbenchLayout::centralizeItems() {
         geometries << item->geometry().adjusted(xdiff, ydiff, xdiff, ydiff);
     moveItems(itemsList, geometries);
 }
+
+bool QnWorkbenchLayout::isSearchLayout() const {
+    if (!data().contains(Qn::LayoutSearchStateRole))
+        return false;
+    return data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+}

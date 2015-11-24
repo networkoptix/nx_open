@@ -34,7 +34,7 @@ public:
     virtual QnDbTransaction* getTransaction() override;
 
     void setEventLogPeriod(qint64 periodUsec);
-    bool saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes);
+    bool saveActionToDB(const QnAbstractBusinessActionPtr& action);
     bool removeLogForRes(QnUuid resId);
 
     QnBusinessActionDataList getActions(
