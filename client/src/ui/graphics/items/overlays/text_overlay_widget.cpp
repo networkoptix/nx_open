@@ -27,7 +27,7 @@ QnOverlayTextItemData::QnOverlayTextItemData(const QnUuid &initId
 {
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), (id)(text)(itemOptions)(timeout));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), QnOverlayTextItemData_Fields);
 
 ///
 

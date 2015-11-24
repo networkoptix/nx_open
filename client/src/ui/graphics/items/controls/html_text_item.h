@@ -27,6 +27,8 @@ struct QnHtmlTextItemOptions
 
 QN_FUSION_DECLARE_FUNCTIONS(QnHtmlTextItemOptions, (eq));
 
+#define QnHtmlTextItemOptions_Fields (backgroundColor)(maxWidth)(borderRadius)(horPadding)(vertPadding)(autosize)
+
 class QnHtmlTextItem : public QGraphicsWidget {
     Q_OBJECT
 

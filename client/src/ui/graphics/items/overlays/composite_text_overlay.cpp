@@ -101,7 +101,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     initBookmarksMode();
 
     connect(this, &QnCompositeTextOverlay::modeChanged
-        , this, &QnCompositeTextOverlay::currentModeChanged);
+        , this, &QnCompositeTextOverlay::at_modeChanged);
 }
 
 QnCompositeTextOverlay::~QnCompositeTextOverlay()
@@ -195,29 +195,33 @@ void QnCompositeTextOverlay::initTextMode()
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
-        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId
-        const auto &actionParams = businessAction->getParams();
+        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
+        /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
         if (!businessAction->getResources().contains(cameraId))
             return;
 
+        enum { kDefaultInstantActionTimeoutMs = 5000 };
+
+        const auto &actionParams = businessAction->getParams();
         const auto state = businessAction->getToggleState();
-        const bool isInstantAction = (state == QnBusiness::UndefinedState);
+        const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
+        const int timeout = (isInstantAction 
+            ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
+            : QnOverlayTextItemData::kInfinite);
+
         const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
 
-        if (state == QnBusiness::InactiveState)
+        
+        if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            /// qDebug() << "Remove " << actionId; // For future debug
+            // qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
 
-        /// qDebug() << "Added: " << actionId; // For future debug
-        enum { kDefaultInstantActionTimeoutMs = 5000 };
-        const int timeout = (isInstantAction
-            ? (actionParams.durationMs ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
-            : QnOverlayTextItemData::kInfinite);
-
+        // qDebug() << "Added: " << actionId << ":" << isInstantAction 
+        //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum 
         {
@@ -305,7 +309,7 @@ void QnCompositeTextOverlay::setColors(const QnCompositeTextOverlayColors &color
     setModeData(m_currentMode, tmp);
 }
 
-void QnCompositeTextOverlay::currentModeChanged()
+void QnCompositeTextOverlay::at_modeChanged()
 {
     const bool bookmarksEnabled = (mode() == kBookmarksMode);
     if (m_bookmarksQuery.isNull() != bookmarksEnabled)
