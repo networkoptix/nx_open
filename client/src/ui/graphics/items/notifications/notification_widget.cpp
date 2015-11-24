@@ -157,11 +157,11 @@ void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) 
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
-    m_notificationLevel(Qn::OtherNotification),
+    m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(NULL),
     m_inToolTipPositionUpdate(false)
 {
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 128)); // TODO: Same as in workbench_ui. Unify?
@@ -242,16 +242,16 @@ void QnNotificationWidget::setSound(const QString &soundPath, bool loop) {
         AudioPlayer::playFileAsync(soundPath);
 }
 
-Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
+QnNotificationLevel::Value QnNotificationWidget::notificationLevel() const {
     return m_notificationLevel;
 }
 
-void QnNotificationWidget::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
+void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
     m_notificationLevel = notificationLevel;
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     updateOverlayColor();
 

@@ -46,7 +46,7 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
     return messageTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, const QnAbstractBusinessActionPtr &businessAction, QString resourceName) 
+QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) 
 {
     QStringList messageParts;
 

@@ -23,18 +23,52 @@ QnPage {
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool failed: player.failed
+
+        property bool showOfflineStatus: false
 
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
 
+        Timer {
+            id: offlineStatusDelay
+
+            interval: 20 * 1000
+            repeat: false
+            running: d.serverOffline || d.cameraOffline
+
+            onTriggered: d.showOfflineStatus = true
+        }
+
+        onShowOfflineStatusChanged: updateOfflineDisplay()
+
         onServerOfflineChanged: {
-            if (serverOffline) {
-                exitFullscreen()
-                navigationLoader.opacity = 0.0
-                navigationBarTint.opacity = 0.0
-                toolBar.opacity = 1.0
+            if (!d.serverOffline)
+                d.showOfflineStatus = d.cameraOffline
+        }
+
+        onCameraOfflineChanged: {
+            if (!d.cameraOffline)
+                d.showOfflineStatus = d.serverOffline
+        }
+
+        onFailedChanged: {
+            if (failed)
+                videoNavigation.paused = true
+        }
+
+        function updateOfflineDisplay() {
+            if (showOfflineStatus) {
+                if (serverOffline) {
+                    exitFullscreen()
+                    navigationLoader.opacity = 0.0
+                    navigationBarTint.opacity = 0.0
+                    toolBar.opacity = 1.0
+                } else if (cameraOffline) {
+                    showUi()
+                }
             } else {
                 navigationLoader.opacity = 1.0
                 navigationBarTint.opacity = 1.0
@@ -167,9 +201,30 @@ QnPage {
     Loader {
         id: dummyLoader
 
-        sourceComponent: player.atLive && (d.serverOffline || d.cameraOffline || d.cameraUnauthorized) ? dummyComponent : undefined
+        visible: {
+            if (d.cameraUnauthorized)
+                return true
 
-        y: parent.height / 6
+            var offline = d.serverOffline || d.cameraOffline
+
+            if (!offline && d.failed)
+                return true
+
+            if (offline && d.showOfflineStatus)
+                return true
+
+            return false
+        }
+
+        sourceComponent: visible ? dummyComponent : undefined
+
+        y: {
+            var minY = (parent.height - height) / 6
+            var maxY = navigationLoader.y - height - dp(56)
+            var y = (parent.height - height) / 2
+
+            return Math.max(minY, Math.min(maxY, y))
+        }
         anchors.horizontalCenter: parent.horizontalCenter
     }
 
@@ -192,6 +247,8 @@ QnPage {
                         return "qrc:///images/camera_locked_1.png"
                     else if (d.cameraOffline)
                         return "qrc:///images/camera_offline_1.png"
+                    else if (d.failed)
+                        return "qrc:///images/camera_warning_1.png"
                     else
                         return ""
                 }
@@ -215,6 +272,8 @@ QnPage {
                         return qsTr("Authentication\nrequired")
                     else if (d.cameraOffline)
                         return qsTr("Camera offline")
+                    else if (d.failed)
+                        return qsTr("Can't load video")
                     else
                         return ""
                 }

@@ -1,5 +1,4 @@
-#ifndef QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
-#define QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -105,16 +104,13 @@ protected:
 
     Qn::ResourceSavingFlags defaultFlags(const QnLayoutResourcePtr &resource) const;
 
-    ec2::AbstractECConnectionPtr connection2() const;
-
 protected slots:
     void processReply(int status, const QnLayoutResourceList &resources, int handle);
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
-    void at_layout_storeRequested(const QnLayoutResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
-    void at_layout_changed(const QnResourcePtr &resource);
+    void at_resource_changed(const QnResourcePtr &resource);
 
 private:
     friend class QnWorkbenchLayoutReplyProcessor;
@@ -125,6 +121,3 @@ private:
     /** Layout to flags mapping. */
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags> m_flagsByLayout;
 };
-
-
-#endif // QN_WORKBENCH_LAYOUT_SNAPSHOT_MANAGER_H
