@@ -216,14 +216,14 @@ void QnCompositeTextOverlay::initTextMode()
         
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            qDebug() << "Remove " << actionId; // For future debug
+            //qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
 
-        qDebug() << "Added: " << actionId << ":" << isInstantAction 
-            << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
+        //qDebug() << "Added: " << actionId << ":" << isInstantAction 
+        //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum 
         {
