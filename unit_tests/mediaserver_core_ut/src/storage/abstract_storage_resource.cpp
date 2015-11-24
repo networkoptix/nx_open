@@ -12,6 +12,8 @@
 
 std::unique_ptr<test::StorageTestGlobals> tg;
 
+bool recursiveClean(const QString &path); 
+
 TEST(AbstractStorageResourceTest, Init)
 {
     tg.reset(new test::StorageTestGlobals());
@@ -420,18 +422,21 @@ TEST(Storage_load_balancing_algorithm_test, Main) {
 
     std::unique_ptr<QnStorageManager> storageManager;
     if (!qnNormalStorageMan) {
-        storageManager = std::unique_ptr<QnStorageManager>(new QnStorageManager(QnServer::StoragePool::Normal));
+        storageManager = std::unique_ptr<QnStorageManager>(
+                new QnStorageManager(QnServer::StoragePool::Normal));
     }
     storageManager->stopAsyncTasks();
 
     std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
     if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(new QnResourceStatusDictionary);
+        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
+                new QnResourceStatusDictionary);
     }
 
     std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
     if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
+        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
+                new QnResourcePropertyDictionary);
     }
 
     std::unique_ptr<QnStorageDbPool> dbPool;
@@ -510,4 +515,5 @@ TEST(Storage_load_balancing_algorithm_test, Main) {
 TEST(AbstractStorageResourceTest, fini)
 {
     tg.reset();
+    recursiveClean(qApp->applicationDirPath() + lit("/tmp"));
 }
