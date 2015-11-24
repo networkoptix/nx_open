@@ -10,7 +10,6 @@
 // private
 class FrameTypeExtractor;
 #include <utils/thread/wait_condition.h>
-#include "core/datapacket/audio_data_packet.h"
 #include <recording/playbackmask_helper.h>
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
@@ -187,7 +186,6 @@ private:
     qint64 determineDisplayTime(bool reverseMode);
     void internalJumpTo(qint64 mksec);
     bool getNextVideoPacket();
-    void addAudioChannel(const QnCompressedAudioDataPtr& audio);
     QnAbstractMediaDataPtr getNextPacket();
     void channeljumpToUnsync(qint64 mksec, int channel, qint64 skipTime);
     void setSkipFramesToTime(qint64 skipFramesToTime, bool keepLast);
