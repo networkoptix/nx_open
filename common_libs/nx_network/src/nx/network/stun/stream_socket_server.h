@@ -14,7 +14,7 @@
 namespace nx {
 namespace stun {
 
-class NX_NETWORK_API SocketServer
+class SocketServer
 :
     public StreamSocketServer<SocketServer, ServerConnection>
 {

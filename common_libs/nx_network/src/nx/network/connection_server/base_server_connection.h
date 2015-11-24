@@ -37,7 +37,7 @@ namespace nx_api
         and method(s):
         \code {*.cpp}
             //!This connection is passed here just after socket has been terminated
-            closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionManagerType::ConnectionType* )
+            closeConnection( SystemError::ErrorCode reasonCode, CustomConnectionType* )
         \endcode
 
         \note This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to. 
@@ -45,18 +45,17 @@ namespace nx_api
         \note Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
     */
     template<
-        class CustomConnectionType,
-        class CustomConnectionManagerType
+        class CustomConnectionType
     > class BaseServerConnection
     {
     public:
-        typedef BaseServerConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
+        typedef BaseServerConnection<CustomConnectionType> SelfType;
 
         /*!
             \param connectionManager When connection is finished, \a connectionManager->closeConnection(closeReason, this) is called
         */
         BaseServerConnection(
-            CustomConnectionManagerType* connectionManager,
+            StreamConnectionHolder<CustomConnectionType>* connectionManager,
             std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
             m_connectionManager( connectionManager ),
@@ -102,10 +101,9 @@ namespace nx_api
 
         void closeConnection(SystemError::ErrorCode closeReasonCode)
         {
-            typedef typename CustomConnectionManagerType::ConnectionType ConnectionType;
             m_connectionManager->closeConnection(
                 closeReasonCode,
-                static_cast<ConnectionType*>(this) );
+                static_cast<CustomConnectionType*>(this) );
         }
 
         //!Register handler to be executed when connection just about to be destroyed
@@ -128,13 +126,13 @@ namespace nx_api
             return m_streamSocket->getForeignAddress();
         }
 
-        CustomConnectionManagerType* connectionManager()
+        StreamConnectionHolder<CustomConnectionType>* connectionManager()
         {
             return m_connectionManager;
         }
 
     private:
-        CustomConnectionManagerType* m_connectionManager;
+        StreamConnectionHolder<CustomConnectionType>* m_connectionManager;
         std::unique_ptr<AbstractCommunicatingSocket> m_streamSocket;
         nx::Buffer m_readBuffer;
         size_t m_bytesToSend;
@@ -143,14 +141,13 @@ namespace nx_api
         void onBytesRead( SystemError::ErrorCode errorCode, size_t bytesRead )
         {
             using namespace std::placeholders;
-            typedef typename CustomConnectionManagerType::ConnectionType ConnectionType;
 
             if( errorCode != SystemError::noError )
                 return handleSocketError( errorCode );
             if( bytesRead == 0 )    //connection closed by remote peer
                 return m_connectionManager->closeConnection(
                     SystemError::connectionReset,
-                    static_cast<ConnectionType*>(this) );
+                    static_cast<CustomConnectionType*>(this) );
 
             assert( m_readBuffer.size() == bytesRead );
             static_cast<CustomConnectionType*>(this)->bytesReceived( m_readBuffer ); 
@@ -172,7 +169,6 @@ namespace nx_api
 
         void handleSocketError( SystemError::ErrorCode errorCode )
         {
-            typedef typename CustomConnectionManagerType::ConnectionType ConnectionType;
             switch( errorCode )
             {
                 case SystemError::noError:
@@ -183,12 +179,12 @@ namespace nx_api
                 case SystemError::notConnected:
                     return m_connectionManager->closeConnection(
                         errorCode,
-                        static_cast<ConnectionType*>(this) );
+						static_cast<CustomConnectionType*>(this) );
 
                 default:
                     return m_connectionManager->closeConnection(
                         errorCode,
-                        static_cast<ConnectionType*>(this) );
+						static_cast<CustomConnectionType*>(this) );
             }
         }
     };

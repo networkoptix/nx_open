@@ -12,7 +12,7 @@
 namespace nx_http
 {
     HttpServerConnection::HttpServerConnection(
-        nx_http::HttpStreamSocketServer* socketServer,
+        StreamConnectionHolder<HttpServerConnection>* socketServer,
         std::unique_ptr<AbstractCommunicatingSocket> sock,
         nx_http::AbstractAuthenticationManager* const authenticationManager,
         nx_http::MessageDispatcher* const httpMessageDispatcher )

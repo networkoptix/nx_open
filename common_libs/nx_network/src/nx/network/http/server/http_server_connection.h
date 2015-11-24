@@ -17,15 +17,13 @@
 
 namespace nx_http
 {
-    class HttpStreamSocketServer;
     class AbstractAuthenticationManager;
     class MessageDispatcher;
 
-    class HttpServerConnection
+    class NX_NETWORK_API HttpServerConnection
     :
         public nx_api::BaseStreamProtocolConnection<
             HttpServerConnection,
-            nx_http::HttpStreamSocketServer,
             nx_http::Message,
             nx_http::MessageParser,
             nx_http::MessageSerializer>,
@@ -34,14 +32,13 @@ namespace nx_http
     public:
         typedef BaseStreamProtocolConnection<
             HttpServerConnection,
-            nx_http::HttpStreamSocketServer,
             nx_http::Message,
             nx_http::MessageParser,
             nx_http::MessageSerializer
         > BaseType;
 
         HttpServerConnection(
-            nx_http::HttpStreamSocketServer* socketServer,
+            StreamConnectionHolder<HttpServerConnection>* socketServer,
             std::unique_ptr<AbstractCommunicatingSocket> sock,
             nx_http::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher );

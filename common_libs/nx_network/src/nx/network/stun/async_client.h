@@ -14,10 +14,15 @@ namespace stun {
 
 //!Connects to STUN server, sends requests, receives responses and indications
 class NX_NETWORK_API AsyncClient
+	: public StreamConnectionHolder<
+		nx_api::BaseStreamProtocolConnectionEmbeddable<
+			Message,
+			MessageParser,
+			MessageSerializer
+		>>
 {
 public:
     typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
-        AsyncClient,
         Message,
         MessageParser,
         MessageSerializer

@@ -17,7 +17,7 @@ public:
     virtual ~AsyncClient() {}
 
     //! Simple SOAP call
-    struct Message
+    struct NX_NETWORK_API Message
     {
         QString action;
         QString service;
@@ -63,7 +63,7 @@ public:
     void deleteMapping( const QUrl& url, quint16 externalPort, Protocol protocol,
                         std::function< void( bool ) > callback );
 
-    struct MappingInfo
+    struct NX_NETWORK_API MappingInfo
     {
         HostAddress internalIp;
         quint16     internalPort;

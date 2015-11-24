@@ -8,7 +8,7 @@
 #include <QCoreApplication>
 
 #include <utils/common/log.h>
-#include <nx/network/socket_factory.cpp>
+#include <nx/network/socket_factory.h>
 
 int main( int argc, char **argv )
 {

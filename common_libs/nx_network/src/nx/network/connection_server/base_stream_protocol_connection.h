@@ -34,35 +34,33 @@ namespace nx_api
     */
     template<
         class CustomConnectionType,
-        class CustomConnectionManagerType,
         class MessageType,
         class ParserType,
         class SerializerType
     > class BaseStreamProtocolConnection
     :
+		public BaseServerConnection<CustomConnectionType>/*
         public BaseServerConnection<
             BaseStreamProtocolConnection<
                 CustomConnectionType,
-                CustomConnectionManagerType,
                 MessageType,
                 ParserType,
-                SerializerType>,
-            CustomConnectionManagerType>
+                SerializerType>>
+				*/
     {
     public:
         typedef BaseStreamProtocolConnection<
             CustomConnectionType,
-            CustomConnectionManagerType,
             MessageType,
             ParserType,
             SerializerType> SelfType;
         //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
-        typedef BaseServerConnection<SelfType, CustomConnectionManagerType> BaseType;
+        typedef BaseServerConnection<CustomConnectionType> BaseType;
         //!Type of messages used by this connection class. Request/response/indication is sub-class of message, so no difference at this level
         typedef MessageType message_type;
 
         BaseStreamProtocolConnection(
-            CustomConnectionManagerType* connectionManager,
+            StreamConnectionHolder<CustomConnectionType>* connectionManager,
             std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
             BaseType( connectionManager, std::move(streamSocket) ),
@@ -297,7 +295,7 @@ namespace nx_api
             m_connectionFreedFlag = nullptr;
             this->connectionManager()->closeConnection(
                 errorCode,
-                static_cast<typename CustomConnectionManagerType::ConnectionType*>(this) );
+                static_cast<CustomConnectionType*>(this) );
         }
     };
 
@@ -306,7 +304,6 @@ namespace nx_api
         \todo Remove this class or get rid of virtual call (in function)
     */
     template<
-        class CustomConnectionManagerType,
         class MessageType,
         class ParserType,
         class SerializerType
@@ -314,24 +311,20 @@ namespace nx_api
     :
         public BaseStreamProtocolConnection<
             BaseStreamProtocolConnectionEmbeddable<
-                CustomConnectionManagerType,
                 MessageType,
                 ParserType,
                 SerializerType>,
-            CustomConnectionManagerType,
             MessageType,
             ParserType,
             SerializerType>
     {
         typedef BaseStreamProtocolConnectionEmbeddable<
-            CustomConnectionManagerType,
             MessageType,
             ParserType,
             SerializerType
         > self_type;
         typedef BaseStreamProtocolConnection<
             self_type,
-            CustomConnectionManagerType,
             MessageType,
             ParserType,
             SerializerType
@@ -339,7 +332,7 @@ namespace nx_api
 
     public:
         BaseStreamProtocolConnectionEmbeddable(
-            CustomConnectionManagerType* connectionManager,
+            StreamConnectionHolder<self_type>* connectionManager,
             std::unique_ptr<AbstractCommunicatingSocket> streamSocket )
         :
             base_type(

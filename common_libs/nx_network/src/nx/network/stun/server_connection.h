@@ -23,7 +23,6 @@ class NX_NETWORK_API ServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<
         stun::ServerConnection,
-        StreamConnectionHolder<ServerConnection>,
         Message,
         MessageParser,
         MessageSerializer>,
@@ -32,7 +31,6 @@ class NX_NETWORK_API ServerConnection
 public:
     typedef nx_api::BaseStreamProtocolConnection<
         ServerConnection,
-        StreamConnectionHolder<ServerConnection>,
         Message,
         MessageParser,
         MessageSerializer

@@ -26,7 +26,7 @@
         <!--Global libs-->
         <qt.libs>core network</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_network</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
@@ -38,6 +38,7 @@
         <!--Specific os defines-->
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>
+	
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -46,6 +47,15 @@
             <type>pom</type> 
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>            
+        </dependency>
+		
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
     </dependencies>  
 </project>

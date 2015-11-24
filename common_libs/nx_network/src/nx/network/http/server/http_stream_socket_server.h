@@ -15,7 +15,7 @@
 
 namespace nx_http
 {
-    class NX_NETWORK_API HttpStreamSocketServer
+    class HttpStreamSocketServer
     :
         public StreamSocketServer<HttpStreamSocketServer, HttpServerConnection>
     {
@@ -28,11 +28,25 @@ namespace nx_http
             nx_http::AbstractAuthenticationManager* const authenticationManager,
             nx_http::MessageDispatcher* const httpMessageDispatcher,
             bool sslRequired,
-            SocketFactory::NatTraversalType natTraversalRequired );
+            SocketFactory::NatTraversalType natTraversalRequired )	
+		:
+			base_type(sslRequired, natTraversalRequired),
+			m_authenticationManager(authenticationManager),
+			m_httpMessageDispatcher(httpMessageDispatcher)
+		{
+		}
 
     protected:
         virtual std::shared_ptr<HttpServerConnection> createConnection(
-            std::unique_ptr<AbstractStreamSocket> _socket) override;
+            std::unique_ptr<AbstractStreamSocket> _socket) override
+		{
+
+			return std::make_shared<HttpServerConnection>(
+				this,
+				std::move(_socket),
+				m_authenticationManager,
+				m_httpMessageDispatcher);
+		}
 
     private:
         nx_http::AbstractAuthenticationManager* const m_authenticationManager;

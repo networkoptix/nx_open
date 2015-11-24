@@ -22,7 +22,7 @@ namespace stun {
 /*!
     \note This class methods are not thread-safe
 */
-class MessageDispatcher
+class NX_NETWORK_API MessageDispatcher
 :
     public Singleton<MessageDispatcher>
 {
