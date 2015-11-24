@@ -22,7 +22,7 @@ namespace {
                     tr("%1 of %n IO modules", nullptr, totalCount)
                 ), total
             ).arg(count);
-        } 
+        }
 
         static QString anyCamera() {
             return QnDeviceDependentStrings::getDefaultNameFromSet(
@@ -97,9 +97,16 @@ bool QnExecPtzPresetPolicy::isResourceValid(const QnVirtualCameraResourcePtr &ca
 }
 
 QString QnExecPtzPresetPolicy::getText(const QnResourceList &resources, const bool detailed) {
+
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
-    int invalid = invalidResourcesCount<QnExecPtzPresetPolicy>(cameras);
-    return genericCameraText<QnExecPtzPresetPolicy>(cameras, detailed, tr("%1 have no ptz presets", "", invalid), invalid);
+    if (cameras.size() != 1)
+        return tr("Select exactly one camera");
+
+    QnVirtualCameraResourcePtr camera = cameras.first();
+    if (!isResourceValid(camera))
+        return tr("%1 has no ptz presets").arg(getShortResourceName(camera));
+
+    return getShortResourceName(camera);
 }
 
 bool QnCameraMotionPolicy::isResourceValid(const QnVirtualCameraResourcePtr &camera) {
