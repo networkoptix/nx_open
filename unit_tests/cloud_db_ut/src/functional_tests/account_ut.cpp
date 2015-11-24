@@ -39,20 +39,20 @@ TEST_F(CdbFunctionalTest, account_activation)
     //adding system1 to account1
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
-    ASSERT_EQ(result, api::ResultCode::forbidden);
+    ASSERT_EQ(api::ResultCode::forbidden, result);
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
-    ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
+    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(api::AccountStatus::awaitingActivation, account1.statusCode);
 
     result = activateAccount(activationCode);
-    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(api::ResultCode::ok, result);
 
     result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
-    ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
 TEST_F(CdbFunctionalTest, account_general)
@@ -148,8 +148,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
 
     //trying to add account with same email once again
     result = addActivatedAccount(&account1, &account1Password);
-    //TODO #ak error code must be alreadyExists
-    ASSERT_EQ(result, api::ResultCode::forbidden);
+    ASSERT_EQ(result, api::ResultCode::alreadyExists);
 }
 
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)

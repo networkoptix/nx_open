@@ -73,6 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
+	{
+            "keys": [
+                "ArecontVision|??05", "ArecontVision|?155"
+            ],
+            "isRTSPSupported": false
+	},
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -110,7 +116,8 @@
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "AXIS|Q6000-E"
             ],
             "forceONVIF": true
         },
@@ -157,7 +164,8 @@
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "Cellinx|STH795"
             ],
             "onvifPtzPresetsEnabled": true
         },

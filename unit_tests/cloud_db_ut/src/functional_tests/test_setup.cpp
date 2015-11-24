@@ -112,6 +112,11 @@ void CdbFunctionalTest::restart()
     waitUntilStarted();
 }
 
+SocketAddress CdbFunctionalTest::endpoint() const
+{
+    return SocketAddress(HostAddress::localhost, m_port);
+}
+
 nx::cdb::api::ConnectionFactory* CdbFunctionalTest::connectionFactory()
 {
     return m_connectionFactory.get();

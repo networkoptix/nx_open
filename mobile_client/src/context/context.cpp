@@ -72,6 +72,10 @@ bool QnContext::getDeviceIsPhone() const {
     return isPhone();
 }
 
+void QnContext::setKeepScreenOn(bool keepScreenOn) {
+    ::setKeepScreenOn(keepScreenOn);
+}
+
 void QnContext::enterFullscreen() {
     hideSystemUi();
 }

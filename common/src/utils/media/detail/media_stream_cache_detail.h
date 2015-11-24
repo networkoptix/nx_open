@@ -15,6 +15,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <core/datapacket/abstract_data_packet.h>
+#include <utils/thread/mutex.h>
 
 class QnMediaStreamEventReceiver;
 
@@ -116,7 +117,7 @@ private:
     const qint64 m_cacheSizeUsec;
     const qint64 m_maxCacheSizeUsec;
     PacketContainerType m_packetsByTimestamp;
-    mutable QMutex m_mutex;
+    mutable QnMutex m_mutex;
     //!In micros
     qint64 m_prevPacketSrcTimestamp;
     size_t m_cacheSizeInBytes;
@@ -125,7 +126,7 @@ private:
     std::map<int, quint64> m_dataBlockings;
     mutable QElapsedTimer m_inactivityTimer;
 
-    void clearCacheIfNeeded(QMutexLocker* const lk);
+    void clearCacheIfNeeded(QnMutexLockerBase* const lk);
 };
 
 }

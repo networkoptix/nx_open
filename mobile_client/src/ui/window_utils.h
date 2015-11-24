@@ -1,5 +1,4 @@
-#ifndef WINDOW_UTILS_H
-#define WINDOW_UTILS_H
+#pragma once
 
 #include <QtCore/QtGlobal>
 
@@ -11,4 +10,4 @@ int statusBarHeight();
 int navigationBarHeight();
 bool isPhone();
 
-#endif // WINDOW_UTILS_H
+void setKeepScreenOn(bool keepScreenOn);

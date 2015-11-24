@@ -118,7 +118,7 @@ std::unique_ptr< AbstractStreamServerSocket > SocketFactory::createStreamServerS
 
 #ifdef ENABLE_SSL
     if( result && sslRequired )
-        result.reset( new SSLServerSocket( result.release(), false ) );
+        result.reset( new SSLServerSocket( result.release(), true ) );
 #endif // ENABLE_SSL
 
     return std::move( result );

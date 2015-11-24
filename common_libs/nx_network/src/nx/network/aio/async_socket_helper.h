@@ -12,6 +12,9 @@
 
 #include <QtCore/QThread>
 
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
+
 #include "../abstract_socket.h"
 #include "../socket_global.h"
 
@@ -233,7 +236,7 @@ public:
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_recvAsyncCallCounter;
-        nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etRead, this );
+        nx::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etRead, this );
     }
 
     void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
@@ -257,7 +260,7 @@ public:
 
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_connectSendAsyncCallCounter;
-        nx::SocketGlobals::aioService().watchSocketNonSafe( this->m_socket, aio::etWrite, this );
+        nx::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
     void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
@@ -270,6 +273,7 @@ public:
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_registerTimerCallCounter;
         nx::SocketGlobals::aioService().watchSocketNonSafe(
+            &lk,
             this->m_socket,
             aio::etTimedOut,
             this,
@@ -284,19 +288,19 @@ public:
          ++this->m_socket->impl()->terminated;
         if (waitForRunningHandlerCompletion)
         {
-            QMutex mtx;
-            QWaitCondition cond;
+            QnMutex mtx;
+            QnWaitCondition cond;
             bool done = false;
             nx::SocketGlobals::aioService().dispatch(
                 this->m_socket,
                 [this, &mtx, &cond, &done, eventType]() {
                     stopPollingSocket(this->m_socket, eventType);
-                    QMutexLocker lk(&mtx);
+                    QnMutexLocker lk(&mtx);
                     done = true;
                     cond.wakeAll();
                 });
 
-            QMutexLocker lk(&mtx);
+            QnMutexLocker lk(&mtx);
             while(!done)
                 cond.wait(lk.mutex());
         }
@@ -393,7 +397,7 @@ private:
                 return;     //most likely, socket has been removed in handler
             QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
-                nx::SocketGlobals::aioService().removeFromWatchNonSafe( sock, aio::etWrite );
+                nx::SocketGlobals::aioService().removeFromWatchNonSafe( &lk, sock, aio::etWrite );
         };
 
         auto __finally_connect = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
@@ -414,7 +418,7 @@ private:
                 return;     //most likely, socket has been removed in handler
             QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
             if( recvAsyncCallCounterBak == m_recvAsyncCallCounter )
-                nx::SocketGlobals::aioService().removeFromWatchNonSafe( sock, aio::etRead );
+                nx::SocketGlobals::aioService().removeFromWatchNonSafe( &lk, sock, aio::etRead );
         };
 
         auto __finally_read = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
@@ -438,7 +442,7 @@ private:
                 return;     //most likely, socket has been removed in handler
             QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
             if( connectSendAsyncCallCounterBak == m_connectSendAsyncCallCounter )
-                nx::SocketGlobals::aioService().removeFromWatchNonSafe( sock, aio::etWrite );
+                nx::SocketGlobals::aioService().removeFromWatchNonSafe( &lk, sock, aio::etWrite );
         };
 
         auto __finally_write = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
@@ -458,7 +462,7 @@ private:
                 return;     //most likely, socket has been removed in handler
             QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
             if( registerTimerCallCounterBak == m_registerTimerCallCounter )
-                nx::SocketGlobals::aioService().removeFromWatchNonSafe( sock, aio::etTimedOut );
+                nx::SocketGlobals::aioService().removeFromWatchNonSafe( &lk, sock, aio::etTimedOut );
         };
 
         auto __finally_timer = [this, &terminated]( AsyncSocketImplHelper* /*pThis*/ )
@@ -636,6 +640,7 @@ private:
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_connectSendAsyncCallCounter;
         nx::SocketGlobals::aioService().watchSocketNonSafe(
+            &lk,
             this->m_socket,
             aio::etWrite,
             this,
@@ -705,7 +710,7 @@ public:
             //if asyncAccept has been called from onNewConnection, no need to call removeFromWatch
             QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
             if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
-                nx::SocketGlobals::aioService().removeFromWatchNonSafe(sock, aio::etRead);
+                nx::SocketGlobals::aioService().removeFromWatchNonSafe(&lk, sock, aio::etRead);
             m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
         };
 
@@ -746,7 +751,7 @@ public:
         QnMutexLocker lk( nx::SocketGlobals::aioService().mutex() );
         ++m_acceptAsyncCallCount;
         //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
-        return nx::SocketGlobals::aioService().watchSocketNonSafe(m_sock, aio::etRead, this);
+        return nx::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
     void cancelAsyncIO(bool waitForRunningHandlerCompletion)

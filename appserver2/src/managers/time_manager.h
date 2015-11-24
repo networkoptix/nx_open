@@ -153,7 +153,7 @@ namespace ec2
         void processTimeSyncInfoHeader(
             const QnUuid& peerID,
             const nx_http::StringType& serializedTimeSync,
-            AbstractStreamSocket* sock );
+            boost::optional<qint64> requestRttMillis);
         void setContext(const ResourceContext& resCtx);
 
     signals:
@@ -199,6 +199,8 @@ namespace ec2
             nx_http::AuthInfoCache::AuthorizationCacheItem authData;
             TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
+            //!request round-trip time 
+            boost::optional<qint64> rttMillis;
 
             PeerContext(
                 SocketAddress _peerAddress,
@@ -290,7 +292,8 @@ namespace ec2
         void synchronizeWithPeer( const QnUuid& peerID );
         void timeSyncRequestDone(
             const QnUuid& peerID,
-            nx_http::AsyncHttpClientPtr clientPtr );
+            nx_http::AsyncHttpClientPtr clientPtr,
+            qint64 requestRttMillis);
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
         void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(

@@ -32,17 +32,18 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 
 template<typename OutputData>
 void processHttpResponse(
-    std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, OutputData)> handler,
+    std::function<void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> handler,
     SystemError::ErrorCode errCode,
-    int statusCode,
+    const nx_http::Response* response,
     nx_http::BufferType msgBody)
 {
     if (errCode != SystemError::noError ||
-        statusCode != nx_http::StatusCode::ok)
+        !response ||
+        (response->statusLine.statusCode / 100) != (nx_http::StatusCode::ok / 100))
     {
         handler(
             errCode,
-            static_cast<nx_http::StatusCode::Value>(statusCode),
+            response,
             OutputData());
         return;
     }
@@ -51,11 +52,11 @@ void processHttpResponse(
     OutputData outputData = QJson::deserialized<OutputData>(msgBody, OutputData(), &success);
     if (!success)
     {
-        handler(SystemError::noError, nx_http::StatusCode::badRequest, OutputData());
+        handler(SystemError::noError, response, OutputData());
         return;
     }
 
-    handler(SystemError::noError, nx_http::StatusCode::ok, std::move(outputData));
+    handler(SystemError::noError, response, std::move(outputData));
 }
 
 template<typename HandlerFunc>
@@ -115,10 +116,10 @@ template<typename InputData, typename OutputData>
 class FusionDataHttpClient
 :
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value, OutputData)>
+        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value, OutputData)> ParentType;
+        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
 
 public:
     /*!
@@ -139,7 +140,7 @@ private:
         detail::processHttpResponse(
             std::move(this->m_handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
-            client->response() ? client->response()->statusLine.statusCode : 0,
+            client->response(),
             client->fetchMessageBodyBuffer());
     }
 };
@@ -149,10 +150,10 @@ template<typename OutputData>
 class FusionDataHttpClient<void, OutputData>
 :
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value, OutputData)>
+        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value, OutputData)> ParentType;
+        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
 
 public:
     FusionDataHttpClient(QUrl url)
@@ -167,7 +168,7 @@ private:
         detail::processHttpResponse(
             std::move(this->m_handler),
             client->failed() ? client->lastSysErrorCode() : SystemError::noError,
-            client->response() ? client->response()->statusLine.statusCode : 0,
+            client->response(),
             client->fetchMessageBodyBuffer());
     }
 };
@@ -177,10 +178,10 @@ template<typename InputData>
 class FusionDataHttpClient<InputData, void>
 :
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value)>
+        void(SystemError::ErrorCode, const nx_http::Response*)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value)> ParentType;
+        void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
 
 public:
     FusionDataHttpClient(
@@ -196,15 +197,9 @@ private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         auto handler = std::move(this->m_handler);
-        if (client->response())
-            handler(
-                SystemError::noError,
-                static_cast<nx_http::StatusCode::Value>(
-                    client->response()->statusLine.statusCode));
-        else
-            handler(
-                client->lastSysErrorCode(),
-                nx_http::StatusCode::internalServerError);
+        handler(
+            client->lastSysErrorCode(),
+            client->response());
     }
 };
 
@@ -213,10 +208,10 @@ template<>
 class FusionDataHttpClient<void, void>
 :
     public detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value)>
+        void(SystemError::ErrorCode, const nx_http::Response*)>
 {
     typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, nx_http::StatusCode::Value)> ParentType;
+        void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
 
 public:
     FusionDataHttpClient(QUrl url)
@@ -229,15 +224,9 @@ private:
     virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
     {
         auto handler = std::move(this->m_handler);
-        if (client->response())
-            handler(
-                SystemError::noError,
-                static_cast<nx_http::StatusCode::Value>(
-                    client->response()->statusLine.statusCode));
-        else
-            handler(
-                client->lastSysErrorCode(),
-                nx_http::StatusCode::internalServerError);
+        handler(
+            client->lastSysErrorCode(),
+            client->response());
     }
 };
 

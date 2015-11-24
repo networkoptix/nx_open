@@ -24,8 +24,8 @@
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
 
-#include <nx/network/module_finder.h>
-#include <nx/network/router.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 #include <utils/server_interface_watcher.h>
 
 QnAxClientModule::QnAxClientModule(QObject *parent)

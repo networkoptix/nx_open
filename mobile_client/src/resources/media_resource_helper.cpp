@@ -21,19 +21,24 @@
 #include <nx/network/http/httptypes.h>
 #include "watchers/user_watcher.h"
 #include <mobile_client/mobile_client_settings.h>
+#include <ui/texture_size_helper.h>
 
 namespace {
 
 #if defined(Q_OS_IOS)
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Hls;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #elif defined(Q_OS_ANDROID)
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #else
-    QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
-    QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
+    const QnMediaResourceHelper::Protocol nativeStreamProtocol = QnMediaResourceHelper::Rtsp;
+    const QnMediaResourceHelper::Protocol transcodingProtocol = QnMediaResourceHelper::Mjpeg;
 #endif
+
+    enum {
+        mjpegQuality = 4 // picked as the best balance between traffic and picture quality
+    };
 
     QString protocolName(QnMediaResourceHelper::Protocol protocol) {
         switch (protocol) {
@@ -82,10 +87,9 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     m_transcodingSupported(true),
     m_transcodingProtocol(transcodingProtocol),
     m_nativeProtocol(nativeStreamProtocol),
-    m_maxTextureSize(std::numeric_limits<int>::max()),
+    m_maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
     m_maxNativeResolution(0)
 {
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
     updateStardardResolutions();
     connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
     connect(this, &QnMediaResourceHelper::rotationChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
@@ -221,8 +225,10 @@ void QnMediaResourceHelper::updateUrl() {
             query.addQueryItem(lit("auth"), getAuth(user, protocol));
     }
 
-    if (protocol == Mjpeg)
+    if (protocol == Mjpeg) {
         query.addQueryItem(lit("ct"), lit("false"));
+        query.addQueryItem(lit("quality"), QString::number(mjpegQuality));
+    }
 
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());

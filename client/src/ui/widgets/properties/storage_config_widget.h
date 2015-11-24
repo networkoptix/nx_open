@@ -106,6 +106,7 @@ private:
     void setupGrid(QTableView* tableView, bool isMainPool);
     void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;
     bool hasStoragesChanges(const QnStorageModelInfoList &storages) const;
+    void updateBackupWidgetsVisibility();
 
 private:
     int m_backupTypeLastIndex;

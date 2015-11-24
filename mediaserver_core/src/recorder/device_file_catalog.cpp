@@ -76,7 +76,11 @@ bool DeviceFileCatalog::Chunk::containsTime(qint64 timeMs) const
 
 void DeviceFileCatalog::TruncableChunk::truncate(qint64 timeMs)
 {
-    originalDuration = durationMs;
+    if (!isTruncated)
+    {
+        originalDuration = durationMs;
+        isTruncated = true;
+    }
     durationMs = qMax(0ll, timeMs - startTimeMs);
 }
 
@@ -823,11 +827,19 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
     if (itr > m_chunks.begin())
     {
         --itr;
-         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs && itr < m_chunks.end()-1)
+         if (method == OnRecordHole_NextChunk && itr->startTimeMs + itr->durationMs <= startTimeMs)
          {
-            ++itr;
+             if (itr < m_chunks.end()-1)
+                 ++itr;
+             else
+                 return -1;
          }
     }
+    else if (method == OnRecordHole_PrevChunk)
+    {
+        return -1;
+    }
+    
     return itr - m_chunks.begin();
 }
 

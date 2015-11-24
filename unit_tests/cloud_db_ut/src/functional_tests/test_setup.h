@@ -36,6 +36,8 @@ public:
     //!restarts process
     void restart();
 
+    SocketAddress endpoint() const;
+
 protected:
     nx::cdb::api::ConnectionFactory* connectionFactory();
     api::ModuleInfo moduleInfo() const;

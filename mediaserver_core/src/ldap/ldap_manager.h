@@ -4,10 +4,10 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 #include <QtCore/QMap>
-#include <QtCore/QMutex>
 
 #include <utils/common/singleton.h>
 #include <utils/common/ldap.h>
+#include <utils/thread/mutex.h>
 #include "common/common_globals.h"
 
 
@@ -29,7 +29,7 @@ public:
 
 private:
     mutable QMap<QString, QString> m_realmCache;
-    mutable QMutex m_realmCacheMutex;
+    mutable QnMutex m_realmCacheMutex;
 };
 
 #endif // LDAP_MANAGER_H_

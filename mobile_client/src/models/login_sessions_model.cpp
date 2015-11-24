@@ -3,7 +3,7 @@
 #include <algorithm>
 
 #include <mobile_client/mobile_client_settings.h>
-#include <nx/network/module_finder.h>
+#include <network/module_finder.h>
 #include <context/session_settings.h>
 
 namespace {

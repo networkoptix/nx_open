@@ -25,7 +25,6 @@ else
     SOURCE_APK=apk/bin/QtApp-debug.apk
     APK_SUFFIX="debug"
 fi
-
 TARGET_APK=revamped-${installer.name}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
 
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
