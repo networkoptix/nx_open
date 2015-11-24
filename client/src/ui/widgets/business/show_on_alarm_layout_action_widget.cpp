@@ -52,6 +52,11 @@ void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewMod
         ui->useSourceCheckBox->setChecked(model->actionParams().useSource);
         updateUsersButtonText();
     }
+
+    if (fields.testFlag(QnBusiness::EventTypeField)) {
+        bool canUseSource = (model->eventType() >= QnBusiness::UserDefinedEvent || requiresCameraResource(model->eventType()));
+        ui->useSourceCheckBox->setEnabled(canUseSource);
+    }
 }
 
 void QnShowOnAlarmLayoutActionWidget::selectUsers() {

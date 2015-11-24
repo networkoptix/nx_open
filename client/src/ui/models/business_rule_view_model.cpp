@@ -713,6 +713,14 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         case QnBusiness::PlaySoundOnceAction:
         case QnBusiness::SayTextAction:
             return qnSkin->icon("events/sound.png");
+
+        case QnBusiness::ShowOnAlarmLayoutAction:
+        {
+            bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
+            if (canUseSource)
+                return qnResIconCache->icon(QnResourceIconCache::Camera);
+            break;
+        }
         default:
             break;
         }
@@ -803,23 +811,13 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
                     m_actionResources.size() == 1 &&
                    !m_actionParams.presetId.isEmpty();
-        case QnBusiness::ShowTextOverlayAction:
-            break;  // Just check cameras here
         case QnBusiness::ShowOnAlarmLayoutAction:
-            {
-                /* Check if some cameras are selected directly */
-                if (!QnBusiness::filteredResources<QnVirtualCameraResource>(m_actionResources).isEmpty())
-                    return true;
-
-                if (m_actionParams.useSource) {
-                    /* Always valid for generic events. */
-                    if (m_eventType >= QnBusiness::UserDefinedEvent)
-                        return true;
-                    return requiresCameraResource(m_eventType);
-                }
-
-                return false;
-            }
+        {
+            bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
+            if (canUseSource)
+                return true;
+            break;
+        }
         default:
             break;
         }
@@ -940,9 +938,21 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     }
     case QnBusiness::ExecutePtzPresetAction:
         return QnExecPtzPresetPolicy::getText(resources, detailed);
-    case QnBusiness::ShowTextOverlayAction:
+
     case QnBusiness::ShowOnAlarmLayoutAction:
-        break;  //TODO: #GDM #actions
+    {
+        bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
+
+        if (canUseSource) {
+            QnVirtualCameraResourceList targetCameras = QnBusiness::filteredResources<QnVirtualCameraResource>(m_actionResources);
+
+            if (targetCameras.isEmpty())
+                return tr("Source camera");
+
+            return tr("Source and %n more cameras", nullptr, targetCameras.size());
+        }
+        break;
+    }
     default:
         break;
     }
