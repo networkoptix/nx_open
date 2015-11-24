@@ -95,7 +95,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , m_backupSchedule()
     , m_backupCancelled(false)
     , m_updating(false)
-    , m_backupTypeLastIndex(0)
 {
     ui->setupUi(this);
  
@@ -248,16 +247,6 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
     ui->pushButtonSchedule->setEnabled(currentBackupType == Qn::Backup_Schedule);
     ui->backupTimeLabel->setVisible(currentBackupType != Qn::Backup_RealTime);
 
-    if (index != m_backupTypeLastIndex)
-    {
-        if (currentBackupType == Qn::Backup_RealTime)
-        {
-            QMessageBox::warning(this, tr("Warning")
-                , tr("Previous footage will not be backed up!"), QMessageBox::Ok);
-        }
-
-        m_backupTypeLastIndex = index;
-    }
 
     emit hasChangesChanged();
 }
@@ -269,8 +258,9 @@ void QnStorageConfigWidget::loadDataToUi() {
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
     loadStoragesFromResources();
     m_backupSchedule = m_server->getBackupSchedule();
-    m_backupTypeLastIndex = ui->comboBoxBackupType->findData(m_backupSchedule.backupType);
-    ui->comboBoxBackupType->setCurrentIndex(m_backupTypeLastIndex);    
+
+    const auto backupTypeIndex = ui->comboBoxBackupType->findData(m_backupSchedule.backupType);
+    ui->comboBoxBackupType->setCurrentIndex(backupTypeIndex);    
 
     updateRebuildInfo();
     updateBackupInfo();
@@ -527,7 +517,13 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return error(tr("Backup is already in progress."));
 
     if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-        return error(tr("In Realtime mode all data is backed up on continuously"));
+    {
+        static const auto kMessageWithWarningTemplate = lit("<html>%1<br><font color = red>%2</font></html>");
+        const auto message = kMessageWithWarningTemplate.arg(
+            tr("In Realtime mode all data is backed up on continuously")
+            , tr("Previous footage will not be backed up!"));
+        return error(message);
+    }
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
         return storage.isWritable && storage.isUsed && storage.isBackup;
