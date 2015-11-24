@@ -12,7 +12,7 @@
 #include "dxva/dxva.h"
 #endif
 #include "utils/media/ffmpeg_helper.h"
-
+#include "utils/media/frame_type_extractor.h"
 
 struct AVCodec;
 struct AVCodecContext;

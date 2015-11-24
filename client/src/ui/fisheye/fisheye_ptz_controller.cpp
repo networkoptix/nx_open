@@ -42,7 +42,7 @@ QnFisheyePtzController::QnFisheyePtzController(QnMediaResourceWidget *widget):
     updateLimits();
 }
 
-QnFisheyePtzController::QnFisheyePtzController(QnMediaResourcePtr mediaRes):
+QnFisheyePtzController::QnFisheyePtzController(const QnMediaResourcePtr& mediaRes):
     base_type(mediaRes->toResourcePtr()),
     m_animationMode(NoAnimation),
     m_mediaDewarpingParams(mediaRes->getDewarpingParams())

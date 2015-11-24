@@ -3,24 +3,14 @@
 
 #ifdef ENABLE_ARCHIVE
 
-extern "C"
-{
-    #include <libavformat/avformat.h>
-}
-
-#include <utils/thread/wait_condition.h>
-
-#include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"
-
-#include <recording/playbackmask_helper.h>
-
-#include "utils/media/ffmpeg_helper.h"
-
 #include "abstract_archive_stream_reader.h"
 
-
-struct AVFormatContext;
+// private
+class FrameTypeExtractor;
+#include <utils/thread/wait_condition.h>
+#include "core/datapacket/audio_data_packet.h"
+#include <recording/playbackmask_helper.h>
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
 {
@@ -90,7 +80,7 @@ public:
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;
     
-    /* Return true if archvie range is accessible immedeatly without opening an archive */
+    /* Return true if archive range is accessible immediately without opening an archive */
     bool offlineRangeSupported() const;
 
     virtual void afterRun() override;
@@ -103,8 +93,6 @@ public:
     virtual bool isRealTimeSource() const override;
 protected:
     virtual bool init();
-
-    virtual AVIOContext* getIOContext();
 
     virtual qint64 contentLength() const { return m_delegate->endTime() - m_delegate->startTime(); }
     bool initCodecs();

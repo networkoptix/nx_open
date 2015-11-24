@@ -15,13 +15,14 @@
 #include "core/ptz/preset_ptz_controller.h"
 #include "core/ptz/activity_ptz_controller.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
+#include "ui/workaround/widgets_signals_workaround.h"
 
 QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::ExecPtzPresetBusinessActionWidget)
 {
     ui->setupUi(this);
-    connect(ui->presetComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
+    connect(ui->presetComboBox,  QnComboboxCurrentIndexChanged, this, &QnExecPtzPresetBusinessActionWidget::paramsChanged);
     //setHelpTopic(this, Qn::EventsActions_CameraOutput_Help);
 }
 
