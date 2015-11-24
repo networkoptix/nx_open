@@ -21,6 +21,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
     Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
+    Q_PROPERTY(qint64 finalTimestamp READ finalTimestamp NOTIFY finalTimestampChanged)
 
     Q_ENUMS(Protocol)
     Q_ENUMS(Qn::ResourceStatus)
@@ -63,6 +64,8 @@ public:
 
     int rotation() const;
 
+    qint64 finalTimestamp() const;
+
     Q_INVOKABLE void updateUrl();
 
 signals:
@@ -77,6 +80,7 @@ signals:
     void aspectRatioChanged();
     void rotatedAspectRatioChanged();
     void rotationChanged();
+    void finalTimestampChanged();
 
 private:
     void updateMediaStreams();
@@ -90,11 +94,14 @@ private:
     QString currentResolutionString() const;
     int optimalResolution() const;
     int maximumResolution() const;
+    void updateFinalTimestamp();
+    void setFinalTimestamp(qint64 finalTimestamp);
 
 private:
     QnVirtualCameraResourcePtr m_camera;
     QUrl m_url;
     qint64 m_position;
+    qint64 m_finalTimestamp;
     int m_resolution;
     QList<int> m_standardResolutions;
     QSize m_screenSize;
