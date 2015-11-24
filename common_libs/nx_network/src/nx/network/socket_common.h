@@ -33,6 +33,7 @@ class NX_NETWORK_API HostAddress
 public:
     //!Creates 0.0.0.0 address
     HostAddress();
+    ~HostAddress();
 
     HostAddress( const HostAddress& rhs );
     HostAddress( HostAddress&& rhs );
@@ -96,6 +97,7 @@ public:
     quint16 port;
 
     SocketAddress();
+    ~SocketAddress();
     SocketAddress( HostAddress _address, quint16 _port );
     SocketAddress( const QString& str );
     SocketAddress( const char* str );

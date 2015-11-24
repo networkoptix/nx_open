@@ -30,7 +30,7 @@ enum class FusionRequestErrorClass
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorClass)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorClass), (lexical))
 
-class FusionRequestResult
+class NX_NETWORK_API FusionRequestResult
 {
 public:
     enum ErrorDetail

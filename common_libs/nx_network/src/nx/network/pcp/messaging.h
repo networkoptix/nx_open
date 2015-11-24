@@ -59,7 +59,7 @@ struct NX_NETWORK_API RequestHeader
 NX_NETWORK_API QDataStream& operator<<(QDataStream& stream, const RequestHeader& data);
 NX_NETWORK_API QDataStream& operator>>(QDataStream& stream, RequestHeader& data);
 
-struct NX_NETWORK_API NX_NETWORK_API ResponseHeadeer
+struct NX_NETWORK_API ResponseHeadeer
 {
     quint8      version;
     Opcode      opcode;

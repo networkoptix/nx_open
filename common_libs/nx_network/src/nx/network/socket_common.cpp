@@ -19,6 +19,10 @@ HostAddress::HostAddress()
     memset( &m_sinAddr, 0, sizeof(m_sinAddr) );
 }
 
+HostAddress::~HostAddress()
+{
+}
+
 HostAddress::HostAddress( const HostAddress& rhs )
 :
     m_addrStr( rhs.m_addrStr ),
@@ -212,6 +216,10 @@ void HostAddress::initializeFromString(const char* addrStr)
 SocketAddress::SocketAddress()
 :
     port(0)
+{
+}
+
+SocketAddress::~SocketAddress()
 {
 }
 

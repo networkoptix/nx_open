@@ -79,10 +79,10 @@ win* {
 }
 
 isEmpty(BUILDLIB) {
-  DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+  DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
 } else {
     contains(BUILDLIB,staticlib) {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/
     }
     else {
       contains (LIBTYPE,plugin) {
@@ -90,16 +90,16 @@ isEmpty(BUILDLIB) {
       }
       else {
         win* {
-          DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+          DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
         }
         else {
-          DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+          DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/
         }
       }
     }
 }
 
-OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
+OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
