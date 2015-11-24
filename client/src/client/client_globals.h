@@ -212,19 +212,6 @@ namespace Qn {
     };
 
     /**
-     * Importance level of a notification. 
-     */
-    enum NotificationLevel {
-        NoNotification,
-        OtherNotification,
-        CommonNotification,
-        ImportantNotification,
-        CriticalNotification,
-        SystemNotification,
-        LevelCount
-    };
-
-    /**
      * Modes of layout export.
      */
     enum LayoutExportMode {

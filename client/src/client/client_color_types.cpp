@@ -6,6 +6,7 @@
 #include <utils/serialization/json_functions.h>
 #include <utils/fusion/fusion_adaptor.h>
 #include <utils/math/math.h>
+#include <utils/common/model_functions.h>
 
 QnTimeSliderColors::QnTimeSliderColors() {
     tickmark = QColor(255, 255, 255, 255);
@@ -138,6 +139,12 @@ QnBookmarkColors::QnBookmarkColors()
 {
 }
 
+QnCompositeTextOverlayColors::QnCompositeTextOverlayColors()
+    : bookmarkColors()
+    , textOverlayItemColor(0, 0, 0, 128)
+{
+}
+
 QnLicensesListModelColors::QnLicensesListModelColors() {
     normal = QColor(255, 255, 255, 255);
     warning = QColor(Qt::yellow);
@@ -216,7 +223,7 @@ QnBackupCamerasColors::QnBackupCamerasColors() {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
-    (json),
+    (json)(eq),
     _Fields,
     (optional, true)
-)
+);
