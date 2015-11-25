@@ -29,7 +29,7 @@ QString containerString(const Container& container,
     for (const auto& item : container)
         strings << toString(item);
 
-    return lit("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
+    return QString::fromLatin1("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
 }
 
 //!Adds some useful overloads to \a QString
@@ -78,7 +78,7 @@ public:
     template<typename T>
     QnLogMessage container(const T& a)
     {
-        return arg(containerString(a, lit(", "), lit(""), lit("") ));
+        return arg(containerString(a, QLatin1String(", "), QLatin1String(""), QLatin1String("") ));
     }
 
     operator QString() const;
