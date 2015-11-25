@@ -22,7 +22,7 @@ namespace {
         else
             disabledVendorList = disabledVendors.split(lit(" "));
 
-        QStringList updatedVendorList;        
+        QStringList updatedVendorList;
         for (int i = 0; i < disabledVendorList.size(); ++i) {
             if (!disabledVendorList[i].trimmed().isEmpty()) {
                 updatedVendorList << disabledVendorList[i].trimmed();
@@ -57,11 +57,11 @@ namespace {
     const QString ldapSearchFilter(lit("ldapSearchFilter"));
 }
 
-QnGlobalSettings::QnGlobalSettings(QObject *parent): 
+QnGlobalSettings::QnGlobalSettings(QObject *parent):
     base_type(parent)
 {
     assert(qnResPool);
-    
+
     m_allAdaptors
         << initEmailAdaptors()
         << initLdapAdaptors()
@@ -153,6 +153,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
     connect(m_serverAutoDiscoveryEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::serverAutoDiscoveryChanged,          Qt::QueuedConnection);
     connect(m_statisticsAllowedAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::statisticsAllowedChanged,            Qt::QueuedConnection);
+    connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
 
     QnGlobalSettings::AdaptorList result;
     result
@@ -268,7 +269,7 @@ QnEmailSettings QnGlobalSettings::emailSettings() const {
 
     /*
      * VMS-1055 - default email changed to link.
-     * We are checking if the value is not overridden and replacing it by the updated one. 
+     * We are checking if the value is not overridden and replacing it by the updated one.
      */
     if (result.supportEmail == QnAppInfo::supportEmailAddress() && !QnAppInfo::supportLink().isEmpty()) {
         result.supportEmail = QnAppInfo::supportLink();
@@ -287,7 +288,7 @@ void QnGlobalSettings::setEmailSettings(const QnEmailSettings &settings) {
     m_signatureAdaptor->setValue(settings.signature);
     m_supportLinkAdaptor->setValue(settings.supportEmail);
     m_simpleAdaptor->setValue(settings.simple);
-    m_timeoutAdaptor->setValue(settings.timeout);   
+    m_timeoutAdaptor->setValue(settings.timeout);
 }
 
 void QnGlobalSettings::synchronizeNow() {

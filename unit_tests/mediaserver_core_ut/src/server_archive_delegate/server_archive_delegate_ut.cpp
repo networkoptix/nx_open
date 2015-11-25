@@ -15,6 +15,11 @@
 #include <core/resource/network_resource.h>
 #include <utils/common/util.h>
 
+#ifndef _WIN32
+#   include <platform/monitoring/global_monitor.h>
+#   include <platform/platform_abstraction.h>
+#endif
+
 #include <functional>
 #include <thread>
 #include <chrono>
@@ -117,18 +122,12 @@ public:
     public:
         TimeLine(int timeGapMs) 
             : m_timePoint(std::numeric_limits<int64_t>::max()),
-              m_timeGapMs(timeGapMs),
-              m_reverse(false)
+              m_timeGapMs(timeGapMs)
         {}
 
         void addTimePeriod(int64_t startTime, int duration)
         {
             addTimePeriod(TimePeriod(startTime, duration));
-        }
-
-        void setReverseMode(bool value)
-        {
-            m_reverse = value;
         }
 
         void setTimeGapMs(int timeGap)
@@ -179,7 +178,7 @@ public:
             if (m_currentIt == m_timeLine.cend())
                 return true;
 
-            if (time < m_timePoint && !m_reverse || time > m_timePoint && m_reverse)
+            if (time < m_timePoint)
                 return false;
 
             //qDebug() << "current time period: (" 
@@ -224,7 +223,6 @@ public:
         int64_t                 m_timePoint;
         int64_t                 m_permTimePoint;
         int                     m_timeGapMs;
-        bool                    m_reverse;
     };
 
 public:
@@ -511,6 +509,15 @@ TEST(ServerArchiveDelegate_playback_test, Main)
         dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
     }
 
+#ifndef _WIN32
+    std::unique_ptr<QnPlatformAbstraction> platformAbstraction;
+    if (!qnPlatform) {
+        platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(
+            new QnPlatformAbstraction
+        );
+    }
+#endif
+
     TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
     testHelper.print();
 
@@ -524,7 +531,6 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     archiveDelegate.setQuality(MEDIA_Quality_High, true);
     archiveDelegate.seek(0, true);
 
-    qDebug() << "\n\n\n\n *** HIGH QUALITY *** \n\n\n\n";
     testHelper.getTimeLine().reset();
 
     QnAbstractMediaDataPtr data;
@@ -536,7 +542,6 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             break;
     } 
 
-    qDebug() << "\n\n\n\n *** LOW QUALITY *** \n\n\n\n";
     archiveDelegate.setQuality(MEDIA_Quality_Low, true);
     archiveDelegate.seek(0, true);
     testHelper.getTimeLine().reset();

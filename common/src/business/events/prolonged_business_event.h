@@ -9,7 +9,7 @@ class QnProlongedBusinessEvent: public QnAbstractBusinessEvent
 protected:
     explicit QnProlongedBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStamp);
 public:
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const override;
+    virtual bool isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const override;
 };
 
 #endif // PROLONGED_BUSINESS_EVENT_H

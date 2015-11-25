@@ -13,6 +13,7 @@
 #include <health/system_health.h>
 
 #include <ui/actions/action_parameters.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -82,7 +83,7 @@ public:
     }
     void setBlinker(QnBlinkingImageButtonWidget *blinker);
 
-    Qn::NotificationLevel notificationLevel() const;
+    QnNotificationLevel::Value notificationLevel() const;
 
 signals:
     void visibleSizeChanged();
@@ -97,7 +98,6 @@ private:
     void hideAll();
     void updateBlinker();
 
-    void at_debugButton_clicked();
     void at_list_itemRemoved(QnNotificationWidget *item);
     void at_item_actionTriggered(Qn::ActionId actionId, const QnActionParameters &parameters);
     void at_notificationCache_fileDownloaded(const QString& filename);
@@ -112,11 +112,14 @@ private:
     void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
     void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
 
-    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource, bool useResource = true);
-    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource, bool useResource = true);
+    QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource);
+    QnNotificationWidget* findItem(const QnUuid& businessRuleId, std::function<bool(QnNotificationWidget* item)> filter);
 
+    QIcon iconForAction(const QnAbstractBusinessActionPtr& businessAction) const;
+
+    void cleanUpItem(QnNotificationWidget* item);
 private:
-    QnNotificationWidget* findItem(int businessRuleId, const QnResourcePtr &resource);
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
 

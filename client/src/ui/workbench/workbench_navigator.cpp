@@ -443,15 +443,9 @@ void QnWorkbenchNavigator::initialize() {
             if (!camera)
                 return;
 
-            int sameCamerasCount = 0;
-            for (auto layoutItem: layout->items())
-            {
-                if (extractCamera(layoutItem) == camera)
-                    ++sameCamerasCount;
-            }
-
+            const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
             const auto query = m_bookmarkQueries.getQuery(camera);
-            if ((query == m_currentQuery) && !sameCamerasCount)
+            if ((query == m_currentQuery) && !hasSameCameras)
                 resetCurrentBookmarkQuery();
 
             m_bookmarkQueries.removeQuery(camera);
@@ -1158,8 +1152,7 @@ void QnWorkbenchNavigator::updateCurrentWidgetFlags() {
         if(m_currentWidget->resource()->flags() & Qn::sync)
             flags |= WidgetSupportsSync;
 
-        QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
-        if(searchState.step > 0) /* Is a thumbnails search layout. */
+        if(workbench()->currentLayout()->isSearchLayout()) /* Is a thumbnails search layout. */
             flags &= ~(WidgetSupportsLive | WidgetSupportsSync);
 
         QnTimePeriod period = workbench()->currentLayout()->resource() ? workbench()->currentLayout()->resource()->getLocalRange() : QnTimePeriod();
@@ -1414,7 +1407,7 @@ void QnWorkbenchNavigator::updateLines() {
         m_timeSlider->setLastMinuteIndicatorVisible(CurrentLine, false);
         m_timeSlider->setLastMinuteIndicatorVisible(SyncedLine, false);
     } else {
-        bool isSearch = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+        bool isSearch = workbench()->currentLayout()->isSearchLayout();
         bool isLocal = m_currentWidget && m_currentWidget->resource()->flags().testFlag(Qn::local);
 
         bool hasNonLocalResource = !isLocal;

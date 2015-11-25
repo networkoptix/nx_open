@@ -994,6 +994,11 @@ QnActionManager::QnActionManager(QObject *parent):
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
                       this));
 
+    factory(Qn::OpenInAlarmLayoutAction).
+        mode(QnActionTypes::DesktopMode).
+        flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        text(tr("Open in the Alarm Layout"));   
+
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
