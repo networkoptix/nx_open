@@ -47,7 +47,7 @@ private:
 
 void onAcceptedConnection(
     AbstractStreamServerSocket* serverSocket,
-    SystemError::ErrorCode errCode,
+    SystemError::ErrorCode /*errCode*/,
     AbstractStreamSocket* sock)
 {
     delete sock;
@@ -78,7 +78,7 @@ TEST(SocketUdt, cancelConnect)
     for (int i = 0; i < 100; ++i)
     {
         UdtStreamSocket sock(false);
-        std::atomic<bool> handlerCalled = false;
+        std::atomic<bool> handlerCalled(false);
         ASSERT_TRUE(sock.setNonBlockingMode(true));
         sock.connectAsync(
             serverSocket.getLocalAddress(),
