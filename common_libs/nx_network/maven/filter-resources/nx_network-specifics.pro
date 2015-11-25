@@ -5,7 +5,7 @@ INCLUDEPATH += ${root.dir}/common/src/
 INCLUDEPATH += ${root.dir}/common_libs/udt/src
 
 win* {
-    DEFINES += NX_NETWORK_API=Q_DECL_EXPORT
+    DEFINES += NX_NETWORK_API=__declspec(dllexport)
 }
 
 !win32 {

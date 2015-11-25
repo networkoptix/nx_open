@@ -124,9 +124,9 @@ INCLUDEPATH +=  ${qt.dir}/include \
 
 win* {
     DEFINES += \
-        NX_NETWORK_API=Q_DECL_IMPORT \
-        NX_TOOL_API=Q_DECL_IMPORT \
-        UDT_API=Q_DECL_IMPORT \
+        NX_NETWORK_API=__declspec(dllimport) \
+        NX_TOOL_API=__declspec(dllimport) \
+        UDT_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \

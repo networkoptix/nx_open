@@ -2,7 +2,7 @@ TEMPLATE = lib
 CONFIG += console
 
 win* {
-    DEFINES += UDT_API=Q_DECL_EXPORT
+    DEFINES += UDT_API=__declspec(dllexport)
 }
 
 !win32 {
