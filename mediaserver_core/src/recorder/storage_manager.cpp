@@ -52,6 +52,9 @@ namespace {
     static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
     static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
     static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+   
+    const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
+    const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
     const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 }
@@ -59,21 +62,32 @@ namespace {
 class ArchiveScanPosition
 {
 public:
-    ArchiveScanPosition(): m_catalog(QnServer::LowQualityCatalog) {}
-    ArchiveScanPosition(const QnStorageResourcePtr& storage, QnServer::ChunksCatalog catalog, const QString& cameraUniqueId):
-        m_storagePath(storage->getUrl()),
-        m_catalog(catalog), 
-        m_cameraUniqueId(cameraUniqueId) 
+    ArchiveScanPosition(QnServer::StoragePool role) 
+        : m_catalog(QnServer::LowQualityCatalog),
+          m_role(role)
+    {}
+
+    ArchiveScanPosition(QnServer::StoragePool       role,
+                        const QnStorageResourcePtr  &storage, 
+                        QnServer::ChunksCatalog     catalog, 
+                        const QString               &cameraUniqueId) 
+        : m_role(role), 
+          m_storagePath(storage->getUrl()),
+          m_catalog(catalog), 
+          m_cameraUniqueId(cameraUniqueId) 
     {}
 
     void save() {
         QString serializedData(lit("%1;;%2;;%3"));
-        serializedData = serializedData.arg(m_storagePath).arg(QnLexical::serialized(m_catalog)).arg(m_cameraUniqueId);
-        MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, serializedData);
+        serializedData = serializedData.arg(m_storagePath)
+                                       .arg(QnLexical::serialized(m_catalog))
+                                       .arg(m_cameraUniqueId);
+        MSSettings::roSettings()->setValue(settingName(m_role), serializedData);
         MSSettings::roSettings()->sync();
     }
+
     void load() {
-        QString serializedData = MSSettings::roSettings()->value(SCAN_ARCHIVE_FROM).toString();
+        QString serializedData = MSSettings::roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
             m_storagePath = data[0];
@@ -81,10 +95,19 @@ public:
             m_cameraUniqueId = data[2];
         }
     }
-    static void reset() {
-        MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, QString());
+
+    static QString settingName(QnServer::StoragePool role)
+    {
+        return role == QnServer::StoragePool::Normal ? 
+                       SCAN_ARCHIVE_NORMAL_PREFIX + SCAN_ARCHIVE_FROM : 
+                       SCAN_ARCHIVE_BACKUP_PREFIX + SCAN_ARCHIVE_FROM;
+    }
+
+    static void reset(QnServer::StoragePool role) {
+        MSSettings::roSettings()->setValue(settingName(role), QString());
         MSSettings::roSettings()->sync();
     }
+
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
     bool operator<(const ArchiveScanPosition& other) {
         if (m_storagePath != other.m_storagePath)
@@ -94,9 +117,10 @@ public:
         return m_cameraUniqueId < other.m_cameraUniqueId;
     }
 private:
-    QString m_storagePath;
-    QnServer::ChunksCatalog m_catalog;
-    QString m_cameraUniqueId;
+    const QnServer::StoragePool m_role;
+    QString                     m_storagePath;
+    QnServer::ChunksCatalog     m_catalog;
+    QString                     m_cameraUniqueId;
 };
 
 
@@ -440,7 +464,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     }
     if (isRebuildFinished) {
         if (!QnResource::isStopping())
-            ArchiveScanPosition::reset(); // do not reset position if server is going to restart
+            ArchiveScanPosition::reset(m_role); // do not reset position if server is going to restart
         bool isCancel = data.state == Qn::RebuildState_Canceled;
         emit rebuildFinished(isCancel);
     }
@@ -448,7 +472,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
 {
-    ArchiveScanPosition scanPos;
+    ArchiveScanPosition scanPos(m_role);
     scanPos.load(); // load from persistent storage
 
     QnAbstractStorageResource::FileInfoList list = 
@@ -493,7 +517,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             return; // cancel rebuild
 
         QString cameraUniqueId = fi.fileName();
-        ArchiveScanPosition currentPos(storage, catalog, cameraUniqueId);
+        ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);
         if (currentPos < scanPos) {
             // already scanned
         }
@@ -1441,7 +1465,7 @@ void QnStorageManager::testStoragesDone()
 {
     m_firstStorageTestDone = true;
     
-    ArchiveScanPosition rebuildPos;
+    ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
         rebuildCatalogAsync(); // continue to rebuild
