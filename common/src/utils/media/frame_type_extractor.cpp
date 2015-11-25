@@ -1,5 +1,7 @@
 #include "frame_type_extractor.h"
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 #include "vc1Parser.h"
 #include <utils\media\nalUnits.h>
 
@@ -239,4 +241,4 @@ FrameTypeExtractor::FrameType FrameTypeExtractor::getFrameType(const quint8* dat
     
 }
 
-
+#endif // ENABLE_DATA_PROVIDERS
