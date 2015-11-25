@@ -1052,7 +1052,16 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
          else if (NULL != (u = self->m_pRendezvousQueue->retrieve(addr, id)))
          {
             if (!u->m_bSynRecving)
-               u->connect(unit->m_Packet);
+            {
+                try
+                {
+                    u->connect(unit->m_Packet);
+                }
+                catch(CUDTException /*e*/)
+                {
+                    //socket has been removed before connect finished? ignoring error...
+                }
+            }
             else
                self->storePkt(id, unit->m_Packet.clone());
          }
