@@ -12,7 +12,7 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool loading: d.mediaPlayer && d.mediaPlayer.loading
+    readonly property bool loading: !d.paused && d.mediaPlayer && d.mediaPlayer.loading
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
@@ -287,8 +287,8 @@ QnObject {
     }
 
     function pause() {
-        d.mediaPlayer.pause()
         d.paused = true
+        d.mediaPlayer.pause()
     }
 
     function stop() {
