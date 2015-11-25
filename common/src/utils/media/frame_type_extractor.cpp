@@ -1,7 +1,7 @@
 #include "frame_type_extractor.h"
 
 #include "vc1Parser.h"
-#include <utils\media\nalUnits.h>
+#include <utils/media/nalUnits.h>
 
 void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 {
