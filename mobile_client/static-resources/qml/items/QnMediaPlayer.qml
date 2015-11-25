@@ -12,7 +12,7 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool loading: d.mediaPlayer && d.mediaPlayer.loading
+    readonly property bool loading: !d.paused && d.mediaPlayer && d.mediaPlayer.loading
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
@@ -56,9 +56,10 @@ QnObject {
         repeat: false
         running: false
         onTriggered: {
-            if (d.startPosition == d.mediaPlayer.position)
+            if (!d.paused && d.startPosition == d.mediaPlayer.position) {
                 d.failed = true
-            d.mediaPlayer.stop()
+                d.mediaPlayer.stop()
+            }
         }
         onRunningChanged: {
             if (running) {
@@ -82,7 +83,29 @@ QnObject {
             autoPlay: !d.paused
 
             onPositionChanged: {
-                updatePosition()
+                if (d.position < 0)
+                    return
+
+                if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
+                    /* A workaround for Android issue 11590
+                       Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
+                       To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
+                     */
+                    d.position += 300
+                } else {
+                    d.position += d.mediaPlayer.position - d.prevPlayerPosition
+                }
+                d.prevPlayerPosition = d.mediaPlayer.position
+
+                if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
+                    seek(d.chunkEnd + 1)
+                    return
+                }
+
+                if (d.updateTimeline) {
+                    timelineCorrectionRequest(d.position)
+                    d.updateTimeline = false
+                }
             }
 
             onPlaybackStateChanged: {
@@ -103,6 +126,13 @@ QnObject {
                        status == MediaPlayer.Loaded ||
                        status == MediaPlayer.Buffered
             }
+
+            function getFinalTimestamp(startPos) {
+                if (startPos <= 0)
+                    return -1
+
+                return chunkProvider.closestChunkEndMs(startPos, true)
+            }
         }
     }
 
@@ -112,12 +142,47 @@ QnObject {
         QnMjpegPlayer {
             source: resourceHelper.mediaUrl
 
-            onPositionChanged: updatePosition()
+            readonly property bool hasTimestamp: true
+            readonly property bool loading: playbackState == MediaPlayer.PlayingState && position == 0
+
+            finalTimestamp: {
+                var chunksEnd = resourceHelper.finalTimestamp
+                if (chunksEnd != -1)
+                    chunksEnd = chunkProvider.closestChunkEndMs(chunksEnd - 1, false)
+                return chunksEnd
+            }
+
             reconnectOnPlay: atLive
 
-            readonly property bool hasTimestamp: true
+            onTimestampChanged: {
+                if (d.position < 0)
+                    return
 
-            readonly property bool loading: playbackState == MediaPlayer.PlayingState && position == 0
+                if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
+                    seek(d.chunkEnd + 1)
+                    return
+                }
+
+                if (mediaPlayer.timestamp >= 0) {
+                    d.position = mediaPlayer.timestamp
+                    timelineCorrectionRequest(d.position)
+                }
+            }
+
+            onPlaybackFinished: {
+                if (d.position == -1)
+                    return
+
+                if (!d.paused)
+                    player.play(d.chunkEnd + 1)
+            }
+
+            function getFinalTimestamp(startPos) {
+                if (startPos <= 0)
+                    return -1
+
+                return Qt.binding(function() { return finalTimestamp })
+            }
         }
     }
 
@@ -154,7 +219,7 @@ QnObject {
             if (connectionManager.connectionState == QnConnectionManager.Connected) {
                 if (d.resetUrlOnConnect) {
                     d.resetUrlOnConnect = false
-                    resourceHelper.setPosition(position)
+                    resourceHelper.position = position
                 }
             } else {
                 d.resetUrlOnConnect = true
@@ -173,7 +238,7 @@ QnObject {
     function play(pos) {
         d.failed = false
 
-        if (pos && (pos != d.position || pos == -1))
+        if (d.position == -1 || pos && (pos != d.position || pos == -1))
             d.dirty = true
 
         d.paused = false
@@ -188,30 +253,25 @@ QnObject {
 
         var live = (new Date()).getTime()
         var aligned = -1
-        if (live - pos > d.lastMinuteLength) {
+        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
             if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
-        }
-        if (d.position == -1 && aligned == -1) {
-            timelinePositionRequest(d.position)
-            if (!playing) {
-                d.mediaPlayer.play()
-                failureTimer.restart()
-            }
-
-            d.dirty = false
-            return
         }
 
         d.mediaPlayer.stop()
 
         d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
-        d.chunkEnd = (d.position >= 0) ? chunkProvider.closestChunkEndMs(pos, true) : -1
+
+        d.chunkEnd = (d.position >= 0) ? d.mediaPlayer.getFinalTimestamp(pos) : -1
 
         timelinePositionRequest(d.position)
         d.updateTimeline = true
-        resourceHelper.setPosition(d.position)
+
+        if (d.position == -1 && resourceHelper.position == -1)
+            resourceHelper.updateUrl()
+        else
+            resourceHelper.position = d.position
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
@@ -221,8 +281,8 @@ QnObject {
     }
 
     function pause() {
-        d.mediaPlayer.pause()
         d.paused = true
+        d.mediaPlayer.pause()
     }
 
     function stop() {
@@ -239,40 +299,6 @@ QnObject {
             d.updateTimeline = false
         } else {
             play(pos)
-        }
-    }
-
-    function updatePosition() {
-        if (d.position < 0)
-            return
-
-        if (mediaPlayer.hasTimestamp) {
-            if (mediaPlayer.timestamp >= 0) {
-                d.position = mediaPlayer.timestamp
-                timelineCorrectionRequest(d.position)
-            }
-            return
-        } else {
-            if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
-                /* A workaround for Android issue 11590
-                   Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
-                   To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
-                 */
-                d.position += 300
-            } else {
-                d.position += d.mediaPlayer.position - d.prevPlayerPosition
-            }
-            d.prevPlayerPosition = d.mediaPlayer.position
-        }
-
-        if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
-            seek(d.chunkEnd + 1)
-            return
-        }
-
-        if (d.updateTimeline) {
-            timelineCorrectionRequest(d.position)
-            d.updateTimeline = false
         }
     }
 }

@@ -14,10 +14,10 @@
 #include <utils/common/delayed.h>
 
 namespace {
-    /** Delay between requests when the rebuild is running. */ 
+    /** Delay between requests when the rebuild is running. */
     const int updateRebuildStatusDelayMs = 500;
 
-    /** Delay between requests when the backup is running. */ 
+    /** Delay between requests when the backup is running. */
     const int updateBackupStatusDelayMs = 500;
 
     void processStorage(const QnClientStorageResourcePtr &storage, const QnStorageSpaceData &spaceInfo) {
@@ -28,7 +28,7 @@ namespace {
 }
 
 struct ServerPoolInfo {
-    int archiveRebuildRequestHandle;  
+    int archiveRebuildRequestHandle;
     QnStorageScanData rebuildStatus;
 
     ServerPoolInfo()
@@ -36,7 +36,7 @@ struct ServerPoolInfo {
         , rebuildStatus()
     {}
 };
-    
+
 struct QnServerStorageManager::ServerInfo {
     std::array<ServerPoolInfo, static_cast<int>(QnServerStoragesPool::Count)> storages;
     QSet<QString> protocols;
@@ -58,14 +58,14 @@ QnServerStorageManager::RequestKey::RequestKey()
     , pool(QnServerStoragesPool::Main)
 {}
 
-QnServerStorageManager::RequestKey::RequestKey(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool) 
+QnServerStorageManager::RequestKey::RequestKey(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool)
     : server(server)
     , pool(pool)
 {}
 
 
 QnServerStorageManager::QnServerStorageManager( QObject *parent )
-    : base_type(parent)    
+    : base_type(parent)
 {
 
     auto getServerForResource = [](const QnResourcePtr &resource) -> QnMediaServerResourcePtr {
@@ -82,8 +82,18 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
 
 
     auto resourceAdded = [this, checkStoragesStatusInternal](const QnResourcePtr &resource) {
-        if (const QnStorageResourcePtr &storage = resource.dynamicCast<QnStorageResource>()) {
+
+        auto emitStorageChanged = [this](const QnResourcePtr &resource) {
+            emit storageChanged(resource.dynamicCast<QnStorageResource>());
+        };
+
+        if (const QnClientStorageResourcePtr &storage = resource.dynamicCast<QnClientStorageResource>()) {
             connect(storage, &QnResource::statusChanged, this, checkStoragesStatusInternal);
+            //connect(storage, &QnClientStorageResource::freeSpaceChanged,    this, emitStorageChanged); // free space is not used in the client but called quite often
+            connect(storage, &QnClientStorageResource::totalSpaceChanged,   this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::isWritableChanged,   this, emitStorageChanged);
+
+            emit storageAdded(storage);
             checkStoragesStatusInternal(storage);
             return;
         }
@@ -103,6 +113,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         if (const QnStorageResourcePtr &storage = resource.dynamicCast<QnStorageResource>()) {
             disconnect(storage, nullptr, this, nullptr);
             checkStoragesStatusInternal(storage);
+            emit storageRemoved(storage);
             return;
         }
 
@@ -207,15 +218,15 @@ bool QnServerStorageManager::sendArchiveRebuildRequest( const QnMediaServerResou
         return false;
 
     int handle = server->apiConnection()->doRebuildArchiveAsync(
-        action, 
-        pool == QnServerStoragesPool::Main, 
-        this, 
+        action,
+        pool == QnServerStoragesPool::Main,
+        this,
         SLOT(at_archiveRebuildReply(int, const QnStorageScanData &, int)));
     if (handle <= 0)
         return false;
 
     m_requests.insert(handle, RequestKey(server, pool));
-    m_serverInfo[server].storages[static_cast<int>(pool)].archiveRebuildRequestHandle = handle;  
+    m_serverInfo[server].storages[static_cast<int>(pool)].archiveRebuildRequestHandle = handle;
     return true;
 }
 
@@ -263,8 +274,8 @@ bool QnServerStorageManager::sendBackupRequest( const QnMediaServerResourcePtr &
         return false;
 
     int handle = server->apiConnection()->backupControlActionAsync(
-        action, 
-        this, 
+        action,
+        this,
         SLOT(at_backupStatusReply(int, const QnBackupStatusData &, int)));
     if (handle <= 0)
         return false;
@@ -313,7 +324,7 @@ bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourc
         return false;
 
     int handle = server->apiConnection()->getStorageSpaceAsync(
-        this, 
+        this,
         SLOT(at_storageSpaceReply(int, const QnStorageSpaceReply &, int)));
     if (handle <= 0)
         return false;
@@ -325,15 +336,12 @@ bool QnServerStorageManager::sendStorageSpaceRequest( const QnMediaServerResourc
 
 void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSpaceReply &reply, int handle ) {
 
-    QSet<QnUuid> processedStorages;
-
     for (const QnStorageSpaceData &spaceInfo: reply.storages) {
         QnClientStorageResourcePtr storage = qnResPool->getResourceById<QnClientStorageResource>(spaceInfo.storageId);
         if (!storage)
             continue;
-       
+
         processStorage(storage, spaceInfo);
-        processedStorages.insert(spaceInfo.storageId);
     }
 
     /* Requests were invalidated. */
@@ -350,38 +358,53 @@ void QnServerStorageManager::at_storageSpaceReply( int status, const QnStorageSp
 
     if (serverInfo.storageSpaceRequestHandle != handle)
         return;
-    
+
     serverInfo.storageSpaceRequestHandle = 0;
 
     if(status != 0)
         return;
 
-    /* 
+    /*
      * Reply can contain some storages that were instantiated after the server starts.
      * Therefore they will be absent in the resource pool, but user can add them manually.
+     * Also we should manually remove these storages from pool if they were not added on the
+     * server side and removed before getting into database.
      * This code should be executed if and only if server still exists and our request is actual.
      */
+    QSet<QString> existingStorages;
+    for (const QnStorageResourcePtr &storage: requestKey.server->getStorages())
+        existingStorages.insert(storage->getUrl());
+
     for (const QnStorageSpaceData &spaceInfo: reply.storages) {
         /* Skip storages that are already exist. */
-        if (processedStorages.contains(spaceInfo.storageId))
-            continue;
-
-        /* Storage was already added */
-        if (QnStorageResourcePtr existing = requestKey.server->getStorageByUrl(spaceInfo.url))
+        if (existingStorages.contains(spaceInfo.url))
             continue;
 
         Q_ASSERT_X(spaceInfo.storageId.isNull(), Q_FUNC_INFO, "We should process only non-pool storages here");
         if (!spaceInfo.storageId.isNull())
             continue;
 
-        QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);             
+        QnClientStorageResourcePtr storage = QnClientStorageResource::newStorage(requestKey.server, spaceInfo.url);
         storage->setStorageType(spaceInfo.storageType);
 
         processStorage(storage, spaceInfo);
-
         qnResPool->addResource(storage);
+
+        existingStorages.insert(spaceInfo.url);
     }
 
+    QSet<QString> receivedStorages;
+    for (const QnStorageSpaceData &spaceInfo: reply.storages)
+        receivedStorages.insert(spaceInfo.url);
+
+    QnResourceList storagesToDelete;
+    for (const QnStorageResourcePtr &storage: requestKey.server->getStorages()) {
+        if (receivedStorages.contains(storage->getUrl()))
+            continue;
+        storagesToDelete << storage;
+    }
+
+    qnResPool->removeResources(storagesToDelete);
 
     auto replyProtocols = reply.storageProtocols.toSet();
     if (serverInfo.protocols != replyProtocols) {

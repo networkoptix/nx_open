@@ -45,7 +45,7 @@ namespace
 
     enum { kBookmarksFilterPrecisionMs = 5 * 60 * 1000 };
 
-    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
+    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs) {
         if (positionMs <= 0)
             return QnCameraBookmarkSearchFilter::invalidFilter();
 
@@ -58,8 +58,6 @@ namespace
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
         result.endTimeMs = mid + kBookmarksFilterPrecisionMs * 2;
-
-        result.text = text;
 
         return result;
     }
@@ -118,7 +116,6 @@ void QnCompositeTextOverlay::setMode(Mode mode)
     if (mode == m_currentMode)
         return;
 
-    const Mode prevMode = m_currentMode;
     m_currentMode = mode;
 
     setItems(removeOutdatedItems(m_currentMode));
@@ -192,11 +189,16 @@ void QnCompositeTextOverlay::initTextMode()
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
     {
+        //qDebug() << "---new action" << businessAction->actionType() << ":" 
+        //    << cameraId << ":" << businessAction->getResources()
+        //    << ":" << businessAction->getResources().size() << ":"
+        //    << (cameraId == businessAction->getParams().actionResourceId) ;
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
         /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
         /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
+
         if (!businessAction->getResources().contains(cameraId))
             return;
 
@@ -214,13 +216,13 @@ void QnCompositeTextOverlay::initTextMode()
         
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            // qDebug() << "Remove " << actionId; // For future debug
+            //qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
 
-        // qDebug() << "Added: " << actionId << ":" << isInstantAction 
+        //qDebug() << "Added: " << actionId << ":" << isInstantAction 
         //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum 
@@ -265,8 +267,6 @@ void QnCompositeTextOverlay::initBookmarksMode()
     //// TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
 
     connect(m_navigator, &QnWorkbenchNavigator::positionChanged, this, &QnCompositeTextOverlay::updateBookmarksFilter);
-    connect(m_navigator->bookmarksSearchStrategy(), &QnSearchQueryStrategy::queryUpdated
-        , this, &QnCompositeTextOverlay::updateBookmarksFilter);
 
     /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
     m_updateQueryFilterTimer.reset([this]()
@@ -357,8 +357,7 @@ void QnCompositeTextOverlay::updateBookmarksFilter()
     if (!m_bookmarksQuery)
         return;
 
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(m_getUtcCurrentTimeMs()
-        , m_navigator->bookmarksSearchStrategy()->query()));
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(m_getUtcCurrentTimeMs()));
 }
 
 QnOverlayTextItemDataList QnCompositeTextOverlay::removeOutdatedItems(Mode mode)

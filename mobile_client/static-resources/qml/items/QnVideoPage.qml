@@ -190,11 +190,22 @@ QnPage {
         }
 
         function clearScreenshotSource() {
+            screenshotDelay.stop()
             screenshotSource = ""
         }
 
         function bindScreenshotSource() {
             screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
+        }
+
+        function bindScreenshotSourceDelayed() {
+            screenshotDelay.start()
+        }
+
+        Timer {
+            id: screenshotDelay
+            interval: 150
+            onTriggered: video.bindScreenshotSource()
         }
     }
 
@@ -306,7 +317,7 @@ QnPage {
             if (!loading)
                 return
 
-            video.bindScreenshotSource()
+            video.bindScreenshotSourceDelayed()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
@@ -316,7 +327,7 @@ QnPage {
                 return
             }
 
-            video.bindScreenshotSource()
+            video.bindScreenshotSourceDelayed()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
@@ -363,10 +374,15 @@ QnPage {
             onPausedChanged: {
                 setKeepScreenOn(!paused)
 
-                if (paused)
+                if (paused) {
                     mediaPlayer.pause()
+                    return
+                }
+
+                if (d.resumeAtLive)
+                    mediaPlayer.playLive()
                 else
-                    mediaPlayer.play(d.resumeAtLive ? -1 : timelinePosition)
+                    mediaPlayer.play()
             }
         }
     }
