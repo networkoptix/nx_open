@@ -16,7 +16,7 @@
 namespace nx {
 namespace cc {
 
-class CloudModulesXmlHandler
+class NX_NETWORK_API CloudModulesXmlHandler
 :
     public QXmlDefaultHandler
 {

@@ -10,11 +10,10 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
 
 #include <utils/common/log.h>
+#include <utils/thread/mutex.h>
+#include <utils/thread/wait_condition.h>
 
 
 using namespace std;

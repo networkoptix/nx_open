@@ -56,9 +56,12 @@ public:
 
 #define FusionRequestResult_Fields (resultCode)(errorDetail)(errorText)
 
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (FusionRequestResult),
-    (json))
+//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);
+void NX_NETWORK_API serialize(QnJsonContext*, const FusionRequestResult&, class QJsonValue*);
+//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+//    (FusionRequestResult),
+//    (json))
 
 }
 
