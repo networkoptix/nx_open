@@ -56,7 +56,7 @@ QnObject {
         repeat: false
         running: false
         onTriggered: {
-            if (d.startPosition == d.mediaPlayer.position) {
+            if (!d.paused && d.startPosition == d.mediaPlayer.position) {
                 d.failed = true
                 d.mediaPlayer.stop()
             }
