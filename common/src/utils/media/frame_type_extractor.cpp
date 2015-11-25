@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "vc1Parser.h"
-#include <utils\media\nalUnits.h>
+#include <utils/media/nalUnits.h>
 
 void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
 {
