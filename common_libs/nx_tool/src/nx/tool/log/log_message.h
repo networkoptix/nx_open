@@ -11,6 +11,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 
 class QnUuid;
