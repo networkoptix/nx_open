@@ -73,11 +73,17 @@ public:
     QnBusiness::EventState getToggleState()     const { return m_toggleState; }
 
     /**
-     * @brief checkCondition    Checks event parameters. 
-     * @param params            Parameters of an event that are selected in rule.
-     * @return                  True if event should be handled, false otherwise.
+     * @brief isEventStateMatched Checks if event state matches to a rule. Rule will be terminated if it isn't pass any longer
+     * @return                    True if event should be handled, false otherwise.
      */
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters& params, QnBusiness::ActionType actionType) const = 0;
+    virtual bool isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const = 0;
+
+    /**
+     * @brief checkCondition      Checks if event params matches to a rule. Rule will not start if it isn't pass
+     * @param params              Parameters of an event that are selected in rule.
+     * @return                    True if event should be handled, false otherwise.
+     */
+    virtual bool checkEventParams(const QnBusinessEventParameters &params) const;
 
     virtual QnBusinessEventParameters getRuntimeParams() const;
 

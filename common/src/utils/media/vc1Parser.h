@@ -5,14 +5,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-extern "C"
-{
-    #include <libavutil/rational.h>
-}
-
 #include "bitStream.h"
-#include "memory.h"
-
+#include <memory.h>
 
 static const int NOT_ENOUGHT_BUFFER = -1;
 
