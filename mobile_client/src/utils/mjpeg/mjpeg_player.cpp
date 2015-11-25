@@ -274,6 +274,13 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     d->waitingForFrame = true;
     d->session->setUrl(url);
     d->session->stop();
+
+    if (d->position != 0) {
+        d->position = 0;
+        d->timestamp = invalidTimestamp;
+        emit positionChanged();
+    }
+
     d->session->start();
 }
 
