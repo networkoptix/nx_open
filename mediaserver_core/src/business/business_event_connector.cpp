@@ -148,10 +148,9 @@ void QnBusinessEventConnector::at_NoStorages(const QnResourcePtr& resource)
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 
-void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &resource, bool isCanceled) 
+void QnBusinessEventConnector::at_archiveRebuildFinished(const QnResourcePtr &resource, QnSystemHealth::MessageType msgType)
 {
-    auto messageType = isCanceled ? QnSystemHealth::ArchiveRebuildCanceled : QnSystemHealth::ArchiveRebuildFinished;
-    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(messageType, resource->getId()));
+    QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(msgType, resource->getId()));
     qnBusinessRuleProcessor->broadcastBusinessAction(action);
 }
 

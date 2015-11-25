@@ -106,7 +106,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
         QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
         if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
             QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
-            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveRebuildFinished)
+            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
             {
                 for (const auto &cameraId: getServerFootageData(businessAction->getRuntimeParams().eventResourceId))
                     invalidateCameraHistory(cameraId);

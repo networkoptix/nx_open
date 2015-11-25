@@ -30,4 +30,6 @@ namespace QnSystemHealth {
     };
 }
 
+Q_DECLARE_METATYPE(QnSystemHealth::MessageType);
+
 #endif // SYSTEM_HEALTH_H
