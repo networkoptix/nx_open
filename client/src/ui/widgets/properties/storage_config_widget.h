@@ -71,17 +71,17 @@ private:
     QString backupPositionToString(qint64 backupTimeMs);
 
 private slots:
-   
+
     void at_serverRebuildStatusChanged(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool, const QnStorageScanData &status);
     void at_serverBackupStatusChanged(const QnMediaServerResourcePtr &server, const QnBackupStatusData &status);
-    
+
     void at_serverRebuildArchiveFinished(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool);
     void at_serverBackupFinished(const QnMediaServerResourcePtr &server);
 
     void at_addExtStorage(bool addToMain);
-    
+
     void at_openBackupSchedule_clicked();
-    
+
     void at_backupTypeComboBoxChange(int index);
 
 private:
@@ -92,7 +92,7 @@ private:
 
     struct StoragePool
     {
-        StoragePool();        
+        StoragePool();
         bool rebuildCancelled;
     };
 
