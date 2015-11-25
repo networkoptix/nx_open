@@ -1,7 +1,7 @@
 #include "address_resolver.h"
 
 #include "common/common_globals.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
 

@@ -2,7 +2,7 @@
 #define NX_CC_DNS_TABLE_H
 
 #include "utils/common/guard.h"
-#include "utils/thread/mutex.h"
+#include <nx/tool/thread/mutex.h>
 
 #include <nx/network/dns_resolver.h>
 #include <nx/network/stun/async_client.h>

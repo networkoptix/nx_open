@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/wait_condition.h>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"

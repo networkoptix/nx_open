@@ -8,9 +8,9 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include <nx/network/socket_factory.h>
 #include "utils/tz/tz.h"
 

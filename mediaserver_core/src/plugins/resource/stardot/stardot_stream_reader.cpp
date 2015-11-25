@@ -4,7 +4,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include "utils/media/nalUnits.h"
 #include "network/tcp_connection_priv.h"
 

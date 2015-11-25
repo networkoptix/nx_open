@@ -12,9 +12,9 @@
 
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/synctime.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>

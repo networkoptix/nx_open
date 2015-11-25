@@ -14,9 +14,10 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 
+#include <nx/tool/log/log.h>
+
 #include "../decoders/abstractclientplugin.h"
 #include "../decoders/abstractvideodecoderplugin.h"
-#include "../utils/common/log.h"
 #include "camera_plugin.h"
 
 

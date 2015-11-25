@@ -11,7 +11,7 @@
 #include <QtXml/QXmlSimpleReader>
 
 #include <plugins/videodecoder/stree/streesaxhandler.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/model_functions.h>
 
 #include "cdb_ns.h"

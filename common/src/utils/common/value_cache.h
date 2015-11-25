@@ -5,7 +5,7 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 
 /*!

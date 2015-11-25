@@ -13,7 +13,7 @@
 #include "nx_ec/data/api_server_alive_data.h"
 #include "nx_ec/data/api_runtime_data.h"
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <utils/common/connective.h>
 
 class QnCommonMessageProcessor: public Connective<QObject>, public Singleton<QnCommonMessageProcessor>

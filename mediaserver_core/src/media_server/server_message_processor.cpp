@@ -11,7 +11,7 @@
 #include <media_server/settings.h>
 #include <nx_ec/dummy_handler.h>
 #include <network/universal_tcp_listener.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"

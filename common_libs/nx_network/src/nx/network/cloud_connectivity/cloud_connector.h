@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/cloud_connectivity/cloud_tunnel.h>
 

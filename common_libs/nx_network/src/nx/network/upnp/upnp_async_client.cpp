@@ -3,7 +3,7 @@
 #include "upnp_device_description.h"
 #include "utils/common/model_functions.h"
 #include "utils/serialization/lexical_functions.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 
 namespace nx_upnp {
 namespace /* noname */ {

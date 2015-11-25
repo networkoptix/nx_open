@@ -3,7 +3,7 @@
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtCore/QString>
 
 #include "core/datapacket/audio_data_packet.h"

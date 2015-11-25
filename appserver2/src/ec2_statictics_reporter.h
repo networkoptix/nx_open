@@ -4,9 +4,9 @@
 #include <QtCore/QDateTime>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_statistics.h>
 

@@ -2,7 +2,7 @@
 #define CL_ringbuffer_1842
 
 #include <QtCore/QIODevice>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 
 class CLRingBuffer : public QIODevice

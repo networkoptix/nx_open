@@ -6,7 +6,7 @@
 #include <QtCore/QDateTime>
 #include <QtNetwork/QNetworkInterface>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/product_features.h>
 

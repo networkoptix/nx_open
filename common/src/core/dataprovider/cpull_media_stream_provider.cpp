@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <utils/common/sleep.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include <core/datapacket/video_data_packet.h>
 #include <core/resource/camera_resource.h>

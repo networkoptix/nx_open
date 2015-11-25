@@ -1,6 +1,6 @@
 #include "netstate.h"
 #include "nettools.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 
 
 CLNetState::CLNetState()

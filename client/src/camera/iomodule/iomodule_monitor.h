@@ -1,7 +1,7 @@
 #ifndef __IOMODULE_MONITOR_H_
 #define __IOMODULE_MONITOR_H_
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"

@@ -8,7 +8,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 namespace nx {
 namespace stun {

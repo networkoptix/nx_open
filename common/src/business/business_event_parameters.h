@@ -6,7 +6,7 @@
 #include <business/business_fwd.h>
 
 #include <utils/common/model_functions_fwd.h>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 struct QnEventMetaData
 {

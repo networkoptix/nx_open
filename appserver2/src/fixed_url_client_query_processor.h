@@ -8,8 +8,8 @@
 
 #include <memory>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "client_query_processor.h"
 

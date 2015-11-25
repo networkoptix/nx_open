@@ -2,9 +2,9 @@
 
 #include <memory>
 
-#include <utils/common/uuid.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/uuid.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 
 template<class KeyType, class MappedType>

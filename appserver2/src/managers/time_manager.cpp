@@ -10,7 +10,7 @@
 
 #include <QtConcurrent/QtConcurrent>
 #include <QtCore/QDateTime>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #if defined(Q_OS_MACX) || defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 #include <zlib.h>
 #else
@@ -29,8 +29,8 @@
 #include <nx_ec/data/api_runtime_data.h>
 
 #include <utils/common/joinable.h>
-#include <utils/common/log.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/log/log.h>
+#include <nx/tool/timermanager.h>
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/network/time/multiple_internet_time_fetcher.h>
 

@@ -8,8 +8,8 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/thread/wait_condition.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
 
 #include <utils/common/stoppable.h>
 

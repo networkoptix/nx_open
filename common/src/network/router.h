@@ -2,9 +2,9 @@
 #define ROUTER_H
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_common.h>
 

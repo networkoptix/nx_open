@@ -6,7 +6,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
 
-#include "singleton.h"
+#include <nx/tool/singleton.h>
 #include "semaphore.h"
 #include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>

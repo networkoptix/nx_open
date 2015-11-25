@@ -7,7 +7,7 @@
 
 #include <thread>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 
 namespace nx {

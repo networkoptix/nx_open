@@ -2,7 +2,7 @@
 
 #include "common/common_globals.h"
 #include "utils/common/cpp14.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include <nx/network/socket_factory.h>
 
 static const std::chrono::milliseconds RETRY_INTERVAL = std::chrono::minutes( 10 );

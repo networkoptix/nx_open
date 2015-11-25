@@ -11,7 +11,7 @@
 #include <QtCore/QDateTime>
 #include <QtSql/QSqlQuery>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 #include <nxemail/mustache/mustache_helper.h>

@@ -13,7 +13,7 @@
 
 class QnMutexImpl;
 
-class QnMutex
+class NX_TOOL_API QnMutex
 {
     friend class QnWaitCondition;
     friend class MutexLockAnalyzer;
@@ -35,11 +35,14 @@ public:
     bool tryLock();
 
 private:
-    std::unique_ptr<QnMutexImpl> m_impl;
+    QnMutexImpl* m_impl;
+
+    QnMutex(const QnMutex&);
+    QnMutex& operator=(const QnMutex&);
 };
 
 //!This class for internal usage only
-class QnMutexLockerBase
+class NX_TOOL_API QnMutexLockerBase
 {
 public:
     QnMutexLockerBase(

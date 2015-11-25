@@ -2,7 +2,7 @@
 
 #include <QtCore/QCryptographicHash>
 
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"

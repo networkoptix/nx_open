@@ -2,7 +2,7 @@
 
 #include <network/tcp_connection_priv.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 namespace {
     const QString idParam = lit("id");

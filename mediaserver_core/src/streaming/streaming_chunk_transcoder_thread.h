@@ -10,8 +10,8 @@
 #include <QElapsedTimer>
 #include <QSharedPointer>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 #include <utils/common/long_runnable.h>
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 

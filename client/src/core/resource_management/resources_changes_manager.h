@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 /** 
  * Utility class for saving resources user attributes.

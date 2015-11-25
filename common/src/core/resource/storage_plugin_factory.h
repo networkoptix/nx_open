@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "storage_resource.h"
 

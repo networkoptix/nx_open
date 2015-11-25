@@ -25,6 +25,8 @@ QnMutex::QnMutex( QnMutex::RecursionMode mode )
 
 QnMutex::~QnMutex()
 {
+    delete m_impl;
+    m_impl = nullptr;
 }
 
 void QnMutex::lock(

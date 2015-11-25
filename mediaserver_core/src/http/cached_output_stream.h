@@ -9,7 +9,7 @@
 #include <queue>
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>

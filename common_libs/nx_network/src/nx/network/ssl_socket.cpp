@@ -13,7 +13,7 @@
 #include <openssl/opensslconf.h>
 #include <openssl/ssl.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/systemerror.h>
 
 #ifdef max

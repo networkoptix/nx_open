@@ -24,10 +24,10 @@
 #include <memory>
 
 #include <QtCore/QElapsedTimer>
-#include <utils/thread/mutex.h>
 #include <QtCore/QThread>
 
-#include <utils/common/log.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/log/log.h>
 #include <utils/media/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"

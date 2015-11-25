@@ -2,7 +2,7 @@
 #define QN_COUNTER_H
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 class QnCounter: public QObject {
     Q_OBJECT;

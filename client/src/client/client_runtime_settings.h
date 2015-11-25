@@ -1,7 +1,7 @@
 #pragma once
 
 #include <utils/common/property_storage.h>
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 class QnClientRuntimeSettings: public QnPropertyStorage, public Singleton<QnClientRuntimeSettings> {
     Q_OBJECT

@@ -9,7 +9,7 @@
 #include <map>
 
 #include <nx/network/socket.h>
-#include "utils/thread/mutex.h"
+#include <nx/tool/thread/mutex.h>
 
 #include "endpoint_selector.h"
 

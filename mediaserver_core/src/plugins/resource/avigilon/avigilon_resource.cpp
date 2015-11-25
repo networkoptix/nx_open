@@ -11,7 +11,7 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/common/synctime.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 
 
 //!Auxiliary structures for parsing camera response

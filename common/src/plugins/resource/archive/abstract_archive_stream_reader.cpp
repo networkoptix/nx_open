@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/util.h>
 
 #include <recording/time_period.h>

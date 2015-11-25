@@ -1,6 +1,6 @@
 #include "security_cam_resource.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include <api/global_settings.h>
 

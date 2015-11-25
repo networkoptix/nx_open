@@ -6,8 +6,8 @@
 #define HLS_SERVER_H
 
 #include <QDateTime>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/httpstreamreader.h>

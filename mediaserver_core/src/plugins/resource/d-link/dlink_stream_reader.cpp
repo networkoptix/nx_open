@@ -4,7 +4,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/synctime.h>
 #include <nx/network/http/httptypes.h>
 

@@ -11,7 +11,7 @@
 
 #include <QtOpenGL/QGLContext>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #ifdef Q_OS_LINUX
 #include <QtX11Extras/QX11Info>

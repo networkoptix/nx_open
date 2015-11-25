@@ -9,12 +9,12 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QString>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>

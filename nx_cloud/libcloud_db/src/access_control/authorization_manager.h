@@ -7,7 +7,6 @@
 #define cloud_db_authorization_manager_h
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/common/singleton.h>
 
 #include "managers/managers_types.h"
 #include "auth_types.h"

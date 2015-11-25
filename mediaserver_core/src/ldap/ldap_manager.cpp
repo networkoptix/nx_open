@@ -1,7 +1,7 @@
 #include "ldap_manager.h"
 
 #include "api/global_settings.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include <iostream>
 #include <sstream>
 

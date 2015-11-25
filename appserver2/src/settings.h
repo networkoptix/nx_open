@@ -12,8 +12,8 @@
 #include <QString>
 #include <QVariant>
 
-#include <utils/common/singleton.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/singleton.h>
+#include <nx/tool/thread/mutex.h>
 
 
 namespace ec2 {

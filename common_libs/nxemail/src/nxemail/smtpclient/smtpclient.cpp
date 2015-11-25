@@ -21,7 +21,7 @@
 #include <QFileInfo>
 #include <QByteArray>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 
 /* [1] Constructors and destructors */

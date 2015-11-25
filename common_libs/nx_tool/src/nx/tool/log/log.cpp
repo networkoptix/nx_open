@@ -392,7 +392,7 @@ bool QnLog::Logs::init( int logID, const QString& logLevelStr )
     get(logID)->setLogLevel(logLevel);
     if (needWarnLogLevel) {
         NX_LOG(QLatin1String("================================================================================="), cl_logALWAYS);
-        NX_LOG(lit("Unknown log level specified. Using level %1").arg(QnLog::logLevelToString(logLevel)), cl_logALWAYS);
+        NX_LOG(QString::fromLatin1("Unknown log level specified. Using level %1").arg(QnLog::logLevelToString(logLevel)), cl_logALWAYS);
     }
     return true;
 }

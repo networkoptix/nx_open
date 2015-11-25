@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <nx/network/http/httptypes.h>
 
 #include "core/resource/camera_resource.h"

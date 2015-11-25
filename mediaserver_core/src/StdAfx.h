@@ -62,8 +62,8 @@ extern "C" {
 #include <QtCore/QUrlQuery>
 #include <QtNetwork/QHostAddress>
 #include <QtNetwork/QAuthenticator>
-#include <utils/common/uuid.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/uuid.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #endif

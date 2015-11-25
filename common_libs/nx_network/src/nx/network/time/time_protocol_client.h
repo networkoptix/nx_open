@@ -9,7 +9,7 @@
 #include <memory>
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "abstract_accurate_time_fetcher.h"
 #include <nx/network/abstract_socket.h>

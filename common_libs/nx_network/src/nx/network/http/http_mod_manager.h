@@ -10,7 +10,7 @@
 #include <list>
 #include <map>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 #include "httptypes.h"
 

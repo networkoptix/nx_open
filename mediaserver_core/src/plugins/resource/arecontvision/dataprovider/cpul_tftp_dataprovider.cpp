@@ -2,9 +2,9 @@
 
 #include "cpul_tftp_dataprovider.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 

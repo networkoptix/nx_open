@@ -9,10 +9,10 @@
 #include <deque>
 
 #include <QtOpenGL/QGLWidget>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QRunnable>
 #include <QtCore/QThread>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #include <utils/common/safepool.h>
 #include <utils/common/threadqueue.h>

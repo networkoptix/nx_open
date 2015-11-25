@@ -3,7 +3,7 @@
 
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include "param.h"

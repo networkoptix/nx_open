@@ -1,7 +1,7 @@
 #ifndef NX_STUN_ASYNC_CLIENT_H
 #define NX_STUN_ASYNC_CLIENT_H
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
 

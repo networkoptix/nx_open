@@ -12,11 +12,10 @@
 #include <QtGlobal>
 #include <QtCore/QMutexLocker>
 
-#include <utils/common/log.h>
-
 #include "mutex.h"
 #include "mutex_impl.h"
 #include "thread_util.h"
+#include "nx/tool/log/log.h"
 
 
 ////////////////////////////////////////////////////////////

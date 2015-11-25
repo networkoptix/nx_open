@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>

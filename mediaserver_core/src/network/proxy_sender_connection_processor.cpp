@@ -12,7 +12,7 @@
 #include "network/universal_request_processor_p.h"
 #include "network/tcp_connection_priv.h"
 #include "network/tcp_listener.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "utils/common/synctime.h"
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_tools.h>

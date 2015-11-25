@@ -5,7 +5,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <nx/network/socket_common.h>
 #include <core/resource/resource_fwd.h>
 

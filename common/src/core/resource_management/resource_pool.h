@@ -3,16 +3,16 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 class QnResource;
 class QnNetworkResource;

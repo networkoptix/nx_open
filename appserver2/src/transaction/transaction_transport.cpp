@@ -8,14 +8,14 @@
 
 #include <nx_ec/ec_proto_version.h>
 #include <utils/bsf/sized_data_decoder.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 #include <utils/gzip/gzip_compressor.h>
 #include <utils/gzip/gzip_uncompressor.h>
 #include <utils/media/custom_output_stream.h>
 #include <nx/network/http/base64_decoder_filter.h>
 
 #include "transaction_message_bus.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "utils/common/util.h"
 #include "utils/common/systemerror.h"
 #include <nx/network/socket_factory.h>

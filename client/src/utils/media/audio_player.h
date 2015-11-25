@@ -9,8 +9,8 @@
 #include <memory>
 
 #include <QtCore/QBuffer>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <plugins/storage/memory/ext_iodevice_storage.h>

@@ -2,7 +2,7 @@
 
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 
 struct QnCheckForUpdateResult {

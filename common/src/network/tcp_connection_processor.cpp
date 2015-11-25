@@ -2,7 +2,7 @@
 
 #include <QtCore/QTime>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/util.h>
 
 #include <nx/network/flash_socket/types.h>

@@ -3,7 +3,7 @@
 
 #include <QtCore/QCoreApplication> /* For Q_DECLARE_TR_FUNCTIONS. */
 #include <QtCore/QString>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 #include <client/client_globals.h>
 

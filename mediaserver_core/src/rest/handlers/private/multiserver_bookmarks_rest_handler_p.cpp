@@ -19,8 +19,8 @@
 #include <utils/common/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 namespace {
     static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =

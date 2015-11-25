@@ -9,7 +9,7 @@
 #include <map>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>

@@ -10,8 +10,8 @@
 #include <core/resource/camera_bookmark_fwd.h>
 
 #include <utils/db/db_helper.h>
-#include <utils/common/uuid.h>
-#include <utils/common/singleton.h>
+#include <nx/tool/uuid.h>
+#include <nx/tool/singleton.h>
 #include "server/server_globals.h"
 
 class QnTimePeriod;

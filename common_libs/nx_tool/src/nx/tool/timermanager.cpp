@@ -11,9 +11,9 @@
 #include <QtCore/QAtomicInt>
 #include <QtCore/QElapsedTimer>
 
-#include <utils/common/log.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include "log/log.h"
+#include "thread/mutex.h"
+#include "thread/wait_condition.h"
 
 
 using namespace std;

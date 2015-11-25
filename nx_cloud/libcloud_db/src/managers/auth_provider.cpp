@@ -9,7 +9,7 @@
 
 #include <openssl/md5.h>
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <utils/common/util.h>
 #include <nx/network/http/auth_tools.h>
 

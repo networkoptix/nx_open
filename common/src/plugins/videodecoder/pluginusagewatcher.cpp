@@ -5,9 +5,9 @@
 #include "pluginusagewatcher.h"
 
 #include <QtCore/QDateTime>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 
 static const size_t SHARED_MEMORY_SIZE = 16*1024;

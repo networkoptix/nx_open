@@ -15,7 +15,7 @@
 #include <QtCore/QFile>
 
 #include <cdb/connection.h>
-#include <cloud_db_process.h>
+#include <cloud_db_process_public.h>
 
 
 namespace nx {
@@ -99,7 +99,7 @@ private:
     QString m_tmpDir;
     int m_port;
     std::vector<char*> m_args;
-    std::unique_ptr<CloudDBProcess> m_cdbInstance;
+    std::unique_ptr<CloudDBProcessPublic> m_cdbInstance;
     std::future<int> m_cdbProcessFuture;
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,

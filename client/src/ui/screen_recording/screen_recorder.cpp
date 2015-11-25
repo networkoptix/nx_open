@@ -9,7 +9,7 @@
 
 #include "ui/style/skin.h"
 #include "video_recorder_settings.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "plugins/resource/desktop_win/desktop_file_encoder.h"
 #include "plugins/resource/desktop_win/desktop_resource.h"
 #include "recording/stream_recorder.h"

@@ -2,7 +2,7 @@
 #define __DISTRIBUTED_MUTEX_H_
 
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QTimer>

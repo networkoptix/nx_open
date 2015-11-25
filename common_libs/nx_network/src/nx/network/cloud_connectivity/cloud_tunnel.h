@@ -10,7 +10,7 @@
 #include <list>
 #include <memory>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <utils/common/stoppable.h>
 
 #include "cc_common.h"

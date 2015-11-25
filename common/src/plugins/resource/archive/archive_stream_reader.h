@@ -8,7 +8,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #include "core/datapacket/audio_data_packet.h"
 #include "core/resource/resource_media_layout.h"

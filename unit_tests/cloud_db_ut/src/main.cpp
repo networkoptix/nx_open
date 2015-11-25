@@ -7,7 +7,7 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/auth_tools.h>
 

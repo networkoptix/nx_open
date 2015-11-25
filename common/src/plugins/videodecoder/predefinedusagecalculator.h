@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QString>
 
 #include "stree/resourcenameset.h"

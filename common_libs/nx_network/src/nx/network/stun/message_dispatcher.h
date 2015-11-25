@@ -10,7 +10,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "utils/common/singleton.h"
+#include <nx/tool/singleton.h>
 #include "utils/common/stoppable.h"
 
 #include "server_connection.h"

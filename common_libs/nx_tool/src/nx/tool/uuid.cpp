@@ -63,6 +63,16 @@ QnUuid::QnUuid(const QUuid &uuid)
 {
 }
 
+const QUuid& QnUuid::getQUuid() const
+{
+    return m_uuid;
+}
+
+bool QnUuid::isNull() const
+{
+    return m_uuid.isNull();
+}
+
 const QByteArray& QnUuid::toByteArray() const
 {
     if( !m_byteArrayRepresentation )
@@ -96,6 +106,31 @@ std::string QnUuid::toStdString() const
     return std::string( byteArray.constData(), byteArray.size() );
 }
 
+QUuid QnUuid::toQUuid() const
+{
+    return m_uuid;
+}
+
+bool QnUuid::operator!=(const QnUuid& other) const
+{
+    return m_uuid != other.m_uuid;
+}
+
+bool QnUuid::operator==(const QnUuid& other) const
+{
+    return m_uuid == other.m_uuid;
+}
+
+bool QnUuid::operator<(const QnUuid& other) const
+{
+    return m_uuid < other.m_uuid;
+}
+
+bool QnUuid::operator>(const QnUuid& other) const
+{
+    return m_uuid > other.m_uuid;
+}
+
 QnUuid QnUuid::fromRfc4122( const QByteArray& bytes )
 {
     QnUuid _uuid;
@@ -108,7 +143,7 @@ QnUuid QnUuid::fromHardwareId( const QString& hwid )
     if (hwid.length() != 34)
         return QnUuid();
 
-    return QnUuid(lit("%1-%2-%3-%4-%5")
+    return QnUuid(QString::fromLatin1("%1-%2-%3-%4-%5")
         .arg(hwid.mid(2, 8)).arg(hwid.mid(10, 4)).arg(hwid.mid(14, 4))
         .arg(hwid.mid(18, 4)).arg(hwid.mid(22, 12)));
 }

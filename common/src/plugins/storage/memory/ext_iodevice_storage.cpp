@@ -5,7 +5,7 @@
 
 #include "ext_iodevice_storage.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 
 QnExtIODeviceStorageResource::QnExtIODeviceStorageResource()

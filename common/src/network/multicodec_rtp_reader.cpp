@@ -10,7 +10,7 @@
 #include "network/h264_rtp_parser.h"
 #include "network/rtp_stream_parser.h"
 
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <nx/network/compat_poll.h>

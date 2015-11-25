@@ -5,7 +5,7 @@
 
 #include <utils/common/long_runnable.h>
 #include <nx/network/aio/pollset.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "networkoptixmodulerevealcommon.h"
 

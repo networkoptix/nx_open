@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include <ui/graphics/opengl/gl_context.h>
 

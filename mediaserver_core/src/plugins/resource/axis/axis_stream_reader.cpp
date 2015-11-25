@@ -6,7 +6,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/media/nalUnits.h>

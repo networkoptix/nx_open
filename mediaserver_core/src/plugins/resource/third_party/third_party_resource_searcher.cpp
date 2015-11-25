@@ -9,7 +9,7 @@
 
 #include <algorithm>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource/media_server_resource.h"

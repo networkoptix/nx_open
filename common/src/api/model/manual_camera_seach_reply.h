@@ -4,7 +4,7 @@
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 #include <QtCore/QList>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 

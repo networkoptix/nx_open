@@ -6,7 +6,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "decoders/abstractvideodecoderplugin.h"
 #include "decoders/video/ffmpeg.h"

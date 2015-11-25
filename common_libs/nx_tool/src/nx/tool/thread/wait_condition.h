@@ -16,7 +16,7 @@
 
 class QnWaitConditionImpl;
 
-class QnWaitCondition
+class NX_TOOL_API QnWaitCondition
 {
 public:
 	QnWaitCondition();
@@ -27,7 +27,10 @@ public:
     void wakeOne();
 
 private:
-    std::unique_ptr<QnWaitConditionImpl> m_impl;
+    QnWaitConditionImpl* m_impl;
+
+    QnWaitCondition(const QnWaitCondition&);
+    QnWaitCondition& operator=(const QnWaitCondition&);
 };
 
 #else   //USE_OWN_MUTEX

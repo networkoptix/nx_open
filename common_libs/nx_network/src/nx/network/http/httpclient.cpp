@@ -5,7 +5,7 @@
 
 #include "httpclient.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 
 namespace nx_http

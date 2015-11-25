@@ -6,7 +6,7 @@
 
 #include "recorder/storage_manager.h"
 #include "core/resource/network_resource.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 
 #include <cmath>
 

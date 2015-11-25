@@ -13,7 +13,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "core/resource/media_server_user_attributes.h"
 #include "core/resource_management/resource_properties.h"

@@ -11,7 +11,7 @@
 #include "plugins/plugin_tools.h"
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include "utils/media/ffmpeg_helper.h"
 #include <nx/network/http/httptypes.h>
 #include "version.h"

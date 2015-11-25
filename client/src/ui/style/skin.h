@@ -7,7 +7,7 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QMovie>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 #include "icon.h"
 

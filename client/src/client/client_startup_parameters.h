@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 struct QnStartupParameters
 {

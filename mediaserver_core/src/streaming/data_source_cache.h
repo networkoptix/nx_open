@@ -8,12 +8,12 @@
 #include <map>
 #include <memory>
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 #include <transcoding/transcoder.h>
-#include <utils/common/timermanager.h>
+#include <nx/tool/timermanager.h>
 
 #include "streaming_chunk_cache_key.h"
 

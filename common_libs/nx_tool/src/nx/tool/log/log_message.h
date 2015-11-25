@@ -33,7 +33,7 @@ QString containerString(const Container& container,
 }
 
 //!Adds some useful overloads to \a QString
-class QnLogMessage
+class NX_TOOL_API QnLogMessage
 {
 public:
     QnLogMessage();

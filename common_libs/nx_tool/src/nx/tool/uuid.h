@@ -19,7 +19,7 @@
 
 
 //!This class added to minimise creation/destruction of QByteArray and QString
-class QnUuid
+class NX_TOOL_API QnUuid
 {
 public:
     static const size_t RFC4122_SIZE = 16;
@@ -31,38 +31,20 @@ public:
     QnUuid( const std::string& text );
     explicit QnUuid( const QUuid &uuid );
 
-    const QUuid& getQUuid() const
-    {
-        return m_uuid;
-    }
+    const QUuid& getQUuid() const;
 
-    bool isNull() const { return m_uuid.isNull(); }
+    bool isNull() const;
     const QByteArray& toByteArray() const;
     const QByteArray& toRfc4122() const;
     const QString& toString() const;
     QString toSimpleString() const;
     std::string toStdString() const;
-    QUuid toQUuid() const { return m_uuid; }
+    QUuid toQUuid() const;
 
-    bool operator!=( const QnUuid& other ) const
-    {
-        return m_uuid != other.m_uuid;
-    }
-
-    bool operator==( const QnUuid& other ) const
-    {
-        return m_uuid == other.m_uuid;
-    }
-
-    bool operator<( const QnUuid& other ) const
-    {
-        return m_uuid < other.m_uuid;
-    }
-
-    bool operator>( const QnUuid& other ) const
-    {
-        return m_uuid > other.m_uuid;
-    }
+    bool operator!=( const QnUuid& other ) const;
+    bool operator==( const QnUuid& other ) const;
+    bool operator<( const QnUuid& other ) const;
+    bool operator>( const QnUuid& other ) const;
 
     static QnUuid fromRfc4122( const QByteArray& bytes );
     static QnUuid fromHardwareId( const QString& hwid );
@@ -85,14 +67,14 @@ private:
     //!binary representation
     mutable boost::optional<QByteArray> m_rfc4122Representation;
 
-    friend QDataStream& operator>>(QDataStream& s, QnUuid& id);
+    friend NX_TOOL_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
 
 Q_DECLARE_METATYPE(QnUuid);
 
-uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
-QDataStream& operator<<(QDataStream& s, const QnUuid& id);
-QDebug operator<<(QDebug dbg, const QnUuid& id);
-QDataStream& operator>>(QDataStream& s, QnUuid& id);
+NX_TOOL_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
+NX_TOOL_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
+NX_TOOL_API QDebug operator<<(QDebug dbg, const QnUuid& id);
+NX_TOOL_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 
 #endif  //NX_UUID_H

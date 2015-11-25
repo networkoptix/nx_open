@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 #include "sql.h"
 #include "sql_macros.h"

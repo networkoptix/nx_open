@@ -27,6 +27,8 @@ QnWaitCondition::QnWaitCondition()
 
 QnWaitCondition::~QnWaitCondition()
 {
+    delete m_impl;
+    m_impl = nullptr;
 }
     
 bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )

@@ -15,7 +15,7 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 
 
 namespace Ui {

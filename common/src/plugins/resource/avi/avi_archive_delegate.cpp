@@ -12,7 +12,7 @@ extern "C"
 }
 
 #include <utils/media/ffmpeg_helper.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
 

@@ -5,7 +5,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>

@@ -4,7 +4,7 @@
 #include <QtCore/QUrl>
 
 #include "network/tcp_connection_priv.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 #include <nx/network/socket.h>
 #include "common/common_module.h"
 

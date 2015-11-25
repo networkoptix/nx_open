@@ -1,8 +1,8 @@
 #ifndef cl_adaptive_sleep_137
 #define cl_adaptive_sleep_137
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 #include <QtCore/QTime>
 #include "sleep.h"
 

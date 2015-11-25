@@ -9,7 +9,7 @@
 #include <api/app_server_connection.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 

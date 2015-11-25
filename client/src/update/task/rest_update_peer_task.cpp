@@ -6,7 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx_ec/ec_proto_version.h>
 #include <api/model/upload_update_reply.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;

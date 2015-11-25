@@ -6,11 +6,11 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
-#include <utils/common/uuid.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/uuid.h>
+#include <nx/tool/thread/mutex.h>
 #include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
 

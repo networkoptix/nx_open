@@ -7,7 +7,7 @@
 #include <QtConcurrent/QtConcurrentMap>
 
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <nx/network/ip_range_checker.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>

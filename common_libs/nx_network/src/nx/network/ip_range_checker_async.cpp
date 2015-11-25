@@ -5,7 +5,7 @@
 
 #include "ip_range_checker_async.h"
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include "socket.h"
 

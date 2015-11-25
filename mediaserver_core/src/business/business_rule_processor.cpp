@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/synctime.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/app_info.h>
 
 #include "business/business_strings_helper.h"

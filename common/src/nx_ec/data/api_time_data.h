@@ -5,7 +5,7 @@
 #include "api_data.h"
 #include "utils/common/latin1_array.h"
 #include "utils/common/model_functions_fwd.h"
-#include "utils/common/uuid.h"
+#include <nx/tool/uuid.h>
 
 
 namespace ec2

@@ -1,6 +1,7 @@
 #ifndef QN_SINGLETON_H
 #define QN_SINGLETON_H
 
+#include <cassert>
 #include <typeinfo>
 
 

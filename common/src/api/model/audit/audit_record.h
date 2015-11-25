@@ -1,7 +1,7 @@
 #ifndef _QN_AUDIT_RECORD_H__
 #define _QN_AUDIT_RECORD_H__
 
-#include "utils/common/uuid.h"
+#include <nx/tool/uuid.h>
 #include "common/common_globals.h"
 #include <utils/common/model_functions_fwd.h>
 #include "auth_session.h"

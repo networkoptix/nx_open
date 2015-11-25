@@ -4,7 +4,7 @@
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "network/tcp_connection_processor.h"
 #include "network/tcp_listener.h"
-#include "utils/common/timermanager.h"
+#include <nx/tool/timermanager.h>
 
 class QnFfmpegTranscoder;
 

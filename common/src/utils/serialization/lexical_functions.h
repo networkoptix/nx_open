@@ -1,7 +1,7 @@
 #ifndef QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 #define QN_SERIALIZATION_LEXICAL_FUNCTIONS_H
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtCore/QUrl>
 #include <QtGui/QColor>
 

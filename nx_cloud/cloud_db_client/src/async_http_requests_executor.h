@@ -16,7 +16,7 @@
 #include <utils/common/stoppable.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 #include "data/account_data.h"
 #include "data/types.h"

@@ -8,7 +8,7 @@
 
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtCore/QUrl>
 
 #include <utils/fusion/fusion.h>

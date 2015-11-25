@@ -4,9 +4,9 @@
 
 #include "hls_live_playlist_manager.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 

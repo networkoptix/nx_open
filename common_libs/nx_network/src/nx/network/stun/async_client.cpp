@@ -2,7 +2,7 @@
 
 #include "common/common_globals.h"
 #include "utils/common/guard.h"
-#include "utils/common/log.h"
+#include <nx/tool/log/log.h>
 
 namespace nx {
 namespace stun {

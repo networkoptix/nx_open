@@ -15,8 +15,8 @@
 #include <cdb/auth_provider.h>
 #include <cdb/connection.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/tool/thread/mutex.h>
+#include <nx/tool/thread/wait_condition.h>
 
 #include "abstract_user_data_provider.h"
 

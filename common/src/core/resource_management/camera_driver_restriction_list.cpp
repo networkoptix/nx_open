@@ -5,7 +5,7 @@
 
 #include "camera_driver_restriction_list.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/tool/thread/mutex.h>
 
 
 static CameraDriverRestrictionList* CameraDriverRestrictionList_instance = nullptr;

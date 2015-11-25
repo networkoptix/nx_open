@@ -7,7 +7,7 @@
 #include <fstream>
 
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/media/h264_utils.h>
 
 #ifdef _DEBUG

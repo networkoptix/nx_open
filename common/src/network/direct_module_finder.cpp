@@ -11,7 +11,7 @@
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 #include <utils/common/model_functions.h>
 #include <nx/network/http/asynchttpclient.h>

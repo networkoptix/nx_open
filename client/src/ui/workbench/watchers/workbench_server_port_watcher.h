@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <utils/common/connective.h>
 #include <ui/workbench/workbench_context_aware.h>
 

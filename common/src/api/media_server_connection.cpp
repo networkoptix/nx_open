@@ -3,7 +3,7 @@
 #include <cstring> /* For std::strstr. */
 
 #include <QtCore/QSharedPointer>
-#include <utils/common/uuid.h>
+#include <nx/tool/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QtGui/QImage>

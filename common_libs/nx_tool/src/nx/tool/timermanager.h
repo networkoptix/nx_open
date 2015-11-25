@@ -11,11 +11,11 @@
 
 #include <QtCore/QThread>
 
-#include <utils/common/singleton.h>
+#include <nx/tool/singleton.h>
 
 
 //!Interface of receiver of timer events
-class TimerEventHandler
+class NX_TOOL_API TimerEventHandler
 {
 public:
     virtual ~TimerEventHandler() {}
@@ -39,7 +39,7 @@ typedef std::chrono::milliseconds TimerDuration;
     \note This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
         so additional synchronization in timer event handler may be required
 */
-class TimerManager
+class NX_TOOL_API TimerManager
 :
     public QThread,
     public Singleton<TimerManager>
@@ -50,7 +50,7 @@ public:
         \note Not thread-safe
         \warning This class calls \a TimerManager::joinAndDeleteTimer, so watch out for deadlock!
     */
-    class TimerGuard
+    class NX_TOOL_API TimerGuard
     {
         typedef void (TimerGuard::*bool_type)() const;
         void this_type_does_not_support_comparisons() const {}
@@ -138,7 +138,8 @@ private:
     TimerManagerImpl* m_impl;
 };
 
-TimerDuration parseTimerDuration( const QString& duration,
-                                  TimerDuration defaultValue = TimerDuration( 0 ) );
+TimerDuration NX_TOOL_API parseTimerDuration(
+    const QString& duration,
+    TimerDuration defaultValue = TimerDuration(0) );
 
 #endif //TIMERMANAGER_H

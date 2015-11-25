@@ -13,7 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <http/custom_headers.h>
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <nx/network/rtsp/rtsp_types.h>

@@ -2,7 +2,7 @@
 #define __RESOURCE_PROPERTY_DICTIONARY_H
 
 #include "utils/common/threadsafe_item_storage.h"
-#include "utils/common/singleton.h"
+#include <nx/tool/singleton.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_resource_data.h"
 #include "nx_ec/impl/ec_api_impl.h"

@@ -2,7 +2,7 @@
 
 #include <api/global_settings.h>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 #include <utils/common/synctime.h>
 
 #include <recorder/storage_manager.h>

@@ -116,15 +116,16 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
+                ${root.dir}/common_libs/nx_tool/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 win* {
-    DEFINES += NX_NETWORK_API=Q_DECL_IMPORT
+    DEFINES += NX_NETWORK_API=Q_DECL_IMPORT NX_TOOL_API=Q_DECL_IMPORT
 } else {
-    DEFINES += NX_NETWORK_API=
+    DEFINES += NX_NETWORK_API= NX_TOOL_API=
 }
 
 DEPENDPATH *= $${INCLUDEPATH}
