@@ -5,7 +5,6 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt_socket.h>
 
-#include <udt.h>
 #include <thread>
 
 #define ERROR_TEXT SystemError::getLastOSErrorText().toStdString()

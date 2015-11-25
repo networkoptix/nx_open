@@ -1,11 +1,8 @@
 TEMPLATE = lib
 CONFIG += console
 
-INCLUDEPATH += ${root.dir}/common/src/
-INCLUDEPATH += ${root.dir}/common_libs/udt/src
-
 win* {
-    DEFINES += NX_NETWORK_API=Q_DECL_EXPORT
+    DEFINES += UDT_API=Q_DECL_EXPORT
 }
 
 !win32 {
