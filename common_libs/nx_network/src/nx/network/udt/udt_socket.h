@@ -7,11 +7,9 @@
 #include "../socket_common.h"
 #include "../system_socket.h"
 #include "../aio/pollset.h"
-#include "../common_socket_impl.h"
 
 
 class UdtSocket;
-typedef CommonSocketImpl<UdtSocket> UDTSocketImpl;
 
 
 template<class SocketType> class AsyncSocketImplHelper;
@@ -26,8 +24,6 @@ class UdtStreamServerSocket;
 // but some sacrifice on inline function.
 namespace detail {
 class UdtSocketImpl;
-class UdtPollSetImpl;
-class UdtPollSetConstIteratorImpl;
 // This is a work around for incomplete type within the unique_ptr. If this type is not
 // in the namespace scope, such work around will not be needed since a non trivial ctor/dtor
 // will be perfectly enough. However once in namespace scope, a wrapper pointer is needed
@@ -36,17 +32,6 @@ class UdtPollSetConstIteratorImpl;
 struct UdtSocketImplPtr : public std::unique_ptr<UdtSocketImpl> {
     NX_NETWORK_API UdtSocketImplPtr( UdtSocketImpl* impl );
     NX_NETWORK_API ~UdtSocketImplPtr();
-};
-
-struct UdtPollSetImplPtr : public std::unique_ptr<UdtPollSetImpl> {
-    NX_NETWORK_API UdtPollSetImplPtr( UdtPollSetImpl* imp );
-    NX_NETWORK_API ~UdtPollSetImplPtr();
-};
-
-struct UdtPollSetConstIteratorImplPtr : public std::unique_ptr<UdtPollSetConstIteratorImpl> {
-    NX_NETWORK_API UdtPollSetConstIteratorImplPtr( UdtPollSetConstIteratorImpl* imp );
-    NX_NETWORK_API UdtPollSetConstIteratorImplPtr();
-    NX_NETWORK_API ~UdtPollSetConstIteratorImplPtr();
 };
 
 }// namespace detail
@@ -61,8 +46,8 @@ public:
     bool getRecvTimeout(unsigned int* millis);
     bool getSendTimeout(unsigned int* millis);
 
-    UDTSocketImpl* impl();
-    const UDTSocketImpl* impl() const;
+    CommonSocketImpl<UdtSocket>* impl();
+    const CommonSocketImpl<UdtSocket>* impl() const;
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
@@ -203,53 +188,6 @@ private:
     std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;
 
     Q_DISABLE_COPY(UdtStreamServerSocket)
-};
-
-// Udt poller 
-class NX_NETWORK_API UdtPollSet {
-public:
-    class const_iterator {
-    public:
-        const_iterator();
-        const_iterator( const const_iterator& );
-        const_iterator( detail::UdtPollSetImpl* impl , bool end );
-        ~const_iterator();
-        const_iterator& operator=( const const_iterator& );
-        const_iterator operator++(int);   
-        const_iterator& operator++();      
-        UdtSocket* socket();
-        const UdtSocket* socket() const;
-        aio::EventType eventType() const;
-        void* userData();
-
-        bool operator==( const const_iterator& right ) const;
-        bool operator!=( const const_iterator& right ) const;
-
-    private:
-        detail::UdtPollSetConstIteratorImplPtr impl_;
-    };
-public:
-    UdtPollSet();
-    ~UdtPollSet();
-    bool isValid() const {
-        return static_cast<bool>(impl_);
-    }
-    void interrupt();
-    bool add( UdtSocket* sock, aio::EventType eventType, void* userData = NULL );
-    void* remove( UdtSocket*  sock, aio::EventType eventType );
-    void* getUserData( UdtSocket*  sock, aio::EventType eventType ) const;
-    bool canAcceptSocket( UdtSocket* sock ) const { Q_UNUSED(sock); return true; }
-    int poll( int millisToWait = aio::INFINITE_TIMEOUT );
-    const_iterator begin() const;
-    const_iterator end() const;
-    size_t size() const;
-    static unsigned int maxPollSetSize() {
-        return std::numeric_limits<unsigned int>::max();
-    }
-
-private:
-    detail::UdtPollSetImplPtr impl_;
-    Q_DISABLE_COPY(UdtPollSet)
 };
 
 #endif // __UDT_SOCKET_H__

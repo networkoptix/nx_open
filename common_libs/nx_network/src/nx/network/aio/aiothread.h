@@ -24,6 +24,7 @@
 #include "../detail/socket_sequence.h"
 #include "../system_socket.h"
 #include "../udt/udt_socket.h"
+#include "../udt/udt_pollset.h"
 
 
 namespace aio {
