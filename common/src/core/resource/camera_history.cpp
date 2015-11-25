@@ -15,6 +15,11 @@
 #include <utils/common/util.h>
 #include <utils/common/delayed.h>
 #include "utils/common/synctime.h"
+#include <api/common_message_processor.h>
+#include <business/actions/abstract_business_action.h>
+#include <business/business_action_parameters.h>
+#include <health/system_health.h>
+
 
 namespace {
     static const int HistoryCheckDelay = 1000 * 15;
@@ -44,6 +49,8 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnVirtualCameraResourcePtr c
 {
     /* 
     * When camera goes to a recording state it's expected that current history server is the same as parentID.
+    * We should check it because in case of camera is moved several times between 2 servers, 
+    * there is no cameraHistoryChanged signal expected.
     * Check it after some delay to avoid call 'invalidateCameraHistory' several times in a row.
     * It could be because client video camera sends extra 'statusChanged' signal when camera is moved.
     * Also, online->recording may occurs on the server side before history information updated. 
@@ -88,16 +95,23 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
         if (!resource->hasFlags(Qn::remote_server))
             return;
 
-        auto cameras = getServerFootageData(resource->getId());
-
-        /* Do not invalidate history if server goes offline. */
-        if (resource->getStatus() == Qn::Online)
-            for (const auto &cameraId: cameras)
-                invalidateCameraHistory(cameraId);
-
-        for (const auto &cameraId: cameras)
+        for (const auto &cameraId: getServerFootageData(resource->getId()))
             if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
                 emit cameraFootageChanged(camera);
+    });
+    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived, this, 
+            [this] (const QnAbstractBusinessActionPtr &businessAction) 
+    {
+        QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
+        if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
+            QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
+            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveRebuildFinished)
+            {
+                for (const auto &cameraId: getServerFootageData(businessAction->getRuntimeParams().eventResourceId))
+                    invalidateCameraHistory(cameraId);
+            }
+        }
     });
 }
 

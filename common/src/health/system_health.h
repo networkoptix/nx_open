@@ -22,6 +22,7 @@ namespace QnSystemHealth {
         StoragesAreFull,
         ArchiveRebuildFinished,
         ArchiveRebuildCanceled,
+        ArchiveFastScanFinished,
 
         NotDefined,
 

@@ -30,6 +30,7 @@
 #include <array>
 #include <functional>
 #include "storage_db_pool.h"
+#include "health/system_health.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -140,7 +141,7 @@ public:
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
-    void rebuildFinished(bool isCanceled);
+    void rebuildFinished(QnSystemHealth::MessageType msgType);
     void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
