@@ -277,12 +277,17 @@ QString QnMediaResourceHelper::resourceName() const {
     return m_camera->getName();
 }
 
+qint64 QnMediaResourceHelper::position() const {
+    return m_position;
+}
+
 void QnMediaResourceHelper::setPosition(qint64 position) {
     if (m_position == position)
         return;
 
     m_position = position;
 
+    emit positionChanged();
     updateFinalTimestamp();
     updateUrl();
 }

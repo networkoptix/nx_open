@@ -374,10 +374,15 @@ QnPage {
             onPausedChanged: {
                 setKeepScreenOn(!paused)
 
-                if (paused)
+                if (paused) {
                     mediaPlayer.pause()
+                    return
+                }
+
+                if (d.resumeAtLive)
+                    mediaPlayer.playLive()
                 else
-                    mediaPlayer.play(d.resumeAtLive ? -1 : timelinePosition)
+                    mediaPlayer.play()
             }
         }
     }

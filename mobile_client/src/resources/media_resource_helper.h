@@ -14,6 +14,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
+    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
@@ -47,7 +48,8 @@ public:
 
     QString resourceName() const;
 
-    Q_INVOKABLE void setPosition(qint64 position);
+    qint64 position() const;
+    void setPosition(qint64 position);
 
     QStringList resolutions() const;
     QString resolution() const;
@@ -73,6 +75,7 @@ signals:
     void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
+    void positionChanged();
     void resolutionsChanged();
     void resolutionChanged();
     void screenSizeChanged();

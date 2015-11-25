@@ -219,7 +219,7 @@ QnObject {
             if (connectionManager.connectionState == QnConnectionManager.Connected) {
                 if (d.resetUrlOnConnect) {
                     d.resetUrlOnConnect = false
-                    resourceHelper.setPosition(position)
+                    resourceHelper.position = position
                 }
             } else {
                 d.resetUrlOnConnect = true
@@ -238,7 +238,7 @@ QnObject {
     function play(pos) {
         d.failed = false
 
-        if (pos && (pos != d.position || pos == -1))
+        if (d.position == -1 || pos && (pos != d.position || pos == -1))
             d.dirty = true
 
         d.paused = false
@@ -253,20 +253,10 @@ QnObject {
 
         var live = (new Date()).getTime()
         var aligned = -1
-        if (live - pos > d.lastMinuteLength) {
+        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
             if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
-        }
-        if (d.position == -1 && aligned == -1) {
-            timelinePositionRequest(d.position)
-            if (!playing) {
-                d.mediaPlayer.play()
-                failureTimer.restart()
-            }
-
-            d.dirty = false
-            return
         }
 
         d.mediaPlayer.stop()
@@ -277,7 +267,11 @@ QnObject {
 
         timelinePositionRequest(d.position)
         d.updateTimeline = true
-        resourceHelper.setPosition(d.position)
+
+        if (d.position == -1 && resourceHelper.position == -1)
+            resourceHelper.updateUrl()
+        else
+            resourceHelper.position = d.position
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
