@@ -7,7 +7,7 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 int main( int argc, char **argv )
 {

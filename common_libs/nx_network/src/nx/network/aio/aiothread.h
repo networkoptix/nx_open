@@ -17,6 +17,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QString>
 
 #include "aioeventhandler.h"
 #include "pollset.h"
@@ -100,7 +101,7 @@ public:
         QnLongRunnable( false ),
         m_impl( new AIOThreadImplType( aioServiceMutex ) )
     {
-        setObjectName( lit("AIOThread") );
+        setObjectName(QString::fromLatin1("AIOThread") );
     }
     virtual ~AIOThread()
     {
@@ -395,7 +396,7 @@ protected:
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 if (errorCode == SystemError::interrupted)
                     continue;
-                NX_LOG(lit("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+                NX_LOG(QString::fromLatin1("AIOThread. poll failed. %1").arg(SystemError::toString(errorCode)), cl_logDEBUG1);
                 msleep(ERROR_RESET_TIMEOUT);
                 continue;
             }
@@ -683,7 +684,7 @@ public:
             if (!pollSet.add(socket, eventType, handlingData.get()))
             {
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
-                NX_LOG(lit("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
+                NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                 //TODO #ak report error to eventHandler
                 return false;
             }
@@ -706,7 +707,7 @@ public:
 
     void removeSocketFromPollSet(SocketType* sock, aio::EventType eventType)
     {
-        //NX_LOG( lit("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
+        //NX_LOG( QString::fromLatin1("removing %1, eventType %2").arg((size_t)sock, 0, 16).arg(eventType), cl_logDEBUG1 );
 
         void*& userData = sock->impl()->eventTypeToUserData[eventType];
         if (userData)
@@ -813,7 +814,7 @@ public:
 
             //TODO #ak notify second handler (if any) and if it not removed by first handler
 
-            //NX_LOG( lit("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType), cl_logDEBUG1 );
+            //NX_LOG( QString::fromLatin1("processing %1, eventType %2").arg((size_t)socket, 0, 16).arg(handlerToInvokeType), cl_logDEBUG1 );
 
             //no need to lock aioServiceMutex, since data is removed in this thread only
             std::shared_ptr<AIOEventHandlingData<SocketType>> handlingData =

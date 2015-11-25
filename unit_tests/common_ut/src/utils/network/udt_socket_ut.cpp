@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/network/http/test_http_server.h>
-#include <utils/network/socket.h>
-#include <utils/network/udt_socket.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/socket.h>
+#include <nx/network/udt_socket.h>
 
 
 class TestHandler

@@ -1,6 +1,6 @@
 #include "request_processor.h"
 
-#include <utils/common/log.h>
+#include <nx/tool/log/log.h>
 
 namespace nx {
 namespace hpm {

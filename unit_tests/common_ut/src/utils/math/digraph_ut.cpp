@@ -12,8 +12,8 @@
 #include <array>
 #include <algorithm>
 
-#include <utils/math/digraph.h>
-#include <utils/thread/mutex_lock_analyzer.h>
+#include <nx/tool/math/digraph.h>
+#include <nx/tool/thread/mutex_lock_analyzer.h>
 
 
 namespace
