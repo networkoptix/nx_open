@@ -13,7 +13,7 @@
 
 #include <QtCore/QMutex>
 
-#include "../thread/mutex_lock_analyzer.h"
+#include "mutex_lock_analyzer.h"
 
 
 class QnMutex;

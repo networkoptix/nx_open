@@ -2,8 +2,7 @@
 #define QN_COMMON_MODULE_H
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <QtCore/QUrl>
 
 #include <core/resource/resource_fwd.h>
 
@@ -11,6 +10,7 @@
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
 #include <utils/common/uuid.h>
+#include <utils/thread/mutex.h>
 #include "network/module_information.h"
 #include "nx_ec/data/api_runtime_data.h"
 

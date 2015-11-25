@@ -852,23 +852,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 template<typename T>
 QString toString( const T& t ) { return t.toString(); }
 
-template<typename Container>
-QString containerString(const Container& container,
-                        const QString& delimiter = QString::fromLatin1(", "),
-                        const QString& prefix = QString::fromLatin1("{ "),
-                        const QString& suffix = QString::fromLatin1(" }"),
-                        const QString& empty = QString::fromLatin1("none"))
-{
-    if (container.begin() == container.end())
-        return empty;
-
-    QStringList strings;
-    for (const auto& item : container)
-          strings << toString(item);
-
-    return lit("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
-}
-
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),
     (metatype)

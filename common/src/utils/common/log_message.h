@@ -12,10 +12,25 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QString>
 
-#include <common/common_globals.h>
-
 
 class QnUuid;
+
+template<typename Container>
+QString containerString(const Container& container,
+    const QString& delimiter = QString::fromLatin1(", "),
+    const QString& prefix = QString::fromLatin1("{ "),
+    const QString& suffix = QString::fromLatin1(" }"),
+    const QString& empty = QString::fromLatin1("none"))
+{
+    if (container.begin() == container.end())
+        return empty;
+
+    QStringList strings;
+    for (const auto& item : container)
+        strings << toString(item);
+
+    return lit("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
+}
 
 //!Adds some useful overloads to \a QString
 class QnLogMessage

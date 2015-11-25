@@ -8,7 +8,7 @@
 #include "mutex.h"
 
 #include "mutex_impl.h"
-#include "../common/long_runnable.h"
+#include "thread_util.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -48,7 +48,7 @@ bool QnMutex::tryLock()
 {
     if( m_impl->mutex.tryLock() )
     {
-        m_impl->threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
+        m_impl->threadHoldingMutex = ::currentThreadSystemId();
         return true;
     }
     return false;

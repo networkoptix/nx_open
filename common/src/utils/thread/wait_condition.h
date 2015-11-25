@@ -8,10 +8,11 @@
 
 #ifdef USE_OWN_MUTEX
 
+#include <climits>
 #include <memory>
 
 #include "mutex.h"
-#include "limits.h"
+
 
 class QnWaitConditionImpl;
 

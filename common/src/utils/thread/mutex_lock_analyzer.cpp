@@ -13,10 +13,10 @@
 #include <QtCore/QMutexLocker>
 
 #include <utils/common/log.h>
-#include <utils/common/long_runnable.h>
 
 #include "mutex.h"
 #include "mutex_impl.h"
+#include "thread_util.h"
 
 
 ////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 {
     QWriteLocker lk( &m_mutex );
 
-    lockedThread = QnLongRunnable::currentThreadSystemId();
+    lockedThread = ::currentThreadSystemId();
 
     m_lockDigraph.removeVertice( mutex );
 }
@@ -211,9 +211,9 @@ void MutexLockAnalyzer::beforeMutexDestruction( QnMutex* const mutex )
 void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition )
 {
     QReadLocker readLock( &m_mutex );
-    lockedThread = QnLongRunnable::currentThreadSystemId();
+    lockedThread = ::currentThreadSystemId();
 
-    const std::uintptr_t curThreadID = QnLongRunnable::currentThreadSystemId();
+    const std::uintptr_t curThreadID = ::currentThreadSystemId();
     auto iter = m_threadContext.lower_bound( curThreadID );
     if( (iter == m_threadContext.end()) || (iter->first != curThreadID) )
     {
@@ -337,9 +337,9 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
 {
     QWriteLocker lk( &m_mutex );
 
-    lockedThread = QnLongRunnable::currentThreadSystemId();
+    lockedThread = ::currentThreadSystemId();
 
-    ThreadContext& threadContext = m_threadContext[QnLongRunnable::currentThreadSystemId()];
+    ThreadContext& threadContext = m_threadContext[::currentThreadSystemId()];
 
     if (threadContext.currentLockPath.empty())
     {

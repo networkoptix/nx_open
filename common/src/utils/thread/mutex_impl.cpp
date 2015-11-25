@@ -6,8 +6,7 @@
 #ifdef USE_OWN_MUTEX
 
 #include "mutex_impl.h"
-
-#include "../common/long_runnable.h"
+#include "thread_util.h"
 
 
 QnMutexImpl::QnMutexImpl( QMutex::RecursionMode mode, QnMutex* const _mutexPtr )
@@ -35,7 +34,7 @@ void QnMutexImpl::afterMutexLocked(
     int sourceLine,
     size_t lockID )
 {
-    threadHoldingMutex = QnLongRunnable::currentThreadSystemId();
+    threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
 
 #ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK

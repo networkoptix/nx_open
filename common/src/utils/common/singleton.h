@@ -3,7 +3,6 @@
 
 #include <typeinfo>
 
-#include "warnings.h"
 
 /**
  * Singleton base class that provides instance access, but does not manage
@@ -23,7 +22,7 @@ protected:
     Singleton() {
         /* Init global instance. */
         if(s_instance) {
-            qnWarning("Instance of %1 already exists.", typeid(Derived).name());
+            assert(false);
         } else {
             s_instance = static_cast<Derived *>(this);
         }
@@ -40,6 +39,5 @@ private:
 
 template<class Derived>
 Derived *Singleton<Derived>::s_instance = NULL;
-
 
 #endif // QN_SINGLETON_H
