@@ -443,15 +443,9 @@ void QnWorkbenchNavigator::initialize() {
             if (!camera)
                 return;
 
-            int sameCamerasCount = 0;
-            for (auto layoutItem: layout->items())
-            {
-                if (extractCamera(layoutItem) == camera)
-                    ++sameCamerasCount;
-            }
-
+            const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
             const auto query = m_bookmarkQueries.getQuery(camera);
-            if ((query == m_currentQuery) && !sameCamerasCount)
+            if ((query == m_currentQuery) && !hasSameCameras)
                 resetCurrentBookmarkQuery();
 
             m_bookmarkQueries.removeQuery(camera);

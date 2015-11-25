@@ -46,8 +46,7 @@ QnHtmlTextItemOptions::QnHtmlTextItemOptions(const QColor &initBackgroundColor
 {
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq) \
-    , (backgroundColor)(maxWidth)(borderRadius)(horPadding)(vertPadding)(autosize));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq), QnHtmlTextItemOptions_Fields);
 
 ///
 
