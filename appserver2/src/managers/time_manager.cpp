@@ -1082,7 +1082,7 @@ namespace ec2
 
         //restoring local time priority from DB
         QByteArray timePriorityStr;
-        if( QnDbManager::instance()->readMiscParam( TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr ) )
+        if (QnDbManager::instance()->readMiscParam(TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr))
         {
             const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
             TimePriorityKey restoredPriorityKey;
@@ -1222,6 +1222,13 @@ namespace ec2
             {
                 forceTimeResync();
             }
+
+            if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+                Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                    &QnDbManager::saveMiscParam,
+                    QnDbManager::instance(),
+                    TIME_DELTA_PARAM_NAME,
+                    QByteArray::number(QDateTime::currentMSecsSinceEpoch() - getSyncTime()))));
         }
 
         QnMutexLocker lk(&m_mutex);
