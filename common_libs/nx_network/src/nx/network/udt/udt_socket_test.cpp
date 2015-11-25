@@ -12,7 +12,7 @@
 #include <QCoreApplication>
 #include <QCommandLineParser>
 
-#include <nx/network/udt_socket.h>
+#include <nx/network/udt/udt_socket.h>
 #include <nx/network/socket_factory.h>
 
 namespace {

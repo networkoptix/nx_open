@@ -17,7 +17,7 @@
 #include "aioeventhandler.h"
 #include "aiothread.h"
 #include "pollset.h"
-#include "../udt_socket.h"
+#include "../udt/udt_socket.h"
 
 // Forward
 namespace nx { class SocketGlobals; }

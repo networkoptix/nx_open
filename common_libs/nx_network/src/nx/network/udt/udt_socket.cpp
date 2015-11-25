@@ -1,22 +1,27 @@
-#include "udt_socket.h"
-#include <nx/network/system_socket.h>
 
-#include <set>
-#include <udt/udt.h>
-#include <nx/tool/log/log.h>
-#include <utils/common/checked_cast.h>
-#include <boost/optional.hpp>
-#include <mutex>
+#include "udt_socket.h"
 
 #ifdef _WIN32
 #  include <ws2tcpip.h>
 #  include <iphlpapi.h>
-#  include "win32_socket_tools.h"
 #else
 #  include <netinet/tcp.h>
 #endif
 
-#include "aio/async_socket_helper.h"
+#include <set>
+#include <mutex>
+
+#include <boost/optional.hpp>
+
+#include <udt/udt.h>
+#include <nx/tool/log/log.h>
+#include <nx/network/system_socket.h>
+#include <utils/common/checked_cast.h>
+
+#include "../aio/async_socket_helper.h"
+#ifdef _WIN32
+#include "../win32_socket_tools.h"
+#endif
 
 #define ADDR_(x) reinterpret_cast<sockaddr*>(x)
 

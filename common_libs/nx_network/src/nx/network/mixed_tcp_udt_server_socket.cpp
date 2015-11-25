@@ -7,7 +7,7 @@
 
 #include <QtCore/QMutexLocker>
 
-#include "udt_socket.h"
+#include "udt/udt_socket.h"
 #include "system_socket.h"
 
 

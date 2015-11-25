@@ -1,12 +1,14 @@
 #ifndef __UDT_SOCKET_H__
 #define __UDT_SOCKET_H__
-#include "abstract_socket.h"
-#include "socket_common.h"
-#include "system_socket.h"
-#include "aio/pollset.h"
+
 #include <memory>
 
-#include "common_socket_impl.h"
+#include "../abstract_socket.h"
+#include "../socket_common.h"
+#include "../system_socket.h"
+#include "../aio/pollset.h"
+#include "../common_socket_impl.h"
+
 
 class UdtSocket;
 typedef CommonSocketImpl<UdtSocket> UDTSocketImpl;

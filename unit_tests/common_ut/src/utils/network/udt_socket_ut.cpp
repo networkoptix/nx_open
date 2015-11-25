@@ -45,6 +45,7 @@ private:
 };
 
 
+namespace {
 void onAcceptedConnection(
     AbstractStreamServerSocket* serverSocket,
     SystemError::ErrorCode /*errCode*/,
@@ -54,6 +55,7 @@ void onAcceptedConnection(
 
     using namespace std::placeholders;
     serverSocket->acceptAsync(std::bind(onAcceptedConnection, serverSocket, _1, _2));
+}
 }
 
 TEST(SocketUdt, cancelConnect)
