@@ -657,6 +657,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 int main(int argc, char **argv)
 {
+	nx::SocketGlobals::InitGuard sgGuard;
+
 #ifdef Q_WS_X11
     XInitThreads();
 #endif
