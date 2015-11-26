@@ -74,6 +74,8 @@ QnSideNavigationItem {
 
     onClicked: {
         if (!active) {
+            connectionManager.disconnectFromServer(false)
+            mainWindow.currentSystemName = systemName
             LoginDialog.connectToServer(sessionId, address, port, user, password)
         } else {
             sideNavigation.hide()

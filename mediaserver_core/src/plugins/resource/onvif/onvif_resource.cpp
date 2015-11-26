@@ -187,23 +187,6 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
     if (square1Max != square2Max)
         return square1Max > square2Max;
 
-    //if (square1Min != square2Min)
-    //    return square1Min > square2Min;
-    
-    // analyse better resolution for secondary stream
-    double coeff1 = 0, coeff2 = 0;
-    QnPlOnvifResource::findSecondaryResolution(max1Res, s1.resolutions, &coeff1);
-    QnPlOnvifResource::findSecondaryResolution(max2Res, s2.resolutions, &coeff2);
-    if (qAbs(coeff1 - coeff2) > 1e-4) {
-
-        if (!s1.isH264 && s2.isH264)
-            coeff2 /= 1.4;
-        else if (s1.isH264 && !s2.isH264)
-            coeff1 /= 1.4;
-
-        return coeff1 < coeff2; // less coeff is better
-    }
-
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)
         return false;

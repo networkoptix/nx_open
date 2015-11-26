@@ -158,3 +158,9 @@ QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
 
     return params;
 }
+
+bool QnAbstractBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const
+{
+    Q_UNUSED(params);
+    return true;
+}

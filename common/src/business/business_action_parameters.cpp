@@ -16,7 +16,12 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , inputPortId()
     , sayText()
     , tags()
-    , bookmarkDuration(0)
+    , text()
+    , durationMs(0)
+    , additionalResources()
+    , forced(true)
+    , presetId()
+    , useSource(false)
 {}
 
 

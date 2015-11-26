@@ -1013,10 +1013,10 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     QnTimePeriodList::const_iterator pos[Qn::TimePeriodContentCount];
     QnTimePeriodList::const_iterator end[Qn::TimePeriodContentCount];
     int chunkCount = 0;
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
          pos[i] = d->timePeriods[i].findNearestPeriod(minimumValue, true);
          end[i] = d->timePeriods[i].findNearestPeriod(maximumValue, true);
-         if(end[i] != d->timePeriods[i].end() && end[i]->contains(maximumValue))
+         if (end[i] != d->timePeriods[i].end() && end[i]->contains(maximumValue))
              end[i]++;
 
          chunkCount += std::distance(pos[i], end[i]);
@@ -1024,7 +1024,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
     qint64 value = minimumValue;
     bool inside[Qn::TimePeriodContentCount];
-    for(int i = 0; i < Qn::TimePeriodContentCount; i++)
+    for (int i = 0; i < Qn::TimePeriodContentCount; i++)
         inside[i] = pos[i] == end[i] ? false : pos[i]->contains(value);
 
     qreal y = height() - d->chunkBarHeight;
@@ -1034,22 +1034,35 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     colors[Qn::RecordingContent] = d->chunkColor;
     colors[Qn::TimePeriodContentCount] = d->chunkBarColor;
     chunkPainter.setColors(colors);
-    chunkPainter.start(value, position(), QRectF(0, y, width(), height() - y),
+    chunkPainter.start(value, QRectF(0, y, width(), height() - y),
                        chunkCount, minimumValue, maximumValue);
 
-    while (value != maximumValue) {
-        qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
-        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-            if(pos[i] == end[i])
+    while (value < maximumValue) {
+        qint64 nextValue[Qn::TimePeriodContentCount] = { maximumValue, maximumValue };
+        for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
+            if (pos[i] == end[i])
                 continue;
 
-            if(!inside[i]) {
+            if (pos[i] != d->timePeriods[i].begin()) {
+                const auto prev = pos[i] - 1;
+                if (pos[i]->startTimeMs < prev->startTimeMs) {
+                    // TODO: Check Time periods merging and prevent this warning from appearing.
+                    qWarning() << "Invalid period order!"
+                               << "Current is:" << pos[i]->startTimeMs << pos[i]->endTimeMs()
+                               << "Previous was:" << prev->startTimeMs << prev->endTimeMs();
+                    pos[i]++;
+                    inside[i] = pos[i] != end[i];
+                    continue;
+                }
+            }
+
+            if (!inside[i]) {
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs);
                 continue;
             }
 
-            if(!pos[i]->isInfinite())
-                nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
+            if (!pos[i]->isInfinite())
+                nextValue[i] = qMin(maximumValue, pos[i]->endTimeMs());
         }
 
         qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
@@ -1065,11 +1078,11 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
 
         chunkPainter.paintChunk(bestValue - value, content);
 
-        for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-            if(bestValue != nextValue[i])
+        for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
+            if (bestValue != nextValue[i])
                 continue;
 
-            if(inside[i])
+            if (inside[i])
                 pos[i]++;
             inside[i] = !inside[i];
         }

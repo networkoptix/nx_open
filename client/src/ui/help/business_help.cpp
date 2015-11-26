@@ -31,26 +31,29 @@ int QnBusiness::eventHelpId(QnBusiness::EventType type) {
 
 int QnBusiness::actionHelpId(QnBusiness::ActionType type) {
     switch (type) {
-    case CameraOutputAction:
-    case CameraOutputOnceAction:
+    case QnBusiness::CameraOutputAction:
+    case QnBusiness::CameraOutputOnceAction:
         return Qn::EventsActions_CameraOutput_Help;
-    case CameraRecordingAction:
+    case QnBusiness::CameraRecordingAction:
         return Qn::EventsActions_StartRecording_Help;
-    case PanicRecordingAction:
+    case QnBusiness::PanicRecordingAction:
         return Qn::EventsActions_StartPanicRecording_Help;
-    case SendMailAction:
+    case QnBusiness::SendMailAction:
         return Qn::EventsActions_SendMail_Help;
-    case ShowPopupAction:
+    case QnBusiness::ShowPopupAction:
         return Qn::EventsActions_ShowNotification_Help;
-    case PlaySoundOnceAction:
+    case QnBusiness::PlaySoundOnceAction:
         return Qn::EventsActions_PlaySound_Help;
-    case PlaySoundAction:
+    case QnBusiness::PlaySoundAction:
         return Qn::EventsActions_PlaySoundRepeated_Help;
-    case SayTextAction:
+    case QnBusiness::SayTextAction:
         return Qn::EventsActions_Speech_Help;
-    case DiagnosticsAction:
+    case QnBusiness::DiagnosticsAction:
         return Qn::EventsActions_Diagnostics_Help;
-    case BookmarkAction:
+    case QnBusiness::BookmarkAction:
+    case QnBusiness::ExecutePtzPresetAction:
+    case QnBusiness::ShowTextOverlayAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
         return -1;
     default:
         return -1;

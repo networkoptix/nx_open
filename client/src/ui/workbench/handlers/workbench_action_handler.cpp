@@ -1188,7 +1188,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if (!widget)
         return;
 
-    bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+    bool isSearchLayout = workbench()->currentLayout()->isSearchLayout();
     
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);

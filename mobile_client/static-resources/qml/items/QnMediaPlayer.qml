@@ -16,6 +16,8 @@ QnObject {
     readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
     readonly property bool atLive: d.position < 0
 
+    readonly property alias failed: d.failed
+
     readonly property alias position: d.position
     readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
 
@@ -34,6 +36,9 @@ QnObject {
         readonly property int lastMinuteLength: 60000
         readonly property int maximumInitialPosition: 2000
 
+        property bool failed: false
+        property int startPosition: 0
+
         property bool paused: false
         property real position: -1
         property real chunkEnd: -1
@@ -42,6 +47,25 @@ QnObject {
         property bool dirty: true
         property alias mediaPlayer: playerLoader.item
         property bool resetUrlOnConnect: false
+    }
+
+    Timer {
+        id: failureTimer
+
+        interval: resourceHelper.protocol == QnMediaResourceHelper.Mjpeg ? 20 * 1000 : 120 * 1000
+        repeat: false
+        running: false
+        onTriggered: {
+            if (d.startPosition == d.mediaPlayer.position)
+                d.failed = true
+            d.mediaPlayer.stop()
+        }
+        onRunningChanged: {
+            if (running) {
+                d.failed = false
+                d.startPosition = d.mediaPlayer.position
+            }
+        }
     }
 
     Loader {
@@ -147,14 +171,18 @@ QnObject {
     }
 
     function play(pos) {
+        d.failed = false
+
         if (pos && (pos != d.position || pos == -1))
             d.dirty = true
 
         d.paused = false
 
         if (!d.dirty) {
-            if (!playing)
+            if (!playing) {
                 d.mediaPlayer.play()
+                failureTimer.restart()
+            }
             return
         }
 
@@ -167,8 +195,10 @@ QnObject {
         }
         if (d.position == -1 && aligned == -1) {
             timelinePositionRequest(d.position)
-            if (!playing)
+            if (!playing) {
                 d.mediaPlayer.play()
+                failureTimer.restart()
+            }
 
             d.dirty = false
             return
@@ -185,6 +215,7 @@ QnObject {
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
+        failureTimer.restart()
 
         d.dirty = false
     }

@@ -424,6 +424,11 @@ namespace Qn {
         OpenInNewLayoutAction,
 
         /**
+         * Opens selected resources in the Alarm Layout.
+         */
+        OpenInAlarmLayoutAction,
+
+        /**
          * Opens selected resources in a new window.
          */
         OpenInNewWindowAction,

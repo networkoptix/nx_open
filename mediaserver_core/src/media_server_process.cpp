@@ -244,6 +244,7 @@ static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
+static const QByteArray PREV_SYSTEM_NAME_KEY("prevSystemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
 
 class MediaServerProcess;
@@ -1756,7 +1757,15 @@ void MediaServerProcess::run()
         serverFlags |= Qn::SF_HasPublicIP;
 
 
+    // If system name has been changed, reset 'database restore time' variable
     QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
+    QString prevSystemName = settings->value(PREV_SYSTEM_NAME_KEY).toString();
+    if (systemName != prevSystemName) {
+        if (!prevSystemName.isEmpty())
+            settings->setValue(SYSTEM_IDENTITY_TIME, QString());
+        settings->setValue(PREV_SYSTEM_NAME_KEY, systemName);
+    }
+
 #ifdef __arm__
     if (systemName.isEmpty()) {
         systemName = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());

@@ -164,7 +164,6 @@ struct QnResourceWidgetFrameColors {
 };
 #define QnResourceWidgetFrameColors_Fields (normal)(active)(selected)
 
-
 struct QnBookmarkColors {
     QnBookmarkColors();
 
@@ -175,8 +174,18 @@ struct QnBookmarkColors {
     QColor separator;
     QColor tags;
 };
-
 #define QnBookmarkColors_Fields (tooltipBackground)(background)(text)(separator)(tags)
+
+struct QnCompositeTextOverlayColors
+{
+    QnCompositeTextOverlayColors();
+
+    QnBookmarkColors bookmarkColors;
+
+    QColor textOverlayItemColor;
+
+};
+#define QnCompositeTextOverlayColors_Fields (bookmarkColors)(textOverlayItemColor)
 
 
 struct QnLicensesListModelColors {
@@ -290,10 +299,15 @@ struct QnBackupCamerasColors {
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
     (QnBackupCamerasColors) \
+    (QnBookmarkColors) \
+    (QnCompositeTextOverlayColors) \
+
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
-    (metatype)(json)
+    (metatype)(json)(eq)
+
+
 );
 
 #endif // QN_CLIENT_COLOR_TYPES_H

@@ -105,7 +105,7 @@ Item {
 
                 d.shiftToNeighbourMonth()
             }
-            monthsList.onContentWidthChanged: {
+            monthsList.onContentHeightChanged: {
                 monthsList.positionViewAtIndex(1, ListView.Beginning)
             }
         }
@@ -131,7 +131,7 @@ Item {
 
                 d.shiftToNeighbourMonth()
             }
-            monthsList.onContentWidthChanged: {
+            monthsList.onContentHeightChanged: {
                 monthsList.positionViewAtIndex(1, ListView.Beginning)
             }
         }

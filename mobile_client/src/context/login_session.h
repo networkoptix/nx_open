@@ -10,7 +10,6 @@ struct QnLoginSession {
     int port;
     QString user;
     QString password;
-    QnSoftwareVersion serverVersion;
 
     QnLoginSession();
 

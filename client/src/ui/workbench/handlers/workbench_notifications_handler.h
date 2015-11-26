@@ -33,8 +33,8 @@ signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
     void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
 
-    void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
-    void businessActionRemoved(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationAdded(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationRemoved(const QnAbstractBusinessActionPtr& businessAction);
     
     void cleared();
 
@@ -53,7 +53,7 @@ private slots:
     void at_emailSettingsChanged();
 
 private:
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    void addNotification(const QnAbstractBusinessActionPtr& businessAction);
 
     /**
      * Check that system health message can be displayed to admins only.
