@@ -36,8 +36,7 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(CodecID codecId):
     m_averageVideoTimePerFrame(0),
     m_encodedFrames(0),
     m_droppedFrames(0),
-    m_useRealTimeOptimization(false),
-    m_prevCodecID(CODEC_ID_NONE)
+    m_useRealTimeOptimization(false)
 {
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
     {
@@ -162,12 +161,6 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
 
     if (result)
         *result = QnCompressedVideoDataPtr();
-
-    if (m_prevCodecID != video->compressionType) {
-        if (m_prevCodecID != CODEC_ID_NONE && video->context)
-            decoder->resetDecoder(video);
-        m_prevCodecID = video->compressionType;
-    }
 
     if (!decoder->decode(video, &m_decodedVideoFrame))
         return 0; // ignore decode error

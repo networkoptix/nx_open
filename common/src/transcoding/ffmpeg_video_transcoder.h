@@ -55,7 +55,6 @@ private:
     qint64 m_averageVideoTimePerFrame;
     qint64 m_encodedFrames;
     qint64 m_droppedFrames;
-    CodecID m_prevCodecID;
 
     bool m_useRealTimeOptimization;
 };
