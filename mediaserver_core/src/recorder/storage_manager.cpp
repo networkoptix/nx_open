@@ -63,8 +63,8 @@ class ArchiveScanPosition
 {
 public:
     ArchiveScanPosition(QnServer::StoragePool role) 
-        : m_catalog(QnServer::LowQualityCatalog),
-          m_role(role)
+        : m_role(role),
+          m_catalog(QnServer::LowQualityCatalog)
     {}
 
     ArchiveScanPosition(QnServer::StoragePool       role,
