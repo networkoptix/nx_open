@@ -131,8 +131,6 @@ public:
 
     // comparators
 
-    typedef std::function<bool(const DataIndex */*this*/, const QnLightBusinessActionP &, const QnLightBusinessActionP &)> LessFunc;
-
     bool lessThanTimestamp(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
         return d1->eventParams.eventTimestampUsec < d2->eventParams.eventTimestampUsec;
@@ -187,7 +185,10 @@ public:
                 *dst++ = &data[j];
         }
 
-        LessFunc lessThan = nullptr;
+        // typedef std::function<bool(const DataIndex * /*this*/, const QnLightBusinessActionP &, const QnLightBusinessActionP &)> LessFunc;
+        typedef bool (DataIndex::*LessFunc)(const QnLightBusinessActionP &, const QnLightBusinessActionP &) const;
+
+        LessFunc lessThan;
         switch (m_sortCol) {
         case DateTimeColumn:
             lessThan = &DataIndex::lessThanTimestamp;
@@ -206,7 +207,8 @@ public:
         }
 
         qSort(m_records.begin(), m_records.end(), [this, lessThan](const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) {
-            return lessThan(this, d1, d2);
+            //return lessThan(this, d1, d2);
+            return (this->*lessThan)(d1, d2);
         });
     }
 
