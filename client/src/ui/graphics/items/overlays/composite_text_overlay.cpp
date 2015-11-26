@@ -189,22 +189,15 @@ void QnCompositeTextOverlay::initTextMode()
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
     {
-        //qDebug() << "---new action" << businessAction->actionType() << ":" 
-        //    << cameraId << ":" << businessAction->getResources()
-        //    << ":" << businessAction->getResources().size() << ":"
-        //    << (cameraId == businessAction->getParams().actionResourceId) ;
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
-        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
-        /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
-
-        if (!businessAction->getResources().contains(cameraId))
+        const auto &actionParams = businessAction->getParams();
+        if (actionParams.actionResourceId != cameraId)
             return;
 
         enum { kDefaultInstantActionTimeoutMs = 5000 };
 
-        const auto &actionParams = businessAction->getParams();
         const auto state = businessAction->getToggleState();
         const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
         const int timeout = (isInstantAction 
