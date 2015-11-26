@@ -35,4 +35,16 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libconnection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>
