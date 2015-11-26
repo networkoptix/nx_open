@@ -8,9 +8,9 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/network/http/test_http_server.h>
-#include <utils/network/socket.h>
-#include <utils/network/udt_socket.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/socket.h>
+#include <nx/network/udt/udt_socket.h>
 
 
 class TestHandler
@@ -45,15 +45,17 @@ private:
 };
 
 
+namespace {
 void onAcceptedConnection(
     AbstractStreamServerSocket* serverSocket,
-    SystemError::ErrorCode errCode,
+    SystemError::ErrorCode /*errCode*/,
     AbstractStreamSocket* sock)
 {
     delete sock;
 
     using namespace std::placeholders;
     serverSocket->acceptAsync(std::bind(onAcceptedConnection, serverSocket, _1, _2));
+}
 }
 
 TEST(SocketUdt, cancelConnect)
@@ -78,7 +80,7 @@ TEST(SocketUdt, cancelConnect)
     for (int i = 0; i < 100; ++i)
     {
         UdtStreamSocket sock(false);
-        std::atomic<bool> handlerCalled = false;
+        std::atomic<bool> handlerCalled(false);
         ASSERT_TRUE(sock.setNonBlockingMode(true));
         sock.connectAsync(
             serverSocket.getLocalAddress(),

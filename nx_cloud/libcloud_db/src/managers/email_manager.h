@@ -14,7 +14,7 @@
 
 #include <nx_ec/data/api_email_data.h>
 #include <utils/common/threadqueue.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 namespace nx {

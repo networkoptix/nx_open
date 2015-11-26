@@ -4,7 +4,7 @@
 #include "common/common_module.h"
 #include "network/module_finder.h"
 #include "network/module_information.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 

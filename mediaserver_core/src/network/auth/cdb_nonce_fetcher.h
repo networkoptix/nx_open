@@ -18,9 +18,9 @@
 #include <QtCore/QObject>
 
 #include <cdb/connection.h>
-#include <utils/common/timermanager.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/timermanager.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_nonce_provider.h"
 

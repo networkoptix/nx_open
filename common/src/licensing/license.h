@@ -8,7 +8,7 @@
 #include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QTimer>

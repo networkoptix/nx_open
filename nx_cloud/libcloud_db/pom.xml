@@ -26,12 +26,12 @@
         <product.title>${company.name} libcloud_db</product.title>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -ludt -lcloud_db_client -lnxemail</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lnxemail -lavcodec -lavformat -lavutil</linux.oslibs>
+        <linux.oslibs>-lnx_email -lavcodec -lavformat -lavutil</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
@@ -40,16 +40,35 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
-
+	
     <dependencies>
-         <dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nxemail</artifactId>
+            <artifactId>common</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nxemail/pom.xml</systemPath>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+		
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+		
+         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_email</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
+        </dependency>
+		
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>cloud_db_client</artifactId>

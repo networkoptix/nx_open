@@ -11,7 +11,7 @@
 
 #include <plugins/resource/onvif/onvif_resource.h>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "dw_resource_settings.h"
 

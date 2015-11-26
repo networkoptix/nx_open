@@ -7,7 +7,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/model_functions.h>
 
 QnCameraAdvancedParamValue::QnCameraAdvancedParamValue() {}

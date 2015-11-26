@@ -17,10 +17,10 @@
 #include <network/router.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 namespace {
     static std::array<QString, static_cast<int>(QnBookmarkOperation::Count)>  operations =

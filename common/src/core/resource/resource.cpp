@@ -9,7 +9,7 @@
 #include <QtCore/QMetaProperty>
 #include <QtCore/QRunnable>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/model_functions.h>
 

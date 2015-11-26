@@ -1,12 +1,12 @@
 #ifndef __IOMODULE_MONITOR_H_
 #define __IOMODULE_MONITOR_H_
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "api/model/api_ioport_data.h"
 #include "core/resource/resource_fwd.h"
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/network/http/multipart_content_parser.h"
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
 
 class AbstractByteStreamFilter;
 

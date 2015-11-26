@@ -17,7 +17,7 @@
 #include <cdb/account_manager.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/sync_call.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "version.h"
 
@@ -65,7 +65,7 @@ void CdbFunctionalTest::start()
     m_cdbProcessFuture = std::async(
         std::launch::async,
         [this, &cdbInstantiatedCreatedPromise]()->int {
-            m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcess>(
+            m_cdbInstance = std::make_unique<nx::cdb::CloudDBProcessPublic>(
                 static_cast<int>(m_args.size()), m_args.data());
             cdbInstantiatedCreatedPromise.set_value();
             return m_cdbInstance->exec();

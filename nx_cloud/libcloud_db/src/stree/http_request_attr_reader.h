@@ -7,7 +7,7 @@
 #define NX_CDB_STREE_HTTP_REQUEST_ATTR_READER_H
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 namespace nx {

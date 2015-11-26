@@ -2,7 +2,7 @@
 
 #include "dlink_resource.h"
 
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "dlink_stream_reader.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"

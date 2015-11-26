@@ -1,5 +1,5 @@
 #include "old_client_connect_rest_handler.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/common/app_info.h>
 #include <QFile>
 

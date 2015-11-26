@@ -9,7 +9,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "network/ffmpeg_rtp_parser.h"
 #include "network/multicodec_rtp_reader.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 
 class QnDesktopCameraStreamReader: public CLServerPushStreamReader
 {

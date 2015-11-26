@@ -3,13 +3,13 @@
 #include "vmax480_tcp_server.h"
 
 #include <QtCore/QElapsedTimer>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QString>
 
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "vmax480_stream_fetcher.h"
-#include "network/tcp_connection_priv.h"
+#include <network/tcp_connection_priv.h>
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 
 static const int UUID_LEN = 38;

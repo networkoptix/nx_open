@@ -135,7 +135,7 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 

@@ -20,7 +20,7 @@
         <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -ludt -lcloud_db_client -lconnection_mediator</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib -lssleay32 -llibeay32 Iphlpapi.lib</windows.oslibs>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
@@ -35,4 +35,16 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libconnection_mediator</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libconnection_mediator/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>

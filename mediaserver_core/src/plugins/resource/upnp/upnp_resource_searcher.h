@@ -5,10 +5,10 @@
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_searcher.h"
-#include "utils/network/nettools.h"
-#include "utils/network/socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/socket.h>
 
-#include "utils/network/upnp/upnp_device_searcher.h"
+#include <nx/network/upnp/upnp_device_searcher.h>
 
 // TODO: Remove and and use nx_upnp::DeviceSearcher instead!
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher

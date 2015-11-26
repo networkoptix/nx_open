@@ -9,7 +9,7 @@
 #include <api/applauncher_api.h>
 #include <api/ipc_pipe_names.h>
 #include <utils/ipc/named_pipe_socket.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace applauncher

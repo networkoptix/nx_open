@@ -16,14 +16,14 @@
 
 #include <api/global_settings.h>
 #include <platform/process/current_process.h>
-#include <utils/network/auth_restriction_list.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
-#include <utils/network/socket_global.h>
-#include <utils/network/http/server/http_message_dispatcher.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/http/server/http_message_dispatcher.h>
 
 #include "access_control/authentication_manager.h"
 #include "db/structure_update_statements.h"

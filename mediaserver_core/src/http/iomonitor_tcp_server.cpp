@@ -11,8 +11,8 @@
 #include "network/tcp_connection_priv.h"
 #include "utils/serialization/json.h"
 #include <utils/common/model_functions.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {

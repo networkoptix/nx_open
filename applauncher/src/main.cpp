@@ -12,7 +12,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
-#include <utils/network/socket_global.h>
+#include <nx/network/socket_global.h>
 #include "version.h"
 
 #include "applauncher_process.h"
@@ -309,7 +309,7 @@ int doInstallation(
 #include <fstream>
 #include <string.h>
 
-#include <utils/network/http/httpclient.h>
+#include <nx/network/http/httpclient.h>
 
 //--rsync --dir=c:/temp/1 --url=http://enk.me/clients/2.1/default/windows/x64/
 //--rsync --dir=c:/tmp/1/ --url=http://downloads.hdwitness.com/clients/2.1/default/windows/x64/

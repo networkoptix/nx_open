@@ -2,7 +2,7 @@
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
 #include <atomic>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <network/rtpsession.h>
 #include <network/ffmpeg_rtp_parser.h>
 

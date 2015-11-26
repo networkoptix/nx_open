@@ -11,7 +11,7 @@
 #include <QByteArray>
 #include <QString>
 
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 
 //!Used by google test to print QByteArray as text

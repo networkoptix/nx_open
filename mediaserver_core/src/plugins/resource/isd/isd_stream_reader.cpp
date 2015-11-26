@@ -4,9 +4,9 @@
 
 #include <QtCore/QTextStream>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "isd_resource.h"
 

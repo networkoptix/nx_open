@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_MODEL_TYPES_H
 #define QN_CLIENT_MODEL_TYPES_H
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QList>
 #include <QtCore/QHash>
 #include <QtCore/QString>

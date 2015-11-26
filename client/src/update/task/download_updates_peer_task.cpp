@@ -6,7 +6,7 @@
 #include <QtNetwork/QNetworkRequest>
 
 #include <utils/update/update_utils.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 namespace {
 

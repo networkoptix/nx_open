@@ -7,8 +7,9 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/log.h>
-#include <utils/network/socket_factory.cpp>
+#include <nx/utils/log/log.h>
+#include <nx/network/socket_factory.h>
+#include <nx/network/socket_global.h>
 
 int main( int argc, char **argv )
 {
@@ -19,8 +20,10 @@ int main( int argc, char **argv )
         10,
         cl_logDEBUG2);
 #endif
-
+	
+	nx::SocketGlobals::InitGuard sgGuard;
     ::testing::InitGoogleTest( &argc, argv );
+
     for( int i = 0; i < argc; ++i )
     {
         std::string arg( argv[ i ] );

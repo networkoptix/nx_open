@@ -1,7 +1,7 @@
 #ifndef QN_REMOTE_PTZ_CONTROLLER_H
 #define QN_REMOTE_PTZ_CONTROLLER_H
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QAtomicInt>
 
 #include "abstract_ptz_controller.h"

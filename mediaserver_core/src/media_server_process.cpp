@@ -19,7 +19,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
@@ -157,14 +157,14 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/util.h>
-#include <utils/network/simple_http_client.h>
-#include <utils/network/ssl_socket.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/network/ssl_socket.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -209,7 +209,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "http/iomonitor_tcp_server.h"
 #include "ldap/ldap_manager.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"

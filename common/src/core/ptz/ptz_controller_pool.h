@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 
 #include <core/resource/resource_fwd.h>

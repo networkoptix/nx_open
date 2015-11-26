@@ -4,7 +4,7 @@
 
 #include <core/resource/resource.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 struct FffmpegLog
 {

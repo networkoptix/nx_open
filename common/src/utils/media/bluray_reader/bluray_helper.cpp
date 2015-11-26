@@ -8,7 +8,7 @@ extern "C"
 }
 
 #include "utils/common/util.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 
 #ifdef _MSC_VER

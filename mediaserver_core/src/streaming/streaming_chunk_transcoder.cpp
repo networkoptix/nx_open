@@ -4,7 +4,7 @@
 
 #include "streaming_chunk_transcoder.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/dataprovider/h264_mp4_to_annexb.h>
 #include <core/resource_management/resource_pool.h>
@@ -12,8 +12,8 @@
 #include <plugins/resource/archive/abstract_archive_stream_reader.h>
 #include <recording/time_period.h>
 #include <transcoding/ffmpeg_transcoder.h>
-#include <utils/common/log.h>
-#include <utils/common/timermanager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/timermanager.h>
 
 #include "ondemand_media_data_provider.h"
 #include "live_media_cache_reader.h"

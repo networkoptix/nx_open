@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/network/pcp/messaging.h>
+#include <nx/network/pcp/messaging.h>
 #include <utils/memory/data_stream_helpers.h>
 
 using namespace pcp;

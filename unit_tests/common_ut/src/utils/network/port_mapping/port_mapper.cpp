@@ -1,4 +1,4 @@
-#include "utils/network/port_mapping/port_mapper.h"
+#include <nx/network/port_mapping/port_mapper.h>
 #include <gtest/gtest.h>
 
 TEST(NatPnpPortMapper, Test)

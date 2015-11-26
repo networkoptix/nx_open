@@ -1,8 +1,8 @@
 #ifndef UPNP_PORT_MAPPER_MOCKED_H
 #define UPNP_PORT_MAPPER_MOCKED_H
 
-#include <utils/network/upnp/upnp_async_client.h>
-#include <utils/network/upnp/upnp_port_mapper.h>
+#include <nx/network/upnp/upnp_async_client.h>
+#include <nx/network/upnp/upnp_port_mapper.h>
 
 namespace nx_upnp {
 namespace test {

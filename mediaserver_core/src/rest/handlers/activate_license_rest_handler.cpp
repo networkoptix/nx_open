@@ -7,7 +7,7 @@
 #include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "common/common_module.h"
 #include "licensing/license.h"
 #include "api/runtime_info_manager.h"
@@ -17,7 +17,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
-#include <nxemail/mustache/mustache_helper.h>
+#include <nx/email/mustache/mustache_helper.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 

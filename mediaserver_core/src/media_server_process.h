@@ -19,9 +19,9 @@
 #include "utils/common/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
 #include "utils/common/public_ip_discovery.h"
-#include <utils/network/http/http_mod_manager.h>
-#include <utils/network/upnp/upnp_port_mapper.h>
-#include <utils/network/cloud_connectivity/mediator_address_publisher.h>
+#include <nx/network/http/http_mod_manager.h>
+#include <nx/network/upnp/upnp_port_mapper.h>
+#include <nx/network/cloud_connectivity/mediator_address_publisher.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;

@@ -4,9 +4,9 @@
 
 #include <memory>
 
-#include <utils/network/nettools.h>
-#include <utils/network/system_socket.h>
-#include <utils/network/socket_factory.h>
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/socket_factory.h>
 
 #ifndef Q_OS_WIN
 #include <netinet/in.h>

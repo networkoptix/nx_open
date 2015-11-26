@@ -2,7 +2,7 @@
 #define __PUBLIC_IP_DISCOVERY_H_
 
 #include <QHostAddress>
-#include "utils/network/http/async_http_client_reply.h"
+#include <nx/network/http/async_http_client_reply.h>
 
 class QnPublicIPDiscovery: public QObject
 {

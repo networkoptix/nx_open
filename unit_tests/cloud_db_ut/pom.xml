@@ -20,10 +20,10 @@
         <product.title>cloud_db unit tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnxemail -ludt -lcloud_db -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_email -ludt -lcloud_db -lcloud_db_client</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib Wldap32.lib</windows.oslibs>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
+        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac -lssl</linux.oslibs>
         <linux.arm.oslibs></linux.arm.oslibs>
         <windows.oslibs.release></windows.oslibs.release>
         <windows.oslibs.debug></windows.oslibs.debug>
@@ -35,4 +35,16 @@
         <linux.defines/>
         <mac.defines/>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libcoud_db</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libcloud_db/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
 </project>

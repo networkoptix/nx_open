@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 
 namespace nx_http

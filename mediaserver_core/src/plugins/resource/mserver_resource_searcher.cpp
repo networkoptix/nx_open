@@ -1,8 +1,8 @@
 #include "mserver_resource_searcher.h"
 
 #include <business/events/mserver_conflict_business_event.h>
-#include "utils/network/nettools.h"
-#include "utils/network/system_socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h" /* For DEFAULT_APPSERVER_HOST. */

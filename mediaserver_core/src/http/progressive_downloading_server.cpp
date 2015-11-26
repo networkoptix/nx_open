@@ -8,7 +8,7 @@
 
 #include <server/server_globals.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>

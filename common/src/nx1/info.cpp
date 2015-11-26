@@ -12,7 +12,7 @@
 
 #include "utils/common/app_info.h"
 #include "utils/fs/dir.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 
 
 namespace

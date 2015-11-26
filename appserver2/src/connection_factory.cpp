@@ -7,13 +7,13 @@
 
 #include <functional>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/auth_tools.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
 

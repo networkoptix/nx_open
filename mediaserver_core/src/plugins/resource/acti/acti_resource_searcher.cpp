@@ -6,7 +6,7 @@
 #include "core/resource/camera_resource.h"
 #include "acti_resource.h"
 #include "../mdns/mdns_listener.h"
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"

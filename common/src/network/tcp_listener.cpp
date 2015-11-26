@@ -3,10 +3,10 @@
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 // ------------------------ QnTcpListenerPrivate ---------------------------
 

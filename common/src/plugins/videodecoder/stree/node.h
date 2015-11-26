@@ -7,7 +7,7 @@
 
 #include "resourcecontainer.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 /*!

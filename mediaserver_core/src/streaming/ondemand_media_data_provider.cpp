@@ -4,7 +4,7 @@
 
 #include "ondemand_media_data_provider.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 static const size_t MAX_DATA_QUEUE_SIZE = 16;   //TODO: #ak is queue really needed here?

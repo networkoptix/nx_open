@@ -1,5 +1,5 @@
 #include <QtCore/QString>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtGui/QDesktopServices>
 #include <QtCore/QDir>
 #include <QtCore/QEventLoop>
@@ -11,7 +11,7 @@
 #include <nx_ec/dummy_handler.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <network/authenticate_helper.h>

@@ -5,9 +5,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
-#include <utils/common/singleton.h>
-#include <utils/network/socket_common.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
+#include <nx/network/socket_common.h>
 #include <core/resource/resource_fwd.h>
 
 #include "module_information.h"

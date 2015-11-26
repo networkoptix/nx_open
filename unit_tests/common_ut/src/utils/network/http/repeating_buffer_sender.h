@@ -6,7 +6,7 @@
 #ifndef REPEATING_BUFFER_SENDER_H
 #define REPEATING_BUFFER_SENDER_H
 
-#include <utils/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
 
 
 //!Sends specified buffer forever

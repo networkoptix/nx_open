@@ -5,7 +5,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
     base_type()

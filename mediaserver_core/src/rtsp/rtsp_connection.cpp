@@ -1,7 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
@@ -21,7 +21,7 @@
 #include <utils/common/string.h>
 
 #include "network/tcp_connection_priv.h"
-#include "utils/network/rtsp/rtsp_types.h"
+#include <nx/network/rtsp/rtsp_types.h>
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
 #include "network/rtpsession.h"

@@ -3,10 +3,10 @@
 
 #ifdef ENABLE_VMAX
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QMap>
-#include "network/tcp_listener.h"
-#include "network/tcp_connection_processor.h"
+#include <network/tcp_listener.h>
+#include <network/tcp_connection_processor.h>
 #include "core/datapacket/media_data_packet.h"
 #include "vmax480_stream_fetcher.h"
 

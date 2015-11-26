@@ -5,7 +5,7 @@
 
 #include <utils/fs/file.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>

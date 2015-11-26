@@ -3,9 +3,9 @@
 #include "vmax480_resource_searcher.h"
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/simple_http_client.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>

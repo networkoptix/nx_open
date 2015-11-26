@@ -7,10 +7,12 @@
 
 #include <QCoreApplication>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/socket_global.h>
 
 int main( int argc, char **argv )
 {
+	nx::SocketGlobals::InitGuard sgGuard;
     QnLog::initLog("DEBUG2");
 
     ::testing::InitGoogleTest(&argc, argv);

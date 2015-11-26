@@ -1,6 +1,6 @@
 #include "client_video_camera.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <core/dataprovider/media_streamdataprovider.h>
 #include <core/resource/media_resource.h>

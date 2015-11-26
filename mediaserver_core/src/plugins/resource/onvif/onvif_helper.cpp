@@ -3,7 +3,7 @@
 
 #include "onvif_helper.h"
 #include "onvif/soapDeviceBindingProxy.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "core/resource/resource_type.h"
 
 #include <QtCore/QDebug>

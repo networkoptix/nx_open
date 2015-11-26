@@ -17,10 +17,10 @@
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>
 #include <utils/applauncher_utils.h>
-#include <utils/network/http/async_http_client_reply.h>
+#include <nx/network/http/async_http_client_reply.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 

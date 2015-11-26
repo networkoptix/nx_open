@@ -1,8 +1,8 @@
 #ifndef MEDIASERVER_API_H
 #define MEDIASERVER_API_H
 
-#include <utils/network/socket_common.h>
-#include <utils/network/http/httpclient.h>
+#include <nx/network/socket_common.h>
+#include <nx/network/http/httpclient.h>
 
 #include "request_processor.h"
 

@@ -5,14 +5,14 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver-x86", "src\medi
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${mediaserver_core.guid} = ${mediaserver_core.guid}
-		${nxemail.guid} = ${nxemail.guid}
+		${nx_email.guid} = ${nx_email.guid}
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver_core-x86", "..\mediaserver_core\src\mediaserver_core-x86.vcxproj", "${mediaserver_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
-		${nxemail.guid} = ${nxemail.guid}
+		${nx_email.guid} = ${nx_email.guid}
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
@@ -23,7 +23,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x86", "..\appser
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nxemail-x86", "..\common_libs\nxemail\src\nxemail-x86.vcxproj", "${nxemail.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_email-x86", "..\common_libs\nx_email\src\nx_email-x86.vcxproj", "${nx_email.guid}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,10 @@ Global
 		${appserver2.guid}.Debug|Win32.Build.0 = Debug|Win32
 		${appserver2.guid}.Release|Win32.ActiveCfg = Release|Win32
 		${appserver2.guid}.Release|Win32.Build.0 = Release|Win32
-		${nxemail.guid}.Debug|Win32.ActiveCfg = Debug|Win32
-		${nxemail.guid}.Debug|Win32.Build.0 = Debug|Win32
-		${nxemail.guid}.Release|Win32.ActiveCfg = Release|Win32
-		${nxemail.guid}.Release|Win32.Build.0 = Release|Win32
+		${nx_email.guid}.Debug|Win32.ActiveCfg = Debug|Win32
+		${nx_email.guid}.Debug|Win32.Build.0 = Debug|Win32
+		${nx_email.guid}.Release|Win32.ActiveCfg = Release|Win32
+		${nx_email.guid}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,11 +3,11 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include <gtest/gtest.h>
 
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 
 TEST(HttpAuthDigest, partialResponse_test)

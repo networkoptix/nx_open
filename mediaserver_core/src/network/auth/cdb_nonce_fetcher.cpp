@@ -7,7 +7,7 @@
 
 #include <algorithm>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "cloud/cloud_connection_manager.h"
 

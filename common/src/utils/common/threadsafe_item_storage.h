@@ -1,7 +1,7 @@
 #ifndef THREADSAFE_ITEM_STORAGE_H
 #define THREADSAFE_ITEM_STORAGE_H
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/warnings.h>
 

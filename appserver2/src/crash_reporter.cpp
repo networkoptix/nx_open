@@ -11,7 +11,7 @@
 #include <common/systemexcept_win32.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <utils/common/synctime.h>
 

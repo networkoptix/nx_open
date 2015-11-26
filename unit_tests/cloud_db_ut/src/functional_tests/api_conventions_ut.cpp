@@ -6,8 +6,8 @@
 #include <gtest/gtest.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/server/fusion_request_result.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/server/fusion_request_result.h>
 
 #include "test_setup.h"
 #include "version.h"

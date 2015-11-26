@@ -7,8 +7,8 @@
 #define NX_CDB_CLIENT_DATA_TYPES_H
 
 #include <utils/common/model_functions_fwd.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/server/fusion_request_result.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/server/fusion_request_result.h>
 
 #include <cdb/result_code.h>
 

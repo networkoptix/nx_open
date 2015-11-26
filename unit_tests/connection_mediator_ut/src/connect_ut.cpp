@@ -2,16 +2,16 @@
 #include <gmock/gmock.h>
 
 #include <common/common_globals.h>
-#include <utils/network/connection_server/multi_address_server.h>
-#include <utils/network/stun/async_client.h>
+#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/stun/async_client.h>
 #include <utils/thread/sync_queue.h>
-#include <utils/network/stun/server_connection.h>
-#include <utils/network/stun/stream_socket_server.h>
-#include <utils/network/stun/message_dispatcher.h>
-#include <utils/network/stun/cc/custom_stun.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/test_http_server.h>
-#include <utils/network/socket_global.h>
+#include <nx/network/stun/server_connection.h>
+#include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/stun/message_dispatcher.h>
+#include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/test_http_server.h>
+#include <nx/network/socket_global.h>
 
 #include "mediator_mocks.h"
 

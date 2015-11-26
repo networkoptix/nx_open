@@ -1,5 +1,5 @@
 #include "common/common_globals.h"
-#include "utils/network/upnp/upnp_device_searcher.h"
+#include <nx/network/upnp/upnp_device_searcher.h>
 
 #include <gtest/gtest.h>
 #include <iostream>

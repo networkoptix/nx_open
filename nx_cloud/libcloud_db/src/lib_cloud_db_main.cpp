@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include "cloud_db_process.h"
+#include "cloud_db_process_public.h"
 
 #ifdef _WIN32
     #include <windows.h>
@@ -15,7 +15,7 @@
 #endif
 
 
-static nx::cdb::CloudDBProcess* serviceInstance = NULL;
+static nx::cdb::CloudDBProcessPublic* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -43,7 +43,7 @@ int libCloudDBMain(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    nx::cdb::CloudDBProcess service(argc, argv);
+    nx::cdb::CloudDBProcessPublic service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

@@ -6,7 +6,7 @@
 #include <future>
 
 #include <utils/common/cpp14.h>
-#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
 
 #include <gtest/gtest.h>
 

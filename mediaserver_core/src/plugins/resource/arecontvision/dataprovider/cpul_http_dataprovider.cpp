@@ -1,7 +1,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <utils/common/synctime.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "../resource/av_resource.h"
 #include "core/datapacket/video_data_packet.h"

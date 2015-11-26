@@ -8,10 +8,10 @@
 
 #include <http/custom_headers.h>
 #include <utils/common/cpp14.h>
-#include <utils/network/http/buffer_source.h>
-#include <utils/network/http/server/abstract_fusion_request_handler.h>
-#include <utils/network/http/server/abstract_http_request_handler.h>
-#include <utils/network/http/server/http_server_connection.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/server/abstract_fusion_request_handler.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/server/http_server_connection.h>
 
 #include <cloud_db_client/src/data/types.h>
 #include <utils/common/model_functions.h>

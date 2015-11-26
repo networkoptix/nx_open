@@ -14,7 +14,7 @@
 #include <client/client_message_processor.h>
 #include <common/common_module.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <network/router.h>
 
 namespace {

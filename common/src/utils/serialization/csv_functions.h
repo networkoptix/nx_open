@@ -10,7 +10,7 @@
 #include <boost/range/mutable_iterator.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 
 #include <utils/common/latin1_array.h>

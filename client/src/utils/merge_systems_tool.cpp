@@ -11,7 +11,7 @@
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
 #include "network/module_finder.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "client/client_settings.h"
 #include "ui/workbench/workbench_context.h"
 #include "ui/workbench/watchers/workbench_user_watcher.h"

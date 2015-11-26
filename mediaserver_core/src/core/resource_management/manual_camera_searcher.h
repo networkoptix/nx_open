@@ -9,7 +9,7 @@
 #include <api/model/manual_camera_seach_reply.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/ip_range_checker_async.h>
+#include <nx/network/ip_range_checker_async.h>
 
 
 //!Scans different addresses simultaneously (using aio or concurrent operations)

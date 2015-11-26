@@ -14,9 +14,9 @@
 #include <http/custom_headers.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
-#include <utils/network/http/fusion_data_http_client.h>
-#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
-#include <utils/thread/mutex.h>
+#include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "data/account_data.h"
 #include "data/types.h"

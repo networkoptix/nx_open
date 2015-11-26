@@ -9,7 +9,7 @@
 #include <QtCore/QSize>
 #include <QtCore/QStringList>
 
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 
 #include "camera_manager.h"
 #include "plugin.h"

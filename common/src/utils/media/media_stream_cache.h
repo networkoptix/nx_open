@@ -13,7 +13,7 @@
 #include <QtCore/QElapsedTimer>
 
 #include <core/dataconsumer/abstract_data_receptor.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 class QnMediaStreamEventReceiver
 {

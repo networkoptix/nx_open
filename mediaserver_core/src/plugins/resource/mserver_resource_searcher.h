@@ -10,7 +10,7 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "utils/common/long_runnable.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 
 class UDPSocket;

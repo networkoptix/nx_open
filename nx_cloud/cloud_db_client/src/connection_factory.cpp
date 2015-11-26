@@ -6,7 +6,7 @@
 #include "connection_factory.h"
 
 #include <utils/common/cpp14.h>
-#include <utils/network/cloud_connectivity/random_online_endpoint_selector.h>
+#include <nx/network/cloud_connectivity/random_online_endpoint_selector.h>
 
 #include "cdb_connection.h"
 #include "version.h"

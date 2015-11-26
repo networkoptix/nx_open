@@ -65,7 +65,7 @@ libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
-libnxemail.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libpostproc.so.52.0.100 \

@@ -10,7 +10,7 @@
 
 #include "utils/common/util.h"
 #include "utils/media/ffmpeg_helper.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),

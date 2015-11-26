@@ -2,12 +2,12 @@
 
 #include <QtCore/QTime>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
-#include <utils/network/flash_socket/types.h>
-#include <utils/network/http/httptypes.h>
-#include <utils/network/http/http_mod_manager.h>
+#include <nx/network/flash_socket/types.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_mod_manager.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"

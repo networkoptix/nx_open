@@ -10,7 +10,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "test_setup.h"
 #include "version.h"

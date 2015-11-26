@@ -3,7 +3,7 @@
 
 #include <core/resource/media_server_resource.h>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),

@@ -5,13 +5,13 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include "utils/common/util.h"
 #include "utils/common/synctime.h"
-#include <utils/network/simple_http_client.h>
+#include <nx/network/simple_http_client.h>
 #include <utils/match/wildcard.h>
 #include "api/app_server_connection.h"
 #include "common/common_module.h"
@@ -21,7 +21,7 @@
 #include "network/authutil.h"
 #include <nx_ec/dummy_handler.h>
 #include <ldap/ldap_manager.h>
-#include <utils/network/rtsp/rtsp_types.h>
+#include <nx/network/rtsp/rtsp_types.h>
 #include "network/auth/time_based_nonce_provider.h"
 #include "network/auth/generic_user_data_provider.h"
 #include "network/auth/cdb_nonce_fetcher.h"
