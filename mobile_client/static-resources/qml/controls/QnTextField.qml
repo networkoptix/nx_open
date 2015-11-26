@@ -118,11 +118,7 @@ FocusScope {
 
                 renderType: TextInput.NativeRendering
 
-                onAccepted: {
-                    Qt.inputMethod.commit()
-                    Qt.inputMethod.hide()
-                    textField.accepted()
-                }
+                onAccepted: textField.accepted()
 
                 font.pixelSize: sp(16)
                 font.weight: Font.Normal

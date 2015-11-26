@@ -96,15 +96,20 @@ QnPage {
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    KeyNavigation.tab: loginField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
                 QnTextField {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
-                    placeholderText: qsTr("Port")
+                    placeholderText: qsTr("Port (optional)")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
                     inputMethodHints: Qt.ImhDigitsOnly
+                    validator: IntValidator { bottom: 0; top: 32767 }
+                    KeyNavigation.tab: loginField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
             }
 
@@ -118,6 +123,8 @@ QnPage {
                     showError: _authError
                     onTextChanged: loginPage.removeWarnings()
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+                    KeyNavigation.tab: passwordField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
                 QnTextField {
@@ -128,6 +135,8 @@ QnPage {
                     showError: _authError
                     onTextChanged: loginPage.removeWarnings()
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                    KeyNavigation.tab: hostField
+                    onAccepted: connect()
                 }
             }
 
@@ -142,7 +151,7 @@ QnPage {
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
 
-                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, portField.text, loginField.text, passwordField.text, title)
+                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, title)
                 }
 
                 QnButton {
@@ -162,16 +171,7 @@ QnPage {
                 color: QnTheme.buttonAccentBackground
                 textColor: QnTheme.buttonAccentText
 
-                onClicked: {
-                    loginPage.removeWarnings()
-
-                    if (_showWarning) {
-                        _showWarning = false
-                        delayedLoginTimer.start()
-                    } else {
-                        loginWithCurrentFields()
-                    }
-                }
+                onClicked: connect()
             }
 
             Loader {
@@ -270,6 +270,17 @@ QnPage {
         onTriggered: loginWithCurrentFields()
     }
 
+    function connect() {
+        loginPage.removeWarnings()
+
+        if (_showWarning) {
+            _showWarning = false
+            delayedLoginTimer.start()
+        } else {
+            loginWithCurrentFields()
+        }
+    }
+
     function showWarning(status, infoParameter) {
         var message = ""
         if (status == QnConnectionManager.Unauthorized)
@@ -297,7 +308,11 @@ QnPage {
     function loginWithCurrentFields() {
         var sessionId = (state == "FailedSaved" ? loginPage.sessionId : "")
         var customConnection = (loginPage.objectName == "newConnectionPage")
-        LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text, customConnection)
+        LoginFunctions.connectToServer(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, customConnection)
+    }
+
+    function actualPort() {
+        return portField.text ? portField.text : connectionManager.defaultServerPort()
     }
 
     focus: true
