@@ -15,6 +15,7 @@
 #include "utils/media/ffmpeg_helper.h"
 #include <nx/network/http/httptypes.h>
 #include "version.h"
+#include "utils/media/frame_type_extractor.h"
 
 namespace
 {

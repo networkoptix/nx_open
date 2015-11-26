@@ -112,24 +112,41 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 {
     if (needProxyAction(action, res))
         doProxyAction(action, res);
-    else
-        executeActionInternal(action, res);
+    else {
+        auto actionCopy = QnBusinessActionFactory::cloneAction(action);
+        if (res)
+            actionCopy->getParams().actionResourceId = res->getId();
+        executeActionInternal(actionCopy);
+    }
 }
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnNetworkResourceList resList = qnResPool->getResources<QnNetworkResource>(action->getResources());
-    if (resList.isEmpty()) {
+    QnNetworkResourceList resources;
+
+    switch (action->actionType()) {
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::ShowTextOverlayAction:
+        /* These actions should be executed once for the whole resources list, not one-by-one */
+        //TODO: #rvasilenko Possibly this may be implemented more correct way
+        break;
+    default:
+        resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
+        break;
+    }
+    
+    if (resources.isEmpty()) {
         executeAction(action, QnResourcePtr());
     }
     else {
-        for(const QnResourcePtr& res: resList)
+        for(const QnResourcePtr& res: resources)
             executeAction(action, res);
     }
 }
 
-bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
+bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
+    QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
     if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
@@ -154,6 +171,8 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::PlaySoundOnceAction:
     case QnBusiness::PlaySoundAction:
     case QnBusiness::SayTextAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
 
     default:
@@ -222,7 +241,7 @@ bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, con
 
 bool QnBusinessRuleProcessor::checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const
 {
-    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams(), rule->actionType()))
+    if (!bEvent->isEventStateMatched(rule->eventState(), rule->actionType()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
@@ -288,7 +307,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
         return QnAbstractBusinessActionPtr();
 
 
-    if (rule->aggregationPeriod() == 0)
+    if (rule->aggregationPeriod() == 0 || !QnBusiness::allowsAggregation(rule->actionType()))
         return QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
     QString eventKey = rule->getUniqueId();
@@ -334,9 +353,9 @@ void QnBusinessRuleProcessor::at_timer()
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
     bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
-//    auto resList = rule->eventResourceObjects<QnResource>();
-//    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
+        return false;
+    if (!bEvent->checkEventParams(rule->eventParams()))
         return false;
 
 

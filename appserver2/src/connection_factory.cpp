@@ -440,9 +440,16 @@ namespace ec2
                 QnConnectionInfo oldECConnectionInfo;
                 oldECConnectionInfo.ecUrl = httpsEcUrl;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
-                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                {
+                    if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+                        completionFunc(ErrorCode::ioError, QnConnectionInfo()); //ignoring response from 2.3+ server received using compatibility response
+                    else
+                        completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                }
                 else
+                {
                     completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                }
                 break;
             }
 

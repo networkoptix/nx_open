@@ -120,6 +120,11 @@ QIcon QnLayoutTabBar::layoutIcon(QnWorkbenchLayout *layout) const {
     if(!layout)
         return QIcon();
 
+    QIcon layoutIcon = layout->data(Qt::DecorationRole).value<QIcon>();
+    if (!layoutIcon.isNull())
+        return layoutIcon;
+
+    //TODO: #GDM refactor this logic as in Alarm Layout. Tab bar should not know layout internal structure
     if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 

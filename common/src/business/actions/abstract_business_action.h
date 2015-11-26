@@ -19,6 +19,9 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
+    bool canBeInstant(ActionType actionType);
+    bool supportsDuration(ActionType actionType);
+    bool allowsAggregation(ActionType actionType);
 
     bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
 
@@ -37,7 +40,8 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessAction();
-    QnBusiness::ActionType actionType() const { return m_actionType; }
+
+    QnBusiness::ActionType actionType() const;
 
     /**
      * Resource depend of action type.

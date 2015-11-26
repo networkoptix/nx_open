@@ -66,6 +66,7 @@ signals:
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
+    void updateNotificationsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

@@ -98,7 +98,7 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
 bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters &parameters) const {
     return
         parameters.scope() == Qn::SceneScope &&
-        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+        context()->workbench()->currentLayout()->isSearchLayout();
 }
 
 Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
@@ -572,7 +572,7 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if (isPanoramic)
         return Qn::InvisibleAction;
 
-    if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
+    if (context()->workbench()->currentLayout()->isSearchLayout())
         return Qn::EnabledAction;
 
 #if 0
@@ -778,7 +778,7 @@ Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &
 Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters &parameters) {
     bool isPreviewSearchMode = 
         parameters.scope() == Qn::SceneScope &&
-        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+        context()->workbench()->currentLayout()->isSearchLayout();
     if (isPreviewSearchMode)
         return Qn::InvisibleAction;
     return QnActionCondition::check(parameters);
