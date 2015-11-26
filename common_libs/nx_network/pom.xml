@@ -51,6 +51,15 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>nx_tool</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_tool/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>udt</artifactId>
             <version>4.11.0-SNAPSHOT</version>
             <type>pom</type>
