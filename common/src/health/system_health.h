@@ -22,11 +22,14 @@ namespace QnSystemHealth {
         StoragesAreFull,
         ArchiveRebuildFinished,
         ArchiveRebuildCanceled,
+        ArchiveFastScanFinished,
 
         NotDefined,
 
         MessageTypeCount = ArchiveRebuildFinished
     };
 }
+
+Q_DECLARE_METATYPE(QnSystemHealth::MessageType);
 
 #endif // SYSTEM_HEALTH_H
