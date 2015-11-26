@@ -95,6 +95,7 @@ QnPage {
                     placeholderText: qsTr("Host")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
                     KeyNavigation.tab: loginField
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
@@ -106,6 +107,7 @@ QnPage {
                     placeholderText: qsTr("Port (optional)")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhDigitsOnly
                     validator: IntValidator { bottom: 0; top: 32767 }
                     KeyNavigation.tab: loginField
@@ -122,6 +124,7 @@ QnPage {
                     placeholderText: qsTr("Login")
                     showError: _authError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
                     KeyNavigation.tab: passwordField
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
@@ -134,6 +137,7 @@ QnPage {
                     echoMode: TextInput.Password
                     showError: _authError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
                     KeyNavigation.tab: hostField
                     onAccepted: connect()
