@@ -162,7 +162,7 @@ qint64 QnAviArchiveDelegate::endTime() const
 QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 {
     if (stream->codec->codec_id == CODEC_ID_MJPEG)
-        return QnMediaContextPtr();
+        return QnMediaContextPtr(new QnMediaContext(stream->codec));
 
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);

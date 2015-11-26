@@ -240,7 +240,7 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //openDecoder();
     //return;
 
-    if (m_passedContext && data->context->ctx())
+    if (m_passedContext && data->context && data->context->ctx())
         avcodec_copy_context(m_passedContext, data->context->ctx());
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
     {
@@ -248,6 +248,7 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
         m_currentHeight = m_passedContext->height;
     }
     
+    m_codec = findCodec(data->context->ctx()->codec_id);
     
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
     QnFfmpegHelper::deleteCodecContext(m_context);
