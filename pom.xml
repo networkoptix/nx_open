@@ -385,7 +385,7 @@
                 <module>plugins/mjpg_link</module>
                 <module>common_libs/nx_email</module>
                 <module>common_libs/nx_network</module>
-                <module>common_libs/nx_tool</module>
+                <module>common_libs/nx_utils</module>
                 <module>common_libs/udt</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>

@@ -19,7 +19,7 @@
         <template>lib</template>
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
         <template>lib</template>
-        <global.libs>-lnx_tool -ludt</global.libs>
+        <global.libs>-lnx_utils -ludt</global.libs>
         <ffmpeg.libs/>
         <!--Specific os libs used-->
         <windows.oslibs>-lcommon -lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lsigar -lSecur32 -lwinmm -lssleay32 -llibeay32</windows.oslibs>
@@ -51,11 +51,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nx_tool</artifactId>
+            <artifactId>nx_utils</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_tool/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_utils/pom.xml</systemPath>
         </dependency>
 
         <dependency>
