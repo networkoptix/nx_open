@@ -18,5 +18,5 @@ private:
     void openCamerasInAlarmLayout(const QnVirtualCameraResourceList &cameras, bool switchToLayout);
 
     QnWorkbenchLayout* findOrCreateAlarmLayout();
-
+    bool alarmLayoutExists() const;
 };
