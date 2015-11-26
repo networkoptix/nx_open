@@ -14,7 +14,7 @@
 #   include <QtCore/QString>
 #   include <QtCore/QByteArray>
 #   include <QtCore/QUrl>
-#   include <nx/tool/uuid.h>
+#   include <nx/utils/uuid.h>
 #endif
 
 #include <utils/common/collection.h>
