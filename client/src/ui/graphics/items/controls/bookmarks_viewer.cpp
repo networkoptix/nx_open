@@ -8,6 +8,7 @@
 #include <ui/graphics/items/generic/separator.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
+#include <ui/graphics/items/controls\tags_control.h>
 #include <ui/actions/action_parameters.h>
 
 #include <utils/common/string.h>
@@ -56,26 +57,17 @@ namespace
         , LabelParams(true, 12, 15)     /// For tags label
     };
 
-    int createLabel(int insertionIndex
-        , const QString &text
+    int placeLabel(QnProxyLabel *label
         , const QColor &textColor
-        , QGraphicsItem *parent
         , QGraphicsLinearLayout *layout
+        , int insertionIndex
         , LabelParamIds labelParamsId)
     {
-        const QString trimmedText = text.trimmed();
-
-        if (text.isEmpty())
-            return insertionIndex;
-        
-        const LabelParams &params = kLabelParams[labelParamsId];
-        const auto label = new QnProxyLabel(parent);
-
-        label->setText(trimmedText);
         label->setIndent(0);
         label->setMargin(0);
         layout->insertItem(insertionIndex, label);
 
+        const LabelParams &params = kLabelParams[labelParamsId];
         if (insertionIndex > 0 && params.topMargin)
             layout->setItemSpacing(insertionIndex - 1, params.topMargin);
 
@@ -101,7 +93,7 @@ namespace
         if (label->textFormat() == Qt::RichText)    /// Workaround for wrong sizeHint when rendering 'complex' html
         {
             QTextDocument td;
-            td.setHtml(trimmedText);
+            td.setHtml(label->text());
             td.setTextWidth(label->minimumWidth());
             td.setDocumentMargin(0);
 
@@ -110,6 +102,40 @@ namespace
         }
 
         return (insertionIndex + 1);
+    }
+
+    int createTagsControl(int insertionIndex
+        , const QnCameraBookmarkTags &tags
+        , const QColor &commonTextColor
+        , QGraphicsItem *parent
+        , QGraphicsLinearLayout *layout
+        , LabelParamIds paramsId)
+    {
+        if (tags.empty())
+            return insertionIndex;
+
+        const auto tagsControl = new QnTagsControl(tags, parent);
+
+        return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, paramsId);
+    }
+
+    int createLabel(int insertionIndex
+        , const QString &text
+        , const QColor &textColor
+        , QGraphicsItem *parent
+        , QGraphicsLinearLayout *layout
+        , LabelParamIds labelParamsId)
+    {
+        const QString trimmedText = text.trimmed();
+
+        if (text.isEmpty())
+            return insertionIndex;
+        
+        const auto label = new QnProxyLabel(parent);
+
+        label->setText(trimmedText);
+
+        return placeLabel(label, textColor, layout, insertionIndex, labelParamsId);
     }
 
     void insertButtonsSeparator(int lineWidth
@@ -244,28 +270,15 @@ namespace
         position = createLabel(position, elideString(bookmark.description, kMaxBodyLength)
             , colors.text, this, layout, kDescriptionLabelIndex);
 
-        enum { kMaxTags = 16 };
-        QStringList tagsList;
-        for (const auto &tag: bookmark.tags)
+        if (!bookmark.tags.empty())
         {
-            static const QString tagTemplate = lit("<table cellspacing = \"1\" cellpadding=\"5\" style = \"margin-top: 0;float: left;display:inline-block; border-style: none; border-color: %1;border-width:0;\"><tr><td bgcolor = \"#3E6E93\">%2</td></tr></table>");
-            tagsList.push_back(tagTemplate.arg(colors.tags.name(QColor::HexRgb), tag));
-            if (tagsList.size() >= kMaxTags)
-                break;
-        }
+            enum { kMaxTags = 16 };
+            const auto &trimmedTags = (bookmark.tags.size() <= kMaxTags ? bookmark.tags
+                : QnCameraBookmarkTags::fromList(bookmark.tags.toList().mid(0, kMaxTags)));
 
-        static const QString htmlTemplate = lit("<html><body>%1</body></html>");
-        const auto tags = (tagsList.empty() ? QString() : htmlTemplate.arg(tagsList.join(lit(""))));
-
-        const bool tagsInserted = (position != createLabel(position, tags, colors.text, this, layout, kTagsIndex));
-        /*
-        ///Separator for future buttons
-        if ()
-        {
-            enum { kSeparatorWidth = 1 };
-            insertButtonsSeparator(kSeparatorWidth, colors.separator, position, this, layout);
+            createTagsControl(position, trimmedTags, colors.text, this, layout, kTagsIndex);
         }
-        */
+       
         return layout;
     }
 
