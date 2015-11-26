@@ -119,41 +119,39 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
     m_camera = camera;
 
-    if (camera) {
-        m_camera = camera;
-
-        qnCameraHistoryPool->updateCameraHistoryAsync(m_camera, [](bool) {});
-
-        m_nativeProtocol = nativeStreamProtocol;
-        m_resolution = qnSettings->lastUsedQuality();
-
-        connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
-        connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
-        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
-            Q_ASSERT(m_camera == resource);
-            if (m_camera != resource)
-                return;
-
-            if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
-                updateMediaStreams();
-            else if (key == QnMediaResource::rotationKey())
-                emit rotationChanged();
-
-        });
-        connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
-
-        at_resource_parentIdChanged(camera);
-        updateMediaStreams();
-
-        emit resourceIdChanged();
-        emit resourceNameChanged();
-
-        emit resolutionChanged();
-        emit rotationChanged();
-        emit resourceStatusChanged();
+    if (!m_camera) {
+        updateUrl();
+        return;
     }
 
-    updateUrl();
+    qnCameraHistoryPool->updateCameraHistoryAsync(m_camera, [](bool) {});
+
+    m_nativeProtocol = nativeStreamProtocol;
+    m_resolution = qnSettings->lastUsedQuality();
+
+    connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
+    connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
+    connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
+        Q_ASSERT(m_camera == resource);
+        if (m_camera != resource)
+            return;
+
+        if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+            updateMediaStreams();
+        else if (key == QnMediaResource::rotationKey())
+            emit rotationChanged();
+
+    });
+    connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
+
+    updateMediaStreams();
+
+    emit resourceIdChanged();
+    emit resourceNameChanged();
+
+    emit resolutionChanged();
+    emit rotationChanged();
+    emit resourceStatusChanged();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const {
