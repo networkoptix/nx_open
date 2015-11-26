@@ -148,6 +148,15 @@ public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
     {
     }
+    
+    bool hasFullScanTasksUnsafe() const
+    {
+        for (const auto& task: m_scanTasks) {
+            if (!task.partialScan)
+                return true;
+        }
+        return false;
+    }
 
     void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
@@ -464,16 +473,20 @@ QnStorageScanData QnStorageManager::rebuildInfo() const
 
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
-    QnStorageScanData result(Qn::RebuildState_FullScan, QString(), 0.0);
+    QnStorageScanData result = rebuildInfo();
     QnMutexLocker lock( &m_mutexRebuild );
 
-    m_rebuildCancelled = false;
-    QVector<QnStorageResourcePtr> storagesToScan;
-    for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
-        if (storage->getStatus() == Qn::Online)
-            storagesToScan << storage;
+    if (!m_rebuildArchiveThread->hasFullScanTasksUnsafe())
+    {
+        result = QnStorageScanData(Qn::RebuildState_FullScan, QString(), 0.0);
+        m_rebuildCancelled = false;
+        QVector<QnStorageResourcePtr> storagesToScan;
+        for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
+            if (storage->getStatus() == Qn::Online)
+                storagesToScan << storage;
+        }
+        m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
-    m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
 
     return result;
 }
@@ -1508,13 +1521,11 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::testStoragesDone()
 {
-    if (!m_firstStorageTestDone) {
-        m_firstStorageTestDone = true;
-        ArchiveScanPosition rebuildPos(m_role);
-        rebuildPos.load();
-        if (!rebuildPos.isEmpty())
-            rebuildCatalogAsync(); // continue to rebuild
-    }
+    m_firstStorageTestDone = true;
+    ArchiveScanPosition rebuildPos(m_role);
+    rebuildPos.load();
+    if (!rebuildPos.isEmpty())
+        rebuildCatalogAsync(); // continue to rebuild
 }
 
 void QnStorageManager::writeCameraInfoFiles()
