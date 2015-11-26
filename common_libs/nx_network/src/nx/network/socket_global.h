@@ -44,7 +44,7 @@ private:
 
 	static QnMutex s_mutex;
 	static size_t s_counter;
-    static std::unique_ptr< SocketGlobals > s_instance;
+    static SocketGlobals* s_instance;
 
 private:
     std::shared_ptr< QnLog::Logs > m_log;
