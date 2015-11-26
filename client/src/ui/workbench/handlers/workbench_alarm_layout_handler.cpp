@@ -72,7 +72,8 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
             targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         }
 
-        if (!targetCameras.isEmpty())
+        /* If forced, open layout instantly */
+        if (!targetCameras.isEmpty() && !businessAction->getParams().forced)
             openCamerasInAlarmLayout(targetCameras, businessAction->getParams().forced);
     });
 
