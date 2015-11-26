@@ -62,8 +62,7 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
     m_prevSampleAspectRatio( 1.0 ),
     m_forcedMtDecoding(false),
     m_prevTimestamp(false),
-    m_spsFound(false),
-    m_prevCodecID(CODEC_ID_NONE)
+    m_spsFound(false)
 {
     m_mtDecoding = mtDecoding;
 
@@ -345,10 +344,10 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
-    if (m_prevCodecID != data->compressionType) {
-        if (m_prevCodecID != CODEC_ID_NONE && data->context)
+    if (m_codecId!= data->compressionType) {
+        if (m_codecId != CODEC_ID_NONE && data->context)
             resetDecoder(data);
-        m_prevCodecID = data->compressionType;
+        m_codecId = data->compressionType;
     }
 
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();

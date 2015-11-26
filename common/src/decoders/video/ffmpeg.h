@@ -117,7 +117,6 @@ private:
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;
     bool m_spsFound;
-    CodecID m_prevCodecID;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
