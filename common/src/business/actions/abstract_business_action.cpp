@@ -124,7 +124,6 @@ namespace QnBusiness {
         switch (actionType) {
         case BookmarkAction:
         case ShowTextOverlayAction:
-		case ShowOnAlarmLayoutAction:
             return parameters.durationMs <= 0;
 
         default:
