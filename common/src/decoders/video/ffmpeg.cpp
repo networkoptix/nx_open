@@ -344,7 +344,7 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
-    if (m_codecId!= data->compressionType) {
+    if (data && m_codecId!= data->compressionType) {
         if (m_codecId != CODEC_ID_NONE && data->context)
             resetDecoder(data);
         m_codecId = data->compressionType;
