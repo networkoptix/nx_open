@@ -20,13 +20,11 @@ void QnTimelineChunkPainter::setColors(const std::array<QColor, Qn::TimePeriodCo
     m_color = colors;
 }
 
-void QnTimelineChunkPainter::start(qint64 startPos, qint64 centralPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd) {
+void QnTimelineChunkPainter::start(qint64 startPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd) {
     m_position = startPos;
     m_rect = rect.toRect();
     m_windowStart = windowStart;
     m_windowEnd = windowEnd;
-    m_centralPosition = centralPos;
-    m_centralCoordinate = xFromValue(m_centralPosition);
     m_minChunkLength = (windowEnd - windowStart) / rect.width();
 
     // There cannot be more rectangles than count of pixels

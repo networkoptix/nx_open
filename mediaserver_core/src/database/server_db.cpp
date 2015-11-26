@@ -545,7 +545,7 @@ bool QnServerDb::removeLogForRes(QnUuid resId)
     return execSQLQuery(&delQuery, Q_FUNC_INFO);
 }
 
-bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& actionRes)
+bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
     QWriteLocker lock(&m_mutex);
 
@@ -561,8 +561,6 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
     
     QnBusinessActionParameters actionParams = action->getParams();
-    if (actionRes)
-        actionParams.actionResourceId = actionRes->getId();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
@@ -574,7 +572,7 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action, const
 
     insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
-    insQuery.bindValue(":action_resource_guid", actionRes ? actionRes->getId().toRfc4122() : QByteArray());
+    insQuery.bindValue(":action_resource_guid", !actionParams.actionResourceId.isNull() ? actionParams.actionResourceId.toRfc4122() : QByteArray());
 
     bool rez = execSQLQuery(&insQuery, Q_FUNC_INFO);
     if (rez)

@@ -7,6 +7,7 @@
 
 #include <ui/animation/animated.h>
 #include <ui/animation/animation_timer_listener.h>
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 
 class QnNotificationWidget;
@@ -31,7 +32,7 @@ public:
     void setToolTipsEnclosingRect(const QRectF &rect);
 
     int itemCount() const;
-    Qn::NotificationLevel notificationLevel() const;
+    QnNotificationLevel::Value notificationLevel() const;
 
 signals:
     void visibleSizeChanged();
@@ -110,7 +111,7 @@ private:
     qreal m_speedUp;
     QSizeF m_visibleSize;
     QRectF m_tooltipsEnclosingRect;
-    Qn::NotificationLevel m_itemNotificationLevel;
+    QnNotificationLevel::Value m_itemNotificationLevel;
 };
 
 #endif // NOTIFICATION_LIST_WIDGET_H

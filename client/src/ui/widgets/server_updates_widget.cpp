@@ -70,7 +70,7 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->tableView->setItemDelegateForColumn(QnServerUpdatesModel::VersionColumn, new QnUpdateStatusItemDelegate(ui->tableView));
 
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::NameColumn, QHeaderView::Stretch);
-    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);   
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QnServerUpdatesModel::VersionColumn, QHeaderView::ResizeToContents);
     ui->tableView->horizontalHeader()->setSectionsClickable(false);
     setPaletteColor(ui->tableView, QPalette::Highlight, Qt::transparent);
 
@@ -102,12 +102,12 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
     ui->refreshButton->setIcon(qnSkin->icon("refresh.png"));
 
     connect(ui->browseFileButton,       &QPushButton::clicked,      this, [this] {
-        QString fileName = QnFileDialog::getOpenFileName(this, 
+        QString fileName = QnFileDialog::getOpenFileName(this,
             tr("Select Update File..."),
-            QString(), tr("Update Files (*.zip)"), 
+            QString(), tr("Update Files (*.zip)"),
             0,
             QnCustomFileDialog::fileDialogOptions());
-        if (fileName.isEmpty()) 
+        if (fileName.isEmpty())
             return;
         ui->filenameLineEdit->setText(fileName);
         checkForUpdatesLocal();
@@ -165,6 +165,8 @@ QnServerUpdatesWidget::QnServerUpdatesWidget(QWidget *parent) :
         ui->linkLineEdit->setText(m_updateTool->generateUpdatePackageUrl(m_targetVersion).toString());
     });
 
+    connect(qnGlobalSettings, &QnGlobalSettings::updateNotificationsChanged, this, &QnAbstractPreferencesWidget::loadDataToUi);
+
     at_tool_stageChanged(QnFullUpdateStage::Init);
     checkForUpdatesInternet(true);
 }
@@ -202,7 +204,7 @@ void QnServerUpdatesWidget::initSourceMenu() {
     connect(m_updateSourceActions[InternetSource], &QAction::triggered, this, [this] {
         if (!m_updateTool->idle())
             return;
-        
+
         ui->sourceWidget->setCurrentWidget(ui->internetPage);
         ui->sourceButton->setText(tr("Update from Internet"));
         checkForUpdatesInternet();
@@ -223,7 +225,7 @@ void QnServerUpdatesWidget::initLinkButtons() {
         qApp->clipboard()->setText(ui->linkLineEdit->text());
         QMessageBox::information(this, tr("Success"), tr("URL copied to clipboard."));
     });
- 
+
     connect(ui->linkLineEdit,           &QLineEdit::textChanged,    this, [this](const QString &text){
         ui->copyLinkButton->setEnabled(!text.isEmpty());
         ui->linkLineEdit->setCursorPosition(0);
@@ -287,18 +289,18 @@ QnMediaServerUpdateTool *QnServerUpdatesWidget::updateTool() const {
 }
 
 void QnServerUpdatesWidget::loadDataToUi() {
-    ui->updatesNotificationCheckbox->setChecked(QnGlobalSettings::instance()->isUpdateNotificationsEnabled());
+    ui->updatesNotificationCheckbox->setChecked(qnGlobalSettings->isUpdateNotificationsEnabled());
 }
 
 void QnServerUpdatesWidget::applyChanges() {
-    QnGlobalSettings::instance()->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
+    qnGlobalSettings->setUpdateNotificationsEnabled(ui->updatesNotificationCheckbox->isChecked());
 }
 
 bool QnServerUpdatesWidget::hasChanges() const {
     if (isReadOnly())
         return false;
 
-    return QnGlobalSettings::instance()->isUpdateNotificationsEnabled() != ui->updatesNotificationCheckbox->isChecked();
+    return qnGlobalSettings->isUpdateNotificationsEnabled() != ui->updatesNotificationCheckbox->isChecked();
 }
 
 bool QnServerUpdatesWidget::canApplyChanges() {
@@ -307,7 +309,7 @@ bool QnServerUpdatesWidget::canApplyChanges() {
         QMessageBox::information(this, tr("Information"), tr("Update is in process now."));
         return false;
     }
-   
+
     return true;
 }
 
@@ -354,7 +356,7 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                         unholdConnection = true;
                         QMessageBox::critical(this,
                             tr("Launcher process not found."),
-                            tr("Cannot restart the client.") + L'\n' 
+                            tr("Cannot restart the client.") + L'\n'
                           + tr("Please close the application and start it again using the shortcut in the start menu."));
                     } else {
                         qApp->exit(0);
@@ -512,7 +514,7 @@ void QnServerUpdatesWidget::checkForUpdatesInternet(bool autoSwitch, bool autoSt
 
         if (autoSwitch && result.result == QnCheckForUpdateResult::InternetProblem)
             m_updateSourceActions[LocalSource]->trigger();
-        
+
         m_releaseNotesUrl = result.releaseNotesUrl;
 
         ui->connectionProblemLabel->setVisible(result.result == QnCheckForUpdateResult::InternetProblem);

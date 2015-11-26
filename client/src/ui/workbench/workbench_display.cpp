@@ -17,7 +17,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
-#include <utils/common/variant_timer.h>
+#include <utils/common/delayed.h>
 #include <utils/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
@@ -145,6 +145,12 @@ namespace {
      * operation is performed. */
     const qreal zStep = 1.0;
 
+    /** How often splashes should be painted on items when notification appears.  */
+    const int splashPeriodMs = 500;
+
+    /** How long splashes should be painted on items when notification appears.  */
+    const int splashTotalLengthMs = 1000;
+
     enum {
         ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
         ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
@@ -257,7 +263,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Connect to context. */
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(), SIGNAL(businessActionAdded(const QnAbstractBusinessActionPtr &)), this, SLOT(at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &)));
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded, 
+        this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
@@ -1992,29 +1999,30 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
-    if (!resource)
+    if (workbench()->currentLayout()->isSearchLayout())
         return;
+    
+    QnBusinessEventParameters params = businessAction->getRuntimeParams();
+    QnBusiness::EventType eventType = params.eventType;
 
-    // TODO: #Elric copypasta
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
-    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
-    if(thumbnailed)
-        return;
+    QSet<QnResourcePtr> targetResources;
+    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) 
+        targetResources.unite(qnResPool->getResources<QnResource>(businessAction->getResources()).toSet());
+    
+    if (eventType >= QnBusiness::UserDefinedEvent) 
+        targetResources.unite(qnResPool->getResources<QnResource>(params.metadata.cameraRefs).toSet());
 
-    int type = businessAction->getRuntimeParams().eventType;
-
-    at_notificationTimer_timeout(resource, type);
-    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
-    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
+    if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId))
+        targetResources.insert(resource);
+    
+    for (const QnResourcePtr &resource: targetResources)
+        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+            executeDelayed([this, resource, businessAction]{
+                showSplashOnResource(resource, businessAction);
+            }, timeMs);
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, const QVariant &type) {
-    at_notificationTimer_timeout(resource.value<QnResourcePtr>(), type.toInt());
-}
-
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
+void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction) {
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
@@ -2033,7 +2041,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
+        splashItem->setColor(
+            withAlpha(
+                QnNotificationLevel::notificationColor(QnNotificationLevel::valueOf(businessAction)),
+                128));
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);

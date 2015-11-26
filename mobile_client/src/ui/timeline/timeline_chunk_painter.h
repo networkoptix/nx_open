@@ -11,8 +11,6 @@ class QnTimelineChunkPainter {
 public:
     QnTimelineChunkPainter(QSGGeometry *geometry):
         m_geometry(geometry),
-        m_centralPosition(0),
-        m_centralCoordinate(0),
         m_minChunkLength(0),
         m_position(0),
         m_pendingLength(0),
@@ -27,7 +25,7 @@ public:
     std::array<QColor, Qn::TimePeriodContentCount + 1> colors() const;
     void setColors(const std::array<QColor, Qn::TimePeriodContentCount + 1> &colors);
 
-    void start(qint64 startPos, qint64 centralPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd);
+    void start(qint64 startPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd);
     void paintChunk(qint64 length, Qn::TimePeriodContent content);
     void stop();
 
@@ -45,8 +43,6 @@ private:
 
     qint64 m_windowStart;
     qint64 m_windowEnd;
-    qint64 m_centralPosition;
-    qreal m_centralCoordinate;
     qint64 m_minChunkLength;
     QRect m_rect;
 

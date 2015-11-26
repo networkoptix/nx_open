@@ -27,7 +27,7 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
-class QnBookmarksOverlayWidget;
+class QnCompositeTextOverlay;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -129,6 +129,7 @@ signals:
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
+    void colorsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -201,10 +202,7 @@ private:
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
 
-    void updateBookmarksMode();
-    void updateBookmarksFilter();
-    void updateBookmarks();
-    void updateBookmarksVisibility();
+    void updateCompositeOverlayMode();
 
     qint64 getDisplayTimeUsec() const;
     qint64 getUtcCurrentTimeUsec() const;
@@ -265,9 +263,7 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarksQueryPtr m_bookmarksQuery;
-    QnBookmarksOverlayWidget *m_bookmarksOverlayWidget;
+    QnCompositeTextOverlay *m_compositeTextOverlay;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
