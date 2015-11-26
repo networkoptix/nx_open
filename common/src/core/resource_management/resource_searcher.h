@@ -1,7 +1,7 @@
 #ifndef QN_RESOURCE_SEARCHER_H
 #define QN_RESOURCE_SEARCHER_H
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStringList>
 
 #include <core/resource/resource_factory.h>

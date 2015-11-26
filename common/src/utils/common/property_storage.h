@@ -7,7 +7,7 @@
 #include <QtCore/QSet>
 #include <QtCore/QStringList>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 class QSettings;

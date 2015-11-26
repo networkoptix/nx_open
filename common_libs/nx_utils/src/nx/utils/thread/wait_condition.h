@@ -16,7 +16,7 @@
 
 class QnWaitConditionImpl;
 
-class NX_TOOL_API QnWaitCondition
+class NX_UTILS_API QnWaitCondition
 {
 public:
 	QnWaitCondition();

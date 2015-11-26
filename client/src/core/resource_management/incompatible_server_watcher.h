@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <core/resource/resource_fwd.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <network/module_information.h>
 
 class QnIncompatibleServerWatcher : public QObject {

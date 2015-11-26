@@ -4,7 +4,7 @@
 
 #include <QtCore/QDebug>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"

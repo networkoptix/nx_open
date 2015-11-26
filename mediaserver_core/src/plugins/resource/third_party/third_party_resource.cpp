@@ -22,7 +22,7 @@
 #include "third_party_stream_reader.h"
 #include "utils/common/synctime.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 
 

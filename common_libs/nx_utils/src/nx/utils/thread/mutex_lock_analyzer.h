@@ -15,7 +15,7 @@
 #include <QtCore/QReadWriteLock>
 #include <QtCore/QString>
 
-#include "nx/tool/math/digraph.h"
+#include <nx/utils/math/digraph.h>
 
 
 //!Checks that two sorted ranges contain elements of same value using comparator \a comp. Though, different element count is allowed

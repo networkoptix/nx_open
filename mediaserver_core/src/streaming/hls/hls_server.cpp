@@ -18,7 +18,7 @@
 #include <core/resource/media_resource.h>
 
 #include <network/authenticate_helper.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>

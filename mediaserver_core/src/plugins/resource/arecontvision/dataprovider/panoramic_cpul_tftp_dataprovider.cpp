@@ -3,7 +3,7 @@
 #include "panoramic_cpul_tftp_dataprovider.h"
 
 #include <utils/common/synctime.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "av_client_pull.h"
 #include "../resource/av_resource.h"

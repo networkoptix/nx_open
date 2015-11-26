@@ -1,8 +1,8 @@
 #include "client.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/nettools.h>
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 
 #include <QDateTime>
 

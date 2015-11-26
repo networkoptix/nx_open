@@ -3,7 +3,7 @@
 
 #include <nx/network/stun/async_client.h>
 #include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 
 namespace nx {
 namespace cc {

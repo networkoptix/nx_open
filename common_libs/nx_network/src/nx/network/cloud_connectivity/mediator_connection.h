@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/socket_common.h>
 

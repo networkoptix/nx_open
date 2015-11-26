@@ -12,7 +12,7 @@
 #include <api/api_fwd.h>
 
 #include "time_period.h"
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 class QnTimePeriodListTimeIterator;
 
 /**

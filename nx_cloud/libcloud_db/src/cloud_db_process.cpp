@@ -19,7 +19,7 @@
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <utils/common/cpp14.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/db/db_structure_updater.h>
 #include <nx/network/socket_global.h>

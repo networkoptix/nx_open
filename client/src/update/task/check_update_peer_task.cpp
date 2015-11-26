@@ -20,7 +20,7 @@
 #include <nx/network/http/async_http_client_reply.h>
 
 #include <utils/common/app_info.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #define QnNetworkReplyError static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error)
 

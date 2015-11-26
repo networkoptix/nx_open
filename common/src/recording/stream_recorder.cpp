@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <utils/common/util.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/model_functions.h>
 
 #include <core/resource/resource_consumer.h>

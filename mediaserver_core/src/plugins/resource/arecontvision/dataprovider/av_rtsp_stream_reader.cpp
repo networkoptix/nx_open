@@ -8,7 +8,7 @@
 #include "av_rtsp_stream_reader.h"
 
 #include <nx/network/rtsp/rtsp_types.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 QnArecontRtspStreamReader::QnArecontRtspStreamReader(const QnResourcePtr& res)

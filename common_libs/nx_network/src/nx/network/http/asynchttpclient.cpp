@@ -10,11 +10,11 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <http/custom_headers.h>
 #include <utils/crypt/linux_passwd_crypt.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <nx/network/socket_factory.h>
 #include <utils/common/systemerror.h>

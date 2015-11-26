@@ -19,7 +19,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
@@ -157,7 +157,7 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/cpp14.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>

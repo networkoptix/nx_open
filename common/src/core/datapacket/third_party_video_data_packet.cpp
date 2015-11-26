@@ -7,7 +7,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(nxcip::MediaDataPacket* videoPacket,

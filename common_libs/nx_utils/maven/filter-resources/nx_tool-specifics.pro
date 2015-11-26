@@ -2,7 +2,7 @@ TEMPLATE = lib
 CONFIG += console
 
 win* {
-    DEFINES += NX_TOOL_API=__declspec(dllexport)
+    DEFINES += NX_UTILS_API=__declspec(dllexport)
 }
 
 !win32 {

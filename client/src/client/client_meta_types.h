@@ -1,7 +1,7 @@
 #ifndef QN_CLIENT_META_TYPES_H
 #define QN_CLIENT_META_TYPES_H
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QVector>
 #include <QtCore/QMetaType>
 #include <QtGui/QColor>

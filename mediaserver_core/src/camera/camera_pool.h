@@ -2,7 +2,7 @@
 #define __CAMERA_POOL_H__
 
 #include <QtCore/QMap>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 #include "camera/video_camera.h"

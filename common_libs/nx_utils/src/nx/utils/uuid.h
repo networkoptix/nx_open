@@ -19,7 +19,7 @@
 
 
 //!This class added to minimise creation/destruction of QByteArray and QString
-class NX_TOOL_API QnUuid
+class NX_UTILS_API QnUuid
 {
 public:
     static const size_t RFC4122_SIZE = 16;
@@ -67,14 +67,14 @@ private:
     //!binary representation
     mutable boost::optional<QByteArray> m_rfc4122Representation;
 
-    friend NX_TOOL_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+    friend NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 };
 
 Q_DECLARE_METATYPE(QnUuid);
 
-NX_TOOL_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
-NX_TOOL_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
-NX_TOOL_API QDebug operator<<(QDebug dbg, const QnUuid& id);
-NX_TOOL_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
+NX_UTILS_API uint qHash( const QnUuid& uuid, uint seed = 0 ) throw();
+NX_UTILS_API QDataStream& operator<<(QDataStream& s, const QnUuid& id);
+NX_UTILS_API QDebug operator<<(QDebug dbg, const QnUuid& id);
+NX_UTILS_API QDataStream& operator>>(QDataStream& s, QnUuid& id);
 
 #endif  //NX_UUID_H

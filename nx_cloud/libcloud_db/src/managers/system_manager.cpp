@@ -7,7 +7,7 @@
 
 #include <QtSql/QSqlQuery>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sync_call.h>
 #include <utils/serialization/lexical.h>
 #include <utils/serialization/sql.h>

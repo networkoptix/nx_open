@@ -1,7 +1,7 @@
 #include "upnp_port_mapper.h"
 
 #include "common/common_globals.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include <random>
 #include <QtCore/QDateTime>

@@ -11,7 +11,7 @@
 #include <core/resource/user_resource.h>
 #include <http/custom_headers.h>
 #include <utils/common/app_info.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sync_call.h>
 #include <nx/network/http/auth_tools.h>
 

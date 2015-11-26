@@ -2,12 +2,12 @@
 
 #include <boost/preprocessor/stringize.hpp>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QRegExp>
 #include <QtGui/QOpenGLContext>
 
 #include <utils/common/warnings.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "gl_context_data.h"
 

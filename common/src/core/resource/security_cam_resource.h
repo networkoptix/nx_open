@@ -2,7 +2,7 @@
 #define sequrity_cam_resource_h_1239
 
 #include <QtGui/QRegion>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/value_cache.h>
 

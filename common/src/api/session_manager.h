@@ -3,8 +3,8 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QTimer>
 
 #include <QtNetwork/QNetworkCookie>

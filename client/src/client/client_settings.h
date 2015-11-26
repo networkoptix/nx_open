@@ -4,12 +4,12 @@
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
 #include <QtCore/QStringList>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtGui/QColor>
 
 #include <utils/common/property_storage.h>
 #include <utils/common/software_version.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <client/client_globals.h>
 #include <client/client_connection_data.h>

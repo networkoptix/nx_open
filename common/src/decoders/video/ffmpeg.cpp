@@ -11,7 +11,7 @@
 #endif
 
 #include <utils/math/math.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;

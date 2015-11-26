@@ -2,7 +2,7 @@
 #define VIDEOWALL_RESOURCE_H
 
 #include <QtCore/QRectF>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/videowall_item.h>

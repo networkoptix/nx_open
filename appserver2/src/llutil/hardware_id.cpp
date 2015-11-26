@@ -13,7 +13,7 @@
 #include "hardware_id.h"
 #include "hardware_id_p.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "licensing/hardware_info.h"
 
 namespace {

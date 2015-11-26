@@ -16,7 +16,7 @@
 #include <QtCore/QRectF>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
 #include <QtCore/QtNumeric>
 #include <QtCore/QJsonArray>

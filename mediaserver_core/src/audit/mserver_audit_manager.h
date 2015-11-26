@@ -3,7 +3,7 @@
 
 #include <QElapsedTimer>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "audit/audit_manager.h"
 #include "nx_ec/data/api_server_alive_data.h"

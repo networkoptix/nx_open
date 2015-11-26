@@ -5,7 +5,7 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/ping.h>
 #include <nx/network/ip_range_checker.h>
 

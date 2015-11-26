@@ -5,7 +5,7 @@
 
 #include "log_message.h"
 
-#include "nx/tool/uuid.h"
+#include <nx/utils/uuid.h>
 
 
 QnLogMessage::QnLogMessage()

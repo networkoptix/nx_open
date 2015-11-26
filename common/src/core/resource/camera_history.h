@@ -4,7 +4,7 @@
 #include <set>
 
 #include <QtCore/QObject>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -13,8 +13,8 @@
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 
-#include <nx/tool/singleton.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 #include "api/server_rest_connection_fwd.h"
 
 /**

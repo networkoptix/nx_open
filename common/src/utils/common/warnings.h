@@ -12,7 +12,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QJsonValue>
 #include <QtCore/QUrl>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 namespace detail {
     inline void debugInternal(const char *functionName, const QString &s) {

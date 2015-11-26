@@ -4,7 +4,7 @@
 #ifdef ENABLE_ARCHIVE
 
 #include <QtCore/QMap>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <camera/data/camera_data_fwd.h>
 #include <common/common_globals.h>

@@ -33,7 +33,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_client_info_data.h"
 #include "api/runtime_info_manager.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
 #include "business/business_event_rule.h"

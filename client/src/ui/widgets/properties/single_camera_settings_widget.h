@@ -10,7 +10,7 @@
 #include "camera_settings_tab.h"
 
 #include <utils/common/connective.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 namespace Ui {
     class SingleCameraSettingsWidget;

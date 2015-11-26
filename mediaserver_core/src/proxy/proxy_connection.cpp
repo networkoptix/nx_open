@@ -17,7 +17,7 @@
 #include "proxy_connection_processor_p.h"
 #include "transaction/transaction_message_bus.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <nx/network/compat_poll.h>

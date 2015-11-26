@@ -9,7 +9,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "log_message.h"
 
@@ -28,7 +28,7 @@ enum QnLogLevel {
 
 class QnLogPrivate;
 
-class NX_TOOL_API QnLog {
+class NX_UTILS_API QnLog {
 public:
     static const int MAIN_LOG_ID = 0;
     static const int CUSTOM_LOG_BASE_ID = 1;
@@ -77,7 +77,7 @@ public:
     }
 #undef QN_LOG_BODY
     
-    class NX_TOOL_API Logs
+    class NX_UTILS_API Logs
     {
     public:
         const std::unique_ptr< QnLog >& get( int logID = MAIN_LOG_ID );
@@ -147,7 +147,7 @@ private:
 
 #define cl_log (*QnLog::instance())
 
-NX_TOOL_API void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
+NX_UTILS_API void qnLogMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QString& msg);
 
 
 template<class T>

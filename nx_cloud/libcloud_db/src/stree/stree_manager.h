@@ -13,7 +13,7 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <plugins/videodecoder/stree/resourcenameset.h>
 #include <utils/common/model_functions_fwd.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include "cdb_ns.h"
 #include "settings.h"

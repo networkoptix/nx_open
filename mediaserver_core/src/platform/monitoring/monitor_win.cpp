@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 

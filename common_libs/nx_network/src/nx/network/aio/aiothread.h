@@ -10,9 +10,9 @@
 #include <deque>
 #include <memory>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/common/long_runnable.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
 #include <QtCore/QDateTime>

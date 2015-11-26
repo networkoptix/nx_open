@@ -2,7 +2,7 @@
 
 #include <QtWidgets/QMessageBox>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/common/software_version.h>
 

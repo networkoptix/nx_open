@@ -10,12 +10,12 @@
 #include <memory>
 #include <thread>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <qglobal.h>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 using namespace std;

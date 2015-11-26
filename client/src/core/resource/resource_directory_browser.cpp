@@ -6,7 +6,7 @@
 
 #include <utils/common/model_functions.h>
 #include <utils/serialization/proto_message.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/warnings.h>
 #include <utils/local_file_cache.h>
 

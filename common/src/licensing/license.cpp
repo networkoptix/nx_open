@@ -4,7 +4,7 @@
 
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QSettings>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QStringList>
 
 #include <openssl/rsa.h>

@@ -2,7 +2,7 @@
 
 #include "av_singesensor.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/cpul_tftp_dataprovider.h"

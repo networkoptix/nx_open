@@ -4,13 +4,13 @@
 #ifdef ENABLE_ACTI
 
 #include <QtCore/QMap>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include "core/datapacket/media_data_packet.h"
 #include "utils/common/request_param.h"
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/multipartcontentparser.h>

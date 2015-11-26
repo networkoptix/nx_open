@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 
 namespace nx {

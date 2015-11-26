@@ -1,8 +1,8 @@
 #ifndef QNSERVERADDITIONALADDRESSESDICTIONARY_H
 #define QNSERVERADDITIONALADDRESSESDICTIONARY_H
 
-#include <nx/tool/singleton.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
 
 
 class QnServerAdditionalAddressesDictionary: public QObject, public Singleton<QnServerAdditionalAddressesDictionary>

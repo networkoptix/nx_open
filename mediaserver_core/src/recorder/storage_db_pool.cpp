@@ -3,7 +3,7 @@
 #include "common/common_module.h"
 #include "utils/common/util.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace

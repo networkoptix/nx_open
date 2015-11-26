@@ -8,7 +8,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/param.h>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/model_functions.h>
 
 namespace {

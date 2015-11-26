@@ -4,10 +4,10 @@
 #include <atomic>
 #include <functional>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <utils/common/long_runnable.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/systemerror.h>
 
 #include "socket_common.h"

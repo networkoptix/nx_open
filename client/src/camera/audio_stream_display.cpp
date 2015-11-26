@@ -1,6 +1,6 @@
 #include "audio_stream_display.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/audio_processor.h>
 
 #include "decoders/audio/audio_struct.h"

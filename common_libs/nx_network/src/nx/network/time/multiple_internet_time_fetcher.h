@@ -11,7 +11,7 @@
 #include <memory>
 #include <vector>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 //!Fetches time from multiple time fetchers. If all succeeded than returns mean value

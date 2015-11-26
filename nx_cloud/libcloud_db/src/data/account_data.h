@@ -13,7 +13,7 @@
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/common/model_functions_fwd.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
 #include <cloud_db_client/src/data/account_data.h>

@@ -7,7 +7,7 @@
 
 #include <api/global_settings.h>
 #include <utils/common/cpp14.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/email/email_manager_impl.h>
 

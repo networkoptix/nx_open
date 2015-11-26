@@ -4,7 +4,7 @@
 #include <QTextStream>
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"

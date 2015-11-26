@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <utils/common/sleep.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 QnAbstractDataConsumer::QnAbstractDataConsumer(int maxQueueSize)

@@ -12,7 +12,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 
 namespace nx {

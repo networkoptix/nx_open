@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <QtCore/QObject>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "asynchttpclient.h"
 

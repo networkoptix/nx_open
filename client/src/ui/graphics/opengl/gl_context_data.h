@@ -2,7 +2,7 @@
 #define QN_GL_CONTEXT_DATA_H
 
 #include <QHash>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
 #include <QtOpenGL/QGLContext>
 

@@ -9,6 +9,6 @@
 #include <stdint.h>
 
 
-uintptr_t NX_TOOL_API currentThreadSystemId();
+uintptr_t NX_UTILS_API currentThreadSystemId();
 
 #endif //NX_TOOL_THREAD_UTIL_H

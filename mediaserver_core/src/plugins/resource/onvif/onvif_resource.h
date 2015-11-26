@@ -13,7 +13,7 @@
 #include <QtCore/QMap>
 #include <QtCore/QPair>
 #include <QSharedPointer>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 #include <QElapsedTimer>
 

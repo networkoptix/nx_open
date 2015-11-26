@@ -1,7 +1,7 @@
 #ifndef __STATUS_DICTIONARY_H
 #define __STATUS_DICTIONARY_H
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnResourceStatusDictionary: public QObject, public Singleton<QnResourceStatusDictionary>
 {

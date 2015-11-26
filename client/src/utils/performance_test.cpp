@@ -7,7 +7,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/performance.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>

@@ -1,7 +1,7 @@
 #ifndef __IOPORT_DATA_H_
 #define __IOPORT_DATA_H_
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/model_functions_fwd.h>
 
 struct QnIOPortData

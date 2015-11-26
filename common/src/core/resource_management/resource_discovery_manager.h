@@ -3,13 +3,13 @@
 
 #include <memory> // for auto_ptr
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThread>
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
 #include <utils/common/long_runnable.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 #include <nx/network/netstate.h>
 #include <nx/network/nettools.h>
 

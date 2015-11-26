@@ -1,7 +1,7 @@
 #include "cloud_data_provider.h"
 
-#include <nx/tool/log/log.h>
-#include <nx/tool/log/log_message.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
 
 namespace nx {
 namespace hpm {

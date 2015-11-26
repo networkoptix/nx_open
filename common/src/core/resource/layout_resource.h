@@ -2,7 +2,7 @@
 #define QN_LAYOUT_RESOURCE_H
 
 #include <QtCore/QRectF>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <recording/time_period.h>
 

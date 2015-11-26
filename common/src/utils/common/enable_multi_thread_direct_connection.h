@@ -8,8 +8,8 @@
 
 #include <QtCore/QObject>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 
 //!QObject's successors which allow using Qt::DirectConnection to connect object living in different thread should inherit this class

@@ -7,7 +7,7 @@
 
 #include <QCoreApplication>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/socket_global.h>
 
 int main( int argc, char **argv )

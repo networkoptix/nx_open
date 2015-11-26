@@ -11,8 +11,8 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 

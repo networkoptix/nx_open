@@ -11,11 +11,11 @@
 #include <QSharedPointer>
 #include <QString>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <core/datapacket/media_data_packet.h>
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 
 #include "api/model/audit/auth_session.h"
 #include "audit/audit_manager_fwd.h"

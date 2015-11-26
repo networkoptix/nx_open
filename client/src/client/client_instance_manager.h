@@ -2,7 +2,7 @@
 
 #include <QtCore/QSharedMemory>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 class QnClientInstanceManager : public QObject {
     Q_OBJECT

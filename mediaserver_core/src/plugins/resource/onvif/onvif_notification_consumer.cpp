@@ -7,12 +7,12 @@
 
 #include "onvif_notification_consumer.h"
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <nx/network/system_socket.h>
 
 #include "onvif_resource.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 using std::map;

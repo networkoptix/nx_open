@@ -1,7 +1,7 @@
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QSet>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>

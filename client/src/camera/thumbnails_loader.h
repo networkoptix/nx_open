@@ -3,7 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QMetaType>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QStack>
 
 #include <utils/common/long_runnable.h>

@@ -2,7 +2,7 @@
 
 #include <QtCore/QUuid>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 /** Class for generating uuid's from the fixed pool. */
 class QnUuidPool {

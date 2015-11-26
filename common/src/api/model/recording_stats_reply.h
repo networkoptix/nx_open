@@ -1,7 +1,7 @@
 #ifndef NX_RECORDING_STATS_DATA_H
 #define NX_RECORDING_STATS_DATA_H
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/model_functions_fwd.h>
 #include <vector>
 

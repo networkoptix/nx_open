@@ -13,7 +13,7 @@
 
 class QnMutexImpl;
 
-class NX_TOOL_API QnMutex
+class NX_UTILS_API QnMutex
 {
     friend class QnWaitCondition;
     friend class MutexLockAnalyzer;
@@ -42,7 +42,7 @@ private:
 };
 
 //!This class for internal usage only
-class NX_TOOL_API QnMutexLockerBase
+class NX_UTILS_API QnMutexLockerBase
 {
 public:
     QnMutexLockerBase(

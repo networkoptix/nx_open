@@ -4,13 +4,13 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <utils/common/warnings.h>
 
 #include <common/systemexcept_win32.h>
 #include <common/systemexcept_linux.h>
-#include <nx/tool/thread/thread_util.h>
+#include <nx/utils/thread/thread_util.h>
 
 
 // -------------------------------------------------------------------------- //

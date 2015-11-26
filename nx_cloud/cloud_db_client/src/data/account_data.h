@@ -12,7 +12,7 @@
 #include <string>
 
 #include <utils/common/model_functions_fwd.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/fusion/fusion_fwd.h>
 
 #include <cdb/account_data.h>

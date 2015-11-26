@@ -26,8 +26,8 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/custom_output_stream.h>
 
 #include "ilp_empty_packet.h"

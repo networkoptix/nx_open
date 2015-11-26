@@ -13,7 +13,7 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include "httptypes.h"
 

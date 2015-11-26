@@ -4,7 +4,7 @@
 #include <QCryptographicHash>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QtEndian>
 #include <QCryptographicHash>
 

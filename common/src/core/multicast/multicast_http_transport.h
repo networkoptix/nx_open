@@ -8,7 +8,7 @@
 #include <QCache>
 #include <QLinkedList>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 namespace QnMulticast

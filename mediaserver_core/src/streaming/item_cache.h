@@ -10,7 +10,7 @@
 
 #include <QCache>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 template<class KeyType, class CachedType>

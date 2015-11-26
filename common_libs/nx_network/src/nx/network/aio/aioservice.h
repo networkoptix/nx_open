@@ -12,7 +12,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include "aioeventhandler.h"
 #include "aiothread.h"

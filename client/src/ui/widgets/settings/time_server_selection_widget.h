@@ -3,7 +3,7 @@
 
 #include <QtWidgets/QWidget>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <ui/widgets/settings/abstract_preferences_widget.h>
 #include <ui/workbench/workbench_context_aware.h>

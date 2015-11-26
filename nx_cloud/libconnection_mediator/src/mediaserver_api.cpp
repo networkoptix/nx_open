@@ -2,7 +2,7 @@
 
 #include <api/model/ping_reply.h>
 #include <rest/server/json_rest_result.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include <QJsonDocument>
 

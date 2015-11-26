@@ -9,7 +9,7 @@
 
 #include <memory>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_decoder_event_receiver.h"
 #include "../../decoders/video/abstractdecoder.h"

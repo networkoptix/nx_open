@@ -15,7 +15,7 @@
 #include <QtSql/QSqlError>
 
 #include <utils/common/cpp14.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/common/threadqueue.h>
 
 #include "request_execution_thread.h"

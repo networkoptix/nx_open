@@ -116,7 +116,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
-                ${root.dir}/common_libs/nx_tool/src \
+                ${root.dir}/common_libs/nx_utils/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
@@ -125,13 +125,13 @@ INCLUDEPATH +=  ${qt.dir}/include \
 win* {
     DEFINES += \
         NX_NETWORK_API=__declspec(dllimport) \
-        NX_TOOL_API=__declspec(dllimport) \
+        NX_UTILS_API=__declspec(dllimport) \
         UDT_API=__declspec(dllimport) \
 
 } else {
     DEFINES += \
         NX_NETWORK_API= \
-        NX_TOOL_API= \
+        NX_UTILS_API= \
         UDT_API= \
 
 }

@@ -13,7 +13,7 @@
 #include <common/systemexcept_linux.h>
 #endif
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/http/httptypes.h>
 
 

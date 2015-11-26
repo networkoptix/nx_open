@@ -5,7 +5,7 @@
 
 #include <QtCore/QPoint>
 #include <QtCore/QHash>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtGui/QColor>
 
 inline uint qHash(const QPoint &value, uint seed = 0) {

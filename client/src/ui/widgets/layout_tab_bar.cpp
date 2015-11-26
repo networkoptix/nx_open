@@ -1,7 +1,7 @@
 #include "layout_tab_bar.h"
 
 #include <QtCore/QVariant>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <QtGui/QContextMenuEvent>
 #include <QtWidgets/QStyle>

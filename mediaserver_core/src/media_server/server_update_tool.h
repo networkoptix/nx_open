@@ -5,11 +5,11 @@
 #include <QtCore/QHash>
 #include <QtCore/QMap>
 #include <QtCore/QSet>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <utils/common/system_information.h>
 #include <utils/common/software_version.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QFile;
 class QIODevice;

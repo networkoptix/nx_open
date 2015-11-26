@@ -3,7 +3,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QFileInfo>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/synctime.h>
 

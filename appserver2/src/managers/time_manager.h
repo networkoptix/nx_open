@@ -8,7 +8,7 @@
 
 #include <map>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
 #include <QtGlobal>
 #include <QtCore/QElapsedTimer>
@@ -18,8 +18,8 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
-#include <nx/tool/timermanager.h>
-#include <nx/tool/singleton.h>
+#include <nx/utils/timermanager.h>
+#include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
 #include <nx/network/http/httptypes.h>
 
@@ -27,7 +27,7 @@
 #include "transaction/transaction.h"
 #include "transaction/transaction_transport.h"
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 /*! \page time_sync Time synchronization in cluster
     Server system time is never changed. To adjust server times means, adjust server "delta" which server adds to it's time. 

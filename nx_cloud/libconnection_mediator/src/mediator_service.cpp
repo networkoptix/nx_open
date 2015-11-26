@@ -14,7 +14,7 @@
 
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <nx/network/socket_global.h>
 

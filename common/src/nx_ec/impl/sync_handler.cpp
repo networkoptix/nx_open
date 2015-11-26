@@ -5,7 +5,7 @@
 
 #include "sync_handler.h"
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 namespace ec2

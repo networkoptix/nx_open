@@ -15,7 +15,7 @@
 #include "mutex.h"
 #include "mutex_impl.h"
 #include "thread_util.h"
-#include "nx/tool/log/log.h"
+#include <nx/utils/log/log.h>
 
 
 ////////////////////////////////////////////////////////////

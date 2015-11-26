@@ -16,7 +16,7 @@
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/stoppable.h>
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 #include <nx/network/aio/aioeventhandler.h>
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/asynchttpclient.h>

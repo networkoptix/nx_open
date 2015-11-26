@@ -7,7 +7,7 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <utils/serialization/sql.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 
 static const int COMMIT_INTERVAL = 1000 * 60 * 1;

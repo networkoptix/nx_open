@@ -13,7 +13,7 @@
 
 #include <QtCore/QVariant>
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include "resourcenameset.h"
 

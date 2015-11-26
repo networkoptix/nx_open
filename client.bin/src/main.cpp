@@ -56,7 +56,7 @@ extern "C"
 
 #include "decoders/video/ipp_h264_decoder.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/network/http/http_mod_manager.h>
 #include "ui/workbench/workbench_context.h"
@@ -124,7 +124,7 @@ extern "C"
 #include "ui/workaround/mac_utils.h"
 #endif
 #include "api/runtime_info_manager.h"
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 
 void decoderLogCallback(void* /*pParam*/, int i, const char* szFmt, va_list args)
 {

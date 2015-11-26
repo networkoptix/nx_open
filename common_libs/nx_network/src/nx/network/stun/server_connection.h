@@ -14,7 +14,7 @@
 #include <nx/network/stun/message_serializer.h>
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace stun {

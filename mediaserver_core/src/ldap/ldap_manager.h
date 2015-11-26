@@ -5,9 +5,9 @@
 #include <QtCore/QStringList>
 #include <QtCore/QMap>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/ldap.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include "common/common_globals.h"
 
 

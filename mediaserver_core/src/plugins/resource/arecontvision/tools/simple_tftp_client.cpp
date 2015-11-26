@@ -3,7 +3,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <nx/network/socket.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/byte_array.h"
 #include "utils/common/systemerror.h"
 #include "core/dataprovider/abstract_streamdataprovider.h"

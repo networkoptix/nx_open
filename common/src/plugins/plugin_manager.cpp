@@ -14,7 +14,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QDir>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "../decoders/abstractclientplugin.h"
 #include "../decoders/abstractvideodecoderplugin.h"

@@ -20,7 +20,7 @@
 #include <boost/multi_index/member.hpp>
 
 #include <utils/db/db_manager.h>
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "access_control/auth_types.h"
 #include "cache.h"

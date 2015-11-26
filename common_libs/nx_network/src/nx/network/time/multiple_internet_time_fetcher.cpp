@@ -5,7 +5,7 @@
 
 #include "multiple_internet_time_fetcher.h"
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <limits>
 

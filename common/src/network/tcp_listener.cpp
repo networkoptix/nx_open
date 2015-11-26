@@ -3,7 +3,7 @@
 #include "tcp_connection_processor.h"
 #include "tcp_listener.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
 #include <nx/network/socket.h>

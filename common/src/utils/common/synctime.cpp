@@ -2,7 +2,7 @@
 #include <QtCore/QRunnable>
 #include <QtCore/QThreadPool>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "synctime.h"
 #include "api/app_server_connection.h"

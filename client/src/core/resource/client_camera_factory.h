@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <core/resource/resource_factory.h>
 

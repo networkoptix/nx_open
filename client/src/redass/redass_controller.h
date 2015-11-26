@@ -10,7 +10,7 @@
 
 #include <client/client_globals.h>
 
-#include <nx/tool/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnCamDisplay;
 class QnArchiveStreamReader;

@@ -7,7 +7,7 @@
 #include "core/datapacket/video_data_packet.h"
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "../resource/camera_resource.h"
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;

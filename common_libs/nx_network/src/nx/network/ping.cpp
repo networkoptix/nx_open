@@ -18,7 +18,7 @@
 
 #include <QtCore/QProcess>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 
 

@@ -23,12 +23,12 @@
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
 #include <nx/network/http/httptypes.h>
 #include <nx/network/socket_global.h>
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
@@ -37,7 +37,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include <nx/tool/timermanager.h>
+#include <nx/utils/timermanager.h>
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 #include "core/onvif/onvif_config_data.h"

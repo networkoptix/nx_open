@@ -7,9 +7,9 @@
 
 #include <limits>
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 //#define DEBUG_OUTPUT
 

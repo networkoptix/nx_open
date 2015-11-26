@@ -15,7 +15,7 @@
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
 #include "server_stream_recorder.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "api/app_server_connection.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"

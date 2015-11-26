@@ -2,7 +2,7 @@
 
 #include "axis_resource_searcher.h"
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include <core/resource/camera_resource.h>
 

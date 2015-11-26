@@ -27,7 +27,7 @@
 #include <transaction/transaction_transport.h>
 
 #include <utils/common/checked_cast.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"

@@ -1,7 +1,7 @@
 #ifndef QN_AUDIO_STREAM_DISPLAY
 #define QN_AUDIO_STREAM_DISPLAY
 
-#include <nx/tool/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "decoders/audio/audio_struct.h"
 #include "openal/qtvsound.h"

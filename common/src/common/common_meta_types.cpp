@@ -5,7 +5,7 @@
 #include <nx/network/mac_address.h>
 #include <nx/network/socket_common.h>
 #include <utils/common/request_param.h>
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>

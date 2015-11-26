@@ -26,7 +26,7 @@ extern "C"
 }
 
 #include <utils/common/util.h> /* For random. */
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/math/math.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>

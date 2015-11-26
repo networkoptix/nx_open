@@ -2,7 +2,7 @@
 #define __HTTP_CONNECTION_LISTENER_H__
 
 #include <QMultiMap>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <QtCore/QElapsedTimer>
 
 #include "network/tcp_listener.h"

@@ -1,7 +1,7 @@
 #include "mediator_address_publisher.h"
 
 #include "common/common_globals.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
 

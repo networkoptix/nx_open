@@ -2,7 +2,7 @@
 #include "universal_tcp_listener.h"
 
 #include <common/common_module.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "universal_request_processor.h"
 #include "proxy_sender_connection_processor.h"

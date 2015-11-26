@@ -8,8 +8,8 @@
 #include <utils/common/systemerror.h>
 #include <utils/common/warnings.h>
 #include <nx/network/ssl_socket.h>
-#include <nx/tool/thread/mutex.h>
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #ifdef Q_OS_WIN
 #  include <ws2tcpip.h>
@@ -24,7 +24,7 @@
 
 #include "aio/async_socket_helper.h"
 #include "compat_poll.h"
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 
 #ifdef Q_OS_WIN

@@ -1,6 +1,6 @@
 #ifdef ENABLE_ARECONT
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/http/httptypes.h>
 
 #include "../dataprovider/av_rtsp_stream_reader.h"

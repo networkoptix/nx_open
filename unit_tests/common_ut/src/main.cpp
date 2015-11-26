@@ -7,7 +7,7 @@
 
 #include <QCoreApplication>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 

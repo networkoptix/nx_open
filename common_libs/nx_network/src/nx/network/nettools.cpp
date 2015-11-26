@@ -12,7 +12,7 @@
 #include <QtCore/QTime>
 #include <QtNetwork/QHostInfo>
 
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "nettools.h"
 #include "ping.h"

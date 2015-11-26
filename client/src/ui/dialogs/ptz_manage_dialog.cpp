@@ -1,7 +1,7 @@
 #include "ptz_manage_dialog.h"
 #include "ui_ptz_manage_dialog.h"
 
-#include <nx/tool/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QScopedPointer>
 
 #include <QtWidgets/QStyledItemDelegate>

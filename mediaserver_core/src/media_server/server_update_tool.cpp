@@ -11,7 +11,7 @@
 
 #include <media_server/settings.h>
 #include <media_server/serverutil.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/process.h>
 #include <utils/update/update_utils.h>
 #include <utils/update/zip_utils.h>

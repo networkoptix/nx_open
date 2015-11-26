@@ -8,7 +8,7 @@
 #include <QtCore/QBuffer>
 
 #include <common/common_globals.h>
-#include <nx/tool/log/log.h>
+#include <nx/utils/log/log.h>
 
 #include "cloud_modules_xml_sax_handler.h"
 #include "version.h"

@@ -9,7 +9,7 @@
 
 // private
 class FrameTypeExtractor;
-#include <nx/tool/thread/wait_condition.h>
+#include <nx/utils/thread/wait_condition.h>
 #include <recording/playbackmask_helper.h>
 
 class QnArchiveStreamReader : public QnAbstractArchiveReader
