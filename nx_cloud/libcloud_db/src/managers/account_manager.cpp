@@ -14,7 +14,7 @@
 #include <nx/tool/log/log.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
-#include <nxemail/mustache/mustache_helper.h>
+#include <nx/email/mustache/mustache_helper.h>
 
 #include "email_manager.h"
 #include "http_handlers/activate_account_handler.h"

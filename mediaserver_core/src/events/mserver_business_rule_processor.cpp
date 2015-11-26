@@ -30,12 +30,12 @@
 
 #include <QtConcurrent>
 #include <utils/email/email.h>
-#include <nxemail/email_manager_impl.h>
+#include <nx/email/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
 #include <nx/tool/timermanager.h>
 #include <core/resource/user_resource.h>
 #include <api/global_settings.h>
-#include <nxemail/mustache/mustache_helper.h>
+#include <nx/email/mustache/mustache_helper.h>
 #include "business/business_strings_helper.h"
 #include <business/actions/system_health_business_action.h>
 #include "core/resource/resource_name.h"

@@ -8,8 +8,8 @@
 #include <api/global_settings.h>
 #include <utils/common/cpp14.h>
 #include <nx/tool/log/log.h>
-#include <nxemail/mustache/mustache_helper.h>
-#include <nxemail/email_manager_impl.h>
+#include <nx/email/mustache/mustache_helper.h>
+#include <nx/email/email_manager_impl.h>
 
 #include "settings.h"
 
