@@ -3,7 +3,7 @@
 #include <utils/common/cpp14.h>
 #include <utils/thread/sync_queue.h>
 #include <nx/network/system_socket.h>
-#include <nx/network/udt_socket.h>
+#include <nx/network/udt/udt_socket.h>
 
 #include <thread>
 

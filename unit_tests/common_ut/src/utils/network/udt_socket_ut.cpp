@@ -10,7 +10,7 @@
 
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket.h>
-#include <nx/network/udt_socket.h>
+#include <nx/network/udt/udt_socket.h>
 
 
 class TestHandler
