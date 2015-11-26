@@ -172,6 +172,9 @@ public:
 bool UdtSocketImpl::Open() {
     Q_ASSERT(IsClosed());
     udtHandle = UDT::socket(AF_INET,SOCK_STREAM,0);
+#ifdef TRACE_UDT_SOCKET
+    NX_LOG(lit("created UDT socket %1").arg(udtHandle), cl_logDEBUG2);
+#endif
     VERIFY_(udtHandle != UDT::INVALID_SOCK,"UDT::socket",0);
     if( udtHandle != UDT::INVALID_SOCK ) {
         state_ = OPEN;
@@ -221,6 +224,14 @@ SocketAddress UdtSocketImpl::GetPeerAddress() const {
 
 bool UdtSocketImpl::Close() {
     //Q_ASSERT(!IsClosed());
+
+    int val = 1;
+    UDT::setsockopt(udtHandle, 0, UDT_LINGER, &val, sizeof(val));
+
+#ifdef TRACE_UDT_SOCKET
+    NX_LOG(lit("closing UDT %1").arg(udtHandle), cl_logDEBUG2);
+#endif
+
     int ret = UDT::close(udtHandle);
     //VERIFY_(OK_(ret),"UDT::Close",udtHandle);
     udtHandle = UDT::INVALID_SOCK;
@@ -496,6 +507,9 @@ UdtSocketImpl* UdtAcceptor::Accept() {
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
         return NULL;
     } else {
+#ifdef TRACE_UDT_SOCKET
+        NX_LOG(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
+#endif
         return new UdtSocketImpl( ret , UdtSocketImpl::ESTABLISHED );
     }
 }

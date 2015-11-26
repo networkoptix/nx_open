@@ -14,20 +14,6 @@
 namespace detail {
 class UdtPollSetImpl;
 class UdtPollSetConstIteratorImpl;
-
-struct UdtPollSetConstIteratorImplPtr: public std::unique_ptr<UdtPollSetConstIteratorImpl>
-{
-    NX_NETWORK_API UdtPollSetConstIteratorImplPtr(UdtPollSetConstIteratorImpl* imp);
-    NX_NETWORK_API UdtPollSetConstIteratorImplPtr();
-    NX_NETWORK_API ~UdtPollSetConstIteratorImplPtr();
-};
-
-struct UdtPollSetImplPtr: public std::unique_ptr<UdtPollSetImpl>
-{
-    NX_NETWORK_API UdtPollSetImplPtr(UdtPollSetImpl* imp);
-    NX_NETWORK_API ~UdtPollSetImplPtr();
-};
-
 }
 
 class UdtSocket;
@@ -39,13 +25,12 @@ public:
     class const_iterator
     {
     public:
-        const_iterator();
-        const_iterator(const const_iterator&);
         const_iterator(detail::UdtPollSetImpl* impl, bool end);
+        const_iterator(const_iterator&&);
         ~const_iterator();
-        const_iterator& operator=(const const_iterator&);
-        const_iterator operator++(int);
+
         const_iterator& operator++();
+
         UdtSocket* socket();
         const UdtSocket* socket() const;
         aio::EventType eventType() const;
@@ -55,7 +40,10 @@ public:
         bool operator!=(const const_iterator& right) const;
 
     private:
-        detail::UdtPollSetConstIteratorImplPtr m_impl;
+        detail::UdtPollSetConstIteratorImpl* m_impl;
+
+        const_iterator(const const_iterator&);
+        const_iterator& operator=(const const_iterator&);
     };
 
 public:
@@ -81,7 +69,7 @@ public:
     }
 
 private:
-    detail::UdtPollSetImplPtr m_impl;
+    detail::UdtPollSetImpl* m_impl;
     Q_DISABLE_COPY(UdtPollSet)
 };
 

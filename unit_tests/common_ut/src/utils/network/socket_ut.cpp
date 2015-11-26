@@ -110,7 +110,7 @@ TEST( Socket, AsyncOperationCancellation )
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
-        static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
+        static const int MAX_SIMULTANEOUS_CONNECTIONS = 50;
         static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
 
         RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );

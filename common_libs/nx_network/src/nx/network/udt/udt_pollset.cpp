@@ -34,19 +34,9 @@ struct SocketUserData
 };
 }// namespace 
 
-UdtPollSetImplPtr::UdtPollSetImplPtr(UdtPollSetImpl* imp):
-    std::unique_ptr<UdtPollSetImpl>(imp) {}
-
-UdtPollSetImplPtr::~UdtPollSetImplPtr() {}
-
-UdtPollSetConstIteratorImplPtr::UdtPollSetConstIteratorImplPtr(UdtPollSetConstIteratorImpl* imp) :
-    std::unique_ptr<UdtPollSetConstIteratorImpl>(imp) {}
-
-UdtPollSetConstIteratorImplPtr::UdtPollSetConstIteratorImplPtr() {}
-
-UdtPollSetConstIteratorImplPtr::~UdtPollSetConstIteratorImplPtr() {}
-
 static const int kInterruptionBufferLength = 128;
+
+class UdtPollSetConstIteratorImpl;
 
 class UdtPollSetImpl
 {
@@ -55,19 +45,20 @@ public:
 
     std::set<UDTSOCKET> udt_read_set_;
     std::set<UDTSOCKET> udt_write_set_;
-    std::size_t size_;
+    std::size_t m_size;
     std::map<UDTSOCKET, SocketUserData> socket_user_data_;
     int epoll_fd_;
     UDPSocket interrupt_socket_;
     std::set<SYSSOCKET> udt_sys_socket_read_set_;
     typedef std::map<UDTSOCKET, SocketUserData>::iterator socket_iterator;
     std::list<socket_iterator> reclaim_list_;
+    std::set<UdtPollSetConstIteratorImpl*> iterators;
 
-    UdtPollSetImpl():size_(0), epoll_fd_(-1) {}
-    bool Initialize();
+    UdtPollSetImpl():m_size(0), epoll_fd_(-1) {}
+    bool initialize();
 
-    bool InitializeInterruptSocket();
-    void RemoveFromEpoll(UDTSOCKET udt_handler, int event_type);
+    bool initializeInterruptSocket();
+    void removeFromEpoll(UDTSOCKET udt_handler, int event_type);
     int MapAioEventToUdtEvent(aio::EventType et)
     {
         switch (et)
@@ -77,14 +68,14 @@ public:
             default: Q_ASSERT(0); return 0;
         }
     }
-    void ReclaimSocket();
+    void reclaimSocket();
     // Right now UDT can give socket that is not supposed to be watched 
-    void RemovePhantomSocket(std::set<UDTSOCKET>* set);
+    void removePhantomSocket(std::set<UDTSOCKET>* set);
 
     static UdtPollSetImpl* Create();
 };
 
-void UdtPollSetImpl::RemovePhantomSocket(std::set<UDTSOCKET>* set)
+void UdtPollSetImpl::removePhantomSocket(std::set<UDTSOCKET>* set)
 {
     std::set<UDTSOCKET>::iterator ib = set->begin();
     while (ib != set->end())
@@ -102,7 +93,7 @@ void UdtPollSetImpl::RemovePhantomSocket(std::set<UDTSOCKET>* set)
     }
 }
 
-void UdtPollSetImpl::RemoveFromEpoll(UDTSOCKET udt_handler, int event_type)
+void UdtPollSetImpl::removeFromEpoll(UDTSOCKET udt_handler, int event_type)
 {
     // UDT will remove all the related event type related to a certain UDT handler, so if a udt
     // handler is watching read/write, then after a remove, all the event type will be removed.
@@ -116,7 +107,7 @@ void UdtPollSetImpl::RemoveFromEpoll(UDTSOCKET udt_handler, int event_type)
     }
 }
 
-void UdtPollSetImpl::ReclaimSocket()
+void UdtPollSetImpl::reclaimSocket()
 {
     for (std::list<socket_iterator>::iterator ib = reclaim_list_.begin(); ib != reclaim_list_.end(); ++ib)
     {
@@ -126,7 +117,7 @@ void UdtPollSetImpl::ReclaimSocket()
     reclaim_list_.clear();
 }
 
-bool UdtPollSetImpl::Initialize()
+bool UdtPollSetImpl::initialize()
 {
     Q_ASSERT(epoll_fd_ <0);
     epoll_fd_ = UDT::epoll_create(EPOLL_SIZE);
@@ -135,10 +126,10 @@ bool UdtPollSetImpl::Initialize()
         SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));
         return false;
     }
-    return InitializeInterruptSocket();
+    return initializeInterruptSocket();
 }
 
-bool UdtPollSetImpl::InitializeInterruptSocket()
+bool UdtPollSetImpl::initializeInterruptSocket()
 {
     interrupt_socket_.setNonBlockingMode(true);
     interrupt_socket_.bind(SocketAddress(HostAddress::localhost, 0));
@@ -155,7 +146,7 @@ bool UdtPollSetImpl::InitializeInterruptSocket()
 UdtPollSetImpl* UdtPollSetImpl::Create()
 {
     std::unique_ptr<UdtPollSetImpl> ret(new UdtPollSetImpl());
-    if (ret->Initialize())
+    if (ret->initialize())
         return ret.release();
     else
         return NULL;
@@ -164,71 +155,64 @@ UdtPollSetImpl* UdtPollSetImpl::Create()
 class UdtPollSetConstIteratorImpl
 {
 public:
-
-    UdtPollSetConstIteratorImpl(UdtPollSetImpl* impl, bool end):
-        m_impl(impl),
-        in_read_set_(!end)
+    UdtPollSetConstIteratorImpl(UdtPollSetImpl* pollSetImpl, bool end)
+    :
+        m_pollSetImpl(pollSetImpl),
+        m_inReadSet(!end)
     {
         if (end)
         {
-            iterator_ = impl->udt_write_set_.end();
+            m_curPos = m_pollSetImpl->udt_write_set_.end();
         }
         else
         {
-            iterator_ = impl->udt_read_set_.begin();
-            if (iterator_ == m_impl->udt_read_set_.end())
+            m_curPos = m_pollSetImpl->udt_read_set_.begin();
+            if (m_curPos == m_pollSetImpl->udt_read_set_.end())
             {
-                iterator_ = m_impl->udt_write_set_.begin();
-                in_read_set_ = false;
+                m_curPos = m_pollSetImpl->udt_write_set_.begin();
+                m_inReadSet = false;
             }
         }
+
+        m_pollSetImpl->iterators.insert(this);
     }
 
-    UdtPollSetConstIteratorImpl(const UdtPollSetConstIteratorImpl& impl):
-        m_impl(impl.m_impl),
-        in_read_set_(impl.in_read_set_),
-        iterator_(impl.iterator_)
+    ~UdtPollSetConstIteratorImpl()
     {
+        m_pollSetImpl->iterators.erase(this);
     }
 
-    UdtPollSetConstIteratorImpl& operator = (const UdtPollSetConstIteratorImpl& impl)
+    void next()
     {
-        if (this == &impl) return *this;
-        m_impl = impl.m_impl;
-        in_read_set_ = impl.in_read_set_;
-        iterator_ = impl.iterator_;
-        return *this;
-    }
-
-    void Next()
-    {
-        Q_ASSERT(!Done());
-        if (in_read_set_)
+        Q_ASSERT(!done());
+        if (m_inReadSet)
         {
-            ++iterator_;
-            if (iterator_ == m_impl->udt_read_set_.end())
+            ++m_curPos;
+            if (m_curPos == m_pollSetImpl->udt_read_set_.end())
             {
-                in_read_set_ = false;
-                iterator_ = m_impl->udt_write_set_.begin();
+                m_inReadSet = false;
+                m_curPos = m_pollSetImpl->udt_write_set_.begin();
             }
         }
         else
         {
-            ++iterator_;
+            ++m_curPos;
         }
     }
 
-    bool Done() const
+    bool done() const
     {
-        if (in_read_set_)
+        if (m_inReadSet)
+        {
             return false;
+        }
         else
         {
-            return iterator_ == m_impl->udt_write_set_.end();
+            return m_curPos == m_pollSetImpl->udt_write_set_.end();
         }
     }
 
-    UdtSocket* GetSocket() const
+    UdtSocket* getSocket() const
     {
         return GetSocketUserData()->socket;
     }
@@ -236,7 +220,7 @@ public:
     void* getUserData() const
     {
         const SocketUserData* ref = GetSocketUserData();
-        aio::EventType event_type = GetEventType();
+        aio::EventType event_type = getEventType();
         if (event_type == aio::etRead)
         {
             return ref->read_data == boost::none ? NULL : ref->read_data.get();
@@ -252,10 +236,10 @@ public:
         }
     }
 
-    aio::EventType GetEventType() const
+    aio::EventType getEventType() const
     {
-        Q_ASSERT(!Done());
-        if (in_read_set_)
+        Q_ASSERT(!done());
+        if (m_inReadSet)
         {
             return aio::etRead;
         }
@@ -266,7 +250,7 @@ public:
             // bug with broken connection .
             int pending_epoll_event;
             int pending_epoll_event_size = sizeof(int);
-            int ret = UDT::getsockopt(*iterator_, 0, UDT_EVENT,
+            int ret = UDT::getsockopt(*m_curPos, 0, UDT_EVENT,
                 &pending_epoll_event, &pending_epoll_event_size);
             if (ret != 0)
                 return aio::etWrite;
@@ -280,34 +264,37 @@ public:
         }
     }
 
-    bool Equal(const UdtPollSetConstIteratorImpl& impl) const
+    bool equal(const UdtPollSetConstIteratorImpl& impl) const
     {
         // iterator from different set/map cannot compare 
-        bool result = in_read_set_ ^ impl.in_read_set_;
-        if (result)
-        {
-            return false;
-        }
-        else
-        {
-            return iterator_ == impl.iterator_;
-        }
+        return m_inReadSet == impl.m_inReadSet &&
+               m_curPos == impl.m_curPos;
     }
-private:
 
+    bool inReadSet() const
+    {
+        return m_inReadSet;
+    }
+
+    std::set<UDTSOCKET>::iterator curPos() const
+    {
+        return m_curPos;
+    }
+
+private:
     const SocketUserData* GetSocketUserData() const
     {
-        Q_ASSERT(!Done());
+        Q_ASSERT(!done());
         std::map<UDTSOCKET, SocketUserData>::
-            iterator ib = m_impl->socket_user_data_.find(*iterator_);
-        Q_ASSERT(ib != m_impl->socket_user_data_.end());
+            iterator ib = m_pollSetImpl->socket_user_data_.find(*m_curPos);
+        Q_ASSERT(ib != m_pollSetImpl->socket_user_data_.end());
         return &(ib->second);
     }
 
 private:
-    UdtPollSetImpl* m_impl;
-    bool in_read_set_;
-    std::set<UDTSOCKET>::iterator iterator_;
+    UdtPollSetImpl* m_pollSetImpl;
+    bool m_inReadSet;
+    std::set<UDTSOCKET>::iterator m_curPos;
 };
 
 }// namespace detail
@@ -317,12 +304,10 @@ private:
  // Const Iterator
  // =========================================
 
-UdtPollSet::const_iterator::const_iterator() {}
-
-UdtPollSet::const_iterator::const_iterator(const const_iterator& it)
+UdtPollSet::const_iterator::const_iterator(const_iterator&& right)
 {
-    if (it.m_impl)
-        m_impl.reset(new detail::UdtPollSetConstIteratorImpl(*it.m_impl));
+    m_impl = right.m_impl;
+    right.m_impl = nullptr;
 }
 
 UdtPollSet::const_iterator::const_iterator(detail::UdtPollSetImpl* impl, bool end):
@@ -330,51 +315,27 @@ UdtPollSet::const_iterator::const_iterator(detail::UdtPollSetImpl* impl, bool en
 {
 }
 
-UdtPollSet::const_iterator& UdtPollSet::const_iterator::operator =(const UdtPollSet::const_iterator& ib)
+UdtPollSet::const_iterator::~const_iterator()
 {
-    if (this == &ib) return *this;
-    if (!m_impl)
-    {
-        if (ib.m_impl)
-            m_impl.reset(new detail::UdtPollSetConstIteratorImpl(*ib.m_impl));
-        else
-            m_impl.reset();
-    }
-    else
-    {
-        if (ib.m_impl)
-        {
-            *m_impl = *ib.m_impl;
-        }
-        else
-        {
-            m_impl.reset();
-        }
-    }
-    return *this;
+    delete m_impl;
+    m_impl = nullptr;
 }
 
 UdtPollSet::const_iterator& UdtPollSet::const_iterator::operator ++()
 {
     Q_ASSERT(m_impl);
-    m_impl->Next();
+    m_impl->next();
     return *this;
-}
-
-UdtPollSet::const_iterator UdtPollSet::const_iterator::operator++(int)
-{
-    UdtPollSet::const_iterator self(*this);
-    m_impl->Next();
-    return self;
 }
 
 bool UdtPollSet::const_iterator::operator==(const UdtPollSet::const_iterator& right) const
 {
-    if (this == &right) return true;
+    if (this == &right)
+        return true;
     if (m_impl)
     {
         if (right.m_impl)
-            return m_impl->Equal(*right.m_impl);
+            return m_impl->equal(*right.m_impl);
         else
             return false;
     }
@@ -395,19 +356,19 @@ bool UdtPollSet::const_iterator::operator!=(const UdtPollSet::const_iterator& ri
 UdtSocket* UdtPollSet::const_iterator::socket()
 {
     Q_ASSERT(m_impl);
-    return m_impl->GetSocket();
+    return m_impl->getSocket();
 }
 
 const UdtSocket* UdtPollSet::const_iterator::socket() const
 {
     Q_ASSERT(m_impl);
-    return m_impl->GetSocket();
+    return m_impl->getSocket();
 }
 
 aio::EventType UdtPollSet::const_iterator::eventType() const
 {
     Q_ASSERT(m_impl);
-    return m_impl->GetEventType();
+    return m_impl->getEventType();
 }
 
 void* UdtPollSet::const_iterator::userData()
@@ -415,8 +376,6 @@ void* UdtPollSet::const_iterator::userData()
     Q_ASSERT(m_impl);
     return m_impl->getUserData();
 }
-
-UdtPollSet::const_iterator::~const_iterator() {}
 
 // ============================================
 // UdtPollSet
@@ -427,7 +386,11 @@ UdtPollSet::UdtPollSet():
 {
 }
 
-UdtPollSet::~UdtPollSet() {}
+UdtPollSet::~UdtPollSet()
+{
+    delete m_impl;
+    m_impl = nullptr;
+}
 
 void UdtPollSet::interrupt()
 {
@@ -456,23 +419,33 @@ bool UdtPollSet::add(UdtSocket* socket, aio::EventType eventType, void* userData
         ref.write_data = userData;
     ref.socket = socket;
     ref.deleted = false;
-    ++m_impl->size_;
+    ++m_impl->m_size;
     return true;
 }
 
 void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
 {
     assert(socket);
+    if (eventType != aio::etRead && eventType != aio::etWrite)
+    {
+        Q_ASSERT(false);
+        return nullptr;
+    }
+
+    const auto udtHandle = static_cast<UDTSocketImpl*>(socket->impl())->udtHandle;
+
+    std::map<UDTSOCKET, detail::SocketUserData>::iterator
+        ib = m_impl->socket_user_data_.find(udtHandle);
+    int remain_event_type = UDT_EPOLL_ERR;
+    void* rudata = nullptr;
+
     switch (eventType)
     {
         case aio::etRead:
         {
-            std::map<UDTSOCKET, detail::SocketUserData>::iterator
-                ib = m_impl->socket_user_data_.find(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle);
             if (ib == m_impl->socket_user_data_.end() || ib->second.read_data == boost::none)
                 return NULL;
-            void* rudata = ib->second.read_data.get();
-            int remain_event_type = UDT_EPOLL_ERR;
+            rudata = ib->second.read_data.get();
             ib->second.read_data = boost::none;
             if (ib->second.write_data == boost::none)
             {
@@ -484,18 +457,29 @@ void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
                 // We have write operation for this objects
                 remain_event_type = UDT_EPOLL_OUT;
             }
-            m_impl->RemoveFromEpoll(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle, remain_event_type);
-            --m_impl->size_;
-            return rudata;
+            auto udtHandleIter = m_impl->udt_read_set_.find(udtHandle);
+            if (udtHandleIter == m_impl->udt_read_set_.end())
+                break;
+            bool canRemove = true;
+            for (auto iter: m_impl->iterators)
+            {
+                if (iter->inReadSet() && (iter->curPos() == udtHandleIter))
+                {
+                    //cannot remove element since it is being used
+                    canRemove = false;
+                    break;
+                }
+            }
+            if (canRemove)
+                m_impl->udt_read_set_.erase(udtHandleIter);
+            break;
         }
+
         case aio::etWrite:
         {
-            std::map<UDTSOCKET, detail::SocketUserData>::iterator
-                ib = m_impl->socket_user_data_.find(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle);
             if (ib == m_impl->socket_user_data_.end() || ib->second.write_data == boost::none)
                 return NULL;
-            void* rudata = ib->second.write_data.get();
-            int remain_event_type = UDT_EPOLL_ERR;
+            rudata = ib->second.write_data.get();
             ib->second.write_data = boost::none;
             if (ib->second.read_data == boost::none)
             {
@@ -506,17 +490,37 @@ void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
             {
                 remain_event_type = UDT_EPOLL_IN;
             }
-            m_impl->RemoveFromEpoll(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle, remain_event_type);
-            --m_impl->size_;
-            return rudata;
+            auto udtHandleIter = m_impl->udt_write_set_.find(udtHandle);
+            if (udtHandleIter == m_impl->udt_write_set_.end())
+                break;
+            bool canRemove = true;
+            for (auto iter : m_impl->iterators)
+            {
+                if (!iter->inReadSet() && (iter->curPos() == udtHandleIter))
+                {
+                    //cannot remove element since it is being used
+                    canRemove = false;
+                    break;
+                }
+            }
+            if (canRemove)
+                m_impl->udt_write_set_.erase(udtHandleIter);
+            break;
         }
-        default: Q_ASSERT(0); return NULL;
+
+        default:
+            Q_ASSERT(false);
+            return nullptr;
     }
+
+    m_impl->removeFromEpoll(udtHandle, remain_event_type);
+    --m_impl->m_size;
+    return rudata;
 }
 
 size_t UdtPollSet::size() const
 {
-    return m_impl->size_;
+    return m_impl->m_size;
 }
 
 void* UdtPollSet::getUserData(UdtSocket* socket, aio::EventType eventType) const
@@ -541,7 +545,7 @@ void* UdtPollSet::getUserData(UdtSocket* socket, aio::EventType eventType) const
 
 int UdtPollSet::poll(int millisToWait)
 {
-    m_impl->ReclaimSocket();
+    m_impl->reclaimSocket();
     m_impl->udt_read_set_.clear();
     m_impl->udt_write_set_.clear();
     m_impl->udt_sys_socket_read_set_.clear();
@@ -573,8 +577,8 @@ int UdtPollSet::poll(int millisToWait)
             --ret;
         }
         // remove the phantom sockets
-        m_impl->RemovePhantomSocket(&m_impl->udt_read_set_);
-        m_impl->RemovePhantomSocket(&m_impl->udt_write_set_);
+        m_impl->removePhantomSocket(&m_impl->udt_read_set_);
+        m_impl->removePhantomSocket(&m_impl->udt_write_set_);
         return ret;
     }
 }
@@ -582,11 +586,11 @@ int UdtPollSet::poll(int millisToWait)
 UdtPollSet::const_iterator UdtPollSet::begin() const
 {
     Q_ASSERT(m_impl);
-    return const_iterator(m_impl.get(), false);
+    return const_iterator(m_impl, false);
 }
 
 UdtPollSet::const_iterator UdtPollSet::end() const
 {
     Q_ASSERT(m_impl);
-    return const_iterator(m_impl.get(), true);
+    return const_iterator(m_impl, true);
 }
