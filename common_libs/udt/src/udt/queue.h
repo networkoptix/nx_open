@@ -345,9 +345,9 @@ public:
    ~CRendezvousQueue();
 
 public:
-   void insert(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl);
-   void remove(const UDTSOCKET& id);
-   CUDT* retrieve(const sockaddr* addr, UDTSOCKET& id);
+   void insertToRQ(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl);
+   void removeFromRQ(const UDTSOCKET& id);
+   CUDT* retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id);
 
    void updateConnStatus();
 

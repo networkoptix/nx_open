@@ -777,7 +777,7 @@ CRendezvousQueue::~CRendezvousQueue()
    m_lRendezvousID.clear();
 }
 
-void CRendezvousQueue::insert(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
+void CRendezvousQueue::insertToRQ(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
 {
    CGuard vg(m_RIDVectorLock);
 
@@ -792,7 +792,7 @@ void CRendezvousQueue::insert(const UDTSOCKET& id, CUDT* u, int ipv, const socka
    m_lRendezvousID.push_back(r);
 }
 
-void CRendezvousQueue::remove(const UDTSOCKET& id)
+void CRendezvousQueue::removeFromRQ(const UDTSOCKET& id)
 {
    CGuard vg(m_RIDVectorLock);
 
@@ -812,7 +812,7 @@ void CRendezvousQueue::remove(const UDTSOCKET& id)
    }
 }
 
-CUDT* CRendezvousQueue::retrieve(const sockaddr* addr, UDTSOCKET& id)
+CUDT* CRendezvousQueue::retrieveFromRQ(const sockaddr* addr, UDTSOCKET& id)
 {
    CGuard vg(m_RIDVectorLock);
 
@@ -1021,7 +1021,7 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
       {
          if (NULL != self->m_pListener)
             self->m_pListener->listen(addr, unit->m_Packet);
-         else if (NULL != (u = self->m_pRendezvousQueue->retrieve(addr, id)))
+         else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
          {
             // asynchronous connect: call connect here
             // otherwise wait for the UDT socket to retrieve this packet
@@ -1049,7 +1049,7 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
                }
             }
          }
-         else if (NULL != (u = self->m_pRendezvousQueue->retrieve(addr, id)))
+         else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
          {
             if (!u->m_bSynRecving)
             {
@@ -1189,12 +1189,12 @@ void CRcvQueue::removeListener(const CUDT* u)
 
 void CRcvQueue::registerConnector(const UDTSOCKET& id, CUDT* u, int ipv, const sockaddr* addr, uint64_t ttl)
 {
-   m_pRendezvousQueue->insert(id, u, ipv, addr, ttl);
+   m_pRendezvousQueue->insertToRQ(id, u, ipv, addr, ttl);
 }
 
 void CRcvQueue::removeConnector(const UDTSOCKET& id)
 {
-   m_pRendezvousQueue->remove(id);
+   m_pRendezvousQueue->removeFromRQ(id);
 
    CGuard bufferlock(m_PassLock);
 
