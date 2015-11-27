@@ -8,7 +8,7 @@
 #include <ui/graphics/items/generic/separator.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
-#include <ui/graphics/items/controls/tags_control.h>
+#include <ui/graphics/items/controls/bookmark_tags_control.h>
 #include <ui/actions/action_parameters.h>
 
 #include <utils/common/string.h>
@@ -114,7 +114,7 @@ namespace
         if (tags.empty())
             return insertionIndex;
 
-        const auto tagsControl = new QnTagsControl(tags, parent);
+        const auto tagsControl = new QnBookmarkTagsControl(tags, parent);
 
         return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, paramsId);
     }
