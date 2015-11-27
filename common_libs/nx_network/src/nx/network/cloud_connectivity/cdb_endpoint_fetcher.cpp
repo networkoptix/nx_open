@@ -9,6 +9,7 @@
 
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/guard.h>
 
 #include "cloud_modules_xml_sax_handler.h"
 #include "version.h"
@@ -73,6 +74,11 @@ void CloudModuleEndPointFetcher::get(
 
 void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 {
+    auto guard = makeScopedGuard([this](){
+        QnMutexLocker lk(&m_mutex);
+        m_httpClient.reset();
+    });
+
     if (!client->response())
         return signalWaitingHandlers(
             nx_http::StatusCode::serviceUnavailable,
@@ -99,9 +105,6 @@ void CloudModuleEndPointFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr cl
         m_moduleName,
         std::move(endpoints),
         std::bind(&CloudModuleEndPointFetcher::endpointSelected, this, _1, _2));
-
-    QnMutexLocker lk(&m_mutex);
-    m_httpClient.reset();
 }
 
 bool CloudModuleEndPointFetcher::parseCloudXml(
@@ -137,8 +140,6 @@ void CloudModuleEndPointFetcher::signalWaitingHandlers(
     lk.unlock();
     for (auto& handler : handlers)
         handler(statusCode, endpoint);
-    lk.relock();
-    m_httpClient.reset();
 }
 
 void CloudModuleEndPointFetcher::endpointSelected(
