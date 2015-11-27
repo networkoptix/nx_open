@@ -148,6 +148,17 @@ public:
     ScanMediaFilesTask(QnStorageManager* owner): QnLongRunnable(), m_owner(owner), m_fullScanCanceled(false)
     {
     }
+
+    virtual ~ScanMediaFilesTask()
+    {
+        stop();
+    }
+
+    virtual void pleaseStop() override
+    {
+        QnLongRunnable::pleaseStop();
+        m_waitCond.wakeAll();
+    }
     
     bool hasFullScanTasksUnsafe() const
     {
