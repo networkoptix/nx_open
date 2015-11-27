@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'nx_cloud',
         'USER': 'root',
-        'PASSWORD': '', #'KME2m9TjsvDugs',
+        'PASSWORD': '',  # 'KME2m9TjsvDugs',
         'HOST': '127.0.0.1',
         'PORT': '3306'
     }
@@ -119,18 +119,21 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
-            },
         },
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'formatter': 'verbose'
+        },
+    },
     'loggers': {
         'django': {
             'level': 'DEBUG',
             'propagate': True,
-            'handlers': ['console']
-            },
-        }
+            'handlers': ['console', 'mail_admins']
+        },
     }
-
-
+}
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -150,16 +153,28 @@ REST_FRAMEWORK = {
 }
 
 CLOUD_CONNECT = {
-    #'url': 'http://cloud-demo.hdw.mx:3346',
-    'url': 'http://localhost:3346',
-    #'url': 'http://10.0.3.41:3346',
-    'customization':'default',
-    'password_realm':'VMS'
+    'url': 'http://cloud-demo.hdw.mx:3346',
+    # 'url': 'http://localhost:3346',
+    # 'url': 'http://10.0.3.41:3346',
+    'customization': 'default',
+    'password_realm': 'VMS'
 }
 
 AUTH_USER_MODEL = 'api.Account'
 AUTHENTICATION_BACKENDS = ('api.account_backend.AccountBackend',)
 
 
-CORS_ORIGIN_ALLOW_ALL = True #Change this value on production!
+CORS_ORIGIN_ALLOW_ALL = True  # TODO: Change this value on production!
 CORS_ALLOW_CREDENTIALS = True
+
+
+ADMINS = (('Evgeny', 'ebalashov@networkoptix.com'),)
+
+DEFAULT_FROM_EMAIL = 'service@networkoptix.com'
+SERVER_EMAIL = 'service@networkoptix.com'
+EMAIL_SUBJECT_PREFIX = '[CLOUD_PORTAL]'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'service@networkoptix.com'
+EMAIL_HOST_PASSWORD = 'kbnUk06boqBkwU'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True

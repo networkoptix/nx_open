@@ -548,10 +548,13 @@ module.exports = function (grunt) {
     grunt.registerTask('publish', [
         'build',
         'clean:publish',
-        'copy:publish',
-        'scp:publish'
+        'copy:publish'
     ]);
 
+    grunt.registerTask('fr', [
+        'build',
+        'scp:frontend'
+    ]);
 
     grunt.registerTask('pub', [
         'publish'

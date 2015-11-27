@@ -21,6 +21,7 @@ class CreateAccountSerializer(serializers.Serializer): # ModelSerializer
     def create(self, validated_data):
         return Account.objects.create_user( **validated_data)
 
+
 class AccountSerializer(serializers.ModelSerializer): # ModelSerializer
     class Meta:
         model = Account

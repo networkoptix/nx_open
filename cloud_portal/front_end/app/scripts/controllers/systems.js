@@ -18,7 +18,7 @@ angular.module('cloudApp')
             var password = encodeURIComponent($sessionStorage.password);
             var system   = system?system.id:'localhost:7000';
             var protocol = Config.clientProtocol;
-
+            system = system.replace('{','').replace('}','');
             var url = protocol + username + ":" + password + "@" + system + "/";
             window.open(url);
         }

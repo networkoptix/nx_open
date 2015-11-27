@@ -6,14 +6,14 @@ import logging
 import models
 logger = logging.getLogger('django')
 
-from api.controllers.cloud_api import account
+from api.controllers.cloud_api import Account
 
 class AccountBackend(object):
     def authenticate(self, username=None, password=None):
 
         logger.debug("authentificate " + username)
 
-        checkUser = account.get(username, password)
+        checkUser = Account.get(username, password)
         logger.debug(checkUser)
 
         if checkUser:
@@ -46,7 +46,7 @@ class AccountManager(db.models.Manager):
         last_name = extra_fields.pop("last_name", True)
         created_date = now
 
-        if account.register(email, password, first_name, last_name) == None :
+        if Account.register(email, password, first_name, last_name) == None :
             return None
 
         user = self.model(email=email,
