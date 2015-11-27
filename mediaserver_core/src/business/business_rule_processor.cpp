@@ -122,16 +122,18 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnNetworkResourceList resources;
+    QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 
     switch (action->actionType()) {
     case QnBusiness::ShowOnAlarmLayoutAction:
     case QnBusiness::ShowTextOverlayAction:
-        /* These actions should be executed once for the whole resources list, not one-by-one */
-        //TODO: #rvasilenko Possibly this may be implemented more correct way
+        if (action->getParams().useSource) {
+            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId))
+                resources << sourceCamera;
+            resources << qnResPool->getResources<QnNetworkResource>(action->getRuntimeParams().metadata.cameraRefs);
+        }
         break;
     default:
-        resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
         break;
     }
     
