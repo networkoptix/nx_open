@@ -38,11 +38,12 @@ written by
    Yunhong Gu, last updated 01/01/2011
 *****************************************************************************/
 
-#ifdef LINUX
+#ifdef __linux__
    #include <sys/epoll.h>
    #include <unistd.h>
 #endif
 #include <algorithm>
+#include <iostream>
 #include <cerrno>
 #include <cstring>
 #include <iterator>
@@ -70,7 +71,7 @@ int CEPoll::create()
 
    int localid = 0;
 
-   #ifdef LINUX
+   #ifdef __linux__
    localid = epoll_create(1024);
    if (localid < 0)
       throw CUDTException(-1, 0, errno);
@@ -115,7 +116,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
    if (p == m_mPolls.end())
       throw CUDTException(5, 13);
 
-#ifdef LINUX
+#ifdef __linux__
    epoll_event ev;
    memset(&ev, 0, sizeof(epoll_event));
 
@@ -165,7 +166,7 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
    if (p == m_mPolls.end())
       throw CUDTException(5, 13);
 
-#ifdef LINUX
+#ifdef __linux__
    epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
       throw CUDTException();
@@ -227,7 +228,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
 
       if (lrfds || lwfds)
       {
-         #ifdef LINUX
+         #ifdef __linux__
          const int max_events = p->second.m_sLocals.size();
          epoll_event ev[max_events];
          int nfds = ::epoll_wait(p->second.m_iLocalID, ev, max_events, 0);
@@ -308,7 +309,7 @@ int CEPoll::release(const int eid)
    if (i == m_mPolls.end())
       throw CUDTException(5, 13);
 
-   #ifdef LINUX
+   #ifdef __linux__
    // release local/system epoll descriptor
    ::close(i->second.m_iLocalID);
    #endif
