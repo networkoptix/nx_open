@@ -128,7 +128,7 @@ private:
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
-
+    typedef QnLongRunnable base_type;
     struct ScanData
     {
         ScanData(): partialScan(false) {}
@@ -201,7 +201,13 @@ public:
         m_fullScanCanceled = true;
     }
 
-    
+    virtual void pleaseStop() override
+    {
+        base_type::pleaseStop();
+        QnMutexLocker lock(&m_mutex);
+        m_waitCond.wakeAll();
+    }
+
     virtual void run() override
     {
         bool fullscanProcessed = false;
