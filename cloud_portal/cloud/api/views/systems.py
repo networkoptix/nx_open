@@ -1,10 +1,8 @@
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from api.controllers import cloud_api
 
-from api.helpers.exceptions import handle_exceptions,api_success
+from api.helpers.exceptions import handle_exceptions, api_success
 import logging
 
 logger = logging.getLogger('django')

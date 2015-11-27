@@ -10,6 +10,7 @@ from api.helpers.exceptions import handle_exceptions, APIRequestException, APINo
 
 logger = logging.getLogger('django')
 
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
@@ -20,12 +21,13 @@ def register(request):
     serializer.save()
     return api_success()
 
+
 @api_view(['POST'])
-@permission_classes(( AllowAny, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def login(request):
-    #authorize user here
-    #return user
+    # authorize user here
+    # return user
 
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
 
@@ -39,12 +41,14 @@ def login(request):
     serializer = AccountSerializer(user, many=False)
     return api_success(serializer.data)
 
+
 @api_view(['POST'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def logout(request):
     django.contrib.auth.logout(request)
     return api_success()
+
 
 @api_view(['GET', 'POST'])
 @permission_classes((IsAuthenticated, ))
@@ -85,14 +89,16 @@ def change_password(request):
     request.session['password'] = new_password
     return api_success()
 
+
 @api_view(['POST'])
-@permission_classes(( AllowAny, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def activate(request):
     return api_success(status_code=status.HTTP_501_NOT_IMPLEMENTED)
 
+
 @api_view(['POST'])
-@permission_classes(( AllowAny, ))
+@permission_classes((AllowAny, ))
 @handle_exceptions
 def restore_password(request):
     return api_success(status_code=status.HTTP_501_NOT_IMPLEMENTED)

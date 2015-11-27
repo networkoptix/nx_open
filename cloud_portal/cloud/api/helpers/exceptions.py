@@ -3,11 +3,11 @@ from rest_framework import status
 from django.conf import settings
 import logging
 import traceback
-import json
 
 logger = logging.getLogger('django')
 
-def api_success(data = None, status_code = status.HTTP_200_OK):
+
+def api_success(data=None, status_code=status.HTTP_200_OK):
     if data is not None:
         return Response(data, status=status_code)
     return Response({
@@ -37,13 +37,15 @@ class APIException(Exception):
 class APIInternalException(APIException):
     # 500 error - internal server error
     def __init__(self, error_text, error_code=None):
-        super(APIException, self).__init__(error_text, error_code=error_code, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        super(APIException, self).__init__(error_text, error_code=error_code,
+                                           status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class APIServiceException(APIException):
     # 503 error - service unavailable
     def __init__(self, error_text, error_code=None):
-        super(APIException, self).__init__(error_text, error_code=error_code, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        super(APIException, self).__init__(error_text, error_code=error_code,
+                                           status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class APINotFoundException(APIException):

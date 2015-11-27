@@ -1,30 +1,32 @@
-
 from django.utils import timezone
-
 from django import db
 import logging
 import models
-logger = logging.getLogger('django')
-
 from api.controllers.cloud_api import Account
 
+logger = logging.getLogger('django')
+
+
 class AccountBackend(object):
-    def authenticate(self, username=None, password=None):
+    @staticmethod
+    def authenticate(username=None, password=None):
 
         logger.debug("authentificate " + username)
 
-        checkUser = Account.get(username, password)
-        logger.debug(checkUser)
+        checkuser = Account.get(username, password)
+        logger.debug(checkuser)
 
-        if checkUser:
+        if checkuser:
             return models.Account.objects.get(email=username)
         return None
 
-    def get_user(self, user_id):
+    @staticmethod
+    def get_user(user_id):
         try:
             return models.Account.objects.get(pk=user_id)
         except models.Account.DoesNotExist:
             return None
+
 
 class AccountManager(db.models.Manager):
 
@@ -41,12 +43,12 @@ class AccountManager(db.models.Manager):
         now = timezone.now()
         if not email:
             raise ValueError('The given email must be set')
-        #email = self.normalize_email(email)
+        # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name", True)
         last_name = extra_fields.pop("last_name", True)
         created_date = now
 
-        if Account.register(email, password, first_name, last_name) == None :
+        if Account.register(email, password, first_name, last_name) is None:
             return None
 
         user = self.model(email=email,
