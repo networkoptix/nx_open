@@ -154,12 +154,6 @@ public:
         stop();
     }
 
-    virtual void pleaseStop() override
-    {
-        QnLongRunnable::pleaseStop();
-        m_waitCond.wakeAll();
-    }
-    
     bool hasFullScanTasksUnsafe() const
     {
         for (const auto& task: m_scanTasks) {
