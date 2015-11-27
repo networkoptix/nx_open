@@ -198,7 +198,6 @@ public:
     virtual void pleaseStop() override
     {
         base_type::pleaseStop();
-        QnMutexLocker lock(&m_mutex);
         m_waitCond.wakeAll();
     }
 
