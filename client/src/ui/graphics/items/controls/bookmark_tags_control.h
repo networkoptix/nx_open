@@ -5,17 +5,17 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 
-class QnTagsControl : public QnProxyLabel
+class QnBookmarkTagsControl : public QnProxyLabel
 {
     Q_OBJECT
 
-    Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors NOTIFY colorsChanged)
+    Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
 
 public:
-    QnTagsControl(const QnCameraBookmarkTags &tags
+    QnBookmarkTagsControl(const QnCameraBookmarkTags &tags
         , QGraphicsItem *parent = nullptr);
 
-    virtual ~QnTagsControl();
+    virtual ~QnBookmarkTagsControl();
 
     void setTags(const QnCameraBookmarkTags &tags);
 
@@ -26,16 +26,12 @@ public:
 signals:
     void tagClicked(const QString &tag);
 
-    void colorsChanged();
-
 private:
     void updateCurrentTag(const QString &currentTag);
 
     void onLinkHovered(const QString &tag);
 
-    void hoverEnterEvent(QGraphicsSceneHoverEvent * event);
-
-    void hoverLeaveEvent(QGraphicsSceneHoverEvent * event);
+    virtual void hoverLeaveEvent(QGraphicsSceneHoverEvent * event) override;
 
 private:
     QnBookmarkColors m_colors;

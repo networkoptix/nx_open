@@ -1,5 +1,5 @@
 
-#include "tags_control.h"
+#include "bookmark_tags_control.h"
 
 namespace
 {
@@ -8,7 +8,7 @@ namespace
     static const auto kTableTag = lit("<table cellspacing = \"1\" cellpadding=\"3\" style = \"margin-top: 0;float: left;display:inline-block; border-style: none;border-width:0;\"><tr><td bgcolor = %1><a href = \"%2\" style = \"text-decoration: none;\">%3</a></td></tr></table></tr></table>");
 }
 
-QnTagsControl::QnTagsControl(const QnCameraBookmarkTags &tags
+QnBookmarkTagsControl::QnBookmarkTagsControl(const QnCameraBookmarkTags &tags
     , QGraphicsItem *parent)
     : QnProxyLabel(parent)
     , m_colors()
@@ -17,8 +17,8 @@ QnTagsControl::QnTagsControl(const QnCameraBookmarkTags &tags
     setAcceptHoverEvents(true);
 
     setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::TextEditable);
-    connect(this, &QnTagsControl::linkHovered, this, &QnTagsControl::onLinkHovered);
-    connect(this, &QnTagsControl::linkActivated, this, &QnTagsControl::tagClicked);
+    connect(this, &QnBookmarkTagsControl::linkHovered, this, &QnBookmarkTagsControl::onLinkHovered);
+    connect(this, &QnBookmarkTagsControl::linkActivated, this, &QnBookmarkTagsControl::tagClicked);
 
     /* For future debug
     connect(this, &QnTagsControl::linkActivated, this, [this](const QString &link)
@@ -30,12 +30,12 @@ QnTagsControl::QnTagsControl(const QnCameraBookmarkTags &tags
     setTags(tags);
 }
 
-QnTagsControl::~QnTagsControl()
+QnBookmarkTagsControl::~QnBookmarkTagsControl()
 {
 
 }
 
-void QnTagsControl::setTags(const QnCameraBookmarkTags &tags)
+void QnBookmarkTagsControl::setTags(const QnCameraBookmarkTags &tags)
 {
     if (m_tags == tags)
         return;
@@ -45,7 +45,7 @@ void QnTagsControl::setTags(const QnCameraBookmarkTags &tags)
     updateCurrentTag(QString());
 }
 
-void QnTagsControl::updateCurrentTag(const QString &currentTag)
+void QnBookmarkTagsControl::updateCurrentTag(const QString &currentTag)
 {
     setCursor(currentTag.isEmpty() ? Qt::ArrowCursor : Qt::PointingHandCursor);
 
@@ -61,12 +61,12 @@ void QnTagsControl::updateCurrentTag(const QString &currentTag)
     setText(labelText);
 }
 
-const QnBookmarkColors &QnTagsControl::colors() const
+const QnBookmarkColors &QnBookmarkTagsControl::colors() const
 {
     return m_colors;
 }
 
-void QnTagsControl::setColors(const QnBookmarkColors &colors)
+void QnBookmarkTagsControl::setColors(const QnBookmarkColors &colors)
 {
     if (colors == m_colors)
         return;
@@ -74,27 +74,13 @@ void QnTagsControl::setColors(const QnBookmarkColors &colors)
     m_colors = colors;
 }
 
-void QnTagsControl::hoverEnterEvent(QGraphicsSceneHoverEvent * event)
-{
-    if (event->lastPos() != QPointF(0, 0))
-    {
-        event->setLastPos(QPointF(0, 0));
-        event->setLastScenePos(QPointF(0, 0));
-        event->setLastScreenPos(QPoint(0, 0));
-        qApp->sendEvent(this, event);
-        return;
-    }
-
-    QnProxyLabel::hoverEnterEvent(event);
-}
-
-void QnTagsControl::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
+void QnBookmarkTagsControl::hoverLeaveEvent(QGraphicsSceneHoverEvent * event)
 {
     updateCurrentTag(QString());
     QnProxyLabel::hoverLeaveEvent(event);
 }
 
-void QnTagsControl::onLinkHovered(const QString &tag)
+void QnBookmarkTagsControl::onLinkHovered(const QString &tag)
 {
     updateCurrentTag(tag);
 }
