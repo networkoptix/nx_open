@@ -126,7 +126,6 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
     switch (action->actionType()) {
     case QnBusiness::ShowOnAlarmLayoutAction:
-    case QnBusiness::ShowTextOverlayAction:
         if (action->getParams().useSource) {
             if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId))
                 resources << sourceCamera;
