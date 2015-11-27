@@ -131,8 +131,12 @@ bool UdtPollSetImpl::initialize()
 
 bool UdtPollSetImpl::initializeInterruptSocket()
 {
-    interrupt_socket_.setNonBlockingMode(true);
-    interrupt_socket_.bind(SocketAddress(HostAddress::localhost, 0));
+    if (!interrupt_socket_.setNonBlockingMode(true) ||
+        !interrupt_socket_.bind(SocketAddress(HostAddress::localhost, 0)))
+    {
+        return false;
+    }
+
     // adding this iterrupt_socket_ to the epoll set
     int ret = UDT::epoll_add_ssock(epoll_fd_, interrupt_socket_.handle());
     if (ret <0)
