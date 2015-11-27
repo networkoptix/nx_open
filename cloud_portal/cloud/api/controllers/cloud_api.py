@@ -1,151 +1,78 @@
-__author__ = 'noptix'
-
+import requests
+import logging
 from requests.auth import HTTPDigestAuth
 from hashlib import md5
-from  cloud import settings
-import logging
-import requests
-import django
+from cloud import settings
+from api.helpers.exceptions import validate_response
 
 logger = logging.getLogger('django')
 
-class system(object):
+
+class System(object):
     @staticmethod
+    @validate_response
     def list(email, password):
-         # TODO: create wrappers
+        # TODO: create wrappers
         request = settings.CLOUD_CONNECT['url'] + "/system/get"
 
-        response = requests.get(request, auth=HTTPDigestAuth(email, password))
-
-        logger.debug(request)
-        logger.debug(response.status_code)
-        logger.debug(response.text)
-        logger.debug('------------------------------------------------------------')
-
-        return response.json()
+        return requests.get(request, auth=HTTPDigestAuth(email, password))
 
 
-class account(object):
+class Account(object):
 
     @staticmethod
+    @validate_response
     def register(email, password, first_name, last_name):
-        '''
-            <function>
-                <name>register</name>
-                <description></description>
-                <method>GET</method>
-                <params>
-                    <param>
-                        <name>email</name>
-                        <description>Unique address to be associated with account</description>
-                        <optional>false</optional>
-                    </param>
-                    <param>
-                        <name>passwordHa1</name>
-                        <description>Hex representation of HA1 (see rfc2617) digest of user's password. Realm is VMS</description>
-                        <optional>true</optional>
-                    </param>
-                    <param>
-                        <name>fullName</name>
-                        <description></description>
-                        <optional>true</optional>
-                    </param>
-                    <param>
-                        <name>customization</name>
-                        <description>Customization of portal has been used to create account</description>
-                        <optional>true</optional>
-                    </param>
-                </params>
-                <result>
-                    <caption>Account activation code in JSON format</caption>
-                </result>
-            </function>
-        '''
-
-
         customization = settings.CLOUD_CONNECT['customization']
         realm = settings.CLOUD_CONNECT['password_realm']
-        api_url = settings.CLOUD_CONNECT['url']
 
-        passwordString = '%s:%s:%s' % (email, realm, password)
-        passwordHA1 = md5(passwordString).hexdigest()
-
+        password_string = '%s:%s:%s' % (email, realm, password)
+        password_ha1 = md5(password_string).hexdigest()
 
         full_name = '%s %s' % (first_name, last_name)
 
+        params = {
+            'email': email,
+            'passwordHa1': password_ha1,
+            'fullName': full_name,
+            'customization': customization
+        }
+        # django.utils.http.urlencode(params)
+        request = settings.CLOUD_CONNECT['url'] + '/account/register'
 
-        request = '%s/account/register?%s' % (api_url, django.utils.http.urlencode({
-            'email':email,
-            'passwordHa1':passwordHA1,
-            'fullName':full_name,
-            'customization':customization
-        }))
-
-
-        response = requests.get(request)
-
-        logger.debug({"passwordString":passwordString,"passwordHA1":passwordHA1})
-        logger.debug(request)
-        logger.debug(response.status_code)
-        logger.debug(response.text)
-        logger.debug('------------------------------------------------------------')
-
-
-        if response.status_code != 200:
-            return None
-
-        code = response.json()
-        # REMOVE quotes here, or unJSON
-        return code
+        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
-    def changePassword(email, oldPassword, newPassword, first_name, last_name):
+    @validate_response
+    def change_password(email, password, new_password):
         realm = settings.CLOUD_CONNECT['password_realm']
-        api_url = settings.CLOUD_CONNECT['url']
 
-        passwordString = '%s:%s:%s' % (email, realm, newPassword)
-        passwordHA1 = md5(passwordString).hexdigest()
+        password_string = '%s:%s:%s' % (email, realm, new_password)
+        password_ha1 = md5(password_string).hexdigest()
 
-        request = '%s/account/update?%s' % (api_url, django.utils.http.urlencode({
-            'passwordHa1':passwordHA1
-        }))
+        params = {
+            'passwordHa1': password_ha1
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/update'
 
-        response = requests.get(request, auth=HTTPDigestAuth(email, oldPassword))
-
-        if response.status_code != 200:
-            return None
-
-        # REMOVE quotes here, or unJSON
-        return response.json()
+        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
+    @validate_response
     def update(email, password, first_name, last_name):
-        api_url = settings.CLOUD_CONNECT['url']
-
         full_name = '%s %s' % (first_name, last_name)
 
-        request = '%s/account/update?%s' % (api_url, django.utils.http.urlencode({
-            'fullName':full_name
-        }))
+        params = {
+            'fullName': full_name
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/update'
 
-        response = requests.get(request, auth=HTTPDigestAuth(email, password))
-
-        if response.status_code != 200:
-            return None
-
-        # REMOVE quotes here, or unJSON
-        return response.json()
+        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
+    @validate_response
     def get(email=None, password=None):
         # TODO: create wrappers
         request = settings.CLOUD_CONNECT['url'] + "/account/get"
 
-        response = requests.get(request, auth=HTTPDigestAuth(email, password))
-
-        logger.debug(request)
-        logger.debug(response.status_code)
-        logger.debug(response.text)
-        logger.debug('------------------------------------------------------------')
-
-        return response.json()
+        return requests.get(request, auth=HTTPDigestAuth(email, password))
