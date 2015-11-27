@@ -33,6 +33,9 @@ signals:
     /// @brief Remove action callback
     void removeBookmarkClicked(const QnCameraBookmark &bookmark);
 
+    /// @brief Tag-clicked action
+    void tagClicked(const QString &tag);
+
 public slots:
     /// Set timestamp for bookmarks extraction
     void setTargetTimestamp(qint64 timestamp);

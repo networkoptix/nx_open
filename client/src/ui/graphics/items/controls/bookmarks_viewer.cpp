@@ -109,6 +109,7 @@ namespace
         , const QColor &commonTextColor
         , QGraphicsItem *parent
         , QGraphicsLinearLayout *layout
+        , QnBookmarksViewer *viewer
         , LabelParamIds paramsId)
     {
         if (tags.empty())
@@ -116,6 +117,7 @@ namespace
 
         const auto tagsControl = new QnBookmarkTagsControl(tags, parent);
 
+        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked, viewer, &QnBookmarksViewer::tagClicked);
         return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, paramsId);
     }
 
@@ -178,7 +180,7 @@ namespace
         BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
             , bool showMoreTooltip
             , const QnBookmarkColors &colors
-            , QGraphicsItem *parent);
+            , QnBookmarksViewer *parent);
 
         virtual ~BookmarkToolTipFrame();
 
@@ -186,7 +188,8 @@ namespace
 
     private:
         QGraphicsLinearLayout *createBookmarksLayout(const QnCameraBookmark &bookmark
-            , const QnBookmarkColors &colors);
+            , const QnBookmarkColors &colors
+            , QnBookmarksViewer *viewer);
 
         QGraphicsLinearLayout *createLeftCountLayout(int bookmarksLeft
             , const QnBookmarkColors &colors);
@@ -198,7 +201,7 @@ namespace
     BookmarkToolTipFrame::BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
         , bool showMoreTooltip
         , const QnBookmarkColors &colors
-        , QGraphicsItem *parent)
+        , QnBookmarksViewer *parent)
 
         : QnToolTipWidget(parent)
 
@@ -223,7 +226,7 @@ namespace
                 insertBookmarksSeparator(kTopPositionIndex, colors, this, m_mainLayout);
 
             m_mainLayout->insertItem(kTopPositionIndex
-                , createBookmarksLayout(bookmark, colors));
+                , createBookmarksLayout(bookmark, colors, parent));
             addSeparator = true;
         }
     }
@@ -253,7 +256,8 @@ namespace
     }
 
     QGraphicsLinearLayout *BookmarkToolTipFrame::createBookmarksLayout(const QnCameraBookmark &bookmark
-        , const QnBookmarkColors &colors)
+        , const QnBookmarkColors &colors
+        , QnBookmarksViewer *viewer)
     {
         const auto layout = createBookmarkItemLayout();
 
@@ -275,8 +279,8 @@ namespace
             enum { kMaxTags = 16 };
             const auto &trimmedTags = (bookmark.tags.size() <= kMaxTags ? bookmark.tags
                 : QnCameraBookmarkTags::fromList(bookmark.tags.toList().mid(0, kMaxTags)));
-
-            createTagsControl(position, trimmedTags, colors.text, this, layout, kTagsIndex);
+ 
+            createTagsControl(position, trimmedTags, colors.text, this, layout, viewer, kTagsIndex);
         }
        
         return layout;
