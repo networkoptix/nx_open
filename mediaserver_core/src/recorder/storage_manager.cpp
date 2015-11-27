@@ -1065,27 +1065,13 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 
 void QnStorageManager::updateCameraHistory() 
 {
-    std::vector<QnUuid> archivedListNew = 
-        qnNormalStorageMan->getCamerasWithArchive();
-
-    std::vector<QnUuid> archivedListNewBackup = 
-        qnBackupStorageMan->getCamerasWithArchive();
-
-    std::sort(archivedListNew.begin(), archivedListNew.end());
-    std::sort(archivedListNewBackup.begin(), archivedListNewBackup.end());
-
-    std::vector<QnUuid> resultNewList;
-    std::set_union(archivedListNew.cbegin(),
-                   archivedListNew.cend(),
-                   archivedListNewBackup.cbegin(),
-                   archivedListNewBackup.cend(),
-                   std::back_inserter(resultNewList));
+    auto archivedListNew = getCamerasWithArchive();
 
     std::vector<QnUuid> archivedListOld = 
         qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
-
     std::sort(archivedListOld.begin(), archivedListOld.end());
-    if (archivedListOld == resultNewList) 
+
+    if (archivedListOld == archivedListNew) 
         return;
 
     const ec2::AbstractECConnectionPtr& appServerConnection = 
@@ -1094,7 +1080,7 @@ void QnStorageManager::updateCameraHistory()
     ec2::ErrorCode errCode = 
         appServerConnection->getCameraManager()
                            ->setCamerasWithArchiveSync(qnCommon->moduleGUID(), 
-                                                       resultNewList);
+                                                       archivedListNew);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " 
@@ -1102,7 +1088,7 @@ void QnStorageManager::updateCameraHistory()
         return;
     }
     qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(), 
-                                              resultNewList);
+                                              archivedListNew);
     return;
 }
 
@@ -2109,7 +2095,7 @@ bool QnStorageManager::isStorageAvailable(const QnStorageResourcePtr& storage) c
 }
 
 
-std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
 {
     QnMutexLocker locker(&m_mutexCatalog);
     std::set<QString> internalData;
@@ -2122,6 +2108,27 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
             result.push_back(cam->getId());
     }
     return result;
+}
+
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchive()
+{
+    std::vector<QnUuid> archivedListNormal = 
+        qnNormalStorageMan->getCamerasWithArchiveHelper();
+
+    std::vector<QnUuid> archivedListBackup = 
+        qnBackupStorageMan->getCamerasWithArchiveHelper();
+
+    std::sort(archivedListNormal.begin(), archivedListNormal.end());
+    std::sort(archivedListBackup.begin(), archivedListBackup.end());
+
+    std::vector<QnUuid> resultList;
+    std::set_union(archivedListNormal.cbegin(),
+                   archivedListNormal.cend(),
+                   archivedListBackup.cbegin(),
+                   archivedListBackup.cend(),
+                   std::back_inserter(resultList));
+
+    return resultList;
 }
 
 void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, const FileCatalogMap& catalogMap ) const
