@@ -11,13 +11,6 @@
 #include "udt_socket.h"
 #include "udt_socket_impl.h"
 
-#ifdef __APPLE__
-static const int EPOLL_SIZE = 1024;
-#else
-//TODO #ak rebuild udt for linux and win32
-#define EPOLL_SIZE
-#endif
-
 
 // ========================================================
 // PollSet implementation
@@ -120,7 +113,7 @@ void UdtPollSetImpl::reclaimSocket()
 bool UdtPollSetImpl::initialize()
 {
     Q_ASSERT(epoll_fd_ <0);
-    epoll_fd_ = UDT::epoll_create(EPOLL_SIZE);
+    epoll_fd_ = UDT::epoll_create();
     if (epoll_fd_ <0)
     {
         SystemError::setLastErrorCode(detail::convertToSystemError(UDT::getlasterror().getErrorCode()));

@@ -80,7 +80,7 @@ public: // for CUDTUnited API
       // Returned value:
       //    new EPoll ID if success, otherwise an error number.
 
-   int create(size_t maxSockets);
+   int create();
 
       // Functionality:
       //    add a UDT socket to an EPoll.

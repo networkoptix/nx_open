@@ -67,14 +67,14 @@ CEPoll::~CEPoll()
    CGuard::releaseMutex(m_EPollLock);
 }
 
-int CEPoll::create(size_t maxSockets)
+int CEPoll::create()
 {
    CGuard pg(m_EPollLock);
 
    int localid = 0;
 
    #if __linux__
-   localid = epoll_create(maxSockets);
+   localid = epoll_create(1024);    //Since Linux 2.6.8, the size argument is ignored, but must be greater than zero
    if (localid < 0)
       throw CUDTException(-1, 0, errno);
    #elif __apple__

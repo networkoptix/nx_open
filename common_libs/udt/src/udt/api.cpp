@@ -1082,9 +1082,9 @@ int CUDTUnited::selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfd
    return count;
 }
 
-int CUDTUnited::epoll_create(size_t maxSockets)
+int CUDTUnited::epoll_create()
 {
-   return m_EPoll.create(maxSockets);
+   return m_EPoll.create();
 }
 
 int CUDTUnited::epoll_add_usock(const int eid, const UDTSOCKET u, const int* events)
@@ -1997,11 +1997,11 @@ int CUDT::selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfds, vec
    }
 }
 
-int CUDT::epoll_create(size_t maxSockets)
+int CUDT::epoll_create()
 {
    try
    {
-      return s_UDTUnited.epoll_create(maxSockets);
+      return s_UDTUnited.epoll_create();
    }
    catch (CUDTException e)
    {
@@ -2300,9 +2300,9 @@ int selectEx(const vector<UDTSOCKET>& fds, vector<UDTSOCKET>* readfds, vector<UD
    return CUDT::selectEx(fds, readfds, writefds, exceptfds, msTimeOut);
 }
 
-int epoll_create(size_t maxSockets)
+int epoll_create()
 {
-   return CUDT::epoll_create(maxSockets);
+   return CUDT::epoll_create();
 }
 
 int epoll_add_usock(int eid, UDTSOCKET u, const int* events)
