@@ -1094,7 +1094,7 @@ void QnStorageManager::updateCameraHistory()
     ec2::ErrorCode errCode = 
         appServerConnection->getCameraManager()
                            ->setCamerasWithArchiveSync(qnCommon->moduleGUID(), 
-                                                       archivedListNew);
+                                                       resultNewList);
 
     if (errCode != ec2::ErrorCode::ok) {
         qCritical() << "ECS server error during execute method addCameraHistoryItem: " 
@@ -1102,7 +1102,7 @@ void QnStorageManager::updateCameraHistory()
         return;
     }
     qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(), 
-                                              archivedListNew);
+                                              resultNewList);
     return;
 }
 
