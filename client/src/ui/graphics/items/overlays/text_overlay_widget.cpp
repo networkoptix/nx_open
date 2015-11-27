@@ -8,7 +8,7 @@
 #include <utils/common/model_functions.h>
 #include <ui/graphics/items/generic/graphics_scroll_area.h>
 
-namespace 
+namespace
 {
     const int maximumBookmarkWidth = 250;
     const int layoutSpacing = 1;
@@ -31,14 +31,14 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnOverlayTextItemData, (eq), QnOverlayTextItemD
 
 ///
 
-class QnTextOverlayWidgetPrivate 
+class QnTextOverlayWidgetPrivate
 {
     Q_DECLARE_PUBLIC(QnTextOverlayWidget)
     QnTextOverlayWidget *q_ptr;
 
 public:
     QnTextOverlayWidgetPrivate(QnTextOverlayWidget *parent);
-    
+
     ~QnTextOverlayWidgetPrivate();
 
     void clear();
@@ -187,10 +187,10 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
     setAcceptedMouseButtons(0);
     setLayout(d->m_mainLayout);
 
-    enum 
+    enum
     {
-        kDefaultHorMargin = 4 
-        , kDefaultBottomMargin = 27
+        kDefaultHorMargin = 0
+        , kDefaultBottomMargin = 34
         , kDefaultTopMargin = 28
     };
 
@@ -198,7 +198,7 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
         , kDefaultHorMargin, kDefaultBottomMargin);
 }
 
-QnTextOverlayWidget::~QnTextOverlayWidget() 
+QnTextOverlayWidget::~QnTextOverlayWidget()
 {
 }
 
