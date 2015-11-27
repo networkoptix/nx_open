@@ -291,6 +291,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
     Qn::Corner timestampPos = Qn::NoCorner;
+
+    bool transcodeWarnShown = false;
+    QnImageFilterHelper imageParameters;
+
     while (true) {
         /* Check if we were disconnected (server shut down) while the dialog was open. 
          * Skip this check if we were not logged in before. */
@@ -388,17 +392,58 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             }
         }
 
-        if(doTranscode || timestampPos != Qn::NoCorner) {
-            QMessageBox::StandardButton button = QMessageBox::question(
-                        mainWindow(),
-                        tr("Save As"),
-                        tr("You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?"),
-                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                        QMessageBox::No
-                        );
-            if(button != QMessageBox::Yes)
-                return;
+        imageParameters.setSrcRect(zoomRect);
+        imageParameters.setContrastParams(contrastParams);
+        imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
+        imageParameters.setRotation(rotation);
+        imageParameters.setCustomAR(customAr);
+        imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
+        imageParameters.setVideoLayout(mediaResource->getVideoLayout());
+
+        if(doTranscode || timestampPos != Qn::NoCorner) 
+        {
+            if (virtualCamResource && !transcodeWarnShown)
+            {
+                const int bigValue = std::numeric_limits<int>::max();
+                for (const auto& stream: virtualCamResource->mediaStreams().streams)
+                {
+                    auto filters = imageParameters.createFilterChain(stream.getResolution(), QSize(bigValue, bigValue));
+                    const QSize resultResolution = imageParameters.updatedResolution( filters, stream.getResolution() );
+                    if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
+                        resultResolution.height() > imageParameters.defaultResolutionLimit.height())
+                    {
+                        transcodeWarnShown = true;
+                        int result = QMessageBox::warning(
+                            mainWindow(),
+                            tr("Selected format is not recommended"),
+                            tr("Selected format is not recommended for this camera due to video downscaling. "
+                            "We recommend to export selected video to the '.nov' format. "
+                            "Do you want to continue?"), 
+                            QMessageBox::Yes | QMessageBox::No
+                            );
+                        if (result != QMessageBox::Yes)
+                            return;
+                        else
+                            break; // do not show warning for other tracks
+                    }
+
+                }
+            }
+            if (!transcodeWarnShown) 
+            {
+                transcodeWarnShown = true;
+                QMessageBox::StandardButton button = QMessageBox::question(
+                            mainWindow(),
+                            tr("Save As"),
+                            tr("You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?"),
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No
+                            );
+                if(button != QMessageBox::Yes)
+                    return;
+            }
         }
+
 
         /* Check if we were disconnected (server shut down) while the dialog was open. 
          * Skip this check if we were not logged in before. */
@@ -463,15 +508,6 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnClientVideoCamera* camera = new QnClientVideoCamera(mediaResource);
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
-
-    QnImageFilterHelper imageParameters;
-    imageParameters.setSrcRect(zoomRect);
-    imageParameters.setContrastParams(contrastParams);
-    imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
-    imageParameters.setRotation(rotation);
-    imageParameters.setCustomAR(customAr);
-    imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
-    imageParameters.setVideoLayout(mediaResource->getVideoLayout());
 
     QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
                                               camera,
