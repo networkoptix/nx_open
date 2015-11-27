@@ -633,6 +633,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveFastScanFinished:
         item->addActionButton(
             qnSkin->icon("events/storage.png"),
             tr("Server settings..."),
@@ -641,6 +642,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         );
         break;
     default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Undefined system health message ");
         break;
     }
 
