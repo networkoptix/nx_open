@@ -12,11 +12,13 @@ namespace nx {
 namespace cdb {
 namespace api {
 
+static const int CDB_API_ERROR_CODE_BASE = 100;
+
 enum class ResultCode
 {
     ok = 0,
     //!Provided credentials are invalid
-    notAuthorized,
+    notAuthorized = CDB_API_ERROR_CODE_BASE,
     //!Requested operation is not allowed with credentials provided
     forbidden,
     notFound,

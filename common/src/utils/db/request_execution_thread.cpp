@@ -8,7 +8,7 @@
 #include <QtCore/QUuid>
 #include <QtSql/QSqlError>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace nx {

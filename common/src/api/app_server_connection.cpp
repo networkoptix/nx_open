@@ -13,7 +13,7 @@
 #include "core/resource/layout_resource.h"
 #include "core/resource/user_resource.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/model_functions.h>
 #include <utils/common/synctime.h>

@@ -1,6 +1,6 @@
 #include "home_ptz_executor.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstract_ptz_controller.h"
 #include "ptz_object.h"
@@ -55,7 +55,7 @@ bool QnHomePtzExecutorPrivate::handleTimer(int timerId) {
      * the activation commands are pretty rare. */
 
     if(homePosition.type == Qn::PresetPtzObject) {
-        controller->activatePreset(homePosition.id, 1.0);
+        controller->activatePreset(homePosition.id, QnAbstractPtzController::MaxPtzSpeed);
     } else if(homePosition.type == Qn::TourPtzObject) {
         controller->activateTour(homePosition.id);
     }

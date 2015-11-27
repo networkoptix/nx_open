@@ -1,12 +1,14 @@
 #ifndef __DUAL_QUALITY_HELPER__
 #define __DUAL_QUALITY_HELPER__
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include "recorder/device_file_catalog.h"
 #include "core/resource/resource_fwd.h"
 #include "core/datapacket/media_data_packet.h"
 #include <server/server_globals.h>
+
+#include <stack>
 
 class QnDualQualityHelper
 {
@@ -26,13 +28,17 @@ public:
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
 private:
+    typedef std::stack<DeviceFileCatalogPtr> SearchStack;
+
+private:
     void findDataForTimeHelper(
         const qint64                        time,
         DeviceFileCatalog::TruncableChunk   &resultChunk,
         DeviceFileCatalogPtr                &resultCatalog,
         DeviceFileCatalog::FindMethod       findMethod,
         bool                                preciseFind,
-        QnServer::StoragePool               storageManager
+        SearchStack                         &searchStack,
+        qint64                              previousDistance
     );
 
     static int64_t calcDistanceHelper(

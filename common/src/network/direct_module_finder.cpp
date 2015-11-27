@@ -11,11 +11,11 @@
 #include <rest/server/json_rest_result.h>
 
 #include <utils/common/app_info.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <utils/common/model_functions.h>
-#include <utils/network/http/asynchttpclient.h>
-#include <utils/network/http/async_http_client_reply.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/async_http_client_reply.h>
 
 namespace {
 

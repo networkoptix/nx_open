@@ -79,10 +79,10 @@ win* {
 }
 
 isEmpty(BUILDLIB) {
-  DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+  DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
 } else {
     contains(BUILDLIB,staticlib) {
-      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+      DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/
     }
     else {
       contains (LIBTYPE,plugin) {
@@ -90,20 +90,20 @@ isEmpty(BUILDLIB) {
       }
       else {
         win* {
-          DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION
+          DESTDIR = $$OUTPUT_PATH/bin/$$CONFIGURATION/
         }
         else {
-          DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION
+          DESTDIR = $$OUTPUT_PATH/lib/$$CONFIGURATION/
         }
       }
     }
 }
 
-OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION
+OBJECTS_DIR = ${project.build.directory}/build/$$CONFIGURATION/
 MOC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 UI_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
 RCC_DIR = ${project.build.directory}/build/$$CONFIGURATION/generated
-LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
+LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/$$CONFIGURATION
 !win*:!mac {
     LIBS += -Wl,-rpath-link,${qt.dir}/lib
 }
@@ -115,10 +115,26 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
+                ${root.dir}/common_libs/nx_network/src \
+                ${root.dir}/common_libs/nx_utils/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
+
+win* {
+    DEFINES += \
+        NX_NETWORK_API=__declspec(dllimport) \
+        NX_UTILS_API=__declspec(dllimport) \
+        UDT_API=__declspec(dllimport) \
+
+} else {
+    DEFINES += \
+        NX_NETWORK_API= \
+        NX_UTILS_API= \
+        UDT_API= \
+
+}
 
 DEPENDPATH *= $${INCLUDEPATH}
 
@@ -140,13 +156,13 @@ android: {
 #   QMAKE_CFLAGS_USE_PRECOMPILE   = -include ${QMAKE_PCH_OUTPUT}
 #   QMAKE_CXXFLAGS_PRECOMPILE     = -x c++-header -c ${QMAKE_PCH_INPUT} -o ${QMAKE_PCH_OUTPUT}.gch
 #   QMAKE_CXXFLAGS_USE_PRECOMPILE = $$QMAKE_CFLAGS_USE_PRECOMPILE
-# 
+#
 #   # Make sure moc files compile
 #   QMAKE_CXXFLAGS += -fpermissive
-# 
+#
 #   # Replace slashes in paths with backslashes
 #   OBJECTS_DIR ~= s,/,\\,g
-# 
+#
 #   # Work around CreateProcess limit on arg size
 #   QMAKE_AR_CMD = \
 #     del /F $$OBJECTS_DIR\\_list.bat                                                 $$escape_expand(\n\t)\

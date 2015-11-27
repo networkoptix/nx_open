@@ -5,9 +5,9 @@
 
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
-#include <utils/network/ping.h>
-#include <utils/network/ip_range_checker.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/ping.h>
+#include <nx/network/ip_range_checker.h>
 
 #include "api/app_server_connection.h"
 #include "business/business_event_connector.h"

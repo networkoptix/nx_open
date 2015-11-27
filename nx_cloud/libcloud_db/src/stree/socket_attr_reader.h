@@ -7,7 +7,7 @@
 #define NX_CDB_STREE_SOCKET_ATTR_READER_H
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/network/socket.h>
+#include <nx/network/socket.h>
 
 
 namespace nx {

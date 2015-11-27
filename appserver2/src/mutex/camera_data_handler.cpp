@@ -1,6 +1,6 @@
 #include "camera_data_handler.h"
 
-#include "utils/network/nettools.h" /* For MAC_ADDR_LEN and getMacFromPrimaryIF. */
+#include <nx/network/nettools.h> /* For MAC_ADDR_LEN and getMacFromPrimaryIF. */
 
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/camera_resource.h"

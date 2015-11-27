@@ -2,7 +2,7 @@
 
 #include <QtCore/QThread>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>

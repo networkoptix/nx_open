@@ -19,7 +19,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QSettings>
 #include <QtCore/QUrl>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/ldap.h>
 #include <QtCore/QThreadPool>
 
@@ -157,14 +157,14 @@
 
 #include <utils/common/command_line_parser.h>
 #include <utils/common/cpp14.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/ssl_gen_cert.h>
 #include <utils/common/synctime.h>
 #include <utils/common/system_information.h>
 #include <utils/common/util.h>
-#include <utils/network/simple_http_client.h>
-#include <utils/network/ssl_socket.h>
+#include <nx/network/simple_http_client.h>
+#include <nx/network/ssl_socket.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -209,7 +209,7 @@
 #include "core/resource_management/resource_properties.h"
 #include "network/universal_request_processor.h"
 #include "core/resource/camera_history.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "http/iomonitor_tcp_server.h"
 #include "ldap/ldap_manager.h"
 #include "rest/handlers/multiserver_chunks_rest_handler.h"
@@ -244,6 +244,7 @@ static const QByteArray AUTH_KEY("authKey");
 static const QByteArray APPSERVER_PASSWORD("appserverPassword");
 static const QByteArray LOW_PRIORITY_ADMIN_PASSWORD("lowPriorityPassword");
 static const QByteArray SYSTEM_NAME_KEY("systemName");
+static const QByteArray PREV_SYSTEM_NAME_KEY("prevSystemName");
 static const QByteArray AUTO_GEN_SYSTEM_NAME("__auto__");
 
 class MediaServerProcess;
@@ -1756,7 +1757,15 @@ void MediaServerProcess::run()
         serverFlags |= Qn::SF_HasPublicIP;
 
 
+    // If system name has been changed, reset 'database restore time' variable
     QString systemName = settings->value(SYSTEM_NAME_KEY).toString();
+    QString prevSystemName = settings->value(PREV_SYSTEM_NAME_KEY).toString();
+    if (systemName != prevSystemName) {
+        if (!prevSystemName.isEmpty())
+            settings->setValue(SYSTEM_IDENTITY_TIME, QString());
+        settings->setValue(PREV_SYSTEM_NAME_KEY, systemName);
+    }
+
 #ifdef __arm__
     if (systemName.isEmpty()) {
         systemName = QString(lit("%1system_%2")).arg(QString::fromLatin1(AUTO_GEN_SYSTEM_NAME)).arg(getMacFromPrimaryIF());

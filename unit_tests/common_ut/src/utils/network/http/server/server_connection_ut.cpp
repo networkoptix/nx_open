@@ -12,9 +12,9 @@
 #include <QString>
 
 #include <utils/common/cpp14.h>
-#include <utils/network/http/server/abstract_http_request_handler.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/test_http_server.h>
+#include <nx/network/http/server/abstract_http_request_handler.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/test_http_server.h>
 
 namespace nx_http {
 

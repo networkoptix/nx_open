@@ -93,8 +93,8 @@ QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPt
 
 QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution) const
 {
-    static const float MIN_STEP_CHANGE_COEFF = 0.95;
-    static const float ASPECT_RATIO_COMPARISION_PRECISION = 0.01;
+    static const float MIN_STEP_CHANGE_COEFF = 0.95f;
+    static const float ASPECT_RATIO_COMPARISION_PRECISION = 0.01f;
 
     QList<QnAbstractImageFilterPtr> result;
 

@@ -9,15 +9,16 @@
 #include <atomic>
 #include <memory>
 
-#include <utils/thread/mutex.h>
 #include <QtCore/QUrl>
-#include <utils/thread/wait_condition.h>
+
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/http/multipart_content_parser.h>
 
 #include <plugins/camera_plugin.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/plugin_container_api.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/http/multipart_content_parser.h>
 #include <utils/memory/cyclic_allocator.h>
 
 #include "ilp_video_packet.h"

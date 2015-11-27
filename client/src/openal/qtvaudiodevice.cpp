@@ -11,7 +11,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #endif
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 //#define OPENAL_STATIC
 

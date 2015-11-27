@@ -4,7 +4,7 @@
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/http/auth_tools.h>
 
 static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
 static const int MSEC_PER_SEC = 1000;

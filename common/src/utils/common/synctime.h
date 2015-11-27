@@ -4,13 +4,13 @@
 #include <atomic>
 
 #include <QtCore/QDateTime>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/ec_api.h>
 
 #include <plugins/plugin_container_api.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 /** 
  * Time provider that is synchronized with Server.

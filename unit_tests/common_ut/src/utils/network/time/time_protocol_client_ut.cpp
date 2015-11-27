@@ -10,8 +10,8 @@
 
 #include <QtCore/QElapsedTimer>
 
-#include <utils/network/time/multiple_internet_time_fetcher.h>
-#include <utils/network/time/time_protocol_client.h>
+#include <nx/network/time/multiple_internet_time_fetcher.h>
+#include <nx/network/time/time_protocol_client.h>
 
 
 static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };

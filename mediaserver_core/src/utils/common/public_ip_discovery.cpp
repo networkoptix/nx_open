@@ -8,7 +8,7 @@
 #include <media_server/settings.h>
 
 #include <utils/common/sleep.h>
-#include <utils/network/http/httpclient.h>
+#include <nx/network/http/httpclient.h>
 
 namespace {
     const QString primaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");

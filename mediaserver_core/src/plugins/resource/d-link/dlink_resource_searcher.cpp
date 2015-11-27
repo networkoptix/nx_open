@@ -3,9 +3,9 @@
 #include "dlink_resource_searcher.h"
 #include "core/resource/camera_resource.h"
 #include "dlink_resource.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"

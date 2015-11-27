@@ -21,6 +21,7 @@
 #include <client/client_runtime_settings.h>
 
 #include <utils/common/app_info.h>
+#include <utils/common/warnings.h>
 
 
 namespace {

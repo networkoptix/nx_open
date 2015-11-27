@@ -20,7 +20,7 @@
 #include <net/if_arp.h>
 #include <sys/statvfs.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
 #include <utils/fs/dir.h>
 

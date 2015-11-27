@@ -14,9 +14,9 @@
 
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
-#include <utils/network/socket_global.h>
+#include <nx/network/socket_global.h>
 
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"

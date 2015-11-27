@@ -1,4 +1,4 @@
-#include <utils/network/upnp/upnp_async_client.h>
+#include <nx/network/upnp/upnp_async_client.h>
 
 #include <common/common_globals.h>
 

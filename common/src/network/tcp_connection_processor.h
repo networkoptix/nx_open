@@ -1,11 +1,11 @@
 #ifndef __TCP_CONNECTION_PROCESSOR_H__
 #define __TCP_CONNECTION_PROCESSOR_H__
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QUrl>
 
 #include "utils/common/long_runnable.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"
 

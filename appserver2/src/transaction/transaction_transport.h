@@ -15,16 +15,16 @@
 #include <transaction/transaction_transport_header.h>
 
 #include "utils/common/id.h"
-#include <utils/common/log.h>
-#include <utils/common/uuid.h>
-#include <utils/network/abstract_socket.h>
-#include "utils/network/http/asynchttpclient.h"
-#include <utils/network/http/auth_cache.h>
-#include "utils/network/http/httpstreamreader.h"
-#include "utils/network/http/http_message_stream_parser.h"
-#include "utils/network/http/multipart_content_parser.h"
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
+#include <nx/network/abstract_socket.h>
+#include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/auth_cache.h>
+#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_message_stream_parser.h>
+#include <nx/network/http/multipart_content_parser.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #ifdef _DEBUG
 #include <common/common_module.h>

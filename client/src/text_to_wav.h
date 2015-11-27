@@ -2,14 +2,14 @@
 #define TEXT_TO_WAV_H
 
 #include <QtCore/QIODevice>
-#include <utils/thread/mutex.h>
 #include <QtCore/QSharedPointer>
 #include <QtCore/QString>
-#include <utils/thread/wait_condition.h>
 
 #include <utils/common/long_runnable.h>
 #include <utils/common/threadqueue.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 // TODO: #Elric this header does not belong in the source root.
 

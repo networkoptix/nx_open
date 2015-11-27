@@ -1,7 +1,7 @@
 #ifndef __TEST_CAMERA_CONNECTION_PROCESSOR_H__
 #define __TEST_CAMERA_CONNECTION_PROCESSOR_H__
 
-#include "utils/network/tcp_connection_processor.h"
+#include <nx/network/tcp_connection_processor.h>
 
 class QnTestCameraProcessorPrivate;
 

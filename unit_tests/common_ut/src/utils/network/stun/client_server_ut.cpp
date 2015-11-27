@@ -2,11 +2,11 @@
 
 #include <common/common_globals.h>
 #include <utils/thread/sync_queue.h>
-#include <utils/network/connection_server/multi_address_server.h>
-#include <utils/network/stun/async_client.h>
-#include <utils/network/stun/server_connection.h>
-#include <utils/network/stun/stream_socket_server.h>
-#include <utils/network/stun/message_dispatcher.h>
+#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/stun/async_client.h>
+#include <nx/network/stun/server_connection.h>
+#include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/stun/message_dispatcher.h>
 
 namespace nx {
 namespace stun {

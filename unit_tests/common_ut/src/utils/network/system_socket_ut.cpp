@@ -2,10 +2,9 @@
 
 #include <utils/common/cpp14.h>
 #include <utils/thread/sync_queue.h>
-#include <utils/network/system_socket.h>
-#include <utils/network/udt_socket.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/udt/udt_socket.h>
 
-#include <udt.h>
 #include <thread>
 
 #define ERROR_TEXT SystemError::getLastOSErrorText().toStdString()
@@ -73,12 +72,24 @@ static void socketSimpleSync()
 
         for( int i = CLIENT_COUNT; i > 0; --i )
         {
-            QByteArray buffer( 128, char( 0 ) );
-            std::unique_ptr< AbstractStreamSocket > client( server->accept() );
-            ASSERT_TRUE( client->setNonBlockingMode( false ) );
-            EXPECT_NE( client->recv( buffer.data(), 1024 ), -1 );
-            EXPECT_STREQ( buffer.data(), MESSAGE.data() );
-            EXPECT_EQ( client->recv( buffer.data(), 1024 ), 0 );
+            static const int BUF_SIZE = 128;
+
+            QByteArray buffer(BUF_SIZE, char(0));
+            std::unique_ptr< AbstractStreamSocket > client(server->accept());
+            ASSERT_TRUE(client->setNonBlockingMode(false));
+
+            int bufDataSize = 0;
+            for(;;)
+            {
+                const auto bytesRead = client->recv(
+                    buffer.data()+ bufDataSize,
+                    buffer.size()- bufDataSize);
+                ASSERT_NE(-1, bytesRead);
+                if (bytesRead == 0)
+                    break;  //connection closed
+            }
+
+            EXPECT_STREQ(MESSAGE.data(), buffer.data());
         }
     } );
 

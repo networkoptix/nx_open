@@ -1,7 +1,7 @@
 #ifndef QN_CACHING_PTZ_CONTROLLER_H
 #define QN_CACHING_PTZ_CONTROLLER_H
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "proxy_ptz_controller.h"
 

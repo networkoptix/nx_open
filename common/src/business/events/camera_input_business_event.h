@@ -16,7 +16,7 @@ public:
 
     const QString& inputPortID() const;
 
-    virtual bool checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params, QnBusiness::ActionType actionType) const override;
+    virtual bool checkEventParams(const QnBusinessEventParameters &params) const override;
 
     virtual QnBusinessEventParameters getRuntimeParams() const override;
 private:

@@ -10,8 +10,8 @@
 #include <boost/optional.hpp>
 
 #include <utils/common/app_info.h>
-#include <utils/network/auth_restriction_list.h>
-#include <utils/network/http/auth_tools.h>
+#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "stree/cdb_ns.h"
 #include "managers/account_manager.h"

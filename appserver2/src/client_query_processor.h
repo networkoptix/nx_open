@@ -9,15 +9,15 @@
 #include <map>
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include "ec2_thread_pool.h"
 #include "rest/request_params.h"

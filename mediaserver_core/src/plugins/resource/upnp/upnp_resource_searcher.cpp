@@ -1,13 +1,13 @@
 #include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
-#include "utils/network/simple_http_client.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/network/simple_http_client.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include "core/resource_management/resource_pool.h"
-#include "utils/network/nettools.h"
-#include "utils/network/system_socket.h"
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
 
 #include <utils/common/app_info.h>
 

@@ -116,7 +116,7 @@ void QnServerPtzControllerPool::at_controllerChanged(const QnResourcePtr &resour
     if(object.type == Qn::TourPtzObject)
         controller->activateTour(object.id);
     else if(object.type == Qn::PresetPtzObject)
-        controller->activatePreset(object.id, 1.0);
+        controller->activatePreset(object.id, QnAbstractPtzController::MaxPtzSpeed);
 
     qDebug() << "activate" << object.id << object.type;
 }

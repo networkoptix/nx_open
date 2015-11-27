@@ -2,12 +2,12 @@
 
 #include "server_rest_connection_fwd.h"
 
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 #include "utils/common/systemerror.h"
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.

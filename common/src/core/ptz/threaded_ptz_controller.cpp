@@ -1,6 +1,6 @@
 #include "threaded_ptz_controller.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QThreadPool>
 
 #include <common/common_meta_types.h>

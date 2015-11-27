@@ -9,7 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <utils/media/custom_output_stream.h>
-#include <utils/network/http/multipart_content_parser.h>
+#include <nx/network/http/multipart_content_parser.h>
 
 
 TEST( HttpMultipartContentParser, genericTest )

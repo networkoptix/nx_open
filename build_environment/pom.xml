@@ -32,13 +32,17 @@
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
 
-        <!-- <dependency>
+        <!--
+        <dependency>
             <groupId>com.google</groupId>
             <artifactId>protobuf</artifactId>
             <version>${protobuf.version}</version>
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
+        </dependency>
+        -->
+
+        <!--
         <dependency>
             <groupId>net.sourceforge</groupId>
             <artifactId>udt</artifactId>
@@ -46,6 +50,8 @@
             <type>tar.gz</type>
             <classifier>${profile.classifier}-${additional.compiler}</classifier>
         </dependency>
+        -->
+
         <!--
         <dependency>
             <groupId>com.nokia.qt.addons</groupId>
@@ -53,7 +59,8 @@
             <version>2.6.1-SNAPSHOT</version>
             <type>tar.gz</type>
             <classifier>${platform}</classifier>
-        </dependency>                      -->
+        </dependency>
+        -->
     </dependencies>
 
     <profiles>
@@ -437,21 +444,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -503,21 +510,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>             
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -563,7 +570,7 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
@@ -577,7 +584,7 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.ffmpeg</groupId>
                     <artifactId>ffmpeg</artifactId>
@@ -623,21 +630,21 @@
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>              
+                </dependency>
                 <dependency>
                     <groupId>org.openldap</groupId>
                     <artifactId>openldap</artifactId>
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.cyrus</groupId>
                     <artifactId>sasl2</artifactId>
                     <version>${sasl2.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>

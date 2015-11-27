@@ -4,17 +4,13 @@
 #include <typeinfo>
 
 #include <QtCore/QSet>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+#include <utils/common/warnings.h>
 
 #include <common/systemexcept_win32.h>
 #include <common/systemexcept_linux.h>
-
-#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-#   include <sys/types.h>
-#   include <linux/unistd.h>
-static pid_t gettid(void) { return syscall(__NR_gettid); }
-#endif
+#include <nx/utils/thread/thread_util.h>
 
 
 // -------------------------------------------------------------------------- //
@@ -168,7 +164,7 @@ void QnLongRunnable::pauseDelay() {
         m_semaphore.tryAcquire(1, 50);
 }
 
-std::uintptr_t QnLongRunnable::systemThreadId() const {
+uintptr_t QnLongRunnable::systemThreadId() const {
     return m_systemThreadId;
 }
 
@@ -179,16 +175,9 @@ void QnLongRunnable::initSystemThreadId() {
     m_systemThreadId = currentThreadSystemId();
 }
 
-std::uintptr_t QnLongRunnable::currentThreadSystemId()
+uintptr_t QnLongRunnable::currentThreadSystemId()
 {
-#if defined(Q_OS_LINUX)
-    /* This one is purely for debugging purposes.
-    * QThread::currentThreadId is implemented via pthread_self,
-    * which is not an identifier you see in GDB. */
-    return gettid();
-#else
-    return reinterpret_cast<std::uintptr_t>(QThread::currentThreadId());
-#endif
+    return ::currentThreadSystemId();
 }
 
 void QnLongRunnable::smartSleep(int ms) {

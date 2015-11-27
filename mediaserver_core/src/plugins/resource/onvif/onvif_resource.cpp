@@ -23,12 +23,12 @@
 #include "onvif_resource.h"
 #include "onvif_stream_reader.h"
 #include "onvif_helper.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/network/socket_global.h"
-#include "utils/common/timermanager.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/socket_global.h>
+#include <nx/utils/timermanager.h>
 #include "utils/common/systemerror.h"
 #include "api/app_server_connection.h"
 #include "soap/soapserver.h"
@@ -37,7 +37,7 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
-#include "utils/common/timermanager.h"
+#include <nx/utils/timermanager.h>
 #include "gsoap_async_call_wrapper.h"
 #include "plugins/resource/d-link/dlink_ptz_controller.h"
 #include "core/onvif/onvif_config_data.h"
@@ -186,23 +186,6 @@ bool videoOptsGreaterThan(const VideoOptionsLocal &s1, const VideoOptionsLocal &
 
     if (square1Max != square2Max)
         return square1Max > square2Max;
-
-    //if (square1Min != square2Min)
-    //    return square1Min > square2Min;
-    
-    // analyse better resolution for secondary stream
-    double coeff1 = 0, coeff2 = 0;
-    QnPlOnvifResource::findSecondaryResolution(max1Res, s1.resolutions, &coeff1);
-    QnPlOnvifResource::findSecondaryResolution(max2Res, s2.resolutions, &coeff2);
-    if (qAbs(coeff1 - coeff2) > 1e-4) {
-
-        if (!s1.isH264 && s2.isH264)
-            coeff2 /= 1.4;
-        else if (s1.isH264 && !s2.isH264)
-            coeff1 /= 1.4;
-
-        return coeff1 < coeff2; // less coeff is better
-    }
 
     // if some option doesn't have H264 it "less"
     if (!s1.isH264 && s2.isH264)

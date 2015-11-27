@@ -4,8 +4,8 @@
 
 #include <utils/common/sleep.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/simple_http_client.h>
 
 #include <core/resource/camera_resource.h>
 

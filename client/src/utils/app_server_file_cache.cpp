@@ -11,7 +11,7 @@
 #include <client/client_message_processor.h>
 
 #include <utils/common/util.h> /* For removeDir. */
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <utils/common/string.h>
 
 namespace {

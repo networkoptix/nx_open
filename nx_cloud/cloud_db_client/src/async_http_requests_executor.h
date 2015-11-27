@@ -11,11 +11,12 @@
 
 #include <QtCore/QUrl>
 
+#include <http/custom_headers.h>
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
-#include <utils/network/http/fusion_data_http_client.h>
-#include <utils/network/cloud_connectivity/cdb_endpoint_fetcher.h>
-#include <utils/thread/mutex.h>
+#include <nx/network/http/fusion_data_http_client.h>
+#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "data/account_data.h"
 #include "data/types.h"
@@ -204,16 +205,25 @@ private:
         client->get(
             [completionHandler, requestIter, this](
                 SystemError::ErrorCode errCode,
-                nx_http::StatusCode::Value statusCode,
+                const nx_http::Response* response,
                 OutputData data)
             {
                 {
                     QnMutexLocker lk(&m_mutex);
                     m_runningRequests.erase(requestIter);
                 }
-                if (errCode != SystemError::noError)
+                if (errCode != SystemError::noError || !response)
                     return completionHandler(api::ResultCode::networkError, OutputData());
-                completionHandler(api::httpStatusCodeToResultCode(statusCode), std::move(data));
+
+                api::ResultCode resultCode = api::ResultCode::ok;
+                const auto resultCodeStrIter = response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+                if (resultCodeStrIter != response->headers.end())
+                    resultCode = QnLexical::deserialized<api::ResultCode>(resultCodeStrIter->second);
+                else
+                    resultCode = api::httpStatusCodeToResultCode(
+                        static_cast<nx_http::StatusCode::Value>(
+                            response->statusLine.statusCode));
+                completionHandler(resultCode, std::move(data));
             });
         m_runningRequests.back() = std::move(client);
     }
@@ -230,16 +240,25 @@ private:
         client->get(
             [completionHandler, requestIter, this](
                 SystemError::ErrorCode errCode,
-                nx_http::StatusCode::Value statusCode)
+                const nx_http::Response* response)
             {
                 {
                     QnMutexLocker lk(&m_mutex);
                     m_runningRequests.erase(requestIter);
                 }
-                if (errCode != SystemError::noError)
+                if (errCode != SystemError::noError || !response)
                     return completionHandler(api::ResultCode::networkError);
-                completionHandler(api::httpStatusCodeToResultCode(statusCode));
-            });
+
+                api::ResultCode resultCode = api::ResultCode::ok;
+                const auto resultCodeStrIter = response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+                if (resultCodeStrIter != response->headers.end())
+                    resultCode = QnLexical::deserialized<api::ResultCode>(resultCodeStrIter->second);
+                else
+                    resultCode = api::httpStatusCodeToResultCode(
+                        static_cast<nx_http::StatusCode::Value>(
+                            response->statusLine.statusCode));
+                completionHandler(resultCode);
+        });
         m_runningRequests.back() = std::move(client);
     }
 };

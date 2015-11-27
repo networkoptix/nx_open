@@ -4,8 +4,8 @@
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/ptz_object.h>
 #include "nx_ec/impl/ec_api_impl.h"
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 
 class QnServerPtzControllerPool: public QnPtzControllerPool {

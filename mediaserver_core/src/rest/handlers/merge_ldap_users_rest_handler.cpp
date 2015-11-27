@@ -7,7 +7,7 @@
 
 #include <common/common_module.h>
 #include "common/user_permissions.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include <core/resource/user_resource.h>
 #include <ldap/ldap_manager.h>

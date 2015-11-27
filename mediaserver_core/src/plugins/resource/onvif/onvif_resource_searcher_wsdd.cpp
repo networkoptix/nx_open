@@ -2,11 +2,11 @@
 
 #include <openssl/evp.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/string.h"
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 #include "core/resource/camera_resource.h"
 

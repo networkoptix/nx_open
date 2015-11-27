@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <utils/network/socket_common.h>
+#include <nx/network/socket_common.h>
 
 #include <algorithm>
 

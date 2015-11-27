@@ -14,9 +14,9 @@
 #include <qtservice.h>
 
 #include <utils/common/stoppable.h>
-#include <utils/network/connection_server/multi_address_server.h>
-#include <utils/network/http/server/http_stream_socket_server.h>
-#include <utils/network/stun/stream_socket_server.h>
+#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/stun/stream_socket_server.h>
 
 namespace nx {
 namespace hpm {

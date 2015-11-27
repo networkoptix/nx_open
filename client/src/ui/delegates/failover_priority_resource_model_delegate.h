@@ -6,7 +6,7 @@
 
 #include <ui/delegates/resource_pool_model_custom_column_delegate.h>
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 class QnFailoverPriorityResourceModelDelegate: public QnResourcePoolModelCustomColumnDelegate {
     Q_OBJECT

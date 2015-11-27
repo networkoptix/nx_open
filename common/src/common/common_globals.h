@@ -480,8 +480,8 @@ public:
         LayoutCellAspectRatioRole,                  /**< Role for layout's cell aspect ratio. Value of type qreal. */
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
-        LayoutSearchStateRole,                      /**< */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label diplay. Value of type bool. */ 
+        LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
+        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */ 
         LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
@@ -573,9 +573,7 @@ public:
         
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
-        //RecordingStatForecastDataRole,              /**< Return qreal for chart. Forecast value. Used in QnRecordingStatsModel */
         RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
-        //RecordingStatColorsDataRole,                /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
         
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
@@ -583,11 +581,9 @@ public:
         AlternateColorRole,                         /**< Use alternate color in painting */
         AuditLogChartDataRole,                      /**< Return qreal in range [0..1] for chart. Used in QnAuditLogModel */
 
-        LastItemDataRole,
-
-        StorageInfoDataRole,                        /** return QnStorageModelInfo object at QnStorageConfigWidget */
-        BackupSettingsDataRole,                     /** return BackupSettingsData, used in BackupSettings model */
-        TextWidthDataRole,                          /** used in BackupSettings model */
+        StorageInfoDataRole,                        /**< return QnStorageModelInfo object at QnStorageConfigWidget */
+        BackupSettingsDataRole,                     /**< return BackupSettingsData, used in BackupSettings model */
+        TextWidthDataRole,                          /**< used in BackupSettings model */
 
         RoleCount
     };
@@ -851,23 +847,6 @@ namespace QnLitDetail { template<int N> void check_string_literal(const char (&)
 
 template<typename T>
 QString toString( const T& t ) { return t.toString(); }
-
-template<typename Container>
-QString containerString(const Container& container,
-                        const QString& delimiter = QString::fromLatin1(", "),
-                        const QString& prefix = QString::fromLatin1("{ "),
-                        const QString& suffix = QString::fromLatin1(" }"),
-                        const QString& empty = QString::fromLatin1("none"))
-{
-    if (container.begin() == container.end())
-        return empty;
-
-    QStringList strings;
-    for (const auto& item : container)
-          strings << toString(item);
-
-    return lit("%1%2%3").arg(prefix).arg(strings.join(delimiter)).arg(suffix);
-}
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::TimePeriodContent)(Qn::Corner),

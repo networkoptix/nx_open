@@ -2,7 +2,7 @@
 #define QN_NETWORK_PROXY_FACTORY_H
 
 #include <QtNetwork/QNetworkProxy>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include <core/resource/resource_fwd.h>
 

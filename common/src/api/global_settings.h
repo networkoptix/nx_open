@@ -1,12 +1,12 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
 
 #include <nx_ec/data/api_fwd.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 #include <utils/common/connective.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
@@ -66,6 +66,7 @@ signals:
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
+    void updateNotificationsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

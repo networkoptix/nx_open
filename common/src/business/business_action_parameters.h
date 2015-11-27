@@ -4,9 +4,13 @@
 #include <business/business_fwd.h>
 #include <utils/common/model_functions_fwd.h>
 
+#include <nx/utils/uuid.h>
+
+
 struct QnBusinessActionParameters {
     QnBusinessActionParameters();
 
+    /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
     // Play Sound
@@ -14,7 +18,7 @@ struct QnBusinessActionParameters {
 
     // Email
     QString emailAddress;
- 
+
     // Popups and System Health
     QnBusiness::UserGroup userGroup;
 
@@ -28,22 +32,39 @@ struct QnBusinessActionParameters {
     QString relayOutputId;
     int relayAutoResetTimeout;
     QString inputPortId;
-    
+
     // Say Text
     QString sayText;
 
     // Bookmark
     QString tags;
-    int bookmarkDuration;
 
-    /** 
-     * \returns                        Whether all parameters have default values. 
+    // Generic text: Show Text Overlay
+    QString text;
+
+    // Generic duration: Bookmark, Show Text Overlay
+    int durationMs;
+
+    // Generic additional resources List: Show On Alarm Layout - users
+    std::vector<QnUuid> additionalResources;
+
+    // Alarm Layout - if it must be opened immediately
+    bool forced;
+
+    // exec PTZ preset action
+    QString presetId;
+
+    // Alarm Layout - if the source resource should also be used
+    bool useSource;
+
+    /**
+     * \returns                        Whether all parameters have default values.
      */
     bool isDefault() const;
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(bookmarkDuration)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 

@@ -10,7 +10,7 @@ extern "C"
     #include <libavcodec/avcodec.h>
 }
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include <plugins/plugin_manager.h>
 #include <decoders/abstractvideodecoderplugin.h>

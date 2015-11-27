@@ -1,13 +1,14 @@
 
 #include "server_archive_delegate.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <server/server_globals.h>
 
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
+#include <nx/utils/log/log.h>
 #include "motion/motion_archive.h"
 #include "motion/motion_helper.h"
 #include "utils/common/sleep.h"
@@ -151,6 +152,7 @@ void QnServerArchiveDelegate::close()
 
     m_currentChunkCatalog[QnServer::StoragePool::Normal].clear();
     m_currentChunkCatalog[QnServer::StoragePool::Backup].clear();
+    m_currentChunk = DeviceFileCatalog::Chunk();
 
     m_aviDelegate->close();
 
@@ -440,8 +442,9 @@ AVCodecContext* QnServerArchiveDelegate::setAudioChannel(int num)
 
 bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableChunk &newChunk, const DeviceFileCatalogPtr& newCatalog)
 {
-    if (newChunk.startTimeMs == -1)
+    if (newChunk.startTimeMs == -1) 
         return false;
+    
     m_currentChunk = newChunk;
     
     m_currentChunkCatalog[newCatalog->getStoragePool()] = newCatalog;
@@ -452,6 +455,8 @@ bool QnServerArchiveDelegate::switchToChunk(const DeviceFileCatalog::TruncableCh
     m_aviDelegate->close();
     m_aviDelegate->setStorage(QnStorageManager::getStorageByUrl(url, QnServer::StoragePool::Both));
 
+    NX_LOG(lit("Switching to chunk %1").arg(url), cl_logDEBUG2);
+    
     bool rez = m_aviDelegate->open(m_fileRes);
     if (rez)
         m_aviDelegate->setAudioChannel(m_selectedAudioChannel);

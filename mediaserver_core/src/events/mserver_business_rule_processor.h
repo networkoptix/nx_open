@@ -25,14 +25,15 @@ public:
     void setEventLogPeriod(qint64 periodUsec);
 
 protected slots:
-    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res) override;
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action) override;
     void onRemoveResource(const QnResourcePtr &resource);
 
 private:
-    bool executeRecordingAction(const QnRecordingBusinessActionPtr& action, const QnResourcePtr& res);
+    bool executeRecordingAction(const QnRecordingBusinessActionPtr& action);
     bool executePanicAction(const QnPanicBusinessActionPtr& action);
-    bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action, const QnResourcePtr& resource);
-    bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action, const QnResourcePtr &resource);
+    bool triggerCameraOutput(const QnCameraOutputBusinessActionPtr& action);
+    bool executeBookmarkAction(const QnAbstractBusinessActionPtr &action);
+    bool executePtzAction(const QnAbstractBusinessActionPtr& action);
 
 private:
     class SendEmailAggregationKey

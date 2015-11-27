@@ -1,5 +1,5 @@
 #include "exec_script_rest_handler.h"
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <QFileInfo>
 #include "media_server/serverutil.h"
 #include <QProcess>

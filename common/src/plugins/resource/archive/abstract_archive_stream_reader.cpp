@@ -2,15 +2,16 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
 #include "core/resource/media_resource.h"
+#include "utils/common/sleep.h"
+#include <core/datapacket/video_data_packet.h>
 
-
-QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr& dev ) :
+QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),

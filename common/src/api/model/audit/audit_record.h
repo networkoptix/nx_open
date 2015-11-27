@@ -1,12 +1,12 @@
 #ifndef _QN_AUDIT_RECORD_H__
 #define _QN_AUDIT_RECORD_H__
 
-#include "utils/common/uuid.h"
+#include <nx/utils/uuid.h>
 #include "common/common_globals.h"
 #include <utils/common/model_functions_fwd.h>
 #include "auth_session.h"
 #include "utils/common/latin1_array.h"
-#include "utils/network/http/qnbytearrayref.h"
+#include <nx/network/http/qnbytearrayref.h>
 
 struct QnAuditRecord
 {

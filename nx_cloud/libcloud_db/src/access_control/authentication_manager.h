@@ -8,8 +8,7 @@
 
 #include <random>
 
-#include <utils/common/singleton.h>
-#include <utils/network/http/server/abstract_authentication_manager.h>
+#include <nx/network/http/server/abstract_authentication_manager.h>
 
 #include "auth_types.h"
 

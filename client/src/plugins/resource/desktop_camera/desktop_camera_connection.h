@@ -4,7 +4,7 @@
 #include <QSharedPointer>
 #include "utils/common/long_runnable.h"
 #include "core/resource/resource_fwd.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "network/tcp_connection_processor.h"
 
 class QnDesktopResource;

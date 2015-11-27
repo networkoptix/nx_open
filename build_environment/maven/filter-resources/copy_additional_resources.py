@@ -36,7 +36,7 @@ def mkdir_p(path):
         else: raise
 
 def extract(tar_url, extract_path='.'):
-    print tar_url
+    print 'Extracting Archive: %s' % tarfile
     tar = tarfile.open(tar_url, 'r')
     for item in tar:
         #print (item.name)
@@ -46,7 +46,9 @@ def extract(tar_url, extract_path='.'):
         tar.extract(item, extract_path)
         if item.name.find(".tar.gz") != -1:
             extract(item.name, "./" + item.name[:item.name.rfind('/')])        
-    tar.close() 
+    tar.close()
+    print 'Patching Artifact: %s' % tarfile
+    os.system('%s dpatcher %s' % (sys.executable, tarfile))
     os.unlink(file)
 if __name__ == '__main__':        
 

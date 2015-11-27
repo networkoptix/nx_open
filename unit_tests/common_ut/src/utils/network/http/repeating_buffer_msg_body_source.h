@@ -6,7 +6,7 @@
 #ifndef REPEATING_BUFFER_MSG_BODY_SOURCE_H
 #define REPEATING_BUFFER_MSG_BODY_SOURCE_H
 
-#include <utils/network/http/abstract_msg_body_source.h>
+#include <nx/network/http/abstract_msg_body_source.h>
 
 
 class RepeatingBufferMsgBodySource

@@ -4,7 +4,7 @@
 #include "ec2_statictics_reporter.h"
 
 #include <utils/common/concurrent.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <QDir>
 #include <QSettings>

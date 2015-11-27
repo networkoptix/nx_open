@@ -7,13 +7,13 @@
 
 #include <functional>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/auth_tools.h>
-#include <utils/network/simple_http_client.h>
+#include <nx/network/http/auth_tools.h>
+#include <nx/network/simple_http_client.h>
 
 #include <rest/active_connections_rest_handler.h>
 
@@ -440,9 +440,16 @@ namespace ec2
                 QnConnectionInfo oldECConnectionInfo;
                 oldECConnectionInfo.ecUrl = httpsEcUrl;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
-                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                {
+                    if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+                        completionFunc(ErrorCode::ioError, QnConnectionInfo()); //ignoring response from 2.3+ server received using compatibility response
+                    else
+                        completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                }
                 else
+                {
                     completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                }
                 break;
             }
 

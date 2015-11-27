@@ -21,8 +21,8 @@ extern "C"
 #include "utils/camera/camera_diagnostics.h"
 #include "network/client_authenticate_helper.h"
 
-#include <utils/network/socket.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/socket.h>
+#include <nx/network/http/httptypes.h>
 
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM

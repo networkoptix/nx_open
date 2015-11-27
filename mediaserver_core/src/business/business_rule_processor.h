@@ -1,7 +1,7 @@
 #ifndef __BUSINESS_RULE_PROCESSOR_H_
 #define __BUSINESS_RULE_PROCESSOR_H_
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QTimer>
 #include <QtCore/QThread>
 #include <QtCore/QMultiMap>
@@ -129,7 +129,7 @@ protected slots:
     /*
     * Execute action physically. Return true if action success executed
     */
-    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+    virtual bool executeActionInternal(const QnAbstractBusinessActionPtr& action);
 private slots:
     void at_broadcastBusinessActionFinished(int handle, ec2::ErrorCode errorCode);
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
@@ -187,7 +187,8 @@ private:
 
 
     /**
-     * @brief match resources between event and rule
+     * @brief match resources between event and rule. 
+     * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
 

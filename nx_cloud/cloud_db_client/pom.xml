@@ -53,11 +53,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nxemail</artifactId>
+            <artifactId>nx_email</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nxemail/pom.xml</systemPath>
+            <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
         </dependency>
     </dependencies>
 

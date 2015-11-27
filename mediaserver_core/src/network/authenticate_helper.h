@@ -12,12 +12,12 @@
 #include <core/resource/resource_fwd.h>
 
 #include "utils/common/id.h"
-#include "utils/common/timermanager.h"
-#include "utils/common/uuid.h"
-#include "utils/common/singleton.h"
-#include "utils/network/http/httptypes.h"
-#include "utils/thread/mutex.h"
-#include "utils/network/auth_restriction_list.h"
+#include <nx/utils/timermanager.h>
+#include <nx/utils/uuid.h>
+#include <nx/utils/singleton.h>
+#include <nx/network/http/httptypes.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/network/auth_restriction_list.h>
 
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"

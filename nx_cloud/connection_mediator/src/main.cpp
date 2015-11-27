@@ -4,6 +4,7 @@
 ***********************************************************/
 
 #include <mediator_service.h>
+#include <nx/network/socket_global.h>
 
 #ifdef _WIN32
     #include <windows.h>
@@ -31,6 +32,8 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 
 int main(int argc, char* argv[])
 {
+	nx::SocketGlobals::InitGuard sgGuard;
+
 #ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);
 #else

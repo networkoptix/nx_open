@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
 #include <utils/common/concurrent.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"

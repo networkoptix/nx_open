@@ -135,7 +135,7 @@
 #include <utils/common/url.h>
 #include <utils/email/email.h>
 #include <utils/math/math.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 #include <utils/aspect_ratio.h>
 #include <utils/screen_manager.h>
 
@@ -1188,7 +1188,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
     if (!widget)
         return;
 
-    bool isSearchLayout = workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+    bool isSearchLayout = workbench()->currentLayout()->isSearchLayout();
     
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);

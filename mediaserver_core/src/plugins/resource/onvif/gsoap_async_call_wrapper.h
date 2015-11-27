@@ -10,15 +10,15 @@
 #include <memory>
 #include <type_traits>
 
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <onvif/stdsoap2.h>
 
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
-#include <utils/network/socket.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/socket.h>
+#include <nx/network/http/httptypes.h>
 
 #include "soap_wrapper.h"
 

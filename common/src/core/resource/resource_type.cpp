@@ -2,7 +2,7 @@
 
 #include <QtCore/QDebug>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 
 const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
 

@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ONVIF
 
-#include <utils/network/mac_address.h>
+#include <nx/network/mac_address.h>
 #include <utils/common/util.h>
 #include <utils/common/sleep.h>
 

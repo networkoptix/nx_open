@@ -7,8 +7,8 @@
 #include <QtConcurrent/QtConcurrentMap>
 
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/common/log.h>
-#include <utils/network/ip_range_checker.h>
+#include <nx/utils/log/log.h>
+#include <nx/network/ip_range_checker.h>
 
 #include <core/resource_management/camera_driver_restriction_list.h>
 #include <core/resource_management/resource_pool.h>

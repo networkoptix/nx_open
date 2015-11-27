@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <api/app_server_connection.h>
 

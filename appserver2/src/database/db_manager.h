@@ -10,9 +10,9 @@
 #include "utils/db/db_helper.h"
 #include "transaction/transaction_log.h"
 #include "nx_ec/data/api_runtime_data.h"
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/unused.h>
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 
 namespace ec2

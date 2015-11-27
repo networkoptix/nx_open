@@ -3,7 +3,7 @@
 
 #include <QtNetwork/QAuthenticator>
 #include <QtNetwork/QHostAddress>
-#include "utils/network/mac_address.h"
+#include <nx/network/mac_address.h>
 #include "resource.h"
 
 class QnTimePeriodList;

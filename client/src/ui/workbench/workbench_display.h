@@ -3,7 +3,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtOpenGL/QGLWidget>
 
 #include <utils/common/connective.h>
@@ -436,8 +436,7 @@ protected slots:
     void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
     void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
-    void at_notificationTimer_timeout(const QVariant &resource, const QVariant &type);
-    void at_notificationTimer_timeout(const QnResourcePtr &resource, int type);
+    void showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction);
 
     bool canShowLayoutBackground() const;
 private:

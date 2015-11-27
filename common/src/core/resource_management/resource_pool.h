@@ -3,16 +3,16 @@
 
 #include <QtCore/QList>
 #include <QtCore/QHash>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 class QnResource;
 class QnNetworkResource;
@@ -59,6 +59,8 @@ public:
     { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
+    QnResourceList getResources(const QVector<QnUuid>& idList) const;
+    QnResourceList getResources(const std::vector<QnUuid>& idList) const;
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
@@ -170,7 +172,7 @@ public:
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
-    
+
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.

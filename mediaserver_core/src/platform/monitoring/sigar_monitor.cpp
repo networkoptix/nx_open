@@ -8,7 +8,7 @@
 
 #include <utils/common/warnings.h>
 #include <utils/common/util.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 extern "C"
 {

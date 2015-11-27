@@ -2,9 +2,9 @@
 
 #include "sony_resource.h"
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "onvif/soapMediaBindingProxy.h"
 #include "utils/common/synctime.h"

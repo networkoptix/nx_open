@@ -4,7 +4,7 @@
 
 #include <QtGui/QScreen>
 #include <QtCore/QLibrary>
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include <emmintrin.h>
 #include "utils/media/sse_helper.h"
 #include "utils/color_space/yuvconvert.h"

@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include "network/module_information.h"
 
 //TODO: #dklychkov move the watcher to the network folder, as the router and module finder

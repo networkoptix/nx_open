@@ -6,7 +6,7 @@
 #ifndef DUMMY_SOCKET_H
 #define DUMMY_SOCKET_H
 
-#include <utils/network/abstract_socket.h>
+#include <nx/network/abstract_socket.h>
 
 
 //!Base class for socket, reading/writing data from/to any source (e.g., file)

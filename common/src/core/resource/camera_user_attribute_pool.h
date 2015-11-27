@@ -8,7 +8,7 @@
 
 #include <core/resource/general_attribute_pool.h>
 
-#include <utils/common/singleton.h>
+#include <nx/utils/singleton.h>
 
 #include "camera_user_attributes.h"
 

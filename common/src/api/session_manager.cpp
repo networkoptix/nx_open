@@ -9,7 +9,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkAccessManager>
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/warnings.h"
 #include "utils/common/delete_later.h"
 #include "utils/common/object_thread_puller.h"

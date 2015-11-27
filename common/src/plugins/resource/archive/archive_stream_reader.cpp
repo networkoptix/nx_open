@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include "stdint.h"
+#include <stdint.h>
 
 #include <core/resource/resource.h>
 
@@ -10,7 +10,9 @@
 #include "utils/media/externaltimesource.h"
 #include "utils/common/synctime.h"
 #include "core/resource/media_resource.h"
-
+#include "utils/common/sleep.h"
+#include <core/datapacket/video_data_packet.h>
+#include <utils/media/frame_type_extractor.h>
 
 // used in reverse mode.
 // seek by 1.5secs. It is prevents too fast seeks for short GOP, also some codecs has bagged seek function. Large step prevent seek
@@ -185,11 +187,6 @@ qint64 QnArchiveStreamReader::currentTime() const
         return m_skipFramesToTime;
     else
         return m_currentTime;
-}
-
-AVIOContext* QnArchiveStreamReader::getIOContext()
-{
-    return 0;
 }
 
 QString QnArchiveStreamReader::serializeLayout(const QnResourceVideoLayout* layout)

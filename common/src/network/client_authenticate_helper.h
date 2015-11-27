@@ -2,7 +2,7 @@
 #define __QN_CLIENT_AUTH_HELPER__
 
 #include "common/common_globals.h"
-#include "utils/network/http/httptypes.h"
+#include <nx/network/http/httptypes.h>
 
 class HttpAuthenticationClientContext
 {

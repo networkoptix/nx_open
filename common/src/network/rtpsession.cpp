@@ -18,17 +18,17 @@
 #include "tcp_connection_priv.h"
 #include "tcp_connection_processor.h"
 
-#include "utils/common/log.h"
+#include <nx/utils/log/log.h>
 #include "utils/common/sleep.h"
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/util.h"
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include "utils/media/bitStream.h"
 
-#include "utils/network/http/httptypes.h"
-#include <utils/network/rtsp/rtsp_types.h>
-#include "utils/network/simple_http_client.h"
+#include <nx/network/http/httptypes.h>
+#include <nx/network/rtsp/rtsp_types.h>
+#include <nx/network/simple_http_client.h>
 
 #include "version.h"
 

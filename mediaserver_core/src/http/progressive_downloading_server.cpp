@@ -8,10 +8,11 @@
 
 #include <server/server_globals.h>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
@@ -33,7 +34,6 @@
 #include "cached_output_stream.h"
 #include "common/common_module.h"
 #include "audit/audit_manager.h"
-
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;

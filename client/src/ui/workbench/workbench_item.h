@@ -5,7 +5,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 #include <QtCore/QScopedPointer>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <QtCore/QVariant>
 
 #include <client/client_globals.h>

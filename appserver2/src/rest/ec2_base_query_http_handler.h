@@ -7,15 +7,15 @@
 #define EC2_BASE_QUERY_HTTP_HANDLER_H
 
 #include <QtCore/QByteArray>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
-#include <utils/thread/wait_condition.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <rest/server/request_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/model_functions.h>
-#include <utils/network/http/httptypes.h>
+#include <nx/network/http/httptypes.h>
 
 #include "ec2_thread_pool.h"
 #include "request_params.h"

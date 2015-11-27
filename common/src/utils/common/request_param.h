@@ -7,7 +7,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <QNetworkReply>
 

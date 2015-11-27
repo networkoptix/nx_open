@@ -2,7 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <client/client_message_processor.h>
 

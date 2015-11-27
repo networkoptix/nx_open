@@ -8,7 +8,7 @@
 #include "core/resource_management/resource_pool.h"
 
 #include <QtCore/QUrlQuery>
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "vmax480_resource_searcher.h"
 
 QnMutex QnPlVmax480Resource::m_chunkReaderMutex;

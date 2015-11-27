@@ -6,7 +6,7 @@
 #ifndef NX_PING_RESPONSE_H
 #define NX_PING_RESPONSE_H
 
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 
 #include <utils/common/model_functions_fwd.h>
 

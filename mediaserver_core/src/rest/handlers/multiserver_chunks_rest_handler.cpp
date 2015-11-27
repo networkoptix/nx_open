@@ -17,7 +17,7 @@
 
 #include "network/router.h"
 #include <utils/common/model_functions.h>
-#include "utils/network/http/asynchttpclient.h"
+#include <nx/network/http/asynchttpclient.h>
 #include "utils/serialization/compressed_time.h"
 #include "server/server_globals.h"
 #include "recorder/storage_manager.h"
@@ -126,7 +126,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     {
         QSet<QnMediaServerResourcePtr> servers;
         for (const auto& camera: ctx.request.resList)
-            servers += qnCameraHistoryPool->getCameraFootageData(camera).toSet();
+            servers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
 
         for (const auto& server: servers) 
         {

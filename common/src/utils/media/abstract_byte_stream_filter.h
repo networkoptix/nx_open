@@ -1,15 +1,9 @@
-/**********************************************************
-* 1 oct 2013
-* a.kolesnikov
-***********************************************************/
-
 #ifndef ABSTRACT_BYTE_STREAM_FILTER_H
 #define ABSTRACT_BYTE_STREAM_FILTER_H
 
 #include <memory>
 
-#include "../network/http/qnbytearrayref.h"
-
+#include <nx/network/http/qnbytearrayref.h>
 
 //!Interface for class doing something with byte stream
 /*!

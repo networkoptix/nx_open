@@ -9,7 +9,7 @@
 #include "utils/media/media_stream_cache.h"
 
 #include <core/datapacket/media_data_packet.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 
 namespace detail

@@ -20,7 +20,7 @@
 
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
-#include "utils/network/socket_common.h"
+#include <nx/network/socket_common.h>
 #include "runtime_info_manager.h"
 #include <utils/common/app_info.h>
 #include "nx_ec/data/api_resource_data.h"

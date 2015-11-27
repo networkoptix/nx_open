@@ -6,7 +6,7 @@
 #include "account_data.h"
 
 #include <utils/common/model_functions.h>
-#include <utils/network/buffer.h>
+#include <nx/network/buffer.h>
 
 #include "stree/cdb_ns.h"
 

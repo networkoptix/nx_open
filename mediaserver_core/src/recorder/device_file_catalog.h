@@ -5,9 +5,9 @@
 #include <QtCore/QFile>
 #include <QtCore/QVector>
 #include <QtCore/QMap>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 #include <QtCore/QFileInfo>
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 #include <deque>
 #include <QtCore/QFileInfo>
@@ -63,15 +63,18 @@ public:
     {
         using Chunk::Chunk;
         int64_t originalDuration;
+        bool isTruncated;
 
         TruncableChunk() 
             : Chunk(),
-              originalDuration(0)
+              originalDuration(0),
+              isTruncated(false)
         {}
 
         TruncableChunk(const Chunk &other) 
             : Chunk(other), 
-              originalDuration(other.durationMs) 
+              originalDuration(other.durationMs),
+              isTruncated(false)
         {}
 
         Chunk toBaseChunk() const

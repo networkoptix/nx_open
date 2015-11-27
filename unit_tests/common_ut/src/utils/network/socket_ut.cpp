@@ -15,10 +15,10 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 
-#include <utils/network/dns_resolver.h>
-#include <utils/network/http/httpclient.h>
-#include <utils/network/socket_global.h>
-#include <utils/network/system_socket.h>
+#include <nx/network/dns_resolver.h>
+#include <nx/network/http/httpclient.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/system_socket.h>
 
 #include "socket_test_helper.h"
 
@@ -110,7 +110,7 @@ TEST( Socket, AsyncOperationCancellation )
 
     for( int i = 0; i < TEST_RUNS; ++i )
     {
-        static const int MAX_SIMULTANEOUS_CONNECTIONS = 100;
+        static const int MAX_SIMULTANEOUS_CONNECTIONS = 50;
         static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
 
         RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );

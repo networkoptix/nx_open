@@ -5,7 +5,7 @@
 #include <QtCore/QCoreApplication>
 
 #include "stardot_resource.h"
-#include "utils/network/nettools.h"
+#include <nx/network/nettools.h>
 #include "utils/common/sleep.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource/resource_data.h"

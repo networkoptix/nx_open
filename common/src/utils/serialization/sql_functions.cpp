@@ -1,6 +1,6 @@
 #include "sql_functions.h"
 #include "api/model/audit/auth_session.h"
-#include "utils/network/http/qnbytearrayref.h"
+#include <nx/network/http/qnbytearrayref.h>
 
 void serialize_field(const std::vector<QnUuid>&value, QVariant *target) 
 {

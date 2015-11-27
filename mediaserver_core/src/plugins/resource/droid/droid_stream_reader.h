@@ -4,9 +4,9 @@
 #ifdef ENABLE_DROID
 
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include "utils/network/simple_http_client.h"
+#include <nx/network/simple_http_client.h>
 #include "droid_resource.h"
-#include "utils/network/socket.h"
+#include <nx/network/socket.h>
 #include "network/rtpsession.h"
 
 class CLH264RtpParser;

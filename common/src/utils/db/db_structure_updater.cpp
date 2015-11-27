@@ -10,7 +10,7 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/db/db_helper.h>
 
 #include "db_manager.h"

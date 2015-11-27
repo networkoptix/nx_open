@@ -24,6 +24,9 @@
 class QnAbstractPtzController: public Connective<QObject> {
     Q_OBJECT
 public:
+
+    static const qreal MaxPtzSpeed;
+
     /**
      * \param resource                  Resource that this PTZ controller belongs to.
      */

@@ -16,7 +16,7 @@
 #include <QtGui/qopengl.h>
 
 #include <utils/math/math.h>
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 #include <utils/media/sse_helper.h>
 #include <utils/color_space/yuvconvert.h>
 #include <ui/graphics/opengl/gl_shortcuts.h>

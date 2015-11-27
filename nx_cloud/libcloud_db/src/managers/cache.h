@@ -11,7 +11,7 @@
 
 #include <boost/optional.hpp>
 
-#include <utils/thread/mutex.h>
+#include <nx/utils/thread/mutex.h>
 
 
 namespace nx {

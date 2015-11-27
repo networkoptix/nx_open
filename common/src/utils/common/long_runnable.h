@@ -6,7 +6,7 @@
 #include <QtCore/QThread>
 #include <QtCore/QSharedPointer>
 
-#include "singleton.h"
+#include <nx/utils/singleton.h>
 #include "semaphore.h"
 #include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
@@ -39,10 +39,10 @@ public:
     /*!
         This id is remembered in \a QnLongRunnable::initSystemThreadId
     */
-    std::uintptr_t systemThreadId() const;
+    uintptr_t systemThreadId() const;
 
     //!Returns thread id of current thread. On unix uses \a gettid function instead of pthread_self. It allows to find thread in gdb
-    static std::uintptr_t currentThreadSystemId();
+    static uintptr_t currentThreadSystemId();
 
 public slots:
     virtual void start(Priority priority = InheritPriority);
@@ -61,7 +61,7 @@ protected:
     volatile bool m_needStop;
     volatile bool m_onPause;
     QnSemaphore m_semaphore;
-    std::uintptr_t m_systemThreadId;
+    uintptr_t m_systemThreadId;
     QSharedPointer<QnLongRunnablePoolPrivate> m_pool;
     DEBUG_CODE(const std::type_info *m_type;)
 };

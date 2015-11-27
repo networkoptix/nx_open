@@ -8,7 +8,7 @@
 #include <QtCore/QBuffer>
 #include <QtXml/QXmlSimpleReader>
 
-#include <utils/network/cloud_connectivity/cloud_modules_xml_sax_handler.h>
+#include <nx/network/cloud_connectivity/cloud_modules_xml_sax_handler.h>
 
 
 namespace nx {

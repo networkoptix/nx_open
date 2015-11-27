@@ -4,7 +4,7 @@
 
 #include "predefinedusagecalculator.h"
 
-#include <utils/common/log.h>
+#include <nx/utils/log/log.h>
 
 #include "stree/streesaxhandler.h"
 #include "stree/node.h"
