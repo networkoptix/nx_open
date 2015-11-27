@@ -25,12 +25,12 @@ FocusScope {
     property color textColor: showError ? QnTheme.inputTextError : QnTheme.inputText
     property color placeholderColor: showError ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
     property color cursorColor: activeColor
+    property alias selectionAllowed: textInput.selectionAllowed
 
     signal accepted()
     signal editingFinished()
 
-    height: dp(48)
-
+    implicitHeight: dp(48)
     implicitWidth: Math.round(textInput.contentHeight * 8)
 
     activeFocusOnTab: true
@@ -81,79 +81,25 @@ FocusScope {
             rightMargin: textPadding / 3 + rightPadding
         }
 
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.IBeamCursor
-            onClicked: textField.forceActiveFocus()
-        }
+        QnTextInput {
+            id: textInput
+            focus: true
 
-        QnFlickable {
-            id: flickable
-            flickableDirection: Flickable.HorizontalFlick
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: textInput.height
-            y: Math.round((parent.height - textInput.height) / 2)
+            width: parent.width
+            anchors.verticalCenter: parent.verticalCenter
 
-            interactive: contentWidth - 4 > width
-            contentWidth: textInput.width + 2
-            contentHeight: textInput.height
-            clip: textInput.contentWidth > width - leftMargin - rightMargin
-            boundsBehavior: Flickable.StopAtBounds
+            color: textField.textColor
+            cursorColor: textField.cursorColor
+            font.pixelSize: sp(16)
+            font.weight: Font.Normal
+            renderType: TextInput.NativeRendering
 
-            TextInput {
-                id: textInput
-                focus: true
-                selectByMouse: Qt.platform.os !== "android" // Workaround for QTBUG-36515
+            verticalAlignment: Text.AlignVCenter
 
-                color: textField.textColor
+            Keys.forwardTo: textField
 
-                verticalAlignment: Text.AlignVCenter
-                clip: false
-
-                Keys.forwardTo: textField
-                autoScroll: false
-
-                renderType: TextInput.NativeRendering
-
-                onAccepted: {
-                    Qt.inputMethod.commit()
-                    Qt.inputMethod.hide()
-                    textField.accepted()
-                }
-
-                font.pixelSize: sp(16)
-                font.weight: Font.Normal
-
-                onEditingFinished: textField.editingFinished()
-                onCursorPositionChanged: {
-                    if (!cursorVisible)
-                        return
-
-                    var rect = cursorRectangle
-                    if (rect.x < flickable.contentX)
-                        flickable.contentX = rect.x
-                    var right = rect.x + rect.width
-                    if (right > flickable.contentX + flickable.width)
-                        flickable.contentX = right - flickable.width
-                }
-
-                cursorDelegate: Rectangle {
-                    id: cursor
-                    width: dp(1)
-                    color: textField.cursorColor
-
-                    Timer {
-                        interval: 500
-                        running: textInput.cursorVisible
-                        repeat: true
-                        onTriggered: cursor.visible = !cursor.visible
-                        onRunningChanged: cursor.visible = running
-                    }
-                }
-            }
+            onAccepted: textField.accepted()
+            onEditingFinished: textField.editingFinished()
         }
 
         Text {

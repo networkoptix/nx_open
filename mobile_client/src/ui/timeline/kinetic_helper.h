@@ -1,5 +1,4 @@
-#ifndef QNKINETICHELPER_H
-#define QNKINETICHELPER_H
+#pragma once
 
 #include <limits>
 
@@ -31,6 +30,7 @@ public:
     State m_state;
     qreal m_minSpeed;
     qreal m_maxSpeed;
+    qreal m_epsilonSpeed;
 
     T m_minValue;
     T m_maxValue;
@@ -39,7 +39,8 @@ public:
     QnKineticHelper() :
         m_deceleration(0.01),
         m_state(Stopped),
-        m_maxSpeed(std::numeric_limits<qreal>::max())
+        m_maxSpeed(std::numeric_limits<qreal>::max()),
+        m_epsilonSpeed(0.3)
     {
         m_minValue = std::numeric_limits<T>::lowest();
         m_maxValue = std::numeric_limits<T>::max();
@@ -59,6 +60,14 @@ public:
 
     void setMaxSpeed(qreal speed) {
         m_maxSpeed = speed;
+    }
+
+    qreal epsilonSpeed() const {
+        return m_epsilonSpeed;
+    }
+
+    void setEpsilonSpeed(qreal speed) {
+        m_epsilonSpeed = speed;
     }
 
     void setMinimum(T minValue) {
@@ -105,9 +114,10 @@ public:
         qreal time = m_moves.last().second - m_moves.first().second;
 
         m_startSpeed = qBound(m_minSpeed, sum / time, m_maxSpeed);
+
         m_startValue = m_value = targetValue;
 
-        m_state = qFuzzyIsNull(m_startSpeed) ? Stopped : Moving;
+        m_state = qAbs(m_startSpeed) < m_epsilonSpeed ? Stopped : Moving;
         m_timer.restart();
     }
 
@@ -167,5 +177,3 @@ public:
         return m_state == Measuring;
     }
 };
-
-#endif // QNKINETICHELPER_H

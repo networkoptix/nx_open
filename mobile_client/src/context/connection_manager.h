@@ -36,6 +36,8 @@ public:
 
     State connectionState() const;
 
+    Q_INVOKABLE int defaultServerPort() const;
+
 signals:
     void connectionFailed(ConnectionStatus status, const QVariant &infoParameter);
     void systemNameChanged(const QString &systemName);

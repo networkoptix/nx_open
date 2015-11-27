@@ -128,7 +128,7 @@ Item {
 
                     var live = position + 1000 >= (new Date()).getTime()
                     if (!live)
-                        mediaPlayer.stop()
+                        mediaPlayer.pause()
                 }
 
                 Connections {
@@ -221,6 +221,11 @@ Item {
                 anchors.top: timeline.bottom
                 color: QnTheme.navigationPanelBackground
                 clip: true
+
+                MouseArea {
+                    /* Block mouse events */
+                    anchors.fill: parent
+                }
 
                 QnButton {
                     anchors.right: parent.right

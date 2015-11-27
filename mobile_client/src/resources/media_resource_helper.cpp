@@ -83,6 +83,7 @@ namespace {
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     base_type(parent),
     m_position(-1),
+    m_finalTimestamp(-1),
     m_nativeStreamIndex(1),
     m_transcodingSupported(true),
     m_transcodingProtocol(transcodingProtocol),
@@ -93,6 +94,13 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
     updateStardardResolutions();
     connect(this, &QnMediaResourceHelper::aspectRatioChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
     connect(this, &QnMediaResourceHelper::rotationChanged, this, &QnMediaResourceHelper::rotatedAspectRatioChanged);
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this, [this](const QnVirtualCameraResourcePtr &camera) {
+        if (!m_camera || m_camera != camera)
+            return;
+
+        updateFinalTimestamp();
+    });
 }
 
 QString QnMediaResourceHelper::resourceId() const {
@@ -111,39 +119,39 @@ void QnMediaResourceHelper::setResourceId(const QString &id) {
 
     m_camera = camera;
 
-    if (camera) {
-        m_camera = camera;
-
-        m_nativeProtocol = nativeStreamProtocol;
-        m_resolution = qnSettings->lastUsedQuality();
-
-        connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
-        connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
-        connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
-            Q_ASSERT(m_camera == resource);
-            if (m_camera != resource)
-                return;
-
-            if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
-                updateMediaStreams();
-            else if (key == QnMediaResource::rotationKey())
-                emit rotationChanged();
-
-        });
-        connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
-
-        at_resource_parentIdChanged(camera);
-        updateMediaStreams();
-
-        emit resourceIdChanged();
-        emit resourceNameChanged();
-
-        emit resolutionChanged();
-        emit rotationChanged();
-        emit resourceStatusChanged();
+    if (!m_camera) {
+        updateUrl();
+        return;
     }
 
-    updateUrl();
+    qnCameraHistoryPool->updateCameraHistoryAsync(m_camera, [](bool) {});
+
+    m_nativeProtocol = nativeStreamProtocol;
+    m_resolution = qnSettings->lastUsedQuality();
+
+    connect(m_camera, &QnResource::parentIdChanged, this, &QnMediaResourceHelper::at_resource_parentIdChanged);
+    connect(m_camera, &QnResource::nameChanged,     this, &QnMediaResourceHelper::resourceNameChanged);
+    connect(m_camera, &QnResource::propertyChanged, this, [this](const QnResourcePtr &resource, const QString &key){
+        Q_ASSERT(m_camera == resource);
+        if (m_camera != resource)
+            return;
+
+        if (key == Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME)
+            updateMediaStreams();
+        else if (key == QnMediaResource::rotationKey())
+            emit rotationChanged();
+
+    });
+    connect(m_camera, &QnResource::statusChanged,   this, &QnMediaResourceHelper::resourceStatusChanged);
+
+    updateMediaStreams();
+
+    emit resourceIdChanged();
+    emit resourceNameChanged();
+
+    emit resolutionChanged();
+    emit rotationChanged();
+    emit resourceStatusChanged();
 }
 
 Qn::ResourceStatus QnMediaResourceHelper::resourceStatus() const {
@@ -267,12 +275,18 @@ QString QnMediaResourceHelper::resourceName() const {
     return m_camera->getName();
 }
 
+qint64 QnMediaResourceHelper::position() const {
+    return m_position;
+}
+
 void QnMediaResourceHelper::setPosition(qint64 position) {
     if (m_position == position)
         return;
 
     m_position = position;
 
+    emit positionChanged();
+    updateFinalTimestamp();
     updateUrl();
 }
 
@@ -370,6 +384,42 @@ int QnMediaResourceHelper::maximumResolution() const {
     return maxResolution;
 }
 
+void QnMediaResourceHelper::updateFinalTimestamp() {
+    if (!m_camera) {
+        setFinalTimestamp(-1);
+        return;
+    }
+
+    if (m_position <= 0) {
+        setFinalTimestamp(-1);
+        return;
+    }
+
+    if (!qnCameraHistoryPool->isCameraHistoryValid(m_camera)) {
+        qnCameraHistoryPool->updateCameraHistoryAsync(m_camera, [this](bool success) {
+            if (success) {
+                updateFinalTimestamp();
+            } else {
+                setFinalTimestamp(-1);
+            }
+        });
+        return;
+    }
+
+    QnTimePeriod period;
+    qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+
+    setFinalTimestamp(period.isValid() && !period.isInfinite() ? period.endTimeMs() : -1);
+}
+
+void QnMediaResourceHelper::setFinalTimestamp(qint64 finalTimestamp) {
+    if (m_finalTimestamp == finalTimestamp)
+        return;
+
+    m_finalTimestamp = finalTimestamp;
+    emit finalTimestampChanged();
+}
+
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const {
     if (m_transcodingSupported)
         return m_transcodingProtocol;
@@ -433,6 +483,10 @@ int QnMediaResourceHelper::rotation() const {
         return 0;
 
     return m_camera->getProperty(QnMediaResource::rotationKey()).toInt();
+}
+
+qint64 QnMediaResourceHelper::finalTimestamp() const {
+    return m_finalTimestamp;
 }
 
 void QnMediaResourceHelper::updateMediaStreams() {
