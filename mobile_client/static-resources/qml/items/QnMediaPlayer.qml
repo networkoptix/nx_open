@@ -192,7 +192,7 @@ QnObject {
         screenSize: Qt.size(mainWindow.width, mainWindow.height)
         resourceId: player.resourceId
 
-        onMediaUrlChanged: console.log(mediaUrl)
+        onMediaUrlChanged: console.log("Media URL changed: " + mediaUrl)
     }
 
     QnCameraChunkProvider {

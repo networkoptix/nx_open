@@ -28,12 +28,12 @@ namespace {
 
 
 QnChunksRequestData::QnChunksRequestData() :
-    periodsType(Qn::RecordingContent), 
-    startTimeMs(0), 
-    endTimeMs(DATETIME_NOW), 
-    detailLevel(1), 
+    periodsType(Qn::RecordingContent),
+    startTimeMs(0),
+    endTimeMs(DATETIME_NOW),
+    detailLevel(1),
     keepSmallChunks(false),
-    isLocal(false), 
+    isLocal(false),
     format(Qn::JsonFormat),
     limit(INT_MAX),
     flat(false)
@@ -82,7 +82,7 @@ QnChunksRequestData QnChunksRequestData::fromParams(const QnRequestParamList& pa
             request.resList << camRes;
     }
     for (const auto& id: params.allValues(idKey)) {
-        QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById(id).dynamicCast<QnVirtualCameraResource>();
+        QnVirtualCameraResourcePtr camRes = qnResPool->getResourceById(QnUuid::fromStringSafe(id)).dynamicCast<QnVirtualCameraResource>();
         if (camRes)
             request.resList << camRes;
     }
@@ -122,7 +122,7 @@ QUrlQuery QnChunksRequestData::toUrlQuery() const
 
 bool QnChunksRequestData::isValid() const
 {
-    return !resList.isEmpty() 
-        && endTimeMs > startTimeMs 
+    return !resList.isEmpty()
+        && endTimeMs > startTimeMs
         && format != Qn::UnsupportedFormat;
 }

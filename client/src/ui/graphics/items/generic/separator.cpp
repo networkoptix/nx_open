@@ -1,77 +1,93 @@
 
 #include "separator.h"
 
-QnSeparator::QnSeparator(QGraphicsItem *parent)
-    : QnFramedWidget(parent)
-    , m_lastSize()
+#include <numeric>
+
+namespace
 {
-    init();
+    enum { kDefaultSeparatorWidth = 1 };
 }
 
-QnSeparator::QnSeparator(const QColor &color
+SeparatorAreaProperties::SeparatorAreaProperties()
+    : width(kDefaultSeparatorWidth)
+    , color(Qt::black)
+{
+}
+
+SeparatorAreaProperties::SeparatorAreaProperties(qreal initWidth
+    , const QColor &initColor)
+    : width(initWidth)
+    , color(initColor)
+{
+}
+
+///
+
+QnSeparator::QnSeparator(qreal width
+    , const QColor &color
     , QGraphicsItem *parent)
-    : QnFramedWidget(parent)
-    , m_lastSize()
+    : QGraphicsWidget(parent)
+    , m_areas(1, SeparatorAreaProperties(width, color))
+    , m_pixmap()
 {
     init();
-    setLineColor(color);
 }
 
-void QnSeparator::init()
+QnSeparator::QnSeparator(const SeparatorAreas &areas
+    , QGraphicsItem *parent)
+    : QGraphicsWidget(parent)
+    , m_areas(areas)
+    , m_pixmap()
 {
-    enum { kDefaultLineWidth = 1 };
-
-    setFrameShape(Qn::CustomFrame);
-    setLineWidth(kDefaultLineWidth, true);
-    updateLinePos();
-
-    connect(this, &QnFramedWidget::geometryChanged
-        , this, [this]() { updateLinePos(); });
+    init();
 }
-
 
 QnSeparator::~QnSeparator()
 {
 }
 
-qreal QnSeparator::lineWidth() const
+void QnSeparator::init()
 {
-    return frameWidth();
+    connect(this, &QnSeparator::geometryChanged, this, &QnSeparator::updatePixmap);
+    updatePixmap();
 }
 
-void QnSeparator::setLineWidth(qreal lineWidth
-    , bool changeHeight)
+void QnSeparator::updatePixmap()
 {
-    setFrameWidth(lineWidth);
-
-    if (changeHeight)
-        setMaximumHeight(lineWidth * 2);
-}
-
-QColor QnSeparator::lineColor() const
-{
-    return frameColor();
-}
-
-void QnSeparator::setLineColor(const QColor &color)
-{
-    setFrameColor(color);
-}
-
-void QnSeparator::updateLinePos()
-{
-    const auto newSize = rect().size();
-    if (newSize == m_lastSize)
+    const auto width = geometry().width();
+    if (m_pixmap.width() == qRound(width))
         return;
 
-    m_lastSize = newSize;
+    const auto height = std::accumulate(m_areas.begin(), m_areas.end(), 0
+        , [](qreal init, const SeparatorAreaProperties &props) 
+    { 
+        return init + props.width; 
+    });
 
-    const auto y = newSize.height() / 2;
+    const auto size = QSize(width, height);
+    m_pixmap = QPixmap(size);
+    m_pixmap.fill(Qt::red);
 
-    QPainterPath path;
-    path.moveTo(0, y);
-    path.lineTo(newSize.width(), y);
+    QPainter painter(&m_pixmap);
+    painter.setPen(Qt::NoPen);
 
-    setCustomFramePath(path);
+    qreal y = 0;
+    for(const auto &area: m_areas)
+    {
+        const auto areaRect = QRectF(QPointF(0, y), QPointF(width, y + area.width));
+        painter.setBrush(area.color);
+        painter.drawRect(areaRect);
+        y += area.width;
+    }
+
+    resize(size);
+    setMaximumHeight(size.height());
+
+    update();
 }
 
+void QnSeparator::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    if (!m_pixmap.isNull())
+        painter->drawPixmap(0, 0, m_pixmap);
+}

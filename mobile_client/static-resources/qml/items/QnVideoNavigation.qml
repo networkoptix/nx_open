@@ -222,6 +222,11 @@ Item {
                 color: QnTheme.navigationPanelBackground
                 clip: true
 
+                MouseArea {
+                    /* Block mouse events */
+                    anchors.fill: parent
+                }
+
                 QnButton {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter

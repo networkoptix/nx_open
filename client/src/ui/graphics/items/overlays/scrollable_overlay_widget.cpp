@@ -1,0 +1,42 @@
+#include "scrollable_overlay_widget.h"
+
+#include <ui/graphics/items/overlays/private/scrollable_overlay_widget_p.h>
+
+QnScrollableOverlayWidget::QnScrollableOverlayWidget(Qt::Alignment alignment, QGraphicsWidget *parent /*= nullptr*/ )
+    : base_type(parent)
+    , d_ptr(new QnScrollableOverlayWidgetPrivate(alignment, this))
+{
+    Q_D(QnScrollableOverlayWidget);
+
+    setFlag(QGraphicsItem::ItemClipsChildrenToShape);
+    setAcceptedMouseButtons(0);
+    setLayout(d->m_mainLayout);
+}
+
+QnScrollableOverlayWidget::~QnScrollableOverlayWidget() {
+}
+
+QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item ) {
+    Q_D(QnScrollableOverlayWidget);
+    return d->addItem(item);
+}
+
+void QnScrollableOverlayWidget::removeItem( const QnUuid &id ) {
+    Q_D(QnScrollableOverlayWidget);
+    d->removeItem(id);
+}
+
+void QnScrollableOverlayWidget::clear() {
+    Q_D(QnScrollableOverlayWidget);
+    d->clear();
+}
+
+int QnScrollableOverlayWidget::overlayWidth() const {
+    Q_D(const QnScrollableOverlayWidget);
+    return d->overlayWidth();
+}
+
+void QnScrollableOverlayWidget::setOverlayWidth( int width ) {
+    Q_D(QnScrollableOverlayWidget);
+    d->setOverlayWidth(width);
+}

@@ -31,12 +31,14 @@
 #include <ui/graphics/opengl/gl_shortcuts.h>
 #include <ui/graphics/opengl/gl_context_data.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
+#include <ui/graphics/items/controls/html_text_item.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -46,6 +48,7 @@
 #include <utils/aspect_ratio.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/common/string.h>
 
 namespace {
 
@@ -84,8 +87,8 @@ namespace {
         }
     }
 
-    QString mergeFormat(const QString &left, const QString &right) {
-        return right.isEmpty() ? left : (left + QLatin1Char('\t') + right);
+    bool itemBelongsToValidLayout(QnWorkbenchItem *item) {
+        return (item && item->layout() && item->layout()->resource() && item->layout()->resource()->resourcePool());
     }
 
     GraphicsLabel *createGraphicsLabel() {
@@ -112,15 +115,19 @@ namespace {
 
 } // anonymous namespace
 
-QnResourceWidget::OverlayWidgets::OverlayWidgets():
-    infoOverlay(nullptr)
-    , mainOverlay(nullptr)
+QnResourceWidget::OverlayWidgets::OverlayWidgets()
+    : cameraNameOnlyOverlay(nullptr)
+    , cameraNameOnlyLabel(createGraphicsLabel())
+
+    , cameraNameWithButtonsOverlay(nullptr)
     , mainNameLabel(createGraphicsLabel())
     , mainExtrasLabel(createGraphicsLabel())
-    , mainDetailsLabel(createGraphicsLabel())
-    , mainTimeLabel(createGraphicsLabel())
-    , infoNameLabel(createGraphicsLabel())
-    , infoTimeLabel(createGraphicsLabel())
+
+    , detailsOverlay(nullptr)
+    , detailsItem(new QnHtmlTextItem())
+
+    , positionOverlay(nullptr)
+    , positionItem(new QnHtmlTextItem())
 {}
 
 // -------------------------------------------------------------------------- //
@@ -130,17 +137,13 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     base_type(parent),
     QnWorkbenchContextAware(context),
     m_item(item),
-    m_options(DisplaySelection | DisplayButtons),
+    m_options(DisplaySelection),
     m_localActive(false),
     m_frameOpacity(1.0),
     m_frameWidth(-1.0),
     m_titleTextFormat(lit("%1")),
-    m_infoTextFormat(lit("%1")),
     m_titleTextFormatHasPlaceholder(true),
-    m_infoTextFormatHasPlaceholder(true),
     m_overlayWidgets(),
-    m_mainHeaderIsTooSmall(false),
-    m_infoHeaderIsTooSmall(false),
     m_aboutToBeDestroyedEmitted(false),
     m_mouseInWidget(false),
     m_statusOverlay(Qn::EmptyOverlay),
@@ -159,11 +162,14 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20); 
+    font.setPixelSize(20);
     setFont(font);
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     createButtons();
+    /* Handle layout permissions if an item is placed on the common layout. Otherwise, it can be Motion Widget, for example. */
+    if (itemBelongsToValidLayout(item))
+        connect(accessController()->notifier(item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     addInfoOverlay();
     addMainOverlay();
@@ -205,41 +211,51 @@ QnResourceWidget::~QnResourceWidget() {
 
 void QnResourceWidget::addInfoOverlay() {
     auto titleLayout = createGraphicsLayout(Qt::Horizontal);
-    titleLayout->addItem(m_overlayWidgets.infoNameLabel);
+    titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
     titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
     auto titleWidget = createGraphicsWidget(titleLayout);
-
-    /* Footer overlay. */
-    auto *footerLayout = createGraphicsLayout(Qt::Horizontal);
-    footerLayout->addStretch();
-    footerLayout->addItem(m_overlayWidgets.infoTimeLabel);
-
-    auto footerWidget = createGraphicsWidget(footerLayout);
-
     auto overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(titleWidget);
     overlayLayout->addStretch();
-    overlayLayout->addItem(footerWidget);
 
-    QnViewportBoundWidget *infoOverlay = new QnViewportBoundWidget(this);
-    infoOverlay->setLayout(overlayLayout);
-    infoOverlay->setAcceptedMouseButtons(0);
-    m_overlayWidgets.infoOverlay = infoOverlay;
+    QnViewportBoundWidget *cameraNameOnlyOverlay = new QnViewportBoundWidget(this);
+    cameraNameOnlyOverlay->setLayout(overlayLayout);
+    cameraNameOnlyOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.cameraNameOnlyOverlay = cameraNameOnlyOverlay;
 
-    addOverlayWidget(m_overlayWidgets.infoOverlay, UserVisible, true, true, InfoLayer);
-    setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, false, false);
+    addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
+    setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
 
-    connect(infoOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, titleWidget](QGraphicsView *view){
-        updateHeaderIsTooSmallFlag(titleWidget, view, &m_infoHeaderIsTooSmall);
-    });
+    {
+        QnHtmlTextItemOptions infoOptions;
+        infoOptions.backgroundColor = QColor(0, 0, 0, 127);
+        infoOptions.borderRadius = 4;
+        infoOptions.autosize = true;
+        m_overlayWidgets.detailsItem->setOptions(infoOptions);
+        m_overlayWidgets.positionItem->setOptions(infoOptions);
+
+        auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
+        detailsOverlay->setContentsMargins(0, 0, 0, 0);
+        detailsOverlay->addItem(m_overlayWidgets.detailsItem);
+        addOverlayWidget(detailsOverlay, UserVisible, true, true, InfoLayer);
+        m_overlayWidgets.detailsOverlay = detailsOverlay;
+        setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay, false, false);
+
+        auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
+        positionOverlay->setContentsMargins(0, 0, 0, 0);
+        positionOverlay->addItem(m_overlayWidgets.positionItem);
+        addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
+        m_overlayWidgets.positionOverlay = positionOverlay;
+        setOverlayWidgetVisible(m_overlayWidgets.positionOverlay, false, false);
+    }
 }
 
 void QnResourceWidget::addMainOverlay() {
     auto headerLayout = createGraphicsLayout(Qt::Horizontal);
     headerLayout->setSpacing(2.0);
     headerLayout->addItem(m_overlayWidgets.mainNameLabel);
-    headerLayout->addStretch(); 
+    headerLayout->addStretch();
     headerLayout->addItem(m_overlayWidgets.mainExtrasLabel);
     headerLayout->addItem(m_buttonBar);
 
@@ -253,34 +269,17 @@ void QnResourceWidget::addMainOverlay() {
 
     auto headerWidget = createGraphicsWidget(headerLayout);
 
-    /* Footer overlay. */
-    auto footerLayout = createGraphicsLayout(Qt::Horizontal);
-    footerLayout->addItem(m_overlayWidgets.mainDetailsLabel);
-    footerLayout->addStretch();
-    footerLayout->addItem(m_overlayWidgets.mainTimeLabel);
-
-    auto footerWidget = createGraphicsWidget(footerLayout);
-
     QGraphicsLinearLayout *overlayLayout = createGraphicsLayout(Qt::Vertical);
     overlayLayout->addItem(headerWidget);
     overlayLayout->addStretch();
-    overlayLayout->addItem(footerWidget);
 
-    QnViewportBoundWidget *mainOverlay = new QnViewportBoundWidget(this);
-    mainOverlay->setLayout(overlayLayout);
-    mainOverlay->setAcceptedMouseButtons(0);
-    m_overlayWidgets.mainOverlay = mainOverlay;
+    QnViewportBoundWidget *cameraNameWithButtonsOverlay = new QnViewportBoundWidget(this);
+    cameraNameWithButtonsOverlay->setLayout(overlayLayout);
+    cameraNameWithButtonsOverlay->setAcceptedMouseButtons(0);
+    m_overlayWidgets.cameraNameWithButtonsOverlay = cameraNameWithButtonsOverlay;
 
-    connect(mainOverlay, &QnViewportBoundWidget::scaleUpdated, this, [this, headerWidget](QGraphicsView *view){
-        updateHeaderIsTooSmallFlag(headerWidget, view, &m_mainHeaderIsTooSmall);
-    });
-
-    OverlayVisibility visibility = options().testFlag(QnResourceWidget::InfoOverlaysForbidden)
-        ? OverlayVisibility::Invisible
-        : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
-
-    addOverlayWidget(m_overlayWidgets.mainOverlay, visibility, true, true, InfoLayer);
-    setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, false, false);
+    addOverlayWidget(m_overlayWidgets.cameraNameWithButtonsOverlay, UserVisible, true, true, InfoLayer);
+    setOverlayWidgetVisible(m_overlayWidgets.cameraNameWithButtonsOverlay, false, false);
 }
 
 void QnResourceWidget::createButtons() {
@@ -289,7 +288,6 @@ void QnResourceWidget::createButtons() {
     closeButton->setProperty(Qn::NoBlockMotionSelection, true);
     closeButton->setToolTip(tr("Close"));
     connect(closeButton, &QnImageButtonWidget::clicked, this, &QnResourceWidget::close);
-    connect(accessController()->notifier(m_item->layout()->resource()), &QnWorkbenchPermissionsNotifier::permissionsChanged, this, &QnResourceWidget::updateButtonsVisibility);
 
     QnImageButtonWidget *infoButton = new QnImageButtonWidget();
     infoButton->setIcon(qnSkin->icon("item/info.png"));
@@ -462,53 +460,43 @@ void QnResourceWidget::setTitleTextInternal(const QString &titleText) {
     m_overlayWidgets.mainNameLabel->setText(leftText);
     m_overlayWidgets.mainExtrasLabel->setText(rightText);
 
-    m_overlayWidgets.infoNameLabel->setText(leftText);
+    m_overlayWidgets.cameraNameOnlyLabel->setText(leftText);
 }
 
 QString QnResourceWidget::calculateTitleText() const {
-    return m_resource->getName();
+    enum {
+        kMaxNameLength = 30
+    };
+
+    return elideString(m_resource->getName(), kMaxNameLength);
 }
 
 void QnResourceWidget::updateTitleText() {
     setTitleTextInternal(m_titleTextFormatHasPlaceholder ? m_titleTextFormat.arg(calculateTitleText()) : m_titleTextFormat);
 }
 
-QString QnResourceWidget::infoText() {
-    return mergeFormat(m_overlayWidgets.mainDetailsLabel->text(), m_overlayWidgets.mainTimeLabel->text());
+void QnResourceWidget::updateInfoText() {
+    updateDetailsText();
+    updatePositionText();
 }
 
-QString QnResourceWidget::infoTextFormat() const {
-    return m_infoTextFormat;
-}
-
-void QnResourceWidget::setInfoTextFormat(const QString &infoTextFormat) {
-    if(m_infoTextFormat == infoTextFormat)
-        return;
-
-    m_infoTextFormat = infoTextFormat;
-    m_infoTextFormatHasPlaceholder = infoTextFormat.contains(QLatin1String("%1"));
-
-    updateInfoText();
-}
-
-void QnResourceWidget::setInfoTextInternal(const QString &infoText) {
-    QString leftText, rightText;
-
-    splitFormat(infoText, &leftText, &rightText);
-
-    m_overlayWidgets.mainDetailsLabel->setText(leftText);
-    m_overlayWidgets.mainTimeLabel->setText(rightText);
-
-    m_overlayWidgets.infoTimeLabel->setText(rightText);
-}
-
-QString QnResourceWidget::calculateInfoText() const {
+QString QnResourceWidget::calculateDetailsText() const {
     return QString();
 }
 
-void QnResourceWidget::updateInfoText() {
-    setInfoTextInternal(m_infoTextFormatHasPlaceholder ? m_infoTextFormat.arg(calculateInfoText()) : m_infoTextFormat);
+void QnResourceWidget::updateDetailsText() {
+    m_overlayWidgets.detailsItem->setHtml(calculateDetailsText());
 }
+
+QString QnResourceWidget::calculatePositionText() const {
+    return QString();
+}
+
+void QnResourceWidget::updatePositionText() {
+    m_overlayWidgets.positionItem->setHtml(calculatePositionText());
+}
+
+
 
 QCursor QnResourceWidget::calculateCursor() const {
     return Qt::ArrowCursor;
@@ -638,7 +626,7 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
     if (!(m_options & WindowRotationForbidden))
         result |= RotateButton;
 
-    if(item() && item()->layout()) {
+    if(itemBelongsToValidLayout(item())) {
         Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
         if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
             result |= CloseButton;
@@ -649,7 +637,7 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 
 void QnResourceWidget::updateButtonsVisibility() {
     m_buttonBar->setVisibleButtons(
-        calculateButtonsVisibility() & 
+        calculateButtonsVisibility() &
         ~(item() ? item()->data<int>(Qn::ItemDisabledButtonsRole, 0): 0)
     );
 }
@@ -739,7 +727,7 @@ Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(int resourceS
         return Qn::NoVideoDataOverlay;
     } else if(m_renderStatus == Qn::NothingRendered || m_renderStatus == Qn::CannotRender) {
         return Qn::LoadingOverlay;
-    } else if(QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) { 
+    } else if(QDateTime::currentMSecsSinceEpoch() - m_lastNewFrameTimeMSec >= defaultLoadingTimeoutMSec) {
         /* m_renderStatus is OldFrameRendered at this point. */
         return Qn::LoadingOverlay;
     } else {
@@ -770,31 +758,32 @@ int QnResourceWidget::channelCount() const {
 }
 
 void QnResourceWidget::updateHud(bool animate) {
-    bool detailsVisible = m_options.testFlag(DisplayInfo);
-    bool buttonsVisible = m_options.testFlag(DisplayButtons);
 
+    /*
+        Logic must be the following:
+        * there are two options: 'mouse in the widget' and 'info button checked'
+        * camera name should be visible if any option is active
+        * position item should be visible if any option is active
+        * control buttons should be visible if mouse cursor is in the widget
+        * detailed info should be visible if both options are active simultaneously (or runtime property set)
+    */
+
+    /* Motion mask widget should not have overlays at all */
+    bool overlaysCanBeVisible = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    bool detailsVisible = m_options.testFlag(DisplayInfo);
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
         infoButton->setChecked(detailsVisible);
 
-    m_buttonBar->setVisible(buttonsVisible);
+    bool showOnlyCameraName         = overlaysCanBeVisible && detailsVisible && !m_mouseInWidget;
+    bool showCameraNameWithButtons  = overlaysCanBeVisible && m_mouseInWidget;
+    bool showPosition               = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
+    bool showDetailedInfo           = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());
 
-    bool infoVisible = m_infoHeaderIsTooSmall || options().testFlag(QnResourceWidget::InfoOverlaysForbidden) || qnRuntime->showFullInfo()
-        ? false
-        : detailsVisible && !m_mouseInWidget;
-
-    OverlayVisibility mainInfoVisibility = Invisible;
-
-    if (!options().testFlag(QnResourceWidget::InfoOverlaysForbidden) && !m_mainHeaderIsTooSmall) {
-        mainInfoVisibility = qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible
-                                                       : OverlayVisibility::AutoVisible;
-    }
-    setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainInfoVisibility);
-
-    bool mainVisible = !m_mainHeaderIsTooSmall && qnRuntime->showFullInfo() && (detailsVisible || m_mouseInWidget);
-    if (qnRuntime->showFullInfo())
-        setOverlayWidgetVisible(m_overlayWidgets.mainOverlay, mainVisible, animate);
-    else
-        setOverlayWidgetVisible(m_overlayWidgets.infoOverlay, infoVisible, animate);
+    setOverlayWidgetVisible(m_overlayWidgets.cameraNameWithButtonsOverlay,  showCameraNameWithButtons,  animate);
+    setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay,         showOnlyCameraName,         animate);
+    setOverlayWidgetVisible(m_overlayWidgets.positionOverlay,               showPosition,               animate);
+    setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay,                showDetailedInfo,           animate);
 }
 
 bool QnResourceWidget::isHovered() const {
@@ -846,7 +835,7 @@ void QnResourceWidget::paintChannelForeground(QPainter *, int, const QRectF &) {
 void QnResourceWidget::paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     if(qFuzzyIsNull(m_frameOpacity))
         return;
-   
+
     QColor color;
     if(isSelected()) {
         color = m_frameColors.selected;
@@ -937,22 +926,10 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 }
 
 void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if (
-        (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
-        || changedFlags.testFlag(DisplayButtons)
-        )
+    if (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
         updateHud(false);
-
-    if (changedFlags.testFlag(InfoOverlaysForbidden)) {
-        bool forbidden = options().testFlag(InfoOverlaysForbidden);
-
-        OverlayVisibility mainVisibility = forbidden 
-            ? OverlayVisibility::Invisible 
-            : qnRuntime->showFullInfo() ? OverlayVisibility::UserVisible : OverlayVisibility::AutoVisible;
-        setOverlayWidgetVisibility(m_overlayWidgets.mainOverlay, mainVisibility);
+    else if (changedFlags.testFlag(InfoOverlaysForbidden))
         updateHud(false);
-    }
-
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {
@@ -973,21 +950,3 @@ void QnResourceWidget::at_buttonBar_checkedButtonsChanged() {
     update();
 }
 
-void QnResourceWidget::updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag) {
-    if (!view)
-        return;
-
-    enum { minimalHeaderHeight = 8 };
-
-    qreal sceneScale = widget->sceneTransform().m11();
-    qreal viewportScale = view->transform().m11();
-    qreal headerHeight = widget->size().height() * sceneScale * viewportScale;
-    bool headerIsTooSmall = headerHeight < minimalHeaderHeight;
-
-    if (headerIsTooSmall == *targetFlag)
-        return;
-
-    *targetFlag = headerIsTooSmall;
-
-    updateHud();
-}

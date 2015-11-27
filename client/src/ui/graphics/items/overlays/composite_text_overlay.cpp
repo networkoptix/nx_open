@@ -20,28 +20,14 @@
 
 namespace
 {
-    enum 
+    enum
     {
         kCaptionMaxLength = 128
         , kDescriptionMaxLength = 256
         , kMaxItemWidth = 250
     };
 
-    QString makePTag(const QString &text
-        , int pixelSize
-        , bool isBold = false
-        , bool isItalic = false)
-    {
-        static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
 
-        if (text.isEmpty())
-            return QString();
-
-        const QString boldValue = (isBold ? lit("bold") : lit("normal"));
-        const QString italicValue (isItalic ? lit("italic") : lit("normal"));
-        
-        return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, text);
-    }
 
     enum { kBookmarksFilterPrecisionMs = 5 * 60 * 1000 };
 
@@ -85,7 +71,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
 
     , m_counter()
     , m_navigator(navigator)
-    
+
     , m_currentMode(kUndefinedMode)
     , m_data()
 
@@ -190,30 +176,24 @@ void QnCompositeTextOverlay::initTextMode()
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
     {
         //qDebug() << "---new action" << businessAction->actionType() << ":" 
-        //    << cameraId << ":" << businessAction->getResources()
-        //    << ":" << businessAction->getResources().size() << ":"
-        //    << (cameraId == businessAction->getParams().actionResourceId) ;
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
-        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId,
-        /// adding simultaneous changes on the server side (now the Text Overlay action is handled separately there)
-
-        if (!businessAction->getResources().contains(cameraId))
+        const auto &actionParams = businessAction->getParams();
+        if (actionParams.actionResourceId != cameraId)
             return;
 
         enum { kDefaultInstantActionTimeoutMs = 5000 };
 
-        const auto &actionParams = businessAction->getParams();
         const auto state = businessAction->getToggleState();
         const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
-        const int timeout = (isInstantAction 
+        const int timeout = (isInstantAction
             ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
             : QnOverlayTextItemData::kInfinite);
 
         const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
 
-        
+
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
             //qDebug() << "Remove " << actionId; // For future debug
@@ -222,10 +202,10 @@ void QnCompositeTextOverlay::initTextMode()
             return;
         }
 
-        //qDebug() << "Added: " << actionId << ":" << isInstantAction 
+        //qDebug() << "Added: " << actionId << ":" << isInstantAction
         //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
-        enum 
+        enum
         {
             kDescriptionPixelFontSize = 13
             , kCaptionPixelFontSize = 16
@@ -245,13 +225,13 @@ void QnCompositeTextOverlay::initTextMode()
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
             static const auto kComplexHtml = lit("%1%2");
-            text = kComplexHtml.arg(makePTag(caption, kCaptionPixelFontSize, true)
-                , makePTag(desciption, kDescriptionPixelFontSize));
+            text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)
+                , htmlFormattedParagraph(desciption, kDescriptionPixelFontSize));
         }
         else
         {
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            text = elideString(kTextHtml.arg(makePTag(actionParams.text, 13)), kDescriptionMaxLength);
+            text = elideString(kTextHtml.arg(htmlFormattedParagraph(actionParams.text, 13)), kDescriptionMaxLength);
         }
 
         const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
@@ -282,7 +262,7 @@ void QnCompositeTextOverlay::initBookmarksMode()
     m_updateBookmarksTimer.reset([this]()
     {
         enum { kUpdateBookmarksPeriodMs = 1000 };
-        
+
         QTimer* timer = new QTimer(this);
         timer->setInterval(kUpdateBookmarksPeriodMs);
         connect(timer, &QTimer::timeout, this, &QnCompositeTextOverlay::updateBookmarks);
@@ -315,7 +295,7 @@ void QnCompositeTextOverlay::at_modeChanged()
     if (m_bookmarksQuery.isNull() != bookmarksEnabled)
         return;
 
-    if (bookmarksEnabled) 
+    if (bookmarksEnabled)
     {
         m_bookmarksQuery = qnCameraBookmarksManager->createQuery();
 
@@ -323,8 +303,8 @@ void QnCompositeTextOverlay::at_modeChanged()
             , &QnCompositeTextOverlay::updateBookmarks);
         updateBookmarksFilter();
         m_bookmarksQuery->setCamera(m_camera);
-    } 
-    else 
+    }
+    else
     {
         if (m_bookmarksQuery)
             disconnect(m_bookmarksQuery, nullptr, this, nullptr);
@@ -336,7 +316,7 @@ void QnCompositeTextOverlay::at_modeChanged()
 
 void QnCompositeTextOverlay::updateBookmarks()
 {
-    if (!m_bookmarksQuery) 
+    if (!m_bookmarksQuery)
     {
         resetModeData(QnCompositeTextOverlay::kBookmarksMode);
         return;
@@ -376,7 +356,7 @@ QnOverlayTextItemDataList QnCompositeTextOverlay::removeOutdatedItems(Mode mode)
         const auto timeout = itemData.timeout;
         const auto timestamp = internalData.first;
 
-        const bool timeoutExpired = ((timeout > 0) 
+        const bool timeoutExpired = ((timeout > 0)
             && ((currentTimestamp - timestamp) > timeout));
 
         if (timeoutExpired)
@@ -421,15 +401,15 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
     const auto timestamp = m_counter.elapsed();
     for (const auto bookmark: bookmarks)
     {
-        enum 
+        enum
         {
             kCaptionPixelSize = 16
             , kDescriptionPixeSize = 12
         };
 
         const auto bookmarkHtml = kBookTemplate.arg(
-            makePTag(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
-            , makePTag(elideString(bookmark.description, kDescriptionMaxLength), kDescriptionPixeSize));
+            htmlFormattedParagraph(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
+            , htmlFormattedParagraph(elideString(bookmark.description, kDescriptionMaxLength), kDescriptionPixeSize));
 
         const auto itemData = QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options);
         data.insert(itemData.id, InternalData(timestamp, itemData));

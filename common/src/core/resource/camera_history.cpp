@@ -173,6 +173,8 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
     QSet<QnUuid> loadedCamerasIds;
     if (success) {
         for (const auto &detail: periods) {
+            if (detail.items.empty())
+                continue;
 
             /* 
             * Make sure server has received data from all servers that are online.
@@ -295,7 +297,7 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
 
     QnMutexLocker lock(&m_mutex);
     const auto& itr = m_historyDetail.find(camera->getId());
-    if (itr == m_historyDetail.end())
+    if (itr == m_historyDetail.end() || itr.value().empty())
         return camera->getParentServer(); // no history data. use current server constantly
 
     const auto detailData = filterOnlineServers(itr.value());

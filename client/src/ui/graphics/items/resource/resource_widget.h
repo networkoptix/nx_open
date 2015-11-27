@@ -32,6 +32,7 @@ class QnStatusOverlayWidget;
 class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
+class QnHtmlTextItem;
 
 class GraphicsLabel;
 
@@ -51,7 +52,7 @@ public:
         DisplayActivity             = 0x0001,   /**< Whether the paused overlay icon should be displayed. */
         DisplaySelection            = 0x0002,   /**< Whether selected / not selected state should be displayed. */
         DisplayMotion               = 0x0004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
-        DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */
+        //DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */ supressed by InfoOverlaysForbidden
         DisplayMotionSensitivity    = 0x0010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
         DisplayCrosshair            = 0x0020,   /**< Whether PTZ crosshair is to be displayed. */
         DisplayInfo                 = 0x0040,   /**< Whether info panel is to be displayed. */
@@ -105,7 +106,7 @@ public:
     QnConstResourceVideoLayoutPtr channelLayout() const {
         return m_channelsLayout;
     }
-    
+
     const QRectF &zoomRect() const;
     void setZoomRect(const QRectF &zoomRect);
     QnResourceWidget *zoomTargetWidget() const;
@@ -232,8 +233,8 @@ public:
 
     /**
      * Sets format of the title text.
-     * 
-     * If <tt>'\t'</tt> symbol is used in the text, it will be split in two parts 
+     *
+     * If <tt>'\t'</tt> symbol is used in the text, it will be split in two parts
      * at the position of this symbol, and these parts will be aligned to the sides of the title bar.
      *
      * If <tt>"%1"</tt> placeholder is used, it will be replaced with this widget's
@@ -242,22 +243,6 @@ public:
      * \param titleTextFormat           New title text for this window.
      */
     void setTitleTextFormat(const QString &titleTextFormat);
-
-    /**
-     * \returns                         Information text that is displayed in this widget's footer.
-     */
-    QString infoText();
-
-    /**
-     * \returns                         Format string of this widget's information text.
-     */
-    QString infoTextFormat() const;
-
-    /**
-     * \param infoTextFormat            New text to be displayed in this widget's footer. 
-     * \see setTitleTextFormat(const QString &)
-     */
-    void setInfoTextFormat(const QString &infoTextFormat);
 
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
@@ -297,7 +282,7 @@ protected:
     virtual void paintWindowFrame(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) = 0;
     virtual void paintChannelForeground(QPainter *painter, int channel, const QRectF &rect);
-    
+
     void paintSelection(QPainter *painter, const QRectF &rect);
 
     virtual QSizeF constrainedSize(const QSizeF constraint, Qt::WindowFrameSection pinSection) const override;
@@ -320,8 +305,13 @@ protected:
     virtual QString calculateTitleText() const;
     Q_SLOT void updateTitleText();
 
-    virtual QString calculateInfoText() const;
-    Q_SLOT void updateInfoText();
+    virtual QString calculateDetailsText() const;
+    void updateDetailsText();
+
+    virtual QString calculatePositionText() const;
+    void updatePositionText();
+
+    void updateInfoText();
 
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
@@ -343,7 +333,7 @@ protected:
 
     void setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout);
     virtual void channelLayoutChangedNotify() {}
-    
+
     virtual void optionsChangedNotify(Options changedFlags);
 
     int channelCount() const;
@@ -361,7 +351,6 @@ private:
     void createFooterOverlay();
 
     void setTitleTextInternal(const QString &titleText);
-    void setInfoTextInternal(const QString &infoText);
 
     void addInfoOverlay();
     void addMainOverlay();
@@ -371,9 +360,6 @@ private:
     Q_SLOT void at_infoButton_toggled(bool toggled);
 
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
-
-    void updateHeaderIsTooSmallFlag(GraphicsWidget *widget, QGraphicsView *view, bool *targetFlag);
-
 private:
     friend class QnWorkbenchDisplay;
 
@@ -412,8 +398,8 @@ private:
 
     QnResourceWidgetFrameColors m_frameColors;
 
-    QString m_titleTextFormat, m_infoTextFormat;
-    bool m_titleTextFormatHasPlaceholder, m_infoTextFormatHasPlaceholder;
+    QString m_titleTextFormat;
+    bool m_titleTextFormatHasPlaceholder;
 
     /* Widgets for overlaid stuff. */
 
@@ -424,27 +410,23 @@ private:
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
     struct OverlayWidgets {
-        GraphicsWidget* infoOverlay;
-        GraphicsWidget* mainOverlay;
+        GraphicsWidget *cameraNameOnlyOverlay;
+        GraphicsLabel  *cameraNameOnlyLabel;
 
-        GraphicsLabel *mainNameLabel;
-        GraphicsLabel *mainExtrasLabel;
+        GraphicsWidget *cameraNameWithButtonsOverlay;
+        GraphicsLabel  *mainNameLabel;
+        GraphicsLabel  *mainExtrasLabel;
 
-        GraphicsLabel *mainDetailsLabel;
-        GraphicsLabel *mainTimeLabel;
+        GraphicsWidget *detailsOverlay;     /**< Overlay containing info item. */
+        QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
 
-        GraphicsLabel *infoNameLabel;
-        GraphicsLabel *infoTimeLabel;
+        GraphicsWidget *positionOverlay;    /**< Overlay containing position item. */
+        QnHtmlTextItem *positionItem;       /**< Current camera position. */
 
         OverlayWidgets();
     };
-    
-    OverlayWidgets m_overlayWidgets;
 
-    /** Main widget header is too small and thus should be hidden. */
-    bool m_mainHeaderIsTooSmall;
-    /** Short info widget header is too small and thus should be hidden. */
-    bool m_infoHeaderIsTooSmall;
+    OverlayWidgets m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;

@@ -190,12 +190,12 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 
 bool isNumberStart(const QChar &c) {
     /* We don't want to handle negative numbers as this leads to very strange
-     * results. Think how "1-1" and "1-2" are going to be compared in this 
+     * results. Think how "1-1" and "1-2" are going to be compared in this
      * case. */
 
-    return 
-#if 0 
-        c == L'-' || c == L'+' || 
+    return
+#if 0
+        c == L'-' || c == L'+' ||
 #endif
         c.isDigit();
 }
@@ -209,7 +209,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
     isNumber = false;
     QChar curr = string[ pos ];
     // TODO:: Fix it
-    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed 
+    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed
     if ( isNumberStart(curr) )
     {
 #if 0
@@ -236,7 +236,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
             }
 
             /* We don't want to handle exponential notation.
-             * Besides, this implementation is buggy as it treats '14easd' 
+             * Besides, this implementation is buggy as it treats '14easd'
              * as a number. */
 #if 0
             if ( !curr.isNull() && curr.toLower() == L'e' )
@@ -389,11 +389,21 @@ QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
 }
 
-QString elideString(const QString &source, int maxLength, const QString &tail)
-{
-    static const auto resultTemplate = lit("%1%2");
-
+QString elideString(const QString &source, int maxLength, const QString &tail) {
     const auto tailLength = tail.length();
-    return (source.length() <= maxLength ? source 
-        : resultTemplate.arg(source.left(maxLength - tailLength), tail));
+    return source.length() <= maxLength
+        ? source
+        : source.left(maxLength - tailLength) + tail;
+}
+
+QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBold /*= false */, bool isItalic /*= false*/ ) {
+    static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
+
+    if (text.isEmpty())
+        return QString();
+
+    const QString boldValue = (isBold ? lit("bold") : lit("normal"));
+    const QString italicValue (isItalic ? lit("italic") : lit("normal"));
+
+    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, text);
 }

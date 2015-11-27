@@ -33,7 +33,7 @@
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
-    const int defaultActionDuration = 5000;
+    const int defaultActionDurationMs = 5000;
     const int defaultAggregationPeriodSec = 60;
 }
 
@@ -399,7 +399,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
             m_actionType = QnBusiness::ShowPopupAction;
             fields |= QnBusiness::ActionTypeField | QnBusiness::ActionResourcesField | QnBusiness::ActionParamsField;
         } else if (isActionProlonged() && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {
-            m_actionParams.durationMs = defaultActionDuration;
+            m_actionParams.durationMs = defaultActionDurationMs;
             fields |= QnBusiness::ActionParamsField;
         }
     }
@@ -516,6 +516,9 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
     if (QnBusiness::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == QnBusiness::UndefinedState) {
         m_eventState = allowedEventStates(m_eventType).first();
         fields |= QnBusiness::EventStateField;
+    } else if (!QnBusiness::hasToggleState(m_eventType) && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {
+        m_actionParams.durationMs = defaultActionDurationMs;
+        fields |= QnBusiness::ActionParamsField;
     }
 
     emit dataChanged(this, fields);
