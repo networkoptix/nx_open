@@ -5,6 +5,8 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/workaround/sharp_pixmap_painting.h>
+
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -138,12 +140,10 @@ QnHtmlTextItem::~QnHtmlTextItem()
 
 void QnHtmlTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
     Q_UNUSED(option)
-        Q_UNUSED(widget);
+    Q_UNUSED(widget);
 
     Q_D(QnHtmlTextItem);
-
-    if (!d->pixmap.isNull())
-        painter->drawPixmap(0, 0, d->pixmap);
+    paintPixmapSharp(painter, d->pixmap);
 }
 
 QString QnHtmlTextItem::html() const {

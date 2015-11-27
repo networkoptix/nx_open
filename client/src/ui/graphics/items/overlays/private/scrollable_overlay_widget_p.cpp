@@ -5,7 +5,6 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    const int defaultOverlayWidth = 250;
     const int layoutSpacing = 1;
 }
 
@@ -19,8 +18,6 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
     , m_updating(false)
 {
     m_scrollArea->setContentWidget(m_contentWidget);
-    m_scrollArea->setMinimumWidth(defaultOverlayWidth);
-    m_scrollArea->setMaximumWidth(defaultOverlayWidth);
     m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
 
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -35,6 +32,10 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
         m_mainLayout->insertStretch(0);
         m_mainLayout->addStretch();
     }
+
+    QObject::connect(m_scrollArea, &QGraphicsWidget::geometryChanged, m_scrollArea, [this]() {
+        updatePositions();
+    });
 }
 
 QnScrollableOverlayWidgetPrivate::~QnScrollableOverlayWidgetPrivate()
@@ -47,7 +48,7 @@ QnUuid QnScrollableOverlayWidgetPrivate::addItem( QGraphicsWidget *item ) {
     m_items[id] = item;
 
     QObject::connect(item, &QGraphicsWidget::geometryChanged, m_contentWidget, [this]() {
-        updatePositions(); //dirty hack to make graphics labels with pixmap caching work well
+        updatePositions();
     });
 
     updatePositions();
@@ -95,7 +96,7 @@ void QnScrollableOverlayWidgetPrivate::updatePositions() {
 }
 
 int QnScrollableOverlayWidgetPrivate::overlayWidth() const {
-    return m_scrollArea->minimumWidth();
+    return m_scrollArea->geometry().width();
 }
 
 void QnScrollableOverlayWidgetPrivate::setOverlayWidth( int width ) {
