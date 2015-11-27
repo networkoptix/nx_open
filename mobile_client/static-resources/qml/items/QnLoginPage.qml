@@ -276,6 +276,7 @@ QnPage {
 
     function connect() {
         loginPage.removeWarnings()
+        connectButton.forceActiveFocus()
 
         if (_showWarning) {
             _showWarning = false
