@@ -80,7 +80,17 @@ written by
          // VC 6.0 does not support unsigned __int64: may cause potential problems.
          typedef __int64 uint64_t;
       #endif
+
+      #ifdef UDT_EXPORTS
+         #define UDT_API __declspec(dllexport)
+      #else
+         #define UDT_API __declspec(dllimport)
+      #endif
+   #else
+      #define UDT_API
    #endif
+#else
+   #define UDT_API __attribute__ ((visibility("default")))
 #endif
 
 #define NO_BUSY_WAITING
@@ -335,7 +345,7 @@ UDT_API int select(int nfds, UDSET* readfds, UDSET* writefds, UDSET* exceptfds, 
 UDT_API int selectEx(const std::vector<UDTSOCKET>& fds, std::vector<UDTSOCKET>* readfds,
                      std::vector<UDTSOCKET>* writefds, std::vector<UDTSOCKET>* exceptfds, int64_t msTimeOut);
 
-UDT_API int epoll_create();
+UDT_API int epoll_create(size_t maxSockets);
 UDT_API int epoll_add_usock(int eid, UDTSOCKET u, const int* events = NULL);
 UDT_API int epoll_add_ssock(int eid, SYSSOCKET s, const int* events = NULL);
 UDT_API int epoll_remove_usock(int eid, UDTSOCKET u);

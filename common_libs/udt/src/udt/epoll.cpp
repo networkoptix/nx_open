@@ -41,6 +41,8 @@ written by
 #ifdef __linux__
    #include <sys/epoll.h>
    #include <unistd.h>
+#elif __apple__
+   #include <sys/event.h>
 #endif
 #include <algorithm>
 #include <iostream>
@@ -65,20 +67,24 @@ CEPoll::~CEPoll()
    CGuard::releaseMutex(m_EPollLock);
 }
 
-int CEPoll::create()
+int CEPoll::create(size_t maxSockets)
 {
    CGuard pg(m_EPollLock);
 
    int localid = 0;
 
-   #ifdef __linux__
-   localid = epoll_create(1024);
+   #if __linux__
+   localid = epoll_create(maxSockets);
    if (localid < 0)
       throw CUDTException(-1, 0, errno);
-   #else
-   // on BSD, use kqueue
-   // on Solaris, use /dev/poll
-   // on Windows, select
+   #elif __apple__
+      localid = kqueue();
+      if (localid < 0)
+         throw CUDTException(-1, 0, errno);
+   #elif _WIN32
+       // on BSD, use kqueue
+       // on Solaris, use /dev/poll
+       // on Windows, select
    #endif
 
    if (++ m_iIDSeed >= 0x7FFFFFFF)
@@ -116,7 +122,7 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
    if (p == m_mPolls.end())
       throw CUDTException(5, 13);
 
-#ifdef __linux__
+#if __linux__
    epoll_event ev;
    memset(&ev, 0, sizeof(epoll_event));
 
@@ -136,6 +142,26 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
    ev.data.fd = s;
    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
       throw CUDTException();
+#elif __apple__
+   struct kevent ev[2];
+   size_t evCount=0;
+   if (NULL == events)
+   {
+       EV_SET(ev[evCount++], s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+       EV_SET(ev[evCount++], s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+   }
+   else
+   {
+      if (*events & UDT_EPOLL_IN)
+         EV_SET(ev[evCount++], s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+      if (*events & UDT_EPOLL_OUT)
+         EV_SET(ev[evCount++], s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+   }
+
+   //adding new fd to set
+   if (kevent(p->second.m_iLocalID, ev, evCount, NULL, 0, NULL ) != 0)
+      throw CUDTException();
+#elif _WIN32
 #endif
 
    p->second.m_sLocals.insert(s);
@@ -166,10 +192,16 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
    if (p == m_mPolls.end())
       throw CUDTException(5, 13);
 
-#ifdef __linux__
+#if __linux__
    epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
       throw CUDTException();
+#elif __apple__
+   struct kevent ev[2];
+   EV_SET(ev[0], s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+   EV_SET(ev[1], s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+   kevent(p->second.m_iLocalID, ev, 2, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
+#elif _WIN32
 #endif
 
    p->second.m_sLocals.erase(s);
@@ -228,7 +260,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
 
       if (lrfds || lwfds)
       {
-         #ifdef __linux__
+#if __linux__ 
          const int max_events = p->second.m_sLocals.size();
          epoll_event ev[max_events];
          int nfds = ::epoll_wait(p->second.m_iLocalID, ev, max_events, 0);
@@ -236,7 +268,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          for (int i = 0; i < nfds; ++ i)
          {
             if ((NULL != lrfds) && (ev[i].events & EPOLLIN))
-           {
+            {
                lrfds->insert(ev[i].data.fd);
                ++ total;
             }
@@ -246,7 +278,40 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                ++ total;
             }
          }
-         #else
+#elif __apple__
+        static const size_t MAX_EVENTS_TO_READ=128;
+        struct kevent ev[MAX_EVENTS_TO_READ];
+        
+        memset(ev, 0, sizeof(ev));
+        struct timespec timeout;
+        if (msTimeOut >= 0)
+        {
+            memset( &timeout, 0, sizeof(timeout) );
+            timeout.tv_sec = msTimeOut / MILLIS_IN_SEC;
+            timeout.tv_nsec = (msTimeOut % MILLIS_IN_SEC) * NSEC_IN_MS;
+        }
+        int nfds = kevent(
+            p->second.m_iLocalID,
+            NULL,
+            0,
+            ev,
+            MAX_EVENTS_TO_READ,
+            msTimeOut >= 0 ? &timeout : NULL );
+
+         for (int i = 0; i < nfds; ++ i)
+         {
+            if ((NULL != lrfds) && (ev[i].filter == EVFILT_READ))
+            {
+               lrfds->insert(ev[i].ident);
+               ++ total;
+            }
+            if ((NULL != lwfds) && (ev[i].filter == EVFILT_WRITE))
+            {
+               lwfds->insert(ev[i].ident);
+               ++ total;
+            }
+         }
+#elif _WIN32
          //currently "select" is used for all non-Linux platforms.
          //faster approaches can be applied for specific systems in the future.
 
@@ -270,6 +335,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
          tv.tv_usec = 0;
          if (::select(0, &readfds, &writefds, NULL, &tv) > 0)
          {
+            //TODO use win32-specific select features to get O(1) here
             for (set<SYSSOCKET>::const_iterator i = p->second.m_sLocals.begin(); i != p->second.m_sLocals.end(); ++ i)
             {
                if (lrfds && FD_ISSET(*i, &readfds))
@@ -284,7 +350,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                }
             }
          }
-         #endif
+#endif
       }
 
       CGuard::leaveCS(m_EPollLock);
@@ -309,10 +375,11 @@ int CEPoll::release(const int eid)
    if (i == m_mPolls.end())
       throw CUDTException(5, 13);
 
-   #ifdef __linux__
+#if __linux__ || __apple__ 
    // release local/system epoll descriptor
    ::close(i->second.m_iLocalID);
-   #endif
+#elif _WIN32
+#endif
 
    m_mPolls.erase(i);
 
