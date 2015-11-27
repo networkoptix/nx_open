@@ -135,6 +135,7 @@ QnPage {
                     width: parent.width
                     placeholderText: qsTr("Password")
                     echoMode: TextInput.Password
+                    passwordMaskDelay: 1500
                     showError: _authError
                     onTextChanged: loginPage.removeWarnings()
                     selectionAllowed: false
