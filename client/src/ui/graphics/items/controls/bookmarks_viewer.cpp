@@ -8,7 +8,7 @@
 #include <ui/graphics/items/generic/separator.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
-#include <ui/graphics/items/controls\tags_control.h>
+#include <ui/graphics/items/controls/tags_control.h>
 #include <ui/actions/action_parameters.h>
 
 #include <utils/common/string.h>
@@ -467,6 +467,8 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_getBookmarks(getBookmarksFunc)
     , m_getPos(getPosFunc)
 
+    , m_tooltip()
+
     , m_owner(owner)
     , m_hoverProcessor(nullptr)
     , m_colors()
@@ -474,7 +476,6 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_targetTimestamp(kInvalidTimstamp)
 
     , m_bookmarks()
-    , m_tooltip()
 
     , m_futurePosition()
 {
