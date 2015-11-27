@@ -13,5 +13,5 @@ urlpatterns = [
     url(r'^account/changePassword',     account.change_password),
 
 
-    url(r'^systems$',                   systems.list)
+    url(r'^systems$',                   systems.list_systems)
 ]
