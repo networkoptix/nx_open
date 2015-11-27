@@ -140,35 +140,26 @@ public:
     {
         int r1 = toLexEventType(d1->eventParams.eventType);
         int r2 = toLexEventType(d2->eventParams.eventType);
-        if (r1 < r2)
-            return true;
-        else if (r1 > r2)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        if (r1 != r2)
+            return r1 < r2;
+        return lessThanTimestamp(d1, d2);
     }
 
     bool lessThanActionType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
         int r1 = toLexActionType(d1->actionType);
         int r2 = toLexActionType(d2->actionType);
-        if (r1 < r2)
-            return true;
-        else if (r1 > r2)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        if (r1 != r2)
+            return r1 < r2;
+        return lessThanTimestamp(d1, d2);
     }
 
     bool lessLexicographically(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
         int rez = d1->compareString.compare(d2->compareString);
-        if (rez < 0)
-            return true;
-        else if (rez > 0)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        if (rez != 0)
+            return rez < 0;
+        return lessThanTimestamp(d1, d2);
     }
 
     void updateIndex()
