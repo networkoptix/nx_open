@@ -312,7 +312,7 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::RemoveActionColumn)
     {
-        if (record.isExternal)
+        if (m_model->canRemoveStorage(record))
             m_model->removeStorage(record);
         updateColumnWidth();
         updateBackupWidgetsVisibility();
