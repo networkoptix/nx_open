@@ -80,17 +80,7 @@ written by
          // VC 6.0 does not support unsigned __int64: may cause potential problems.
          typedef __int64 uint64_t;
       #endif
-
-      #ifdef UDT_EXPORTS
-         #define UDT_API __declspec(dllexport)
-      #else
-         #define UDT_API __declspec(dllimport)
-      #endif
-   #else
-      #define UDT_API
    #endif
-#else
-   #define UDT_API __attribute__ ((visibility("default")))
 #endif
 
 #define NO_BUSY_WAITING
