@@ -141,6 +141,7 @@ QnBookmarkColors::QnBookmarkColors()
     , tagBgHovered("#547E9F")
     , tagTextNormal("#D8E2E9")
     , tagTextHovered("#ffffff")
+    , moreItemsText("#94AEC3")
 {
 }
 

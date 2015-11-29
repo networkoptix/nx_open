@@ -19,6 +19,8 @@
 
 namespace
 {
+    enum { kTopPositionIndex = 0 };
+
     enum 
     {
         kBorderRadius = 2
@@ -101,7 +103,7 @@ namespace
         label->setFont(font);
 
         setPaletteColor(label, QPalette::Background, Qt::transparent);
-        setPaletteColor(label, QPalette::Text, textColor);
+        setPaletteColor(label, QPalette::WindowText, textColor);
 
         const auto labelSize = kBookmarkFrameWidth - kTotalHorMargin * 2;
         label->setWordWrap(true);
@@ -190,11 +192,43 @@ namespace
 
     ///
 
+    void insertMoreItemsMessage(const QString &moreItemsText
+        , const QnBookmarkColors &colors
+        , QGraphicsLinearLayout *layout
+        , QGraphicsItem *parent)
+    {
+        insertBookmarksSeparator(kTopPositionIndex, colors, parent, layout);
+
+        enum 
+        {
+            kMoreItemsItemHeight = 40 
+            , kFontPixelSize = 11
+        };
+
+        auto label = new QnProxyLabel(moreItemsText, parent);
+        label->setMinimumSize(kBookmarkFrameWidth, kMoreItemsItemHeight);
+
+        QFont font = label->font();
+        font.setPixelSize(kFontPixelSize);
+        font.setBold(true);
+        label->setFont(font);
+        label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+
+        setPaletteColor(label, QPalette::Background, Qt::transparent);
+        setPaletteColor(label, QPalette::WindowText, colors.moreItemsText);
+
+        layout->insertItem(kTopPositionIndex, label);
+    }
+
+    ///
+
     typedef std::function<void (const QnCameraBookmark &bookmark
         , int eventId)> EmitBookmarkEventFunc;
 
     class BookmarkToolTipFrame : public QnToolTipWidget
     {
+        Q_DECLARE_TR_FUNCTIONS(BookmarkToolTipFrame)
+
     public:
         BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
             , bool showMoreTooltip
@@ -239,7 +273,6 @@ namespace
         setLayout(m_mainLayout);
         m_mainLayout->setContentsMargins(0, 0, 0, 0);        
         m_mainLayout->setSpacing(0);
-        enum { kTopPositionIndex = 0 };
 
         bool addSeparator = false;
         for (const auto &bookmark: bookmarks)
@@ -250,6 +283,12 @@ namespace
             m_mainLayout->insertItem(kTopPositionIndex
                 , createBookmarksLayout(bookmark, colors, emitBookmarkEvent, parent));
             addSeparator = true;
+        }
+
+        if (showMoreTooltip)
+        {
+            const auto message = lit("%1\n%2").arg(tr("Zoom timeline"), tr("to view more bookmarks"));
+            insertMoreItemsMessage(message, colors, m_mainLayout, this);
         }
     }
 
@@ -306,6 +345,9 @@ namespace
             , kBookmarkPlayActionEventId));
         buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png"
             , kBookmarkEditActionEventId));
+
+        enum { kSpacerStretch = 1000 };
+        buttonsLayout->addStretch(kSpacerStretch);
         buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png"
             , kBookmarkRemoveActionEventId));
         return buttonsLayout;
