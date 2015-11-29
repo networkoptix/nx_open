@@ -178,10 +178,14 @@ struct QnBookmarkColors {
 
     QColor tagBgNormal;
     QColor tagBgHovered;
+
+    QColor tagTextNormal;
+    QColor tagTextHovered;
 };
 
-#define QnBookmarkColors_Fields (tooltipBackground)(background)(text) \
-    (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom)(tagBgNormal)(tagBgHovered)
+#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)   \
+    (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom) \
+    (tagBgNormal)(tagBgHovered)(tagTextNormal)(tagTextHovered)
 
 struct QnCompositeTextOverlayColors
 {

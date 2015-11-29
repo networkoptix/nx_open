@@ -2468,6 +2468,7 @@ void QnWorkbenchUi::createSliderWidget()
         return bookmarkParams;
     };
 
+    /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
     const auto bookmarksViewer = m_sliderItem->timeSlider()->bookmarksViewer();
     connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
@@ -2479,6 +2480,14 @@ void QnWorkbenchUi::createSliderWidget()
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
         menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        enum { kMicrosecondsFactor = 1000};
+        navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
+        navigator()->setPlaying(true);
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
