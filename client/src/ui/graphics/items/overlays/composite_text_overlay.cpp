@@ -255,7 +255,8 @@ void QnCompositeTextOverlay::initTextMode()
         else
         {
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            text = elideString(kTextHtml.arg(htmlFormattedParagraph(actionParams.text, 13)), kDescriptionMaxLength);
+            const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
+            text = kTextHtml.arg(htmlFormattedParagraph(elided, 13));
         }
 
         const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
