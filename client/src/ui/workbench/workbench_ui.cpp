@@ -2357,7 +2357,7 @@ void QnWorkbenchUi::createSliderWidget()
     m_sliderItem->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
     m_sliderItem->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
-
+    
     m_sliderShowButton = newShowHideButton(m_controlsWidget, action(Qn::ToggleSliderAction));
     {
         QTransform transform;
@@ -2468,16 +2468,39 @@ void QnWorkbenchUi::createSliderWidget()
         return bookmarkParams;
     };
 
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
+    /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
+    const auto bookmarksViewer = m_sliderItem->timeSlider()->bookmarksViewer();
+    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
         menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
     
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
+    connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
         menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        enum { kMicrosecondsFactor = 1000};
+        navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
+        navigator()->setPlaying(true);
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
+        , [this, bookmarksViewer](const QString &tag)
+    {
+        const auto windowStart = m_sliderItem->timeSlider()->windowStart();
+        const auto window = QnTimePeriod(windowStart
+            , m_sliderItem->timeSlider()->windowEnd() - windowStart);
+
+        QnActionParameters params;
+        params.setArgument(Qn::BookmarkTagRole, tag);
+        params.setArgument(Qn::ItemSliderWindowRole, window);
+        menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
     });
     
 }

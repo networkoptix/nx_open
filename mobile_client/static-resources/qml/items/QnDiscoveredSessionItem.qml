@@ -18,8 +18,12 @@ Rectangle {
     radius: dp(2)
 
     QnMaterialSurface {
-        enabled: isCompatible
-        onClicked: Main.openDiscoveredSession(host, port, systemName)
+        onClicked: {
+            if (isCompatible)
+                Main.openDiscoveredSession(host, port, systemName)
+            else
+                oldClientOfferDialog.show()
+        }
     }
 
     Column {
@@ -29,7 +33,7 @@ Rectangle {
 
         Text {
             text: systemName
-            color: QnTheme.listText
+            color: isCompatible ? QnTheme.listText : QnTheme.listDisabledText
             font.pixelSize: sp(18)
             font.weight: Font.DemiBold
             height: dp(32)
@@ -40,7 +44,7 @@ Rectangle {
 
         Text {
             text: host + ":" + port
-            color: QnTheme.listSubText
+            color: isCompatible ? QnTheme.listSubText : QnTheme.listDisabledText
             font.pixelSize: sp(15)
             font.weight: Font.DemiBold
             height: dp(24)

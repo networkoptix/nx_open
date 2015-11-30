@@ -100,6 +100,9 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent) :
             return;
 
         updateFinalTimestamp();
+
+        if (m_url.isEmpty())
+            updateUrl();
     });
 }
 

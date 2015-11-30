@@ -235,15 +235,16 @@ void QnResourceWidget::addInfoOverlay() {
         m_overlayWidgets.detailsItem->setOptions(infoOptions);
         m_overlayWidgets.positionItem->setOptions(infoOptions);
 
+        enum { kMargin = 2 };
         auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
-        detailsOverlay->setContentsMargins(0, 0, 0, 0);
+        detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
         detailsOverlay->addItem(m_overlayWidgets.detailsItem);
         addOverlayWidget(detailsOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.detailsOverlay = detailsOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay, false, false);
 
         auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-        positionOverlay->setContentsMargins(0, 0, 0, 0);
+        positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
         positionOverlay->addItem(m_overlayWidgets.positionItem);
         addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.positionOverlay = positionOverlay;

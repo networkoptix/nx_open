@@ -1141,6 +1141,24 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
+
+    const auto parameters = menu()->currentParameters(sender());
+    if (parameters.hasArgument(Qn::BookmarkTagRole))
+    {
+        const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
+
+        const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+        const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
+
+        const auto start = (correctWindow ? QDateTime::fromMSecsSinceEpoch(timelineWindow.startTimeMs).date()
+            : QDateTime::currentDateTime().date());
+
+        const auto finish = (correctWindow 
+            ? QDateTime::fromMSecsSinceEpoch(timelineWindow.startTimeMs + timelineWindow.durationMs).date()
+            : QDateTime::currentDateTime().date());
+
+        m_searchBookmarksDialog->setParameters(filterText, start, finish);
+    }
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
