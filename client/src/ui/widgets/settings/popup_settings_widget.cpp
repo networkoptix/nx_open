@@ -17,7 +17,7 @@
 
 #include <utils/resource_property_adaptors.h>
 
-QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) 
+QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::PopupSettingsWidget)
@@ -36,12 +36,17 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
         m_businessRulesCheckBoxes[eventType] = checkbox;
     }
 
-    static_assert(QnSystemHealth::MessageTypeCount < 64, "We are packing messages to single quint64");
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+    static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
+
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType(i)));
+        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
-        m_systemHealthCheckBoxes << checkbox;
+        m_systemHealthCheckBoxes[messageType] = checkbox;
     }
 
     connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::loadDataToUi);
@@ -57,7 +62,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
             checkbox->setEnabled(!checked);
         }
     });
-    
+
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
@@ -69,16 +74,21 @@ void QnPopupSettingsWidget::loadDataToUi() {
 
     quint64 healthShown = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
         bool checked = ((healthShown & healthFlag) == healthFlag);
-        m_systemHealthCheckBoxes[i]->setChecked(checked);
+        m_systemHealthCheckBoxes[messageType]->setChecked(checked);
         healthFlag = healthFlag << 1;
 
         all &= checked;
     }
 
     if (context()->user())
-        m_adaptor->setResource(context()->user());   
+        m_adaptor->setResource(context()->user());
 
     QList<QnBusiness::EventType> watchedEvents = context()->user()
         ? m_adaptor->watchedEvents()
@@ -120,8 +130,12 @@ QList<QnBusiness::EventType> QnPopupSettingsWidget::watchedEvents() const {
 quint64 QnPopupSettingsWidget::watchedSystemHealth() const {
     quint64 result = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
+        if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked()) {
             result |= healthFlag;
         } else {
             result &= ~healthFlag;
