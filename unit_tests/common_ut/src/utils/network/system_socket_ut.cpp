@@ -117,7 +117,7 @@ TEST( TcpSocket, SimpleSync )
     socketSimpleSync< TCPServerSocket, TCPSocket >();
 }
 
-TEST( UdtSocket, SimpleSync )
+TEST(SocketUdt, SimpleSync)
 {
     socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >();
 }
@@ -196,7 +196,7 @@ TEST( TcpSocket, SimpleAsync )
     socketSimpleAsync< TCPServerSocket, TCPSocket >();
 }
 
-TEST( UdtSocket, SimpleAsync )
+TEST(SocketUdt, SimpleAsync)
 {
     socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >();
 }
