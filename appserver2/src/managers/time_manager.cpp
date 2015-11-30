@@ -1154,7 +1154,7 @@ namespace ec2
                 m_usedTimeSyncInfo.timePriorityKey = savedPriorityKey;
                 m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
                 m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
-                NX_LOGX( lit(Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
+                NX_LOGX( lit("Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
                     arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
                     arg(timeDelta).
                     arg(savedPriorityKey.toUInt64(), 0, 16), cl_logINFO );
