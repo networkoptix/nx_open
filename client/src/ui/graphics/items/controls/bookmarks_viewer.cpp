@@ -218,6 +218,7 @@ namespace
         font.setBold(true);
         label->setFont(font);
         label->setAlignment(Qt::AlignCenter);
+        label->setWordWrap(true);
 
         setPaletteColor(label, QPalette::Background, Qt::transparent);
         setPaletteColor(label, QPalette::WindowText, colors.moreItemsText);
@@ -296,7 +297,7 @@ namespace
 
         if (showMoreTooltip)
         {
-            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks");
+            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks", "Use '\n' to split message in two lines (required)");
             insertMoreItemsMessage(kMoreItemsCaption, colors, m_mainLayout, this);
         }
     }
@@ -333,7 +334,6 @@ namespace
             button->setIcon(qnSkin->icon(iconName));
             button->setClickableButtons(Qt::LeftButton);
             button->setMaximumSize(kSize, kSize);
-            auto speed = button->animationSpeed();
 
             enum { kAnimationInstantSpeed = 1000 };
             button->setAnimationSpeed(kAnimationInstantSpeed);    // For instant hover state change
@@ -393,12 +393,6 @@ namespace
         layout->addItem(bookmarkItemsLayout);
         layout->addItem(createButtonsLayout(bookmark));
         return layout;
-    }
-
-    QGraphicsLinearLayout *BookmarkToolTipFrame::createLeftCountLayout(int bookmarksLeft
-        , const QnBookmarkColors &colors)
-    {
-        return nullptr;
     }
 
     void BookmarkToolTipFrame::setPosition(const QnBookmarksViewer::PosAndBoundsPair &params)
