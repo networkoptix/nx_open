@@ -17,7 +17,7 @@ logger = logging.getLogger('django')
 def register(request):
     serializer = CreateAccountSerializer(data=request.data)
     if not serializer.is_valid():
-        raise APIRequestException(serializer.errors)
+        raise APIRequestException('Wrong form parameters', error_data = serializer.errors)
     serializer.save()
     return api_success()
 

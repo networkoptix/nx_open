@@ -10,7 +10,7 @@ angular.module('cloudApp')
         });
 
         function errorHandler(result){
-            alert("some error");
+            alert("some error " + (result.data.errorText || result.data.detail));
             console.error(result);
         }
 

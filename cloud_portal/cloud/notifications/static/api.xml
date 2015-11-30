@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="api.xsl"?>
+<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="api.xsd">
+    <groups>
+        <group>
+            <groupName>Sending notification</groupName>
+            <urlPrefix>/notifications</urlPrefix>
+            <groupDescription>Sending notification to user</groupDescription>
+            <functions>
+                <function>
+                    <name>send</name>
+                    <description></description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>user_email</name>
+                            <description>Target user's identifier. Must be registered in database</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>type</name>
+                            <description>Text identifier for message type</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>message</name>
+                            <description>Any structured object or string which contains essential data for sending this notification</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+    </groups>
+</apidoc>

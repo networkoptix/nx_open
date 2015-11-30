@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', function ($scope,cloudApi,$sessionStorage) {
+    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location) {
         cloudApi.systems().then(function(result){
             $scope.systems = result.data;
         });

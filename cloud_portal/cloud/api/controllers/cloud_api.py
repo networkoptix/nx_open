@@ -26,15 +26,13 @@ class Account(object):
         customization = settings.CLOUD_CONNECT['customization']
         realm = settings.CLOUD_CONNECT['password_realm']
 
-        password_string = '%s:%s:%s' % (email, realm, password)
+        password_string = ':'.join((email, realm, password))
         password_ha1 = md5(password_string).hexdigest()
-
-        full_name = '%s %s' % (first_name, last_name)
 
         params = {
             'email': email,
             'passwordHa1': password_ha1,
-            'fullName': full_name,
+            'fullName': ' '.join((first_name, last_name)),
             'customization': customization
         }
         # django.utils.http.urlencode(params)
@@ -47,7 +45,7 @@ class Account(object):
     def change_password(email, password, new_password):
         realm = settings.CLOUD_CONNECT['password_realm']
 
-        password_string = '%s:%s:%s' % (email, realm, new_password)
+        password_string = ':'.join((email, realm, new_password))
         password_ha1 = md5(password_string).hexdigest()
 
         params = {
@@ -60,10 +58,9 @@ class Account(object):
     @staticmethod
     @validate_response
     def update(email, password, first_name, last_name):
-        full_name = '%s %s' % (first_name, last_name)
 
         params = {
-            'fullName': full_name
+            'fullName': ' '.join((first_name, last_name))
         }
         request = settings.CLOUD_CONNECT['url'] + '/account/update'
 

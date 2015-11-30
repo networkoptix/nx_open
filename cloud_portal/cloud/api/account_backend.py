@@ -4,6 +4,8 @@ import logging
 import models
 from api.controllers.cloud_api import Account
 
+import notifications
+
 logger = logging.getLogger('django')
 
 
@@ -46,17 +48,17 @@ class AccountManager(db.models.Manager):
         # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name", True)
         last_name = extra_fields.pop("last_name", True)
-        created_date = now
 
-        if Account.register(email, password, first_name, last_name) is None:
-            return None
+        confirmation_code = Account.register(email, password, first_name, last_name)
 
         user = self.model(email=email,
                           first_name=first_name,
                           last_name=last_name,
-                          created_date=created_date,
                           **extra_fields)
         user.save(using=self._db)
+
+        notifications.send(email, 'activate_account', {'code': confirmation_code})
+
         return user
 
     def create_user(self, email, password, **extra_fields):

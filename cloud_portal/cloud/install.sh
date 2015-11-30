@@ -9,5 +9,7 @@ pip install pygments
 pip install django-cors-headers
 pip install MySQL-python
 
+pip install jsonfield
+
 echo "CREATE DATABASE nx_cloud;" | mysql
 python manage.py migrate
