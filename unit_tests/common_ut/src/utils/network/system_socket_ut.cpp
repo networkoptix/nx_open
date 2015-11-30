@@ -87,6 +87,7 @@ static void socketSimpleSync()
                 ASSERT_NE(-1, bytesRead);
                 if (bytesRead == 0)
                     break;  //connection closed
+                bufDataSize += bytesRead;
             }
 
             EXPECT_STREQ(MESSAGE.data(), buffer.data());
