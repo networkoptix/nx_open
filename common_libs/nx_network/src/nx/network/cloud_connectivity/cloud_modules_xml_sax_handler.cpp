@@ -34,7 +34,7 @@ bool CloudModulesXmlHandler::startElement(
     const QString& /*namespaceURI*/,
     const QString& /*localName*/,
     const QString& qName,
-    const QXmlAttributes& atts)
+    const QXmlAttributes& /*atts*/)
 {
     switch (m_state)
     {
@@ -67,7 +67,9 @@ bool CloudModulesXmlHandler::characters(const QString& ch)
     return true;
 }
 
-bool CloudModulesXmlHandler::endElement(const QString& namespaceURI, const QString& localName, const QString& qName)
+bool CloudModulesXmlHandler::endElement(const QString& /*namespaceURI*/,
+                                        const QString& /*localName*/,
+                                        const QString& /*qName*/)
 {
     switch (m_state)
     {

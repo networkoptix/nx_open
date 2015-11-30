@@ -33,16 +33,26 @@ AsyncClient::~AsyncClient()
 }
 
 void AsyncClient::openConnection( ConnectionHandler connectHandler,
-                                  IndicationHandler indicationHandler,
                                   ConnectionHandler disconnectHandler )
 {
     QnMutexLocker lock( &m_mutex );
 
-    if( connectHandler ) m_connectHandler = std::move( connectHandler );
-    if( indicationHandler ) m_indicationHandler = std::move( indicationHandler );
-    if( disconnectHandler ) m_disconnectHandler = std::move( disconnectHandler );
+    ConnectionHandler* currentConnectHandler( nullptr );
+    if( connectHandler ) {
+        m_connectHandlers.push_back( std::move( connectHandler ) );
+        currentConnectHandler = &m_connectHandlers.back();
+    }
 
-    openConnectionImpl( &lock );
+    if( disconnectHandler )
+        m_disconnectHandlers.push_back( std::move( disconnectHandler ) );
+
+    openConnectionImpl( &lock, currentConnectHandler );
+}
+
+void AsyncClient::monitorIndocations( int method, IndicationHandler handler )
+{
+    QnMutexLocker lock( &m_mutex );
+    m_indicationHandlers[ method ].push_back( std::move( handler ) );
 }
 
 void AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
@@ -74,21 +84,23 @@ void AsyncClient::sendRequest( Message request, RequestHandler requestHandler )
 
 void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
-    BaseConnectionType* connection)
+    BaseConnectionType* connection )
 {
-    Q_ASSERT( !m_baseConnection || connection == m_baseConnection.get() );
+    Q_ASSERT_X( !m_baseConnection || !connection ||
+                connection == m_baseConnection.get(),
+                Q_FUNC_INFO, "Incorrect closeConnection call" );
 
-    ConnectionHandler disconnectHandler;
+    std::vector< ConnectionHandler > disconnectHandlers;
 	std::unique_ptr< BaseConnectionType > baseConnection;
     {
         QnMutexLocker lock( &m_mutex );
-        disconnectHandler = m_disconnectHandler;
+        disconnectHandlers = m_disconnectHandlers;
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
     }
 
-    if( disconnectHandler )
-        disconnectHandler( errorCode );
+    for( const auto& handler : disconnectHandlers )
+        handler( errorCode );
 }
 
 boost::optional< QString >
@@ -110,7 +122,8 @@ boost::optional< QString >
     return boost::none;
 }
 
-void AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
+void AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/,
+                                      ConnectionHandler* currentHandler )
 {
     switch( m_state )
     {
@@ -139,12 +152,14 @@ void AsyncClient::openConnectionImpl( QnMutexLockerBase* /*lock*/ )
         }
 
         case State::connected:
-            m_baseConnection->socket()->post( std::bind(
-                std::move( m_connectHandler ), SystemError::noError ) );
+            // current handler is supposed to be called anyway
+            if( currentHandler )
+                m_baseConnection->socket()->post( std::bind(
+                    *currentHandler, SystemError::noError ) );
             return;
 
         case State::connecting:
-            // m_connectHandler will be called in onConnectionComplete
+            // m_connectHandlers will be called in onConnectionComplete
             return;
 
         default:
@@ -175,8 +190,8 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
 
     lock->unlock();
 
-    for( auto& req : requestsInProgress )   req.second( code, Message() );
-    for( auto& req : requestQueue )         req.second( code, Message() );
+    for( const auto& req : requestsInProgress )   req.second( code, Message() );
+    for( const auto& req : requestQueue )         req.second( code, Message() );
 }
 
 void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
@@ -213,18 +228,18 @@ void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
 
 void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
 {
-    ConnectionHandler connectionHandler;
+    std::vector< ConnectionHandler > handlers;
     Guard onReturn( [ & ]()
     {
-        if( connectionHandler )
-            connectionHandler( code );
+        for( const auto& handler : handlers )
+            handler( code );
     } );
 
     QnMutexLocker lock( &m_mutex );
     if( m_state == State::terminated )
         return;
 
-    std::swap( connectionHandler, m_connectHandler);
+    handlers = m_connectHandlers;
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
 
@@ -275,14 +290,24 @@ void AsyncClient::processMessage( Message message )
         }
 
         case MessageClass::indication:
-            if( m_indicationHandler )
+        {
+            auto it = m_indicationHandlers.find( message.header.method );
+            if( it != m_indicationHandlers.end() )
             {
-                IndicationHandler handler( m_indicationHandler );
-
+                auto handlers = it->second;
                 lock.unlock();
-                handler( std::move( message ) );
+
+                for( const auto& handler : handlers )
+                    handler( message );
+            }
+            else
+            {
+                NX_LOGX( lit( "Unexpected/unsupported indication: %2" )
+                         .arg( message.header.method ),
+                         cl_logWARNING );
             }
             return;
+        }
 
         default:
             Q_ASSERT_X( false, Q_FUNC_INFO, "messageClass is invalid" );

@@ -3,7 +3,7 @@
 namespace nx {
 namespace cc {
 
-bool CloudServerSocket::bind( const SocketAddress& endpoint )
+bool CloudServerSocket::bind( const SocketAddress& /*endpoint*/ )
 {
     //TODO #ak
     return false;

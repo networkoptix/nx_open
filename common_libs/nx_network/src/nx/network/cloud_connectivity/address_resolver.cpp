@@ -196,12 +196,6 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
     return m_requests.count( requestId );
 }
 
-void AddressResolver::resetMediatorAddress( const SocketAddress& newAddress )
-{
-    QnMutexLocker lk( &m_mutex );
-    m_stunClient.reset( new stun::AsyncClient( newAddress ) );
-}
-
 AddressResolver::HostAddressInfo::HostAddressInfo()
     : m_dnsState( State::unresolved )
     , m_mediatorState( State::unresolved )
@@ -300,7 +294,12 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
 {
     info->second.mediatorProgress();
     if( !m_stunClient )
-        m_stunClient = SocketGlobals::mediatorConnector().client();
+    {
+        lk->unlock();
+        auto client = SocketGlobals::mediatorConnector().client();
+        lk->relock();
+        m_stunClient = client;
+    }
 
     if( m_stunClient )
         return mediatorStunResolve( info, lk );

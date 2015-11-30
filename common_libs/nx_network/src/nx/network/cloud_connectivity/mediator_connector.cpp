@@ -34,7 +34,7 @@ void MediatorConnector::enable( bool waitComplete )
     bool needToFetch = false;
     {
         QnMutexLocker lk( &m_mutex );
-        if( !m_promise )
+        if( !m_promise && !m_endpoint )
         {
             needToFetch = true;
             m_promise = std::promise< bool >();
@@ -64,28 +64,61 @@ void MediatorConnector::enable( bool waitComplete )
                          .arg( address.toString() ), cl_logALWAYS );
 
                 QnMutexLocker lk( &m_mutex );
-                m_endpoint = std::move( address );
+                if ( !m_endpoint )
+                    m_endpoint = std::move( address );
                 m_promise->set_value( true );
             }
         });
 
     if( waitComplete )
-        m_promise->get_future().wait();
+    {
+        QnMutexLocker lk( &m_mutex );
+        if( m_promise )
+            m_promise->get_future().wait();
+    }
 }
 
-std::unique_ptr< stun::AsyncClient > MediatorConnector::client()
+stun::AsyncClient* MediatorConnector::client()
 {
     QnMutexLocker lk( &m_mutex );
-    if( !m_endpoint )
-        return nullptr;
+    if( !m_client && m_endpoint )
+    {
+        m_client = std::make_unique< stun::AsyncClient >( *m_endpoint );
+        m_client->openConnection(
+            [ this ]( SystemError::ErrorCode code )
+            {
+                if( code == SystemError::noError )
+                {
+                    NX_LOGX( lit( "Mediator connection is estabilished" ),
+                             cl_logDEBUG1 );
+                }
+                else
+                {
+                    NX_LOGX( lit( "Mediator connection has failed: %1" )
+                             .arg( SystemError::toString( code ) ),
+                             cl_logDEBUG1 );
+                }
 
-    return std::make_unique< stun::AsyncClient >( *m_endpoint );
+            },
+            [ this ]( SystemError::ErrorCode code )
+            {
+                NX_LOGX( lit( "Mediator connection has been lost: %1" )
+                         .arg( SystemError::toString( code ) ),
+                         cl_logDEBUG1 );
+            } );
+    }
+
+    return m_client.get();
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address )
 {
     QnMutexLocker lk( &m_mutex );
+    Q_ASSERT_X( !m_endpoint, Q_FUNC_INFO, "Address is already resolved!" );
+
     m_endpoint = std::move( address );
+    NX_LOGX( lit( "Mediator address is mocked up: %1" )
+             .arg( m_endpoint->toString() ), cl_logWARNING );
 }
 
 }   //cc

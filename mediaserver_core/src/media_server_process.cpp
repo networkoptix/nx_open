@@ -165,6 +165,7 @@
 #include <utils/common/util.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/socket_global.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -1032,7 +1033,7 @@ void MediaServerProcess::updateAddressesList()
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()
             ->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
 
-    m_mediatorAddressPublisher->updateAddresses(std::list<SocketAddress>(
+    nx::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
         serverAddresses.begin(), serverAddresses.end()));
 }
 
@@ -2243,26 +2244,30 @@ void MediaServerProcess::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
-   m_mediatorAddressPublisher.reset(new nx::cc::MediatorAddressPublisher(
-        qnCommon->moduleGUID().toSimpleString().toUtf8(),
+    nx::SocketGlobals::addressPublisher().setUpdateInterval(
         parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
-            nx::cc::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL)));
+            nx::cc::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
         auto cloudSystemId = admin->getProperty(Qn::CLOUD_SYSTEM_ID);
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
-        if (m_mediatorAddressPublisher &&
-            !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
+        if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::cc::MediatorAddressPublisher::Authorization auth = {
-                QnUuid(cloudSystemId).toSimpleString().toUtf8(), cloudAuthKey.toUtf8()};
-            m_mediatorAddressPublisher->authorizationChanged(std::move(auth));
+            nx::cc::MediatorAddressPublisher::Authorization auth =
+            {
+                qnCommon->moduleGUID().toSimpleString().toUtf8(),
+                QnUuid(cloudSystemId).toSimpleString().toUtf8(),
+                cloudAuthKey.toUtf8()
+            };
+
+            nx::SocketGlobals::addressPublisher()
+                    .updateAuthorization(std::move(auth));
             return;
         }
 
-        m_mediatorAddressPublisher->authorizationChanged(boost::none);
+        nx::SocketGlobals::addressPublisher().updateAuthorization(boost::none);
     };
 
     loadResourcesFromECS(messageProcessor.data());
@@ -2414,7 +2419,6 @@ void MediaServerProcess::run()
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
     m_crashReporter.reset();
-    m_mediatorAddressPublisher.reset();
 
     //cancelling dumping system usage
     quint64 dumpSystemResourceUsageTaskID = 0;
@@ -2846,6 +2850,7 @@ int MediaServerProcess::main(int argc, char* argv[])
 #endif
     QString engineVersion;
     QString enforceSocketType;
+    QString enforcedMediatorEndpoint;
 
     QnCommandLineParser commandLineParser;
     commandLineParser.addParameter(&cmdLineArguments.logLevel, "--log-level", NULL,
@@ -2876,6 +2881,8 @@ int MediaServerProcess::main(int argc, char* argv[])
         lit("Force the other engine version"), QString());
     commandLineParser.addParameter(&enforceSocketType, "--enforce-socket", NULL,
         lit("Enforces stream socket type (TCP, UDT)"), QString());
+    commandLineParser.addParameter(&enforcedMediatorEndpoint, "--enforce-mediator", NULL,
+        lit("Enforces mediatror address"), QString());
 
     #ifdef __linux__
         commandLineParser.addParameter(&disableCrashHandler, "--disable-crash-handler", NULL,
@@ -2888,6 +2895,10 @@ int MediaServerProcess::main(int argc, char* argv[])
         if( !disableCrashHandler )
             linux_exception::installCrashSignalHandler();
     #endif
+
+    if ( !enforcedMediatorEndpoint.isEmpty() )
+        nx::SocketGlobals::mediatorConnector().mockupAddress(
+                    enforcedMediatorEndpoint );
 
     if( showVersion )
     {

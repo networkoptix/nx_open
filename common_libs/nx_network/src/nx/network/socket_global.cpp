@@ -7,6 +7,11 @@ SocketGlobals::SocketGlobals()
 {
 }
 
+SocketGlobals::~SocketGlobals()
+{
+    m_addressPublisher.terminate();
+}
+
 void SocketGlobals::init()
 {
 	QnMutexLocker lk( &s_mutex );

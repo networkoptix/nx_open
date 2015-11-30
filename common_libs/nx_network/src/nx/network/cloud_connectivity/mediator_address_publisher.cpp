@@ -11,32 +11,28 @@ namespace cc {
 const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 10 );
 
-MediatorAddressPublisher::MediatorAddressPublisher( String serverId,
-                                                    TimerDuration updateInterval )
-    : m_serverId( std::move( serverId ) )
-    , m_updateInterval( std::move( updateInterval ) )
+MediatorAddressPublisher::MediatorAddressPublisher()
+    : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
     , isTerminating( false )
+    , m_timerSocket( SocketFactory::createStreamSocket() )
+    , m_stunClient( nullptr )
 {
-    SocketGlobals::mediatorConnector().enable();
-}
-
-MediatorAddressPublisher::~MediatorAddressPublisher()
-{
-    QnMutexLocker lk( &m_mutex );
-    isTerminating = true;
-
-    const auto client = std::move( m_stunClient );
-    const auto guard = std::move( m_timerGuard );
-
-    lk.unlock();
 }
 
 bool MediatorAddressPublisher::Authorization::operator == ( const Authorization& rhs ) const
 {
-    return systemId == rhs.systemId && key == rhs.key;
+    return serverId == rhs.serverId &&
+           systemId == rhs.systemId &&
+           key      == rhs.key;
 }
 
-void MediatorAddressPublisher::authorizationChanged(
+void MediatorAddressPublisher::setUpdateInterval( TimerDuration updateInterval )
+{
+    QnMutexLocker lk( &m_mutex );
+    m_updateInterval = updateInterval;
+}
+
+void MediatorAddressPublisher::updateAuthorization(
         boost::optional< Authorization > authorization )
 {
     QnMutexLocker lk( &m_mutex );
@@ -44,18 +40,20 @@ void MediatorAddressPublisher::authorizationChanged(
         return;
 
     NX_LOGX( lm( "New credentials: %1" ).arg(
-                 authorization.is_initialized() ? authorization->systemId : String("none") ),
-             cl_logDEBUG1 );
+                 static_cast< bool >( authorization ) ?
+                     authorization->systemId : String("none") ), cl_logDEBUG1 );
 
     m_stunAuthorization = std::move( authorization );
-    if( m_stunClient )
+    if( m_stunAuthorization && !m_stunClient )
     {
-        const auto stunClient = std::move( m_stunClient );
-        lk.unlock();
-    }
-    else
-    {
+        SocketGlobals::mediatorConnector().enable();
         pingReportedAddresses();
+    }
+
+    if( !m_stunAuthorization && m_stunClient )
+    {
+        lk.unlock();
+        m_stunClient->closeConnection( SystemError::connectionReset );
     }
 }
 
@@ -74,13 +72,11 @@ void MediatorAddressPublisher::setupUpdateTimer()
     if( isTerminating )
         return;
 
-    m_timerGuard = TimerManager::instance()->addTimer(
-        [ this ]( quint64 )
-        {
-            QnMutexLocker lk( &m_mutex );
-            pingReportedAddresses();
-        },
-        m_updateInterval );
+    m_timerSocket->registerTimer( m_updateInterval.count(), [ this ]()
+    {
+        QnMutexLocker lk( &m_mutex );
+        pingReportedAddresses();
+    } );
 }
 
 bool MediatorAddressPublisher::isCloudReady()
@@ -101,25 +97,12 @@ bool MediatorAddressPublisher::isCloudReady()
         }
 
         m_stunClient->openConnection(
+            nullptr,
             [ this ]( SystemError::ErrorCode code )
             {
-                if( code == SystemError::noError )
-                    NX_LOGX( lit( "Mediator connection is estabilished" ),
-                             cl_logDEBUG1 );
-            },
-            [ this ]( stun::Message indication )
-            {
-                static_cast< void >( indication ); // TODO
-            },
-            [ this ]( SystemError::ErrorCode code )
-            {
-                NX_LOGX( lit( "Mediator connection has been lost: %1" )
-                         .arg( SystemError::toString( code ) ),
-                         cl_logDEBUG1 );
-
                 QnMutexLocker lk( &m_mutex );
                 m_publishedAddresses.clear();
-            });
+            } );
     }
 
     return m_stunClient && m_stunAuthorization;
@@ -133,26 +116,28 @@ void MediatorAddressPublisher::pingReportedAddresses()
     if( m_reportedAddresses == m_pingedAddresses )
         return publishPingedAddresses();
 
-    stun::Message request( stun::Header( stun::MessageClass::request,
-                                         stun::cc::methods::ping ) );
-    request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
-    request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_reportedAddresses );
+    using namespace stun;
+    using namespace stun::cc::attrs;
+
+    Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
+    request.newAttribute< SystemId >( m_stunAuthorization->systemId );
+    request.newAttribute< ServerId >( m_stunAuthorization->serverId );
+    request.newAttribute< PublicEndpointList >( m_reportedAddresses );
     request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
     m_stunClient->sendRequest(
         std::move( request ),
-        [ this ]( SystemError::ErrorCode code, stun::Message response )
+        [ this ]( SystemError::ErrorCode code, Message response )
     {
         QnMutexLocker lk( &m_mutex );
-        if( const auto error = stun::AsyncClient::hasError( code, response ) )
+        if( const auto error = AsyncClient::hasError( code, response ) )
         {
             NX_LOGX( *error, cl_logERROR );
             m_pingedAddresses.clear();
             return setupUpdateTimer();
         }
 
-        const auto eps = response.getAttribute< stun::cc::attrs::PublicEndpointList >();
+        const auto eps = response.getAttribute< PublicEndpointList >();
         if( !eps )
         {
             NX_LOGX( lit( "No PublicEndpointList in response" ), cl_logERROR );
@@ -173,19 +158,21 @@ void MediatorAddressPublisher::publishPingedAddresses()
     if( !isCloudReady() )
         return setupUpdateTimer();
 
-    stun::Message request( stun::Header( stun::MessageClass::request,
-                                         stun::cc::methods::bind ) );
-    request.newAttribute< stun::cc::attrs::SystemId >( m_stunAuthorization->systemId );
-    request.newAttribute< stun::cc::attrs::ServerId >( m_serverId );
-    request.newAttribute< stun::cc::attrs::PublicEndpointList >( m_pingedAddresses );
+    using namespace stun;
+    using namespace stun::cc::attrs;
+
+    Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
+    request.newAttribute< SystemId >( m_stunAuthorization->systemId );
+    request.newAttribute< ServerId >( m_stunAuthorization->serverId );
+    request.newAttribute< PublicEndpointList >( m_pingedAddresses );
     request.insertIntegrity( m_stunAuthorization->systemId, m_stunAuthorization->key );
 
     m_stunClient->sendRequest(
         std::move( request ),
-        [ this ]( SystemError::ErrorCode code, stun::Message response )
+        [ this ]( SystemError::ErrorCode code, Message response )
     {
         QnMutexLocker lk( &m_mutex );
-        if( const auto error = stun::AsyncClient::hasError( code, response ) )
+        if( const auto error = AsyncClient::hasError( code, response ) )
         {
             NX_LOGX( *error, cl_logERROR );
             return setupUpdateTimer();
@@ -197,6 +184,16 @@ void MediatorAddressPublisher::publishPingedAddresses()
 
         setupUpdateTimer();
     } );
+}
+
+void MediatorAddressPublisher::terminate()
+{
+    {
+        QnMutexLocker lk( &m_mutex );
+        isTerminating = true;
+    }
+
+    m_timerSocket->terminateAsyncIO( true );
 }
 
 } // namespase cc

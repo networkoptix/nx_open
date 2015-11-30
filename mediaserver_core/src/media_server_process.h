@@ -21,7 +21,6 @@
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
-#include <nx/network/cloud_connectivity/mediator_address_publisher.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -114,7 +113,6 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
-    std::unique_ptr<nx::cc::MediatorAddressPublisher> m_mediatorAddressPublisher;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

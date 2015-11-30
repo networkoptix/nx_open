@@ -25,8 +25,8 @@ public:
     /** Shell be called to enable cloud functionality for application */
     void enable( bool waitComplete = false );
 
-    /** Constructs client if endpoint is resolved, nullptr otherwise */
-    std::unique_ptr< stun::AsyncClient > client();
+    /** Returns client if endpoint is resolved, nullptr otherwise */
+    stun::AsyncClient* client();
 
     /** Injects mediator address (tests only) */
     void mockupAddress( SocketAddress address );
@@ -37,6 +37,7 @@ private:
 
     boost::optional< std::promise< bool > > m_promise;
     boost::optional< SocketAddress > m_endpoint;
+    std::unique_ptr< stun::AsyncClient > m_client;
     CloudModuleEndPointFetcher m_endpointFetcher;
     std::unique_ptr< AbstractStreamSocket > m_timerSocket;
 };

@@ -31,7 +31,7 @@ public:
     typedef BaseConnectionType ConnectionType;
 
     typedef std::function< void( SystemError::ErrorCode ) > ConnectionHandler;
-    typedef std::function< void( Message ) > IndicationHandler;
+    typedef std::function< void( const Message& ) > IndicationHandler;
     typedef std::function< void( SystemError::ErrorCode, Message )> RequestHandler;
 
     static const struct Timeouts { uint send, recv; } DEFAULT_TIMEOUTS;
@@ -45,14 +45,19 @@ public:
     //!Asynchronously openes connection to the server, specified during initialization
     /*!
         \param connectHandler Will be called once to deliver connection completeness
-        \param indicationHandler Will be called for each indication message
         \param disconnectHandler Will be called on disconnect (may be repeated if reconnected)
         \return \a false, if could not start asynchronous operation
-        \note It is valid to call after \fn sendRequest to setup handlers
+        \note It is valid to call any time to add connect and disconnect handlers
     */
     void openConnection( ConnectionHandler connectHandler = nullptr,
-                         IndicationHandler indicationHandler = nullptr,
                          ConnectionHandler disconnectHandler = nullptr );
+
+    //!Subscribes for certain indications
+    /*!
+        \param method Is monitoring indication type
+        \param handler Will be called for each indication message
+    */
+    void monitorIndocations( int method, IndicationHandler handler );
 
     //!Sends message asynchronously
     /*!
@@ -66,8 +71,9 @@ public:
     void sendRequest( Message request, RequestHandler requestHandler );
 
     //! \note Required by \a nx_api::BaseServerConnection
-    virtual void closeConnection(SystemError::ErrorCode errorCode,
-                                 BaseConnectionType*) override;
+    virtual void closeConnection(
+            SystemError::ErrorCode errorCode,
+            BaseConnectionType* connection = nullptr ) override;
 
     static boost::optional< QString >
         hasError( SystemError::ErrorCode code, const Message& message );
@@ -81,8 +87,12 @@ private:
         terminated,
     };
 
-    void openConnectionImpl( QnMutexLockerBase* lock );
-    void closeConnectionImpl( QnMutexLockerBase* lock, SystemError::ErrorCode code );
+    void openConnectionImpl( QnMutexLockerBase* lock,
+                             ConnectionHandler* currentHandler = nullptr );
+
+    void closeConnectionImpl( QnMutexLockerBase* lock,
+                              SystemError::ErrorCode code );
+
     void dispatchRequestsInQueue( QnMutexLockerBase* lock );
     void onConnectionComplete( SystemError::ErrorCode code );
     void processMessage( Message message );
@@ -95,9 +105,13 @@ private:
 
     QnMutex m_mutex;
     State m_state;
-    ConnectionHandler m_connectHandler;
-    IndicationHandler m_indicationHandler;
-    ConnectionHandler m_disconnectHandler;
+    std::vector< ConnectionHandler > m_connectHandlers;
+    std::vector< ConnectionHandler > m_disconnectHandlers;
+    #ifdef _DEBUG
+        std::map< int, std::vector< IndicationHandler > > m_indicationHandlers;
+    #else
+        std::unordered_map< int, std::vector< IndicationHandler > > m_indicationHandlers;
+    #endif
 
     struct Credentials { String userName; String key; };
     boost::optional< Credentials > m_credentials;
