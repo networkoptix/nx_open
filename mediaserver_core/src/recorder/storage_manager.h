@@ -30,6 +30,7 @@
 #include <array>
 #include <functional>
 #include "storage_db_pool.h"
+#include "health/system_health.h"
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
@@ -134,13 +135,13 @@ public:
     /*
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
-    std::vector<QnUuid> getCamerasWithArchive() const;
+    std::vector<QnUuid> getCamerasWithArchiveHelper() const;
 
     QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
-    void rebuildFinished(bool isCanceled);
+    void rebuildFinished(QnSystemHealth::MessageType msgType);
     void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
@@ -201,6 +202,7 @@ private:
         const QnStorageResourcePtr  &storage
     );
     static void updateCameraHistory();
+    static std::vector<QnUuid> getCamerasWithArchive();
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;

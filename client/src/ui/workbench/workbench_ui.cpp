@@ -69,7 +69,6 @@
 #include <ui/widgets/day_time_widget.h>
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
-#include <ui/widgets/search_line_edit.h>
 #include <ui/widgets/main_window.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
@@ -236,9 +235,6 @@ namespace {
     const qreal normalCalendarOpacity = 0.5;
     const qreal hoverCalendarOpacity = 0.95;
 
-    const qreal normalSearchOpacity = 0.85;
-    const qreal hoverSearchOpacity = 0.95;
-
     const qreal opaque = 1.0;
     const qreal hidden = 0.0;
 
@@ -282,8 +278,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_calendarVisible(false),
     m_dayTimeOpened(false),
     m_windowButtonsUsed(true),
-    m_searchVisible(false),
-    m_searchOpened(false),
     m_ignoreClickEvent(false),
     m_inactive(false),
     m_fpsItem(NULL),
@@ -356,12 +350,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_dayTimeItem(NULL),
     m_dayTimeWidget(NULL),
     m_dayTimeSizeAnimator(NULL),
-
-    m_searchWidget(NULL),
-    m_searchSizeAnimator(NULL),
-    m_searchOpacityAnimatorGroup(NULL),
-    m_searchOpacityProcessor(NULL),
-    m_inSearchGeometryUpdate(false),
     
     m_calendarPinOffset(),
     m_dayTimeOffset()
@@ -417,9 +405,6 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
 
     /* Navigation slider. */
     createSliderWidget();
-
-    /* Bookmarks search line. */
-    createSearchWidget();
 
 #ifdef QN_DEBUG_WIDGET
     /* Debug overlay */
@@ -562,7 +547,6 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
         setTreeVisible(false, false);
         setTitleVisible(false, false);
         setNotificationsVisible(false, false);
-        setSearchVisible(false, false);
         return;
     }
 
@@ -586,7 +570,6 @@ void QnWorkbenchUi::updateControlsVisibility(bool animate) {    // TODO
     }
 
     updateCalendarVisibility(animate);
-    updateSearchVisibility(animate);
 }
 
 QMargins QnWorkbenchUi::calculateViewportMargins(qreal treeX, qreal treeW, qreal titleY, qreal titleH, qreal sliderY, qreal notificationsX) {
@@ -648,7 +631,6 @@ bool QnWorkbenchUi::isHovered() const {
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
         || (m_notificationsOpacityProcessor && m_notificationsOpacityProcessor->isHovered())
         || (m_calendarOpacityProcessor      && m_calendarOpacityProcessor->isHovered())
-        || (m_searchOpacityProcessor        && m_searchOpacityProcessor->isHovered())
         ;
 }
 
@@ -1988,7 +1970,7 @@ void QnWorkbenchUi::updateCalendarGeometry() {
     m_calendarItem->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
 
     /* Always change position. */
-    m_calendarItem->setPos(geometry.topLeft() - QPointF(0, m_searchWidget->paintSize().height()));
+    m_calendarItem->setPos(geometry.topLeft());
 }
 
 QRectF QnWorkbenchUi::updatedDayTimeWidgetGeometry(const QRectF &sliderGeometry, const QRectF &calendarGeometry) {
@@ -2315,7 +2297,6 @@ void QnWorkbenchUi::at_sliderItem_geometryChanged() {
     updateCalendarGeometry();
     updateSliderZoomButtonsGeometry();
     updateDayTimeWidgetGeometry();
-    updateSearchGeometry();
 
     QRectF geometry = m_sliderItem->geometry();
     m_sliderShowButton->setPos(QPointF(
@@ -2528,159 +2509,6 @@ void QnWorkbenchUi::createDebugWidget() {
 }
 
 #pragma endregion Debug overlay methods
-
-#pragma region SearchWidget
-
-QRectF QnWorkbenchUi::updatedSearchGeometry(const QRectF &sliderGeometry) {
-    QRectF geometry = m_searchWidget->paintGeometry();
-    geometry.moveRight(m_controlsWidgetRect.right());
-    geometry.moveBottom(sliderGeometry.top());
-    return geometry;
-}
-
-void QnWorkbenchUi::updateSearchGeometry() {
-    /* Update painting rect the "fair" way. */
-    QRectF geometry = updatedSearchGeometry(m_sliderItem->geometry());
-    m_searchWidget->setPaintRect(QRectF(QPointF(0.0, 0.0), geometry.size()));
-
-    /* Always change position. */
-    m_searchWidget->setPos(geometry.topLeft());
-}
-
-void QnWorkbenchUi::at_searchItem_paintGeometryChanged() {
-    if(m_inSearchGeometryUpdate)
-        return;
-    QN_SCOPED_VALUE_ROLLBACK(&m_inSearchGeometryUpdate, true);
-    updateSearchGeometry();
-}
-
-void QnWorkbenchUi::setSearchVisible(bool visible, bool animate) {
-    ensureAnimationAllowed(animate);
-
-    bool changed = m_searchVisible != visible;
-
-    m_searchVisible = visible;
-
-    updateSearchOpacity(animate);
-    if(changed)
-        updateSearchGeometry();
-}
-
-void QnWorkbenchUi::setSearchOpened(bool opened, bool animate) {
-    ensureAnimationAllowed(animate);
-
-    m_inFreespace = false;
-
-    m_searchOpened = opened;
-
-    QSizeF newSize = opened ? QSizeF(250, 21) : QSizeF(250, 0);
-    if (animate) {
-        m_searchSizeAnimator->animateTo(newSize);
-    } else {
-        m_searchSizeAnimator->stop();
-        m_searchWidget->setPaintSize(newSize);
-        m_searchWidget->setVisible(opened);
-    }
-    
-    QnSearchLineEdit *searchWidget = navigator()->bookmarksSearchWidget();
-    searchWidget->setEnabled(opened);
-}
-
-void QnWorkbenchUi::updateSearchOpacity(bool animate) {
-    if (qnSettings->lightMode() & Qn::LightModeNoOpacity) {
-        qreal opacity = m_searchVisible ? opaque : hidden;
-        setSearchOpacity(opacity, false);
-        return;
-    }
-
-    if(!m_searchVisible) {
-        setSearchOpacity(0.0, animate);
-    } else {
-        if(m_searchOpacityProcessor->isHovered()) {
-            setSearchOpacity(hoverSearchOpacity, animate);
-        } else {
-            setSearchOpacity(normalSearchOpacity, animate);
-        }
-    }
-}
-
-void QnWorkbenchUi::setSearchOpacity(qreal opacity, bool animate) {
-    ensureAnimationAllowed(animate);
-
-    if(animate) {
-        m_searchOpacityAnimatorGroup->pause();
-        opacityAnimator(m_searchWidget)->setTargetValue(opacity);
-        m_searchOpacityAnimatorGroup->start();
-    } else {
-        m_searchOpacityAnimatorGroup->stop();
-        m_searchWidget->setOpacity(opacity);
-    }
-}
-
-void QnWorkbenchUi::updateSearchVisibility(bool animate) {
-    ensureAnimationAllowed(animate);
-
-    bool searchVisible = m_sliderVisible && isSliderOpened();
-
-    if(m_inactive)
-        setSearchVisible(searchVisible && isHovered(), animate);
-    else
-        setSearchVisible(searchVisible, animate);
-
-    if(!searchVisible)
-        setSearchOpened(false);
-    else if (action(Qn::BookmarksModeAction)->isChecked())
-        setSearchOpened(true);
-}
-
-void QnWorkbenchUi::createSearchWidget() {
-    QnSearchLineEdit *searchLine = new QnSearchLineEdit();
-    searchLine->setAttribute(Qt::WA_TranslucentBackground);
-    searchLine->resize(250, 21);
-    searchLine->setCloseButtonVisible(false);
-    searchLine->lineEdit()->setPlaceholderText(tr("Search bookmarks"));
-
-    navigator()->setBookmarksSearchWidget(searchLine);
-
-    m_searchWidget = new QnMaskedProxyWidget(m_controlsWidget);
-    m_searchWidget->setWidget(searchLine);
-    m_searchWidget->setProperty(Qn::NoHandScrollOver, true);
-    connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
-    connect(m_searchWidget,   &QGraphicsWidget::geometryChanged,          this,   &QnWorkbenchUi::at_searchItem_paintGeometryChanged);
-    connect(m_searchWidget,   &QnMaskedProxyWidget::paintRectChanged,     this,   &QnWorkbenchUi::at_calendarItem_paintGeometryChanged);
-
-    // slider should be highlighted when search widget is hovered
-    m_sliderOpacityProcessor->addTargetItem(m_searchWidget);
-
-    m_searchOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
-    m_searchOpacityProcessor->addTargetItem(m_searchWidget);
-    connect(m_searchOpacityProcessor, &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateSearchOpacityAnimated);
-    connect(m_searchOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateSearchOpacityAnimated);
-    connect(m_searchOpacityProcessor, &HoverFocusProcessor::hoverEntered,     this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
-    connect(m_searchOpacityProcessor, &HoverFocusProcessor::hoverLeft,        this,   &QnWorkbenchUi::updateControlsVisibilityAnimated);
-
-    m_searchOpacityAnimatorGroup = new AnimatorGroup(this);
-    m_searchOpacityAnimatorGroup->setTimer(m_instrumentManager->animationTimer());
-    m_searchOpacityAnimatorGroup->addAnimator(opacityAnimator(m_searchWidget));
-
-    m_searchSizeAnimator = new VariantAnimator(this);
-    m_searchSizeAnimator->setTimer(m_instrumentManager->animationTimer());
-    m_searchSizeAnimator->setTargetObject(m_searchWidget);
-    m_searchSizeAnimator->setAccessor(new PropertyAccessor("paintSize"));
-    m_searchSizeAnimator->setSpeed(100.0 * 2.0);
-    m_searchSizeAnimator->setTimeLimit(500);
-    connect(m_searchSizeAnimator, &VariantAnimator::valueChanged, this, [this](const QVariant &value)
-    {
-        m_searchWidget->setVisible(!qFuzzyIsNull(value.toSizeF().height()));
-    });
-
-    connect(action(Qn::BookmarksModeAction), &QAction::toggled, this, [this](bool toggled){
-        setSearchOpened(toggled);
-    });
-}
-
-
-#pragma endregion Search widget methods
 
 #pragma region FpsWidget
 

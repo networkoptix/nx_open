@@ -343,6 +343,37 @@ LExit:
     return WcaFinalize(er);
 }
 
+UINT __stdcall DeleteRegistryKeys(MSIHANDLE hInstall)
+{
+    HRESULT hr = S_OK;
+    UINT er = ERROR_SUCCESS;
+
+    CRegKey RegKey;
+
+    CAtlString registryPath;
+
+    hr = WcaInitialize(hInstall, "DeleteRegistryKeys");
+    ExitOnFailure(hr, "Failed to initialize");
+
+    WcaLog(LOGMSG_STANDARD, "Initialized.");
+
+    registryPath = GetProperty(hInstall, L"CustomActionData");
+
+    if(RegKey.Open(HKEY_LOCAL_MACHINE, registryPath, KEY_READ | KEY_WRITE | KEY_WOW64_64KEY) != ERROR_SUCCESS) {
+        WcaLog(LOGMSG_STANDARD, "Couldn't open registry key: %S", (LPCWSTR)registryPath);
+        goto LExit;
+    }
+
+    RegKey.DeleteValue(L"sysIdTime");
+
+    RegKey.Close();
+
+LExit:
+    
+    er = SUCCEEDED(hr) ? ERROR_SUCCESS : ERROR_INSTALL_FAILURE;
+    return WcaFinalize(er);
+}
+
 UINT __stdcall BackupDatabaseFile(MSIHANDLE hInstall)
 {
     HRESULT hr = S_OK;

@@ -210,7 +210,7 @@ Item {
             if (w > maxContentWidth)
                 scale = maxContentWidth / initialWidth
             if (h > maxContentHeight)
-                scale = Math.max(scale, maxContentHeight / initialHeight)
+                scale = Math.min(scale, maxContentHeight / initialHeight)
 
             flick.resizeContent(initialWidth * scale, initialHeight * scale, Qt.point(cx, cy))
         }

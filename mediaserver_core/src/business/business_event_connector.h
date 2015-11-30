@@ -9,6 +9,7 @@
 #include <business/business_fwd.h>
 #include "business/business_event_parameters.h"
 #include <server/server_globals.h>
+#include "health/system_health.h"
 
 struct QnModuleInformation;
 
@@ -73,7 +74,7 @@ public slots:
 
     void at_NoStorages(const QnResourcePtr& resource);
 
-    void at_archiveRebuildFinished(const QnResourcePtr& resource, bool isCanceled);
+    void at_archiveRebuildFinished(const QnResourcePtr& resource, QnSystemHealth::MessageType msgType);
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 

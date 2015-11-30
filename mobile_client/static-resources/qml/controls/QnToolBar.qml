@@ -17,12 +17,18 @@ Item {
 
     property var contentItem: contentItem
 
-    width: parent.width
-    height: bar.height
+    implicitWidth: parent.width
+    implicitHeight: bar.height
     anchors.top: parent.top
     anchors.topMargin: useShadeSize ? statusBarShade.height : 0
 
-    Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }    
+    Behavior on opacity { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+    visible: opacity > 0
+
+    MouseArea {
+        /* Block mouse events */
+        anchors.fill: parent
+    }
 
     Image {
         id: backgroundGradient

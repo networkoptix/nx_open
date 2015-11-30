@@ -156,7 +156,8 @@ private:
     QSet<QnUuid> m_historyValidCameras;
 
     //typedef QMap<int, callbackFunction> HandlerMap;
-    QSet<QnUuid> m_runningRequests;
+    QMap<QnUuid, rest::Handle> m_asyncRunningRequests;
+    QSet<QnUuid> m_syncRunningRequests;
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;
     QSet<QnUuid> m_camerasToCheck;

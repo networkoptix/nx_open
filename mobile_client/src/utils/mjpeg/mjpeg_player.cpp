@@ -54,7 +54,6 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , reconnectOnPlay(false)
     , maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
 {
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 }
 
 void QnMjpegPlayerPrivate::setState(QnMjpegPlayer::PlaybackState state) {
@@ -141,9 +140,11 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
     d->session->moveToThread(networkThread);
     networkThread->start();
 
-    connect(d->session, &QnMjpegSession::frameEnqueued, d, &QnMjpegPlayerPrivate::at_session_frameEnqueued);
-    connect(d->session, &QnMjpegSession::urlChanged, this, &QnMjpegPlayer::sourceChanged);
-    connect(this,   &QnMjpegPlayer::positionChanged, this, &QnMjpegPlayer::timestampChanged);
+    connect(d->session, &QnMjpegSession::frameEnqueued,             d,      &QnMjpegPlayerPrivate::at_session_frameEnqueued);
+    connect(d->session, &QnMjpegSession::urlChanged,                this,   &QnMjpegPlayer::sourceChanged);
+    connect(d->session, &QnMjpegSession::finished,                  this,   &QnMjpegPlayer::playbackFinished);
+    connect(d->session, &QnMjpegSession::finalTimestampChanged,     this,   &QnMjpegPlayer::finalTimestampChanged);
+    connect(this,       &QnMjpegPlayer::positionChanged,            this,   &QnMjpegPlayer::timestampChanged);
 }
 
 QnMjpegPlayer::~QnMjpegPlayer() {
@@ -190,6 +191,16 @@ qint64 QnMjpegPlayer::timestamp() const {
     return d->timestamp;
 }
 
+qint64 QnMjpegPlayer::finalTimestamp() const {
+    Q_D(const QnMjpegPlayer);
+    return d->session->finalTimestampMs();
+}
+
+void QnMjpegPlayer::setFinalTimestamp(qint64 finalTimestamp) {
+    Q_D(QnMjpegPlayer);
+    d->session->setFinalTimestampMs(finalTimestamp);
+}
+
 bool QnMjpegPlayer::reconnectOnPlay() const {
     Q_D(const QnMjpegPlayer);
 
@@ -232,9 +243,12 @@ void QnMjpegPlayer::pause() {
 
     if (d->reconnectOnPlay) {
         d->session->stop();
-        d->position = 0;
-        d->timestamp = invalidTimestamp;
-        emit positionChanged();
+
+        if (d->position != 0) {
+            d->position = 0;
+            d->timestamp = invalidTimestamp;
+            emit positionChanged();
+        }
     }
 }
 
@@ -244,10 +258,11 @@ void QnMjpegPlayer::stop() {
     d->session->stop();
     d->setState(Stopped);
 
-    d->position = 0;
-    d->timestamp = invalidTimestamp;
-
-    emit positionChanged();
+    if (d->position != 0) {
+        d->position = 0;
+        d->timestamp = invalidTimestamp;
+        emit positionChanged();
+    }
 }
 
 void QnMjpegPlayer::setSource(const QUrl &url) {
@@ -259,6 +274,13 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     d->waitingForFrame = true;
     d->session->setUrl(url);
     d->session->stop();
+
+    if (d->position != 0) {
+        d->position = 0;
+        d->timestamp = invalidTimestamp;
+        emit positionChanged();
+    }
+
     d->session->start();
 }
 

@@ -75,11 +75,6 @@ public:
     bool bookmarksModeEnabled() const;
     void setBookmarksModeEnabled(bool bookmarksModeEnabled);
 
-    QnSearchLineEdit *bookmarksSearchWidget() const;
-    void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
-
-    QnSearchQueryStrategy *bookmarksSearchStrategy() const;
-
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
     bool isLiveSupported() const;
@@ -223,7 +218,6 @@ private:
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
-    void updateBookmarkTags();
 
     void resetCurrentBookmarkQuery();
 
@@ -238,8 +232,6 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
-    QnSearchLineEdit *m_bookmarksSearchWidget;
-    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;

@@ -298,13 +298,6 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     return true;
 }
 
-CameraMediaStreams QnPhysicalCameraResource::mediaStreams() const
-{
-    const QString& mediaStreamsStr = getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
-    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
-    return supportedMediaStreams;
-}
-
 void QnPhysicalCameraResource::saveResolutionList( const CameraMediaStreams& supportedNativeStreams )
 {
     static const char* RTSP_TRANSPORT_NAME = "rtsp";
@@ -454,6 +447,13 @@ int QnVirtualCameraResource::issuesTimeoutMs() {
     return ISSUE_KEEP_TIMEOUT_MS;
 }
 
+CameraMediaStreams QnVirtualCameraResource::mediaStreams() const
+{
+    const QString& mediaStreamsStr = getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME);
+    CameraMediaStreams supportedMediaStreams = QJson::deserialized<CameraMediaStreams>(mediaStreamsStr.toLatin1());
+    return supportedMediaStreams;
+}
+
 const QLatin1String CameraMediaStreamInfo::anyResolution( "*" );
 
 QString CameraMediaStreamInfo::resolutionToString( const QSize& resolution )
@@ -477,6 +477,15 @@ bool CameraMediaStreamInfo::operator==( const CameraMediaStreamInfo& rhs ) const
 bool CameraMediaStreamInfo::operator!=( const CameraMediaStreamInfo& rhs ) const
 {
     return !( *this == rhs );
+}
+
+QSize CameraMediaStreamInfo::getResolution() const
+{
+    QStringList tmp = resolution.split(L'x');
+    if (tmp.size() == 2)
+        return QSize(tmp[0].toInt(), tmp[1].toInt());
+    else
+        return QSize();
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \

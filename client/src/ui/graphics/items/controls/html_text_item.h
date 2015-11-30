@@ -34,13 +34,17 @@ class QnHtmlTextItem : public QGraphicsWidget {
 
     typedef QGraphicsWidget base_type;
 public:
-    QnHtmlTextItem(const QString &html
+    QnHtmlTextItem(const QString &html = QString()
         , const QnHtmlTextItemOptions &options = QnHtmlTextItemOptions()
         , QGraphicsItem *parent = nullptr);
 
     ~QnHtmlTextItem();
 
+    QString html() const;
     void setHtml(const QString &html);
+
+    QnHtmlTextItemOptions options() const;
+    void setOptions(const QnHtmlTextItemOptions &options);
 
 private:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

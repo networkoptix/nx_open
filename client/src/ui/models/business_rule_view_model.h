@@ -156,7 +156,7 @@ private:
     IDList  m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
-    int m_aggregationPeriod;
+    int m_aggregationPeriodSec;
     bool m_disabled;
     QString m_comments;
     QString m_schedule;

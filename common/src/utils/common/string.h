@@ -61,11 +61,11 @@ qint64 parseDateTime( const QString& dateTime );
 /**
  * \param size                          File size to format. Can be negative.
  * \param precision                     Maximal number of decimal digits after comma.
- * \param prefixThreshold               
+ * \param prefixThreshold
  * \param minPrefix
  * \param maxPrefix
  * \param useBinaryPrefixes
- * \param pattern                       Pattern to use for result construction. 
+ * \param pattern                       Pattern to use for result construction.
  *                                      <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
  */
 QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString &pattern = QLatin1String("%1 %2"));
@@ -92,6 +92,11 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
 QString htmlBold(const QString &source);
+QString htmlFormattedParagraph(const QString &text
+    , int pixelSize
+    , bool isBold = false
+    , bool isItalic = false);
+
 
 QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
 

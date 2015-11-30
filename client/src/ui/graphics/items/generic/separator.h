@@ -1,37 +1,47 @@
 
 #pragma once
 
-#include <ui/graphics/items/generic/framed_widget.h>
+#include <QVector>
+#include <QtWidgets/QGraphicsWidget>
 
-class QnSeparator : public QnFramedWidget
+struct SeparatorAreaProperties
+{
+    qreal width;
+    QColor color;
+
+    SeparatorAreaProperties();
+
+    SeparatorAreaProperties(qreal width
+        , const QColor &color);
+};
+typedef QVector<SeparatorAreaProperties> SeparatorAreas;
+
+class QnSeparator : public QGraphicsWidget
 {
     Q_OBJECT
 
-    Q_PROPERTY(qreal lineWidth READ lineWidth WRITE setLineWidth)
-    Q_PROPERTY(QColor lineColor READ lineColor WRITE setLineColor)
-
 public:
-    QnSeparator(QGraphicsItem *parent = nullptr);
+    QnSeparator(qreal width
+        , const QColor &color
+        , QGraphicsItem *parent = nullptr);
 
-    QnSeparator(const QColor &color
+    QnSeparator(const SeparatorAreas &areas
         , QGraphicsItem *parent = nullptr);
 
     virtual ~QnSeparator();
 
-public:
-    qreal lineWidth() const;
-
-    void setLineWidth(qreal lineWidth
-        , bool changeHeight = false);
-
-    QColor lineColor() const;
-
-    void setLineColor(const QColor &color);
-
 private:
     void init();
 
-    void updateLinePos();
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
-    QSizeF m_lastSize;
+private:
+    typedef QPair<QColor, QRectF> SeparatorRectProps;
+    typedef QVector<SeparatorRectProps> SeparatorRectPropsVector;
+
+    void updatePixmap();
+
+private:
+    const SeparatorAreas m_areas;
+    QPixmap m_pixmap;
 };
