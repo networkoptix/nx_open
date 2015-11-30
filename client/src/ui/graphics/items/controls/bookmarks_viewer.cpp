@@ -217,7 +217,7 @@ namespace
         font.setPixelSize(kFontPixelSize);
         font.setBold(true);
         label->setFont(font);
-        label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        label->setAlignment(Qt::AlignCenter);
 
         setPaletteColor(label, QPalette::Background, Qt::transparent);
         setPaletteColor(label, QPalette::WindowText, colors.moreItemsText);
@@ -292,8 +292,8 @@ namespace
 
         if (showMoreTooltip)
         {
-            const auto message = lit("%1\n%2").arg(tr("Zoom timeline"), tr("to view more bookmarks"));
-            insertMoreItemsMessage(message, colors, m_mainLayout, this);
+            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks");
+            insertMoreItemsMessage(kMoreItemsCaption, colors, m_mainLayout, this);
         }
     }
 
