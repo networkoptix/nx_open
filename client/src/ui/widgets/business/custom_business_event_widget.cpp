@@ -24,10 +24,12 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
     const QString description = tr("Rule will work only for Generic Events that passes all filters. Empty fields don't affect the result. Each filter passes if any of keyword is matched.");
-    const QString link = tr("To generate Generic Event, please refer to <a href=\"api\">Server API</a>.");
+    const QString linkText = tr("Server API");
+    const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
+    const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);
 
     ui->hintLabel->setTextFormat(Qt::RichText);
-    ui->hintLabel->setText(lit("%1\n%2").arg(description, link));
+    ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
     connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this, [this] {
         auto server = qnCommon->currentServer();
         if (!server)
