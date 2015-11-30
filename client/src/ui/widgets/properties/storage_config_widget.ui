@@ -16,7 +16,7 @@
      <property name="title">
       <string>Main Storages</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -87,7 +87,7 @@
      <property name="title">
       <string>Backup Storages</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
