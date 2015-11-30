@@ -71,6 +71,8 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver()
+:
+    m_stunClient(nullptr)
 {
 }
 
