@@ -59,6 +59,8 @@ Item {
             property real prevY
 
             onPressed: {
+                propagateComposedEvents = (mouse.y < height - timeline.height)
+
                 if (drag.target)
                     prevY = drag.target.y
             }
@@ -90,7 +92,7 @@ Item {
                 height: sourceSize.height
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: timeline.chunkBarHeight
-                sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
+                sourceSize.height: dp(150) - timeline.chunkBarHeight
                 source: "qrc:///images/timeline_gradient.png"
             }
 
@@ -101,7 +103,7 @@ Item {
 
                 anchors.bottom: parent.bottom
                 width: parent.width
-                height: dp(150)
+                height: dp(104)
 
                 stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
@@ -346,7 +348,8 @@ Item {
             QnPlaybackController {
                 id: playbackController
 
-                anchors.verticalCenter: timeline.top
+                anchors.verticalCenter: timeline.bottom
+                anchors.verticalCenterOffset: -dp(150)
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)
