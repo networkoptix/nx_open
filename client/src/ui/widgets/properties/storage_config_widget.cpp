@@ -102,6 +102,9 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->comboBoxBackupType->addItem(tr("In realtime"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On demand"), Qn::Backup_Manual);
 
+    setWarningStyle(ui->storagesWarningLabel);
+    ui->storagesWarningLabel->hide();
+
     setupGrid(ui->mainStoragesTable, true);
     setupGrid(ui->backupStoragesTable, false);
 
@@ -228,8 +231,6 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
 {
     tableView->setItemDelegate(new QnStorageTableItemDelegate(this));
-    setWarningStyle(ui->storagesWarningLabel);
-    ui->storagesWarningLabel->hide();
 
     QnStoragesPoolFilterModel* filterModel = new QnStoragesPoolFilterModel(isMainPool, this);
     filterModel->setSourceModel(m_model.data());
@@ -241,14 +242,7 @@ void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
     tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
     tableView->horizontalHeader()->setSectionResizeMode(QnStorageListModel::UrlColumn, QHeaderView::Stretch);
 
-
     connect(tableView,         &QTableView::clicked,               this,   &QnStorageConfigWidget::at_eventsGrid_clicked);
-    connect(filterModel, &QnStorageListModel::dataChanged, this,
-        [this](const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles) {
-            QN_UNUSED(topLeft, bottomRight);
-            if (!m_updating && roles.contains(Qt::CheckStateRole))
-                emit hasChangesChanged();
-    });
 
     tableView->setMouseTracking(true);
 }
@@ -316,6 +310,10 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
             m_model->removeStorage(record);
         updateColumnWidth();
         updateBackupWidgetsVisibility();
+    }
+    else if (index.column() == QnStorageListModel::CheckBoxColumn) {
+        if (index.data(Qt::CheckStateRole) == Qt::Unchecked && hasChanges())
+            ui->storagesWarningLabel->show();
     }
 
     emit hasChangesChanged();
@@ -449,6 +447,7 @@ void QnStorageConfigWidget::applyChanges()
         });
     }
 
+    ui->storagesWarningLabel->hide();
     emit hasChangesChanged();
 }
 
