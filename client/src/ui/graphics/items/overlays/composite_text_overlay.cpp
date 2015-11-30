@@ -199,7 +199,6 @@ void QnCompositeTextOverlay::initTextMode()
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
     {
-        //qDebug() << "---new action" << businessAction->actionType() << ":" 
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
@@ -220,14 +219,10 @@ void QnCompositeTextOverlay::initTextMode()
 
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            //qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
-
-        //qDebug() << "Added: " << actionId << ":" << isInstantAction
-        //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum
         {
@@ -248,12 +243,17 @@ void QnCompositeTextOverlay::initTextMode()
             const auto desciption = elideString(
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
+            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  /// Do not add empty text items
+                return; 
+
             static const auto kComplexHtml = lit("%1%2");
             text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)
                 , htmlFormattedParagraph(desciption, kDescriptionPixelFontSize));
         }
         else
         {
+            if (text.trimmed().isEmpty()) /// Do not add empty text items
+                return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
             const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
             text = kTextHtml.arg(htmlFormattedParagraph(elided, 13));
@@ -431,6 +431,9 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
             kCaptionPixelSize = 16
             , kDescriptionPixeSize = 12
         };
+
+        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+            continue;
 
         const auto bookmarkHtml = kBookTemplate.arg(
             htmlFormattedParagraph(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
