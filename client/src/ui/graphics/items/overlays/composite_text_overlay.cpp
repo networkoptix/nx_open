@@ -128,9 +128,33 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
     , const QnUuid &id)
 {
     auto &currentData = m_data[mode];
-    const auto it = findModeData(mode, id);
+    auto it = findModeData(mode, id);
     if (it == currentData.end())
         return;
+
+    enum { kMinDataLifetimeMs = 5000 };
+
+    /// Do not remove data too fast (for short prolonged actions, for instance)
+    const auto dataTimestamp = it->first;
+    const auto currentLifetime = (m_counter.elapsed() - dataTimestamp);
+    if (currentLifetime < kMinDataLifetimeMs)
+    {
+        auto &dataToBeUpdated = it->second;
+        if (m_currentMode == mode)
+        {
+            /// Sets timeout to remove item automatically
+            dataToBeUpdated.timeout = (kMinDataLifetimeMs - currentLifetime);
+            addItem(dataToBeUpdated);   /// replaces existing data
+        }
+        else
+        {
+            /// do not change timestamp, but set timeout to be sure
+            /// we delete item on next mode switch
+            dataToBeUpdated.timeout = kMinDataLifetimeMs;
+        }
+
+        return;
+    }
 
     currentData.erase(it);
 

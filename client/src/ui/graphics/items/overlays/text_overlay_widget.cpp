@@ -1,5 +1,6 @@
 #include "text_overlay_widget.h"
 
+#include <QTimer>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <core/resource/camera_bookmark.h>
@@ -46,7 +47,8 @@ public:
     void addItem(const QnOverlayTextItemData &data
         , bool updatePos);
 
-    void removeItem(const QnUuid &id);
+    void removeItem(const QnUuid &id
+        , bool updatePos);
 
     void setItems(const QnOverlayTextItemDataList &data);
 
@@ -54,13 +56,17 @@ private:
     void updatePositions();
 
 private:
+    typedef QSharedPointer<QnHtmlTextItem> QnHtmlTextItemPtr;
+    typedef QPair<QnOverlayTextItemData, QnHtmlTextItemPtr> DataWidgetPair;
+    typedef QHash<QnUuid, QTimer *> DelayedRemoveTimers;
+
     QGraphicsWidget * const m_contentWidget;
     QnGraphicsScrollArea * const m_scrollArea;
     QGraphicsLinearLayout * const m_mainLayout;
 
-    typedef QSharedPointer<QnHtmlTextItem> QnHtmlTextItemPtr;
-    typedef QPair<QnOverlayTextItemData, QnHtmlTextItemPtr> DataWidgetPair;
     QHash<QnUuid, DataWidgetPair> m_items;
+    DelayedRemoveTimers m_delayedRemoveTimers;
+    
 };
 
 
@@ -69,6 +75,9 @@ QnTextOverlayWidgetPrivate::QnTextOverlayWidgetPrivate(QnTextOverlayWidget *pare
     , m_contentWidget(new QGraphicsWidget(parent))
     , m_scrollArea(new QnGraphicsScrollArea(parent))
     , m_mainLayout(new QGraphicsLinearLayout(Qt::Horizontal))
+
+    , m_items()
+    , m_delayedRemoveTimers()
 {
     m_scrollArea->setContentWidget(m_contentWidget);
     m_scrollArea->setMinimumWidth(maximumBookmarkWidth);
@@ -77,7 +86,9 @@ QnTextOverlayWidgetPrivate::QnTextOverlayWidgetPrivate(QnTextOverlayWidget *pare
 
     m_mainLayout->addStretch();
     m_mainLayout->addItem(m_scrollArea);
-    m_mainLayout->setContentsMargins(0, 0, 0, 0);
+    
+    enum { kMarginValue = 2 };
+    m_mainLayout->setContentsMargins(0, 0, kMarginValue, kMarginValue);
 }
 
 QnTextOverlayWidgetPrivate::~QnTextOverlayWidgetPrivate()
@@ -95,41 +106,44 @@ void QnTextOverlayWidgetPrivate::addItem(const QnOverlayTextItemData &data
     , bool updatePos)
 {
     const auto id = data.id;
-    auto it = m_items.find(data.id);
-    if (it == m_items.end())
-    {
-        const QnHtmlTextItemPtr textItem = QnHtmlTextItemPtr(new QnHtmlTextItem(data.text
-            , data.itemOptions, m_contentWidget));
 
-        it = m_items.insert(data.id
-            , DataWidgetPair(data, textItem));
-    }
-    else
-    {
-        it->first = data;
-        it->second->setHtml(data.text);
-    }
+    removeItem(id, false);  /// In case of update we should remove data (and cancel timer event, if any)
+    const QnHtmlTextItemPtr textItem = QnHtmlTextItemPtr(new QnHtmlTextItem(data.text
+        , data.itemOptions, m_contentWidget));
+
+    m_items.insert(data.id, DataWidgetPair(data, textItem));
 
     if (data.timeout > 0)
     {
         Q_Q(QnTextOverlayWidget);
         const auto removeItemFunc = [this, id]()
         {
-            removeItem(id);
+            removeItem(id, true);
         };
 
-        executeDelayedParented(removeItemFunc, data.timeout, q);
+        m_delayedRemoveTimers.insert(id, executeDelayedParented(removeItemFunc, data.timeout, q));
     }
     if (updatePos)
         updatePositions();
 }
 
-void QnTextOverlayWidgetPrivate::removeItem(const QnUuid &id)
+void QnTextOverlayWidgetPrivate::removeItem(const QnUuid &id
+    , bool updatePos)
 {
+    const auto itTimer = m_delayedRemoveTimers.find(id);
+    if (itTimer != m_delayedRemoveTimers.end())
+    {
+        const auto timer = itTimer.value();
+        timer->stop();
+        timer->deleteLater();
+        m_delayedRemoveTimers.erase(itTimer);
+    }
+
     if (!m_items.remove(id))
         return;
 
-    updatePositions();
+    if (updatePos)
+        updatePositions();
 }
 
 void QnTextOverlayWidgetPrivate::setItems(const QnOverlayTextItemDataList &data)
@@ -190,7 +204,7 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
     enum
     {
         kDefaultHorMargin = 0
-        , kDefaultBottomMargin = 34
+        , kDefaultBottomMargin = 35
         , kDefaultTopMargin = 28
     };
 
@@ -217,7 +231,7 @@ void QnTextOverlayWidget::addItem(const QnOverlayTextItemData &data)
 void QnTextOverlayWidget::removeItem(const QnUuid &id)
 {
     Q_D(QnTextOverlayWidget);
-    d->removeItem(id);
+    d->removeItem(id, true);
 }
 
 void QnTextOverlayWidget::setItems(const QnOverlayTextItemDataList &data)
