@@ -230,6 +230,7 @@ namespace
     typedef std::function<void (const QnCameraBookmark &bookmark
         , int eventId)> EmitBookmarkEventFunc;
 
+    /// TODO: #ynikitenkov Move to separate file (for signals etc)
     class BookmarkToolTipFrame : public QnToolTipWidget
     {
         Q_DECLARE_TR_FUNCTIONS(BookmarkToolTipFrame)
@@ -246,15 +247,17 @@ namespace
         void setPosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
     private:
+        QGraphicsLinearLayout *createButtonsLayout(const QnCameraBookmark &bookmark);
+
         QGraphicsLinearLayout *createBookmarksLayout(const QnCameraBookmark &bookmark
             , const QnBookmarkColors &colors
-            , const EmitBookmarkEventFunc &emitBookmarkEvent
             , QnBookmarksViewer *viewer);
 
         QGraphicsLinearLayout *createLeftCountLayout(int bookmarksLeft
             , const QnBookmarkColors &colors);
 
     private:
+        const EmitBookmarkEventFunc m_emitBookmarkEvent;
         QGraphicsLinearLayout *m_mainLayout;
     };
 
@@ -266,6 +269,7 @@ namespace
 
         : QnToolTipWidget(parent)
 
+        , m_emitBookmarkEvent(emitBookmarkEvent)
         , m_mainLayout(new QGraphicsLinearLayout(Qt::Vertical))
     {   
         setMaximumWidth(kBookmarkFrameWidth);
@@ -286,7 +290,7 @@ namespace
                 insertBookmarksSeparator(kTopPositionIndex, colors, this, m_mainLayout);
 
             m_mainLayout->insertItem(kTopPositionIndex
-                , createBookmarksLayout(bookmark, colors, emitBookmarkEvent, parent));
+                , createBookmarksLayout(bookmark, colors, parent));
             addSeparator = true;
         }
 
@@ -315,20 +319,17 @@ namespace
     }
 
 
-    QGraphicsLinearLayout *createButtonsLayout(
-        const QnCameraBookmark &bookmark
-        , const EmitBookmarkEventFunc &emitBookmarkEvent
-        , QGraphicsItem *parent)
+    QGraphicsLinearLayout *BookmarkToolTipFrame::createButtonsLayout(const QnCameraBookmark &bookmark)
     {
         auto buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
         buttonsLayout->setSpacing(0);
 
         const auto createButton = 
-            [parent, emitBookmarkEvent, bookmark](const char *iconName , int eventId)
+            [this, bookmark](const char *iconName , int eventId)
         {
             enum { kSize = 30 };
 
-            auto button = new QnImageButtonWidget(parent);
+            auto button = new QnImageButtonWidget(this);
             button->setIcon(qnSkin->icon(iconName));
             button->setClickableButtons(Qt::LeftButton);
             button->setMaximumSize(kSize, kSize);
@@ -338,10 +339,7 @@ namespace
             button->setAnimationSpeed(kAnimationInstantSpeed);    // For instant hover state change
 
             QObject::connect(button, &QnImageButtonWidget::clicked, button
-                , [emitBookmarkEvent, eventId, bookmark]()
-            {
-                emitBookmarkEvent(bookmark, eventId);
-            });
+                , [this, eventId, bookmark]() { m_emitBookmarkEvent(bookmark, eventId); });
 
             return button;
         };
@@ -360,7 +358,6 @@ namespace
 
     QGraphicsLinearLayout *BookmarkToolTipFrame::createBookmarksLayout(const QnCameraBookmark &bookmark
         , const QnBookmarkColors &colors
-        , const EmitBookmarkEventFunc &emitBookmarkEvent
         , QnBookmarksViewer *viewer)
     {
         const auto layout = createVertLayout(kBaseHorizontalMargins, kBaseTopMargin, kBaseBottomMargin);
@@ -394,7 +391,7 @@ namespace
             insertButtonsSeparator(colors.buttonsSeparator, position, this, bookmarkItemsLayout);
 
         layout->addItem(bookmarkItemsLayout);
-        layout->addItem(createButtonsLayout(bookmark, emitBookmarkEvent, this));
+        layout->addItem(createButtonsLayout(bookmark));
         return layout;
     }
 
