@@ -512,9 +512,11 @@ void QnStorageConfigWidget::cancelBackup() {
 void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
     auto scheduleDialog = new QnBackupScheduleDialog(this);
     scheduleDialog->updateFromSettings(m_backupSchedule);
-    if (scheduleDialog->exec())
-        if (!isReadOnly())
-            scheduleDialog->submitToSettings(m_backupSchedule);
+    if (!scheduleDialog->exec() || isReadOnly())
+        return;
+
+    scheduleDialog->submitToSettings(m_backupSchedule);
+    emit hasChangesChanged();
 }
 
 bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QString *info) {
