@@ -38,7 +38,7 @@ written by
    Yunhong Gu, last updated 01/27/2011
 *****************************************************************************/
 
-#ifndef WIN32
+#ifndef _WIN32
    #include <netdb.h>
    #include <arpa/inet.h>
    #include <unistd.h>
@@ -56,11 +56,11 @@ written by
 #include "channel.h"
 #include "packet.h"
 
-#ifdef WIN32
+#ifdef _WIN32
    #define socklen_t int
 #endif
 
-#ifndef WIN32
+#ifndef _WIN32
    #define NET_ERROR errno
 #else
    #define NET_ERROR WSAGetLastError()
@@ -94,7 +94,7 @@ void CChannel::open(const sockaddr* addr)
    // construct an socket
    m_iSocket = ::socket(m_iIPversion, SOCK_DGRAM, 0);
 
-   #ifdef WIN32
+   #ifdef _WIN32
       if (INVALID_SOCKET == m_iSocket)
    #else
       if (m_iSocket < 0)
@@ -170,7 +170,7 @@ void CChannel::setUDPSockOpt()
       int opts = ::fcntl(m_iSocket, F_GETFL);
       if (-1 == ::fcntl(m_iSocket, F_SETFL, opts | O_NONBLOCK))
          throw CUDTException(1, 3, NET_ERROR);
-   #elif WIN32
+   #elif _WIN32
       DWORD ot = 1; //milliseconds
       if (0 != ::setsockopt(m_iSocket, SOL_SOCKET, SO_RCVTIMEO, (char *)&ot, sizeof(DWORD)))
          throw CUDTException(1, 3, NET_ERROR);
@@ -183,7 +183,7 @@ void CChannel::setUDPSockOpt()
 
 void CChannel::close() const
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       ::close(m_iSocket);
    #else
       ::closesocket(m_iSocket);
@@ -243,7 +243,7 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
       ++ p;
    }
 
-   #ifndef WIN32
+   #ifndef _WIN32
       msghdr mh;
       mh.msg_name = (sockaddr*)addr;
       mh.msg_namelen = m_iSockAddrSize;
@@ -282,7 +282,7 @@ int CChannel::sendto(const sockaddr* addr, CPacket& packet) const
 
 int CChannel::recvfrom(sockaddr* addr, CPacket& packet) const
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       msghdr mh;   
       mh.msg_name = addr;
       mh.msg_namelen = m_iSockAddrSize;

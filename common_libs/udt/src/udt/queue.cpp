@@ -38,7 +38,7 @@ written by
    Yunhong Gu, last updated 05/05/2011
 *****************************************************************************/
 
-#ifdef WIN32
+#ifdef _WIN32
    #include <winsock2.h>
    #include <ws2tcpip.h>
    #ifdef LEGACY_WIN32
@@ -234,7 +234,7 @@ m_pTimer(NULL)
 {
    m_pHeap = new CSNode*[m_iArrayLength];
 
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_init(&m_ListLock, NULL);
    #else
       m_ListLock = CreateMutex(NULL, false, NULL);
@@ -245,7 +245,7 @@ CSndUList::~CSndUList()
 {
    delete [] m_pHeap;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_destroy(&m_ListLock);
    #else
       CloseHandle(m_ListLock);
@@ -390,7 +390,7 @@ void CSndUList::insert_(int64_t ts, const CUDT* u)
    // first entry, activate the sending queue
    if (0 == m_iLastEntry)
    {
-      #ifndef WIN32
+      #ifndef _WIN32
          pthread_mutex_lock(m_pWindowLock);
          pthread_cond_signal(m_pWindowCond);
          pthread_mutex_unlock(m_pWindowLock);
@@ -452,7 +452,7 @@ m_WindowCond(),
 m_bClosing(false),
 m_ExitCond()
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_cond_init(&m_WindowCond, NULL);
       pthread_mutex_init(&m_WindowLock, NULL);
    #else
@@ -466,7 +466,7 @@ CSndQueue::~CSndQueue()
 {
    m_bClosing = true;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_lock(&m_WindowLock);
       pthread_cond_signal(&m_WindowCond);
       pthread_mutex_unlock(&m_WindowLock);
@@ -496,7 +496,7 @@ void CSndQueue::init(CChannel* c, CTimer* t)
    m_pSndUList->m_pWindowCond = &m_WindowCond;
    m_pSndUList->m_pTimer = m_pTimer;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       if (0 != pthread_create(&m_WorkerThread, NULL, CSndQueue::worker, this))
       {
          m_WorkerThread = 0;
@@ -510,7 +510,7 @@ void CSndQueue::init(CChannel* c, CTimer* t)
    #endif
 }
 
-#ifndef WIN32
+#ifndef _WIN32
    void* CSndQueue::worker(void* param)
 #else
    DWORD WINAPI CSndQueue::worker(LPVOID param)
@@ -541,7 +541,7 @@ void CSndQueue::init(CChannel* c, CTimer* t)
       else
       {
          // wait here if there is no sockets with data to be sent
-         #ifndef WIN32
+         #ifndef _WIN32
             pthread_mutex_lock(&self->m_WindowLock);
             if (!self->m_bClosing && (self->m_pSndUList->m_iLastEntry < 0))
                pthread_cond_wait(&self->m_WindowCond, &self->m_WindowLock);
@@ -552,7 +552,7 @@ void CSndQueue::init(CChannel* c, CTimer* t)
       }
    }
 
-   #ifndef WIN32
+   #ifndef _WIN32
       return NULL;
    #else
       SetEvent(self->m_ExitCond);
@@ -751,7 +751,7 @@ CRendezvousQueue::CRendezvousQueue():
 m_lRendezvousID(),
 m_RIDVectorLock()
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_init(&m_RIDVectorLock, NULL);
    #else
       m_RIDVectorLock = CreateMutex(NULL, false, NULL);
@@ -760,7 +760,7 @@ m_RIDVectorLock()
 
 CRendezvousQueue::~CRendezvousQueue()
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_destroy(&m_RIDVectorLock);
    #else
       CloseHandle(m_RIDVectorLock);
@@ -884,7 +884,7 @@ m_mBuffer(),
 m_PassLock(),
 m_PassCond()
 {
-   #ifndef WIN32
+   #ifndef _WIN32
       pthread_mutex_init(&m_PassLock, NULL);
       pthread_cond_init(&m_PassCond, NULL);
       pthread_mutex_init(&m_LSLock, NULL);
@@ -902,7 +902,7 @@ CRcvQueue::~CRcvQueue()
 {
    m_bClosing = true;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       if (0 != m_WorkerThread)
          pthread_join(m_WorkerThread, NULL);
       pthread_mutex_destroy(&m_PassLock);
@@ -952,7 +952,7 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
    m_pRcvUList = new CRcvUList;
    m_pRendezvousQueue = new CRendezvousQueue;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       if (0 != pthread_create(&m_WorkerThread, NULL, CRcvQueue::worker, this))
       {
          m_WorkerThread = 0;
@@ -966,7 +966,7 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
    #endif
 }
 
-#ifndef WIN32
+#ifndef _WIN32
    void* CRcvQueue::worker(void* param)
 #else
    DWORD WINAPI CRcvQueue::worker(LPVOID param)
@@ -1104,7 +1104,7 @@ TIMER_CHECK:
    else
       delete (sockaddr_in6*)addr;
 
-   #ifndef WIN32
+   #ifndef _WIN32
       return NULL;
    #else
       SetEvent(self->m_ExitCond);
@@ -1120,7 +1120,7 @@ int CRcvQueue::recvfrom(int32_t id, CPacket& packet)
 
    if (i == m_mBuffer.end())
    {
-      #ifndef WIN32
+      #ifndef _WIN32
          uint64_t now = CTimer::getTime();
          timespec timeout;
 
@@ -1245,7 +1245,7 @@ void CRcvQueue::storePkt(int32_t id, CPacket* pkt)
    {
       m_mBuffer[id].push(pkt);
 
-      #ifndef WIN32
+      #ifndef _WIN32
          pthread_cond_signal(&m_PassCond);
       #else
          SetEvent(m_PassCond);

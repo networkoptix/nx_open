@@ -150,7 +150,7 @@ public:
       // Returned value:
       //    Pointer to the UDT entity.
 
-   CUDT* lookup(const UDTSOCKET u);
+   CUDT* lookup(const UDTSOCKET u) throw (CUDTException);
 
       // Functionality:
       //    Check the status of the UDT socket.
@@ -214,7 +214,7 @@ private:
 
 private:
    pthread_key_t m_TLSError;                         // thread local error record (last error)
-   #ifndef WIN32
+   #ifndef _WIN32
       static void TLSDestroy(void* e) {if (NULL != e) delete (CUDTException*)e;}
    #else
       std::map<DWORD, CUDTException*> m_mTLSRecord;
@@ -246,7 +246,7 @@ private:
    bool m_bGCStatus;					// if the GC thread is working (true)
 
    pthread_t m_GCThread;
-   #ifndef WIN32
+   #ifndef _WIN32
       static void* garbageCollect(void*);
    #else
       static DWORD WINAPI garbageCollect(LPVOID);
