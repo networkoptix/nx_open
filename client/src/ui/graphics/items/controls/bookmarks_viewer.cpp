@@ -138,7 +138,12 @@ namespace
 
         const auto tagsControl = new QnBookmarkTagsControl(tags, parent);
 
-        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked, viewer, &QnBookmarksViewer::tagClicked);
+        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
+            , viewer, [viewer](const QString &tag)
+        {
+            viewer->tagClicked(tag);
+            viewer->resetBookmarks();   /// Hides tooltip
+        });
         return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, paramsId);
     }
 

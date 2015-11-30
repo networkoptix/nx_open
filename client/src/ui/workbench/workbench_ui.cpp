@@ -2501,8 +2501,6 @@ void QnWorkbenchUi::createSliderWidget()
         params.setArgument(Qn::BookmarkTagRole, tag);
         params.setArgument(Qn::ItemSliderWindowRole, window);
         menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
-
-        bookmarksViewer->resetBookmarks();
     });
     
 }
