@@ -9,6 +9,12 @@
 #include "message_parser.h"
 #include "message_serializer.h"
 
+#ifdef _DEBUG
+    #include <map>
+#else
+    #include <unordered_map>
+#endif
+
 namespace nx {
 namespace stun {
 
