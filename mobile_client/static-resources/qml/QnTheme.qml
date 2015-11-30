@@ -31,6 +31,7 @@ QtObject {
     property color listText
     property color listSubText
     property color listSeparator
+    property color listDisabledText
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
@@ -112,6 +113,7 @@ QtObject {
         listText                = colorTheme.color("list.text")
         listSubText             = colorTheme.color("list.subText")
         listSeparator           = colorTheme.color("list.separator")
+        listDisabledText        = colorTheme.color("list.disabledText")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemBackgroundIncompatible = colorTheme.color("sessionItem.backgroundIncompatible")

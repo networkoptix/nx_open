@@ -29,7 +29,7 @@ Rectangle {
 
         Text {
             text: systemName
-            color: QnTheme.listText
+            color: isCompatible ? QnTheme.listText : QnTheme.listDisabledText
             font.pixelSize: sp(18)
             font.weight: Font.DemiBold
             height: dp(32)
@@ -40,7 +40,7 @@ Rectangle {
 
         Text {
             text: host + ":" + port
-            color: QnTheme.listSubText
+            color: isCompatible ? QnTheme.listSubText : QnTheme.listDisabledText
             font.pixelSize: sp(15)
             font.weight: Font.DemiBold
             height: dp(24)
