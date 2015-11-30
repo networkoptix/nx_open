@@ -20,6 +20,8 @@ QnPage {
 
     property string newConnectionLabel: qsTr("New Connection")
 
+    property var oldClientOfferDialog: oldClientOfferDialog
+
     title: newConnectionLabel
 
     property bool _authError: false
@@ -275,6 +277,10 @@ QnPage {
         onTriggered: loginWithCurrentFields()
     }
 
+    QnOldClientOfferDialog {
+        id: oldClientOfferDialog
+    }
+
     function connect() {
         loginPage.removeWarnings()
         connectButton.forceActiveFocus()
@@ -304,6 +310,9 @@ QnPage {
         else
             _serverError = true
         _showWarning = true
+
+        if (status == QnConnectionManager.InvalidVersion)
+            oldClientOfferDialog.show()
     }
 
     function removeWarnings() {

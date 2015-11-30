@@ -110,10 +110,12 @@
 
     "dialog" : {
         "background" :          "palette.contrast.color_11",
+        "clickBackground" :     "palette.contrast.color_7",
         "text" :                "palette.base.color_1",
         "titleText" :           "palette.base.color_1",
         "selectedBackground":   "window.accent",
-        "selectedText" :        "window.accentText"
+        "selectedText" :        "window.accentText",
+        "buttonSplitter" :      "palette.contrast.color_7"
     },
 
     "cameras" : {

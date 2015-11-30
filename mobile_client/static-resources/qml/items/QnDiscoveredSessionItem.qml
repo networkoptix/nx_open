@@ -18,8 +18,12 @@ Rectangle {
     radius: dp(2)
 
     QnMaterialSurface {
-        enabled: isCompatible
-        onClicked: Main.openDiscoveredSession(host, port, systemName)
+        onClicked: {
+            if (isCompatible)
+                Main.openDiscoveredSession(host, port, systemName)
+            else
+                oldClientOfferDialog.show()
+        }
     }
 
     Column {

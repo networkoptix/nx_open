@@ -171,3 +171,11 @@ bool QnAppInfo::freeLicenseIsTrial() {
 QString QnAppInfo::iosPlayButtonTint() {
     return QStringLiteral("${ios.playButton.tint}");
 }
+
+QString QnAppInfo::oldAndroidClientLink() {
+    return QStringLiteral("https://play.google.com/store/apps/details?id=${namespace.major}.${namespace.minor}.${namespace.additional}");
+}
+
+QString QnAppInfo::oldIosClientLink() {
+    return QStringLiteral("https://itunes.apple.com/ru/app/${ios.old_app_appstore_id}");
+}
