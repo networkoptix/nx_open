@@ -16,6 +16,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
+#include <utils/common/scoped_value_rollback.h>
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
     : base_type(parent)
@@ -24,6 +25,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
     , m_businessRulesCheckBoxes()
     , m_systemHealthCheckBoxes()
     , m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
+    , m_updating(false)
 {
     ui->setupUi(this);
 
@@ -70,6 +72,10 @@ QnPopupSettingsWidget::~QnPopupSettingsWidget()
 }
 
 void QnPopupSettingsWidget::loadDataToUi() {
+    if (m_updating)
+        return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     bool all = true;
 
     quint64 healthShown = qnSettings->popupSystemHealth();
@@ -106,6 +112,9 @@ void QnPopupSettingsWidget::loadDataToUi() {
 }
 
 void QnPopupSettingsWidget::applyChanges() {
+    Q_ASSERT_X(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     if (context()->user())
         m_adaptor->setWatchedEvents(watchedEvents());
     qnSettings->setPopupSystemHealth(watchedSystemHealth());
@@ -142,5 +151,6 @@ quint64 QnPopupSettingsWidget::watchedSystemHealth() const {
         }
         healthFlag = healthFlag << 1;
     }
+
     return result;
 }

@@ -37,4 +37,5 @@ private:
     QMap<QnBusiness::EventType, QCheckBox* > m_businessRulesCheckBoxes;
     QMap<QnSystemHealth::MessageType, QCheckBox* > m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
+    bool m_updating;
 };
