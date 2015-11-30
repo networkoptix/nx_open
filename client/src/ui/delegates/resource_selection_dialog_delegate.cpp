@@ -48,3 +48,7 @@ int QnResourceSelectionDialogDelegate::helpTopicId() const {
     return Qn::Forced_Empty_Help;
 }
 
+bool QnResourceSelectionDialogDelegate::isMultiChoiceAllowed() const {
+    return true;
+}
+

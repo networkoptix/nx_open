@@ -36,11 +36,10 @@ public:
         , m_sortOrder(Qt::DescendingOrder)
         , m_size(0)
     {
-        if (m_eventTypeToLexOrder.isEmpty() && m_actionTypeToLexOrder.isEmpty())
-            initStaticData();
+        initLexOrdering();
     }
 
-    void initStaticData()
+    void initLexOrdering()
     {
         // event types to lex order
         int maxType = 0;
@@ -112,7 +111,7 @@ public:
     /*
      * Reorder event types to lexicographical order (for sorting)
      */
-    static int toLexEventType(QnBusiness::EventType eventType)
+    int toLexEventType(QnBusiness::EventType eventType) const
     {
         return m_eventTypeToLexOrder[eventType];
     }
@@ -120,7 +119,7 @@ public:
     /*
      * Reorder actions types to lexicographical order (for sorting)
      */
-    static int toLexActionType(QnBusiness::ActionType actionType)
+    int toLexActionType(QnBusiness::ActionType actionType) const
     {
         return m_actionTypeToLexOrder[actionType];
     }
@@ -132,46 +131,35 @@ public:
 
     // comparators
 
-    typedef bool (*LessFunc)(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2);
-
-    static bool lessThanTimestamp(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
+    bool lessThanTimestamp(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
         return d1->eventParams.eventTimestampUsec < d2->eventParams.eventTimestampUsec;
     }
 
-    static bool lessThanEventType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
+    bool lessThanEventType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
-        int r1 = QnEventLogModel::DataIndex::toLexEventType(d1->eventParams.eventType);
-        int r2 = QnEventLogModel::DataIndex::toLexEventType(d2->eventParams.eventType);
-        if (r1 < r2)
-            return true;
-        else if (r1 > r2)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        int r1 = toLexEventType(d1->eventParams.eventType);
+        int r2 = toLexEventType(d2->eventParams.eventType);
+        if (r1 != r2)
+            return r1 < r2;
+        return lessThanTimestamp(d1, d2);
     }
 
-    static bool lessThanActionType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
+    bool lessThanActionType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
-        int r1 = QnEventLogModel::DataIndex::toLexActionType(d1->actionType);
-        int r2 = QnEventLogModel::DataIndex::toLexActionType(d2->actionType);
-        if (r1 < r2)
-            return true;
-        else if (r1 > r2)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        int r1 = toLexActionType(d1->actionType);
+        int r2 = toLexActionType(d2->actionType);
+        if (r1 != r2)
+            return r1 < r2;
+        return lessThanTimestamp(d1, d2);
     }
 
-    static bool lessLexographic(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2)
+    bool lessLexicographically(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
         int rez = d1->compareString.compare(d2->compareString);
-        if (rez < 0)
-            return true;
-        else if (rez > 0)
-            return false;
-        else
-            return lessThanTimestamp(d1, d2);
+        if (rez != 0)
+            return rez < 0;
+        return lessThanTimestamp(d1, d2);
     }
 
     void updateIndex()
@@ -188,25 +176,31 @@ public:
                 *dst++ = &data[j];
         }
 
+        // typedef std::function<bool(const DataIndex * /*this*/, const QnLightBusinessActionP &, const QnLightBusinessActionP &)> LessFunc;
+        typedef bool (DataIndex::*LessFunc)(const QnLightBusinessActionP &, const QnLightBusinessActionP &) const;
+
         LessFunc lessThan;
-        switch(m_sortCol) {
+        switch (m_sortCol) {
         case DateTimeColumn:
-            lessThan = &lessThanTimestamp;
+            lessThan = &DataIndex::lessThanTimestamp;
             break;
         case EventColumn:
-            lessThan = &lessThanEventType;
+            lessThan = &DataIndex::lessThanEventType;
             break;
         case ActionColumn:
-            lessThan = &lessThanActionType;
+            lessThan = &DataIndex::lessThanActionType;
             break;
         default:
-            lessThan = &lessLexographic;
-            for (int i = 0; i < m_records.size(); ++i)
-                m_records[i]->compareString = m_parent->textData(m_sortCol, *m_records[i]);
+            lessThan = &DataIndex::lessLexicographically;
+            for (auto record: m_records)
+                record->compareString = m_parent->textData(m_sortCol, *record);
             break;
         }
 
-        qSort(m_records.begin(), m_records.end(), lessThan);
+        qSort(m_records.begin(), m_records.end(), [this, lessThan](const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) {
+            //return lessThan(this, d1, d2);
+            return (this->*lessThan)(d1, d2);
+        });
     }
 
 private:
@@ -216,13 +210,9 @@ private:
     QVector<QnBusinessActionDataListPtr> m_events;
     QVector<QnLightBusinessActionP> m_records;
     int m_size;
-    static QVector<int> m_eventTypeToLexOrder; // TODO: #Elric evil statics. Make non-static.
-    static QVector<int> m_actionTypeToLexOrder;
+    QVector<int> m_eventTypeToLexOrder;
+    QVector<int> m_actionTypeToLexOrder;
 };
-
-QVector<int> QnEventLogModel::DataIndex::m_eventTypeToLexOrder;
-QVector<int> QnEventLogModel::DataIndex::m_actionTypeToLexOrder;
-
 
 // -------------------------------------------------------------------------- //
 // QnEventLogModel

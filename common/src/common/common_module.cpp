@@ -46,7 +46,6 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     instance<QnServerAdditionalAddressesDictionary>();
 
     instance<QnResourcePool>();
-    instance<QnCameraHistoryPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();

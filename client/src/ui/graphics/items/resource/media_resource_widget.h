@@ -112,7 +112,7 @@ public:
 
     /**
      * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns NULL. 
+     * Note that this function never returns NULL.
      *
      * \returns                         PTZ controller associated with this widget.
      */
@@ -138,7 +138,8 @@ protected:
     virtual void channelScreenSizeChangedNotify() override;
     virtual void optionsChangedNotify(Options changedFlags) override;
 
-    virtual QString calculateInfoText() const override;
+    virtual QString calculateDetailsText() const override;
+    virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;

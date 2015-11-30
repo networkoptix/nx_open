@@ -161,13 +161,14 @@ qint64 QnAviArchiveDelegate::endTime() const
 
 QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
 {
-    if (stream->codec->codec_id == CODEC_ID_MJPEG)
-        return QnMediaContextPtr();
+    //if (stream->codec->codec_id == CODEC_ID_MJPEG)
+    //    return QnMediaContextPtr(new QnMediaContext(stream->codec));
 
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
+    if (m_contexts[stream->index] == 0 || 
+        m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
     {
 	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
     }

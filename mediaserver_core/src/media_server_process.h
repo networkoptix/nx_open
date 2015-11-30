@@ -22,6 +22,8 @@
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 
+#include "health/system_health.h"
+
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
@@ -61,7 +63,7 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
-    void at_storageManager_rebuildFinished(bool isCanceled);
+    void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code);
     void at_timer();
     void at_connectionOpened();

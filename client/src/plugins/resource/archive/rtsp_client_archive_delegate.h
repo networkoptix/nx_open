@@ -74,7 +74,7 @@ private:
     QnAbstractMediaDataPtr getNextDataInternal();
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
     void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
-    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera, bool forceReload);
+    void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
     void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
@@ -120,8 +120,7 @@ private:
         QnUuid videowall;
     } m_auth;
     
-    QSet<QnUuid> m_footageServers;
-    std::atomic<bool> m_footageDirty;
+    std::atomic_flag m_footageUpToDate;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

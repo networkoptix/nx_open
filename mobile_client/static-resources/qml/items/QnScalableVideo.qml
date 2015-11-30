@@ -13,10 +13,13 @@ QnZoomableFlickable {
 
     property real maxZoomFactor: 4
 
+    readonly property real sourceContentWidth: screenshot.visible ? screenshot.sourceSize.width : video.sourceRect.width
+    readonly property real sourceContentHeight: screenshot.visible ? screenshot.sourceSize.height : video.sourceRect.height
+
     minContentWidth: width
     minContentHeight: height
-    maxContentWidth: (screenshot.visible ? screenshot.sourceSize.width : video.sourceRect.width) * maxZoomFactor
-    maxContentHeight: (screenshot.visible ? screenshot.sourceSize.height : video.sourceRect.height) * maxZoomFactor
+    maxContentWidth: Math.max(content.rotated90 ? sourceContentHeight : sourceContentWidth, width) * maxZoomFactor
+    maxContentHeight: Math.max(content.rotated90 ? sourceContentWidth : sourceContentHeight, height) * maxZoomFactor
 
     clip: true
 

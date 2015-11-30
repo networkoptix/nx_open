@@ -16,6 +16,9 @@
 #include <ui/common/palette.h>
 
 namespace  {
+
+    enum { kUseContentMargins = -1};
+
     void addEdgeTo(qreal x, qreal y, const QPointF &tailPos, qreal tailWidth, bool useTail, QPainterPath *path) {
         if(!useTail) {
             path->lineTo(x, y);
@@ -88,6 +91,7 @@ QnToolTipWidget::QnToolTipWidget(QGraphicsItem *parent, Qt::WindowFlags windowFl
     base_type(parent, windowFlags),
     m_shapeValid(false),
     m_tailWidth(5.0),
+    m_roundingRadius(kUseContentMargins),
     m_autoSize(true)
 {}
 
@@ -200,6 +204,15 @@ QRectF QnToolTipWidget::boundingRect() const {
     return m_boundingRect;
 }
 
+void QnToolTipWidget::setRoundingRadius(qreal radius)
+{
+    if (qFuzzyEquals(m_roundingRadius, radius))
+        return;
+
+    m_roundingRadius = radius;
+    ensureShape();
+}
+
 void QnToolTipWidget::setGeometry(const QRectF &rect) {
     QSizeF oldSize = size();
 
@@ -240,8 +253,13 @@ void QnToolTipWidget::ensureShape() const {
     if(m_shapeValid)
         return;
 
-    qreal l, t, r, b;
-    getContentsMargins(&l, &t, &r, &b);
+    qreal l = m_roundingRadius;
+    qreal t = m_roundingRadius;
+    qreal r = m_roundingRadius;
+    qreal b = m_roundingRadius;
+
+    if (m_roundingRadius == kUseContentMargins)
+        getContentsMargins(&l, &t, &r, &b);
 
     Qn::Border tailBorder = this->tailBorder();
     QRectF rect = this->rect();

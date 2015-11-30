@@ -9,19 +9,26 @@
 #include "core/datapacket/media_data_packet.h"
 
 
+struct QnDlink_ProfileInfo
+{
+    QnDlink_ProfileInfo(): number(0) {}
+
+    int number;
+    QString url;
+    QByteArray codec;
+};
+
 struct QnDlink_cam_info
 {
     QnDlink_cam_info();
 
     void clear();
 
-    bool inited() const;
-
     // returns resolution with width not less than width
     QSize resolutionCloseTo(int width) const;
 
     // returns next up bitrate 
-    QString bitrateCloseTo(int val);
+    QByteArray bitrateCloseTo(int val);
 
     // returns next up frame rate 
     int frameRateCloseTo(int fr);
@@ -29,17 +36,14 @@ struct QnDlink_cam_info
     QSize primaryStreamResolution() const;
     QSize secondaryStreamResolution() const;
 
-    QString hasH264;// some cams have H.264, some H264
-    bool hasMPEG4;
-    bool hasFixedQuality;
-    int numberOfVideoProfiles;
-    QMap<int, QString> videoProfileUrls;
+    //QString hasH264;// some cams have H.264, some H264
+    //bool hasMPEG4;
     QList<QSize> resolutions;
 
-    QMap<int, QString> possibleBitrates;
+    QMap<int, QByteArray> possibleBitrates;
     QList<int> possibleFps;
-    QStringList possibleQualities;
-
+    QList<QByteArray> possibleQualities;
+    QVector<QnDlink_ProfileInfo> profiles;
 };
 
 class QnPlDlinkResource : public QnPhysicalCameraResource

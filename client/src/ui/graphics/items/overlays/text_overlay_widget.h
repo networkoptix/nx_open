@@ -31,7 +31,15 @@ QN_FUSION_DECLARE_FUNCTIONS(QnOverlayTextItemData, (eq));
 typedef QList<QnOverlayTextItemData> QnOverlayTextItemDataList;
 
 class QnTextOverlayWidgetPrivate;
-class QnTextOverlayWidget : public GraphicsWidget 
+
+/**
+ *  Container class, that displays QnHtmlTextItems on the scrollable area.
+ *  Supports items auto-removing by timeout.
+ */
+class QnTextOverlayWidget : public GraphicsWidget
+    //TODO: #GDM refactor to normal logic:
+    // * replace class with QnScrollableOverlayWidget
+    // * move 'remove-by-timeout' logic to controller class
 {
 public:
     QnTextOverlayWidget(QGraphicsWidget *parent = nullptr);

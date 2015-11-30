@@ -72,8 +72,11 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
             targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         }
 
-        if (!targetCameras.isEmpty())
-            openCamerasInAlarmLayout(targetCameras, businessAction->getParams().forced);
+        /* If forced, open layout instantly */
+        if (businessAction->getParams().forced)
+            openCamerasInAlarmLayout(targetCameras, true);
+        else if (alarmLayoutExists())
+            openCamerasInAlarmLayout(targetCameras, false);
     });
 
 }
@@ -82,6 +85,9 @@ QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler()
 {}
 
 void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCameraResourceList &cameras, bool switchToLayout ) {
+    if (cameras.isEmpty())
+        return;
+
     auto layout = findOrCreateAlarmLayout();
     if (!layout)
         return;
@@ -132,4 +138,16 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     }
 
     return workbenchAlarmLayout;
+}
+
+bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
+    if (!context()->user())
+        return false;
+
+    QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
+    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    if (layouts.empty())
+        return false;
+
+    return QnWorkbenchLayout::instance(QnLayoutResourcePtr(layouts.first())) != nullptr;
 }

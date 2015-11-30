@@ -45,6 +45,9 @@ signals:
     void serverRebuildArchiveFinished(const QnMediaServerResourcePtr &server, QnServerStoragesPool pool);
     void serverBackupFinished(const QnMediaServerResourcePtr &server);
 
+    void storageAdded(const QnStorageResourcePtr &storage);
+    void storageChanged(const QnStorageResourcePtr &storage);
+    void storageRemoved(const QnStorageResourcePtr &storage);
 private:
     bool isServerValid(const QnMediaServerResourcePtr &server) const;
 
