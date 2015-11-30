@@ -140,7 +140,7 @@ private:
     };
     QnStorageManager* m_owner;
     QQueue<ScanData> m_scanTasks;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_waitCond;
     bool m_fullScanCanceled;
 
@@ -154,8 +154,9 @@ public:
         stop();
     }
 
-    bool hasFullScanTasksUnsafe() const
+    bool hasFullScanTasks() const
     {
+        QnMutexLocker lock(&m_mutex);
         for (const auto& task: m_scanTasks) {
             if (!task.partialScan)
                 return true;
@@ -211,10 +212,12 @@ public:
             {
                 {
                     QnMutexLocker lock(&m_mutex);
-                    m_scanTasks.erase(std::remove_if(m_scanTasks.begin(), m_scanTasks.end(), [](const ScanData& data) { return !data.partialScan; }));
+                    m_scanTasks.erase(std::remove_if(m_scanTasks.begin(), m_scanTasks.end(), [](const ScanData& data) { return !data.partialScan; }), m_scanTasks.end());
+                    ArchiveScanPosition::reset(m_owner->m_role);
                 }
                 m_fullScanCanceled = false;
                 fullscanProcessed = false;
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                 emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildCanceled);
             }
 
@@ -484,10 +487,9 @@ QnStorageScanData QnStorageManager::rebuildInfo() const
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
     QnStorageScanData result = rebuildInfo();
-    QnMutexLocker lock( &m_mutexRebuild );
-
-    if (!m_rebuildArchiveThread->hasFullScanTasksUnsafe())
+    if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
+        QnMutexLocker lock( &m_mutexRebuild );
         result = QnStorageScanData(Qn::RebuildState_FullScan, QString(), 0.0);
         m_rebuildCancelled = false;
         QVector<QnStorageResourcePtr> storagesToScan;

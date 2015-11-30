@@ -115,6 +115,10 @@
         <CustomAction Id="FindConfiguredStorages" BinaryKey="CustomActions.dll" DllEntry="FindConfiguredStorages"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>
 
+
+        <CustomAction Id="DeleteRegistryKeys_Cmd" Property="DeleteRegistryKeys" Value="$(var.ServerRegPath)" Execute="immediate" Impersonate="yes"/>
+        <CustomAction Id="DeleteRegistryKeys" BinaryKey="CustomActions.dll" DllEntry="DeleteRegistryKeys" Execute="deferred" Impersonate="no"/>
+
         <CustomAction Id="MissingFeature"  Error="At least one component should be selected"/>
 
         <CustomAction Id="FindFreePorts" BinaryKey="CustomActions.dll" DllEntry="FindFreePorts" />
@@ -226,7 +230,8 @@
 
             <Custom Action="DeleteDatabaseFile_Cmd" After="StopServices">REMOVE_DATABASE=1</Custom>
             <Custom Action="DeleteDatabaseFile" After="DeleteDatabaseFile_Cmd">REMOVE_DATABASE=1</Custom>
-
+            <Custom Action="DeleteRegistryKeys_Cmd" After="DeleteDatabaseFile">NOT $(var.VmsInstalling)</Custom>
+            <Custom Action="DeleteRegistryKeys" After="DeleteRegistryKeys_Cmd">NOT $(var.VmsInstalling)</Custom>
         </InstallExecuteSequence>
 
         <Media Id="1" Cabinet="media1.cab" EmbedCab="yes" />
