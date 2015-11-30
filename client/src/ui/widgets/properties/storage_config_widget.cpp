@@ -575,12 +575,17 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     using boost::algorithm::any_of;
 
-    bool shouldBeVisible = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
+    bool backupIsActive = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
         return info.isBackup;
     });
 
-    ui->backupStoragesGroupBox->setVisible(shouldBeVisible);
-    ui->backupControls->setVisible(shouldBeVisible);
+    bool backupIsPossible = any_of(m_model->storages(), [this](const QnStorageModelInfo &info) {
+        return m_model->canMoveStorage(info);
+    });
+
+    ui->backupStoragesGroupBox->setVisible(backupIsActive);
+    ui->backupControls->setVisible(backupIsActive);
+    ui->backupOptionLabel->setVisible(!backupIsPossible);
 }
 
 
