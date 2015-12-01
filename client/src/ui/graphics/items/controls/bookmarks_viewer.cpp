@@ -709,7 +709,7 @@ void QnBookmarksViewer::Impl::updateBookmarksImpl(QnCameraBookmarkList bookmarks
 
 bool QnBookmarksViewer::Impl::event(QEvent *event)
 {
-    const auto eventType = event->type();
+    const int eventType = event->type();
     switch(eventType)
     {
     case kBookmarksUpdateEventId: 
