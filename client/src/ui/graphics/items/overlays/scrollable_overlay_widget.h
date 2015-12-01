@@ -25,6 +25,18 @@ public:
     int overlayWidth() const;
     void setOverlayWidth(int width);
 
+    /**
+     * Maximum size of the parent widget that can be filled with this overlay.
+     * Counted in the fractions of the whole, e.g. fill coeff (0.5, 0.8) means
+     * that the overlay will take only half of the parent widget by width and
+     * 0.8 of the parent widget by height (on maximum).
+     */
+    QSizeF maxFillCoeff() const;
+    void setMaxFillCoeff(const QSizeF &coeff);
+
+protected:
+    virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
+
 private:
     Q_DECLARE_PRIVATE(QnScrollableOverlayWidget)
     QScopedPointer<QnScrollableOverlayWidgetPrivate> d_ptr;
