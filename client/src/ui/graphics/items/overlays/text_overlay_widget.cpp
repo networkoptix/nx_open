@@ -5,9 +5,11 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/graphics/items/generic/graphics_scroll_area.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
+
 #include <utils/common/delayed.h>
 #include <utils/common/model_functions.h>
-#include <ui/graphics/items/generic/graphics_scroll_area.h>
 
 namespace
 {
@@ -66,7 +68,7 @@ private:
 
     QHash<QnUuid, DataWidgetPair> m_items;
     DelayedRemoveTimers m_delayedRemoveTimers;
-    
+
 };
 
 
@@ -83,10 +85,13 @@ QnTextOverlayWidgetPrivate::QnTextOverlayWidgetPrivate(QnTextOverlayWidget *pare
     m_scrollArea->setMinimumWidth(maximumBookmarkWidth);
     m_scrollArea->setMaximumWidth(maximumBookmarkWidth);
     m_scrollArea->setAlignment(Qt::AlignBottom | Qt::AlignRight);
+    m_scrollArea->setProperty(Qn::NoBlockMotionSelection, true);
+
+    m_contentWidget->setProperty(Qn::NoBlockMotionSelection, true);
 
     m_mainLayout->addStretch();
     m_mainLayout->addItem(m_scrollArea);
-    
+
     enum { kMarginValue = 2 };
     m_mainLayout->setContentsMargins(0, 0, kMarginValue, kMarginValue);
 }
@@ -110,6 +115,7 @@ void QnTextOverlayWidgetPrivate::addItem(const QnOverlayTextItemData &data
     removeItem(id, false);  // In case of update we should remove data (and cancel timer event, if any)
     const QnHtmlTextItemPtr textItem = QnHtmlTextItemPtr(new QnHtmlTextItem(data.text
         , data.itemOptions, m_contentWidget));
+    textItem->setProperty(Qn::NoBlockMotionSelection, true);
 
     m_items.insert(data.id, DataWidgetPair(data, textItem));
 
