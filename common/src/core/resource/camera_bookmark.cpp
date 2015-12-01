@@ -152,7 +152,7 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
     for (const QnCameraBookmarkTagList &source: nonEmptyLists) {
         for (const auto &tag: source) {
             auto &currentCount = mergedTags[tag.name];
-            currentCount = std::max(currentCount, tag.count);
+            currentCount += tag.count;
         }
     }
 
