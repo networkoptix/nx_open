@@ -203,7 +203,7 @@ private:
     QImage m_logo;
 #endif
     QString m_container;
-    QnCodecAudioFormat m_prevAudioFormat;
+    boost::optional<QnCodecAudioFormat> m_prevAudioFormat;
     bool m_needReopen;
     bool m_isAudioPresent;
     QnConstCompressedVideoDataPtr m_lastIFrame;

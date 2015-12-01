@@ -115,8 +115,13 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
             if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
             {
-                for (const auto &cameraId: getServerFootageData(businessAction->getRuntimeParams().eventResourceId))
+                auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
+                for (const auto &cameraId: cameras)
                     invalidateCameraHistory(cameraId);
+
+                for (const auto &cameraId: cameras)
+                    if (QnVirtualCameraResourcePtr camera = toCamera(cameraId))
+                        emit cameraFootageChanged(camera);
             }
         }
     });
@@ -200,32 +205,10 @@ void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& re
 
     QSet<QnUuid> loadedCamerasIds;
     if (success) {
-        for (const auto &detail: periods) {
-            if (detail.items.empty())
-                continue;
-
-            /* 
-            * Make sure server has received data from all servers that are online.
-            * Note that online list on the client and on the server CAN BE DIFFERENT. 
-            */
-            QSet<QnUuid> receivedServers;
-
+        for (const auto &detail: periods) 
+        {
             m_historyDetail[detail.cameraId] = detail.items;
-            for (const auto &item: detail.items)
-                receivedServers.insert(item.serverGuid);
-
-            QnMediaServerResourceList footageServers = getCameraFootageData(detail.cameraId);
-            bool isResultValid = std::all_of(footageServers.cbegin(), footageServers.cend(), 
-                [receivedServers](const QnMediaServerResourcePtr &server) {
-                    /* Ignore offline servers. */
-                    if (server->getStatus() != Qn::Online)
-                        return true;
-                    return (receivedServers.contains(server->getId()));
-            });
-
-            if (isResultValid)
-                m_historyValidCameras.insert(detail.cameraId);
-
+            m_historyValidCameras.insert(detail.cameraId);
             loadedCamerasIds.insert(detail.cameraId);
         }  
     }
