@@ -1213,23 +1213,36 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
 
 void MediaServerProcess::updateStatisticsAllowedSettings() {
-    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
-
-    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
-    if (confStats.isNull()) 
-        return;
 
     {   /* Security check */
         const auto admin = qnResPool->getAdministrator();
         Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
-        if (!admin) 
+        if (!admin)
             return;
     }
 
-    qnGlobalSettings->setStatisticsAllowed(confStats.toBool());
-    qnGlobalSettings->synchronizeNow();
-    MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
-    MSSettings::roSettings()->sync();
+    auto setValue = [this](bool value) {
+        qnGlobalSettings->setStatisticsAllowed(value);
+        qnGlobalSettings->synchronizeNow();
+    };
+
+    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+
+    /* Value set by installer has the greatest priority */
+    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
+    if (!confStats.isNull()) {
+        setValue(confStats.toBool());
+        /* Cleanup installer value. */
+        MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
+        MSSettings::roSettings()->sync();
+    } else
+    /* If user didn't make the decision in the current version, check if he made it in the previous version */
+    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(STATISTICS_REPORT_ALLOWED)) {
+        bool value;
+        if (QnLexical::deserialize(m_mediaServer->getProperty(STATISTICS_REPORT_ALLOWED), &value))
+            setValue(value);
+        propertyDictionary->removeProperty(m_mediaServer->getId(), STATISTICS_REPORT_ALLOWED);
+    }
 }
 
 
@@ -1361,7 +1374,7 @@ void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer:
     if (isStopping())
         return;
     QnBusiness::EventReason reason = QnBusiness::NoReason;
-    switch(code) 
+    switch(code)
     {
         case QnServer::BackupResultCode::Failed:
             reason = QnBusiness::BackupFailed;
@@ -1626,11 +1639,11 @@ void MediaServerProcess::run()
             QnServer::StoragePool::Normal
         )
     );
-    
+
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
             QnServer::StoragePool::Backup
-        ) 
+        )
     );
 
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
@@ -1678,7 +1691,7 @@ void MediaServerProcess::run()
 
     struct stat st;
     memset(&st, 0, sizeof(st));
-    const bool hddPresent = 
+    const bool hddPresent =
         ::stat("/dev/sda", &st) == 0 ||
         ::stat("/dev/sdb", &st) == 0 ||
         ::stat("/dev/sdc", &st) == 0 ||
@@ -1829,7 +1842,7 @@ void MediaServerProcess::run()
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;
-    for (const auto storagePlugin : 
+    for (const auto storagePlugin :
          PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
@@ -1840,7 +1853,7 @@ void MediaServerProcess::run()
                 storagePlugin
             ),
             false
-        );                    
+        );
     }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin(
@@ -1895,7 +1908,7 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
-    
+
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid(), m_universalTcpListener));
 
     using namespace std::placeholders;
@@ -2023,7 +2036,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->sync();
     Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
-    
+
     if (needToStop()) {
         stopObjects();
         return;
@@ -2391,7 +2404,7 @@ void MediaServerProcess::run()
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
-    
+
     mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);
