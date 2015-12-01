@@ -92,7 +92,13 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     if (!layout)
         return;
 
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
+    // Sort items to guarantee the same item placement for the same set of cameras.
+    QnVirtualCameraResourceList sortedCameras = cameras;
+    std::sort(sortedCameras.begin(), sortedCameras.end(), [](const QnVirtualCameraResourcePtr &camera1, const QnVirtualCameraResourcePtr &camera2) {
+        return camera1->getId() < camera2->getId();
+    });
+
+    for (const QnVirtualCameraResourcePtr &camera: sortedCameras) {
         if (!layout->items(camera->getUniqueId()).isEmpty())
             continue;
 
