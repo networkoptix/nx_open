@@ -1724,7 +1724,13 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     // Sort items to guarantee the same item placement for each time the same new layout is opened.
     QList<QnWorkbenchItem *> sortedItems = layout->items().toList();
     std::sort(sortedItems.begin(), sortedItems.end(), [](const QnWorkbenchItem *item1, const QnWorkbenchItem *item2) {
-        return item1->data().resource.id < item2->data().resource.id;
+        const QnLayoutItemData &data1 = item1->data();
+        const QnLayoutItemData &data2 = item2->data();
+
+        if (data1.resource.id != data2.resource.id)
+            return data1.resource.id < data2.resource.id;
+
+        return data1.resource.path < data2.resource.path;
     });
 
     for (QnWorkbenchItem *item: sortedItems)
