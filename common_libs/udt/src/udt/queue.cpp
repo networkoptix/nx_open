@@ -1016,55 +1016,53 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
 
       id = unit->m_Packet.m_iID;
 
-      // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
-      if (0 == id)
+      try
       {
-         if (NULL != self->m_pListener)
-            self->m_pListener->listen(addr, unit->m_Packet);
-         else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
-         {
-            // asynchronous connect: call connect here
-            // otherwise wait for the UDT socket to retrieve this packet
-            if (!u->m_bSynRecving)
-               u->connect(unit->m_Packet);
-            else
-               self->storePkt(id, unit->m_Packet.clone());
-         }
-      }
-      else if (id > 0)
-      {
-         if (NULL != (u = self->m_pHash->lookup(id)))
-         {
-            if (CIPAddress::ipcmp(addr, u->m_pPeerAddr, u->m_iIPversion))
-            {
-               if (u->m_bConnected && !u->m_bBroken && !u->m_bClosing)
-               {
-                  if (0 == unit->m_Packet.getFlag())
-                     u->processData(unit);
-                  else
-                     u->processCtrl(unit->m_Packet);
+          // ID 0 is for connection request, which should be passed to the listening socket or rendezvous sockets
+          if (0 == id)
+          {
+             if (NULL != self->m_pListener)
+                self->m_pListener->listen(addr, unit->m_Packet);
+             else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
+             {
+                // asynchronous connect: call connect here
+                // otherwise wait for the UDT socket to retrieve this packet
+                if (!u->m_bSynRecving)
+                   u->connect(unit->m_Packet);
+                else
+                   self->storePkt(id, unit->m_Packet.clone());
+             }
+          }
+          else if (id > 0)
+          {
+             if (NULL != (u = self->m_pHash->lookup(id)))
+             {
+                if (CIPAddress::ipcmp(addr, u->m_pPeerAddr, u->m_iIPversion))
+                {
+                   if (u->m_bConnected && !u->m_bBroken && !u->m_bClosing)
+                   {
+                      if (0 == unit->m_Packet.getFlag())
+                         u->processData(unit);
+                      else
+                         u->processCtrl(unit->m_Packet);
 
-                  u->checkTimers();
-                  self->m_pRcvUList->update(u);
-               }
-            }
-         }
-         else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
-         {
-            if (!u->m_bSynRecving)
-            {
-                try
-                {
+                      u->checkTimers();
+                      self->m_pRcvUList->update(u);
+                   }
+                }
+             }
+             else if (NULL != (u = self->m_pRendezvousQueue->retrieveFromRQ(addr, id)))
+             {
+                if (!u->m_bSynRecving)
                     u->connect(unit->m_Packet);
-                }
-                catch(CUDTException /*e*/)
-                {
-                    //socket has been removed before connect finished? ignoring error...
-                }
-            }
-            else
-               self->storePkt(id, unit->m_Packet.clone());
-         }
+                else
+                   self->storePkt(id, unit->m_Packet.clone());
+             }
+          }
+      }
+      catch (CUDTException /*e*/)
+      {
+          //socket has been removed before connect finished? ignoring error...
       }
 
 TIMER_CHECK:

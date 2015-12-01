@@ -690,7 +690,7 @@ void CUDT::connect(const sockaddr* serv_addr)
       throw e;
 }
 
-int CUDT::connect(const CPacket& response) throw ()
+int CUDT::connect(const CPacket& response)
 {
    // this is the 2nd half of a connection request. If the connection is setup successfully this returns 0.
    // returning -1 means there is an error.
