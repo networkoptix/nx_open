@@ -42,7 +42,6 @@ namespace
     {
         kBookmarksUpdateEventId = QEvent::User + 1
         , kBookmarkUpdatePositionEventId
-        , kBookmarksResetEventId
         , kBookmarkEditActionEventId
         , kBookmarkRemoveActionEventId
         , kBookmarkPlayActionEventId
@@ -520,6 +519,8 @@ public:
     void emitBookmarkEvent(const QnCameraBookmark &bookmark
         , int eventId);
 
+    void resetBookmarks();
+
 private:
     void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
@@ -527,11 +528,7 @@ private:
 
     void updateBookmarks(QnCameraBookmarkList bookmarks);
 
-    void updateBookmarksImpl(QnCameraBookmarkList bookmarks);
-
     bool event(QEvent *event) override;
-
-    void resetBookmarksImpl();
 
 private:
     typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
@@ -613,7 +610,7 @@ void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
 
     QObject::connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, [this]()
     {
-        qApp->postEvent(this, new QEvent(static_cast<QEvent::Type>(kBookmarksResetEventId)));
+        resetBookmarks();
     });
 }
 
@@ -628,14 +625,14 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
 
     if (newBookmarks.empty())
     {
-        resetBookmarksImpl();
+        resetBookmarks();
         return;
     }
 
     m_owner->setVisible(false);
 
     m_targetTimestamp = timestamp;
-    updateBookmarksImpl(newBookmarks);
+    updateBookmarks(newBookmarks);
     updatePosition(m_getPos(m_targetTimestamp));
 }
 
@@ -648,36 +645,30 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
     const auto bounds = params.second;
     if (params.first.isNull() || ((bounds.second - bounds.first) < kBookmarkFrameWidth))
     {
-        updateBookmarksImpl(QnCameraBookmarkList());
+        updateBookmarks(QnCameraBookmarkList());
         return;
     }
 
     if (m_bookmarks.empty())
     {
         m_owner->setVisible(false);
-        updateBookmarksImpl(m_getBookmarks(m_targetTimestamp));
+        updateBookmarks(m_getBookmarks(m_targetTimestamp));
         updatePosition(params);
     }
     else
         updatePositionImpl(params);
 }
 
-void QnBookmarksViewer::Impl::resetBookmarksImpl()
+void QnBookmarksViewer::Impl::resetBookmarks()
 {
     if (m_targetTimestamp == kInvalidTimstamp)
         return;
 
     m_targetTimestamp = kInvalidTimstamp;
-    updateBookmarksImpl(QnCameraBookmarkList());
+    updateBookmarks(QnCameraBookmarkList());
 }
-
 
 void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
-{
-    qApp->postEvent(this, new UpdateBokmarksEvent(bookmarks));
-}
-
-void QnBookmarksViewer::Impl::updateBookmarksImpl(QnCameraBookmarkList bookmarks)
 {
     if (m_bookmarks == bookmarks)
         return;
@@ -715,7 +706,7 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
     case kBookmarksUpdateEventId: 
     {
         const auto updateEvent = static_cast<UpdateBokmarksEvent *>(event);
-        updateBookmarksImpl(updateEvent->bookmarks());
+        updateBookmarks(updateEvent->bookmarks());
         break;
     }
     case kBookmarkUpdatePositionEventId:
@@ -724,11 +715,6 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
             updatePositionImpl(m_futurePosition);
 
         m_owner->setVisible(true);
-        break;
-    }
-    case kBookmarksResetEventId:
-    {
-        resetBookmarksImpl();
         break;
     }
     case kBookmarkEditActionEventId:
@@ -745,7 +731,7 @@ bool QnBookmarksViewer::Impl::event(QEvent *event)
         else
             emit m_owner->playBookmark(bookmark);
 
-        resetBookmarksImpl();
+        resetBookmarks();
         break;
     }
     default:
@@ -799,7 +785,7 @@ void QnBookmarksViewer::updateOnWindowChange()
 
 void QnBookmarksViewer::resetBookmarks()
 {
-    qApp->postEvent(m_impl, new QEvent(static_cast<QEvent::Type>(kBookmarksResetEventId)));
+    m_impl->resetBookmarks();
 }
 
 void QnBookmarksViewer::setHoverProcessor(HoverFocusProcessor *processor)
