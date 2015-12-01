@@ -67,9 +67,11 @@ namespace {
 #endif
 
     /** Background color for overlay panels. */
-    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
+    const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
+
+    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #gdm #customization
 
     const float noAspectRatio = -1.0;
 
