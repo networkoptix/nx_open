@@ -22,9 +22,6 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
     QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
-    if (QnBusiness::requiresCameraResource(rule->actionType()) && resList.isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera does not exist anymore
-    //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
     runtimeParams.sourceServerId = qnCommon->moduleGUID();

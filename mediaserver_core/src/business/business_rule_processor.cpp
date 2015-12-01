@@ -122,6 +122,11 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
+    if (!action) {
+        Q_ASSERT_X(0, Q_FUNC_INFO, "No action to execute");
+        return; // something wrong. It shouldn't be
+    }
+
     QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 
     switch (action->actionType()) {
@@ -137,7 +142,10 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
     
     if (resources.isEmpty()) {
-        executeAction(action, QnResourcePtr());
+        if (QnBusiness::requiresCameraResource(action->actionType()))
+            return; //camera does not exist anymore
+        else
+            executeAction(action, QnResourcePtr());
     }
     else {
         for(const QnResourcePtr& res: resources)
