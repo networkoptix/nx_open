@@ -59,7 +59,10 @@ Item {
             property real prevY
 
             onPressed: {
-                propagateComposedEvents = (mouse.y < height - timeline.height)
+                /* We propagate composed events for areas free of the UI controls (timeline, play/pause button). */
+                propagateComposedEvents =
+                        (mouse.y < height - timeline.height) &&
+                        (mouse.x < playbackController.x || mouse.x > playbackController.x + playbackController.width)
 
                 if (drag.target)
                     prevY = drag.target.y
