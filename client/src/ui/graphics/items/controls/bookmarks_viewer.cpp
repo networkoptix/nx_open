@@ -641,8 +641,7 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
     }
 
     m_targetTimestamp = timestamp;
-    updateBookmarks(newBookmarks);
-    updatePosition(m_getPos(m_targetTimestamp));
+    updateOnWindowChange();
 }
 
 void QnBookmarksViewer::Impl::updateOnWindowChange()
@@ -658,8 +657,7 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
         return;
     }
 
-    if (m_bookmarks.empty())
-        updateBookmarks(m_getBookmarks(m_targetTimestamp));
+    updateBookmarks(m_getBookmarks(m_targetTimestamp));
 
     updatePosition(params);
 }
