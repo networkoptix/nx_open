@@ -128,7 +128,7 @@ int MediatorProcess::executeApplication()
         [] (const QString& str) { return SocketAddress(str); } );
     if( httpAddrToListenList.empty() )
     {
-        NX_LOG( "No HTTP address to listen", cl_logALWAYS );
+        NX_LOG( "No HTTP address to listen", cl_logERROR );
         return 1;
     }
 
@@ -159,16 +159,24 @@ int MediatorProcess::executeApplication()
         new MultiAddressServer<stun::SocketServer>( false, SocketFactory::NatTraversalType::nttDisabled ) );
 
     if( !m_multiAddressStunServer->bind( stunAddrToListenList ) )
+    {
+        NX_LOG( lit( "Can not bind to %1" )
+                .arg( containerString( stunAddrToListenList ) ), cl_logERROR );
         return 2;
+    }
 
     // process privilege reduction
     CurrentProcess::changeUser( m_settings->value( lit("changeUser") ).toString() );
 
     if( !m_multiAddressStunServer->listen() )
-        return 4;
+    {
+        NX_LOG( lit( "Can not listen on %1" )
+                .arg( containerString( stunAddrToListenList ) ), cl_logERROR );
+        return 3;
+    }
 
-    NX_LOG( lit( "STUN Server is listening %1" )
-            .arg( containerString( stunAddrToListenList ) ), cl_logALWAYS );
+    NX_LOG( lit( "STUN Server is listening on %1" )
+            .arg( containerString( stunAddrToListenList ) ), cl_logERROR );
 
     //TODO #ak remove qt event loop
     //application's main loop

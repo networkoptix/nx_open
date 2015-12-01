@@ -239,8 +239,13 @@ void AddressResolver::HostAddressInfo::checkExpirations()
 
 bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
 {
-    return m_dnsState == State::resolved &&
-           (!natTraversal || m_mediatorState == State::resolved);
+    if( m_dnsState != State::resolved )
+        return false; // DNS is required
+
+    if( !m_dnsEntries.empty() )
+        return true; // do not wait for mediator if DNS records are avaliable
+
+    return ( !natTraversal || m_mediatorState == State::resolved );
 }
 
 std::vector< AddressEntry > AddressResolver::HostAddressInfo::getAll() const
@@ -368,6 +373,7 @@ std::vector< Guard > AddressResolver::grabHandlers(
         for( auto it = range.first; it != range.second; ++it )
         {
             if( it->second.address != info->first ||
+                it->second.inProgress ||
                 !info->second.isResolved( it->second.natTraversal ) )
             {
                 noPending = false;
