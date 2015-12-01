@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/viewport_bound_widget.h>
 
 #include <utils/common/uuid.h>
 
@@ -9,8 +9,10 @@ class QnScrollableOverlayWidgetPrivate;
 /**
  *  Container overlay class, that displays items on the scrollable area.
  */
-class QnScrollableOverlayWidget : public GraphicsWidget {
-    typedef GraphicsWidget base_type;
+class QnScrollableOverlayWidget : public QnViewportBoundWidget {
+    Q_OBJECT
+
+    typedef QnViewportBoundWidget base_type;
 public:
     QnScrollableOverlayWidget(Qt::Alignment alignment, QGraphicsWidget *parent = nullptr);
     virtual ~QnScrollableOverlayWidget();
