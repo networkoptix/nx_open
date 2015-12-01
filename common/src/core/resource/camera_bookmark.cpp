@@ -1,5 +1,7 @@
 #include "camera_bookmark.h"
 
+#include <QtCore/QMap>
+
 #include <utils/math/defines.h>
 
 #include <utils/common/model_functions.h>
@@ -81,7 +83,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
                 if (result.size() >= limit && strategy == Qn::EarliestFirst)
                     return result;
                 result.push_back(startPeriod);
-            } 
+            }
             startIdx++;
         }
     }
@@ -93,7 +95,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
     Q_ASSERT_X(offset > 0, Q_FUNC_INFO, "Make sure algorithm is correct");
 
     switch (strategy) {
-    case Qn::LatestFirst: 
+    case Qn::LatestFirst:
         {
             auto insertIter = result.begin();
             auto sourceIter = result.cbegin() + offset;
@@ -105,7 +107,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
             result.resize(limit);
             break;
         }
-    case Qn::LongestFirst: 
+    case Qn::LongestFirst:
         {
             std::partial_sort(result.begin(), result.begin() + offset, result.end(), [](const QnCameraBookmark &l, const QnCameraBookmark &r) {return l.durationMs > r.durationMs; });
             result.resize(limit);
@@ -142,16 +144,31 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
     int maxSize = 0;
     for (const auto &list: nonEmptyLists)
         maxSize += list.size();
-    result.reserve(maxSize);
+    result.reserve(std::min(limit, maxSize));
 
-    //TODO: #dklychkov merge duplicates , sort and cut by limit    
+    typedef QMap<QString, int> TagCountMap;
+    TagCountMap mergedTags;
+
     for (const QnCameraBookmarkTagList &source: nonEmptyLists) {
-        for (const auto &tag: source)
-            result.push_back(tag);
+        for (const auto &tag: source) {
+            auto &currentCount = mergedTags[tag.name];
+            currentCount = std::max(currentCount, tag.count);
+        }
     }
 
-    if (result.size() > limit)
-        result.resize(limit);
+    typedef QMap<int, QString> CountTagMap;
+
+    CountTagMap sortedTags;
+    for (auto it = mergedTags.begin(); it != mergedTags.end(); ++it)
+        sortedTags.insert(it.value(), it.key());
+
+    for (auto it = sortedTags.begin(); it != sortedTags.end(); ++it) {
+        if (result.size() >= limit)
+            break;
+
+        result.push_front(QnCameraBookmarkTag(it.value(), it.key()));
+    }
+
     return result;
 }
 
