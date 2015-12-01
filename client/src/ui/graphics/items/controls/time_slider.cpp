@@ -2609,31 +2609,25 @@ void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent *event)
     const auto pos = event->pos();
     m_currentRulerRectMousePos = event->pos();
 
-    enum { kMouseMoveFilterTimeout = 100 };
-    const auto filterMouseMove = [this, pos]()
+    if (pos != m_currentRulerRectMousePos)
+        return;
+
+    if (!rulerRect().contains(pos))
     {
-        if (pos != m_currentRulerRectMousePos)
-            return;
+        m_bookmarksViewer->resetBookmarks();
+        return;
+    }
 
-        if (!rulerRect().contains(pos))
-        {
+    const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+    if (lineBarRect.contains(pos))
+    {
+        const auto timestamp = valueFromPosition(pos);
+        const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
+        if (emptyBookmarks)
             m_bookmarksViewer->resetBookmarks();
-            return;
-        }
-
-        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
-        if (lineBarRect.contains(pos))
-        {
-            const auto timestamp = valueFromPosition(pos);
-            const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
-            if (emptyBookmarks)
-                m_bookmarksViewer->resetBookmarks();
-            else
-                m_bookmarksViewer->setTargetTimestamp(timestamp);
-        }
-    };
-
-    executeDelayed(filterMouseMove, kMouseMoveFilterTimeout);
+        else
+            m_bookmarksViewer->setTargetTimestamp(timestamp);
+    }
 }
 
 void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
