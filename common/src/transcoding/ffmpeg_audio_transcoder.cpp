@@ -52,8 +52,10 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
     return open(audio->context);
 }
 
-bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
+bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& context)
 {
+    assert(context);
+
     AVCodec* avCodec = avcodec_find_encoder(m_codecId);
     if (avCodec == 0)
     {
@@ -66,13 +68,13 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
     //m_encoderCtx->codec_type = AVMEDIA_TYPE_AUDIO;
     m_encoderCtx->sample_fmt = avCodec->sample_fmts[0] != AV_SAMPLE_FMT_NONE ? avCodec->sample_fmts[0] : AV_SAMPLE_FMT_S16;
 
-    m_encoderCtx->channels = codecCtx->ctx()->channels;
+    m_encoderCtx->channels = context->getChannels();
     if (m_encoderCtx->channels > 2 && (m_codecId == CODEC_ID_MP3 || m_codecId == CODEC_ID_MP2))
     {
         m_downmixAudio = true;
         m_encoderCtx->channels = 2;
     }
-    m_encoderCtx->sample_rate = codecCtx->ctx()->sample_rate;
+    m_encoderCtx->sample_rate = context->getSampleRate();
     if (m_encoderCtx->sample_rate < 16000) {
         m_encoderCtx->sample_rate = 16000;
     }
@@ -88,14 +90,16 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& codecCtx)
         return false;
     }
 
-    avCodec = avcodec_find_decoder(codecCtx->ctx()->codec_id);
+    avCodec = avcodec_find_decoder(context->getCodecId());
     m_decoderContext = avcodec_alloc_context3(0);
-    avcodec_copy_context(m_decoderContext, codecCtx->ctx());
+    // TODO mike: CURRENT copy av
+    avcodec_copy_context(m_decoderContext, context->ctx());
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialise audio decoder.");
         return false;
     }
+    // TODO mike: CURRENT create(av)
     m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;

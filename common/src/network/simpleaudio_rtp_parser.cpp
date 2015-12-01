@@ -55,6 +55,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         }   
     }
     
+    // TODO mike: CURRENT fields
     m_context = QnMediaContextPtr(new QnMediaContext(m_codecId));
     m_context->ctx()->channels = m_channels;
     m_context->ctx()->sample_rate = m_frequency;
@@ -94,7 +95,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
-    audioData->compressionType = m_context->ctx()->codec_id;
+    audioData->compressionType = !m_context? CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
     if (m_timeHelper) {
         audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);

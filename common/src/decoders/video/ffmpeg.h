@@ -12,13 +12,14 @@
 #include "dxva/dxva.h"
 #endif
 #include "utils/media/ffmpeg_helper.h"
-#include "utils/media/frame_type_extractor.h"
 
+class FrameTypeExtractor;
 struct AVCodec;
 struct AVCodecContext;
 struct AVFrame;
 struct MpegEncContext;
 
+// TODO mike: Rename class and file to QnFfmpegVideoDecoder.
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
 class CLFFmpegVideoDecoder

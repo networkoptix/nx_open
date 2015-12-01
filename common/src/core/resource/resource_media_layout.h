@@ -8,7 +8,7 @@
 #include <QtCore/QPoint>
 #include <QtCore/QSize>
 
-#include <core/datapacket/abstract_media_context.h>
+#include <core/datapacket/media_context.h>
 
 #include <common/common_globals.h>
 
@@ -31,9 +31,9 @@ class QnResourceAudioLayout: public QnResourceLayout {
 public:
     struct AudioTrack {
         AudioTrack() {} 
-        AudioTrack(QnAbstractMediaContextPtr codecContext, const QString &description): codecContext(codecContext), description(description) {}
+        AudioTrack(const QnMediaContextPtr& codecContext, const QString &description): codecContext(codecContext), description(description) {}
 
-        QnAbstractMediaContextPtr codecContext;
+        QnMediaContextPtr codecContext;
         QString description;
     };
 

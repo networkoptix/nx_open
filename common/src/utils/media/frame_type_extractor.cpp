@@ -18,38 +18,40 @@ void FrameTypeExtractor::decodeWMVSequence(const quint8* data, int size)
     }
 }
 
-FrameTypeExtractor::FrameTypeExtractor(AVCodecContext* context): 
+FrameTypeExtractor::FrameTypeExtractor(const QnMediaContextPtr& context):
     m_context(context),
-    m_codecId(context->codec_id),
+    m_codecId(context->getCodecId()),
     m_vcSequence(0),
     m_dataWithNalPrefixes(false)
 {
-    if (context && context->extradata_size > 0)
+    if (context && context->getExtradataSize() > 0)
     {
-        quint8* data = context->extradata;
+        quint8* data = context->getExtradata();
+        int sz = context->getExtradataSize();
         if (m_codecId == CODEC_ID_VC1) 
         {
-            for (int i = 0; i < context->extradata_size-4; ++i)
+            for (int i = 0; i < sz - 4; ++i)
             {
                 if (data[i] == 0 && data[i+1] == 0 && data[i+2] == 1 && data[i+3] == VC1_CODE_SEQHDR) 
                 {
-                    decodeWMVSequence(data + i+ 4, context->extradata_size - i - 4);
+                    decodeWMVSequence(data + i + 4, sz - i - 4);
                     break;
                 }
             }
         }
         else if (m_codecId == CODEC_ID_WMV1 || m_codecId == CODEC_ID_WMV2 || m_codecId == CODEC_ID_WMV3) 
         {
-            decodeWMVSequence(data, context->extradata_size);
+            decodeWMVSequence(data, sz);
         }
-        else if (m_codecId == CODEC_ID_H264) {
-            m_dataWithNalPrefixes = context->extradata[0] == 0;
+        else if (m_codecId == CODEC_ID_H264)
+        {
+            m_dataWithNalPrefixes = data[0] == 0;
         }
     }
 }
 
-FrameTypeExtractor::FrameTypeExtractor(CodecID codecId, bool nalPrefixes)
-:   m_context(nullptr),
+FrameTypeExtractor::FrameTypeExtractor(CodecID codecId, bool nalPrefixes):
+    m_context(nullptr),
     m_codecId(codecId),
     m_vcSequence(nullptr),
     m_dataWithNalPrefixes(nalPrefixes)

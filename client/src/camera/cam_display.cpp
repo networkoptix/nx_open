@@ -1252,14 +1252,20 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
     bool flushCurrentBuffer = false;
     int expectedBufferSize = m_isRealTimeSource ? REALTIME_AUDIO_BUFFER_SIZE : DEFAULT_AUDIO_BUFF_SIZE;
     QnCodecAudioFormat currentAudioFormat;
-    bool audioParamsChanged = ad && (m_playingFormat != currentAudioFormat.fromAvStream(ad->context) || m_audioDisplay->getAudioBufferSize() != expectedBufferSize);
+    bool audioParamsChanged = false;
+    if (ad)
+    {
+        currentAudioFormat = QnCodecAudioFormat(ad->context);
+        audioParamsChanged = m_playingFormat != currentAudioFormat || m_audioDisplay->getAudioBufferSize() != expectedBufferSize;
+    }
     if (((media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) || audioParamsChanged) &&
         m_videoQueue[0].size() > 0)
     {
         // skip data (play current buffer
         flushCurrentBuffer = true;
     }
-    else if (emptyData && m_videoQueue[0].size() > 0) {
+    else if (emptyData && m_videoQueue[0].size() > 0)
+    {
         flushCurrentBuffer = true;
     }
     else if (media->flags & QnAbstractMediaData::MediaFlags_AfterEOF) 

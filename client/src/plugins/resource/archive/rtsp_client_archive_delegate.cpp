@@ -26,7 +26,7 @@ extern "C"
 #include <utils/common/util.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/media/ffmpeg_helper.h>
+#include <utils/media/codec_helper.h>
 #include <network/rtp_stream_parser.h>
 #include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
@@ -314,8 +314,8 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
                 m_audioLayout.reset( new QnResourceCustomAudioLayout() );
                 QByteArray contextData = QByteArray::fromBase64(audioSDP[i].mid(configPos + 7));
                 QnMediaContextPtr context(new QnMediaContext(contextData));
-                if (context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
-                    m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
+                if (context->getCodecType() == AVMEDIA_TYPE_AUDIO)
+                    m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context)));
             }
         }
     }
@@ -667,8 +667,8 @@ QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
         for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnMediaContextPtr context = itr.value()->mediaContext();
-            if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO)
-                m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context->ctx())));
+            if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
+                m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context)));
         }
     }
     return m_audioLayout;

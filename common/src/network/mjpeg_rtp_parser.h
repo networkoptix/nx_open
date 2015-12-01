@@ -26,8 +26,11 @@ private:
     void updateHeaderTables(const quint8* lummaTable, const quint8* chromaTable);
 private:
     int m_frequency;
-    QnMediaContextPtr m_context;
-    //AVJpeg::Header m_jpegHeader;
+
+    // TODO: Consider adding pix_fmt to QnMediaContext. Currently m_context is not used.
+    // QnMediaContextPtr m_context;
+
+    // AVJpeg::Header m_jpegHeader;
     quint8 m_lummaTable[64*2];
     quint8 m_chromaTable[64*2];
     int m_sdpWidth;

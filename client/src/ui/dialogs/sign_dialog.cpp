@@ -16,7 +16,6 @@
 #include "ui/help/help_topic_accessor.h"
 #include "ui/help/help_topics.h"
 
-#include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
 // TODO: #Elric replace with QnRenderingWidget

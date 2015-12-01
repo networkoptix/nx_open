@@ -32,13 +32,12 @@ public:
 
     virtual bool isRtpHeaderExists() const override { return false; }
 
-    void setCodecContext(QnMediaContextPtr context);
-private:
-    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
+    void setCodecContext(const QnConstMediaContextPtr& context);
+
 private:
     bool m_gotLivePacket;
-    QnMediaContextPtr m_ctxSended;
-    QMap<CodecID, QnMediaContextPtr> m_generatedContext;
+    QnMediaContextPtr m_contextSent;
+    QMap<CodecID, QnMediaContextPtr> m_generatedContexts;
     QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
@@ -46,6 +45,8 @@ private:
     quint16 m_additionFlags;
     bool m_eofReached;
     bool m_isLastDataContext;
+
+    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;

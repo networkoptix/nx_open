@@ -30,6 +30,8 @@ extern "C"
 
 #include "abstract_data_packet.h"
 
+#include "media_context.h"
+
 class QIODevice;
 
 struct AVCodecContext;
@@ -48,25 +50,6 @@ enum MediaQuality {
     MEDIA_Quality_Auto,
     MEDIA_Quality_None
 };
-
-class QnMediaContext: public QnAbstractMediaContext {
-public:
-
-    QnMediaContext(AVCodecContext* ctx);
-    QnMediaContext(CodecID codecId);
-    QnMediaContext(const quint8* payload, int dataSize);
-    QnMediaContext(const QByteArray& payload);
-    ~QnMediaContext();
-    AVCodecContext* ctx() const;
-    QString codecName() const;
-
-    bool equalTo(QnMediaContext* other) const;
-
-private:
-    AVCodecContext* m_ctx;
-};
-typedef QSharedPointer<QnMediaContext> QnMediaContextPtr;
-
 
 struct QnAbstractMediaData : public QnAbstractDataPacket
 {

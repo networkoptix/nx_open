@@ -77,6 +77,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
     m_aacHelper.readConfig(m_config);
     
+    // TODO mike: CURRENT fields
     m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_AAC));
     m_context->ctx()->channels = m_aacHelper.m_channels;
     m_context->ctx()->sample_rate = m_aacHelper.m_sample_rate;

@@ -698,7 +698,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
-	updateInfoTextLater();
+    updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -1026,8 +1026,8 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     size.setWidth(size.width() * m_display->camDisplay()->channelsCount());
 
     QString codecString;
-    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
-        codecString = codecContext->codecName();
+    if(QnConstMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
+        codecString = codecContext->getCodecName();
         if(!codecString.isEmpty())
             codecString = lit(" (%1)").arg(codecString);
     }

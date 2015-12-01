@@ -13,6 +13,7 @@
 #include <utils/math/math.h>
 #include <utils/common/log.h>
 
+#include "utils/media/frame_type_extractor.h"
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
@@ -68,6 +69,7 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
 
     if (data->context)
     {
+        // TODO mike: CURRENT copy av
         m_passedContext = avcodec_alloc_context3(0);
         avcodec_copy_context(m_passedContext, data->context->ctx());
     }
@@ -169,6 +171,7 @@ void CLFFmpegVideoDecoder::determineOptimalThreadType(const QnConstCompressedVid
                 m_forceSliceDecoding = 1; // multislice frame. Use multislice decoding if slice count 4 or above
         }
     }
+
     m_context->thread_type = m_context->thread_count > 1 && (m_forceSliceDecoding != 1) ? FF_THREAD_FRAME : FF_THREAD_SLICE;
 
     if (m_context->codec_id == CODEC_ID_H264 && m_context->thread_type == FF_THREAD_SLICE)
@@ -189,7 +192,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
         avcodec_copy_context(m_context, m_passedContext);
     }
 
-    m_frameTypeExtractor = new FrameTypeExtractor(m_context);
+    m_frameTypeExtractor = new FrameTypeExtractor(QnMediaContextPtr(new QnMediaContext(m_context)));
 
 #ifdef _USE_DXVA
     if (m_codecId == CODEC_ID_H264)
@@ -240,6 +243,7 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //openDecoder();
     //return;
 
+    // TODO mike: CURRENT copy av
     if (m_passedContext && data->context->ctx())
         avcodec_copy_context(m_passedContext, data->context->ctx());
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
@@ -451,11 +455,10 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
             if (!m_spsFound)
                 return false; // no sps has found yet. skip frame
         }
-        else if (data->context && data->context->ctx())
+        else if (data->context)
         {
-            AVCodecContext* ctx = data->context->ctx();
-            if (ctx->width && ctx->height)
-                processNewResolutionIfChanged(data, ctx->width, ctx->height);
+            if (data->context->getWidth() != 0 && data->context->getHeight() != 0)
+                processNewResolutionIfChanged(data, data->context->getWidth(), data->context->getHeight());
         }
 
         if (data->motion) {

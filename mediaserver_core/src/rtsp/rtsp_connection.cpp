@@ -224,7 +224,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStre
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
 {
     Q_D(QnRtspConnectionProcessor);
-	directDisconnectAll();
+    directDisconnectAll();
     if (d->auditRecordHandle && d->lastMediaPacketTime != AV_NOPTS_VALUE)
         qnAuditManager->notifyPlaybackInProgress(d->auditRecordHandle, d->lastMediaPacketTime);
 
@@ -700,12 +700,12 @@ int QnRtspConnectionProcessor::composeDescribe()
             if (i >= numVideo) 
             {
                 QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
-                if (media)
+                if (media && media->context)
                     ffmpegEncoder->setCodecContext(media->context);
             }
-
         }
-        else {
+        else
+        {
             QnConstAbstractMediaDataPtr media = getCameraData(i < numVideo ? QnAbstractMediaData::VIDEO : QnAbstractMediaData::AUDIO);
             if (media) 
             {

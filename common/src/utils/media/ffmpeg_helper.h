@@ -12,11 +12,6 @@ extern "C"
 
 #include <QtCore/QIODevice>
 
-
-QString codecIDToString(CodecID codecID);
-QString getAudioCodecDescription(AVCodecContext* codecContext);
-
-
 class QnFfmpegHelper
 {
 private:
@@ -24,14 +19,16 @@ private:
                          Field_CodedWidth, Field_CodedHeight};
     static void appendCtxField(QByteArray *dst, CodecCtxField field, const char* data, int size);
 public:
+    // TODO mike: Move to QnMediaContext.
     static void serializeCodecContext(const AVCodecContext *ctx, QByteArray *data);
+    // TODO mike: Move to QnMediaContext.
     static AVCodecContext *deserializeCodecContext(const char *data, int dataLen);
+    static void deleteCodecContext(AVCodecContext* ctx);
 
     static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
     static AVIOContext* createFfmpegIOContext(QIODevice* ioDevice, int ioBlockSize = 32768);
     static void closeFfmpegIOContext(AVIOContext* ioContext);
     static qint64 getFileSizeByIOContext(AVIOContext* ioContext);
-    static void deleteCodecContext(AVCodecContext* ctx);
 };
 
 #endif // ENABLE_DATA_PROVIDERS

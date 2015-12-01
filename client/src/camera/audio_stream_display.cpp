@@ -276,8 +276,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             return;
 
         //  convert format
-        QnCodecAudioFormat audioFormat;
-        audioFormat.fromAvStream(data->context->ctx());
+        QnCodecAudioFormat audioFormat(data->context);
         if (!m_isConvertMethodInitialized)
         {
             if (m_audioSound)

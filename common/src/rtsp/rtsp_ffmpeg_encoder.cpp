@@ -25,18 +25,26 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
 
 void QnRtspFfmpegEncoder::init()
 { 
-    m_ctxSended.clear();
+    m_contextSent.reset();
     m_gotLivePacket = false;
     m_eofReached = false;
 }
 
 QnMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
 {
-    QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContext.find(compressionType);
-    if (itr != m_generatedContext.end())
-        return itr.value();
-    QnMediaContextPtr result(new QnMediaContext(compressionType));
-    m_generatedContext.insert(compressionType, result);
+    QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
+    QnMediaContextPtr result;
+    if (itr != m_generatedContexts.end())
+    {
+        result = itr.value();
+    }
+    else
+    {
+        result = QnMediaContextPtr(new QnMediaContext(compressionType));
+        m_generatedContexts.insert(compressionType, result);
+    }
+
+    assert(result);
     return result;
 }
 
@@ -46,19 +54,20 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     m_curDataBuffer = media->data();
     m_codecCtxData.clear();
     if (m_media->flags & QnAbstractMediaData::MediaFlags_AfterEOF)
-        m_ctxSended.clear();
+        m_contextSent.reset();
 
     QnConstMetaDataV1Ptr metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
     {
         QnMediaContextPtr currentContext = m_media->context;
-        if (currentContext == 0)
+        if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
+        assert(currentContext);
         //int rtpHeaderSize = 4 + RtpHeader::RTP_HEADER_SIZE;
-        if (!m_ctxSended || !m_ctxSended->equalTo(currentContext.data()))
+        if (!m_contextSent || !m_contextSent->isSimilarTo(currentContext))
         {
-            m_ctxSended = currentContext;
-            QnFfmpegHelper::serializeCodecContext(currentContext->ctx(), &m_codecCtxData);
+            m_contextSent = currentContext;
+            m_codecCtxData = currentContext->serialize();
         }
     }
     m_eofReached = false;
@@ -191,9 +200,10 @@ void QnRtspFfmpegEncoder::setAdditionFlags(quint16 value)
     m_additionFlags = value;
 }
 
-void QnRtspFfmpegEncoder::setCodecContext(QnMediaContextPtr context)
+void QnRtspFfmpegEncoder::setCodecContext(const QnConstMediaContextPtr& context)
 {
-    QnFfmpegHelper::serializeCodecContext(context->ctx(), &m_codecCtxData);
+    if (context)
+        m_codecCtxData = context->serialize();
 }
 
 #endif // ENABLE_DATA_PROVIDERS

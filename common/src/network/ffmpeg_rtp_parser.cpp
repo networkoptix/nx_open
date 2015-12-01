@@ -43,6 +43,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
+        // TODO mike: CURRENT create(payload)
         QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
         m_context = context;
     }
@@ -92,7 +93,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
 
                 QnMetaDataV1 *metadata = new QnMetaDataV1(); 
                 metadata->m_data.clear();
-                context.clear();
+                context.reset();
                 metadata->m_duration = ntohl(*((quint32*)payload))*1000;
                 dataSize -= RTSP_FFMPEG_METADATA_HEADER_SIZE;
                 payload += RTSP_FFMPEG_METADATA_HEADER_SIZE; // deserialize video flags
@@ -100,7 +101,7 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 m_nextDataPacket = QnMetaDataV1Ptr(metadata);
                 m_nextDataPacketBuffer = &metadata->m_data;
             }
-            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
+            else if (context && context->getCodecType() == AVMEDIA_TYPE_VIDEO && dataType == QnAbstractMediaData::VIDEO)
             {
                 if (dataSize < RTSP_FFMPEG_VIDEO_HEADER_SIZE)
                     return false;
@@ -113,13 +114,11 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 QnWritableCompressedVideoData *video = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
                 m_nextDataPacket = QnCompressedVideoDataPtr(video);
                 m_nextDataPacketBuffer = &video->m_data;
-                if (context) 
-                {
-                    video->width = context->ctx()->coded_width;
-                    video->height = context->ctx()->coded_height;
-                }
+
+                video->width = context->getCodedWidth();
+                video->height = context->getCodedHeight();
             }
-            else if (context && context->ctx() && context->ctx()->codec_type == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
+            else if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
                 QnWritableCompressedAudioData *audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
                 audio->context = context;
@@ -129,8 +128,8 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
             }
             else
             {
-                if (context && context->ctx())
-                    qWarning() << "Unsupported RTP codec or packet type. codec=" << context->ctx()->codec_type;
+                if (context)
+                    qWarning() << "Unsupported RTP codec or packet type. codec_type: " << context->getCodecType();
                 else if (dataType == QnAbstractMediaData::AUDIO)
                     qWarning() << "Unsupported audio codec or codec params";
                 else if (dataType == QnAbstractMediaData::VIDEO)
@@ -145,8 +144,8 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
                 m_nextDataPacket->opaque = cseq;
                 m_nextDataPacket->flags = static_cast<QnAbstractMediaData::MediaFlags>(flags);
 
-                if (context && context->ctx())
-                    m_nextDataPacket->compressionType = context->ctx()->codec_id;
+                if (context)
+                    m_nextDataPacket->compressionType = context->getCodecId();
                 m_nextDataPacket->timestamp = ntohl(rtpHeader->timestamp) + (qint64(timestampHigh) << 32);
                 //m_nextDataPacket->channelNumber = channelNum;
                 /*

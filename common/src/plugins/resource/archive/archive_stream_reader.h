@@ -6,6 +6,7 @@
 #include "core/resource/resource_media_layout.h"
 #include "abstract_archive_stream_reader.h"
 #include "core/datapacket/media_data_packet.h"
+#include "core/datapacket/media_context.h"
 
 // private
 class FrameTypeExtractor;

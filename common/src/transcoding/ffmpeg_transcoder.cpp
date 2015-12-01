@@ -250,6 +250,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
             }
 
             if (video->context && video->context->ctx()) {
+                // TODO mike: CURRENT copy av
                 avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
                 m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
@@ -309,6 +310,7 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         }
         else 
         {
+            // TODO mike: CURRENT copy av
             if (audio->context && audio->context->ctx()) {
                 avcodec_copy_context(m_audioEncoderCodecCtx, audio->context->ctx());
                 m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
@@ -349,8 +351,8 @@ int QnFfmpegTranscoder::transcodePacketInternal(const QnConstAbstractMediaDataPt
 
     if (m_audioCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::AUDIO)
         return 0;
-	else if (m_videoCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
-		return 0;
+    else if (m_videoCodec == CODEC_ID_NONE && media->dataType == QnAbstractMediaData::VIDEO)
+        return 0;
 
     AVRational srcRate = {1, 1000000};
     int streamIndex = 0;

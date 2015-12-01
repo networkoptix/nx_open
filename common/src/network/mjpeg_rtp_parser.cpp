@@ -501,13 +501,15 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
         m_frameSize = 0;
     }
 
+    // See ToDo in the header.
+    /*
     if (!m_context) 
     {
         m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_MJPEG));
         m_context->ctx()->pix_fmt = (jpegType & 1) == 1 ? PIX_FMT_YUV420P : PIX_FMT_YUV422P;
         //m_jpegHeader.Initialize(qApp->organizationName().toLatin1().constData(), qApp->applicationName().toLatin1().constData(), "");
     }
-
+    */
 
     //m_frameData.write((const char*)curPtr, bytesLeft);
     m_chunks.push_back(Chunk(curPtr - rtpBufferBase, bytesLeft));

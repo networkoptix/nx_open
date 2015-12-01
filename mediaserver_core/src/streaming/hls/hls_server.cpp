@@ -22,6 +22,7 @@
 #include <utils/common/string.h>
 #include <utils/common/systemerror.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/media/codec_helper.h>
 #include <utils/media/media_stream_cache.h>
 #include <utils/common/app_info.h>
 

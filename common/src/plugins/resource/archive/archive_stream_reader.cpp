@@ -596,10 +596,10 @@ begin_label:
             FrameTypeExtractor::FrameType frameType = FrameTypeExtractor::UnknownFrameType;
             if (videoData->context)
             {
-                if (m_frameTypeExtractor == 0 || videoData->context->ctx() != m_frameTypeExtractor->getContext())
+                if (m_frameTypeExtractor == 0 || videoData->context.get() != m_frameTypeExtractor->getContext().get())
                 {
                     delete m_frameTypeExtractor;
-                    m_frameTypeExtractor = new FrameTypeExtractor((AVCodecContext*) videoData->context->ctx());
+                    m_frameTypeExtractor = new FrameTypeExtractor(videoData->context);
                 }
 
                 frameType = m_frameTypeExtractor->getFrameType((const quint8*) videoData->data(), static_cast<int>(videoData->dataSize()));

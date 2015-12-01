@@ -12,6 +12,7 @@ extern "C"
 }
 
 #include <utils/media/ffmpeg_helper.h>
+#include <utils/media/codec_helper.h>
 #include <utils/common/log.h>
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
@@ -90,7 +91,8 @@ public:
                 if (audioNum++ < index)
                     continue;
                 //result.codec = codecContext->codec_id;
-                result.codecContext =  QnMediaContextPtr(new QnMediaContext(codecContext));
+                // TODO mike: CURRENT create(av)
+                result.codecContext = QnMediaContextPtr(new QnMediaContext(codecContext));
                 result.description = QString::number(++audioNumber);
                 result.description += QLatin1String(". ");
 
@@ -102,7 +104,7 @@ public:
                     result.description += QLatin1String(" - ");
                 }
 
-                result.description = getAudioCodecDescription(codecContext);
+                result.description = getAudioCodecDescription(result.codecContext);
                 break;
             }
         }
@@ -167,9 +169,11 @@ QnMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     while (m_contexts.size() <= stream->index)
         m_contexts << QnMediaContextPtr(0);
 
-    if (m_contexts[stream->index] == 0 || m_contexts[stream->index]->ctx()->codec_id != stream->codec->codec_id)
+    if (m_contexts[stream->index] == 0 ||
+        m_contexts[stream->index]->getCodecId() != stream->codec->codec_id)
     {
-	    m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
+        // TODO mike: CURRENT create(av)
+        m_contexts[stream->index] = QnMediaContextPtr(new QnMediaContext(stream->codec));
     }
 
     return m_contexts[stream->index];

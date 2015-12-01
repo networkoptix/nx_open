@@ -18,12 +18,9 @@ class QnCodecAudioFormat
 {
 public:
     QnCodecAudioFormat();
-    QnCodecAudioFormat(QnMediaContextPtr ctx);
+    QnCodecAudioFormat(const QnConstMediaContextPtr& c);
 
-    QnCodecAudioFormat& fromAvStream(QnMediaContextPtr ctx);
-    void fromAvStream(AVCodecContext* c);
-
-    QVector<quint8> extraData; // codec extra data
+    QVector<quint8> extraData; //!< Codec extra data.
     int bitrate;
     int channel_layout;
     int block_align;
@@ -42,7 +39,7 @@ public:
     //QnCodecAudioFormat format;
     quint64 duration;
 
-    QnCompressedAudioData( QnMediaContextPtr ctx );
+    QnCompressedAudioData(const QnMediaContextPtr& ctx);
 
     void assign(const QnCompressedAudioData* other);
 };

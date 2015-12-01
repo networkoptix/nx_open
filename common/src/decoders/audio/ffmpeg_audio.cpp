@@ -58,6 +58,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
     if (data->context)
     {
+        // TODO mike: CURRENT copy av
         avcodec_copy_context(c, data->context->ctx());
     }
     else {
@@ -83,7 +84,6 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
         */
     }
     avcodec_open2(c, codec, NULL);
-
 }
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)

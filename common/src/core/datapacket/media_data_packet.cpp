@@ -2,98 +2,16 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-extern "C"
-{
-#include <libavformat/avformat.h>
-}
-
 #include <QtGui/QRegion>
 
 #include <utils/media/bitStream.h>
-#include <utils/media/ffmpeg_helper.h>
-#include <utils/media/sse_helper.h>
 #include <utils/common/synctime.h>
-#include <utils/math/math.h>
 
 #include <plugins/camera_plugin.h>
 
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
-
-
-
-QnMediaContext::QnMediaContext(AVCodecContext* ctx)
-{
-    m_ctx = avcodec_alloc_context3(NULL);
-    avcodec_copy_context(m_ctx, ctx);
-}
-
-QnMediaContext::QnMediaContext(CodecID codecId)
-{
-    if (codecId != CODEC_ID_NONE)
-    {
-        AVCodec* codec = avcodec_find_decoder(codecId);
-        if( codec && codec->id == codecId )
-        {
-            m_ctx = avcodec_alloc_context3(codec);
-            m_ctx->codec_id = codecId;
-            m_ctx->codec_type = codec->type;
-        }
-        else
-        {
-            AVCodec* codec = (AVCodec*)av_malloc(sizeof(AVCodec));
-            memset( codec, 0, sizeof(*codec) );
-            codec->id = codecId;
-            codec->type = AVMEDIA_TYPE_VIDEO;
-            m_ctx = avcodec_alloc_context3(codec);
-            m_ctx->codec_id = codecId;
-        }
-    } else {
-        m_ctx = 0;
-    }
-}
-
-QnMediaContext::QnMediaContext(const QByteArray& payload)
-{
-    m_ctx = QnFfmpegHelper::deserializeCodecContext(payload.data(), payload.size());
-}
-
-QnMediaContext::QnMediaContext(const quint8* payload, int dataSize)
-{
-    m_ctx = QnFfmpegHelper::deserializeCodecContext((const char*) payload, dataSize);
-}
-
-QnMediaContext::~QnMediaContext()
-{
-    QnFfmpegHelper::deleteCodecContext(m_ctx);
-    m_ctx = 0;
-}
-
-
-AVCodecContext* QnMediaContext::ctx() const
-{
-    return m_ctx;
-}
-
-QString QnMediaContext::codecName() const 
-{
-    return m_ctx ? codecIDToString(m_ctx->codec_id) : QString();
-}
-
-bool QnMediaContext::equalTo(QnMediaContext *other) const
-{
-    // I've add new condition bits_per_coded_sample for G726 audio codec
-    if( m_ctx == NULL && other->m_ctx == NULL )
-        return true;
-    if( m_ctx == NULL || other->m_ctx == NULL )
-        return false;
-    if (m_ctx->width != other->m_ctx->width || m_ctx->height != other->m_ctx->height)
-        return false;
-    
-    return m_ctx->codec_id == other->m_ctx->codec_id && m_ctx->bits_per_coded_sample == other->m_ctx->bits_per_coded_sample;
-}
-
 
 QnAbstractMediaData::QnAbstractMediaData( DataType _dataType )
 : 

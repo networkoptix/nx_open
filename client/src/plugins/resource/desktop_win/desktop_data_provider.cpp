@@ -468,9 +468,9 @@ bool QnDesktopDataProvider::init()
         m_videoCodecCtx->sample_aspect_ratio.den = 1;
     }
 
-    m_videoCodecCtxPtr = QnMediaContextPtr(new QnMediaContext(m_videoCodecCtx));
-
-
+    // TODO mike: CURRENT create(av)
+    m_videoContext = QnMediaContextPtr(new QnMediaContext(m_videoCodecCtx));
+    
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
         m_lastErrorStr = tr("Could not initialize video encoder.");
@@ -488,7 +488,7 @@ bool QnDesktopDataProvider::init()
 
         m_encodedAudioBuf = (quint8*) av_malloc(FF_MIN_BUFFER_SIZE);
 
-        QString audioCodecName = QLatin1String("libmp3lame"); // ""aac
+        QString audioCodecName = QLatin1String("libmp3lame"); //< "aac"
         AVCodec* audioCodec = avcodec_find_encoder_by_name(audioCodecName.toLatin1().constData());
         if(audioCodec == 0)
         {
@@ -503,11 +503,12 @@ bool QnDesktopDataProvider::init()
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channelCount();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.sampleRate();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
-        m_audioCodecCtx->time_base         = audioRational;
+        m_audioCodecCtx->time_base = audioRational;
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
         //m_audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
-
-        m_audioCodecCtxPtr = QnMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        
+        // TODO mike: CURRENT create(av)
+        m_audioContext = QnMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
@@ -545,21 +546,23 @@ bool QnDesktopDataProvider::init()
         }
     }
 
-    // codecCtxptr was created before open() call to avoid encoder specific fields.
-    // transfer extra_data field manually
+    // QnMediaContext was created before open() call to avoid encoder specific fields.
+    // Transfer extradata field manually.
+
+    // TODO mike: Design a way to assign extradata; assert extradata was null.
 
     if (m_videoCodecCtx->extradata_size)
     {
-        m_videoCodecCtxPtr->ctx()->extradata_size = m_videoCodecCtx->extradata_size;
-        m_videoCodecCtxPtr->ctx()->extradata = (uint8_t*) av_malloc(m_videoCodecCtx->extradata_size);
-        memcpy(m_videoCodecCtxPtr->ctx()->extradata, m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
+        m_videoContext->ctx()->extradata_size = m_videoCodecCtx->extradata_size;
+        m_videoContext->ctx()->extradata = (uint8_t*) av_malloc(m_videoCodecCtx->extradata_size);
+        memcpy(m_videoContext->ctx()->extradata, m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
     }
 
     if (m_audioCodecCtx && m_audioCodecCtx->extradata_size)
     {
-        m_audioCodecCtxPtr->ctx()->extradata_size = m_audioCodecCtx->extradata_size;
-        m_audioCodecCtxPtr->ctx()->extradata = (uint8_t*) av_malloc(m_audioCodecCtx->extradata_size);
-        memcpy(m_audioCodecCtxPtr->ctx()->extradata, m_audioCodecCtx->extradata, m_audioCodecCtx->extradata_size);
+        m_audioContext->ctx()->extradata_size = m_audioCodecCtx->extradata_size;
+        m_audioContext->ctx()->extradata = (uint8_t*) av_malloc(m_audioCodecCtx->extradata_size);
+        memcpy(m_audioContext->ctx()->extradata, m_audioCodecCtx->extradata, m_audioCodecCtx->extradata_size);
     }
 
     //m_videoCodecCtxPtr = QnMediaContextPtr(new QnMediaContext(m_videoCodecCtx));
@@ -593,7 +596,7 @@ int QnDesktopDataProvider::processData(bool flush)
     if (out_size > 0)
     {
 
-        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size, m_videoCodecCtxPtr));
+        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, out_size, m_videoContext));
         video->m_data.write((const char*) m_videoBuf, out_size);
         video->compressionType = m_videoCodecCtx->codec_id;
         video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
@@ -674,7 +677,7 @@ int QnDesktopDataProvider::processData(bool flush)
         int aEncoded = avcodec_encode_audio(m_audioCodecCtx, m_encodedAudioBuf, FF_MIN_BUFFER_SIZE, buffer1);
         if (aEncoded > 0)
         {
-            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, aEncoded, m_audioCodecCtxPtr));
+            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, aEncoded, m_audioContext));
             audio->m_data.write((const char*) m_encodedAudioBuf, aEncoded);
             audio->compressionType = m_audioCodecCtx->codec_id;
             audio->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;
@@ -815,7 +818,7 @@ QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
     if (m_audioCodecCtx && m_audioLayout->channelCount() == 0)
     {
         QnResourceAudioLayout::AudioTrack track;
-        track.codecContext = QnAbstractMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        track.codecContext = QnMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
         m_audioLayout->setAudioTrackInfo(track);
     }
     return m_audioLayout;
