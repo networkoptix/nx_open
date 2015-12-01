@@ -60,26 +60,34 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    if (action->actionType() == QnBusiness::SendMailAction) {
-        // looking for server with public IP address
-        const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-        if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
-            return QnMediaServerResourcePtr(); // do not proxy
-        for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
+    switch(action->actionType()) 
+    {
+        case QnBusiness::SendMailAction:
         {
-            if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
-                return mServer;
+            // looking for server with public IP address
+            const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+            if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
+                return QnMediaServerResourcePtr(); // do not proxy
+            for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
+            {
+                if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
+                    return mServer;
+            }
+            return QnMediaServerResourcePtr();
         }
-        return QnMediaServerResourcePtr();
+        case QnBusiness::DiagnosticsAction:
+        case QnBusiness::ShowPopupAction:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+        case QnBusiness::SayTextAction:
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
+        default:
+            if (!res)
+                return QnMediaServerResourcePtr(); // can not find routeTo resource
+            return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
     }
-
-    if (action->actionType() == QnBusiness::DiagnosticsAction)
-        return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
-
-    if (!res)
-        return QnMediaServerResourcePtr(); // can not find routeTo resource
-
-    return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
 }
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
