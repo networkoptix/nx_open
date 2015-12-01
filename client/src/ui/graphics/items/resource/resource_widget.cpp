@@ -233,7 +233,7 @@ void QnResourceWidget::addInfoOverlay() {
 
     {
         QnHtmlTextItemOptions infoOptions;
-        infoOptions.backgroundColor = QColor(0, 0, 0, 127);
+        infoOptions.backgroundColor = infoBackgroundColor;
         infoOptions.borderRadius = 4;
         infoOptions.autosize = true;
 
