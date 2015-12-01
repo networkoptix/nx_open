@@ -134,7 +134,7 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
 
     enum { kMinDataLifetimeMs = 5000 };
 
-    /// Do not remove data too fast (for short prolonged actions, for instance)
+    // Do not remove data too fast (for short prolonged actions, for instance)
     const auto dataTimestamp = it->first;
     const auto currentLifetime = (m_counter.elapsed() - dataTimestamp);
     if (currentLifetime < kMinDataLifetimeMs)
@@ -142,14 +142,14 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
         auto &dataToBeUpdated = it->second;
         if (m_currentMode == mode)
         {
-            /// Sets timeout to remove item automatically
+            // Sets timeout to remove item automatically
             dataToBeUpdated.timeout = (kMinDataLifetimeMs - currentLifetime);
-            addItem(dataToBeUpdated);   /// replaces existing data
+            addItem(dataToBeUpdated);   // replaces existing data
         }
         else
         {
-            /// do not change timestamp, but set timeout to be sure
-            /// we delete item on next mode switch
+            // do not change timestamp, but set timeout to be sure
+            // we delete item on next mode switch
             dataToBeUpdated.timeout = kMinDataLifetimeMs;
         }
 
@@ -243,7 +243,7 @@ void QnCompositeTextOverlay::initTextMode()
             const auto desciption = elideString(
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
-            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  /// Do not add empty text items
+            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  // Do not add empty text items
                 return; 
 
             static const auto kComplexHtml = lit("%1%2");
@@ -252,7 +252,7 @@ void QnCompositeTextOverlay::initTextMode()
         }
         else
         {
-            if (text.trimmed().isEmpty()) /// Do not add empty text items
+            if (text.trimmed().isEmpty()) // Do not add empty text items
                 return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
             const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
@@ -269,7 +269,7 @@ void QnCompositeTextOverlay::initTextMode()
 
 void QnCompositeTextOverlay::initBookmarksMode()
 {
-    //// TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
+    // TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
 
     connect(m_navigator, &QnWorkbenchNavigator::positionChanged, this, &QnCompositeTextOverlay::updateBookmarksFilter);
 

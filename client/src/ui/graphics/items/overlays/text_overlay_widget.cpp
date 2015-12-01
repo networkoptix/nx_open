@@ -1,6 +1,6 @@
 #include "text_overlay_widget.h"
 
-#include <QTimer>
+#include <QtCore/QTimer>
 #include <QtWidgets/QGraphicsLinearLayout>
 
 #include <core/resource/camera_bookmark.h>
@@ -107,7 +107,7 @@ void QnTextOverlayWidgetPrivate::addItem(const QnOverlayTextItemData &data
 {
     const auto id = data.id;
 
-    removeItem(id, false);  /// In case of update we should remove data (and cancel timer event, if any)
+    removeItem(id, false);  // In case of update we should remove data (and cancel timer event, if any)
     const QnHtmlTextItemPtr textItem = QnHtmlTextItemPtr(new QnHtmlTextItem(data.text
         , data.itemOptions, m_contentWidget));
 
@@ -187,7 +187,6 @@ void QnTextOverlayWidgetPrivate::updatePositions()
     Q_Q(QnTextOverlayWidget);
     q->update();
 }
-
 
 ///
 
