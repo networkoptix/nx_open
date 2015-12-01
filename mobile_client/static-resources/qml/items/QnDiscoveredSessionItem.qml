@@ -32,7 +32,7 @@ Rectangle {
         width: parent.width - 2 * x
 
         Text {
-            text: systemName
+            text: systemName ? systemName : "<%1>".arg(qsTr("Unknown"))
             color: isCompatible ? QnTheme.listText : QnTheme.listDisabledText
             font.pixelSize: sp(18)
             font.weight: Font.DemiBold

@@ -312,7 +312,8 @@ Item {
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
-                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy"))
+                    // TODO: Remove qsTr from this string!
+                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                     color: QnTheme.windowText
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
