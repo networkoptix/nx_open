@@ -1226,22 +1226,23 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
         qnGlobalSettings->synchronizeNow();
     };
 
-    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
+    /* Hardcoded constant from v2.3.2 */
+    static const QString statisticsReportAllowed = lit("statisticsReportAllowed");
 
     /* Value set by installer has the greatest priority */
-    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
+    const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
         setValue(confStats.toBool());
         /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
+        MSSettings::roSettings()->remove(statisticsReportAllowed);
         MSSettings::roSettings()->sync();
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
-    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(STATISTICS_REPORT_ALLOWED)) {
+    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
         bool value;
-        if (QnLexical::deserialize(m_mediaServer->getProperty(STATISTICS_REPORT_ALLOWED), &value))
+        if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
             setValue(value);
-        propertyDictionary->removeProperty(m_mediaServer->getId(), STATISTICS_REPORT_ALLOWED);
+        propertyDictionary->removeProperty(m_mediaServer->getId(), statisticsReportAllowed);
     }
 }
 
