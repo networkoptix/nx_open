@@ -296,7 +296,8 @@ public:
                     if (fullscanProcessed) {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
-                        emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
+                        if (!m_fullScanCanceled)
+                            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
                     }
                     else if (partialScanProcessed)
                         emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
