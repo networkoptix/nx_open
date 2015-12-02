@@ -44,6 +44,10 @@ signals:
     void playBookmark(const QnCameraBookmark &bookmark);
 
 public slots:
+    /// @brief Sets "remove" and "edit" buttons available
+    /// according to specified parameter
+    void setAdjustButtonsAvailable(bool available);
+
     /// Set timestamp for bookmarks extraction
     void setTargetTimestamp(qint64 timestamp);
 

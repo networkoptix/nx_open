@@ -516,7 +516,7 @@ QnActionManager::QnActionManager(QObject *parent):
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
     factory(Qn::OpenBusinessLogAction).
-        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget 
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget
             | Qn::LayoutItemTarget | Qn::WidgetTarget | Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
@@ -751,7 +751,7 @@ QnActionManager::QnActionManager(QObject *parent):
         shortcut(tr("Ctrl+S")).
         autoRepeat(false).
         condition(new QnConjunctionActionCondition(
-            new QnForbiddenInSafeModeCondition(this),      
+            new QnForbiddenInSafeModeCondition(this),
             new QnSaveVideowallReviewActionCondition(true, this),
             this));
 
@@ -905,7 +905,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::CameraListAction).
         flags(Qn::GlobalHotkey).
         mode(QnActionTypes::DesktopMode).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).        
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("Devices List"),
             tr("Cameras List")
@@ -997,7 +997,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open in the Alarm Layout"));   
+        text(tr("Open in the Alarm Layout"));
 
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).
@@ -1662,6 +1662,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::EditCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Edit Bookmark...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1670,6 +1671,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::RemoveCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
         text(tr("Remove Bookmark...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnModifyBookmarkActionCondition(this),
@@ -1971,7 +1973,7 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
     /* This method call means that we are opening brand new context menu.
-       Following check will assure that only the latest context menu will be displayed. 
+       Following check will assure that only the latest context menu will be displayed.
        In the standalone application it is guarantied by the qt GUI engine. */
     if (qnRuntime->isActiveXMode()) {
         for (auto menuObject: m_parametersByMenu.keys()) {
@@ -2116,12 +2118,12 @@ QMenu *QnActionManager::newMenuRecursive(const QnAction *parent, Qn::ActionScope
 QnActionParameters QnActionManager::currentParameters(QnAction *action) const {
     if(m_shortcutAction == action)
         return m_parametersByMenu.value(NULL);
-    
+
     if(!m_parametersByMenu.contains(m_lastClickedMenu)) {
         qnWarning("No active menu, no target exists.");
         return QnActionParameters();
     }
-    
+
     return m_parametersByMenu.value(m_lastClickedMenu);
 }
 
