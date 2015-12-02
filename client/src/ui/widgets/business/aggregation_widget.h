@@ -21,8 +21,12 @@ public:
     void setShort(bool value);
 
     static int optimalWidth();
+
 signals:
     void valueChanged();
+
+private:
+    void updateMinimumValue();
 
 private:
     QScopedPointer<Ui::AggregationWidget> ui;
