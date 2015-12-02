@@ -29,7 +29,7 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
 
     m_mainLayout->setContentsMargins(0, 0, 0, 0);
 
-     m_mainLayout->addItem(m_scrollArea);
+    m_mainLayout->addItem(m_scrollArea);
 
     if (alignment.testFlag(Qt::AlignLeft)) {
         m_mainLayout->addStretch();
@@ -48,10 +48,13 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
 QnScrollableOverlayWidgetPrivate::~QnScrollableOverlayWidgetPrivate()
 {}
 
-QnUuid QnScrollableOverlayWidgetPrivate::addItem( QGraphicsWidget *item ) {
+QnUuid QnScrollableOverlayWidgetPrivate::addItem( QGraphicsWidget *item, const QnUuid &externalId ) {
+    item->setParent(m_contentWidget);
     item->setParentItem(m_contentWidget);
 
-    QnUuid id = QnUuid::createUuid();
+    QnUuid id = externalId.isNull()
+        ? QnUuid::createUuid()
+        : externalId;
     m_items[id] = item;
 
     QObject::connect(item, &QGraphicsWidget::geometryChanged, m_contentWidget, [this]() {
@@ -70,6 +73,8 @@ void QnScrollableOverlayWidgetPrivate::removeItem( const QnUuid &id ) {
 }
 
 void QnScrollableOverlayWidgetPrivate::clear() {
+    for (QGraphicsWidget* item: m_items)
+        delete item;
     m_items.clear();
     updatePositions();
 }
@@ -99,7 +104,7 @@ void QnScrollableOverlayWidgetPrivate::updatePositions() {
     m_contentWidget->resize(widht, std::max(0, height - layoutSpacing));
 
     Q_Q(QnScrollableOverlayWidget);
-    q->update();
+    q->updateGeometry();
 }
 
 int QnScrollableOverlayWidgetPrivate::overlayWidth() const {
@@ -121,7 +126,7 @@ void QnScrollableOverlayWidgetPrivate::setOverlayWidth( int width ) {
     updatePositions();
 }
 
-QSizeF QnScrollableOverlayWidgetPrivate::minimalSize() const {
+QSizeF QnScrollableOverlayWidgetPrivate::minimumSize() const {
     if (m_items.isEmpty())
         return QSizeF();
 
@@ -133,7 +138,13 @@ QSizeF QnScrollableOverlayWidgetPrivate::minimalSize() const {
         return left->size().height() < right->size().height();
     });
 
-    return QSizeF(widest.value()->size().width() / m_maxFillCoeff.width(), tallest.value()->size().height() / m_maxFillCoeff.height());
+    Q_Q(const QnScrollableOverlayWidget);
+    auto margins = q->contentsMargins();
+
+    qreal maxWidth  = widest.value()->size().width()   + margins.left() + margins.right();
+    qreal maxHeight = tallest.value()->size().height() + margins.top()  + margins.bottom();
+
+    return QSizeF(maxWidth / m_maxFillCoeff.width(), maxHeight / m_maxFillCoeff.height());
 }
 
 QSizeF QnScrollableOverlayWidgetPrivate::maxFillCoeff() const {
