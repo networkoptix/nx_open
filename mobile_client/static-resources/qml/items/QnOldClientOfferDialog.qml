@@ -10,20 +10,23 @@ QnDialog {
     QtObject {
         id: d
 
-        function storeString() {
-            if (Qt.platform.os == "android")
-                return qsTr("Google Play")
-            else if (Qt.platform.os == "ios")
-                return qsTr("the App Store")
-            else
-                return qsTr("the Internet")
+        function downloadOfferString() {
+            if (Qt.platform.os == "android") {
+                return qsTr("To connect to old servers please download the legacy application from Google Play.",
+                            "\"Google Play\" is the name of the main Android application store.")
+            } else if (Qt.platform.os == "ios") {
+                return qsTr("To connect to old servers please download the legacy application from the App Store.",
+                            "\"App Store\" is the name of the main Apple application store.")
+            } else {
+                return qsTr("To connect to old servers please download the legacy application from the Internet.")
+            }
         }
     }
 
     Text {
         width: dialog.width - dp(32)
         x: dp(16)
-        text: qsTr("To connect to old servers please download the legacy application from %1.").arg(d.storeString())
+        text: d.downloadOfferString()
         font.pixelSize: sp(18)
         wrapMode: Text.WordWrap
         color: QnTheme.dialogText

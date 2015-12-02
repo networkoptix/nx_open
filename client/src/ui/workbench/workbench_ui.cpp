@@ -2400,7 +2400,7 @@ void QnWorkbenchUi::createSliderWidget()
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
-    enum {kSliderLeaveTimeout = 200 };
+    enum {kSliderLeaveTimeout = 100 };
     m_sliderOpacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
     m_sliderItem->timeSlider()->bookmarksViewer()->setHoverProcessor(m_sliderOpacityProcessor);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);

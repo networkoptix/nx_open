@@ -12,7 +12,7 @@ Item {
     property int year: (new Date()).getFullYear()
     property int month: (new Date()).getMonth() + 1
     property date date: new Date()
-    property bool mondayIsFirstDay: true
+    property bool mondayIsFirstDay: d.locale.firstDayOfWeek == Qt.Monday
     property bool horizontal: Main.isMobile() ? !isPhone || Screen.width > Screen.height
                                               : mainWindow.width > dp(540)
     property var chunkProvider

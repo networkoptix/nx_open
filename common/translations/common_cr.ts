@@ -382,6 +382,22 @@
         <source>%1 --&gt; %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>

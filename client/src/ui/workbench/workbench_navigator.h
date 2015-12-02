@@ -219,6 +219,8 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
+    void updateBookmarksModeState();
+
     void resetCurrentBookmarkQuery();
 
     void setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query);

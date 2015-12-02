@@ -273,6 +273,7 @@ void QnStorageConfigWidget::loadDataToUi() {
     updateRebuildInfo();
     updateBackupInfo();
 
+    ui->storagesWarningLabel->hide();
 }
 
 void QnStorageConfigWidget::loadStoragesFromResources() {

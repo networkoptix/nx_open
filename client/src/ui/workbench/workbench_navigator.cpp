@@ -327,7 +327,7 @@ void QnWorkbenchNavigator::setDayTimeWidget(QnDayTimeWidget *dayTimeWidget) {
 }
 
 bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
-    return !m_currentQuery.isNull();
+    return m_timeSlider->isBookmarksVisible();
 }
 
 QnCameraBookmarksQueryPtr QnWorkbenchNavigator::refreshQueryFilter(const QnVirtualCameraResourcePtr &camera)
@@ -345,13 +345,11 @@ QnCameraBookmarksQueryPtr QnWorkbenchNavigator::refreshQueryFilter(const QnVirtu
     return query;
 }
 
-void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled)
+void QnWorkbenchNavigator::updateBookmarksModeState()
 {
-    m_timeSlider->setBookmarksVisible(bookmarksModeEnabled);
-
-    if (bookmarksModeEnabled && m_currentMediaWidget)
+    if (bookmarksModeEnabled() && m_currentWidget)
     {
-        const auto camera = m_currentMediaWidget->resource().dynamicCast<QnVirtualCameraResource>();
+        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
         const auto query = refreshQueryFilter(camera);
         setCurrentBookmarkQuery(query);
     }
@@ -363,6 +361,15 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool bookmarksModeEnabled)
         m_timeSlider->setBookmarks(QnCameraBookmarkList());
         m_timeSlider->bookmarksViewer()->resetBookmarks();
     }
+}
+
+void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
+{
+    if (bookmarksModeEnabled() == enabled)
+        return;
+
+    m_timeSlider->setBookmarksVisible(enabled);
+    updateBookmarksModeState();
 
     emit bookmarksModeEnabledChanged();
 }
@@ -1049,6 +1056,7 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSpeedRange();
     updateSpeed();
     updateThumbnailsLoader();
+    updateBookmarksModeState();
 
     emit currentWidgetChanged();
 }

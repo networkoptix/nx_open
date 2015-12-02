@@ -59,7 +59,10 @@ Item {
             property real prevY
 
             onPressed: {
-                propagateComposedEvents = (mouse.y < height - timeline.height)
+                /* We propagate composed events for areas free of the UI controls (timeline, play/pause button). */
+                propagateComposedEvents =
+                        (mouse.y < height - timeline.height) &&
+                        (mouse.x < playbackController.x || mouse.x > playbackController.x + playbackController.width)
 
                 if (drag.target)
                     prevY = drag.target.y
@@ -309,7 +312,8 @@ Item {
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
-                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy"))
+                    // TODO: Remove qsTr from this string!
+                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                     color: QnTheme.windowText
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
