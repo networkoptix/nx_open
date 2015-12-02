@@ -104,7 +104,7 @@ void QnCompositeTextOverlay::setMode(Mode mode)
 
     m_currentMode = mode;
 
-    setItems(removeOutdatedItems(m_currentMode));
+    setTextItems(removeOutdatedItems(m_currentMode));
 
     emit modeChanged();
 }
@@ -121,7 +121,7 @@ void QnCompositeTextOverlay::addModeData(Mode mode
         *it = internalData;
 
     if (mode == m_currentMode)
-        addItem(data);
+        addTextItem(data);
 }
 
 void QnCompositeTextOverlay::removeModeData(Mode mode
@@ -144,7 +144,7 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
         {
             // Sets timeout to remove item automatically
             dataToBeUpdated.timeout = (kMinDataLifetimeMs - currentLifetime);
-            addItem(dataToBeUpdated);   // replaces existing data
+            addTextItem(dataToBeUpdated);   // replaces existing data
         }
         else
         {
@@ -159,7 +159,7 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
     currentData.erase(it);
 
     if (m_currentMode == mode)
-        removeItem(id);
+        removeTextItem(id);
 }
 
 void QnCompositeTextOverlay::setModeData(Mode mode
@@ -173,7 +173,7 @@ void QnCompositeTextOverlay::setModeData(Mode mode
     m_data[mode] = data;
 
     if (m_currentMode == mode)
-        setItems(removeOutdatedItems(m_currentMode));
+        setTextItems(removeOutdatedItems(m_currentMode));
 }
 
 void QnCompositeTextOverlay::resetModeData(Mode mode)

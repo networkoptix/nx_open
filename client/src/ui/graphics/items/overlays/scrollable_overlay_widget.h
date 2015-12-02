@@ -18,7 +18,7 @@ public:
     virtual ~QnScrollableOverlayWidget();
 
     /** Add item to scrollable area. Will take ownership of the item. */
-    QnUuid addItem(QGraphicsWidget *item);
+    QnUuid addItem(QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
     void removeItem(const QnUuid &id);
     void clear();
 

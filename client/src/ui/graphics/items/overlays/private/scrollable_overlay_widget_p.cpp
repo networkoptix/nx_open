@@ -48,10 +48,13 @@ QnScrollableOverlayWidgetPrivate::QnScrollableOverlayWidgetPrivate(Qt::Alignment
 QnScrollableOverlayWidgetPrivate::~QnScrollableOverlayWidgetPrivate()
 {}
 
-QnUuid QnScrollableOverlayWidgetPrivate::addItem( QGraphicsWidget *item ) {
+QnUuid QnScrollableOverlayWidgetPrivate::addItem( QGraphicsWidget *item, const QnUuid &externalId ) {
+    item->setParent(m_contentWidget);
     item->setParentItem(m_contentWidget);
 
-    QnUuid id = QnUuid::createUuid();
+    QnUuid id = externalId.isNull()
+        ? QnUuid::createUuid()
+        : externalId;
     m_items[id] = item;
 
     QObject::connect(item, &QGraphicsWidget::geometryChanged, m_contentWidget, [this]() {
@@ -70,6 +73,8 @@ void QnScrollableOverlayWidgetPrivate::removeItem( const QnUuid &id ) {
 }
 
 void QnScrollableOverlayWidgetPrivate::clear() {
+    for (QGraphicsWidget* item: m_items)
+        delete item;
     m_items.clear();
     updatePositions();
 }

@@ -16,9 +16,9 @@ QnScrollableOverlayWidget::QnScrollableOverlayWidget(Qt::Alignment alignment, QG
 QnScrollableOverlayWidget::~QnScrollableOverlayWidget() {
 }
 
-QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item ) {
+QnUuid QnScrollableOverlayWidget::addItem( QGraphicsWidget *item, const QnUuid &externalId) {
     Q_D(QnScrollableOverlayWidget);
-    return d->addItem(item);
+    return d->addItem(item, externalId);
 }
 
 void QnScrollableOverlayWidget::removeItem( const QnUuid &id ) {
