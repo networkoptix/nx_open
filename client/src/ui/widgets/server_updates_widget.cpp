@@ -418,6 +418,14 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
                                   lit("\n") +
                                   serverNamesString(result.failedPeers));
             break;
+        case QnUpdateResult::UploadingFailed_AuthenticationFailed:
+            QMessageBox::critical(this, tr("Update unsuccessful."),
+                                  tr("Could not push updates to servers.") +
+                                  lit("\n") +
+                                  tr("Authentication failed for %n servers:", "", result.failedPeers.size()) +
+                                  lit("\n") +
+                                  serverNamesString(result.failedPeers));
+            break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not install an update to the client."));
             break;
@@ -700,7 +708,7 @@ QString QnServerUpdatesWidget::serverNamesString(const QSet<QnUuid> &serverIds) 
     QString result;
 
     for (const QnUuid &id: serverIds) {
-        QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(id);
+        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (!server)
             continue;
 

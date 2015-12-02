@@ -47,7 +47,8 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
-    const QString nameDefaultBackupQualities(lit("defaultBackupQualities"));
+    const QString nameBackupQualities(lit("backupQualities"));
+    const QString nameBackupNewCamerasByDefault(lit("backupNewCamerasByDefault"));
     const QString nameStatisticsAllowed(lit("statisticsAllowed"));
 
     const QString ldapUri(lit("ldapUri"));
@@ -145,7 +146,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
-    m_defaultBackupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameDefaultBackupQualities, Qn::CameraBackup_Disabled, this);
+    m_backupQualitiesAdaptor = new QnLexicalResourcePropertyAdaptor<Qn::CameraBackupQualities>(nameBackupQualities, Qn::CameraBackup_Both, this);
+    m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameBackupNewCamerasByDefault, false, this);
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(nameStatisticsAllowed, QnOptionalBool(), this);
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -162,7 +164,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_auditTrailEnabledAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
-        << m_defaultBackupQualitiesAdaptor
+        << m_backupQualitiesAdaptor
+        << m_backupNewCamerasByDefaultAdaptor
         << m_statisticsAllowedAdaptor
         ;
 
@@ -304,12 +307,20 @@ void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEna
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
 }
 
-Qn::CameraBackupQualities QnGlobalSettings::defaultBackupQualities() const {
-    return m_defaultBackupQualitiesAdaptor->value();
+Qn::CameraBackupQualities QnGlobalSettings::backupQualities() const {
+    return m_backupQualitiesAdaptor->value();
 }
 
-void QnGlobalSettings::setDefauldBackupQualities( Qn::CameraBackupQualities value ) {
-    m_defaultBackupQualitiesAdaptor->setValue(value);
+void QnGlobalSettings::setBackupQualities( Qn::CameraBackupQualities value ) {
+    m_backupQualitiesAdaptor->setValue(value);
+}
+
+bool QnGlobalSettings::backupNewCamerasByDefault() const {
+    return m_backupNewCamerasByDefaultAdaptor->value();
+}
+
+void QnGlobalSettings::setBackupNewCamerasByDefault( bool value ) {
+    m_backupNewCamerasByDefaultAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::isStatisticsAllowedDefined() const {
@@ -325,4 +336,3 @@ bool QnGlobalSettings::isStatisticsAllowed() const {
 void QnGlobalSettings::setStatisticsAllowed( bool value ) {
     m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
 }
-

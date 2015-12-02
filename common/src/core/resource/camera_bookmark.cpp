@@ -146,9 +146,7 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
         maxSize += list.size();
     result.reserve(std::min(limit, maxSize));
 
-    typedef QMap<QString, int> TagCountMap;
-    TagCountMap mergedTags;
-
+    QMap<QString, int> mergedTags;
     for (const QnCameraBookmarkTagList &source: nonEmptyLists) {
         for (const auto &tag: source) {
             auto &currentCount = mergedTags[tag.name];
@@ -156,9 +154,7 @@ QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMul
         }
     }
 
-    typedef QMap<int, QString> CountTagMap;
-
-    CountTagMap sortedTags;
+    QMap<int, QString> sortedTags;
     for (auto it = mergedTags.begin(); it != mergedTags.end(); ++it)
         sortedTags.insert(it.value(), it.key());
 

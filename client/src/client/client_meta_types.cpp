@@ -32,7 +32,7 @@ QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ClientSkin)
 
 void QnClientMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK, 
+    /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
     if(qn_clientMetaTypes_initialized)
         return;
@@ -47,7 +47,7 @@ void QnClientMetaTypes::initialize() {
 
     qRegisterMetaType<Qn::NodeType>();
     qRegisterMetaType<Qn::ItemRole>();
-    qRegisterMetaType<QnThumbnail>();    
+    qRegisterMetaType<QnThumbnail>();
     qRegisterMetaType<QnWorkbenchState>();
     qRegisterMetaTypeStreamOperators<QnWorkbenchState>();
     qRegisterMetaType<QnWorkbenchStateHash>();
@@ -104,7 +104,6 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnServerUpdatesColors>();
     qRegisterMetaType<QnBackupScheduleColors>();
     qRegisterMetaType<QnFailoverPriorityColors>();
-    qRegisterMetaType<QnBackupCamerasColors>();
 
     qRegisterMetaType<QnAbstractCameraDataPtr>();
 
@@ -135,7 +134,6 @@ void QnClientMetaTypes::initialize() {
     QnJsonSerializer::registerSerializer<QnServerUpdatesColors>();
     QnJsonSerializer::registerSerializer<QnBackupScheduleColors>();
     QnJsonSerializer::registerSerializer<QnFailoverPriorityColors>();
-    QnJsonSerializer::registerSerializer<QnBackupCamerasColors>();
 
     QnJsonSerializer::registerSerializer<Qn::ClientSkin>();
     QnJsonSerializer::registerSerializer<Qn::BackgroundAnimationMode>();
