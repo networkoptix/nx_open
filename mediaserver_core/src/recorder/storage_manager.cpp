@@ -244,7 +244,6 @@ public:
                 if (needToStop())
                     break;
                 scanData = m_scanTasks.front();
-                m_scanTasks.pop_front();
             }
 
             if (scanData.partialScan)
@@ -289,6 +288,7 @@ public:
             
             {
                 QnMutexLocker lock(&m_mutex);
+                m_scanTasks.pop_front();
                 if (m_scanTasks.isEmpty()) 
                 {
                     // not data to process left                
@@ -490,13 +490,15 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
     if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
         QnMutexLocker lock( &m_mutexRebuild );
-        result = QnStorageScanData(Qn::RebuildState_FullScan, QString(), 0.0);
         m_rebuildCancelled = false;
         QVector<QnStorageResourcePtr> storagesToScan;
         for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
             if (storage->getStatus() == Qn::Online)
                 storagesToScan << storage;
         }
+        if (storagesToScan.isEmpty())
+            return result;
+        result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
         m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
 
