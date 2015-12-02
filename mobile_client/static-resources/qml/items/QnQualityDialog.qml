@@ -42,7 +42,6 @@ QnDialog {
             Rectangle {
                 width: parent.width
                 height: parent.height
-                x: -dp(16)
 
                 color: current ? QnTheme.dialogSelectedBackground : "transparent"
 
@@ -56,6 +55,7 @@ QnDialog {
             }
 
             Text {
+                x: dp(16)
                 anchors.verticalCenter: parent.verticalCenter
                 text: modelData ? modelData : qsTr("Auto")
                 color: current ? QnTheme.dialogSelectedText : QnTheme.dialogText

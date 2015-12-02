@@ -32,7 +32,6 @@ Item {
         Repeater {
             model: QnCalendarModel {
                 id: calendarModel
-                onMondayIsFirstDayChanged: dayNames.updateDayNames()
             }
 
             Item {

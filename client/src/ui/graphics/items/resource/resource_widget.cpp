@@ -67,9 +67,11 @@ namespace {
 #endif
 
     /** Background color for overlay panels. */
-    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #Elric #customization
+    const QColor overlayBackgroundColor = QColor(0, 0, 0, 96); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #Elric #customization
+    const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
+
+    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #gdm #customization
 
     const float noAspectRatio = -1.0;
 
@@ -210,41 +212,54 @@ QnResourceWidget::~QnResourceWidget() {
 
 
 void QnResourceWidget::addInfoOverlay() {
-    auto titleLayout = createGraphicsLayout(Qt::Horizontal);
-    titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
-    titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
+    {
+        auto titleLayout = createGraphicsLayout(Qt::Horizontal);
+        titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
+        titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
-    auto titleWidget = createGraphicsWidget(titleLayout);
-    auto overlayLayout = createGraphicsLayout(Qt::Vertical);
-    overlayLayout->addItem(titleWidget);
-    overlayLayout->addStretch();
+        auto titleWidget = createGraphicsWidget(titleLayout);
+        auto overlayLayout = createGraphicsLayout(Qt::Vertical);
+        overlayLayout->addItem(titleWidget);
+        overlayLayout->addStretch();
 
-    QnViewportBoundWidget *cameraNameOnlyOverlay = new QnViewportBoundWidget(this);
-    cameraNameOnlyOverlay->setLayout(overlayLayout);
-    cameraNameOnlyOverlay->setAcceptedMouseButtons(0);
-    m_overlayWidgets.cameraNameOnlyOverlay = cameraNameOnlyOverlay;
+        QnViewportBoundWidget *cameraNameOnlyOverlay = new QnViewportBoundWidget(this);
+        cameraNameOnlyOverlay->setLayout(overlayLayout);
+        cameraNameOnlyOverlay->setAcceptedMouseButtons(0);
+        m_overlayWidgets.cameraNameOnlyOverlay = cameraNameOnlyOverlay;
 
-    addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
-    setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
+        addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
+        setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
+    }
 
     {
         QnHtmlTextItemOptions infoOptions;
-        infoOptions.backgroundColor = QColor(0, 0, 0, 127);
+        infoOptions.backgroundColor = infoBackgroundColor;
         infoOptions.borderRadius = 4;
         infoOptions.autosize = true;
-        m_overlayWidgets.detailsItem->setOptions(infoOptions);
-        m_overlayWidgets.positionItem->setOptions(infoOptions);
 
+        enum { kMargin = 2 };
+
+        static const QSizeF maxFillCoeff(0.7, 0.5);
+
+        m_overlayWidgets.detailsItem->setOptions(infoOptions);
+        m_overlayWidgets.detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
         auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
-        detailsOverlay->setContentsMargins(0, 0, 0, 0);
+        detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
+        detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
         detailsOverlay->addItem(m_overlayWidgets.detailsItem);
+        detailsOverlay->setMaxFillCoeff(maxFillCoeff);
         addOverlayWidget(detailsOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.detailsOverlay = detailsOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay, false, false);
 
+
+        m_overlayWidgets.positionItem->setOptions(infoOptions);
+        m_overlayWidgets.positionItem->setProperty(Qn::NoBlockMotionSelection, true);
         auto positionOverlay = new QnScrollableOverlayWidget(Qt::AlignRight, this);
-        positionOverlay->setContentsMargins(0, 0, 0, 0);
+        positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
+        positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
         positionOverlay->addItem(m_overlayWidgets.positionItem);
+        positionOverlay->setMaxFillCoeff(maxFillCoeff);
         addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.positionOverlay = positionOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.positionOverlay, false, false);
@@ -485,7 +500,9 @@ QString QnResourceWidget::calculateDetailsText() const {
 }
 
 void QnResourceWidget::updateDetailsText() {
-    m_overlayWidgets.detailsItem->setHtml(calculateDetailsText());
+    const QString text = calculateDetailsText();
+    m_overlayWidgets.detailsItem->setHtml(text);
+    m_overlayWidgets.detailsItem->setVisible(!text.isEmpty());
 }
 
 QString QnResourceWidget::calculatePositionText() const {
@@ -493,10 +510,10 @@ QString QnResourceWidget::calculatePositionText() const {
 }
 
 void QnResourceWidget::updatePositionText() {
-    m_overlayWidgets.positionItem->setHtml(calculatePositionText());
+    const QString text = calculatePositionText();
+    m_overlayWidgets.positionItem->setHtml(text);
+    m_overlayWidgets.positionItem->setVisible(!text.isEmpty());
 }
-
-
 
 QCursor QnResourceWidget::calculateCursor() const {
     return Qt::ArrowCursor;

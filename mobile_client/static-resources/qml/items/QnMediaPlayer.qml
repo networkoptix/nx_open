@@ -13,7 +13,7 @@ QnObject {
     property string resourceId
 
     readonly property bool loading: !d.paused && d.mediaPlayer && d.mediaPlayer.loading
-    readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playbackState === MediaPlayer.PlayingState && d.mediaPlayer.position > 0 : false
+    readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playing : false
     readonly property bool atLive: d.position < 0
 
     readonly property alias failed: d.failed
@@ -47,6 +47,8 @@ QnObject {
         property bool dirty: true
         property alias mediaPlayer: playerLoader.item
         property bool resetUrlOnConnect: false
+
+        onPausedChanged: failureTimer.updateTimer()
     }
 
     Timer {
@@ -61,11 +63,17 @@ QnObject {
                 d.mediaPlayer.stop()
             }
         }
-        onRunningChanged: {
-            if (running) {
-                d.failed = false
-                d.startPosition = d.mediaPlayer.position
+
+        function updateTimer() {
+            if (d.paused) {
+                stop()
+                return
             }
+
+            d.failed = false
+            d.startPosition = d.mediaPlayer.position
+
+            restart()
         }
     }
 
@@ -83,6 +91,8 @@ QnObject {
             autoPlay: !d.paused
 
             onPositionChanged: {
+                failureTimer.updateTimer()
+
                 if (d.position < 0)
                     return
 
@@ -127,6 +137,8 @@ QnObject {
                        status == MediaPlayer.Buffered
             }
 
+            readonly property bool playing: playbackState === MediaPlayer.PlayingState && position > 0
+
             function getFinalTimestamp(startPos) {
                 if (startPos <= 0)
                     return -1
@@ -143,7 +155,8 @@ QnObject {
             source: resourceHelper.mediaUrl
 
             readonly property bool hasTimestamp: true
-            readonly property bool loading: playbackState == MediaPlayer.PlayingState && position == 0
+            readonly property bool loading: playbackState == QnMjpegPlayer.PlayingState && mediaStatus != QnMjpegPlayer.BufferedMedia
+            readonly property bool playing: playbackState == QnMjpegPlayer.PlayingState && mediaStatus == QnMjpegPlayer.BufferedMedia
 
             finalTimestamp: {
                 var chunksEnd = resourceHelper.finalTimestamp
@@ -176,6 +189,8 @@ QnObject {
                 if (!d.paused)
                     player.play(d.chunkEnd + 1)
             }
+
+            onPositionChanged: failureTimer.updateTimer()
 
             function getFinalTimestamp(startPos) {
                 if (startPos <= 0)
@@ -246,7 +261,7 @@ QnObject {
         if (!d.dirty) {
             if (!playing) {
                 d.mediaPlayer.play()
-                failureTimer.restart()
+                failureTimer.updateTimer()
             }
             return
         }
@@ -275,7 +290,7 @@ QnObject {
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
-        failureTimer.restart()
+        failureTimer.updateTimer()
 
         d.dirty = false
     }

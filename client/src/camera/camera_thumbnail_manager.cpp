@@ -22,7 +22,7 @@ QnCameraThumbnailManager::QnCameraThumbnailManager(QObject *parent) :
     m_refreshingTimer->setInterval(10 * 1000);
 
     connect(m_refreshingTimer,      &QTimer::timeout,                                   this,   &QnCameraThumbnailManager::forceRefreshThumbnails);
-    connect(qnResPool,              &QnResourcePool::statusChanged,                     this,   &QnCameraThumbnailManager::at_resPool_statusChanged);    
+    connect(qnResPool,              &QnResourcePool::statusChanged,                     this,   &QnCameraThumbnailManager::at_resPool_statusChanged);
     connect(qnResPool,              &QnResourcePool::resourceRemoved,                   this,   &QnCameraThumbnailManager::at_resPool_resourceRemoved);
     connect(this,                   &QnCameraThumbnailManager::thumbnailReadyDelayed,   this,   &QnCameraThumbnailManager::thumbnailReady, Qt::QueuedConnection);
     setThumbnailSize(defaultThumbnailSize);
@@ -81,7 +81,7 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size) {
 
     m_thumnailSize = size;
     m_statusPixmaps.clear();
-    
+
     m_statusPixmaps[Loading] = scaledPixmap(qnSkin->pixmap("events/thumb_loading.png"));
     m_statusPixmaps[NoData] = scaledPixmap(qnSkin->pixmap("events/thumb_no_data.png"));
     m_statusPixmaps[NoSignal] = scaledPixmap(qnSkin->pixmap("events/thumb_no_signal.png"));
@@ -94,6 +94,9 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
 
     QnMediaServerResourcePtr serverResource = qnResPool->getResourceById<QnMediaServerResource>(resource->getParentId());
     if (!serverResource)
+        return 0;
+
+    if (serverResource->getStatus() != Qn::Online)
         return 0;
 
     QnMediaServerConnectionPtr serverConnection = serverResource->apiConnection();

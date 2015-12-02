@@ -7,6 +7,15 @@
 
 #include <utils/common/warnings.h>
 
+detail::OverlayedBase::OverlayWidget::OverlayWidget()
+    : visibility(OverlayVisibility::Invisible)
+    , widget(nullptr)
+    , childWidget(nullptr)
+    , boundWidget(nullptr)
+    , rotationTransform(nullptr)
+{}
+
+
 void detail::OverlayedBase::initOverlayed(QGraphicsWidget *widget) {
     m_widget = widget;
     m_overlayVisible = false;
@@ -139,12 +148,15 @@ void detail::OverlayedBase::updateOverlayWidgetsVisibility(bool animate) {
             visible = false;
         } else if(overlay.visibility == Visible) {
             visible = true;
-        } 
+        }
         setOverlayWidgetVisible(overlay.widget, visible, animate);
     }
 }
 
 void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, bool visible /*= true*/, bool animate /*= true*/) {
+    if (!widget)
+        return;
+
     qreal opacity = visible ? 1.0 : 0.0;
 
     if(animate) {

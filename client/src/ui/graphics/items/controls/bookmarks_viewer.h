@@ -28,10 +28,20 @@ public:
 
 signals:
     /// @brief Edit action callback
+    /// Closes tooltip after emittance
     void editBookmarkClicked(const QnCameraBookmark &bookmark);
 
     /// @brief Remove action callback
+    /// Closes tooltip after emittance
     void removeBookmarkClicked(const QnCameraBookmark &bookmark);
+
+    /// @brief Tag-clicked action
+    /// Closes tooltip after emittance
+    void tagClicked(const QString &tag);
+
+    /// @brief Play bookmark action
+    /// Closes tooltip after emittance
+    void playBookmark(const QnCameraBookmark &bookmark);
 
 public slots:
     /// Set timestamp for bookmarks extraction
