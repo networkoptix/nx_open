@@ -571,7 +571,7 @@ private:
     qint64 m_targetTimestamp;
 
     QnCameraBookmarkList m_bookmarks;
-    bool m_radonly;
+    bool m_readonly;
 };
 
 enum { kInvalidTimstamp = -1 };
@@ -594,7 +594,7 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_targetTimestamp(kInvalidTimstamp)
 
     , m_bookmarks()
-    , m_radonly(false)
+    , m_readonly(false)
 {
 }
 
@@ -640,7 +640,7 @@ void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
 
 void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 {
-    m_radonly = readonly;
+    m_readonly = readonly;
 }
 
 void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
@@ -712,7 +712,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
             { emitBookmarkEvent(bookmark, eventId); };
 
         m_tooltip.reset(new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0)
-            , m_colors, emitBookmarkEventFunc, m_radonly, m_owner));
+            , m_colors, emitBookmarkEventFunc, m_readonly, m_owner));
     }
 
     if (m_tooltip && m_hoverProcessor)
