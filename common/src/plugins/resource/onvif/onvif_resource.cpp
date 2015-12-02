@@ -942,14 +942,16 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //some cameras (especially, Vista) send here events on output port, filtering them out
-    const bool sourceIsRelayOutPort =
-        (!m_portNamePrefixToIgnore.isEmpty() && handler.source.front().value.startsWith(m_portNamePrefixToIgnore)) ||
+    const bool sourceNameMatchesRelayOutPortName = 
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
             [&handler](const RelayOutputInfo& outputInfo) {
                 return QString::fromStdString(outputInfo.token) == handler.source.front().value;
             }) != m_relayOutputInfo.end();
+    const bool sourceIsRelayOutPort =
+        (!m_portNamePrefixToIgnore.isEmpty() && handler.source.front().value.startsWith(m_portNamePrefixToIgnore)) ||
+        sourceNameMatchesRelayOutPortName;
     if (!sourceIsExplicitRelayInput &&
         !handler.source.empty() &&
         sourceIsRelayOutPort)
