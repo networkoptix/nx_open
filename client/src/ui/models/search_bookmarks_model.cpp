@@ -7,6 +7,10 @@
 #include <core/resource_management/resource_pool.h>
 #include <camera/camera_bookmarks_manager.h>
 
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
+
 namespace
 {
     typedef std::function<void ()> ResetOperationFunction;
@@ -45,22 +49,23 @@ namespace
 }
 
 class QnSearchBookmarksModel::Impl : private QObject
+    , public QnWorkbenchContextAware
 {
 public:
     Impl(QnSearchBookmarksModel *owner
         , const ResetOperationFunction &beginResetModel
         , const ResetOperationFunction &endResetModel);
-	
+
     ~Impl();
 
     ///
-    void setDates(const QDate &start
-        , const QDate &finish);
+    void setRange(qint64 utcStartTimeMs
+        , qint64 utcFinishTimeMs);
 
     void setFilterText(const QString &text);
 
     void setCameras(const QnVirtualCameraResourceList &cameras);
-    
+
     void applyFilter();
 
     void sort(int column
@@ -69,7 +74,7 @@ public:
     ///
 
     int rowCount(const QModelIndex &parent) const;
-    
+
     int columnCount(const QModelIndex &parent) const;
 
     QVariant getData(const QModelIndex &index
@@ -102,6 +107,8 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , const ResetOperationFunction &beginResetModel
     , const ResetOperationFunction &endResetModel)
     : QObject(owner)
+    , QnWorkbenchContextAware(owner)
+
     , m_beginResetModel(beginResetModel)
     , m_endResetModel(endResetModel)
     , m_owner(owner)
@@ -117,17 +124,15 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
 {
 }
 
-QnSearchBookmarksModel::Impl::~Impl() 
+QnSearchBookmarksModel::Impl::~Impl()
 {
 }
 
-void QnSearchBookmarksModel::Impl::setDates(const QDate &start
-    , const QDate &finish)
+void QnSearchBookmarksModel::Impl::setRange(qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs)
 {
-    static const QTime kStartOfTheDayTime = QTime(0, 0, 0, 0);
-    static const QTime kEndOfTheDayTime = QTime(23, 59, 59, 999);
-    m_filter.startTimeMs = QDateTime(start, kStartOfTheDayTime).toMSecsSinceEpoch();
-    m_filter.endTimeMs = QDateTime(finish, kEndOfTheDayTime).toMSecsSinceEpoch();
+    m_filter.startTimeMs = utcStartTimeMs;
+    m_filter.endTimeMs = utcFinishTimeMs;
 }
 
 void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
@@ -202,9 +207,9 @@ int QnSearchBookmarksModel::Impl::rowCount(const QModelIndex &parent) const
 {
     return (parent.isValid() ? 0 : m_bookmarks.size());
 }
-    
+
 int QnSearchBookmarksModel::Impl::columnCount(const QModelIndex &parent) const
-{ 
+{
     return Column::kColumnsCount;
 }
 
@@ -225,9 +230,9 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kName:
         return bookmark.name;
     case kStartTime:
-        return QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
+        return context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(bookmark.startTimeMs);
     case kLength:
-        enum { kNoApproximation = 0};   /// Don't use approximation, because bookmark could have short lifetime 
+        enum { kNoApproximation = 0};   /// Don't use approximation, because bookmark could have short lifetime
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(kNoApproximation);
     case kTags:
         return QnCameraBookmark::tagsToString(bookmark.tags);
@@ -265,10 +270,10 @@ void QnSearchBookmarksModel::applyFilter()
     m_impl->applyFilter();
 }
 
-void QnSearchBookmarksModel::setDates(const QDate &start
-    , const QDate &finish)
+void QnSearchBookmarksModel::setRange(qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs)
 {
-    m_impl->setDates(start, finish);
+    m_impl->setRange(utcStartTimeMs, utcFinishTimeMs);
 }
 
 void QnSearchBookmarksModel::setFilterText(const QString &text)
@@ -285,7 +290,7 @@ int QnSearchBookmarksModel::rowCount(const QModelIndex &parent) const
 {
     return m_impl->rowCount(parent);
 }
-    
+
 int QnSearchBookmarksModel::columnCount(const QModelIndex &parent) const
 {
     return m_impl->columnCount(parent);
