@@ -239,7 +239,7 @@ namespace
             , bool showMoreTooltip
             , const QnBookmarkColors &colors
             , const EmitBookmarkEventFunc &emitBookmarkEvent
-            , bool adjustButtonsAvailable
+            , bool readonly
             , QnBookmarksViewer *parent);
 
         virtual ~BookmarkToolTipFrame();
@@ -261,7 +261,7 @@ namespace
 
     private:
         const EmitBookmarkEventFunc m_emitBookmarkEvent;
-        const bool m_adjustButtonsAvailable;
+        const bool m_readonly;
 
         QGraphicsLinearLayout *m_mainLayout;
         QnBookmarksViewer::PosAndBoundsPair m_posOnTimeline;
@@ -271,13 +271,13 @@ namespace
         , bool showMoreTooltip
         , const QnBookmarkColors &colors
         , const EmitBookmarkEventFunc &emitBookmarkEvent
-        , bool adjustButtonsAvailable
+        , bool readonly
         , QnBookmarksViewer *parent)
 
         : QnToolTipWidget(parent)
 
         , m_emitBookmarkEvent(emitBookmarkEvent)
-        , m_adjustButtonsAvailable(adjustButtonsAvailable)
+        , m_readonly(readonly)
         , m_mainLayout(new QGraphicsLinearLayout(Qt::Vertical))
         , m_posOnTimeline()
     {
@@ -362,7 +362,7 @@ namespace
         buttonsLayout->addItem(createButton("bookmark/tooltip/play.png"
             , kBookmarkPlayActionEventId));
 
-        if (m_adjustButtonsAvailable)
+        if (!m_readonly)
         {
             buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png"
                 , kBookmarkEditActionEventId));
@@ -526,7 +526,7 @@ public:
 
     ///
 
-    void setAdjustButtonsAvailable(bool available);
+    void setReadOnly(bool readonly);
 
     void setTargetTimestamp(qint64 timestamp);
 
@@ -571,7 +571,7 @@ private:
     qint64 m_targetTimestamp;
 
     QnCameraBookmarkList m_bookmarks;
-    bool m_adjustButtonsAvailable;
+    bool m_radonly;
 };
 
 enum { kInvalidTimstamp = -1 };
@@ -594,7 +594,7 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_targetTimestamp(kInvalidTimstamp)
 
     , m_bookmarks()
-    , m_adjustButtonsAvailable(false)
+    , m_radonly(false)
 {
 }
 
@@ -638,9 +638,9 @@ void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
     });
 }
 
-void QnBookmarksViewer::Impl::setAdjustButtonsAvailable(bool available)
+void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 {
-    m_adjustButtonsAvailable = available;
+    m_radonly = readonly;
 }
 
 void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
@@ -712,7 +712,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
             { emitBookmarkEvent(bookmark, eventId); };
 
         m_tooltip.reset(new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0)
-            , m_colors, emitBookmarkEventFunc, m_adjustButtonsAvailable, m_owner));
+            , m_colors, emitBookmarkEventFunc, m_radonly, m_owner));
     }
 
     if (m_tooltip && m_hoverProcessor)
@@ -780,9 +780,9 @@ QnBookmarksViewer::~QnBookmarksViewer()
 {
 }
 
-void QnBookmarksViewer::setAdjustButtonsAvailable(bool available)
+void QnBookmarksViewer::setReadOnly(bool readonly)
 {
-    m_impl->setAdjustButtonsAvailable(available);
+    m_impl->setReadOnly(readonly);
 }
 
 void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)

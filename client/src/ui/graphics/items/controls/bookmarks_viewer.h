@@ -46,7 +46,7 @@ signals:
 public slots:
     /// @brief Sets "remove" and "edit" buttons available
     /// according to specified parameter
-    void setAdjustButtonsAvailable(bool available);
+    void setReadOnly(bool readonly);
 
     /// Set timestamp for bookmarks extraction
     void setTargetTimestamp(qint64 timestamp);

@@ -87,6 +87,7 @@
 #include "workbench_context.h"
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
+#include <common/common_module.h>
 
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
@@ -2477,29 +2478,25 @@ void QnWorkbenchUi::createSliderWidget()
     });
 
 
-    connect(context(), &QnWorkbenchContext::userChanged, this
-        , [this, bookmarksViewer](const QnUserResourcePtr &user)
+    const auto updateBookmarkButtonsAvailability =
+        [this, bookmarksViewer]()
     {
-        const auto updateBookmarkButtonsAvailability =
-            [this, bookmarksViewer](const QnUserResourcePtr &user)
-        {
-            if (context()->user() != user)
-                return;
+        const bool readonly =  qnCommon->isReadOnly()
+            || !accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
 
-            const bool allowBookmarkEditActions =
-                accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
-            bookmarksViewer->setAdjustButtonsAvailable(allowBookmarkEditActions);
-        };
+        bookmarksViewer->setReadOnly(readonly);
+    };
 
-        updateBookmarkButtonsAvailability(user);
-        if (!user)
-            return;
+    connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged
+        , this, [updateBookmarkButtonsAvailability]()
+    {
+        updateBookmarkButtonsAvailability();
+    });
 
-        connect(user, &QnUserResource::permissionsChanged, this
-            , [this, user, updateBookmarkButtonsAvailability]()
-        {
-            updateBookmarkButtonsAvailability(user);
-        });
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this
+        , [updateBookmarkButtonsAvailability](bool /*readonly*/)
+    {
+        updateBookmarkButtonsAvailability();
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this
