@@ -932,6 +932,12 @@
                 "*Grandeye*|EVO-05NxD"
             ],
             "relayInputCountForced": 1
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }
