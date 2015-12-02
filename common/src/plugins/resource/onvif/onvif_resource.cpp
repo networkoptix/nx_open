@@ -58,7 +58,7 @@ const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //khz
 const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
-static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 15;
+static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 60;
 //!if renew subscription exactly at termination time, camera can already terminate subscription, so have to do that a little bit earlier..
 static const unsigned int RENEW_NOTIFICATION_FORWARDING_SECS = 5;
 static const unsigned int MS_PER_SECOND = 1000;
@@ -568,9 +568,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
     
+    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
         bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
         if (forcedAR && m_primaryResolution.height() > 0) 
         {
@@ -585,6 +585,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             setCustomAspectRatio(ar);
         }
     }
+
+    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
 
     saveParams();
 
@@ -864,8 +866,11 @@ void QnPlOnvifResource::notificationReceived(
         NX_LOG( lit("Received notification with no topic specified. Ignoring..."), cl_logDEBUG2 );
         return;
     }
-    
+
     QString eventTopic( QLatin1String(notification.oasisWsnB2__Topic->__item) );
+
+    NX_LOG(lit("QnPlOnvifResource %1. Recevied notification %2").arg(getUrl()).arg(eventTopic), cl_logDEBUG2);
+
     //eventTopic may have namespaces. E.g., ns:Device/ns:Trigger/ns:Relay, 
         //but we want Device/Trigger/Relay. Fixing...
     QStringList eventTopicTokens = eventTopic.split( QLatin1Char('/') );
@@ -937,13 +942,19 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //some cameras (especially, Vista) send here events on output port, filtering them out
-    if( !sourceIsExplicitRelayInput &&
-        !handler.source.empty() &&
+    const bool sourceNameMatchesRelayOutPortName = 
         std::find_if(
             m_relayOutputInfo.begin(),
             m_relayOutputInfo.end(),
-            [&handler](const RelayOutputInfo& outputInfo){ return QString::fromStdString(outputInfo.token) == handler.source.front().value; }
-        ) != m_relayOutputInfo.end() )
+            [&handler](const RelayOutputInfo& outputInfo) {
+                return QString::fromStdString(outputInfo.token) == handler.source.front().value;
+            }) != m_relayOutputInfo.end();
+    const bool sourceIsRelayOutPort =
+        (!m_portNamePrefixToIgnore.isEmpty() && handler.source.front().value.startsWith(m_portNamePrefixToIgnore)) ||
+        sourceNameMatchesRelayOutPortName;
+    if (!sourceIsExplicitRelayInput &&
+        !handler.source.empty() &&
+        sourceIsRelayOutPort)
     {
         return; //this is notification about output port
     }
@@ -1500,6 +1511,9 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         NX_LOG( lit("Failed to subscribe in NotificationProducer. endpoint %1").arg(QString::fromLatin1(soapWrapper.endpoint())), cl_logWARNING );
         return false;
     }
+
+    NX_LOG(lit("QnPlOnvifResource %1. subscribed to notifications").arg(getUrl()), cl_logDEBUG2);
+
     if (m_appStopping)
         return false;
 
@@ -2529,6 +2543,8 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
     const int soapCallResult = soapWrapper.renew( request, response );
     if( soapCallResult != SOAP_OK && soapCallResult != SOAP_MUSTUNDERSTAND )
     {
+        NX_LOG(lit("QnPlOnvifResource %1. failed to renew subscription").arg(getUrl()), cl_logDEBUG2);
+
         if( m_eventCapabilities && m_eventCapabilities->WSPullPointSupport )
         {
             //ignoring renew error since it does not work on some cameras (on Vista, particulary)
@@ -2538,11 +2554,18 @@ void QnPlOnvifResource::onRenewSubscriptionTimer(quint64 timerID)
             NX_LOG( lit("Failed to renew subscription (endpoint %1). %2").
                 arg(QString::fromLatin1(soapWrapper.endpoint())).arg(soapCallResult), cl_logDEBUG1 );
             lk.unlock();
+
+            _oasisWsnB2__Unsubscribe request;
+            _oasisWsnB2__UnsubscribeResponse response;
+            const int soapCallResult = soapWrapper.unsubscribe(request, response);
+
             QnSoapServer::instance()->getService()->removeResourceRegistration( toSharedPointer().staticCast<QnPlOnvifResource>() );
             registerNotificationConsumer();
             return;
         }
     }
+
+    NX_LOG(lit("QnPlOnvifResource %1. renewed subscription").arg(getUrl()), cl_logDEBUG2);
 
     unsigned int renewSubsciptionTimeoutSec = response.oasisWsnB2__CurrentTime
         ? (response.oasisWsnB2__TerminationTime - *response.oasisWsnB2__CurrentTime)

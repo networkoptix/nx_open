@@ -35,6 +35,12 @@ QSet<void*> DeviceFileCatalog::m_pauseList;
 
 namespace {
     boost::array<QString, QnServer::ChunksCatalogCount> catalogPrefixes = {"low_quality", "hi_quality", "bookmarks"};
+
+    QString toLocalStoragePath(const QnStorageResourcePtr &storage, const QString& absolutePath)
+    {
+        QString sUrl = storage->getUrl();
+        return absolutePath.mid(sUrl.size());
+    }
 }
 
 QString DeviceFileCatalog::prefixByCatalog(QnServer::ChunksCatalog catalog) {
@@ -293,21 +299,19 @@ std::deque<DeviceFileCatalog::Chunk> DeviceFileCatalog::mergeChunks(const std::d
 
 int DeviceFileCatalog::detectTimeZone(qint64 startTimeMs, const QString& fileName)
 {
-    int result = currentTimeZone()/60;
-
-    QDateTime datetime1 = QDateTime::fromMSecsSinceEpoch(startTimeMs);
+    QDateTime datetime1 = QDateTime::fromMSecsSinceEpoch(startTimeMs).toUTC();
     datetime1 = datetime1.addMSecs(-(datetime1.time().minute()*60*1000ll + datetime1.time().second()*1000ll + datetime1.time().msec()));
 
-    QStringList dateParts = fileName.split(QDir::separator());
+    QStringList dateParts = fileName.split(getPathSeparator(fileName));
     if (dateParts.size() < 5)
-        return result;
+        return currentTimeZone()/60;
     int hour = dateParts[dateParts.size()-2].toInt();
     int day = dateParts[dateParts.size()-3].toInt();
     int month = dateParts[dateParts.size()-4].toInt();
     int year = dateParts[dateParts.size()-5].toInt();
 
-    QDateTime datetime2(QDate(year, month, day), QTime(hour, 0, 0));
-    result += (datetime2.toMSecsSinceEpoch() - datetime1.toMSecsSinceEpoch()) / 1000 / 60;
+    QDateTime datetime2 = QDateTime(QDate(year, month, day), QTime(hour, 0, 0), Qt::UTC);
+    int result = (datetime2.toMSecsSinceEpoch() - datetime1.toMSecsSinceEpoch()) / 1000 / 60;
 
     return result;
 }
@@ -315,6 +319,8 @@ int DeviceFileCatalog::detectTimeZone(qint64 startTimeMs, const QString& fileNam
 DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourcePtr &storage, const QString& fileName)
 {
     Chunk chunk;
+    
+    const QString localFileName = toLocalStoragePath(storage, fileName);
 
     QnAviResourcePtr res(new QnAviResource(fileName));
     QnAviArchiveDelegate* avi = new QnAviArchiveDelegate();
@@ -332,7 +338,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
         }
 
         //chunk = Chunk(startTimeMs, storage->getIndex(), fileIndex, endTimeMs - startTimeMs, currentTimeZone()/60);
-        chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, fileName));
+        chunk = Chunk(startTimeMs, qnStorageMan->getStorageIndex(storage), fileIndex, endTimeMs - startTimeMs, detectTimeZone(startTimeMs, localFileName));
     }
     else {
         qWarning() << "Can't open media file" << fileName << "storage=" << storage->getUrl();
@@ -344,8 +350,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(const QnStorageResourc
 QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)
 {
     QnTimePeriod timePeriod;
-    QString sUrl = storage->getUrl();
-    QString path = dirName.mid(sUrl.size());
+    const QString path = toLocalStoragePath(storage, dirName);
     QStringList folders = path.split(getPathSeparator(path)).mid(3);
 
     QString timestamp(lit("%1/%2/%3T%4:00:00"));
