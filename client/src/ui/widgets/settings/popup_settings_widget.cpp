@@ -16,14 +16,16 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/resource_property_adaptors.h>
+#include <utils/common/scoped_value_rollback.h>
 
-QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent) 
+QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
     , ui(new Ui::PopupSettingsWidget)
     , m_businessRulesCheckBoxes()
     , m_systemHealthCheckBoxes()
     , m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this))
+    , m_updating(false)
 {
     ui->setupUi(this);
 
@@ -36,12 +38,17 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
         m_businessRulesCheckBoxes[eventType] = checkbox;
     }
 
-    static_assert(QnSystemHealth::MessageTypeCount < 64, "We are packing messages to single quint64");
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+    static_assert(QnSystemHealth::Count < 64, "We are packing messages to single quint64");
+
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
         QCheckBox* checkbox = new QCheckBox(this);
-        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType(i)));
+        checkbox->setText(QnSystemHealthStringsHelper::messageTitle(messageType));
         ui->systemHealthLayout->addWidget(checkbox);
-        m_systemHealthCheckBoxes << checkbox;
+        m_systemHealthCheckBoxes[messageType] = checkbox;
     }
 
     connect(m_adaptor,              &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnPopupSettingsWidget::loadDataToUi);
@@ -57,7 +64,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget *parent)
             checkbox->setEnabled(!checked);
         }
     });
-    
+
 }
 
 QnPopupSettingsWidget::~QnPopupSettingsWidget()
@@ -65,20 +72,29 @@ QnPopupSettingsWidget::~QnPopupSettingsWidget()
 }
 
 void QnPopupSettingsWidget::loadDataToUi() {
+    if (m_updating)
+        return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     bool all = true;
 
     quint64 healthShown = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
+
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
         bool checked = ((healthShown & healthFlag) == healthFlag);
-        m_systemHealthCheckBoxes[i]->setChecked(checked);
+        m_systemHealthCheckBoxes[messageType]->setChecked(checked);
         healthFlag = healthFlag << 1;
 
         all &= checked;
     }
 
     if (context()->user())
-        m_adaptor->setResource(context()->user());   
+        m_adaptor->setResource(context()->user());
 
     QList<QnBusiness::EventType> watchedEvents = context()->user()
         ? m_adaptor->watchedEvents()
@@ -96,6 +112,9 @@ void QnPopupSettingsWidget::loadDataToUi() {
 }
 
 void QnPopupSettingsWidget::applyChanges() {
+    Q_ASSERT_X(!m_updating, Q_FUNC_INFO, "Should never get here while updating");
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
     if (context()->user())
         m_adaptor->setWatchedEvents(watchedEvents());
     qnSettings->setPopupSystemHealth(watchedSystemHealth());
@@ -120,13 +139,18 @@ QList<QnBusiness::EventType> QnPopupSettingsWidget::watchedEvents() const {
 quint64 QnPopupSettingsWidget::watchedSystemHealth() const {
     quint64 result = qnSettings->popupSystemHealth();
     quint64 healthFlag = 1;
-    for (int i = 0; i < QnSystemHealth::MessageTypeCount; i++) {
-        if (m_systemHealthCheckBoxes[i]->isChecked() || ui->showAllCheckBox->isChecked()) {
+    for (int i = 0; i < QnSystemHealth::Count; i++) {
+        QnSystemHealth::MessageType messageType = static_cast<QnSystemHealth::MessageType>(i);
+        if (!QnSystemHealth::isMessageVisible(messageType))
+            continue;
+
+        if (m_systemHealthCheckBoxes[messageType]->isChecked() || ui->showAllCheckBox->isChecked()) {
             result |= healthFlag;
         } else {
             result &= ~healthFlag;
         }
         healthFlag = healthFlag << 1;
     }
+
     return result;
 }

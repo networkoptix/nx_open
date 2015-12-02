@@ -139,6 +139,9 @@ QnBookmarkColors::QnBookmarkColors()
     , bookmarksSeparatorBottom("#3e6e93")
     , tagBgNormal("#3E6E93")
     , tagBgHovered("#547E9F")
+    , tagTextNormal("#D8E2E9")
+    , tagTextHovered("#ffffff")
+    , moreItemsText("#94AEC3")
 {
 }
 

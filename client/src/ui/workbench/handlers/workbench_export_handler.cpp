@@ -317,7 +317,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             : nullptr;
 
         QComboBox* comboBox = 0;
-        bool doTranscode = false;
+        bool transcodeCheckbox = false;
         const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
         if (mediaResource->hasVideo(archive)) {
             comboBox = new QComboBox(dialog.data());
@@ -333,10 +333,10 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
-            doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
-            if (doTranscode) 
+            transcodeCheckbox = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+            if (transcodeCheckbox) 
             {
-                dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
+                dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &transcodeCheckbox, delegate);
             }
         }
 
@@ -361,11 +361,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
         if (binaryExport) {
-            doTranscode = false;
+            transcodeCheckbox = false;
             timestampPos = Qn::NoCorner;
         }
 
-        if (!doTranscode) {
+        if (!transcodeCheckbox) {
             contrastParams.enabled = false;
             dewarpingParams.enabled = false;
             rotation = 0;
@@ -400,7 +400,12 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
         imageParameters.setVideoLayout(mediaResource->getVideoLayout());
 
-        if(doTranscode || timestampPos != Qn::NoCorner) 
+        auto videoLayout = mediaResource->getVideoLayout();
+        bool doTranscode = transcodeCheckbox || 
+                           timestampPos != Qn::NoCorner ||
+                           (!binaryExport && videoLayout && videoLayout->channelCount() > 1);
+
+        if(doTranscode)
         {
             if (virtualCamResource && !transcodeWarnShown)
             {
@@ -417,7 +422,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                             mainWindow(),
                             tr("Selected format is not recommended"),
                             tr("Selected format is not recommended for this camera due to video downscaling. "
-                            "We recommend to export selected video to the '.nov' format. "
+                            "We recommend to export selected video either to the '.nov' or '.exe' format. "
                             "Do you want to continue?"), 
                             QMessageBox::Yes | QMessageBox::No
                             );

@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>%1 kimenet</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>%1 bemenet</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Bookmark</source>
@@ -255,10 +244,6 @@
         <translation>Felirat: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Bemeneti port: %1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -368,6 +353,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>Rögzítés az IO modulon kikapcsolva:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -575,6 +604,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>IO modul indítás folyamatban.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,27 +859,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Nem lehet az IO port beállításokat bekapcsolni</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>%1 kimenet</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1065,109 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Nincs email cím beállítva</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>Nincsenek licencek</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Nincs email szerver beállítva</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Néhány felhasználó nem állította be az email címét</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>A kapcsolat a szerverrrel megszakadt</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Válasszon szervert az időszinkronizációhoz</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Hiba az email küldése közben</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Archív index újraépítése befejeződött</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Nincs email cím beállítva a(z) %1 felhasználóhoz</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Nincs email cím beállítva.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Nem tud fogadni rendszer figyelmeztetéseket emailen keresztül.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Nincs email szerver beállítva.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Néhány felhasználó nem állította be az email címét.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Nem tudnak fogadni rendszer figyelmeztetéseket emailen keresztül.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>A tárhelyek beteltek a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Tárhelyek nincsenek konfigurálva a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Nincs licence.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Nem tud videot rögzíteni a kamerákról.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Archív index újraépítése befejeződött a következő szerveren:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>A tárhelyek beteltek</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Tárhelyek nincsenek konfigurálva</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>A szerver idő nincs szinkronizálva és a közös időt nem lehet auromatikusan detektálni.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>A rendszer biztonsági módban van</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>A rendszer biztonsági módban fut.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Valamennyi beállítás megváltoztatása a licenc aktiválás kivételével nem lehetséges.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1192,17 +1101,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Érvénytelen paraméter</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>%1 kimenet</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>%1 bemenet</translation>
     </message>
 </context>
 <context>

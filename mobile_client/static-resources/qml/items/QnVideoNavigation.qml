@@ -59,6 +59,11 @@ Item {
             property real prevY
 
             onPressed: {
+                /* We propagate composed events for areas free of the UI controls (timeline, play/pause button). */
+                propagateComposedEvents =
+                        (mouse.y < height - timeline.height) &&
+                        (mouse.x < playbackController.x || mouse.x > playbackController.x + playbackController.width)
+
                 if (drag.target)
                     prevY = drag.target.y
             }
@@ -90,7 +95,7 @@ Item {
                 height: sourceSize.height
                 anchors.bottom: timeline.bottom
                 anchors.bottomMargin: timeline.chunkBarHeight
-                sourceSize.height: timeline.height - timeline.chunkBarHeight + playbackController.height / 2
+                sourceSize.height: dp(150) - timeline.chunkBarHeight
                 source: "qrc:///images/timeline_gradient.png"
             }
 
@@ -101,7 +106,7 @@ Item {
 
                 anchors.bottom: parent.bottom
                 width: parent.width
-                height: dp(150)
+                height: dp(104)
 
                 stickToEnd: mediaPlayer.atLive && !playbackController.paused
 
@@ -307,7 +312,8 @@ Item {
                     font.weight: Font.Normal
                     verticalAlignment: Text.AlignVCenter
 
-                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy"))
+                    // TODO: Remove qsTr from this string!
+                    text: timeline.positionDate.toLocaleDateString(d.locale, qsTr("d MMMM yyyy", "DO NOT TRANSLATE THIS STRING!"))
                     color: QnTheme.windowText
 
                     opacity: timeline.stickToEnd ? 0.0 : 1.0
@@ -346,7 +352,8 @@ Item {
             QnPlaybackController {
                 id: playbackController
 
-                anchors.verticalCenter: timeline.top
+                anchors.verticalCenter: timeline.bottom
+                anchors.verticalCenterOffset: -dp(150)
                 anchors.horizontalCenter: parent.horizontalCenter
 
                 loading: !paused && (mediaPlayer.loading || timeline.dragging)

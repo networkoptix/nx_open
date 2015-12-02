@@ -21,6 +21,11 @@ public:
     int overlayWidth() const;
     void setOverlayWidth(int width);
 
+    QSizeF minimalSize() const;
+
+    QSizeF maxFillCoeff() const;
+    void setMaxFillCoeff(const QSizeF &coeff);
+
 private:
     void updatePositions();
 
@@ -31,5 +36,8 @@ private:
 
     QHash<QnUuid, QGraphicsWidget*> m_items;
     Qt::Alignment m_alignment;
+
     bool m_updating;
+
+    QSizeF m_maxFillCoeff;
 };

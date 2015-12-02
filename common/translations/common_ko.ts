@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>ko</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>출력 %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>입력 %1</translation>
     </message>
 </context>
 <context>
@@ -255,10 +244,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>입력 포트 : %1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation></translation>
@@ -368,6 +353,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>IO장치에서 녹화가 중지 되었습니다:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -575,6 +604,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>IO장치 초기화 진행중.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,27 +859,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>프리셋 #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>IO포트 초기화 실패</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1065,109 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>No licenses</source>
-        <translation>인증키 없음</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>이메일 주소를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>이메일 서버를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>일부 사용자가 이메일 주소를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>서버 연결 실패</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>이메일을 보내는 동안 오류 발생</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>%1 사용자에 대한 이메일 주소가 설정되지 않음</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>타 위치에서 시간 동기화 서버로 선택 함</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>저장기 인덱서의 재 설정이 완료됨</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>이메일 주소를 설정하지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>이메일 서버가 설정되어있지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>일부 사용자가 이메일 주소를 설정하지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>그들은 이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>용량이 부족한 서버 목록:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>저장기 설정이 되지 않은 서버 목록:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>인증키가 없습니다.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>카메라에서 비디오를 저장할 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>저장기 인덱스 재 설정이 완료된 서버 목록:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>저장기의 용량이 꽉참</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>저장기 구성이 되어있지 않음</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>서버시간 동기화 하지 않음, 일반시간정보가 자동으로 검색되지 않음.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>서버 안전모드 상태입니다</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>시스템이 안전모드에서 동작중입니다.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>라이센스 활성화 외의 작업 불가능.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1192,17 +1101,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>유효하지 않은 변수</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation></translation>
     </message>
 </context>
 <context>

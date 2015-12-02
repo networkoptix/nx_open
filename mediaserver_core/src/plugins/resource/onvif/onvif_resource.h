@@ -487,6 +487,8 @@ private:
     qint64 m_prevPullMessageResponseClock;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
+    QString m_portNamePrefixToIgnore;
+
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);

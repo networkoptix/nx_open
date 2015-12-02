@@ -57,7 +57,7 @@ void QnStorageListModel::updateStorage( const QnStorageModelInfo& storage ) {
 }
 
 
-void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {  
+void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {
     int idx = storageIndex(m_storages, storage);
     if (idx < 0)
         return;
@@ -69,7 +69,7 @@ void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {
 
 void QnStorageListModel::sortStorages() {
     qSort(m_storages.begin(), m_storages.end(), [](const QnStorageModelInfo &left, const QnStorageModelInfo &right) {
-        
+
         /* Local storages should go first. */
         if (left.isExternal != right.isExternal)
             return right.isExternal;
@@ -134,11 +134,18 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
             return tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1));
         }
     case RemoveActionColumn:
-        return (storageData.isExternal || forcedText) && (!m_readOnly)
-            ? tr("Remove") 
+        /* Calculate predefined column width */
+        if (forcedText)
+            return tr("Remove");
+
+        return canRemoveStorage(storageData)
+            ? tr("Remove")
             : QString();
 
     case ChangeGroupActionColumn:
+        if (forcedText)
+            return tr("Use as backup storage");
+
         if (m_readOnly)
             return QString();
 
@@ -146,7 +153,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
             return tr("Inaccessible");
 
         return storageData.isBackup
-            ? tr("Use as main storage") 
+            ? tr("Use as main storage")
             : canMoveStorage(storageData)
             ? tr("Use as backup storage")
             : QString();
@@ -162,10 +169,9 @@ QVariant QnStorageListModel::fontData(const QModelIndex &index) const {
         return QVariant();
 
     QnStorageModelInfo storageData = storage(index);
-    if (!storageData.isWritable)
-        return QVariant();
 
-    if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
+    if (index.column() == RemoveActionColumn ||
+        (index.column() == ChangeGroupActionColumn && storageData.isWritable))
         return m_linkFont;
 
     return QVariant();
@@ -176,10 +182,9 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
         return QVariant();
 
     QnStorageModelInfo storageData = storage(index);
-    if (!storageData.isWritable)
-        return QVariant();
 
-    if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
+    if (index.column() == RemoveActionColumn ||
+        (index.column() == ChangeGroupActionColumn && storageData.isWritable))
         return m_linkBrush;
 
     return QVariant();
@@ -187,10 +192,6 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
 
 QVariant QnStorageListModel::mouseCursorData(const QModelIndex &index) const {
     if (m_readOnly)
-        return QVariant();
-
-    QnStorageModelInfo storageData = storage(index);
-    if (!storageData.isWritable)
         return QVariant();
 
     if (index.column() == RemoveActionColumn || index.column() == ChangeGroupActionColumn)
@@ -204,14 +205,14 @@ QVariant QnStorageListModel::checkstateData(const QModelIndex &index) const
 {
     if (index.column() == CheckBoxColumn) {
         QnStorageModelInfo storageData = storage(index);
-        return storageData.isUsed && storageData.isWritable 
-            ? Qt::Checked 
+        return storageData.isUsed && storageData.isWritable
+            ? Qt::Checked
             : Qt::Unchecked;
     }
     return QVariant();
 }
 
-QVariant QnStorageListModel::data(const QModelIndex &index, int role) const 
+QVariant QnStorageListModel::data(const QModelIndex &index, int role) const
 {
     if (!hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
@@ -263,7 +264,7 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
 
     Qt::ItemFlags flags = Qt::NoItemFlags;
     flags |= Qt::ItemIsSelectable;
-    
+
     if (storageData.isWritable || index.column() == RemoveActionColumn)
         flags |= Qt::ItemIsEnabled;
 
@@ -287,6 +288,9 @@ void QnStorageListModel::setReadOnly( bool readOnly ) {
 }
 
 bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const {
+    if (m_readOnly)
+        return false;
+
     if (!data.isWritable)
         return false;
 
@@ -310,4 +314,11 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
         return true;
     });
 
+}
+
+bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) const {
+    if (m_readOnly)
+        return false;
+
+    return data.isExternal || !data.isWritable;
 }

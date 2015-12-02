@@ -128,9 +128,33 @@ void QnCompositeTextOverlay::removeModeData(Mode mode
     , const QnUuid &id)
 {
     auto &currentData = m_data[mode];
-    const auto it = findModeData(mode, id);
+    auto it = findModeData(mode, id);
     if (it == currentData.end())
         return;
+
+    enum { kMinDataLifetimeMs = 5000 };
+
+    // Do not remove data too fast (for short prolonged actions, for instance)
+    const auto dataTimestamp = it->first;
+    const auto currentLifetime = (m_counter.elapsed() - dataTimestamp);
+    if (currentLifetime < kMinDataLifetimeMs)
+    {
+        auto &dataToBeUpdated = it->second;
+        if (m_currentMode == mode)
+        {
+            // Sets timeout to remove item automatically
+            dataToBeUpdated.timeout = (kMinDataLifetimeMs - currentLifetime);
+            addItem(dataToBeUpdated);   // replaces existing data
+        }
+        else
+        {
+            // do not change timestamp, but set timeout to be sure
+            // we delete item on next mode switch
+            dataToBeUpdated.timeout = kMinDataLifetimeMs;
+        }
+
+        return;
+    }
 
     currentData.erase(it);
 
@@ -175,7 +199,6 @@ void QnCompositeTextOverlay::initTextMode()
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived
         , this, [this, cameraId](const QnAbstractBusinessActionPtr &businessAction)
     {
-        //qDebug() << "---new action" << businessAction->actionType() << ":" 
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
@@ -196,14 +219,10 @@ void QnCompositeTextOverlay::initTextMode()
 
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            //qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
-
-        //qDebug() << "Added: " << actionId << ":" << isInstantAction
-        //    << "\n" << timeout << ": actionParams.durationMs: " << actionParams.durationMs << "\n___"; // For future debug
 
         enum
         {
@@ -224,14 +243,20 @@ void QnCompositeTextOverlay::initTextMode()
             const auto desciption = elideString(
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
+            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  // Do not add empty text items
+                return; 
+
             static const auto kComplexHtml = lit("%1%2");
             text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)
                 , htmlFormattedParagraph(desciption, kDescriptionPixelFontSize));
         }
         else
         {
+            if (text.trimmed().isEmpty()) // Do not add empty text items
+                return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            text = elideString(kTextHtml.arg(htmlFormattedParagraph(actionParams.text, 13)), kDescriptionMaxLength);
+            const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
+            text = kTextHtml.arg(htmlFormattedParagraph(elided, 13));
         }
 
         const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
@@ -244,7 +269,7 @@ void QnCompositeTextOverlay::initTextMode()
 
 void QnCompositeTextOverlay::initBookmarksMode()
 {
-    //// TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
+    // TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
 
     connect(m_navigator, &QnWorkbenchNavigator::positionChanged, this, &QnCompositeTextOverlay::updateBookmarksFilter);
 
@@ -406,6 +431,9 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
             kCaptionPixelSize = 16
             , kDescriptionPixeSize = 12
         };
+
+        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+            continue;
 
         const auto bookmarkHtml = kBookTemplate.arg(
             htmlFormattedParagraph(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)

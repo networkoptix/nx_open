@@ -36,6 +36,8 @@ QnScheduleSync::~QnScheduleSync()
 
 void QnScheduleSync::updateLastSyncChunk()
 {
+    if (m_syncing)
+        return;
     QnMutexLocker lock(&m_syncPointMutex);
     auto chunk = findLastSyncChunkUnsafe();
     m_syncTimePoint = chunk.startTimeMs;

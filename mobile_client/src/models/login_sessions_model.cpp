@@ -21,7 +21,7 @@ QVariant QnLoginSessionsModel::data(const QModelIndex &index, int role) const {
     case SessionIdRole:
         return session->id;
     case SystemNameRole:
-        return session->systemName.isEmpty() ? tr("<Unknown>") : session->systemName;
+        return session->systemName;
     case AddressRole:
         return session->address;
     case PortRole:

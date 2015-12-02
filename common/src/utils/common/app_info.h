@@ -55,6 +55,9 @@ struct QnAppInfo {
 
     static QString iosPlayButtonTint();
 
+    static QString oldAndroidClientLink();
+    static QString oldIosClientLink();
+
     // helpers:
 
     inline
