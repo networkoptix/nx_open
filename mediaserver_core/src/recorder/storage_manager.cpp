@@ -170,7 +170,7 @@ public:
         if (m_scanTasks.contains(scanData))
             return;
         if (m_scanTasks.isEmpty())
-            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
+            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, storage->getUrl(), 0.0));
         if (partialScan)
             storage->addFlags(Qn::storage_fastscan);
         m_scanTasks.push_back(std::move(scanData));
