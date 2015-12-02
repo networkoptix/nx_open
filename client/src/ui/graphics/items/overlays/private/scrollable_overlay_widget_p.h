@@ -21,7 +21,7 @@ public:
     int overlayWidth() const;
     void setOverlayWidth(int width);
 
-    QSizeF minimalSize() const;
+    QSizeF minimumSize() const;
 
     QSizeF maxFillCoeff() const;
     void setMaxFillCoeff(const QSizeF &coeff);

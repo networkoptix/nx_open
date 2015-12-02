@@ -43,10 +43,10 @@ void QnScrollableOverlayWidget::setOverlayWidth( int width ) {
 
 QSizeF QnScrollableOverlayWidget::sizeHint( Qt::SizeHint which, const QSizeF &constraint /*= QSizeF()*/ ) const {
     if (which != Qt::MinimumSize)
-        return base_type::sizeHint(which, constraint);;
+        return base_type::sizeHint(which, constraint);
 
     Q_D(const QnScrollableOverlayWidget);
-    return d->minimalSize();
+    return d->minimumSize();
 }
 
 QSizeF QnScrollableOverlayWidget::maxFillCoeff() const {
