@@ -57,10 +57,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             const QString& address = QUrl( QString::fromStdString(notification.oasisWsnB2__ProducerReference->Address->__item) ).host();
             auto it = m_notificationProducerAddressToResource.find( address );
             if( it != m_notificationProducerAddressToResource.end() )
-            {
                 resToNotify = it->second;
-                continue;
-            }
         }
 
         if( !resToNotify && notification.oasisWsnB2__SubscriptionReference && notification.oasisWsnB2__SubscriptionReference->Address )
@@ -68,10 +65,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             //trying to find by subscription reference
             auto it = m_subscriptionReferenceToResource.find( QString::fromStdString(notification.oasisWsnB2__SubscriptionReference->Address->__item) );
             if( it != m_subscriptionReferenceToResource.end() )
-            {
                 resToNotify = it->second;
-                continue;
-            }
         }
 
         if( !resToNotify && notificationRequest->soap && notificationRequest->soap->host )
@@ -79,10 +73,7 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             //searching by host
             auto it = m_notificationProducerAddressToResource.find( QLatin1String(notificationRequest->soap->host) );
             if( it != m_notificationProducerAddressToResource.end() )
-            {
                 resToNotify = it->second;
-                continue;
-            }
         }
 
         if( resToNotify )
@@ -95,9 +86,11 @@ int OnvifNotificationConsumer::Notify( _oasisWsnB2__Notify* notificationRequest 
             }
             lk.relock();
         }
-
-        //this is possible shortly after resource unregistration
-        NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
+        else
+        {
+            //this is possible shortly after resource unregistration
+            NX_LOG( lit("Received notification for unknown resource. Ignoring..."), cl_logWARNING );
+        }
     }
 
     return SOAP_OK;

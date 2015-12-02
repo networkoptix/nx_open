@@ -617,7 +617,7 @@
                     }
                 }
             },
-			"onvifPtzDigitsAfterDecimalPoint": 0
+            "onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [
@@ -919,6 +919,12 @@
             "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }
