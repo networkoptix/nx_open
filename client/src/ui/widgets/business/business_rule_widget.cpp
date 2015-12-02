@@ -158,12 +158,14 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         QString actionAtLabelText;
         switch (m_model->actionType()) {
         case QnBusiness::SendMailAction:
+            //: "to" is from the sentence "Send e-mail _to_:"
             actionAtLabelText = tr("to");
             break;
         case QnBusiness::ShowOnAlarmLayoutAction:
             actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(tr("Devices"), tr("Cameras"));
             break;
         default:
+            //: "at" is from the sentence "Display the text _at_ these cameras"
             actionAtLabelText = tr("at");
             break;
         }
