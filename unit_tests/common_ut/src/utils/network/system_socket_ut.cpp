@@ -87,6 +87,7 @@ static void socketSimpleSync()
                 ASSERT_NE(-1, bytesRead);
                 if (bytesRead == 0)
                     break;  //connection closed
+                bufDataSize += bytesRead;
             }
 
             EXPECT_STREQ(MESSAGE.data(), buffer.data());
@@ -116,7 +117,7 @@ TEST( TcpSocket, SimpleSync )
     socketSimpleSync< TCPServerSocket, TCPSocket >();
 }
 
-TEST( UdtSocket, SimpleSync )
+TEST(SocketUdt, SimpleSync)
 {
     socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >();
 }
@@ -195,7 +196,7 @@ TEST( TcpSocket, SimpleAsync )
     socketSimpleAsync< TCPServerSocket, TCPSocket >();
 }
 
-TEST( UdtSocket, SimpleAsync )
+TEST(SocketUdt, SimpleAsync)
 {
     socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >();
 }

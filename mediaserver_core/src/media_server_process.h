@@ -21,7 +21,8 @@
 #include "utils/common/public_ip_discovery.h"
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
-#include <nx/network/cloud_connectivity/mediator_address_publisher.h>
+
+#include "health/system_health.h"
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
@@ -62,7 +63,7 @@ private slots:
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
-    void at_storageManager_rebuildFinished(bool isCanceled);
+    void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code);
     void at_timer();
     void at_connectionOpened();
@@ -114,7 +115,6 @@ private:
     bool m_stopping;
     mutable QnMutex m_stopMutex;
     std::unique_ptr<ec2::CrashReporter> m_crashReporter;
-    std::unique_ptr<nx::cc::MediatorAddressPublisher> m_mediatorAddressPublisher;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

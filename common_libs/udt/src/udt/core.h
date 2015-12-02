@@ -146,7 +146,7 @@ private:
       // Returned value:
       //    Return 0 if connected, positive value if connection is in progress, otherwise error code.
 
-   int connect(const CPacket& pkt) throw ();
+   int connect(const CPacket& pkt);
 
       // Functionality:
       //    Connect to a UDT entity listening at address "peer", which has sent "hs" request.

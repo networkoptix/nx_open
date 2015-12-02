@@ -71,6 +71,8 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver()
+:
+    m_stunClient(nullptr)
 {
 }
 
@@ -196,12 +198,6 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
     return m_requests.count( requestId );
 }
 
-void AddressResolver::resetMediatorAddress( const SocketAddress& newAddress )
-{
-    QnMutexLocker lk( &m_mutex );
-    m_stunClient.reset( new stun::AsyncClient( newAddress ) );
-}
-
 AddressResolver::HostAddressInfo::HostAddressInfo()
     : m_dnsState( State::unresolved )
     , m_mediatorState( State::unresolved )
@@ -243,8 +239,13 @@ void AddressResolver::HostAddressInfo::checkExpirations()
 
 bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
 {
-    return m_dnsState == State::resolved &&
-           (!natTraversal || m_mediatorState == State::resolved);
+    if( m_dnsState != State::resolved )
+        return false; // DNS is required
+
+    if( !m_dnsEntries.empty() )
+        return true; // do not wait for mediator if DNS records are avaliable
+
+    return ( !natTraversal || m_mediatorState == State::resolved );
 }
 
 std::vector< AddressEntry > AddressResolver::HostAddressInfo::getAll() const
@@ -300,7 +301,12 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
 {
     info->second.mediatorProgress();
     if( !m_stunClient )
-        m_stunClient = SocketGlobals::mediatorConnector().client();
+    {
+        lk->unlock();
+        auto client = SocketGlobals::mediatorConnector().client();
+        lk->relock();
+        m_stunClient = client;
+    }
 
     if( m_stunClient )
         return mediatorStunResolve( info, lk );
@@ -367,6 +373,7 @@ std::vector< Guard > AddressResolver::grabHandlers(
         for( auto it = range.first; it != range.second; ++it )
         {
             if( it->second.address != info->first ||
+                it->second.inProgress ||
                 !info->second.isResolved( it->second.natTraversal ) )
             {
                 noPending = false;

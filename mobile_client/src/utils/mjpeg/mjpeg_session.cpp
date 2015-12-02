@@ -81,6 +81,8 @@ public:
     QQueue<FrameData> frameQueue;
     QSemaphore queueSemaphore;
 
+    qint64 finalTimestampMs;
+
     QNetworkAccessManager *networkAccessManager;
     QNetworkReply *reply;
 
@@ -117,6 +119,7 @@ public:
     void disconnect();
 
     void at_reply_readyRead();
+    void at_reply_error();
     void at_reply_finished();
 
     bool processHeaders();
@@ -131,6 +134,7 @@ QnMjpegSessionPrivate::QnMjpegSessionPrivate(QnMjpegSession *parent)
     : QObject(parent)
     , q_ptr(parent)
     , queueSemaphore(maxFrameQueueSize)
+    , finalTimestampMs(-1)
     , networkAccessManager(nullptr)
     , reply(nullptr)
     , state(QnMjpegSession::Stopped)
@@ -213,7 +217,7 @@ bool QnMjpegSessionPrivate::connect() {
 
     QObject::connect(reply, &QNetworkReply::readyRead, this, &QnMjpegSessionPrivate::at_reply_readyRead);
     QObject::connect(reply, &QNetworkReply::finished, this, &QnMjpegSessionPrivate::at_reply_finished);
-    QObject::connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &QnMjpegSessionPrivate::at_reply_finished);
+    QObject::connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &QnMjpegSessionPrivate::at_reply_error);
 
     return true;
 }
@@ -275,7 +279,7 @@ void QnMjpegSessionPrivate::at_reply_readyRead() {
     }
 }
 
-void QnMjpegSessionPrivate::at_reply_finished() {
+void QnMjpegSessionPrivate::at_reply_error() {
     if (reply != sender())
         return;
 
@@ -284,6 +288,20 @@ void QnMjpegSessionPrivate::at_reply_finished() {
 
     if (state == QnMjpegSession::Connecting || QnMjpegSession::Playing)
         connect();
+}
+
+void QnMjpegSessionPrivate::at_reply_finished() {
+    if (reply != sender())
+        return;
+
+    reply->deleteLater();
+    reply = nullptr;
+
+    if (state == QnMjpegSession::Connecting)
+        connect();
+
+    Q_Q(QnMjpegSession);
+    q->finished();
 }
 
 bool QnMjpegSessionPrivate::processHeaders() {
@@ -462,6 +480,13 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     if (!previousFrameData.isEmpty())
         decodeAndEnqueueFrame(previousFrameData, previousFrameTimestampUSec / 1000, framePresentationTimeMSec);
 
+    if (finalTimestampMs > 0 && frameTimestampUSec > finalTimestampMs * 1000) {
+        disconnect();
+        Q_Q(QnMjpegSession);
+        q->finished();
+        return ParseOk;
+    }
+
     previousFrameTimestampUSec = frameTimestampUSec;
     frameTimestampUSec = 0;
 
@@ -520,6 +545,20 @@ bool QnMjpegSession::dequeueFrame(QImage *image, qint64 *timestamp, int *present
     Q_D(QnMjpegSession);
 
     return d->dequeueFrame(image, timestamp, presentationTime);
+}
+
+qint64 QnMjpegSession::finalTimestampMs() const {
+    Q_D(const QnMjpegSession);
+    return d->finalTimestampMs;
+}
+
+void QnMjpegSession::setFinalTimestampMs(qint64 finalTimestampMs) {
+    Q_D(QnMjpegSession);
+    if (d->finalTimestampMs == finalTimestampMs)
+        return;
+
+    d->finalTimestampMs = finalTimestampMs;
+    emit finalTimestampChanged();
 }
 
 void QnMjpegSession::start() {

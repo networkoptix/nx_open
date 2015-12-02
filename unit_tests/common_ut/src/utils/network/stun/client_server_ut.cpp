@@ -49,35 +49,29 @@ TEST_F( StunClientServerTest, Connectivity )
 {
     SyncQueue< SystemError::ErrorCode > connected;
     SyncQueue< SystemError::ErrorCode > disconnected;
-    SyncQueue< Message > indicated;
 
     // 1. try to connect with no server
-    client.openConnection(
-        connected.pusher(), indicated.pusher(), disconnected.pusher() );
+    client.openConnection( connected.pusher(), disconnected.pusher() );
 
     auto r = connected.pop();
     ASSERT_TRUE( r == SystemError::connectionRefused || r == SystemError::timedOut );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 
-    // 2. connect to normal server
+    // 2. connect to normal server, eg reconnect
     startServer();
 
-    client.openConnection(
-        connected.pusher(), indicated.pusher(), disconnected.pusher() );
+    client.openConnection();
 
-    ASSERT_EQ(SystemError::noError, connected.pop());
+    ASSERT_EQ( SystemError::noError, connected.pop() );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 
     // 3. remove server and see what's gonna happen
     stopServer();
 
-    ASSERT_EQ(SystemError::connectionReset, disconnected.pop());
+    ASSERT_EQ( SystemError::connectionReset, disconnected.pop() );
     EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( indicated.isEmpty() );
     EXPECT_TRUE( disconnected.isEmpty() );
 }
 

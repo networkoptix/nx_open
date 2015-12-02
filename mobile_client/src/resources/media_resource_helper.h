@@ -14,6 +14,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(Qn::ResourceStatus resourceStatus READ resourceStatus NOTIFY resourceStatusChanged)
     Q_PROPERTY(QUrl mediaUrl READ mediaUrl NOTIFY mediaUrlChanged)
     Q_PROPERTY(QString resourceName READ resourceName NOTIFY resourceNameChanged)
+    Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QStringList resolutions READ resolutions NOTIFY resolutionsChanged)
     Q_PROPERTY(QString resolution READ resolution WRITE setResolution NOTIFY resolutionChanged)
     Q_PROPERTY(QSize screenSize READ screenSize WRITE setScreenSize NOTIFY screenSizeChanged)
@@ -21,6 +22,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(qreal aspectRatio READ aspectRatio NOTIFY aspectRatioChanged)
     Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
+    Q_PROPERTY(qint64 finalTimestamp READ finalTimestamp NOTIFY finalTimestampChanged)
 
     Q_ENUMS(Protocol)
     Q_ENUMS(Qn::ResourceStatus)
@@ -46,7 +48,8 @@ public:
 
     QString resourceName() const;
 
-    Q_INVOKABLE void setPosition(qint64 position);
+    qint64 position() const;
+    void setPosition(qint64 position);
 
     QStringList resolutions() const;
     QString resolution() const;
@@ -63,6 +66,8 @@ public:
 
     int rotation() const;
 
+    qint64 finalTimestamp() const;
+
     Q_INVOKABLE void updateUrl();
 
 signals:
@@ -70,6 +75,7 @@ signals:
     void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
+    void positionChanged();
     void resolutionsChanged();
     void resolutionChanged();
     void screenSizeChanged();
@@ -77,6 +83,7 @@ signals:
     void aspectRatioChanged();
     void rotatedAspectRatioChanged();
     void rotationChanged();
+    void finalTimestampChanged();
 
 private:
     void updateMediaStreams();
@@ -90,11 +97,14 @@ private:
     QString currentResolutionString() const;
     int optimalResolution() const;
     int maximumResolution() const;
+    void updateFinalTimestamp();
+    void setFinalTimestamp(qint64 finalTimestamp);
 
 private:
     QnVirtualCameraResourcePtr m_camera;
     QUrl m_url;
     qint64 m_position;
+    qint64 m_finalTimestamp;
     int m_resolution;
     QList<int> m_standardResolutions;
     QSize m_screenSize;

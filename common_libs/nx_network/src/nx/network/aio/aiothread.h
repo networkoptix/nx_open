@@ -684,17 +684,26 @@ public:
         AIOEventHandler<SocketType>* eventHandler)
     {
         std::unique_ptr<AIOEventHandlingDataHolder<SocketType>> handlingData(new AIOEventHandlingDataHolder<SocketType>(eventHandler));
+        bool failedToAddToPollset = false;
         if (eventType != aio::etTimedOut)
             if (!pollSet.add(socket, eventType, handlingData.get()))
             {
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
-                //TODO #ak report error to eventHandler
-                return false;
+                failedToAddToPollset = true;
             }
         socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
 
-        if (timeout > 0)
+        if (failedToAddToPollset)
+        {
+            postedCalls.push_back(
+                PostAsyncCallTask(
+                    socket,
+                    [eventHandler, socket](){
+                        eventHandler->eventTriggered(socket, aio::etError);
+                    }));
+        }
+        else if (timeout > 0)
         {
             //adding periodic task associated with socket
             handlingData->data->timeout = timeout;

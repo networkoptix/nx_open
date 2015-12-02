@@ -6,45 +6,48 @@
 #include <nx/utils/timermanager.h>
 
 namespace nx {
+    class SocketGlobals;
+}   //nx
+
+namespace nx {
 namespace cc {
 
 class NX_NETWORK_API MediatorAddressPublisher
 {
+    MediatorAddressPublisher();
+    friend class ::nx::SocketGlobals;
+
 public:
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;
-
-    MediatorAddressPublisher( String serverId,
-                              TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
-    ~MediatorAddressPublisher();
-
     struct Authorization
     {
+        String serverId;
         String systemId;
         String key;
 
         bool operator == ( const Authorization& rhs ) const;
     };
 
-    void authorizationChanged( boost::optional< Authorization > authorization );
+    /** Should be called before initial @fn updateAuthorization */
+    void setUpdateInterval( TimerDuration updateInterval );
+    void updateAuthorization( boost::optional< Authorization > authorization );
     void updateAddresses( std::list< SocketAddress > addresses );
 
 private:
     void setupUpdateTimer();
     bool isCloudReady();
-
     void pingReportedAddresses();
     void publishPingedAddresses();
+    void terminate();
 
 private:
-    const String m_serverId;
-    const TimerDuration m_updateInterval;
-
     QnMutex m_mutex;
-    TimerManager::TimerGuard m_timerGuard;
+    TimerDuration m_updateInterval;
     bool isTerminating;
+    std::unique_ptr< AbstractStreamSocket > m_timerSocket;
 
     boost::optional< Authorization > m_stunAuthorization;
-    std::unique_ptr< stun::AsyncClient > m_stunClient;
+    stun::AsyncClient* m_stunClient;
 
     std::list< SocketAddress > m_reportedAddresses;
     std::list< SocketAddress > m_pingedAddresses;

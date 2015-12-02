@@ -44,7 +44,7 @@ written by
 
 #include "udt.h"
 
-#ifdef WIN32
+#ifdef _WIN32
    struct iovec
    {
       int iov_len;

@@ -42,7 +42,7 @@ written by
 #define __UDT_COMMON_H__
 
 
-#ifndef WIN32
+#ifndef _WIN32
    #include <sys/time.h>
    #include <sys/uio.h>
    #include <pthread.h>
@@ -53,7 +53,7 @@ written by
 #include "udt.h"
 
 
-#ifdef WIN32
+#ifdef _WIN32
    // Windows compability
    typedef HANDLE pthread_t;
    typedef HANDLE pthread_mutex_t;

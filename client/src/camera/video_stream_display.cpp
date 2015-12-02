@@ -656,6 +656,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         outFrame->pkt_dts = m_tmpFrame->pkt_dts;
         outFrame->metadata = m_tmpFrame->metadata;
         outFrame->flags = m_tmpFrame->flags;
+        outFrame->channel = data->channelNumber;
     }
     outFrame->flags |= data->flags;
     //outFrame->pts = data->timestamp;

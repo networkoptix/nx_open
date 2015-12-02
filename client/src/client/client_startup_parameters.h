@@ -40,4 +40,5 @@ struct QnStartupParameters
     /** Uri when the client was launched as uri handler. */
     QString customUri;
     QString enforceSocketType;
+    QString enforceMediatorEndpoint;
 };

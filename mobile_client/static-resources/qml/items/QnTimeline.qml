@@ -103,17 +103,14 @@ Item {
             onReleased: {
                 preventStealing = false
                 pressX = -1
-                timeline.finishDrag(mouse.x)
-                timeline.dragging = false
 
-                if (timeline.moving)
+                if (timeline.moving) {
+                    timeline.dragging = false
                     root.dragFinished()
-            }
-            onClicked: {
-                if (moving)
-                    return
-
-                positionTapped(timeline.positionAtX(mouse.x))
+                    timeline.finishDrag(mouse.x)
+                } else {
+                    positionTapped(timeline.positionAtX(mouse.x))
+                }
             }
             onWheel: {
                 if (wheel.angleDelta.y > 0)

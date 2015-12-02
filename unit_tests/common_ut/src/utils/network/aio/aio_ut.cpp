@@ -83,16 +83,22 @@ public:
     }
 };
 
-TEST(aio, DISABLED_pollsetError)
+TEST(aio, pollsetError)
 {
+    std::promise<void> handlerCalledPromise;
+    auto handlerCalledFuture = handlerCalledPromise.get_future();
+
     UDPSocket socket(false);
     std::atomic<bool> handlerCalledFlag(false);
-    DummyEventHandler evHandler(
-        [&handlerCalledFlag](Pollable*, aio::EventType et) {
-            ASSERT_EQ(aio::etError, et);
-            handlerCalledFlag = true;
-        });
     std::atomic<bool> socketAddedFlag(false);
+
+    DummyEventHandler evHandler(
+        [&handlerCalledFlag, &socketAddedFlag, &handlerCalledPromise](Pollable*, aio::EventType et) {
+            ASSERT_EQ(aio::etError, et);
+            ASSERT_TRUE(socketAddedFlag.load());
+            handlerCalledFlag = true;
+            handlerCalledPromise.set_value();
+        });
 
     QnMutex mtx;
     aio::detail::AIOThread<Pollable, TestPollSet> aioThread(&mtx);
@@ -103,11 +109,13 @@ TEST(aio, DISABLED_pollsetError)
         aio::etRead,
         &evHandler,
         0,
-        [&socketAddedFlag]() {
+        [&socketAddedFlag, &handlerCalledFlag]() {
+            ASSERT_FALSE(handlerCalledFlag.load());
             socketAddedFlag = true;
         });
 
-    std::this_thread::sleep_for(std::chrono::seconds(2));
-    ASSERT_FALSE(socketAddedFlag);
-    ASSERT_TRUE(handlerCalledFlag);
+    handlerCalledFuture.wait();
+    //handlerCalledFuture.wait_for(std::chrono::seconds(2));
+    ASSERT_TRUE(socketAddedFlag);
+    ASSERT_TRUE(handlerCalledFlag.load());
 }

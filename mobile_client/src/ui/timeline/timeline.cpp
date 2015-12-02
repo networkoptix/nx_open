@@ -554,6 +554,8 @@ void QnTimeline::updateDrag(int x) {
 
 void QnTimeline::finishDrag(int x) {
     d->stickyPointKineticHelper.finish(x);
+    if (d->stickyPointKineticHelper.isStopped())
+        emit moveFinished();
     update();
 }
 

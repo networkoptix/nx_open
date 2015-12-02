@@ -36,7 +36,7 @@
 #include "utils/common/checked_cast.h"
 
 
-QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent): 
+QnCameraMotionMaskWidget::QnCameraMotionMaskWidget(QWidget *parent):
     base_type(parent),
     m_readOnly(false),
     m_controlMaxRects(false)
@@ -60,7 +60,7 @@ void QnCameraMotionMaskWidget::init() {
     auto workbenchLayout = new QnWorkbenchLayout(this);
     workbenchLayout->setCellSpacing(QSizeF(0, 0));
     m_context->workbench()->setCurrentLayout(workbenchLayout);
-    
+
     QnWorkbenchDisplay *display = m_context->display();
     display->setLightMode(Qn::LightModeFull);
     display->setScene(m_scene.data());
@@ -158,9 +158,9 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         item->setGeometry(QRect(0, 0, 1, 1));
         item->setRotation(0);
 
-        QnResourceWidget::Options forcedOptions = 
-            QnResourceWidget::DisplayMotionSensitivity | 
-            QnResourceWidget::DisplayMotion | 
+        QnResourceWidget::Options forcedOptions =
+            QnResourceWidget::DisplayMotionSensitivity |
+            QnResourceWidget::DisplayMotion |
             QnResourceWidget::WindowRotationForbidden |
             QnResourceWidget::SyncPlayForbidden |
             QnResourceWidget::InfoOverlaysForbidden;
@@ -173,7 +173,6 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource) {
         m_resourceWidget = dynamic_cast<QnMediaResourceWidget *>(m_context->display()->widget(item)); // TODO: #Elric check for NULL
         Q_ASSERT(m_resourceWidget);
         if (m_resourceWidget) {
-            m_resourceWidget->setOption(QnResourceWidget::DisplayButtons, false);
             m_resourceWidget->setFrameOpacity(0.0);
         }
     }
@@ -187,8 +186,8 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
     switch(errCode){
     case QnMotionRegion::ErrorCode::Windows:
         QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
+            this,
+            tr("Too many motion windows"),
             tr("Maximum number of motion windows for current camera is %1, but %2 motion windows are currently selected.")
             .arg(m_camera->motionWindowCount())
             .arg(region.getMotionRectCount())
@@ -196,8 +195,8 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
         break;
     case QnMotionRegion::ErrorCode::Sens:
         QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
+            this,
+            tr("Too many motion windows"),
             tr("Maximum number of different motion sensitivities for current camera is %1, but %2 motion sensitivities are currently selected.")
             .arg(m_camera->motionSensWindowCount())
             .arg(region.getMotionSensCount())
@@ -205,8 +204,8 @@ void QnCameraMotionMaskWidget::showTooManyWindowsMessage(const QnMotionRegion &r
         break;
     case QnMotionRegion::ErrorCode::Masks:
         QMessageBox::warning(
-            this, 
-            tr("Too many motion windows"), 
+            this,
+            tr("Too many motion windows"),
             tr("Maximum number of motion mask windows for current camera is %1, but %2 motion mask windows are currently selected.")
             .arg(m_camera->motionMaskWindowCount())
             .arg(region.getMaskRectCount())

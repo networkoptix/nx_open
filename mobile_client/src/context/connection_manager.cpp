@@ -13,6 +13,7 @@
 #include "mobile_client/mobile_client_message_processor.h"
 #include "utils/common/app_info.h"
 #include "utils/common/synctime.h"
+#include "utils/common/util.h"
 #include "mobile_client/mobile_client_settings.h"
 #include "common/common_module.h"
 #include "watchers/user_watcher.h"
@@ -87,6 +88,10 @@ QnConnectionManager::State QnConnectionManager::connectionState() const {
     default:
         return Disconnected;
     }
+}
+
+int QnConnectionManager::defaultServerPort() const {
+    return DEFAULT_APPSERVER_PORT;
 }
 
 void QnConnectionManager::connectToServer(const QUrl &url) {

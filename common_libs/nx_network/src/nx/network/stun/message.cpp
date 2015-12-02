@@ -6,7 +6,7 @@
 #include "message.h"
 #include "message_serializer.h"
 
-#include <QCryptographicHash>
+#include <openssl/hmac.h>
 
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
@@ -38,12 +38,7 @@ Header::Header( MessageClass messageClass_ , int method_,
 static Buffer randomBuffer( int size )
 {
     Buffer id( size, 0 );
-    const auto step = sizeof( int );
-    const auto last = id.size() - step;
-
-    for( auto p = id.data(); p < id.data() + last; p += step )
-        *reinterpret_cast< int* >( p ) = qrand();
-
+    std::generate( id.begin(), id.end(), qrand );
     return id;
 }
 
@@ -124,28 +119,25 @@ namespace attrs
 }
 
 // provided by http://wiki.qt.io/HMAC-SHA1
-static String hmacSha1( String key, const String& baseString )
+static Buffer hmacSha1( const String& key, const String& baseString )
 {
-    int blockSize = 64;
-    if (key.length() > blockSize)
-        key = QCryptographicHash::hash(key, QCryptographicHash::Sha1);
+    unsigned int len;
+    Buffer result( 20, 0 );
 
-    QByteArray innerPadding(blockSize, char(0x36));
-    QByteArray outerPadding(blockSize, char(0x5c));
+    HMAC_CTX ctx;
+    HMAC_CTX_init( &ctx);
+    HMAC_Init_ex( &ctx, key.data(), key.size(), EVP_sha1(), NULL );
+    HMAC_Update( &ctx, reinterpret_cast<const unsigned char*>(
+                     baseString.data() ), baseString.size() );
+    HMAC_Final( &ctx, reinterpret_cast<unsigned char*>(
+                    result.data() ), &len );
+    HMAC_CTX_cleanup( &ctx );
 
-    for (int i = 0; i < key.length(); i++) {
-        innerPadding[i] = innerPadding[i] ^ key.at(i);
-        outerPadding[i] = outerPadding[i] ^ key.at(i);
-    }
-
-    QByteArray total = outerPadding;
-    QByteArray part = innerPadding;
-    part.append(baseString);
-    total.append(QCryptographicHash::hash(part, QCryptographicHash::Sha1));
-    return QCryptographicHash::hash(total, QCryptographicHash::Sha1);
+    result.resize( len );
+    return std::move( result );
 }
 
-static String hmacSha1( const String& key, const Message* message )
+static Buffer hmacSha1( const String& key, const Message* message )
 {
     Buffer buffer;
     buffer.reserve( DEFAULT_BUFFER_SIZE );

@@ -570,6 +570,20 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     fetchRelayInputInfo( capabilitiesResponse );
 
+    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.contains(lit("relayInputCountForced")))
+    {
+        setCameraCapability(
+            Qn::RelayInputCapability,
+            resourceData.value<int>(lit("relayInputCountForced"), 0) > 0);
+    }
+    if (resourceData.contains(lit("relayOutputCountForced")))
+    {
+        setCameraCapability(
+            Qn::RelayOutputCapability,
+            resourceData.value<int>(lit("relayOutputCountForced"), 0) > 0);
+    }
+
     QnIOPortDataList allPorts = getRelayOutputList();
 
     if (capabilitiesResponse.Capabilities &&
@@ -603,7 +617,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
-        QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+        //QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
         bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
         if (forcedAR && m_primaryResolution.height() > 0) 
         {

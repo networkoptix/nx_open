@@ -47,8 +47,6 @@ class QnGraphicsMessageBoxItem;
 class QnNotificationsCollectionWidget;
 class QnDayTimeWidget;
 
-class QnSearchLineEdit;
-
 class QnWorkbenchUi: public Disconnective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider, public AnimationTimerListener, protected QnGeometry {
     Q_OBJECT
     Q_ENUMS(Flags Flag)
@@ -155,7 +153,6 @@ public slots:
     void setTitleVisible(bool visible = true, bool animate = true);
     void setNotificationsVisible(bool visible = true, bool animate = true);
     void setCalendarVisible(bool visible = true, bool animate = true);
-    void setSearchVisible(bool visible = true, bool animate = true);
 
     void setTreeOpened(bool opened = true, bool animate = true, bool save = true);
     void setSliderOpened(bool opened = true, bool animate = true, bool save = true);
@@ -163,7 +160,6 @@ public slots:
     void setNotificationsOpened(bool opened = true, bool animate = true, bool save = true);
     void setCalendarOpened(bool opened = true, bool animate = true);
     void setDayTimeWidgetOpened(bool opened = true, bool animate = true);
-    void setSearchOpened(bool opened = true, bool animate = true);
 protected:
     virtual bool event(QEvent *event) override;
 
@@ -194,16 +190,12 @@ protected:
     void setTitleOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setNotificationsOpacity(qreal foregroundOpacity, qreal backgroundOpacity, bool animate);
     void setCalendarOpacity(qreal opacity, bool animate);
-    void setSearchOpacity(qreal opacity, bool animate);
     void setSliderZoomButtonsOpacity(qreal opacity, bool animate);
 
     bool isThumbnailsVisible() const;
     void setThumbnailsVisible(bool visible);
 
     bool isHovered() const;
-
-    void updateSearchGeometry();
-    QRectF updatedSearchGeometry(const QRectF &sliderGeometry);
 
 private:
     void createControlsWidget();
@@ -214,7 +206,6 @@ private:
     void createCalendarWidget();
     void createSliderWidget();
     void createDebugWidget();
-    void createSearchWidget();
 
     Panels openedPanels() const;
     void setOpenedPanels(Panels panels, bool animate = true, bool save = true);
@@ -229,10 +220,8 @@ private slots:
     void updateTitleOpacity(bool animate = true);
     void updateNotificationsOpacity(bool animate = true);
     void updateCalendarOpacity(bool animate = true);
-    void updateSearchOpacity(bool animate = true);
 
     void updateCalendarVisibility(bool animate = true);
-    void updateSearchVisibility(bool animate = true);
     void updateControlsVisibility(bool animate = true);
     
     void updateTreeOpacityAnimated() { updateTreeOpacity(true); }
@@ -241,7 +230,6 @@ private slots:
     void updateNotificationsOpacityAnimated() { updateNotificationsOpacity(true); }
     void updateCalendarOpacityAnimated() { updateCalendarOpacity(true); }
     void updateCalendarVisibilityAnimated() { updateCalendarVisibility(true); }
-    void updateSearchOpacityAnimated() { updateSearchOpacity(true); }
     void updateControlsVisibilityAnimated() { updateControlsVisibility(true); }
 
     void setTreeShowButtonUsed(bool used = true);
@@ -278,7 +266,6 @@ private slots:
 
     void at_calendarWidget_dateClicked(const QDate &date);
 
-    void at_searchItem_paintGeometryChanged();
 private:
     /* Global state. */
 
@@ -324,10 +311,6 @@ private:
     bool m_dayTimeOpened;
 
     bool m_windowButtonsUsed;
-
-    bool m_searchVisible;
-
-    bool m_searchOpened;
 
     bool m_ignoreClickEvent;
 
@@ -481,14 +464,6 @@ private:
     QnDayTimeWidget *m_dayTimeWidget;
 
     VariantAnimator *m_dayTimeSizeAnimator;
-
-    /* Search widget */
-    QnMaskedProxyWidget *m_searchWidget;
-    VariantAnimator *m_searchSizeAnimator;
-    AnimatorGroup *m_searchOpacityAnimatorGroup;
-    HoverFocusProcessor *m_searchOpacityProcessor;
-
-    bool m_inSearchGeometryUpdate;
 
     qreal m_pinOffset;
     QPoint m_calendarPinOffset;
