@@ -22,8 +22,8 @@ namespace
 {
     enum
     {
-        kCaptionMaxLength = 128
-        , kDescriptionMaxLength = 256
+        kCaptionMaxLength = 64
+        , kDescriptionMaxLength = 96
         , kMaxItemWidth = 250
     };
 
@@ -244,7 +244,7 @@ void QnCompositeTextOverlay::initTextMode()
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
             if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  // Do not add empty text items
-                return; 
+                return;
 
             static const auto kComplexHtml = lit("%1%2");
             text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)

@@ -386,7 +386,7 @@ namespace
         enum
         {
             kMaxHeaderLength = 64
-            , kMaxBodyLength = 512
+            , kMaxBodyLength = 96
         };
 
         enum { kFirstPosition = 0 };
@@ -696,7 +696,7 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
     m_bookmarks = bookmarks;
 
-    enum { kMaxBookmarksCount = 6 };
+    enum { kMaxBookmarksCount = 3 };
 
     const int bookmarksCount = std::min<int>(m_bookmarks.size(), kMaxBookmarksCount);
     const int bookmarksLeft = m_bookmarks.size() - bookmarksCount;
