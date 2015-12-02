@@ -155,7 +155,19 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
                 || QnBusiness::requiresUserResource(m_model->actionType());
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
-        ui->actionAtLabel->setText(m_model->actionType() == QnBusiness::SendMailAction ? tr("to") : tr("at"));
+        QString actionAtLabelText;
+        switch (m_model->actionType()) {
+        case QnBusiness::SendMailAction:
+            actionAtLabelText = tr("to");
+            break;
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(tr("Devices"), tr("Cameras"));
+            break;
+        default:
+            actionAtLabelText = tr("at");
+            break;
+        }
+        ui->actionAtLabel->setText(actionAtLabelText);
 
         bool actionIsInstant = !QnBusiness::hasToggleState(m_model->actionType());
         ui->aggregationWidget->setVisible(actionIsInstant);
