@@ -67,7 +67,7 @@ public:
         m_actionTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined actions to the end of the list
         count = 0;
         for (int actionType: actionTypes)
-            m_eventTypeToLexOrder[actionType] = count++;
+            m_actionTypeToLexOrder[actionType] = count++;
     }
 
     void setSort(int column, Qt::SortOrder order)

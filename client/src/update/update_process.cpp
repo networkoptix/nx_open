@@ -501,6 +501,9 @@ void QnUpdateProcess::at_uploadTask_finished(int errorCode, const QSet<QnUuid> &
         case QnUploadUpdatesPeerTask::TimeoutError:
             finishUpdate(QnUpdateResult::UploadingFailed_Timeout);
             break;
+        case QnUploadUpdatesPeerTask::AuthenticationError:
+            finishUpdate(QnUpdateResult::UploadingFailed_AuthenticationFailed);
+            break;
         default:
             finishUpdate(QnUpdateResult::UploadingFailed);
             break;

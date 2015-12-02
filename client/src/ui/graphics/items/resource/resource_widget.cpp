@@ -239,15 +239,13 @@ void QnResourceWidget::addInfoOverlay() {
 
         enum { kMargin = 2 };
 
-        static const QSizeF maxFillCoeff(0.7, 0.5);
-
         m_overlayWidgets.detailsItem->setOptions(infoOptions);
         m_overlayWidgets.detailsItem->setProperty(Qn::NoBlockMotionSelection, true);
         auto detailsOverlay = new QnScrollableOverlayWidget(Qt::AlignLeft, this);
         detailsOverlay->setProperty(Qn::NoBlockMotionSelection, true);
         detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
         detailsOverlay->addItem(m_overlayWidgets.detailsItem);
-        detailsOverlay->setMaxFillCoeff(maxFillCoeff);
+        detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
         addOverlayWidget(detailsOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.detailsOverlay = detailsOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay, false, false);
@@ -259,7 +257,7 @@ void QnResourceWidget::addInfoOverlay() {
         positionOverlay->setProperty(Qn::NoBlockMotionSelection, true);
         positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
         positionOverlay->addItem(m_overlayWidgets.positionItem);
-        positionOverlay->setMaxFillCoeff(maxFillCoeff);
+        positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
         addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
         m_overlayWidgets.positionOverlay = positionOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.positionOverlay, false, false);

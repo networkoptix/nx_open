@@ -19,6 +19,7 @@ public:
         NoError,
         NoFreeSpace,
         TimeoutError,
+        AuthenticationError,
         UnknownError
     };
 

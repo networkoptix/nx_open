@@ -68,8 +68,8 @@ QnStatisticsColors::QnStatisticsColors() {
     frame = QColor(66, 140, 237);
     cpu = QColor(66, 140, 237);
     ram = QColor(219, 59, 169);
-    
-    hdds 
+
+    hdds
         << QColor(237, 237, 237)   // C: sda
         << QColor(237, 200, 66)    // D: sdb
         << QColor(103, 237, 66)    // E: sdc
@@ -80,7 +80,7 @@ QnStatisticsColors::QnStatisticsColors() {
         << QColor(255, 127, 127)
         << QColor(201, 0, 0);
 
-    network 
+    network
         << QColor(255, 52, 52)
         << QColor(240, 255, 52)
         << QColor(228, 52, 255)
@@ -176,7 +176,7 @@ QnAuditLogColors::QnAuditLogColors() {
     updServer = QColor(0xdc, 0xb4, 0x28); //QColor(0x99, 0x49, 0x98);
     eventRules = QColor(0x9c, 0x6b, 0x50); //QColor(0x5d, 0x82, 0xbf);
     emailSettings = QColor(0xcb, 0xcb, 0xcb); //QColor(0x9c, 0x6b, 0x50);
-    
+
     chartColor = QColor(0x25, 0x92, 0xc3);
 }
 
@@ -218,13 +218,6 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     low     = QColor(0x9eb236);
     medium  = QColor(0xcc853d);
     high    = QColor(0xff5500);
-}
-
-QnBackupCamerasColors::QnBackupCamerasColors() {
-    disabled= QColor(0x808080);
-    low     = QColor(0x9eb236);
-    high    = QColor(0xff5500);
-    both    = QColor(0xcc853d);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
