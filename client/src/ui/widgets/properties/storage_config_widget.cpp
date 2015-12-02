@@ -386,6 +386,7 @@ void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, 
             storage->setUsedForWriting(storageData.isUsed);
             storage->setStorageType(storageData.storageType);
             storage->setBackup(storageData.isBackup);
+            storage->setSpaceLimit(storageData.reservedSpace);
 
             qnResPool->addResource(storage);
             result << storage;
