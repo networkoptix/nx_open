@@ -4,12 +4,22 @@ from api.helpers.exceptions import handle_exceptions, APIRequestException, api_s
 from notifications import api
 from django.core.exceptions import ValidationError
 
+import logging
+logger = logging.getLogger('django')
+
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def send_notification(request):
     try:
-        api.send(request.data.user_email, request.data.type, request.data.message)
+        if 'user_email' not in request.data:
+            raise APIRequestException('No user_email in request')
+        if 'type' not in request.data:
+            raise APIRequestException('No type in request')
+        if 'message' not in request.data:
+            raise APIRequestException('No message in request')
+
+        api.send(request.data['user_email'], request.data['type'], request.data['message'])
     except ValidationError as error:
         raise APIRequestException(error.message)
     return api_success()

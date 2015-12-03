@@ -47,7 +47,13 @@ angular.module('cloudApp')
                 });
             },
 
-
+            notification_send:function(user_email,type,message){
+                return $http.post(apiBase.replace("/api","/notifications") + '/send',{
+                    user_email:user_email,
+                    type:type,
+                    message:message
+                });
+            },
 
             accountPost:function(firstName,lastName,subscribe){
                 return $http.post(apiBase + '/account',{
