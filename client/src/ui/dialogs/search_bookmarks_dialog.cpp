@@ -58,8 +58,7 @@ namespace
         const auto timeWathcer = context->instance<QnWorkbenchServerTimeWatcher>();
         const auto server = qnCommon->currentServer();
         const auto serverUtcOffsetSecs = timeWathcer->utcOffset(server) / kMillisecondsInSeconds;
-        const QDateTime serverTime(clientDate, QTime(0, 0), Qt::OffsetFromUTC
-            , serverUtcOffsetSecs / kMillisecondsInSeconds);
+        const QDateTime serverTime(clientDate, QTime(0, 0), Qt::OffsetFromUTC, serverUtcOffsetSecs);
         return serverTime.toMSecsSinceEpoch() + dayEndOffset;
     }
 
