@@ -29,6 +29,7 @@ ecs.db-wal
 compatibility_info.cpp
 *_tmp.py*
 donotrebuild
+vms.pro
 
 .DS_Store
 Debug
