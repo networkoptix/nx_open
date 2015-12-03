@@ -117,7 +117,7 @@ public:
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
         if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
-            nx::SocketGlobals::addressResolver().cancel( this, true );    //TODO #ak must not block here!
+            nx::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
 
             if( m_connectSendHandlerTerminatedFlag )
                 nx::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
@@ -284,62 +284,28 @@ public:
         const aio::EventType eventType,
         std::function<void()> cancelledHandler = std::function<void()>())
     {
-        const bool inAIOThread = m_socket->impl()->aioThread.load() == QThread::currentThread();
-        
-        //TODO #ak put resolving cancellation and stop polling into asynchronous pipeline
-        assert(false);  //TODO #ak this method is not working at the moment
-        
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, false);
-
-        ++this->m_socket->impl()->terminated;  //no new async calls can be scheduled while terminated is non-zero
-        nx::SocketGlobals::aioService().dispatch(
-            this->m_socket,
-            [this, eventType, cancelledHandler, inAIOThread]() mutable {
-                stopPollingSocket(this->m_socket, eventType);
-                --this->m_socket->impl()->terminated;
-                //TODO #ak if cancel called within aio thread, 
-                //  cancelledHandler will be called within cancel call what can be unexpected
-                if (!cancelledHandler)
-                    return;
-                if (inAIOThread)
-                    this->m_socket->impl()->aioThread.load()->post(
-                        m_socket,
-                        std::move(cancelledHandler));   //avoiding calling handler within calling func
-                else
-                    cancelledHandler();
-            });
-
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, false);
-
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
+        auto cancelImpl = [=]()
         {
-            //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-            //  avoiding unnecessary removeFromWatch calls in eventTriggered
-            if (eventType == aio::etRead || eventType == aio::etNone)
-                ++m_recvAsyncCallCounter;
-            if (eventType == aio::etWrite || eventType == aio::etNone)
-                ++m_connectSendAsyncCallCounter;
-            if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                ++m_registerTimerCallCounter;
-                
-            //TODO #ak cancelledHandler ???
-        }
+            // cancelIOSync will be instant from socket's IO thread
+            nx::SocketGlobals::aioService().dispatch(this->m_socket, [=]()
+            {
+                cancelIOSync( eventType );
+                cancelledHandler();
+            });
+        };
+
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            nx::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
+        else
+            cancelImpl();
     }
-                    QnMutexLocker lk(&mtx);
 
     void cancelIOSync(const aio::EventType eventType)
     {
-        const bool inAIOThread = m_socket->impl()->aioThread.load() == QThread::currentThread();
-
-        //TODO #ak put resolving cancellation and stop polling into asynchronous pipeline
-        //TODO #ak probably, it make sense to break this method to sync and async ones
-
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, true);
+            nx::SocketGlobals::addressResolver().cancel(this);
 
+        const bool inAIOThread = this->m_socket->impl()->aioThread.load() == QThread::currentThread();
         if (inAIOThread)
         {
             stopPollingSocket(this->m_socket, eventType);
@@ -361,7 +327,7 @@ public:
         }
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, true);
+            nx::SocketGlobals::addressResolver().cancel(this);
 
         std::atomic_thread_fence(std::memory_order_acquire);
         if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())

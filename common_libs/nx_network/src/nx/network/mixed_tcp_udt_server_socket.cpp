@@ -208,7 +208,7 @@ void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion
         m_acceptingFlags[i] = false;
 }
 
-void MixedTcpUdtServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+void MixedTcpUdtServerSocket::pleaseStop( std::function<void()> completionHandler )
 {
     //TODO #ak
     assert( false );

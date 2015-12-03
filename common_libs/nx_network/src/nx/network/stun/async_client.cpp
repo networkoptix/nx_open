@@ -29,7 +29,7 @@ AsyncClient::~AsyncClient()
     }
 
     if( connectingSocket )
-        connectingSocket->terminateAsyncIO( true );
+        connectingSocket->pleaseStopSync();
 }
 
 void AsyncClient::openConnection( ConnectionHandler connectHandler,

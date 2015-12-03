@@ -34,7 +34,7 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const  override;
     virtual SOCKET_HANDLE handle() const override;
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,

@@ -94,9 +94,8 @@ public:
         std::function<void()> cancellationDoneHandler) override;
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIOBlocking
     virtual void cancelIOSync(aio::EventType eventType) override;
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
-
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     // AbstractStreamSocket ------ interface
     virtual bool reopen() override;
@@ -156,8 +155,8 @@ public:
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
     virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;

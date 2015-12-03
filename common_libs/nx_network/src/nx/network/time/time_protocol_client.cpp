@@ -54,7 +54,7 @@ void TimeProtocolClient::join()
         tcpSock = m_tcpSock;
     }
 
-    tcpSock->terminateAsyncIO( true );
+    tcpSock->pleaseStopSync();
     m_tcpSock.reset();
 }
 
@@ -83,7 +83,7 @@ void TimeProtocolClient::getTimeAsync( std::function<void(qint64, SystemError::E
 
     m_handlerFunc = [this, handlerFunc]( qint64 timestamp, SystemError::ErrorCode error )
     {
-        m_tcpSock->terminateAsyncIO( true );
+        m_tcpSock->pleaseStopSync();
         {
             QnMutexLocker lk( &m_mutex );
             m_tcpSock.reset();

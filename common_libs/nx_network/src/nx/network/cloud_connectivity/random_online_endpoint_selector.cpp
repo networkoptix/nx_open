@@ -30,7 +30,7 @@ RandomOnlineEndpointSelector::~RandomOnlineEndpointSelector()
         sockets = std::move(m_sockets);
     }
     for (auto& val: sockets)
-        val.second->terminateAsyncIO(true);
+        val.second->pleaseStopSync();
 }
 
 void RandomOnlineEndpointSelector::selectBestEndpont(

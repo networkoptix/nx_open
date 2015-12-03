@@ -548,15 +548,13 @@ CommunicatingSocket::CommunicatingSocket(
 CommunicatingSocket::~CommunicatingSocket()
 {
     m_aioHelper->terminate();
+    //m_aioHelper->cancelIOSync(aio::etNone);
 }
 
-void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void CommunicatingSocket::pleaseStop( std::function<void()> completionHandler )
 {
     m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
-    if (waitForRunningHandlerCompletion)
-        m_aioHelper->cancelIOSync(aio::etNone);
-    else
-        m_aioHelper->cancelIOAsync(aio::etNone, std::function<void()>());
+    m_aioHelper->cancelIOAsync( aio::etNone, std::move( completionHandler ) );
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
@@ -1201,48 +1199,22 @@ bool TCPServerSocket::listen( int queueLen )
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void TCPServerSocket::pleaseStop( std::function<void()> completionHandler )
 {
     //TODO #ak add general implementation to Socket class and remove this method
-    if (waitForRunningHandlerCompletion)
+    m_implDelegate.dispatch( [ this, completionHandler ]()
     {
-        QnWaitCondition cond;
-        QnMutex mtx;
-        bool cancelled = false;
+        //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
 
-        m_implDelegate.dispatch(
-            [this, &cond, &mtx, &cancelled]()
-            {
-                nx::SocketGlobals::aioService().cancelPostedCalls(
-                    static_cast<Pollable*>(&m_implDelegate), true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+        nx::SocketGlobals::aioService().cancelPostedCalls(
+            static_cast<Pollable*>(&m_implDelegate), true);
+        nx::SocketGlobals::aioService().removeFromWatch(
+            static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+        nx::SocketGlobals::aioService().removeFromWatch(
+            static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
 
-                QnMutexLocker lk(&mtx);
-                cancelled = true;
-                cond.wakeAll();
-            } );
-
-        QnMutexLocker lk(&mtx);
-        while(!cancelled)
-            cond.wait(lk.mutex());
-    }
-    else
-    {
-        m_implDelegate.dispatch(
-            [this]()
-            {
-                //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
-                nx::SocketGlobals::aioService().cancelPostedCalls(
-                    static_cast<Pollable*>(&m_implDelegate), true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
-        } );
-    }
+        completionHandler();
+    } );
 }
 
 //!Implementation of AbstractStreamServerSocket::accept

@@ -26,7 +26,7 @@ MediatorConnector::~MediatorConnector()
         m_isTerminating = true;
     }
 
-    m_timerSocket->terminateAsyncIO( true );
+    m_timerSocket->pleaseStopSync();
 }
 
 void MediatorConnector::enable( bool waitComplete )

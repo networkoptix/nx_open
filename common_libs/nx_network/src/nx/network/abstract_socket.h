@@ -17,12 +17,13 @@
 #include "nettools.h"
 #include "socket_common.h"
 #include "utils/common/systemerror.h"
-
+#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class NX_NETWORK_API AbstractSocket
+    : public QnStoppableAsync
 {
 public:
 #ifdef Q_OS_WIN
@@ -154,11 +155,6 @@ public:
     */
     template<class HandlerType>
     void dispatch( HandlerType&& handler ) { dispatchImpl( std::forward<HandlerType>(handler) ); }
-    //!Terminates socket operations. This means that no operations can be executed on socket after this call
-    /*!
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
-    */
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) = 0;
 
 protected:
     virtual void postImpl( std::function<void()>&& handler ) = 0;

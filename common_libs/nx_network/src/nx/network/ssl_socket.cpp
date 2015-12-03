@@ -410,7 +410,7 @@ public:
     bool AsyncSend( const nx::Buffer& buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
     bool AsyncRecv( nx::Buffer* buffer , std::function<void(SystemError::ErrorCode,std::size_t)>&& handler );
     void WaitForAllPendingIOFinish() {
-        underly_socket_->terminateAsyncIO( true );
+        underly_socket_->pleaseStopSync();
         Clear();
     }
     void Clear() {
@@ -1251,10 +1251,10 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
     return SSL_write(d->ssl.get(), buffer, bufferLen);
 }
 
-void QnSSLSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void QnSSLSocket::pleaseStop( std::function<void()> completionHandler )
 {
     Q_D(QnSSLSocket); 
-    d->wrappedSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
+    d->wrappedSocket->pleaseStop( std::move( completionHandler ) );
 }
 
 bool QnSSLSocket::reopen()
@@ -1601,9 +1601,9 @@ SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, boo
     initOpenSSLGlobalLock();
 }
 
-void SSLServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void SSLServerSocket::pleaseStop( std::function<void()> completionHandler )
 {
-    return m_delegateSocket->terminateAsyncIO( waitForRunningHandlerCompletion );
+    return m_delegateSocket->pleaseStop( std::move( completionHandler ) );
 }
 
 bool SSLServerSocket::listen(int queueLen)

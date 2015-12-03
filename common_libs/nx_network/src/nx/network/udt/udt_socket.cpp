@@ -708,12 +708,10 @@ void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
     return m_aioHelper->cancelIOSync(eventType);
 }
 
-void UdtStreamSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion ) {
+void UdtStreamSocket::pleaseStop( std::function<void()> completionHandler )
+{
     m_aioHelper->terminateAsyncIO();
-    if (waitForRunningHandlerCompletion)
-        m_aioHelper->cancelIOSync(aio::etNone);
-    else
-        m_aioHelper->cancelIOAsync(aio::etNone, std::function<void()>());
+    m_aioHelper->cancelIOAsync( aio::etNone, std::move( completionHandler ) );
 }
 
 void UdtStreamSocket::postImpl( std::function<void()>&& handler )
@@ -762,7 +760,7 @@ UdtStreamSocket::UdtStreamSocket( detail::UdtSocketImpl* impl )
 
 UdtStreamSocket::~UdtStreamSocket()
 {
-    m_aioHelper->terminate();
+    //m_aioHelper->terminate();
 }
 
 // =====================================================================
@@ -785,10 +783,13 @@ void UdtStreamServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
     m_aioHelper->cancelAsyncIO(waitForRunningHandlerCompletion);
 }
 
-void UdtStreamServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void UdtStreamServerSocket::pleaseStop( std::function<void()> completionHandler )
 {
     impl()->terminated.store( true, std::memory_order_relaxed );
-    m_aioHelper->cancelAsyncIO( waitForRunningHandlerCompletion );
+
+    // TODO: #mux FIX THIS! the completionHandler should be passed and called!
+    m_aioHelper->cancelAsyncIO( false );
+    completionHandler();
 }
 
 bool UdtStreamServerSocket::bind( const SocketAddress& localAddress ) {

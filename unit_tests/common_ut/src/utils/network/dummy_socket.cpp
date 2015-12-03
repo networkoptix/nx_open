@@ -103,10 +103,10 @@ AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
     return 0;
 }
 
-void DummySocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+void DummySocket::pleaseStop( std::function<void()> completionHandler )
 {
+    completionHandler();
 }
-
 
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,

@@ -171,8 +171,8 @@ public:
 
     virtual ~CommunicatingSocket();
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    void terminateAsyncIO( bool waitForRunningHandlerCompletion );
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler );
 
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
@@ -279,8 +279,8 @@ public:
      */
     static int accept(int sockDesc);
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen( int queueLen ) override;

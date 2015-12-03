@@ -31,8 +31,8 @@ public:
     static void initSSLEngine(const QByteArray& certData);
     static void releaseSSLEngine();
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
@@ -153,8 +153,8 @@ public:
     */
     SSLServerSocket( AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect );
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractStreamServerSocket methods

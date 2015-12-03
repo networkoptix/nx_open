@@ -2,6 +2,7 @@
 
 #include "common/common_globals.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/stun/cc/custom_stun.h>
 
@@ -163,33 +164,34 @@ std::vector< AddressEntry > AddressResolver::resolveSync(
     return promise.get_future().get();
 }
 
-void AddressResolver::cancel( void* requestId, bool waitForRunningHandlerCompletion )
+void AddressResolver::cancel( void* requestId, std::function< void() > handler )
 {
-    QnMutexLocker lk( &m_mutex );
-    for( ;; )
+    boost::optional< std::promise< bool > > promise;
+    if( !handler )
     {
-        bool needToWait = false;
+        // no handler means we have to wait for complete
+        promise = std::promise< bool >();
+        handler = [ & ](){ promise->set_value( true ); };
+    }
+
+    {
+        BarrierHandler barrier( std::move( handler ) );
+        QnMutexLocker lk( &m_mutex );
         const auto range = m_requests.equal_range( requestId );
         for( auto it = range.first; it != range.second; )
         {
-            if( waitForRunningHandlerCompletion && it->second.inProgress )
-            {
-                needToWait = true;
-                ++it;
-            }
+            Q_ASSERT_X( !it->second.guard, Q_FUNC_INFO,
+                        "cancel has already been called for this requestId" );
+
+            if( it->second.inProgress && !it->second.guard )
+                ( it++ )->second.guard = barrier.fork();
             else
-            {
-                // remove all we dont have to wait
                 it = m_requests.erase( it );
-            }
         }
-
-        if( !needToWait )
-            return;
-
-        // wait for some tasks to complete and start all over again
-        m_condition.wait( &m_mutex );
     }
+
+    if( promise )
+        promise->get_future().wait();
 }
 
 bool AddressResolver::isRequestIdKnown( void* requestId ) const

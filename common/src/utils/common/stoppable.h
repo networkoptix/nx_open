@@ -34,7 +34,7 @@ public:
     virtual void pleaseStop( std::function<void()> completionHandler ) = 0;
 
     //!Cals \a QnStoppableAsync::pleaseStop and waits for completion
-    void join()
+    void pleaseStopSync()
     {
         std::promise<void> promise;
         auto fut = promise.get_future();

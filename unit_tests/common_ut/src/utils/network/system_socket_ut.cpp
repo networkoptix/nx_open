@@ -155,7 +155,7 @@ static void socketSimpleAsync()
                 serverBuffer.resize( 0 );
             }
 
-            client->terminateAsyncIO( true );
+            client->pleaseStopSync();
             server->acceptAsync( accept );
             serverResults.push( code );
         } );
@@ -187,8 +187,8 @@ static void socketSimpleAsync()
     ASSERT_EQ( clientResults.pop(), SystemError::noError ); // send
     ASSERT_EQ( serverResults.pop(), SystemError::noError ); // recv
 
-    testClient->terminateAsyncIO( true );
-    server->terminateAsyncIO( true );
+    testClient->pleaseStopSync();
+    server->pleaseStopSync();
 }
 
 TEST( TcpSocket, SimpleAsync )

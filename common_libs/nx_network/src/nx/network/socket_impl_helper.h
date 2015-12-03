@@ -179,9 +179,10 @@ public:
     }
 
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override {
-        this->m_implDelegate.terminateAsyncIO( waitForRunningHandlerCompletion );
+    //!Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop( std::function<void()> completionHandler ) override
+    {
+        this->m_implDelegate.pleaseStop( std::move( completionHandler ) );
     }
 
     //////////////////////////////////////////////////////////////////////

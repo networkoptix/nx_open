@@ -9,6 +9,11 @@ template<typename Callback>
 class ScopedGuard
 {
 public:
+    ScopedGuard()
+        : m_fired(true)
+    {
+    }
+
     /** Creates guard holding @param callback */
     ScopedGuard(Callback callback)
     :
@@ -33,9 +38,8 @@ public:
 
     ScopedGuard& operator=(ScopedGuard&& rhs)
     {
-        m_callback = std::move(rhs.m_callback);
-        m_fired = rhs.m_fired;
-        rhs.m_fired = true;
+        std::swap(m_callback, rhs.m_callback);
+        std::swap(m_fired, rhs.m_fired);
         return *this;
     }
 
@@ -53,6 +57,11 @@ public:
     void disarm()
     {
         m_fired = true;
+    }
+
+    operator bool() const
+    {
+        return !m_fired;
     }
 
 private:

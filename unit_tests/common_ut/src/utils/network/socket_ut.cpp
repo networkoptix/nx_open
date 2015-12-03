@@ -146,7 +146,7 @@ TEST( Socket, ServerSocketAsyncCancellation )
         ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
         ASSERT_TRUE( serverSocket->listen() );
         serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
-        serverSocket->terminateAsyncIO( true );
+        serverSocket->pleaseStopSync();
     }
 
     //waiting for some calls to deleted objects
@@ -216,7 +216,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         lk.unlock();
         if( connectionToCancel )
         {
-            connectionToCancel->terminateAsyncIO(true);
+            connectionToCancel->pleaseStopSync();
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
@@ -272,7 +272,7 @@ TEST( Socket, HostNameResolveCancellation )
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
             } );
-        connection->terminateAsyncIO(true);
+        connection->pleaseStopSync();
     }
 }
 
@@ -291,7 +291,7 @@ TEST( Socket, BadHostNameResolve )
             ( SystemError::ErrorCode /*errorCode*/ ) mutable {
                 ASSERT_EQ( i, iBak );
             } );
-        connection->terminateAsyncIO(true);
+        connection->pleaseStopSync();
     }
 }
 
@@ -324,7 +324,7 @@ TEST( Socket, postCancellation )
                 } );
 
             for( const auto& sock : sockets )
-                sock->terminateAsyncIO(true);
+                sock->pleaseStopSync();
 
             //QThread::usleep( 100 );
         }
