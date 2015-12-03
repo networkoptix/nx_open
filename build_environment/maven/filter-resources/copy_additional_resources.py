@@ -48,7 +48,7 @@ def extract(tar_url, extract_path='.'):
             extract(item.name, "./" + item.name[:item.name.rfind('/')])        
     tar.close()
     print 'Patching Artifact: %s' % tar_url
-    subprocess.call([sys.executable, '-u', 'dpatcher.py', tar_url])
+    subprocess.call([sys.executable, '-u', 'dpatcher.py', '--rules-file', 'dpatcher.cache', tar_url])
     os.unlink(file)
 
 if __name__ == '__main__':        
@@ -62,7 +62,9 @@ if __name__ == '__main__':
         os.unlink(buildvar)
 
     print '+++++++++++++++++++++ EXPANDING LIBS +++++++++++++++++++++'
-            
+
+    subprocess.call([sys.executable, 'dpatcher.py', '--make-rules-file', 'dpatcher.cache'])
+
     for file in os.listdir('.'):
         if file.endswith('tar.gz'):
             print(file)
