@@ -11,40 +11,15 @@ QnCameraBookmarkList QnBookmarksRequestHelper::loadBookmarks(const QnGetBookmark
 {
     QnMultiServerCameraBookmarkList multiBookmarks;
     for (const auto &camera: request.cameras) {
-        QnCameraBookmarkList bookmarks;        
+        QnCameraBookmarkList bookmarks;
         if (!qnServerDb->getBookmarks(camera->getUniqueId(), request.filter, bookmarks))
             continue;
         multiBookmarks.push_back(std::move(bookmarks));
     }
-    
+
     return QnCameraBookmark::mergeCameraBookmarks(multiBookmarks, request.filter.limit, request.filter.strategy);
 }
 
 QnCameraBookmarkTagList QnBookmarksRequestHelper::loadTags(const QnGetBookmarkTagsRequestData &request) {
     return qnServerDb->getBookmarkTags(request.limit);
 }
-
-
-QnMultiserverRequestContext::QnMultiserverRequestContext() 
-    : requestsInProgress(0)
-{}
-
-QnGetBookmarksRequestContext::QnGetBookmarksRequestContext(const QnGetBookmarksRequestData& request) 
-    : QnMultiserverRequestContext()
-    , request(request)
-{}
-
-QnGetBookmarkTagsRequestContext::QnGetBookmarkTagsRequestContext(const QnGetBookmarkTagsRequestData& request)
-    : QnMultiserverRequestContext()
-    , request(request)
-{}
-
-QnUpdateBookmarkRequestContext::QnUpdateBookmarkRequestContext(const QnUpdateBookmarkRequestData &request) 
-    : QnMultiserverRequestContext()
-    , request(request)
-{}
-
-QnDeleteBookmarkRequestContext::QnDeleteBookmarkRequestContext(const QnDeleteBookmarkRequestData &request) 
-    : QnMultiserverRequestContext()
-    , request(request)
-{}
