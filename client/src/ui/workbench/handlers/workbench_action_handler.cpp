@@ -1150,12 +1150,11 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
         const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
         const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
 
-        const auto start = (correctWindow ? QDateTime::fromMSecsSinceEpoch(timelineWindow.startTimeMs).date()
-            : QDateTime::currentDateTime().date());
+        const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        const auto start = (correctWindow ? timelineWindow.startTimeMs : nowMs);
 
         const auto finish = (correctWindow
-            ? QDateTime::fromMSecsSinceEpoch(timelineWindow.startTimeMs + timelineWindow.durationMs).date()
-            : QDateTime::currentDateTime().date());
+            ? timelineWindow.startTimeMs + timelineWindow.durationMs : nowMs);
 
         m_searchBookmarksDialog->setParameters(filterText, start, finish);
     }

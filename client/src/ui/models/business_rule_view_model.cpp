@@ -87,7 +87,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_actionType(QnBusiness::ShowPopupAction),
     m_aggregationPeriodSec(defaultAggregationPeriodSec),
     m_disabled(false),
-    m_system(false),
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
@@ -182,13 +181,15 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         break;
 
     case Qt::BackgroundRole:
-        if (m_system || m_disabled || isValid())
+        if (m_disabled || isValid())
             break;
 
         if (!isValid(column))
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
         return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
 
+    case Qn::UuidRole:
+        return qVariantFromValue(m_id);
     case Qn::ModifiedRole:
         return m_modified;
     case Qn::DisabledRole:
@@ -218,9 +219,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
 }
 
 bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
-    if (m_system)
-        return false;
-
     if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole) {
         Qt::CheckState checked = (Qt::CheckState)value.toInt();
         setDisabled(checked == Qt::Unchecked);
@@ -308,7 +306,6 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
     m_disabled = businessRule->isDisabled();
     m_comments = businessRule->comment();
     m_schedule = businessRule->schedule();
-    m_system = businessRule->isSystem();
 
     updateActionTypesModel();//TODO: #GDM #Business connect on dataChanged?
 
@@ -586,10 +583,6 @@ void QnBusinessRuleViewModel::setDisabled(const bool value) {
     m_modified = true;
 
     emit dataChanged(this, QnBusiness::AllFieldsMask); // all fields should be redrawn
-}
-
-bool QnBusinessRuleViewModel::system() const {
-    return m_system;
 }
 
 QString QnBusinessRuleViewModel::comments() const {
