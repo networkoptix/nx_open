@@ -24,9 +24,10 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <client/client_settings.h>
 
+#include <utils/common/synctime.h>
+
 namespace
 {
-    enum {  };
     enum
     {
         kMillisecondsInSeconds = 1000
@@ -55,9 +56,9 @@ namespace
             return QDateTime(clientDate).toMSecsSinceEpoch() + dayEndOffset;
         }
 
-        const auto timeWathcer = context->instance<QnWorkbenchServerTimeWatcher>();
+        const auto timeWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
         const auto server = qnCommon->currentServer();
-        const auto serverUtcOffsetSecs = timeWathcer->utcOffset(server) / kMillisecondsInSeconds;
+        const auto serverUtcOffsetSecs = timeWatcher->utcOffset(server) / kMillisecondsInSeconds;
         const QDateTime serverTime(clientDate, QTime(0, 0), Qt::OffsetFromUTC, serverUtcOffsetSecs);
         return serverTime.toMSecsSinceEpoch() + dayEndOffset;
     }
@@ -175,7 +176,7 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     connect(m_exportBookmarkAction, &QAction::triggered, this, &Impl::exportBookmarkHandler);
 
     static const QString kEmptyFilter;
-    const auto now = QDateTime::currentMSecsSinceEpoch();
+    const auto now = qnSyncTime->currentMSecsSinceEpoch();
     setParameters(kEmptyFilter, getStartOfTheDayMs(now), getEndOfTheDayMs(now));
 }
 

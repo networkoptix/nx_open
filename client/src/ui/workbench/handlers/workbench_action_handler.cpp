@@ -1150,7 +1150,7 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
         const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
         const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
 
-        const auto nowMs = QDateTime::currentMSecsSinceEpoch();
+        const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
         const auto start = (correctWindow ? timelineWindow.startTimeMs : nowMs);
 
         const auto finish = (correctWindow
