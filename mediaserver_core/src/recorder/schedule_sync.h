@@ -117,12 +117,11 @@ private:
     CopyError copyChunk(const ChunkKey &chunkKey);
 
     int state() const;
-    void initSyncData(int64_t timeMs);
+    void initSyncData();
 
     void addSyncDataKey(
         QnServer::ChunksCatalog quality,
-        const QString           &cameraId,
-        int64_t                 timeMs
+        const QString           &cameraId
     );
 
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;

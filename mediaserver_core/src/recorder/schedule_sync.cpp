@@ -330,8 +330,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
 
 void QnScheduleSync::addSyncDataKey(
     QnServer::ChunksCatalog quality,
-    const QString           &cameraId,
-    int64_t                 timeMs
+    const QString           &cameraId
 )
 {
     SyncData syncData;
@@ -348,7 +347,7 @@ void QnScheduleSync::addSyncDataKey(
     m_syncData.emplace(tmp, syncData);
 }
 
-void QnScheduleSync::initSyncData(int64_t timeMs)
+void QnScheduleSync::initSyncData()
 {
     for (const QnVirtualCameraResourcePtr &camera : 
          qnResPool->getAllCameras(QnResourcePtr(), true)) 
@@ -357,10 +356,10 @@ void QnScheduleSync::initSyncData(int64_t timeMs)
             camera->getActualBackupQualities();
 
         if (cameraBackupQualities.testFlag(Qn::CameraBackup_HighQuality))
-            addSyncDataKey(QnServer::HiQualityCatalog, camera->getUniqueId(), timeMs);
+            addSyncDataKey(QnServer::HiQualityCatalog, camera->getUniqueId());
 
         if (cameraBackupQualities.testFlag(Qn::CameraBackup_LowQuality))
-            addSyncDataKey(QnServer::LowQualityCatalog, camera->getUniqueId(), timeMs);
+            addSyncDataKey(QnServer::LowQualityCatalog, camera->getUniqueId());
     }
 }
 
@@ -373,7 +372,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     m_syncTimePoint = chunk.startTimeMs;
     m_syncEndTimePoint = chunk.endTimeMs();
 
-    initSyncData(m_syncTimePoint);
+    initSyncData();
 
     while (1) {
         auto chunkKeyVector = getOldestChunk(m_syncTimePoint);
