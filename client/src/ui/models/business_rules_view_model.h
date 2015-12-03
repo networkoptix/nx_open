@@ -46,11 +46,12 @@ public:
 
     void forceColumnMinWidth(QnBusiness::Columns column, int width);
 
-    QnBusinessRuleViewModel* getRuleModel(int row);
-protected:
     QnBusinessRuleViewModel* ruleModelById(const QnUuid &id);
+    QnBusinessRuleViewModel *rule(const QModelIndex &index) const;
 
 private:
+    bool isIndexValid(const QModelIndex &index) const;
+
     QString columnTitle(QnBusiness::Columns column) const;
     QSize columnSizeHint(QnBusiness::Columns column) const;
 
