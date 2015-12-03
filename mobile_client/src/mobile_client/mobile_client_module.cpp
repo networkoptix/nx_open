@@ -21,6 +21,7 @@
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
+#include "mobile_client_translation_manager.h"
 
 #include <version.h>
 
@@ -37,10 +38,15 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QGuiApplication::setApplicationName(lit(QN_APPLICATION_NAME));
     QGuiApplication::setApplicationVersion(lit(QN_APPLICATION_VERSION));
 
+    // We should load translations before major client's services are started to prevent races
+    QnMobileClientTranslationManager *translationManager = new QnMobileClientTranslationManager();
+    translationManager->updateTranslation();
+
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
 
+    common->store<QnTranslationManager>(translationManager);
     common->store<QnMobileClientSettings>(new QnMobileClientSettings);
     common->store<QnSessionManager>(new QnSessionManager());
 

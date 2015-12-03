@@ -170,7 +170,7 @@ public:
         if (m_scanTasks.contains(scanData))
             return;
         if (m_scanTasks.isEmpty())
-            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
+            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, storage->getUrl(), 0.0));
         if (partialScan)
             storage->addFlags(Qn::storage_fastscan);
         m_scanTasks.push_back(std::move(scanData));
@@ -244,7 +244,6 @@ public:
                 if (needToStop())
                     break;
                 scanData = m_scanTasks.front();
-                m_scanTasks.pop_front();
             }
 
             if (scanData.partialScan)
@@ -289,6 +288,7 @@ public:
             
             {
                 QnMutexLocker lock(&m_mutex);
+                m_scanTasks.pop_front();
                 if (m_scanTasks.isEmpty()) 
                 {
                     // not data to process left                
@@ -296,7 +296,8 @@ public:
                     if (fullscanProcessed) {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
-                        emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
+                        if (!m_fullScanCanceled)
+                            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
                     }
                     else if (partialScanProcessed)
                         emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
@@ -490,13 +491,15 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
     if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
         QnMutexLocker lock( &m_mutexRebuild );
-        result = QnStorageScanData(Qn::RebuildState_FullScan, QString(), 0.0);
         m_rebuildCancelled = false;
         QVector<QnStorageResourcePtr> storagesToScan;
         for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
             if (storage->getStatus() == Qn::Online)
                 storagesToScan << storage;
         }
+        if (storagesToScan.isEmpty())
+            return result;
+        result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
         m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
 

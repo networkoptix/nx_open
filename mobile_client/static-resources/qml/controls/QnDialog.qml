@@ -11,6 +11,8 @@ QnPopup {
 
     default property alias data: contentItem.data
 
+    property alias footer: footerLoader.sourceComponent
+
     property real maxContentHeight: parent.height - dp(56 * 3)
 
     function ensureVisible(y1, y2) {
@@ -28,8 +30,8 @@ QnPopup {
         flickable.contentY = cy
     }
 
-    width: dp(56 * 5)
-    height: content.height + dp(32)
+    implicitWidth: parent ? Math.min(dp(328), parent.width - dp(32)) : dp(56 * 5)
+    implicitHeight: content.height + dp(16)
     anchors.centerIn: parent
 
     Rectangle {
@@ -40,18 +42,20 @@ QnPopup {
     Column {
         id: content
 
-        width: parent.width - dp(32)
-
-        x: dp(16)
+        width: parent.width
         y: dp(16)
 
         spacing: dp(16)
 
         Text {
             id: title
+            x: dp(16)
+            y: dp(16)
+            width: parent.width - dp(32)
             color: QnTheme.dialogTitleText
             font.weight: Font.DemiBold
             font.pixelSize: sp(20)
+            elide: Text.ElideRight
             visible: text != ""
         }
 
@@ -60,15 +64,13 @@ QnPopup {
 
             clip: true
 
-            x: -content.x
-            width: dialog.width
+            width: parent.width
             height: Math.min(maxContentHeight, contentItem.height)
 
             Flickable {
                 id: flickable
 
-                x: content.x
-                width: content.width
+                width: parent.width
                 height: parent.height
 
                 contentWidth: width
@@ -82,6 +84,36 @@ QnPopup {
                     height: childrenRect.height
                 }
             }
+        }
+
+        Loader {
+            id: footerLoader
+            sourceComponent: Component {
+                Item {
+                    width: 1
+                    height: dp(16)
+                }
+            }
+        }
+    }
+
+    showAnimation: NumberAnimation {
+        target: dialog
+        property: "opacity"
+        from: 0.0
+        to: 1.0
+        duration: 100
+    }
+
+    hideAnimation: ParallelAnimation {
+        ScriptAction {
+            script: dialog.parent.hide()
+        }
+        NumberAnimation {
+            target: dialog
+            property: "opacity"
+            to: 0.0
+            duration: 100
         }
     }
 }

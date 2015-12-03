@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Motion on Camera</source>
@@ -255,10 +244,6 @@
         <translation>Chú thích: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Cổng đầu vào: %1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -368,6 +353,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>Ghi trên các module IO là người khuyết tật:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -575,6 +604,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>Quá trình khởi tạo IO Module trong tiến trình.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,27 +859,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>cài sẵn #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Không thể khởi tạo cài đặt cổng IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1065,109 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>No licenses</source>
-        <translation>Không có ủy quyền hợp lệ</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Địa chỉ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Máy chủ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Kết nối đến máy chủ bị mất</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Lỗi trong khi gửi email</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Chọn máy chủ cho những người khác để đồng bộ thời gian với</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Địa chỉ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Máy chủ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Họ không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Kho có đầy đủ trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Kho không được cấu hình trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Bạn không có giấy phép.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Bạn không có thể ghi lại video từ máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Lưu trữ đầy</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Thiết bị lưu trữ không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Lần máy chủ không đồng bộ và một thời gian chung không thể được phát hiện tự động.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>Hệ thống đang ở chế độ an toàn</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Hệ thống đang chạy trong chế độ an toàn.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Bất kỳ thay đổi cấu hình, ngoại trừ kích hoạt giấy phép là không thể.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1192,17 +1101,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Lập luận không hợp lệ</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
     </message>
 </context>
 <context>

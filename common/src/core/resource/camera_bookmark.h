@@ -99,6 +99,12 @@ struct QnCameraBookmarkTag {
         count(0)
     {}
 
+    QnCameraBookmarkTag(const QString &initName
+        , int initCount) :
+        name(initName),
+        count(initCount)
+    {}
+
     static QnCameraBookmarkTagList mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmarkTag_Fields (name)(count)

@@ -15,17 +15,6 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>输出 %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>输入 %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
     <message>
         <source>Motion on Camera</source>
@@ -259,10 +248,6 @@
         <translation>容量: (%1)</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>输入端口: (%1)</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -372,6 +357,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>I/O设备录像无法启用:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -579,6 +608,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>I/O设备正在进行初始化.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -831,27 +864,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>预置位 #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>未能初始化IO端口设置</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>输出 %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1071,109 +1083,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>No licenses</source>
-        <translation>无软件许可</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>邮箱地址未设置</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>邮件服务器未设置</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>部分用户未设置邮箱地址。</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>无法连接到服务器</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>发送邮件错误</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>未给用户 %1设置邮箱地址</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>选择时间同步服务器</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>重建录像索引完成</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>邮箱地址未设置.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>将无法通过电子邮件接收系统通知.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>邮件服务器未设置.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>用户未设置邮箱.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>将无法通过邮件接收系统通知.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>以下服务器的存储空间已满:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>以下服务器未进行存储配置:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>未获得授权许可.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>无法对摄像机进行录像.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>以下服务器已完成录像索引重建:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>存储空间已满</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>未设置存储空间</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>服务器时间不同步,时间不能自动检测。</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>系统处于安全模式</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>系统在安全模式下运行.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>任何配置更改无效，除了进行授权激活.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1198,17 +1107,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>无效参数</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>输出%1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>输入 %1</translation>
     </message>
 </context>
 <context>

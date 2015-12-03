@@ -1,0 +1,38 @@
+#include "mobile_client_translation_manager.h"
+
+#include <QtCore/QLocale>
+
+QnMobileClientTranslationManager::QnMobileClientTranslationManager(QObject *parent) :
+    base_type(parent)
+{
+    addPrefix(lit("base"));
+    addPrefix(lit("qml"));
+}
+
+QnMobileClientTranslationManager::~QnMobileClientTranslationManager()
+{
+}
+
+void QnMobileClientTranslationManager::updateTranslation()
+{
+    QString localeName = QLocale().name();
+    QString langName = localeName.split(L'_').first();
+
+    QnTranslation bestTranslation;
+
+    for (const QnTranslation &translation: loadTranslations()) {
+        if (translation.localeCode() == localeName) {
+            bestTranslation = translation;
+            break;
+        }
+        if (translation.localeCode() == langName) {
+            bestTranslation = translation;
+            // continue to find the exact translation
+        }
+    }
+
+    if (!bestTranslation.isEmpty()) {
+        qDebug() << "Installing translation: " << bestTranslation.localeCode();
+        installTranslation(bestTranslation);
+    }
+}

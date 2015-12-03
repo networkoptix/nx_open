@@ -214,7 +214,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
-
+    m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
     addOverlayWidget(m_compositeTextOverlay, Visible, true, true);
 
     /* Set up overlays */

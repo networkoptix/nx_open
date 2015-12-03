@@ -41,6 +41,9 @@ public:
     /** Check if the storage can be moved from this model to another. */
     bool canMoveStorage(const QnStorageModelInfo& data) const;
 
+    /** Check if storage can be removed from the system. */
+    bool canRemoveStorage(const QnStorageModelInfo &data) const;
+
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
     virtual QVariant data(const QModelIndex &index, int role) const override;

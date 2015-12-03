@@ -14,12 +14,17 @@ public:
     QnScrollableOverlayWidgetPrivate(Qt::Alignment alignment, QnScrollableOverlayWidget *parent);
     virtual ~QnScrollableOverlayWidgetPrivate();
 
-    QnUuid addItem(QGraphicsWidget *item);
+    QnUuid addItem(QGraphicsWidget *item, const QnUuid &externalId = QnUuid());
     void removeItem(const QnUuid &id);
     void clear();
 
     int overlayWidth() const;
     void setOverlayWidth(int width);
+
+    QSizeF minimumSize() const;
+
+    QSizeF maxFillCoeff() const;
+    void setMaxFillCoeff(const QSizeF &coeff);
 
 private:
     void updatePositions();
@@ -31,5 +36,8 @@ private:
 
     QHash<QnUuid, QGraphicsWidget*> m_items;
     Qt::Alignment m_alignment;
+
     bool m_updating;
+
+    QSizeF m_maxFillCoeff;
 };
