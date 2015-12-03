@@ -1,4 +1,4 @@
-import io, sys, os, errno, platform, shutil, fnmatch, tarfile
+import io, sys, os, errno, platform, shutil, fnmatch, tarfile, subprocess
 from os.path import dirname, join, exists, isfile
 
 basedir = join(dirname(os.path.abspath(__file__)))
@@ -36,7 +36,7 @@ def mkdir_p(path):
         else: raise
 
 def extract(tar_url, extract_path='.'):
-    print 'Extracting Archive: %s' % tarfile
+    print 'Extracting Archive: %s' % tar_url
     tar = tarfile.open(tar_url, 'r')
     for item in tar:
         #print (item.name)
@@ -47,9 +47,10 @@ def extract(tar_url, extract_path='.'):
         if item.name.find(".tar.gz") != -1:
             extract(item.name, "./" + item.name[:item.name.rfind('/')])        
     tar.close()
-    print 'Patching Artifact: %s' % tarfile
-    os.system('%s dpatcher %s' % (sys.executable, tarfile))
+    print 'Patching Artifact: %s' % tar_url
+    subprocess.call([sys.executable, '-u', 'dpatcher.py', tar_url])
     os.unlink(file)
+
 if __name__ == '__main__':        
 
     buildenv = join('${project.build.directory}', 'donotrebuild')
