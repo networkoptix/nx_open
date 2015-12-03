@@ -712,6 +712,7 @@ public:
             if( m_acceptAsyncCallCount == acceptAsyncCallCountBak )
                 nx::SocketGlobals::aioService().removeFromWatchNonSafe(&lk, sock, aio::etRead);
             m_threadHandlerIsRunningIn.store( nullptr, std::memory_order_release );
+            m_terminatedFlagPtr = nullptr;
         };
 
         switch( eventType )
