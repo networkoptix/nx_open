@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/thread_util.h>
 #include <utils/common/long_runnable.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
@@ -355,6 +356,7 @@ protected:
         static const int ERROR_RESET_TIMEOUT = 1000;
 
         initSystemThreadId();
+        m_impl->aioThreadId = ::currentThreadSystemId();
         NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG1);
 
         while (!needToStop())
@@ -565,13 +567,15 @@ public:
     */
     std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
+    uintptr_t aioThreadId;
 
     AIOThreadImpl(QnMutex* const _aioServiceMutex)
     :
         aioServiceMutex(_aioServiceMutex),
         newReadMonitorTaskCount(0),
         newWriteMonitorTaskCount(0),
-        processingPostedCalls(0)
+        processingPostedCalls(0),
+        aioThreadId(0)
     {
         m_monotonicClock.restart();
     }
@@ -588,6 +592,7 @@ public:
             return;
 
         QnMutexLocker lk(aioServiceMutex);
+        int x = 0;
 
         for (typename std::deque<SocketAddRemoveTask>::iterator
             it = pollSetModificationQueue.begin();
@@ -609,15 +614,11 @@ public:
                         --newReadMonitorTaskCount;
                     else if (task.eventType == aio::etWrite)
                         --newWriteMonitorTaskCount;
-                    if (!addSockToPollset(
-                            task.socket,
-                            task.eventType,
-                            task.timeout,
-                            task.eventHandler))
-                    {
-                        //TODO #ak call task.eventHandler(etError) delayed
-                        assert(false);
-                    }
+                    addSockToPollset(
+                        task.socket,
+                        task.eventType,
+                        task.timeout,
+                        task.eventHandler);
                     break;
                 }
 
@@ -672,9 +673,12 @@ public:
                 task.taskCompletionHandler();
             it = pollSetModificationQueue.erase(it);
         }
+
+        assert(x == 0);
+        assert(lk.isLocked());
     }
 
-    bool addSockToPollset(
+    void addSockToPollset(
         SocketType* socket,
         aio::EventType eventType,
         int timeout,
@@ -683,12 +687,15 @@ public:
         std::unique_ptr<AIOEventHandlingDataHolder<SocketType>> handlingData(new AIOEventHandlingDataHolder<SocketType>(eventHandler));
         bool failedToAddToPollset = false;
         if (eventType != aio::etTimedOut)
+        {
+            assert(aioThreadId == ::currentThreadSystemId());
             if (!pollSet.add(socket, eventType, handlingData.get()))
             {
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                 failedToAddToPollset = true;
             }
+        }
         socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
 
         if (failedToAddToPollset)
@@ -711,8 +718,6 @@ public:
                 eventType);
         }
         handlingData.release();
-
-        return true;
     }
 
     void removeSocketFromPollSet(SocketType* sock, aio::EventType eventType)
@@ -724,7 +729,10 @@ public:
             delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
         userData = nullptr;
         if (eventType == aio::etRead || eventType == aio::etWrite)
+        {
             pollSet.remove(sock, eventType);
+            assert(aioThreadId == ::currentThreadSystemId());
+        }
     }
 
     void removeSocketsFromPollSet()
@@ -803,6 +811,8 @@ public:
     //!Processes events from \a pollSet
     void processSocketEvents(const qint64 curClock)
     {
+        assert(aioThreadId == ::currentThreadSystemId());
+
         for (typename PollSetType::const_iterator
             it = pollSet.begin();
             it != pollSet.end();

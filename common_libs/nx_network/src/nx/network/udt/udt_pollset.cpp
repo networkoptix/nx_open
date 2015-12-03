@@ -7,6 +7,8 @@
 
 #include <udt/udt.h>
 
+#include <nx/utils/log/log.h>
+
 #include "udt_common.h"
 #include "udt_socket.h"
 #include "udt_socket_impl.h"
@@ -175,7 +177,7 @@ public:
 
     ~UdtPollSetConstIteratorImpl()
     {
-        m_pollSetImpl->iterators.erase(this);
+        assert(m_pollSetImpl->iterators.erase(this) == 1);
     }
 
     void next()
@@ -291,6 +293,9 @@ private:
     UdtPollSetImpl* m_pollSetImpl;
     bool m_inReadSet;
     std::set<UDTSOCKET>::iterator m_curPos;
+
+    UdtPollSetConstIteratorImpl(const UdtPollSetConstIteratorImpl&);
+    UdtPollSetConstIteratorImpl& operator=(const UdtPollSetConstIteratorImpl&);
 };
 
 }// namespace detail
@@ -400,6 +405,10 @@ void UdtPollSet::interrupt()
 
 bool UdtPollSet::add(UdtSocket* socket, aio::EventType eventType, void* userData)
 {
+    NX_LOG(lit("UdtPollSet::add. sock %1, eventType %2").
+        arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
+        arg((int)eventType), cl_logINFO);
+
     Q_ASSERT(socket != NULL);
     int ev = m_impl->MapAioEventToUdtEvent(eventType);
     int ret = UDT::epoll_add_usock(m_impl->epoll_fd_, static_cast<UDTSocketImpl*>(socket->impl())->udtHandle, &ev);
@@ -421,6 +430,10 @@ bool UdtPollSet::add(UdtSocket* socket, aio::EventType eventType, void* userData
 
 void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
 {
+    NX_LOG(lit("UdtPollSet::remove. sock %1, eventType %2").
+        arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
+        arg((int)eventType), cl_logINFO);
+
     assert(socket);
     if (eventType != aio::etRead && eventType != aio::etWrite)
     {
@@ -432,6 +445,8 @@ void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
 
     std::map<UDTSOCKET, detail::SocketUserData>::iterator
         ib = m_impl->socket_user_data_.find(udtHandle);
+    if (ib == m_impl->socket_user_data_.end())
+        return NULL;
     int remain_event_type = UDT_EPOLL_ERR;
     void* rudata = nullptr;
 
@@ -439,14 +454,16 @@ void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
     {
         case aio::etRead:
         {
-            if (ib == m_impl->socket_user_data_.end() || ib->second.read_data == boost::none)
+            if (ib->second.read_data == boost::none)
                 return NULL;
             rudata = ib->second.read_data.get();
             ib->second.read_data = boost::none;
             if (ib->second.write_data == boost::none)
             {
                 ib->second.deleted = true;
-                m_impl->reclaim_list_.push_back(ib);
+                //not adding duplicate iterator
+                if (std::find(m_impl->reclaim_list_.begin(), m_impl->reclaim_list_.end(), ib) == m_impl->reclaim_list_.end())
+                    m_impl->reclaim_list_.push_back(ib);
             }
             else
             {
@@ -473,14 +490,15 @@ void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
 
         case aio::etWrite:
         {
-            if (ib == m_impl->socket_user_data_.end() || ib->second.write_data == boost::none)
+            if (ib->second.write_data == boost::none)
                 return NULL;
             rudata = ib->second.write_data.get();
             ib->second.write_data = boost::none;
             if (ib->second.read_data == boost::none)
             {
                 ib->second.deleted = true;
-                m_impl->reclaim_list_.push_back(ib);
+                if (std::find(m_impl->reclaim_list_.begin(), m_impl->reclaim_list_.end(), ib) == m_impl->reclaim_list_.end())
+                    m_impl->reclaim_list_.push_back(ib);
             }
             else
             {

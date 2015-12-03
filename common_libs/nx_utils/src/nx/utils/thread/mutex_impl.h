@@ -18,7 +18,7 @@
 
 class QnMutex;
 
-class QnMutexImpl
+class NX_UTILS_API QnMutexImpl
 {
 public:
     QMutex mutex;
