@@ -26,8 +26,13 @@
 
 namespace
 {
-    enum { kMillisecondsInSeconds = 1000 };
-    enum { kMillisecondsInDay = 60 * 60 * 24 * kMillisecondsInSeconds };
+    enum {  };
+    enum
+    {
+        kMillisecondsInSeconds = 1000
+        , kStartDayOffsetMs = 0
+        , kMillisecondsInDay = 60 * 60 * 24 * kMillisecondsInSeconds
+    };
 
     qint64 getStartOfTheDayMs(qint64 timeMs)
     {
@@ -39,22 +44,23 @@ namespace
         return getStartOfTheDayMs(timeMs) + kMillisecondsInDay;
     }
 
-    qint64 extractAppropriateTimeMs(QnWorkbenchContext *context
-        , const QDate &date
-        , bool useStartOfDay)
+    qint64 getTimeOnServerMs(QnWorkbenchContext *context
+        , const QDate &clientDate
+        , qint64 dayEndOffset = kStartDayOffsetMs)
     {
-        const QDateTime dateTime = QDateTime(date);
-        const auto msecsSinceEpoch = dateTime.toMSecsSinceEpoch();
-
-        /// dateTime is created from date, thus it always started from the start of the day in current locale
-        const auto dayEdgeTime = (useStartOfDay ? msecsSinceEpoch : msecsSinceEpoch + kMillisecondsInDay);
         if (qnSettings->timeMode() == Qn::ClientTimeMode)
-            return dayEdgeTime;
+        {
+            // QDateTime is created from date, thus it always started
+            // from the start of the day in current timezone
+            return QDateTime(clientDate).toMSecsSinceEpoch() + dayEndOffset;
+        }
 
-        const auto localUtcOffset = dateTime.offsetFromUtc() * kMillisecondsInSeconds;
-        const auto timWatcher = context->instance<QnWorkbenchServerTimeWatcher>();
-        const auto serverUtcOffset = timWatcher->utcOffset(qnCommon->currentServer());
-        return dayEdgeTime + (localUtcOffset - serverUtcOffset);
+        const auto timeWathcer = context->instance<QnWorkbenchServerTimeWatcher>();
+        const auto server = qnCommon->currentServer();
+        const auto serverUtcOffsetSecs = timeWathcer->utcOffset(server) / kMillisecondsInSeconds;
+        const QDateTime serverTime(clientDate, QTime(0, 0), Qt::OffsetFromUTC
+            , serverUtcOffsetSecs / kMillisecondsInSeconds);
+        return serverTime.toMSecsSinceEpoch() + dayEndOffset;
     }
 
     QDate extractDisplayDate(QnWorkbenchContext *context
@@ -143,14 +149,14 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
 
     connect(m_ui->dateEditFrom, &QDateEdit::userDateChanged, this, [this](const QDate &date)
     {
-        m_model->setRange(extractAppropriateTimeMs(context(), date, true)
-            , extractAppropriateTimeMs(context(), m_ui->dateEditTo->date(), false));
+        m_model->setRange(getTimeOnServerMs(context(), date)
+            , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
         m_model->applyFilter();
     });
     connect(m_ui->dateEditTo, &QDateEdit::userDateChanged, this, [this](const QDate &date)
     {
-        m_model->setRange(extractAppropriateTimeMs(context(), m_ui->dateEditFrom->date(), true)
-            , extractAppropriateTimeMs(context(), date, false));
+        m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
+            , getTimeOnServerMs(context(), date, kMillisecondsInDay));
         m_model->applyFilter();
     });
 
@@ -285,8 +291,8 @@ void QnSearchBookmarksDialog::Impl::updateHeadersWidth()
 void QnSearchBookmarksDialog::Impl::refresh()
 {
     m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
-    m_model->setRange(extractAppropriateTimeMs(context(), m_ui->dateEditFrom->date(), true)
-        , extractAppropriateTimeMs(context(), m_ui->dateEditTo->date(), false));
+    m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
+        , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
     m_model->setCameras(m_cameras);
 
     m_model->applyFilter();
