@@ -214,6 +214,7 @@ private:
     mutable QnMutex m_mutexRebuild;
     mutable QnMutex m_rebuildStateMtx;
     mutable QnMutex m_localPatches;
+    mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
     bool m_storagesStatisticsReady;
