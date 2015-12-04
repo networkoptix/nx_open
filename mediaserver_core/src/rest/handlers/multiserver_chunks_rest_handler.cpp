@@ -2,30 +2,32 @@
 
 #include <QUrlQuery>
 
-#include "recording/time_period.h"
-#include "recording/time_period_list.h"
+#include <recording/time_period.h>
+#include <recording/time_period_list.h>
 
 #include <api/helpers/chunks_request_data.h>
 
-#include "common/common_module.h"
+#include <common/common_module.h>
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/camera_resource.h"
-#include "core/resource/camera_history.h"
-#include "core/resource/media_server_resource.h"
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
-#include "network/router.h"
 #include <utils/common/model_functions.h>
-#include "utils/network/http/asynchttpclient.h"
-#include "utils/serialization/compressed_time.h"
-#include "server/server_globals.h"
-#include "recorder/storage_manager.h"
-#include "http/custom_headers.h"
-#include "rest/server/rest_connection_processor.h"
+#include <utils/network/http/asynchttpclient.h>
+#include <utils/serialization/compressed_time.h>
+
+#include <server/server_globals.h>
+#include <recorder/storage_manager.h>
+
+#include <network/tcp_listener.h>
+
+#include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/chunks_request_helper.h>
 #include <rest/helpers/request_context.h>
-#include "network/tcp_listener.h"
+#include <rest/helpers/request_helpers.h>
 
 namespace
 {
@@ -33,8 +35,7 @@ namespace
 
     typedef QnMultiserverRequestContext<QnChunksRequestData> QnChunksRequestContext;
 
-    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server
-        , const QnRestConnectionProcessor* owner, QnChunksRequestContext* ctx)
+    void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server, QnChunksRequestContext* ctx)
     {
 
         auto requestCompletionFunc = [ctx, &outputData] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody )
@@ -44,54 +45,37 @@ namespace
             if( osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok )
                 remoteData = QnCompressedTime::deserialized(msgBody, MultiServerPeriodDataList(), &success);
 
-            QnMutexLocker lock(&ctx->mutex);
-            if (success && !remoteData.empty())
-                outputData.push_back(std::move(remoteData.front()));
-            ctx->requestsInProgress--;
-            ctx->waitCond.wakeAll();
+            ctx->executeGuarded([ctx, success, remoteData, &outputData]()
+            {
+                if (success && !remoteData.empty())
+                    outputData.push_back(std::move(remoteData.front()));
+
+                ctx->requestProcessed();
+            });
         };
 
         QUrl apiUrl(server->getApiUrl());
         apiUrl.setPath(L'/' + urlPath + L'/');
 
-        QnChunksRequestData modifiedRequest = ctx->request;
+        QnChunksRequestData modifiedRequest = ctx->request();
         modifiedRequest.format = Qn::CompressedPeriodsFormat;
         modifiedRequest.isLocal = true;
         apiUrl.setQuery(modifiedRequest.toUrlQuery());
 
-        nx_http::HttpHeaders headers;
-        //QnRouter::instance()->updateRequest(apiUrl, headers, server->getId());
-        headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-        QnRoute route = QnRouter::instance()->routeTo(server->getId());
-        if (route.reverseConnect) {
-            apiUrl.setHost("127.0.0.1"); // proxy via himself to activate backward connection logic
-            apiUrl.setPort(owner->owner()->getPort());
-        }
-        else if (!route.addr.isNull())
-        {
-            apiUrl.setHost(route.addr.address.toString());
-            apiUrl.setPort(route.addr.port);
-        }
-
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-            apiUrl.setUserName(admin->getName());
-            apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
-        }
-
-        QnMutexLocker lock(&ctx->mutex);
-        if (nx_http::downloadFileAsync( apiUrl, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash ))
-            ctx->requestsInProgress++;
+        runMultiserverDownloadRequest(apiUrl, server, requestCompletionFunc, ctx);
     }
 
     void loadLocalData(MultiServerPeriodDataList& outputData, QnChunksRequestContext* ctx)
     {
         MultiServerPeriodData record;
         record.guid = qnCommon->moduleGUID();
-        record.periods = QnChunksRequestHelper::load(ctx->request);
+        record.periods = QnChunksRequestHelper::load(ctx->request());
 
         if (!record.periods.empty()) {
-            QnMutexLocker lock(&ctx->mutex);
-            outputData.push_back(std::move(record));
+            ctx->executeGuarded([&outputData, record]()
+            {
+                outputData.push_back(std::move(record));
+            });
         }
     }
 }
@@ -104,7 +88,8 @@ QnMultiserverChunksRestHandler::QnMultiserverChunksRestHandler(const QString& pa
 
 MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner)
 {
-    QnChunksRequestContext ctx(request, owner);
+    const auto ownerPort = owner->owner()->getPort();
+    QnChunksRequestContext ctx(request, ownerPort);
     MultiServerPeriodDataList outputData;
     if (request.isLocal)
     {
@@ -113,7 +98,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     else
     {
         QSet<QnMediaServerResourcePtr> servers;
-        for (const auto& camera: ctx.request.resList)
+        for (const auto& camera: ctx.request().resList)
             servers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
 
         for (const auto& server: servers)
@@ -121,7 +106,7 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
             if (server->getId() == qnCommon->moduleGUID())
                 loadLocalData(outputData, &ctx);
             else
-                loadRemoteDataAsync(outputData, server, owner, &ctx);
+                loadRemoteDataAsync(outputData, server, &ctx);
         }
 
         ctx.waitForDone();

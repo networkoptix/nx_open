@@ -4,6 +4,7 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <network/tcp_listener.h>
 #include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
 
 QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(const QString& path): QnFusionRestHandler()
@@ -17,11 +18,10 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
                                                   QByteArray& contentType,
                                                   const QnRestConnectionProcessor *processor)
 {
-    Q_UNUSED(processor)
-
     QString action = extractAction(path);
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
+    const auto ownerPort = processor->owner()->getPort();
     switch (op) {
     case QnBookmarkOperation::Add:
     case QnBookmarkOperation::Update:
@@ -30,7 +30,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
 
-            auto context = QnUpdateBookmarkRequestContext(request, processor);
+            auto context = QnUpdateBookmarkRequestContext(request, ownerPort);
             bool result = op == QnBookmarkOperation::Add
                 ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
                 : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
@@ -46,7 +46,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
 
-            auto context = QnDeleteBookmarkRequestContext(request, processor);
+            auto context = QnDeleteBookmarkRequestContext(request, ownerPort);
             return QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context)
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
@@ -57,7 +57,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
 
-            auto context = QnGetBookmarkTagsRequestContext(request, processor);
+            auto context = QnGetBookmarkTagsRequestContext(request, ownerPort);
             QnCameraBookmarkTagList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
             QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
             return nx_http::StatusCode::ok;
@@ -68,7 +68,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
             if (!request.isValid())
                 return nx_http::StatusCode::badRequest;
 
-            auto context = QnGetBookmarksRequestContext(request, processor);
+            auto context = QnGetBookmarksRequestContext(request, ownerPort);
             QnCameraBookmarkList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
             QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
             return nx_http::StatusCode::ok;

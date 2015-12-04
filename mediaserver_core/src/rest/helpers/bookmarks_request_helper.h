@@ -1,7 +1,6 @@
 #pragma once
 
 #include <rest/helpers/request_context.h>
-#include <rest/helpers/request_helpers_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <api/helpers/bookmark_request_data.h>
 

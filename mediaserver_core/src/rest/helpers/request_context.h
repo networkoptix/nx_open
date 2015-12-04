@@ -3,44 +3,88 @@
 
 #include <utils/thread/mutex.h>
 
-class QnRestConnectionProcessor;
-
-template<typename RequestType>
-struct QnMultiserverRequestContext
+template<typename Request>
+class QnMultiserverRequestContext
 {
-    QnMultiserverRequestContext(const RequestType &initRequest
-        , const QnRestConnectionProcessor *initOwner);
+public:
+    QnMultiserverRequestContext(const Request &request
+        , int ownerPort);
+
+    void incRequestsCount();
+
+    void requestProcessed();
 
     void waitForDone();
 
-    QnMutex mutex;
-    QnWaitCondition waitCond;
-    int requestsInProgress;
-    const QnRestConnectionProcessor *owner;
+    const Request &request() const;
 
-    RequestType request;
+    int ownerPort() const;
+
+    typedef std::function<void ()> Handler;
+    void executeGuarded(const Handler &handler);
+
+private:
+    const int m_ownerPort;
+    int m_requestsInProgress;
+    QnMutex m_mutex;
+    QnWaitCondition m_waitCond;
+
+    Request m_request;
 };
 
-// Implementation
+/*
+    Implementation
+*/
 
-template<typename RequestType>
-QnMultiserverRequestContext<RequestType>::QnMultiserverRequestContext(const RequestType &initRequest
-    , const QnRestConnectionProcessor *initOwner)
+template<typename Request>
+QnMultiserverRequestContext<Request>::QnMultiserverRequestContext(const Request &initRequest
+    , int ownerPort)
 
-    : mutex()
-    , waitCond()
-    , requestsInProgress(0)
-    , owner(initOwner)
+    : m_ownerPort(ownerPort)
+    , m_requestsInProgress(0)
+    , m_mutex()
+    , m_waitCond()
 
-    , request(initRequest)
+    , m_request(initRequest)
 {}
 
-template<typename RequestType>
-void QnMultiserverRequestContext<RequestType>::waitForDone()
+template<typename Request>
+void QnMultiserverRequestContext<Request>::waitForDone()
 {
-    QnMutexLocker lock(&mutex);
+    QnMutexLocker lock(&m_mutex);
 
-    while (requestsInProgress > 0)
-        waitCond.wait(&mutex);
+    while (m_requestsInProgress > 0)
+        m_waitCond.wait(&m_mutex);
 }
 
+template<typename Request>
+void QnMultiserverRequestContext<Request>::requestProcessed()
+{
+    --m_requestsInProgress;
+    m_waitCond.wakeAll();
+}
+
+template<typename Request>
+void QnMultiserverRequestContext<Request>::incRequestsCount()
+{
+    ++m_requestsInProgress;
+}
+
+template<typename Request>
+const Request &QnMultiserverRequestContext<Request>::request() const
+{
+    return m_request;
+}
+
+template<typename Request>
+int QnMultiserverRequestContext<Request>::ownerPort() const
+{
+    return m_ownerPort;
+}
+
+template<typename Request>
+void QnMultiserverRequestContext<Request>::executeGuarded(const Handler &handler)
+{
+    const QnMutexLocker guard(&m_mutex);
+    handler();
+}
