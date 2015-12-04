@@ -14,6 +14,7 @@ namespace
 }
 
 QnBookmarkTagsControl::QnBookmarkTagsControl(const QnCameraBookmarkTags &tags
+    , bool allowClickOnTag
     , QGraphicsItem *parent)
     : QnProxyLabel(parent)
     , m_colors()
@@ -22,8 +23,11 @@ QnBookmarkTagsControl::QnBookmarkTagsControl(const QnCameraBookmarkTags &tags
     setAcceptHoverEvents(true);
 
     setTextInteractionFlags(Qt::LinksAccessibleByMouse | Qt::TextEditable);
-    connect(this, &QnBookmarkTagsControl::linkHovered, this, &QnBookmarkTagsControl::onLinkHovered);
-    connect(this, &QnBookmarkTagsControl::linkActivated, this, &QnBookmarkTagsControl::tagClicked);
+    if (allowClickOnTag)
+    {
+        connect(this, &QnBookmarkTagsControl::linkHovered, this, &QnBookmarkTagsControl::onLinkHovered);
+        connect(this, &QnBookmarkTagsControl::linkActivated, this, &QnBookmarkTagsControl::tagClicked);
+    }
 
     setTags(tags);
 }

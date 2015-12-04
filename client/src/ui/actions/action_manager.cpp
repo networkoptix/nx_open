@@ -899,6 +899,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::GlobalHotkey).
         text(tr("Bookmarks...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalAdminPermissions).
         shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
