@@ -6,6 +6,9 @@
 
 #include <utils/common/connective.h>
 
+class QnWorkbenchLayout;
+class QnWorkbenchItem;
+
 class QnWorkbenchAlarmLayoutHandler: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
 
