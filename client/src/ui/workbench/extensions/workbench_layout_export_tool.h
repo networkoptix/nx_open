@@ -93,10 +93,32 @@ private slots:
     void at_camera_progressChanged(int progress);
     void at_camera_exportFinished(int status, const QString &filename);
     void at_camera_exportStopped();
+
 private:
+    /** Info about layout items */
+    struct ItemInfo {
+        QString name;
+        qint64 timezone;
+
+        ItemInfo();
+        ItemInfo(const QString name, qint64 timezone);
+    };
+    typedef QList<ItemInfo> ItemInfoList;
+
+    /** Create and setup storage resource. */
+    bool prepareStorage();
+
+    /** Create and setup layout resource. */
+    ItemInfoList prepareLayout();
+
+    /** Write metadata to storage file. */
+    bool exportMetadata(const ItemInfoList &items);
+
     bool exportNextCamera();
     void finishExport(bool success);
 
+    bool tryAsync(std::function<bool()> handler);
+    bool writeData(const QString &fileName, const QByteArray &data);
 private:
     /** Copy of the provided layout. */
     QnLayoutResourcePtr m_layout;
@@ -122,7 +144,7 @@ private:
     /** Access status of the target layout. */
     bool m_readOnly;
 
-    /** Stage field, used to show correct progress in multi-vidoe layout. */
+    /** Stage field, used to show correct progress in multi-video layout. */
     int m_offset;
 
     /** Last error message. */

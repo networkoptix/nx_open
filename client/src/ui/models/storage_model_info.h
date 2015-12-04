@@ -6,12 +6,14 @@
 
 struct QnStorageSpaceData;
 
-struct QnStorageModelInfo {
+struct QnStorageModelInfo 
+{
     QnUuid id;
     bool isUsed;
     QString url;
     QString storageType;
     qint64 totalSpace;
+    qint64 reservedSpace;
     bool isWritable;
     bool isBackup;
     bool isExternal;

@@ -543,8 +543,11 @@ QIcon QnNotificationsCollectionWidget::iconForAction( const QnAbstractBusinessAc
 }
 
 
-void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params )
-{
+void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::MessageType message, const QVariant& params ) {
+    QString messageText = QnSystemHealthStringsHelper::messageName(message);
+    Q_ASSERT_X(!messageText.isEmpty(), Q_FUNC_INFO, "Undefined system health message ");
+    if (messageText.isEmpty())
+        return;
 
     QnResourcePtr resource;
     if( params.canConvert<QnResourcePtr>() )
@@ -641,6 +644,7 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage( QnSystemHealth::M
         );
         break;
     default:
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Undefined system health message ");
         break;
     }
 

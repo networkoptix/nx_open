@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="he" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>he</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>פלט %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>קלט %1</translation>
     </message>
 </context>
 <context>
@@ -336,10 +325,6 @@
         <translation>כתובית: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>פורט כניסה: %1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -371,6 +356,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>ההקלטה על התקני קלט פלט אינה מאופשרת:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -578,6 +607,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>תהליך אתחול התקן קלט פלט מתרחש כרגע.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -833,27 +866,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>פריסט #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>לא ניתן להפעיל את הגדרות יציאת הקלט/פלט</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>פלט %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1078,109 +1090,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>Email address is not set</source>
-        <translation>לא הוגדרה כתובת אימייל</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>אין רשיונות</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>לא הוגדר שרת אימייל</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>כמה משתמשים לא הגדירו את כתובת האימייל שלהם</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>החיבור לשרת אבד</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>בחר שרת איתו האחרים יסנכרנו את הזמן</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>אירעה שגיאה במהלך שליחת האימייל</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>האחסון מלא</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>תצורת האחסון אינה מוגדרת</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>בניה מחדש של הארכיון הושלמה</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>כתובת הדואר עבור משתמש %1 אינה מוגדרת</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>לא הוגדרה כתובת אימייל.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>אינך יכול לקבל התראות מערכת דרך האימייל.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>לא הוגדר שרת אימייל.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>כמה משתמשים לא הגדירו את כתובת האימייל שלהם.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>הם אינם יכולים לקבל התראות מערכת דרך האימייל.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>התקני האחסון בשרת הבא מלאים:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>התצורה בהתקני האחסון בשרת הבא אינה מוגדרת:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>אין לך רשיונות.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>אינך יכול להקליט וידאו ממצלמות.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>בניה מחדש של הארכיון הושלמה בשרת הבא:</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>הזמנים בשרתים אינם מסונכרנים ולא היה ניתן לזהות זמן משותף באופן אוטומטי.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>המערכת במצב בטוח</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>המערכת רצה במצב בטוח.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>לא ניתן לבצע שינויי הגדרות למעט הפעלת רישיון.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1205,17 +1114,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>פרמטר לא תקין</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>פלט %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>קלט %1</translation>
     </message>
 </context>
 <context>

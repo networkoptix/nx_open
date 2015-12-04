@@ -44,6 +44,7 @@ struct QnUpdateResult {
         UploadingFailed_NoFreeSpace,
         UploadingFailed_Timeout,
         UploadingFailed_Offline,
+        UploadingFailed_AuthenticationFailed,
         ClientInstallationFailed,
         InstallationFailed,
         RestInstallationFailed

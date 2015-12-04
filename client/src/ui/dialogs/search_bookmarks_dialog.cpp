@@ -34,6 +34,10 @@ public:
 
     void refresh();
 
+    void setParameters(const QString &filterText
+        , const QDate &start
+        , const QDate &finish);
+
 private:
     void chooseCamera();
 
@@ -65,6 +69,7 @@ private:
 ///
 
 QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
+
     : QObject(owner)
     , QnWorkbenchContextAware(owner)
     , m_owner(owner)
@@ -77,13 +82,8 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     , m_exportBookmarkAction(new QAction(tr("Export bookmark..."), this))
 {
     m_ui->setupUi(m_owner);
-
-    const QDate now = QDateTime::currentDateTime().date();
-    m_ui->dateEditFrom->setDate(now);
-    m_ui->dateEditTo->setDate(now);
     m_ui->gridBookmarks->setModel(m_model);
 
-    m_model->setDates(m_ui->dateEditFrom->date(), m_ui->dateEditTo->date());
     connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this
         , [this]() 
     { 
@@ -111,8 +111,6 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     connect(m_ui->refreshButton, &QPushButton::clicked, this, &Impl::refresh);
     connect(m_ui->cameraButton, &QPushButton::clicked, this, &Impl::chooseCamera);
 
-    m_model->applyFilter();
-
     connect(m_ui->gridBookmarks, &QTableView::customContextMenuRequested
         , this, &Impl::customContextMenuRequested);
 
@@ -124,10 +122,28 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
 
     connect(m_openInNewTabAction, &QAction::triggered, this, &Impl::openInNewLayoutHandler);
     connect(m_exportBookmarkAction, &QAction::triggered, this, &Impl::exportBookmarkHandler);
+
+    static const QString kEmptyFilter;
+    const auto now = QDateTime::currentDateTime().date();
+    setParameters(kEmptyFilter, now, now);
 }
 
 QnSearchBookmarksDialog::Impl::~Impl()
 {
+}
+
+void QnSearchBookmarksDialog::Impl::setParameters(const QString &filterText
+    , const QDate &start
+    , const QDate &finish)
+{
+    m_ui->filterLineEdit->lineEdit()->setText(filterText);
+    m_ui->dateEditFrom->setDate(start);
+    m_ui->dateEditTo->setDate(finish);
+
+    m_model->setFilterText(filterText);
+    m_model->setDates(start, finish);
+
+    m_model->applyFilter();
 }
 
 bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &params, QnTimePeriod &window)
@@ -284,6 +300,14 @@ QnSearchBookmarksDialog::QnSearchBookmarksDialog(QWidget *parent)
 QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
 {
 }
+
+void QnSearchBookmarksDialog::setParameters(const QString &filterText
+    , const QDate &start
+    , const QDate &finish)
+{
+    m_impl->setParameters(filterText, start, finish);
+}
+
 
 void QnSearchBookmarksDialog::resizeEvent(QResizeEvent *event)
 {

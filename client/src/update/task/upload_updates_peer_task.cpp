@@ -98,6 +98,10 @@ void QnUploadUpdatesPeerTask::at_uploader_finished(int errorCode, const QSet<QnU
         NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Timeout."), cl_logDEBUG1);
         finish(TimeoutError, failedPeers);
         break;
+    case QnUpdateUploader::AuthenticationError:
+        NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Authentication failed."), cl_logDEBUG1);
+        finish(AuthenticationError, failedPeers);
+        break;
     default:
         NX_LOG(lit("Update: QnUploadUpdatesPeerTask: Unknown error."), cl_logDEBUG1);
         finish(UploadError, failedPeers);

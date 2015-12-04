@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="th" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -12,17 +12,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>th</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>เอาท์พุท %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>อินพุท %1</translation>
     </message>
 </context>
 <context>
@@ -255,10 +244,6 @@
         <translation>คำอธิบาย:%1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>พอร์ตอินพุต:%1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -368,6 +353,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>บันทึกในโมดูล IO ถูกปิดใช้งาน:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -575,6 +604,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>กระบวนการเริ่มต้นโมดูล IO อยู่ในความคืบหน้า.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -826,27 +859,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>พรีเซ็ต #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>ไม่สามารถเริ่มต้นการตั้งค่าพอร์ต IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>เอาท์พุท %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1065,109 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>Email address is not set</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>ไม่มีใบอนุญาต</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>การเชื่อมต่อกับเซิร์ฟเวอร์ขาดหาย</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่ส่งอีเมล</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่าสำหรับการใช้งาน %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>เลือกเซิร์ฟเวอร์สำหรับปรับเวลาให้ตรงกัน</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>ที่อยู่อีเมลไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>คุณไม่สามารถรับการแจ้งเตือนระบบผ่านทางอีเมล.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>เซิร์ฟเวอร์อีเมลไม่ได้ตั้งค่า.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>ผู้ใช้บางคนยังไม่ได้ตั้งที่อยู่อีเมล.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>พวกเขาไม่สามารถรับการแจ้งเตือนผ่านทางอีเมล.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>พื้นที่หน่วยความจำเต็ม บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>หน่วยความจำไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>คุณไม่มีใบอนุญาต.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>ท่านไม่สามารถบันทึกวิดีโอจากกล้องได้.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>ดัชนีเก็บสร้างใหม่เสร็จสมบูรณ์บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>หน่วยความจำเต็ม</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>หน่วยความจำไม่ได้กำหนดค่า</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>เวลาเซิร์ฟเวอร์ไม่ตรงกันและเวลาที่พบไม่สามารถตรวจพบโดยอัตโนมัติได้.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>ระบบในเซฟโหมด</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>ระบบจะทำงานในเซฟโหมด.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>เปลี่ยนแปลงการกำหนดค่าการเปิดใช้งานยกเว้นใบอนุญาตใด ๆ ที่เป็นไปไม่ได้.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1192,17 +1101,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>พารามิเตอร์ไม่ถูกต้อง</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>เอาท์พุท %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>อินพุท %1</translation>
     </message>
 </context>
 <context>

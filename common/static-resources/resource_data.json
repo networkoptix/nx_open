@@ -519,7 +519,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XPTZ"
+                "VISTA|VK2-1080XPTZ","VISTA|VK2-1080XVRDPTPMF"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -932,6 +932,12 @@
                 "*Grandeye*|EVO-05NxD"
             ],
             "relayInputCountForced": 1
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }

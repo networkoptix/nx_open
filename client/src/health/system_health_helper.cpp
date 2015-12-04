@@ -1,7 +1,7 @@
 #include "system_health_helper.h"
 #include "business/actions/abstract_business_action.h"
 
-QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType) 
+QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
     switch (messageType) {
     case QnSystemHealth::EmailIsEmpty:
@@ -31,11 +31,12 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
     default:
         break;
     }
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Requesting name for non-visual action");
     return QString();
 }
 
 
-QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType messageType, QString resourceName) 
+QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType messageType, QString resourceName)
 {
     switch (messageType) {
     case QnSystemHealth::UsersEmailIsEmpty:
@@ -46,7 +47,7 @@ QString QnSystemHealthStringsHelper::messageName(QnSystemHealth::MessageType mes
     return messageTitle(messageType);
 }
 
-QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName) 
+QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageType messageType, QString resourceName)
 {
     QStringList messageParts;
 
@@ -63,7 +64,7 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
     case QnSystemHealth::NoPrimaryTimeServer:
         messageParts << tr("Server times are not synchronized and a common time could not be detected automatically." );
         break;
-    case QnSystemHealth::SystemIsReadOnly:         
+    case QnSystemHealth::SystemIsReadOnly:
         messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
         break;
     case QnSystemHealth::StoragesAreFull:
