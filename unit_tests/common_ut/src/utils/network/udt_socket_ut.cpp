@@ -11,6 +11,7 @@
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/udt/udt_pollset.h>
 
 
 class TestHandler
@@ -93,4 +94,23 @@ TEST(SocketUdt, cancelConnect)
     }
 
     serverSocket.cancelAsyncIO(true);
+}
+
+TEST(SocketUdt_UdtPollSet, general)
+{
+    UdtPollSet pollset;
+    ASSERT_TRUE(pollset.isValid());
+
+    UdtStreamSocket sock(false);
+
+    ASSERT_TRUE(pollset.add(&sock, aio::etRead, (void*)1));
+    ASSERT_TRUE(pollset.add(&sock, aio::etWrite, (void*)2));
+
+    pollset.remove(&sock, aio::etRead);
+    pollset.remove(&sock, aio::etWrite);
+    ASSERT_TRUE(pollset.add(&sock, aio::etRead));
+    pollset.remove(&sock, aio::etRead);
+
+    auto result = pollset.poll(100);
+    ASSERT_EQ(0, result);
 }

@@ -105,4 +105,9 @@ void QnMutexLockerBase::unlock()
     m_locked = false;
 }
 
+bool QnMutexLockerBase::isLocked() const
+{
+    return m_locked;
+}
+
 #endif  //USE_OWN_MUTEX

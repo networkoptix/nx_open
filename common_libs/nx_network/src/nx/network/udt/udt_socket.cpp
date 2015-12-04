@@ -229,7 +229,7 @@ bool UdtSocketImpl::Close() {
     UDT::setsockopt(udtHandle, 0, UDT_LINGER, &val, sizeof(val));
 
 #ifdef TRACE_UDT_SOCKET
-    NX_LOG(lit("closing UDT %1").arg(udtHandle), cl_logDEBUG2);
+    NX_LOG(lit("closing UDT socket %1").arg(udtHandle), cl_logDEBUG2);
 #endif
 
     int ret = UDT::close(udtHandle);

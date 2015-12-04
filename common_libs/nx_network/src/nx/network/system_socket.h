@@ -269,6 +269,7 @@ class NX_NETWORK_API TCPServerSocket
 
 public:
     TCPServerSocket();
+    ~TCPServerSocket();
 
     /**
      *   Blocks until a new connection is established on this socket or error
