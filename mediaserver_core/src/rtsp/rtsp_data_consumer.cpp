@@ -633,7 +633,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
-QnMutex* QnRtspDataConsumer::dataQueueMutex()
+QMutex* QnRtspDataConsumer::dataQueueMutex()
 {
     return &m_dataQueueMtx;
 }

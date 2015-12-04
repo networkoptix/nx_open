@@ -1165,7 +1165,7 @@ int QnRtspConnectionProcessor::composePlay()
     if (d->liveMode == Mode_Live) 
     {
         auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
-        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+        QMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
@@ -1304,7 +1304,7 @@ int QnRtspConnectionProcessor::composeSetParameter()
             if (d->liveMode == Mode_Live)
             {
                 auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
-                QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
+                QMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);
 

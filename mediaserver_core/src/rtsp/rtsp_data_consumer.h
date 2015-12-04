@@ -40,7 +40,7 @@ public:
     virtual bool canAcceptData() const;
     void setLiveMode(bool value);
     int copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq);
-    QnMutex* dataQueueMutex();
+    QMutex* dataQueueMutex();
     void setSingleShotMode(bool value);
 
     virtual qint64 getDisplayedTime() const;
