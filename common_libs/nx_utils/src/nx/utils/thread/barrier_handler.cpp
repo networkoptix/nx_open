@@ -3,36 +3,18 @@
 namespace nx {
 
 BarrierHandler::BarrierHandler( std::function< void() > handler )
-    : m_impl( new Impl( std::move( handler ) ) )
+    // TODO: move lambda
+    : m_handlerHolder( this, [ handler ]( BarrierHandler* ){ handler(); } )
 {
-    m_impl->mutex.lock(); // prevent the barier to pass
-}
-
-BarrierHandler::~BarrierHandler()
-{
-    if( m_impl->counter == 0 )
-        m_impl->handler();
-
-    m_impl->mutex.unlock(); // ready for callbacks
 }
 
 std::function< void() > BarrierHandler::fork()
 {
-    auto& impl = m_impl;
-    ++impl->counter;
+    // TODO: move lambda
+    auto holder = std::make_shared<
+            std::shared_ptr< BarrierHandler > >( m_handlerHolder );
 
-    return [ impl ]()
-    {
-        QnMutexLocker lk( &impl->mutex );
-        if( --impl->counter == 0 )
-            impl->handler();
-    };
-}
-
-BarrierHandler::Impl::Impl( std::function< void() > handler_ )
-    : counter( 0 )
-    , handler( std::move( handler_ ) )
-{
+    return [ holder ](){ holder->reset(); };
 }
 
 } // namespace nx

@@ -9,6 +9,7 @@
 #include <functional>
 #include <future>
 
+#include <nx/utils/thread/barrier_handler.h>
 
 //!Abstract class providing interface to stop doing anything without object destruction
 class QN_EXPORT QnStoppable
@@ -34,13 +35,46 @@ public:
     virtual void pleaseStop( std::function<void()> completionHandler ) = 0;
 
     //!Cals \a QnStoppableAsync::pleaseStop and waits for completion
-    void pleaseStopSync()
+    void pleaseStopSync();
+
+    typedef std::unique_ptr< QnStoppableAsync > UniquePtr;
+
+    /*!
+        Calls \fn pleaseStop for each of \param stoppables and remove them after
+        the last terminate is complete.
+    */
+    // TODO: #mux refactor with variadic template
+    static void pleaseStop( std::function< void() > completionHandler,
+                            UniquePtr stoppable1 )
     {
-        std::promise<void> promise;
-        auto fut = promise.get_future();
-        pleaseStop( [&](){ promise.set_value(); } );
-        fut.wait();
+        std::vector< UniquePtr > stoppables;
+        stoppables.push_back( std::move( stoppable1 ) );
+        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler) );
     }
+    static void pleaseStop( std::function< void() > completionHandler,
+                            UniquePtr stoppable1, UniquePtr stoppable2 )
+    {
+        std::vector< UniquePtr > stoppables;
+        stoppables.push_back( std::move( stoppable1 ) );
+        stoppables.push_back( std::move( stoppable2 ) );
+        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler) );
+    }
+
+private:
+    static void pleaseStopImpl( std::vector< UniquePtr > stoppables,
+                                std::function< void() > completionHandler );
+
+    /*
+    template< typename ... Args >
+    static void pleaseStopImpl( std::vector< UniquePtr > stoppables,
+                                std::function< void() > completionHandler,
+                                UniquePtr stoppable1, Args ... args )
+    {
+        stoppables.push_back( std::move( stoppable1 ) );
+        pleaseStopImpl( std::move( stoppables ), std::move( completionHandler),
+                        std::move( args ) );
+    }
+    */
 };
 
 #endif  //QNSTOPPABLE_H
