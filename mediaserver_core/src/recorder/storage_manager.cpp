@@ -499,7 +499,8 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
         }
         if (storagesToScan.isEmpty())
             return result;
-        result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
+        if (result.state <= Qn::RebuildState_None)
+            result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
         m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
 
