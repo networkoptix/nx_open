@@ -579,7 +579,6 @@ void QnScheduleSync::run()
             while (true) 
             {
                 bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
-
                 if (hasRebuildingStorages) 
                 {
                     NX_LOG(
