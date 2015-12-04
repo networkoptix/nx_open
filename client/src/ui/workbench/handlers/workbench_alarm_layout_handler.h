@@ -19,4 +19,6 @@ private:
 
     QnWorkbenchLayout* findOrCreateAlarmLayout();
     bool alarmLayoutExists() const;
+
+    void jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item);
 };

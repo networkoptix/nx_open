@@ -2,6 +2,8 @@
 
 #include <business/actions/abstract_business_action.h>
 
+#include <camera/resource_display.h>
+
 #include <client/client_message_processor.h>
 
 #include <core/resource/resource.h>
@@ -17,8 +19,10 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -94,6 +98,9 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     if (!layout)
         return;
 
+    /* Disable Sync on layout before adding cameras */
+    layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
+
     // Sort items to guarantee the same item placement for the same set of cameras.
     QnVirtualCameraResourceList sortedCameras = cameras;
     std::sort(sortedCameras.begin(), sortedCameras.end(), [](const QnVirtualCameraResourcePtr &camera1, const QnVirtualCameraResourcePtr &camera2) {
@@ -101,8 +108,14 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     });
 
     for (const QnVirtualCameraResourcePtr &camera: sortedCameras) {
-        if (!layout->items(camera->getUniqueId()).isEmpty())
+        auto existingItems = layout->items(camera->getUniqueId());
+
+        /* If the camera is already on layout, just take it to LIVE */
+        if (!existingItems.isEmpty()) {
+            for (auto item: existingItems)
+                jumpToLive(layout, item);
             continue;
+        }
 
         QnLayoutItemData data;
         data.resource.id = camera->getId();
@@ -158,4 +171,23 @@ bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
         return false;
 
     return QnWorkbenchLayout::instance(QnLayoutResourcePtr(layouts.first())) != nullptr;
+}
+
+void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item ) {
+    Q_ASSERT_X(layout && item, Q_FUNC_INFO, "Objects must exist here");
+    if (!item)
+        return;
+
+    /* Set data that will be used on the next layout opening. */
+    item->setData(Qn::ItemTimeRole, DATETIME_NOW);
+
+    /* Update current layout data. */
+    if (!layout || workbench()->currentLayout() != layout)
+        return;
+
+    if (auto camDisplay = display()->display(item)) {
+        camDisplay->setCurrentTimeUSec(DATETIME_NOW);
+        camDisplay->start();
+    }
+
 }
