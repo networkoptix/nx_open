@@ -138,8 +138,15 @@ private:
     Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class NX_NETWORK_API UdtStreamServerSocket : public UdtSocket, public AbstractStreamServerSocket  {
+class NX_NETWORK_API UdtStreamServerSocket
+:
+    public UdtSocket,
+    public AbstractStreamServerSocket
+{
 public:
+    UdtStreamServerSocket();
+    virtual ~UdtStreamServerSocket();
+
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
@@ -166,9 +173,6 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
-
-    UdtStreamServerSocket();
-    virtual ~UdtStreamServerSocket();
 
 protected:
     //!Implementation of AbstractSocket::postImpl

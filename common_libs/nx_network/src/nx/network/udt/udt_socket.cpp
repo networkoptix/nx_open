@@ -253,7 +253,8 @@ bool UdtSocketImpl::IsClosed() const {
 
 bool UdtSocketImpl::SetReuseAddrFlag( bool reuseAddr ) {
     Q_ASSERT(!IsClosed());
-    int ret = UDT::setsockopt(udtHandle,0,UDT_REUSEADDR,&reuseAddr,sizeof(reuseAddr));
+    int reuseAddrInt = reuseAddr ? 1 : 0;
+    int ret = UDT::setsockopt(udtHandle, 0, UDT_REUSEADDR, &reuseAddrInt, sizeof(reuseAddrInt));
     VERIFY_(OK_(ret),"UDT::setsockopt",udtHandle);
     if( ret != 0 )
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
