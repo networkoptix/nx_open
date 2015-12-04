@@ -18,7 +18,6 @@ static void socketSimpleSync(
     std::thread serverThread([&serverAddress, &testMessage, clientCount]()
     {
         auto server = std::make_unique< ServerSocket >();
-        ASSERT_TRUE(server->setNonBlockingMode(false));
         ASSERT_TRUE(server->setReuseAddrFlag(true));
         ASSERT_TRUE(server->bind(serverAddress)) << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
@@ -29,7 +28,6 @@ static void socketSimpleSync(
 
             QByteArray buffer(BUF_SIZE, char(0));
             std::unique_ptr< AbstractStreamSocket > client(server->accept());
-            ASSERT_TRUE(client->setNonBlockingMode(false));
 
             int bufDataSize = 0;
             for (;;)
@@ -48,7 +46,7 @@ static void socketSimpleSync(
     });
 
     // give the server some time to start
-    std::this_thread::sleep_for(std::chrono::microseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     std::thread clientThread([&serverAddress, &testMessage, clientCount]()
     {

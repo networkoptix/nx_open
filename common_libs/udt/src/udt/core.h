@@ -438,7 +438,7 @@ private: // Timers
 
    uint64_t m_ullTargetTime;			// scheduled time of next packet sending
 
-   void checkTimers();
+   void checkTimers(bool forceAck);
 
 private: // for UDP multiplexer
    CSndQueue* m_pSndQueue;			// packet sending queue

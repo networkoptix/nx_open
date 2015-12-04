@@ -106,8 +106,8 @@ protected:
 TEST( Socket, AsyncOperationCancellation )
 {
     static const std::chrono::milliseconds TEST_DURATION( 200 );
-    static const int TEST_RUNS = 1;
-    static const int THREADS = 2;
+    static const int TEST_RUNS = 5;
+    static const int THREADS = 3;
 
     std::vector<std::thread> threads(THREADS);
     for (int i = 0; i < threads.size(); ++i)
@@ -116,7 +116,7 @@ TEST( Socket, AsyncOperationCancellation )
             [](){
                 for (int i = 0; i < TEST_RUNS; ++i)
                 {
-                    static const int MAX_SIMULTANEOUS_CONNECTIONS = 10;
+                    static const int MAX_SIMULTANEOUS_CONNECTIONS = 25;
                     static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
 
                     RandomDataTcpServer server(BYTES_TO_SEND_THROUGH_CONNECTION);

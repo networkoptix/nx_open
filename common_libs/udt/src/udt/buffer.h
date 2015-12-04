@@ -161,6 +161,8 @@ private:
 
 class CRcvBuffer
 {
+    friend class CUDT;
+
 public:
    CRcvBuffer(CUnitQueue* queue, int bufsize = 65536);
    ~CRcvBuffer();

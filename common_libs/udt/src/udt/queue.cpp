@@ -1046,7 +1046,7 @@ void CRcvQueue::init(int qsize, int payload, int version, int hsize, CChannel* c
                       else
                          u->processCtrl(unit->m_Packet);
 
-                      u->checkTimers();
+                      u->checkTimers(false);
                       self->m_pRcvUList->update(u);
                    }
                 }
@@ -1079,7 +1079,7 @@ TIMER_CHECK:
 
          if (u->m_bConnected && !u->m_bBroken && !u->m_bClosing)
          {
-            u->checkTimers();
+            u->checkTimers(false);
             self->m_pRcvUList->update(u);
          }
          else

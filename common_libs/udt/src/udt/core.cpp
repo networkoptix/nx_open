@@ -2218,6 +2218,16 @@ void CUDT::processCtrl(CPacket& ctrlpkt)
       m_bBroken = true;
       m_iBrokenCounter = 60;
 
+      //performing ACK on existing data to provide data already-in-buffer to recv
+      checkTimers(true);
+
+      //if ((m_pRcvBuffer->getRcvDataSize() == 0) &&
+      //    (m_pRcvBuffer->m_iLastAckPos == 0))
+      //{
+      //    //checkTimers did not ACKed existing data
+      //    int x = 0;
+      //}
+
       // Signal the sender and recver if they are waiting for data.
       releaseSynch();
       CTimer::triggerEvent();
@@ -2529,7 +2539,7 @@ int CUDT::listen(sockaddr* addr, CPacket& packet)
    return hs.m_iReqType;
 }
 
-void CUDT::checkTimers()
+void CUDT::checkTimers(bool forceAck)
 {
    // update CC parameters
    CCUpdate();
@@ -2540,7 +2550,9 @@ void CUDT::checkTimers()
    uint64_t currtime;
    CTimer::rdtsc(currtime);
 
-   if ((currtime > m_ullNextACKTime) || ((m_pCC->m_iACKInterval > 0) && (m_pCC->m_iACKInterval <= m_iPktCount)))
+   if ((currtime > m_ullNextACKTime) ||
+       ((m_pCC->m_iACKInterval > 0) && (m_pCC->m_iACKInterval <= m_iPktCount)) ||
+       forceAck)
    {
       // ACK timer expired or ACK interval is reached
 
