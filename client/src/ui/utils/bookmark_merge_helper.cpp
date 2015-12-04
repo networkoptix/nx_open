@@ -54,10 +54,12 @@ class QnBookmarkMergeHelperPrivate
 {
 public:
     int bookmarkMergeDistanceDpix;
+    int bookmarkMergeSpacingDpix;
     QList<DetailLevel> detailLevels;
 
     QnBookmarkMergeHelperPrivate()
         : bookmarkMergeDistanceDpix(100)
+        , bookmarkMergeSpacingDpix(20)
     {
     }
 
@@ -184,12 +186,15 @@ void QnBookmarkMergeHelperPrivate::mergeBookmarkItems(int detailLevel)
     DetailLevel &currentLevel = detailLevels[detailLevel];
     DetailLevel &prevLevel = detailLevels[detailLevel - 1];
     qint64 mergeDistance = bookmarkMergeDistanceDpix * currentLevel.msecsPerDpix;
+    qint64 mergeSpacing = bookmarkMergeSpacingDpix * currentLevel.msecsPerDpix;
 
     BookmarkItemPtr currentItem;
 
     for (BookmarkItemPtr &item: prevLevel.items) {
         if (currentItem) {
-            if (item->startTimeMs - currentItem->startTimeMs < mergeDistance) {
+            if (item->startTimeMs - currentItem->startTimeMs < mergeDistance &&
+                item->startTimeMs - currentItem->endTimeMs < mergeSpacing)
+            {
                 currentItem->endTimeMs = qMax(currentItem->endTimeMs, item->endTimeMs);
                 currentItem->bookmark.reset();
                 item->parent = currentItem;
