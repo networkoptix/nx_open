@@ -214,8 +214,7 @@ void QnCompositeTextOverlay::initTextMode()
             ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
             : QnOverlayTextItemData::kInfinite);
 
-        const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
-
+        const auto actionId = businessAction->getBusinessRuleId();
 
         if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
