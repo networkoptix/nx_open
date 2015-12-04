@@ -405,9 +405,9 @@ void UdtPollSet::interrupt()
 
 bool UdtPollSet::add(UdtSocket* socket, aio::EventType eventType, void* userData)
 {
-    NX_LOG(lit("UdtPollSet::add. sock %1, eventType %2").
-        arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
-        arg((int)eventType), cl_logINFO);
+    //NX_LOG(lit("UdtPollSet::add. sock %1, eventType %2").
+    //    arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
+    //    arg((int)eventType), cl_logINFO);
 
     Q_ASSERT(socket != NULL);
     int ev = m_impl->MapAioEventToUdtEvent(eventType);
@@ -430,9 +430,9 @@ bool UdtPollSet::add(UdtSocket* socket, aio::EventType eventType, void* userData
 
 void* UdtPollSet::remove(UdtSocket* socket, aio::EventType eventType)
 {
-    NX_LOG(lit("UdtPollSet::remove. sock %1, eventType %2").
-        arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
-        arg((int)eventType), cl_logINFO);
+    //NX_LOG(lit("UdtPollSet::remove. sock %1, eventType %2").
+    //    arg(static_cast<UDTSocketImpl*>(socket->impl())->udtHandle).
+    //    arg((int)eventType), cl_logINFO);
 
     assert(socket);
     if (eventType != aio::etRead && eventType != aio::etWrite)

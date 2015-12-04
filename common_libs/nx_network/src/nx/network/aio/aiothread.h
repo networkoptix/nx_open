@@ -356,7 +356,6 @@ protected:
         static const int ERROR_RESET_TIMEOUT = 1000;
 
         initSystemThreadId();
-        m_impl->aioThreadId = ::currentThreadSystemId();
         NX_LOG(QLatin1String("AIO thread started"), cl_logDEBUG1);
 
         while (!needToStop())
@@ -537,7 +536,7 @@ public:
             const std::shared_ptr<AIOEventHandlingData<SocketType>>& _data,
             SocketType* _socket,
             aio::EventType _eventType)
-            :
+        :
             data(_data),
             socket(_socket),
             eventType(_eventType)
@@ -567,15 +566,13 @@ public:
     */
     std::deque<SocketAddRemoveTask> postedCalls;
     std::atomic<int> processingPostedCalls;
-    uintptr_t aioThreadId;
 
     AIOThreadImpl(QnMutex* const _aioServiceMutex)
     :
         aioServiceMutex(_aioServiceMutex),
         newReadMonitorTaskCount(0),
         newWriteMonitorTaskCount(0),
-        processingPostedCalls(0),
-        aioThreadId(0)
+        processingPostedCalls(0)
     {
         m_monotonicClock.restart();
     }
@@ -592,7 +589,6 @@ public:
             return;
 
         QnMutexLocker lk(aioServiceMutex);
-        int x = 0;
 
         for (typename std::deque<SocketAddRemoveTask>::iterator
             it = pollSetModificationQueue.begin();
@@ -673,9 +669,6 @@ public:
                 task.taskCompletionHandler();
             it = pollSetModificationQueue.erase(it);
         }
-
-        assert(x == 0);
-        assert(lk.isLocked());
     }
 
     void addSockToPollset(
@@ -688,7 +681,6 @@ public:
         bool failedToAddToPollset = false;
         if (eventType != aio::etTimedOut)
         {
-            assert(aioThreadId == ::currentThreadSystemId());
             if (!pollSet.add(socket, eventType, handlingData.get()))
             {
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
@@ -729,10 +721,7 @@ public:
             delete static_cast<AIOEventHandlingDataHolder<SocketType>*>(userData);
         userData = nullptr;
         if (eventType == aio::etRead || eventType == aio::etWrite)
-        {
             pollSet.remove(sock, eventType);
-            assert(aioThreadId == ::currentThreadSystemId());
-        }
     }
 
     void removeSocketsFromPollSet()
@@ -811,8 +800,6 @@ public:
     //!Processes events from \a pollSet
     void processSocketEvents(const qint64 curClock)
     {
-        assert(aioThreadId == ::currentThreadSystemId());
-
         for (typename PollSetType::const_iterator
             it = pollSet.begin();
             it != pollSet.end();

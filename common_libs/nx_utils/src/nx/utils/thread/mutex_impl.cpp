@@ -37,6 +37,7 @@ void QnMutexImpl::afterMutexLocked(
     threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
 
+#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     MutexLockKey lockKey(
         sourceFile,
         sourceLine,
@@ -47,6 +48,7 @@ void QnMutexImpl::afterMutexLocked(
     currentLockStack.push( std::move(lockKey) );
 #ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
+#endif
 #else
     Q_UNUSED( sourceFile );
     Q_UNUSED( sourceLine );
@@ -59,7 +61,9 @@ void QnMutexImpl::beforeMutexUnlocked()
 #ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     MutexLockAnalyzer::instance()->beforeMutexUnlocked( currentLockStack.top() );
 #endif
+#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     currentLockStack.pop();
+#endif
 
     if( --recursiveLockCount == 0 )
         threadHoldingMutex = 0;
