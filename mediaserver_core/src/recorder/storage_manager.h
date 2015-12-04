@@ -172,6 +172,7 @@ private:
     mutable QMutex m_mutexRebuild;
     mutable QMutex m_rebuildStateMtx;
     mutable QMutex m_localPatches;
+	mutable QMutex m_testStorageThreadMutex;
 
     QMap<QString, QSet<int> > m_storageIndexes;
     bool m_storagesStatisticsReady;
