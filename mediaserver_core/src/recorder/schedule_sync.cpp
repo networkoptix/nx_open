@@ -574,6 +574,8 @@ void QnScheduleSync::run()
         if (isItTimeForSync() == SyncCode::Ok) // we are there
         {
             m_syncing = true;
+            if (m_forced)
+                m_failReported = false;
             auto result = synchronize(isItTimeForSync);
             {
                 QnMutexLocker lk(&m_syncDataMutex);
