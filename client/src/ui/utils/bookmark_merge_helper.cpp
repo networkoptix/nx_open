@@ -75,11 +75,14 @@ QnBookmarkMergeHelper::QnBookmarkMergeHelper() :
     d_ptr(new QnBookmarkMergeHelperPrivate)
 {
     Q_D(QnBookmarkMergeHelper);
-    d->detailLevels << DetailLevel(0) // Zero level - not merged
-                    << DetailLevel(1000)            // 1 sec
-                    << DetailLevel(5 * 1000)        // 5 sec
-                    << DetailLevel(15 * 1000)       // 15 sec
-                    << DetailLevel(30 * 1000)       // 30 sec
+    d->detailLevels << DetailLevel(0)   // Zero level - not merged
+                    << DetailLevel(250)     // 250 ms
+                    << DetailLevel(500)     // 500 ms
+                    << DetailLevel(1000)        // 1 sec
+                    << DetailLevel(2500)        // 2.5 sec
+                    << DetailLevel(5 * 1000)    // 5 sec
+                    << DetailLevel(15 * 1000)   // 15 sec
+                    << DetailLevel(30 * 1000)   // 30 sec
                     << DetailLevel(60 * 1000)       // 1 min
                     << DetailLevel(5 * 60 * 1000)   // 5 min
                     << DetailLevel(15 * 60 * 1000)  // 15 min
