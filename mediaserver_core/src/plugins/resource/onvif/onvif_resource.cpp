@@ -610,6 +610,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
     
+    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
         bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);
@@ -630,6 +631,8 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     const auto customInitResult = customInitialization(capabilitiesResponse);
     if (customInitResult.errorCode != CameraDiagnostics::ErrorCode::noError)
         return customInitResult;
+
+    m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
 
     m_portNamePrefixToIgnore = resourceData.value<QString>(lit("portNamePrefixToIgnore"), QString());
 
