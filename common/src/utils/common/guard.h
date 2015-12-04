@@ -64,7 +64,7 @@ public:
         m_fired = true;
     }
 
-    typedef void (Result::*safe_bool_type)() const;
+    typedef void (ScopedGuard< Callback >::*safe_bool_type)() const;
     void safe_bool_type_retval() const {}
 
     /** Checks if guard is armed */
