@@ -55,8 +55,9 @@ namespace {
     const int multiThumbnailSpacing = 4;
 
 
-    const char *itemResourcePropertyName = "_qn_itemResource";
-    const char *itemActionTypePropertyName = "_qn_itemActionType";
+    const char *itemResourcePropertyName    = "_qn_itemResource";
+    const char *itemActionTypePropertyName  = "_qn_itemActionType";
+    const char *itemTimeStampPropertyName   = "_qn_itemTimeStamp";
 
 } //anonymous namespace
 
@@ -273,6 +274,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     QnBusiness::EventType eventType = params.eventType;
     QnUuid ruleId = businessAction->getBusinessRuleId();
     QString title = QnBusinessStringsHelper::eventAtResource(params, qnSettings->isIpShownInTree());
+    qint64 timestampMs = params.eventTimestampUsec / 1000;
 
     //TODO: #GDM code duplication
 
@@ -294,10 +296,11 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         if (alarmCameras.isEmpty())
             return;
 
-        if (findItem(ruleId, [](QnNotificationWidget* item){
-            return item->property(itemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction;
+        if (findItem(ruleId, [timestampMs](QnNotificationWidget* item) {
+            return item->property(itemActionTypePropertyName) == QnBusiness::ShowOnAlarmLayoutAction
+                && item->property(itemTimeStampPropertyName)  == timestampMs;
         }))
-            return; /* Show 'Alarm Layout' notifications only once for each rule. */
+            return; /* Show 'Alarm Layout' notifications only once for each event of one rule. */
 
         title = tr("Alarm: %1").arg(title);
     }
@@ -306,8 +309,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setText(title);
     item->setTooltipText(QnBusinessStringsHelper::eventDescription(businessAction, QnBusinessAggregationInfo(), qnSettings->isIpShownInTree(), false));
     item->setNotificationLevel(QnNotificationLevel::valueOf(businessAction));
-    item->setProperty(itemResourcePropertyName, QVariant::fromValue<QnResourcePtr>(resource));
+    item->setProperty(itemResourcePropertyName,   QVariant::fromValue<QnResourcePtr>(resource));
     item->setProperty(itemActionTypePropertyName, businessAction->actionType());
+    item->setProperty(itemTimeStampPropertyName,  timestampMs);
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
     if (businessAction->actionType() == QnBusiness::PlaySoundAction) {
@@ -328,10 +332,9 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
         loadThumbnailForItem(item, alarmCameras, source);
     }
 
-    else switch (eventType) {
-
+    else
+    switch (eventType) {
     case QnBusiness::CameraMotionEvent: {
-        qint64 timestampMs = params.eventTimestampUsec / 1000;
         item->addActionButton(
             icon,
             tr("Browse Archive"),
@@ -428,7 +431,6 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     {
         QnVirtualCameraResourceList sourceCameras = qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         if (!sourceCameras.isEmpty()) {
-            qint64 timestampMs = params.eventTimestampUsec / 1000;
             item->addActionButton(
                 icon,
                 tr("Browse Archive"),
