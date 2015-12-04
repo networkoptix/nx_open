@@ -7,8 +7,6 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource_management/resource_pool.h>
 
-//typedef std::function<void (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)> CompletionFunc;
-
 template<typename Context, typename CompletionFunc>
 void runMultiserverDownloadRequest(QUrl &url
     , const QnMediaServerResourcePtr &server
