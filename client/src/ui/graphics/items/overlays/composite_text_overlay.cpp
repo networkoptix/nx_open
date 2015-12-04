@@ -251,7 +251,7 @@ void QnCompositeTextOverlay::initTextMode()
         }
         else
         {
-            if (text.trimmed().isEmpty()) // Do not add empty text items
+            if (actionParams.text.trimmed().isEmpty()) // Do not add empty text items
                 return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
             const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
