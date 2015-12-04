@@ -1248,6 +1248,20 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
     return m_storageRoots; 
 } 
 
+bool QnStorageManager::hasPartialRebuildingStorages() const
+{
+    bool result = false;
+    for (const auto &storage : getWritableStorages()) 
+    {
+        if (storage->hasFlags(Qn::storage_fastscan)) 
+        {
+            result = true;
+            break;
+        }
+    }
+    return result;
+}
+
 QnStorageResourceList QnStorageManager::getStorages() const 
 {
     QnMutexLocker lock( &m_mutexStorages );

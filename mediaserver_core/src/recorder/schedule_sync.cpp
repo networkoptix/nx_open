@@ -190,7 +190,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
                 DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
             );
             syncDataIt->second.currentIndex = curFileIndex;
-            syncDataIt->second.totalChunks = catalogSize - syncDataIt->second.startIndex;
+            syncDataIt->second.totalChunks = (int) catalogSize - syncDataIt->second.startIndex;
         }
 
         QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);            
@@ -468,7 +468,6 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     ret.backupTimeMs = m_syncEndTimePoint;
     {
         QnMutexLocker lk(&m_syncDataMutex);
-        auto syncDataSize = (double)m_syncData.size();
         int totalChunks = std::accumulate(
             m_syncData.cbegin(),
             m_syncData.cend(),
@@ -576,6 +575,24 @@ void QnScheduleSync::run()
             m_syncing = true;
             if (m_forced)
                 m_failReported = false;
+
+            while (true) 
+            {
+                bool hasRebuildingStorages = 
+                    qnNormalStorageMan->hasPartialRebuildingStorages();
+
+                if (hasRebuildingStorages) 
+                {
+                    NX_LOG(
+                        lit("[Backup] Can't start because some of the source storages are being fast scanned."), 
+                        cl_logWARNING
+                    );
+                }
+                else if (!hasRebuildingStorages || m_interrupted)
+                    break;
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+
             auto result = synchronize(isItTimeForSync);
             {
                 QnMutexLocker lk(&m_syncDataMutex);
