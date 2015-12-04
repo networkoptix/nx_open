@@ -1251,12 +1251,6 @@ int QnSSLSocket::send( const void* buffer, unsigned int bufferLen )
     return SSL_write(d->ssl.get(), buffer, bufferLen);
 }
 
-void QnSSLSocket::pleaseStop( std::function<void()> completionHandler )
-{
-    Q_D(QnSSLSocket); 
-    d->wrappedSocket->pleaseStop( std::move( completionHandler ) );
-}
-
 bool QnSSLSocket::reopen()
 {
     Q_D(QnSSLSocket);
@@ -1348,13 +1342,6 @@ void QnSSLSocket::cancelIOAsync(
             d->async_ssl_ptr->Clear();
             cancellationDoneHandler();
         });
-}
-
-void QnSSLSocket::cancelIOSync(aio::EventType eventType)
-{
-    Q_D(const QnSSLSocket);
-    d->wrappedSocket->cancelIOSync(eventType);
-    d->async_ssl_ptr->Clear();
 }
 
 void QnSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
@@ -1506,15 +1493,6 @@ void QnMixedSSLSocket::cancelIOAsync(
         d->wrappedSocket->cancelIOAsync(eventType, cancellationDoneHandler);
 }
 
-void QnMixedSSLSocket::cancelIOSync(aio::EventType eventType)
-{
-    Q_D(QnMixedSSLSocket);
-    if (d->useSSL)
-        QnSSLSocket::cancelIOSync(eventType);
-    else
-        d->wrappedSocket->cancelIOSync(eventType);
-}
-
 void QnMixedSSLSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
 {
     Q_D( QnMixedSSLSocket );
@@ -1601,11 +1579,6 @@ SSLServerSocket::SSLServerSocket(AbstractStreamServerSocket* delegateSocket, boo
     initOpenSSLGlobalLock();
 }
 
-void SSLServerSocket::pleaseStop( std::function<void()> completionHandler )
-{
-    return m_delegateSocket->pleaseStop( std::move( completionHandler ) );
-}
-
 bool SSLServerSocket::listen(int queueLen)
 {
     return m_delegateSocket->listen(queueLen);
@@ -1622,9 +1595,9 @@ AbstractStreamSocket* SSLServerSocket::accept()
         return new QnSSLSocket(acceptedSock, true);
 }
 
-void SSLServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
+void SSLServerSocket::pleaseStop(std::function< void() > handler)
 {
-    return m_delegateSocket->cancelAsyncIO(waitForRunningHandlerCompletion);
+    return m_delegateSocket->pleaseStop(std::move(handler));
 }
 
 void SSLServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)

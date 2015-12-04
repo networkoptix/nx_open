@@ -77,7 +77,7 @@ namespace nx_http
         }
         //after we set m_terminated to true with m_mutex locked socket event processing is stopped and m_socket cannot change its value
         if( result )
-            result->cancelAsyncIO();
+            result->pleaseStopSync();
         //AIOService guarantees that eventTriggered had returned and will never be called with m_socket
 
         m_socket.clear();

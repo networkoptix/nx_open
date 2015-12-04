@@ -21,7 +21,7 @@ AbstractStreamSocket* CloudServerSocket::accept()
     return nullptr;
 }
 
-void CloudServerSocket::cancelAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
+void CloudServerSocket::pleaseStop( std::function< void() > /*handler*/ )
 {
     //TODO #ak
 }

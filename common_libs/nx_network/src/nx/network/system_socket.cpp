@@ -548,13 +548,6 @@ CommunicatingSocket::CommunicatingSocket(
 CommunicatingSocket::~CommunicatingSocket()
 {
     m_aioHelper->terminate();
-    //m_aioHelper->cancelIOSync(aio::etNone);
-}
-
-void CommunicatingSocket::pleaseStop( std::function<void()> completionHandler )
-{
-    m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
-    m_aioHelper->cancelIOAsync( aio::etNone, std::move( completionHandler ) );
 }
 
 //!Implementation of AbstractCommunicatingSocket::connect
@@ -769,11 +762,6 @@ void CommunicatingSocket::cancelIOAsync(
     std::function<void()> cancellationDoneHandler)
 {
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
-}
-
-void CommunicatingSocket::cancelIOSync(aio::EventType eventType)
-{
-    m_aioHelper->cancelIOSync(eventType);
 }
 
 void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
@@ -1227,12 +1215,6 @@ AbstractStreamSocket* TCPServerSocket::accept()
         return nullptr;
 
     return d->accept( recvTimeoutMs );
-}
-
-void TCPServerSocket::cancelAsyncIO( bool waitForRunningHandlerCompletion )
-{
-    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
-    d->asyncServerSocketHelper.cancelAsyncIO(waitForRunningHandlerCompletion);
 }
 
 bool TCPServerSocket::setListen(int queueLen)

@@ -178,13 +178,6 @@ public:
     {
     }
 
-
-    //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override
-    {
-        this->m_implDelegate.pleaseStop( std::move( completionHandler ) );
-    }
-
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractCommunicatingSocket methods
     //////////////////////////////////////////////////////////////////////
@@ -225,13 +218,6 @@ public:
         std::function<void()> cancellationDoneHandler) override
     {
         return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
-    }
-    //!Cancels async operation and blocks until cancellation is stopped
-    /*!
-    \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
-    */
-    virtual void cancelIOSync(aio::EventType eventType) override {
-        return this->m_implDelegate.cancelIOSync(eventType);
     }
 };
 

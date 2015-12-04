@@ -103,11 +103,6 @@ AbstractSocket::SOCKET_HANDLE DummySocket::handle() const
     return 0;
 }
 
-void DummySocket::pleaseStop( std::function<void()> completionHandler )
-{
-    completionHandler();
-}
-
 bool DummySocket::connect(
     const SocketAddress& remoteSocketAddress,
     unsigned int /*timeoutMillis*/ )
@@ -123,12 +118,9 @@ SocketAddress DummySocket::getForeignAddress() const
 
 void DummySocket::cancelIOAsync(
     aio::EventType /*eventType*/,
-    std::function<void()> /*cancellationDoneHandler*/)
+    std::function< void() > cancellationDoneHandler)
 {
-}
-
-void DummySocket::cancelIOSync(aio::EventType /*eventType*/)
-{
+    cancellationDoneHandler();
 }
 
 bool DummySocket::reopen()

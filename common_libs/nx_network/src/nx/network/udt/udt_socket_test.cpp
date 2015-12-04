@@ -148,7 +148,7 @@ public:
         return true;
     }
     virtual void quit() {
-        server_socket_->cancelAsyncIO(true);
+        server_socket_->pleaseStopSync();
     }
 private:
     struct Connection {
@@ -186,7 +186,7 @@ private:
     void OnRead( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
         if(error_code) {
-            conn->socket->cancelAsyncIO(aio::etNone );
+            conn->socket->pleaseStopSync();
             conn->socket->close();
             --current_conn_size_;
             ++broken_or_error_conn_;
@@ -194,7 +194,7 @@ private:
             if( bytes_transferred == 0 ) {
                 ++closed_conn_;
                 --current_conn_size_;
-                conn->socket->cancelAsyncIO(aio::etNone );
+                conn->socket->pleaseStopSync();
                 conn->socket->close();
             } else {
                 total_recv_bytes_ += bytes_transferred;
@@ -317,7 +317,7 @@ private:
     void OnWrite( SystemError::ErrorCode error_code , std::size_t bytes_transferred , Connection* ptr ) {
         std::unique_ptr<Connection> conn(ptr);
         if( error_code ) {
-            conn->socket->cancelAsyncIO(aio::EventType::etWrite);
+            conn->socket->cancelIOSync(aio::EventType::etWrite);
             conn->socket->close();
             failed_connection_size_++;
             --connected_socket_size_;
@@ -360,7 +360,7 @@ private:
             ScheduleWrite( conn.release() );
             return true;
         } else if( random_.Roll(disconnect_rate_) ) {
-            conn->socket->cancelAsyncIO();
+            conn->socket->pleaseStopSync();
             conn->socket->close();
             --connected_socket_size_;
             ++closed_conn_socket_size_;

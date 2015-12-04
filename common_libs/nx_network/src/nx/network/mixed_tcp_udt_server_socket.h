@@ -72,10 +72,8 @@ public:
     virtual bool listen(int queueLen) override;
     //!Implementation of SSLServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
-    //!Implementation of SSLServerSocket::cancelAsyncIO
-    virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
-    //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
     //!Implementation of AbstractSocket::postImpl

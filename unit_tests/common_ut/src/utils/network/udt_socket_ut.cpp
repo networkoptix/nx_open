@@ -87,10 +87,10 @@ TEST(SocketUdt, cancelConnect)
             [&handlerCalled](SystemError::ErrorCode /*errorCode*/){
                 handlerCalled = true;
             });
-        sock.cancelAsyncIO(aio::EventType::etNone, true);
+        sock.pleaseStopSync();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
     }
 
-    serverSocket.cancelAsyncIO(true);
+    serverSocket.pleaseStopSync();
 }

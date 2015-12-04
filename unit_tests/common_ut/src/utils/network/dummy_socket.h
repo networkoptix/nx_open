@@ -34,7 +34,6 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const  override;
     virtual SOCKET_HANDLE handle() const override;
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
@@ -43,7 +42,6 @@ public:
     virtual void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
 
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;

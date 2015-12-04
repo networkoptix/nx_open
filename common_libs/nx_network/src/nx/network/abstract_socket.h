@@ -275,33 +275,29 @@ public:
             return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
         }
 
-    //!\a deprecated. Cancels asynchronous socket operations
-    /*!
-        It is garanteed that after return of this method no async handler will be called
-        \param eventType Possible values: \a aio::etRead, \a aio::etWrite, \a aio::etTimedOut or \a aio::etNone to cancel all async aio
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
-    */
-    void cancelAsyncIO(
-        aio::EventType eventType = aio::etNone,
-        bool waitForRunningHandlerCompletion = true)
-    {
-        if (waitForRunningHandlerCompletion)
-            cancelIOSync(eventType);
-        else
-            cancelIOAsync(eventType, std::function<void()>());
-    }
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
         \param eventType event to cancel
     */
-    virtual void cancelIOAsync(
-        aio::EventType eventType,
-        std::function<void()> cancellationDoneHandler) = 0;
+    virtual void cancelIOAsync( aio::EventType eventType,
+                                std::function< void() > handler) = 0;
+
     //!Cancels async operation and blocks until cancellation is stopped
     /*!
         \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
     */
-    virtual void cancelIOSync(aio::EventType eventType) = 0;
+    void cancelIOSync(aio::EventType eventType)
+    {
+        std::promise< bool > promise;
+        cancelIOAsync( eventType, [ & ](){ promise.set_value( true ); } );
+        promise.get_future().wait();
+    }
+
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop( std::function< void() > handler ) override
+    {
+        cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
+    }
 
 protected:
     virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
@@ -452,11 +448,6 @@ public:
         {
             return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
         }
-    //!
-    /*!
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
-    */
-    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
     virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;

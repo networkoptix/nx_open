@@ -31,9 +31,6 @@ public:
     static void initSSLEngine(const QByteArray& certData);
     static void releaseSSLEngine();
 
-    //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
-
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;
     virtual bool getNoDelay( bool* value ) const override;
@@ -72,7 +69,6 @@ public:
     virtual void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
 
 protected:
     enum IOMode
@@ -124,7 +120,6 @@ public:
     virtual void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
-    virtual void cancelIOSync(aio::EventType eventType) override;
 
 protected:
     //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
@@ -153,9 +148,6 @@ public:
     */
     SSLServerSocket( AbstractStreamServerSocket* delegateSocket, bool allowNonSecureConnect );
 
-    //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
-
     //////////////////////////////////////////////////////////////////////
     ///////// Implementation of AbstractStreamServerSocket methods
     //////////////////////////////////////////////////////////////////////
@@ -164,8 +156,8 @@ public:
     virtual bool listen( int queueLen ) override;
     //!Implementation of SSLServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
-    //!Implementation of SSLServerSocket::cancelAsyncIO
-    virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion = true) override;
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
     //!Implementation of SSLServerSocket::acceptAsyncImpl

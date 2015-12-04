@@ -280,17 +280,28 @@ public:
             timeoutMs );
     }
 
-    void cancelIOAsync(
-        const aio::EventType eventType,
-        std::function<void()> cancelledHandler = std::function<void()>())
+    void cancelIOAsync( const aio::EventType eventType,
+                        std::function<void()> handler )
     {
         auto cancelImpl = [=]()
         {
             // cancelIOSync will be instant from socket's IO thread
-            nx::SocketGlobals::aioService().dispatch(this->m_socket, [=]()
+            nx::SocketGlobals::aioService().dispatch( this->m_socket, [=]()
             {
-                cancelIOSync( eventType );
-                cancelledHandler();
+                stopPollingSocket( this->m_socket, eventType );
+                std::atomic_thread_fence( std::memory_order_acquire );
+
+                //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+                //  avoiding unnecessary removeFromWatch calls in eventTriggered
+
+                if (eventType == aio::etRead || eventType == aio::etNone)
+                    ++m_recvAsyncCallCounter;
+                if (eventType == aio::etWrite || eventType == aio::etNone)
+                    ++m_connectSendAsyncCallCounter;
+                if (eventType == aio::etTimedOut || eventType == aio::etNone)
+                    ++m_registerTimerCallCounter;
+
+                handler();
             });
         };
 
@@ -298,51 +309,6 @@ public:
             nx::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
         else
             cancelImpl();
-    }
-
-    void cancelIOSync(const aio::EventType eventType)
-    {
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this);
-
-        const bool inAIOThread = this->m_socket->impl()->aioThread.load() == QThread::currentThread();
-        if (inAIOThread)
-        {
-            stopPollingSocket(this->m_socket, eventType);
-        }
-        else
-        {
-            ++this->m_socket->impl()->terminated;  //no new async calls can be scheduled while terminated is non-zero
-            std::promise<bool> ioCancelledPromise;
-            auto ioCancelledFuture = ioCancelledPromise.get_future();
-            nx::SocketGlobals::aioService().dispatch(
-                this->m_socket,
-                [this, &ioCancelledPromise, eventType]() {
-                    stopPollingSocket(this->m_socket, eventType);
-                    ioCancelledPromise.set_value(true);
-                });
-
-            ioCancelledFuture.wait();
-            --this->m_socket->impl()->terminated;
-        }
-
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this);
-
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
-        {
-            //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-            //  avoiding unnecessary removeFromWatch calls in eventTriggered
-            Q_ASSERT(this->m_socket->impl()->aioThread.load() == QThread::currentThread());
-
-            if (eventType == aio::etRead || eventType == aio::etNone)
-                ++m_recvAsyncCallCounter;
-            if (eventType == aio::etWrite || eventType == aio::etNone)
-                ++m_connectSendAsyncCallCounter;
-            if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                ++m_registerTimerCallCounter;
-        }
     }
 
 private:
@@ -699,11 +665,6 @@ public:
             *m_terminatedFlagPtr = true;
     }
 
-    void terminate()
-    {
-        cancelAsyncIO(true);
-    }
-
     virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
     {
         assert(m_acceptHandler);
@@ -765,13 +726,21 @@ public:
         return nx::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
-    void cancelAsyncIO(bool waitForRunningHandlerCompletion)
+    void cancelIOAsync(std::function< void() > handler)
     {
-        nx::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
-        if( m_threadHandlerIsRunningIn.load( std::memory_order_acquire ) == QThread::currentThreadId() )
-            ++m_acceptAsyncCallCount;     //we are in aio thread, eventTriggered is down the stack
-        else
-            assert( waitForRunningHandlerCompletion );      //TODO #ak AIO engine does not support truly async cancellation yet
+        nx::SocketGlobals::aioService().dispatch(this->m_sock, [=]()
+        {
+            nx::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, true);
+            ++m_acceptAsyncCallCount;
+            handler();
+        } );
+    }
+
+    void cancelIOSync()
+    {
+        std::promise< bool > promise;
+        cancelIOAsync( [ & ](){ promise.set_value( true ); } );
+        promise.get_future().wait();
     }
 
 private:

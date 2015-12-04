@@ -100,7 +100,7 @@ public:
 
     virtual void pleaseStop()
     {
-        m_socket->cancelAsyncIO();
+        m_socket->pleaseStopSync();
     }
 
     //!Binds to specified addresses
