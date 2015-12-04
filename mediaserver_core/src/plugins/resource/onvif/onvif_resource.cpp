@@ -610,7 +610,6 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
     if (m_appStopping)
         return CameraDiagnostics::ServerTerminatedResult();
     
-    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     if (getProperty(QnMediaResource::customAspectRatioKey()).isEmpty())
     {
         bool forcedAR = resourceData.value<bool>(lit("forceArFromPrimaryStream"), false);

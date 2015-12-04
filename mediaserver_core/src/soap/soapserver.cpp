@@ -29,7 +29,6 @@ QnSoapServer::QnSoapServer(unsigned int port, const char* path )
 QnSoapServer::~QnSoapServer()
 {
     stop();
-    QnSoapServer_instance = nullptr;
     m_service.soap_force_close_socket();
 }
 
