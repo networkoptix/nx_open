@@ -578,20 +578,21 @@ void QnScheduleSync::run()
 
             while (true) 
             {
-                bool hasRebuildingStorages = 
-                    qnNormalStorageMan->hasPartialRebuildingStorages();
-
+                bool hasRebuildingStorages = qnNormalStorageMan->hasRebuildingStorages();
                 if (hasRebuildingStorages) 
                 {
                     NX_LOG(
-                        lit("[Backup] Can't start because some of the source storages are being fast scanned."), 
-                        cl_logWARNING
+                        lit("[Backup] Can't start because some of the source storages are being rebuilded."), 
+                        cl_logDEBUG1
                     );
                 }
                 else if (!hasRebuildingStorages || m_interrupted)
                     break;
                 std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
+
+            if (m_interrupted)
+                continue;
 
             auto result = synchronize(isItTimeForSync);
             {

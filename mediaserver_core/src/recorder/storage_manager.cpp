@@ -1248,7 +1248,7 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
     return m_storageRoots; 
 } 
 
-bool QnStorageManager::hasPartialRebuildingStorages() const
+bool QnStorageManager::hasRebuildingStorages() const
 {
     bool result = false;
     for (const auto &storage : getWritableStorages()) 
@@ -1259,7 +1259,7 @@ bool QnStorageManager::hasPartialRebuildingStorages() const
             break;
         }
     }
-    return result;
+    return result || m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
 }
 
 QnStorageResourceList QnStorageManager::getStorages() const 
