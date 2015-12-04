@@ -13,6 +13,8 @@
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/udt/udt_pollset.h>
 
+#include "simple_socket_test_helper.h"
+
 
 class TestHandler
 :
@@ -113,4 +115,23 @@ TEST(SocketUdt_UdtPollSet, general)
 
     auto result = pollset.poll(100);
     ASSERT_EQ(0, result);
+}
+
+static const QByteArray kTestMessage("Ping");
+static const size_t kClientCount(3);
+
+TEST(SocketUdt, SimpleAsync)
+{
+    socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount);
+}
+
+TEST(SocketUdt, SimpleSync)
+{
+    socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount);
 }
