@@ -28,13 +28,19 @@ private:
 
     struct SyncData 
     {
-        double  coeff;
-        int     startIndex;
+        int totalChunks;
+        int startIndex;
+        int currentIndex;
 
-        SyncData() : coeff(0.0), startIndex(0) {}
-        SyncData(double coeff, int startIndex) 
-            : coeff(coeff),
-              startIndex(startIndex)
+        SyncData() 
+            : totalChunks(0), 
+              startIndex(0), 
+              currentIndex(0) 
+        {}
+        explicit SyncData(int startIndex) 
+            : totalChunks(0),
+              startIndex(startIndex),
+              currentIndex(startIndex)
         {}
     };
     
@@ -111,12 +117,20 @@ private:
     CopyError copyChunk(const ChunkKey &chunkKey);
 
     int state() const;
+    void initSyncData();
+
+    void addSyncDataKey(
+        QnServer::ChunksCatalog quality,
+        const QString           &cameraId
+    );
 
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
+
     ChunkKey getOldestChunk(
-        const QString           &cameraId,
-        QnServer::ChunksCatalog catalog,
-        qint64                  fromTimeMs
+        const QString           &cameraId, 
+        QnServer::ChunksCatalog catalog, 
+        qint64                  fromTimeMs,
+        SyncData                *syncData = nullptr
     ) const;
 
 private:

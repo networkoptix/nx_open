@@ -39,7 +39,7 @@ namespace ec2 {
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)(backupType)
 
     struct ApiStorageDataStatistics
         : ApiStorageData
@@ -47,7 +47,8 @@ namespace ec2 {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting) \
+    (storageType)(isBackup)(addParams)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx
@@ -59,7 +60,8 @@ namespace ec2 {
         ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
-    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
+    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
+    (backupType)(backupDaysOfTheWeek)(backupStart)(backupDuration)(backupBitrate)
 
 	struct ApiLicenseStatistics
 	{
