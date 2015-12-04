@@ -105,7 +105,7 @@ public:
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
-    bool hasPartialRebuildingStorages() const;
+    bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
