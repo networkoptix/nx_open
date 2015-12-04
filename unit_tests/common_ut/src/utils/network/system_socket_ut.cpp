@@ -131,6 +131,7 @@ static void socketSimpleAsync()
     auto server = std::make_unique< ServerSocket >();
     ASSERT_TRUE( server->setNonBlockingMode( true ) );
     ASSERT_TRUE( server->setReuseAddrFlag( true ) );
+    ASSERT_TRUE( server->setRecvTimeout(5000) );
     ASSERT_TRUE( server->bind( ADDRESS2 ) ) << ERROR_TEXT;
     ASSERT_TRUE( server->listen( CLIENT_COUNT ) ) << ERROR_TEXT;
 
@@ -164,7 +165,12 @@ static void socketSimpleAsync()
     server->acceptAsync( accept );
 
     auto testClient = std::make_unique< ClientSocket >( false );
-    ASSERT_TRUE( testClient->setNonBlockingMode( true ) );
+    ASSERT_TRUE(testClient->setNonBlockingMode(true));
+    ASSERT_TRUE(testClient->setSendTimeout(5000));
+
+    //have to introduce wait here since subscribing to socket events (acceptAsync)
+    //  takes some time and UDT ignores connections received before first accept call
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     QByteArray clientBuffer;
     clientBuffer.reserve( 128 );
