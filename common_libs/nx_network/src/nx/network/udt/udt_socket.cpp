@@ -8,8 +8,8 @@
 #  include <netinet/tcp.h>
 #endif
 
-#include <set>
 #include <mutex>
+#include <set>
 
 #include <boost/optional.hpp>
 
@@ -122,11 +122,21 @@ public:
         ESTABLISHING,
         ESTABLISHED
     };
-    UdtSocketImpl(): state_(CLOSED) {
+
+    UdtSocketImpl(): state_(CLOSED)
+    {
         UdtLibrary::Initialize();
     }
-    UdtSocketImpl( UDTSOCKET socket, int state ) : UDTSocketImpl(socket),state_(state){}
-    ~UdtSocketImpl() {
+
+    UdtSocketImpl( UDTSOCKET socket, int state )
+    :
+        UDTSocketImpl(socket),
+        state_(state)
+    {
+    }
+    
+    ~UdtSocketImpl()
+    {
         if(!IsClosed())
             Close();
     }
@@ -161,6 +171,10 @@ public:
     int Recv( void* buffer, unsigned int bufferLen, int flags );
     int Send( const void* buffer, unsigned int bufferLen );
     bool Reopen();
+
+private:
+    UdtSocketImpl(const UdtSocketImpl&);
+    UdtSocketImpl& operator=(const UdtSocketImpl&);
 };
 
 bool UdtSocketImpl::Open() {
@@ -760,10 +774,11 @@ AbstractStreamSocket* UdtStreamServerSocket::accept()  {
 #ifdef TRACE_UDT_SOCKET
         NX_LOG(lit("accepted UDT socket %1").arg(ret), cl_logDEBUG2);
 #endif
-        return new UdtStreamSocket(
+        auto* impl = 
             new detail::UdtSocketImpl(
                 ret,
-                detail::UdtSocketImpl::ESTABLISHED));
+                detail::UdtSocketImpl::ESTABLISHED);
+        return new UdtStreamSocket(impl);
     }
 }
 

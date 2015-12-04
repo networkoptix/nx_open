@@ -14,6 +14,7 @@
 namespace
 {
     const size_t READ_BUF_SIZE = 4*1024;
+    std::atomic<int> TestConnectionIDCounter(0);
     std::atomic<int> TestConnection_count(0);
 }
 
@@ -31,10 +32,13 @@ TestConnection::TestConnection(
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
-    m_id( ++TestConnection_count )
+    m_id( ++TestConnectionIDCounter ),
+    m_accepted(true)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
     m_outData.resize( READ_BUF_SIZE );
+
+    ++TestConnection_count;
 }
 
 TestConnection::TestConnection(
@@ -52,10 +56,13 @@ TestConnection::TestConnection(
     m_terminated( false ),
     m_totalBytesSent( 0 ),
     m_totalBytesReceived( 0 ),
-    m_id( ++TestConnection_count )
+    m_id( ++TestConnectionIDCounter ),
+    m_accepted(false)
 {
     m_readBuffer.reserve( READ_BUF_SIZE );
     m_outData.resize( READ_BUF_SIZE );
+
+    ++TestConnection_count;
 }
 
 static std::mutex mtx1;
@@ -80,6 +87,8 @@ TestConnection::~TestConnection()
 #ifdef DEBUG_OUTPUT
     std::cout<<"TestConnection::~TestConnection. "<<m_id<<std::endl;
 #endif
+
+    --TestConnection_count;
 }
 
 int TestConnection::id() const
@@ -243,6 +252,11 @@ void RandomDataTcpServer::join()
 {
     if( m_serverSocket )
         m_serverSocket->terminateAsyncIO( true );
+
+    QnMutexLocker lk(&m_mutex);
+    auto acceptedConnections = std::move(m_acceptedConnections);
+    lk.unlock();
+    acceptedConnections.clear();
 }
 
 bool RandomDataTcpServer::start()
@@ -266,18 +280,20 @@ SocketAddress RandomDataTcpServer::addressBeingListened() const
     return m_serverSocket->getLocalAddress();
 }
 
-void RandomDataTcpServer::onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection )
+void RandomDataTcpServer::onNewConnection(
+    SystemError::ErrorCode errorCode,
+    AbstractStreamSocket* newConnection )
 {
     //ignoring errors for now
     if( errorCode == SystemError::noError )
     {
-        std::unique_ptr<TestConnection> testConnection( new TestConnection(
+        std::shared_ptr<TestConnection> testConnection( new TestConnection(
             std::unique_ptr<AbstractStreamSocket>(newConnection),
             m_bytesToSendThrough,
-            std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 ) ) );
+            std::bind(&RandomDataTcpServer::onConnectionDone, this, std::placeholders::_2 )));
         testConnection->start();
-        testConnection.release();
-        //TODO #ak save connection somewhere
+        QnMutexLocker lk(&m_mutex);
+        m_acceptedConnections.emplace_back(std::move(testConnection));
     }
 
     m_serverSocket->acceptAsync( std::bind(
@@ -285,9 +301,18 @@ void RandomDataTcpServer::onNewConnection( SystemError::ErrorCode errorCode, Abs
         std::placeholders::_1, std::placeholders::_2 ) );
 }
 
-void RandomDataTcpServer::onConnectionDone( TestConnection* connection )
+void RandomDataTcpServer::onConnectionDone(
+    TestConnection* connection )
 {
-    delete connection;
+    QnMutexLocker lk(&m_mutex);
+    auto it = std::find_if(
+        m_acceptedConnections.begin(),
+        m_acceptedConnections.end(),
+        [connection](const std::shared_ptr<TestConnection>& sharedConnection) {
+            return sharedConnection.get() == connection;
+        });
+    if (it != m_acceptedConnections.end())
+        m_acceptedConnections.erase(it);
 }
 
 

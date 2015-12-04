@@ -13,12 +13,12 @@
 
 int main( int argc, char **argv )
 {
-#if 0
+#if 1
     cl_log.create(
         "c:\\tmp\\common_ut.log",
         50*1024*1024,
         10,
-        cl_logINFO);
+        cl_logDEBUG2);
 #endif
 	
 	nx::SocketGlobals::InitGuard sgGuard;
