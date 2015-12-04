@@ -54,15 +54,18 @@ def dump_rules(file_name, rules):
     rules_file.close()
 
 def apply_patch(patch):
+    command = ['patch', '-p0', '-i', patch]
+    print 'Exec: ' + ' '.join(command)
     try:
-        print subprocess.check_output('patch -p0 -i {0}'.format(patch), shell=True)
+        subprocess.call(command)
     except:
         return 1
     return 0
 
 def apply_script(script):
+    print 'Exec: ' + script
     try:
-        print subprocess.check_output(script, stderr=subprocess.STDOUT).rstrip()
+        subprocess.call(script)
     except:
         return 1
     return 0
