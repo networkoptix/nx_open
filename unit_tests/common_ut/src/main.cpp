@@ -15,7 +15,7 @@ int main( int argc, char **argv )
 {
 #if 0
     cl_log.create(
-        "common_ut.log",
+        "c:/tmp/common_ut.log",
         50*1024*1024,
         1,
         cl_logDEBUG2);

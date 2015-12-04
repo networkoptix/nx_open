@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <nx/network/abstract_socket.h>
+#include <utils/common/stoppable.h>
 
 #include "stream_socket_server.h"
 
@@ -47,6 +48,8 @@ namespace nx_api
     template<
         class CustomConnectionType
     > class BaseServerConnection
+    :
+        public QnStoppable
     {
     public:
         typedef BaseServerConnection<CustomConnectionType> SelfType;
@@ -67,7 +70,11 @@ namespace nx_api
 
         ~BaseServerConnection()
         {
-            for( auto& handler: m_connectionCloseHandlers )
+        }
+
+        virtual void pleaseStop() override
+        {
+            for (auto& handler : m_connectionCloseHandlers)
                 handler();
             m_connectionCloseHandlers.clear();
 

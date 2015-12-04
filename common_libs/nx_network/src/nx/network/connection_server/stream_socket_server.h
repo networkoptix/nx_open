@@ -44,6 +44,8 @@ public:
             std::lock_guard<std::mutex> lk( m_mutex );
             connections.swap( m_connections );
         }
+        for (auto& connection: connections)
+            connection.first->pleaseStop();
         connections.clear();
     }
 
