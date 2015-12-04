@@ -157,7 +157,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 
     m_updateStatusTimer->setInterval(updateStatusTimeoutMs);
     connect(m_updateStatusTimer, &QTimer::timeout, this, [this] {
-        qnServerStorageManager->checkStoragesStatus(m_server);
+        if (isVisible())
+            qnServerStorageManager->checkStoragesStatus(m_server);
     });
 
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
@@ -655,6 +656,9 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
     if (server != m_server)
         return;
 
+    if (!isVisible())
+        return;
+
     bool isMain = (pool == QnServerStoragesPool::Main);
     StoragePool& storagePool = (isMain ? m_mainPool : m_backupPool);
     if (!storagePool.rebuildCancelled)
@@ -666,6 +670,9 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
 
 void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResourcePtr &server ) {
     if (server != m_server)
+        return;
+
+    if (!isVisible())
         return;
 
     if (!m_backupCancelled)
