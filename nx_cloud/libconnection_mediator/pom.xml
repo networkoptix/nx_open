@@ -24,6 +24,7 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} Mediator Lib</product.title>
+        <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>

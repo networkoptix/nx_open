@@ -24,6 +24,7 @@
     <properties>
         <guid>${nx_email.guid}</guid>
         <product.title>${company.name} nx_email</product.title>
+        <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
         <global.libs>-lcommon</global.libs>
