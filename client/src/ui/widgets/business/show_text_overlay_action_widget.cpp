@@ -28,6 +28,14 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
     connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
+
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
+    {
+        // Prolonged type of event has changed. In case of instant
+        // action event state should be updated
+        if (checked)
+            model()->setEventState(QnBusiness::UndefinedState);
+    });
 }
 
 QnShowTextOverlayActionWidget::~QnShowTextOverlayActionWidget()

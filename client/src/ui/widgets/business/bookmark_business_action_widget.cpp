@@ -26,6 +26,14 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     connect(ui->tagsLineEdit, &QLineEdit::textChanged,      this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->durationSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
+
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
+    {
+        // Prolonged type of event has changed. In case of instant
+        // action event state should be updated
+        if (checked)
+            model()->setEventState(QnBusiness::UndefinedState);
+    });
 }
 
 QnBookmarkBusinessActionWidget::~QnBookmarkBusinessActionWidget()
