@@ -206,20 +206,26 @@ void QnCompositeTextOverlay::initTextMode()
         if (actionParams.actionResourceId != cameraId)
             return;
 
-        enum { kDefaultInstantActionTimeoutMs = 5000 };
-
         const auto state = businessAction->getToggleState();
-        const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
-        const int timeout = (isInstantAction
-            ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
-            : QnOverlayTextItemData::kInfinite);
+        // Text Overlay actions with defined duration are for instant events,
+        // otherwise they are for prolonged.
+        const bool isProlongedAction = (actionParams.durationMs <= 0);
+
+        const bool couldBeInstantEvent = (state == QnBusiness::UndefinedState);
+        if (isProlongedAction && couldBeInstantEvent)
+        {
+            // Do not accept instant events for prolonged actions
+            return;
+        }
+
+        const int timeout = (isProlongedAction ? QnOverlayTextItemData::kInfinite
+            : actionParams.durationMs);
 
         const auto actionId = businessAction->getBusinessRuleId();
 
-        if (!isInstantAction && (state == QnBusiness::InactiveState))
+        if (isProlongedAction && (state == QnBusiness::InactiveState))
         {
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
-
             return;
         }
 
