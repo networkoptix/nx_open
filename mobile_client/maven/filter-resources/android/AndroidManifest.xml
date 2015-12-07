@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto" android:versionCode="${project.version.code}"
-    android:versionName="${project.version.name}.${project.version.code}" package="${display.android.namespace}">
+    android:versionName="${project.version.name}.${project.version.code}" package="${new.android.namespace}">
 
     <application
         android:hardwareAccelerated="true"

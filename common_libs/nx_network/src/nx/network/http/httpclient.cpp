@@ -135,11 +135,7 @@ namespace nx_http
     {
         QnMutexLocker lk(&m_mutex);
 
-        if (m_done)
-        {
-            m_done = false;
-        }
-        else
+        if (!m_done)
         {
             lk.unlock();
 
@@ -151,7 +147,7 @@ namespace nx_http
             }
             instanciateHttpClient();
 
-            //TODO #ak setting up attributes
+            //setting up attributes
             for (const auto& keyValue: m_additionalHeaders)
                 m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
             if (m_subsequentReconnectTries)
@@ -170,6 +166,7 @@ namespace nx_http
             lk.relock();
         }
 
+        m_done = false;
         func(m_asyncHttpClient.get());
 
         m_msgBodyBuffer.clear();

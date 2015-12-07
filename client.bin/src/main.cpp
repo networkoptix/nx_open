@@ -293,7 +293,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
             startupParams.enforceMediatorEndpoint );
 
     /* Dev mode. */
-    if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5) 
+    if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5)
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnRuntime->setDevMode(true);
     }
@@ -321,8 +321,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         startupParams.versionMismatchCheckDisabled = true;
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = startupParams.videoWallItemGuid.isNull() 
-            ? startupParams.videoWallGuid.toString() 
+        logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
+            ? startupParams.videoWallGuid.toString()
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
@@ -356,12 +356,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    QString skinRoot = dynamicCustomizationPath.isEmpty() 
-        ? lit(":") 
-        : dynamicCustomizationPath;
+    QString skinRoot = startupParams.dynamicCustomizationPath.isEmpty()
+        ? lit(":")
+        : startupParams.dynamicCustomizationPath;
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
-        ? skinRoot + lit("/skin_light") 
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
+        ? skinRoot + lit("/skin_light")
         : skinRoot + lit("/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
 #else
@@ -370,7 +370,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
 
-    
+
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
@@ -383,7 +383,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize application instance. */
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
-    
+
     QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
@@ -592,8 +592,8 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         /* Set authentication parameters from uri. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
         context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
-    } 
-    /* If no input files were supplied --- open connection settings dialog.   
+    }
+    /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
      * * we were not connected and clicked "Open in new window"
      * * we have opened exported exe-file
@@ -693,7 +693,7 @@ int main(int argc, char **argv)
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
-     
+
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();

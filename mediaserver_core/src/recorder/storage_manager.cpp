@@ -499,7 +499,8 @@ QnStorageScanData QnStorageManager::rebuildCatalogAsync()
         }
         if (storagesToScan.isEmpty())
             return result;
-        result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
+        if (result.state <= Qn::RebuildState_None)
+            result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
         m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
 
@@ -1248,6 +1249,20 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
     return m_storageRoots; 
 } 
 
+bool QnStorageManager::hasRebuildingStorages() const
+{
+    bool result = false;
+    for (const auto &storage : getWritableStorages()) 
+    {
+        if (storage->hasFlags(Qn::storage_fastscan)) 
+        {
+            result = true;
+            break;
+        }
+    }
+    return result || m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
+}
+
 QnStorageResourceList QnStorageManager::getStorages() const 
 {
     QnMutexLocker lock( &m_mutexStorages );
@@ -1607,18 +1622,22 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
 void QnStorageManager::testOfflineStorages()
 {
-    QnMutexLocker lock( &m_mutexStorages );
-    if (!m_testStorageThread->isRunning())
+    QnMutexLocker lock( &m_testStorageThreadMutex );
+    if (m_testStorageThread && !m_testStorageThread->isRunning())
         m_testStorageThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
 {
-    if (m_testStorageThread) {
-        m_testStorageThread->stop();
-        delete m_testStorageThread;
-        m_testStorageThread = 0;
+    {
+        QnMutexLocker lock( &m_testStorageThreadMutex );
+        if (m_testStorageThread) {
+            m_testStorageThread->stop();
+            delete m_testStorageThread;
+            m_testStorageThread = 0;
+        }
     }
+
     m_rebuildCancelled = true;
     if (m_rebuildArchiveThread) {
         m_rebuildArchiveThread->stop();
