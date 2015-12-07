@@ -670,6 +670,10 @@ QnActionManager::QnActionManager(QObject *parent):
             autoRepeat(false).
             condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
+        factory().
+            flags(Qn::Main).
+            separator();
+
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree).
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
