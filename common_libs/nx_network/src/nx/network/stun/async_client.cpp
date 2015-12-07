@@ -27,6 +27,7 @@ AsyncClient::~AsyncClient()
 		baseConnection = std::move( m_baseConnection );
         m_state = State::terminated;
     }
+    baseConnection->pleaseStop();
 
     if( connectingSocket )
         connectingSocket->terminateAsyncIO( true );
@@ -98,6 +99,7 @@ void AsyncClient::closeConnection(
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
     }
+    baseConnection->pleaseStop();
 
     for( const auto& handler : disconnectHandlers )
         handler( errorCode );
@@ -242,6 +244,8 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     handlers = m_connectHandlers;
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
+
+    assert(!m_baseConnection);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 
