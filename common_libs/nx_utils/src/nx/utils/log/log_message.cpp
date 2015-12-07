@@ -60,6 +60,11 @@ QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, QChar fillChar) 
     return m_str.arg(a.toString(), fieldWidth, fillChar);
 }
 
+QnLogMessage QnLogMessage::arg(const void* a, int fieldWidth, QChar fillChar) const
+{
+    return lit("0x")+m_str.arg((size_t)a, fieldWidth, 16, fillChar);
+}
+
 QnLogMessage::operator QString() const
 {
     return m_str;
