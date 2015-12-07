@@ -270,9 +270,9 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
-    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets]{
+    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets]() {
         m_updateProcess->deleteLater();
-        m_updateProcess = NULL;
+        m_updateProcess = nullptr;
         for (const QnUuid &id: incompatibleTargets)
             qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
     });
