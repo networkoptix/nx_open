@@ -88,10 +88,6 @@ void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection )
 {
-    Q_ASSERT_X( !m_baseConnection || !connection ||
-                connection == m_baseConnection.get(),
-                Q_FUNC_INFO, "Incorrect closeConnection call" );
-
     std::vector< ConnectionHandler > disconnectHandlers;
 	std::unique_ptr< BaseConnectionType > baseConnection;
     {
@@ -100,6 +96,11 @@ void AsyncClient::closeConnection(
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
     }
+
+    Q_ASSERT_X( !baseConnection || !connection ||
+                connection == baseConnection.get(),
+                Q_FUNC_INFO, "Incorrect closeConnection call" );
+
     if (baseConnection)
         baseConnection->pleaseStop();
 
