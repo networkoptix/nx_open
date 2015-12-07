@@ -363,12 +363,16 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
         return;
 
     if (m_server)
-        disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, &QnStorageConfigWidget::hasChangesChanged);
+        disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
 
     m_server = server;
 
     if (m_server)
-        connect(m_server, &QnMediaServerResource::backupScheduleChanged, this, &QnStorageConfigWidget::hasChangesChanged);
+        connect(m_server, &QnMediaServerResource::backupScheduleChanged, this, [this]() {
+            /* Current changes may be lost, it's OK. */
+            m_backupSchedule = m_server->getBackupSchedule();
+            emit hasChangesChanged();
+        });
 }
 
 void QnStorageConfigWidget::updateRebuildInfo() {
