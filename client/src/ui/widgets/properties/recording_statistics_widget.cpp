@@ -198,7 +198,6 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
     m_lastMouseButton(Qt::NoButton),
     m_allData(),
-    m_hiddenCameras(),
     m_availStorages()
 
 {
@@ -378,14 +377,23 @@ void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorage
 void QnRecordingStatisticsWidget::requestFinished()
 {
     QnRecordingStatsReply existsCameras;
-    m_hiddenCameras.clear();
+    QnRecordingStatsReply hiddenCameras;
     for (const auto& camera: m_allData) 
     {
-        if (qnResPool->hasSuchResource(camera.uniqueId))
+        const auto& cam = qnResPool->getResourceByUniqueId(camera.uniqueId);
+        if (cam && cam->getParentId() == m_server->getId())
             existsCameras << camera;
         else
-            m_hiddenCameras << camera;
+            hiddenCameras << camera; // hide all cameras which belong to another server
     }
+    if (!hiddenCameras.isEmpty()) {
+        QnCamRecordingStatsData extraRecord; // data occuped by foreign cameras and cameras missed at resource pool
+        extraRecord.uniqueId = QnSortedRecordingStatsModel::kForeignCameras;
+        for (const auto& hiddenRecord: hiddenCameras)
+            extraRecord.recordedBytes += hiddenRecord.recordedBytes;
+        existsCameras << extraRecord;
+    }
+
     m_model->setModelData(existsCameras);
     ui->gridEvents->setDisabled(false);
     at_forecastParamsChanged();
