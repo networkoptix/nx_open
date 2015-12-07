@@ -30,7 +30,7 @@ signals:
     void businessRuleChanged(const QnUuid &id);
     void businessRuleDeleted(const QnUuid &id);
 public slots:
-    void saveRule(int row);
+    void saveRule(const QModelIndex &index);
 private slots:
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
 

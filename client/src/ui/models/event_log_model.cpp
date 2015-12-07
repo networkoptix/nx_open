@@ -6,6 +6,7 @@
 
 #include <business/events/reasoned_business_event.h>
 #include <business/business_strings_helper.h>
+#include <business/business_types_comparator.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -35,40 +36,11 @@ public:
         , m_sortCol(DateTimeColumn)
         , m_sortOrder(Qt::DescendingOrder)
         , m_size(0)
+        , m_lexComparator(new QnBusinessTypesComparator())
     {
-        initLexOrdering();
+
     }
 
-    void initLexOrdering()
-    {
-        // event types to lex order
-        int maxType = 0;
-        QMap<QString, int> eventTypes;
-        for (auto eventType: QnBusiness::allEvents()) {
-            eventTypes.insert(QnBusinessStringsHelper::eventName(eventType), eventType);
-            if (maxType < eventType)
-                maxType = eventType;
-        }
-
-        m_eventTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined events to the end of the list
-        int count = 0;
-        for (int eventType: eventTypes)
-            m_eventTypeToLexOrder[eventType] = count++;
-
-        // action types to lex order
-        maxType = 0;
-        QMap<QString, int> actionTypes;
-        for (auto actionType: QnBusiness::allActions()) {
-            actionTypes.insert(QnBusinessStringsHelper::actionName(actionType), actionType);
-            if (maxType < actionType)
-                maxType = actionType;
-        }
-
-        m_actionTypeToLexOrder = QVector<int>(maxType + 1, maxType); // put undefined actions to the end of the list
-        count = 0;
-        for (int actionType: actionTypes)
-            m_actionTypeToLexOrder[actionType] = count++;
-    }
 
     void setSort(int column, Qt::SortOrder order)
     {
@@ -108,22 +80,6 @@ public:
         return m_size;
     }
 
-    /*
-     * Reorder event types to lexicographical order (for sorting)
-     */
-    int toLexEventType(QnBusiness::EventType eventType) const
-    {
-        return m_eventTypeToLexOrder[eventType];
-    }
-
-    /*
-     * Reorder actions types to lexicographical order (for sorting)
-     */
-    int toLexActionType(QnBusiness::ActionType actionType) const
-    {
-        return m_actionTypeToLexOrder[actionType];
-    }
-
     inline QnBusinessActionData& at(int row)
     {
         return m_sortOrder == Qt::AscendingOrder ? *m_records[row] : *m_records[m_size-1-row];
@@ -138,19 +94,15 @@ public:
 
     bool lessThanEventType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
-        int r1 = toLexEventType(d1->eventParams.eventType);
-        int r2 = toLexEventType(d2->eventParams.eventType);
-        if (r1 != r2)
-            return r1 < r2;
+        if (d1->eventParams.eventType != d2->eventParams.eventType)
+            return m_lexComparator->lexicographicalLessThan(d1->eventParams.eventType, d2->eventParams.eventType);
         return lessThanTimestamp(d1, d2);
     }
 
     bool lessThanActionType(const QnLightBusinessActionP &d1, const QnLightBusinessActionP &d2) const
     {
-        int r1 = toLexActionType(d1->actionType);
-        int r2 = toLexActionType(d2->actionType);
-        if (r1 != r2)
-            return r1 < r2;
+        if (d1->actionType != d2->actionType)
+            return m_lexComparator->lexicographicalLessThan(d1->actionType, d2->actionType);
         return lessThanTimestamp(d1, d2);
     }
 
@@ -210,8 +162,7 @@ private:
     QVector<QnBusinessActionDataListPtr> m_events;
     QVector<QnLightBusinessActionP> m_records;
     int m_size;
-    QVector<int> m_eventTypeToLexOrder;
-    QVector<int> m_actionTypeToLexOrder;
+    QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
 
 // -------------------------------------------------------------------------- //

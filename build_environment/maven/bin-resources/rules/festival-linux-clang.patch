@@ -1,0 +1,59 @@
+#> festival-.*-linux.*
+
+--- include/festival/EST_Ngrammar.h	2013-06-04 19:54:46.000000000 +0400
++++ include/festival/EST_Ngrammar.h	2014-12-18 13:00:27.088773411 +0300
+@@ -538,18 +538,18 @@
+ 						     double floor);
+     friend EST_write_status save_ngram_htk_ascii(const EST_String filename, 
+ 						 EST_Ngrammar &n,
+-						 double floor=0.0);
++                         double floor);
+ 
+     //friend EST_write_status save_ngram_htk_binary(const EST_String filename, 
+     //					  EST_Ngrammar &n);
+     friend EST_write_status save_ngram_cstr_ascii(const EST_String filename, 
+ 						  EST_Ngrammar &n,
+-						  const bool trace=false,
+-						  double floor=0.0);
++                          const bool trace,
++                          double floor);
+     friend EST_write_status save_ngram_cstr_bin(const EST_String filename, 
+ 						EST_Ngrammar &n, 
+-						const bool trace=false,
+-						double floor=0.0);
++                        const bool trace,
++                        double floor);
+     friend EST_write_status save_ngram_arpa(const EST_String filename, 
+ 					    EST_Ngrammar &n);
+     friend EST_write_status save_ngram_arpa_sub(ostream *ost, 
+@@ -561,11 +561,11 @@
+     // Auxiliary functions
+     
+     // smoothing
+-friend void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n,int this_order=0);
+-friend void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, const int this_order=0);
+-friend bool Good_Turing_smooth(EST_Ngrammar &n, int maxcount, int mincount=0);
++friend void frequency_of_frequencies(EST_DVector &ff, EST_Ngrammar &n,int this_order);
++friend void map_frequencies(EST_Ngrammar &n, const EST_DVector &map, const int this_order);
++friend bool Good_Turing_smooth(EST_Ngrammar &n, int maxcount, int mincount);
+ friend void Good_Turing_discount(EST_Ngrammar &ngrammar, const int maxcount,
+-				 const double default_discount=0.5);
++                 const double default_discount);
+ 
+ friend void fs_build_backoff_ngrams(EST_Ngrammar *backoff_ngrams,
+ 				    EST_Ngrammar &ngram);
+--- include/festival/EST_String.h	2013-06-04 19:54:46.000000000 +0400
++++ include/festival/EST_String.h	2014-12-18 12:59:47.502072068 +0300
+@@ -574,10 +574,10 @@
+       */
+     //@{
+     friend int fcompare(const EST_String &a, const EST_String &b, 
+-			const unsigned char *table=NULL);
++            const unsigned char *table);
+ 
+     friend int fcompare(const EST_String &a, const char *b, 
+-				const unsigned char *table=NULL);
++                const unsigned char *table);
+     ///
+     friend inline int fcompare(const EST_String &a, const EST_String &b, 
+ 			       const EST_String &table) 

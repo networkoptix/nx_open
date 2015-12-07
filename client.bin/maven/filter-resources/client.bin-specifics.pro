@@ -36,3 +36,8 @@ mac {
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
+
+IS_DYNAMIC_CUSTOMIZATION_ENABLED=${dynamic.customization}
+contains( IS_DYNAMIC_CUSTOMIZATION_ENABLED, true ) {
+  DEFINES += ENABLE_DYNAMIC_CUSTOMIZATION
+}
