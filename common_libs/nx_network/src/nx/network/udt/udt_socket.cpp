@@ -516,6 +516,8 @@ UdtSocket::~UdtSocket()
 {
     delete m_impl;
     m_impl = nullptr;
+
+    assert(!nx::SocketGlobals::aioService().isSocketBeingWatched(this));
 }
 
 UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)

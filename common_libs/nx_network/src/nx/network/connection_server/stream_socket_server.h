@@ -54,7 +54,15 @@ public:
         ConnectionType* connection ) override
     {
         std::unique_lock<std::mutex> lk( m_mutex );
-        m_connections.erase( connection );
+        auto connectionIter = m_connections.find(connection);
+        Q_ASSERT(connectionIter != m_connections.end());
+        if (connectionIter == m_connections.end())
+            return;
+        auto connectionCtx = std::move(*connectionIter);
+        m_connections.erase(connectionIter);
+        lk.unlock();
+        //TODO #ak introduce non-blocking implementation when async cancellation is available
+        connectionCtx.first->pleaseStop();
     }
 
 protected:
