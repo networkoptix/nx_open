@@ -117,6 +117,7 @@ TEST_F(HttpClientServerTest, FileDownload)
     const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
     nx_http::HttpClient client;
+    client.setMessageBodyReadTimeoutMs(3000);
 
     for (int i=0; i<1024; ++i)
     {
@@ -137,6 +138,7 @@ TEST_F(HttpClientServerTest, FileDownload)
                 break;
 #endif
 
+        ASSERT_EQ(fileBody.size(), msgBody.size());
         ASSERT_EQ(fileBody, msgBody);
     }
 }
