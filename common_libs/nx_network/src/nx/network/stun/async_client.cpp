@@ -27,7 +27,8 @@ AsyncClient::~AsyncClient()
 		baseConnection = std::move( m_baseConnection );
         m_state = State::terminated;
     }
-    baseConnection->pleaseStop();
+    if (baseConnection)
+        baseConnection->pleaseStop();
 
     if( connectingSocket )
         connectingSocket->terminateAsyncIO( true );
@@ -99,7 +100,8 @@ void AsyncClient::closeConnection(
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
     }
-    baseConnection->pleaseStop();
+    if (baseConnection)
+        baseConnection->pleaseStop();
 
     for( const auto& handler : disconnectHandlers )
         handler( errorCode );
