@@ -24,6 +24,7 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} cloud_db_client</product.title>
+        <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent sql</qt.libs>
         <global.libs>-lcommon -ludt</global.libs>

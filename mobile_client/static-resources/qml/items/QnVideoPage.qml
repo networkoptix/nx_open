@@ -28,6 +28,7 @@ QnPage {
         readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
+        property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
 
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
@@ -60,7 +61,7 @@ QnPage {
         }
 
         function updateOfflineDisplay() {
-            if (showOfflineStatus) {
+            if (cameraWarningVisible) {
                 if (serverOffline) {
                     exitFullscreen()
                     navigationLoader.opacity = 0.0
@@ -212,20 +213,7 @@ QnPage {
     Loader {
         id: dummyLoader
 
-        visible: {
-            if (d.cameraUnauthorized)
-                return true
-
-            var offline = d.serverOffline || d.cameraOffline
-
-            if (!offline && d.failed)
-                return true
-
-            if (offline && d.showOfflineStatus)
-                return true
-
-            return false
-        }
+        visible: d.cameraWarningVisible
 
         sourceComponent: visible ? dummyComponent : undefined
 

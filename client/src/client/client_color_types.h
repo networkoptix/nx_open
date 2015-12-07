@@ -178,10 +178,16 @@ struct QnBookmarkColors {
 
     QColor tagBgNormal;
     QColor tagBgHovered;
+
+    QColor tagTextNormal;
+    QColor tagTextHovered;
+
+    QColor moreItemsText;
 };
 
-#define QnBookmarkColors_Fields (tooltipBackground)(background)(text) \
-    (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom)(tagBgNormal)(tagBgHovered)
+#define QnBookmarkColors_Fields (tooltipBackground)(background)(text)   \
+    (buttonsSeparator)(bookmarksSeparatorTop)(bookmarksSeparatorBottom) \
+    (tagBgNormal)(tagBgHovered)(tagTextNormal)(tagTextHovered)(moreItemsText)
 
 struct QnCompositeTextOverlayColors
 {
@@ -226,7 +232,7 @@ struct QnAuditLogColors {
     QnAuditLogColors();
 
     QColor httpLink;
-    
+
     QColor loginAction;
     QColor unsucessLoginAction;
     QColor updUsers;
@@ -286,16 +292,6 @@ struct QnFailoverPriorityColors {
 };
 #define QnFailoverPriorityColors_Fields (never)(low)(medium)(high)
 
-struct QnBackupCamerasColors {
-    QnBackupCamerasColors();
-
-    QColor disabled;
-    QColor low;
-    QColor high;
-    QColor both;
-};
-#define QnBackupCamerasColors_Fields (disabled)(low)(high)(both)
-
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -305,7 +301,6 @@ struct QnBackupCamerasColors {
     (QnServerUpdatesColors)(QnIoModuleColors) \
     (QnBackupScheduleColors) \
     (QnFailoverPriorityColors) \
-    (QnBackupCamerasColors) \
     (QnBookmarkColors) \
     (QnCompositeTextOverlayColors) \
 

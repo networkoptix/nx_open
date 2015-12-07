@@ -35,7 +35,21 @@ protected:
     virtual void afterRemovingResource(const QnUuid& id) override;
     void execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) override;
     bool isLocalAddress(const QString& addr) const;
+
+    /**
+     * Check if the resource can be safely removed by transaction from other server.
+     * Common scenario is to allow to remove all resources.
+     * Known exceptions are:
+     * * Forbid to remove the current server. Really, if it is running and located in the system
+     *   it should be found again instantly.
+     * * Forbid to remove local server storages. Our server should make this decision himself.
+     */
     virtual bool canRemoveResource(const QnUuid& resourceId) override;
+
+    /**
+     *  If by any way our resource was removed (e.g. somebody removed our server while it was offline)
+     *  we need to restore status-quo. This method sends corresponding transactions.
+     */
     virtual void removeResourceIgnored(const QnUuid& resourceId) override;
 
 private slots:

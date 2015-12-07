@@ -87,6 +87,7 @@
 #include "workbench_context.h"
 #include "workbench_navigator.h"
 #include "workbench_access_controller.h"
+#include <common/common_module.h>
 
 #ifdef _DEBUG
 //#define QN_DEBUG_WIDGET
@@ -140,7 +141,7 @@ namespace {
         else
             button->setCheckable(true);
         button->setIcon(qnSkin->icon("panel/slide_right.png", "panel/slide_left.png"));
-        
+
         button->setProperty(Qn::NoHandScrollOver, true);
         button->setCached(true);
 
@@ -252,7 +253,7 @@ static void uiMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 {
     if (previousMsgHandler) {
         previousMsgHandler(type, ctx, msg);
-    } 
+    }
     if (!debugLabel)
         return;
     debugLabel->appendTextQueued(msg);
@@ -314,7 +315,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_treeShowingProcessor(NULL),
     m_treeOpacityProcessor(NULL),
     m_treeOpacityAnimatorGroup(NULL),
-    m_treeXAnimator(NULL),    
+    m_treeXAnimator(NULL),
 
     m_titleItem(NULL),
     m_titleShowButton(NULL),
@@ -350,7 +351,7 @@ QnWorkbenchUi::QnWorkbenchUi(QObject *parent):
     m_dayTimeItem(NULL),
     m_dayTimeWidget(NULL),
     m_dayTimeSizeAnimator(NULL),
-    
+
     m_calendarPinOffset(),
     m_dayTimeOffset()
 {
@@ -625,7 +626,7 @@ void QnWorkbenchUi::updateActivityInstrumentState() {
 }
 
 bool QnWorkbenchUi::isHovered() const {
-    return  
+    return
            (m_sliderOpacityProcessor        && m_sliderOpacityProcessor->isHovered())
         || (m_treeOpacityProcessor          && m_treeOpacityProcessor->isHovered())
         || (m_titleOpacityProcessor         && m_titleOpacityProcessor->isHovered())
@@ -1176,7 +1177,7 @@ void QnWorkbenchUi::createTreeWidget() {
     m_treeResizerWidget->setProperty(Qn::NoHandScrollOver, true);
     m_treeResizerWidget->stackBefore(m_treeShowButton);
     m_treeItem->stackBefore(m_treeResizerWidget);
-    
+
     m_treeOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
     m_treeOpacityProcessor->addTargetItem(m_treeItem);
     m_treeOpacityProcessor->addTargetItem(m_treeShowButton);
@@ -1875,7 +1876,7 @@ void QnWorkbenchUi::setCalendarOpacity(qreal opacity, bool animate) {
     }
 }
 
-void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate) 
+void QnWorkbenchUi::setCalendarOpened(bool opened, bool animate)
 {
     if (!opened && isCalendarPinned() && action(Qn::ToggleCalendarAction)->isChecked())
     {
@@ -1989,7 +1990,7 @@ void QnWorkbenchUi::updateDayTimeWidgetGeometry() {
     m_dayTimeItem->setPos(geometry.topLeft());
 }
 
-void QnWorkbenchUi::at_calendarItem_paintGeometryChanged() 
+void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
 {
     const QRectF paintGeometry = m_calendarItem->paintGeometry();
     m_calendarPinButton->setPos(paintGeometry.topRight() + m_calendarPinOffset);
@@ -2005,7 +2006,7 @@ void QnWorkbenchUi::at_calendarItem_paintGeometryChanged()
     updateNotificationsGeometry();
 }
 
-void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged() 
+void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged()
 {
     const QRectF paintGeomerty = m_dayTimeItem->paintGeometry();
     m_dayTimeMinimizeButton->setPos(paintGeomerty.topRight() + m_dayTimeOffset);
@@ -2020,9 +2021,9 @@ void QnWorkbenchUi::at_dayTimeItem_paintGeometryChanged()
     updateNotificationsGeometry();
 }
 
-void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date) 
+void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date)
 {
-    const bool sameDate = (m_dayTimeWidget->date() == date); 
+    const bool sameDate = (m_dayTimeWidget->date() == date);
     m_dayTimeWidget->setDate(date);
 
     if(isCalendarOpened())
@@ -2033,7 +2034,7 @@ void QnWorkbenchUi::at_calendarWidget_dateClicked(const QDate &date)
 }
 
 void QnWorkbenchUi::createCalendarWidget() {
-    QnCalendarWidget *calendarWidget = new QnCalendarWidget();    
+    QnCalendarWidget *calendarWidget = new QnCalendarWidget();
     setHelpTopic(calendarWidget, Qn::MainWindow_Calendar_Help);
     navigator()->setCalendar(calendarWidget);
 
@@ -2344,7 +2345,7 @@ void QnWorkbenchUi::at_sliderResizerWidget_geometryChanged() {
     action(Qn::ToggleThumbnailsAction)->setChecked(isThumbnailsVisible());
 }
 
-void QnWorkbenchUi::createSliderWidget() 
+void QnWorkbenchUi::createSliderWidget()
 {
     m_sliderResizerWidget = new QnResizerWidget(Qt::Vertical, m_controlsWidget);
     m_sliderResizerWidget->setProperty(Qn::NoHandScrollOver, true);
@@ -2400,7 +2401,7 @@ void QnWorkbenchUi::createSliderWidget()
 
     m_sliderOpacityProcessor = new HoverFocusProcessor(m_controlsWidget);
 
-    enum {kSliderLeaveTimeout = 200 };
+    enum {kSliderLeaveTimeout = 100 };
     m_sliderOpacityProcessor->setHoverLeaveDelay(kSliderLeaveTimeout);
     m_sliderItem->timeSlider()->bookmarksViewer()->setHoverProcessor(m_sliderOpacityProcessor);
     m_sliderOpacityProcessor->addTargetItem(m_sliderItem);
@@ -2468,18 +2469,63 @@ void QnWorkbenchUi::createSliderWidget()
         return bookmarkParams;
     };
 
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::editBookmarkClicked, this
+    /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
+    const auto bookmarksViewer = m_sliderItem->timeSlider()->bookmarksViewer();
+    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
         menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
-    
-    connect(m_sliderItem->timeSlider()->bookmarksViewer(), &QnBookmarksViewer::removeBookmarkClicked, this
+
+
+    const auto updateBookmarkButtonsAvailability =
+        [this, bookmarksViewer]()
+    {
+        const bool readonly =  qnCommon->isReadOnly()
+            || !accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
+
+        bookmarksViewer->setReadOnly(readonly);
+    };
+
+    connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged
+        , this, [updateBookmarkButtonsAvailability]()
+    {
+        updateBookmarkButtonsAvailability();
+    });
+
+    connect(qnCommon, &QnCommonModule::readOnlyChanged, this
+        , [updateBookmarkButtonsAvailability](bool /*readonly*/)
+    {
+        updateBookmarkButtonsAvailability();
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this
         , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
     {
         menu()->triggerIfPossible(Qn::RemoveCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
-    
+
+    connect(bookmarksViewer, &QnBookmarksViewer::playBookmark, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        enum { kMicrosecondsFactor = 1000};
+        navigator()->setPosition(bookmark.startTimeMs * kMicrosecondsFactor);
+        navigator()->setPlaying(true);
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
+        , [this, bookmarksViewer](const QString &tag)
+    {
+        const auto windowStart = m_sliderItem->timeSlider()->windowStart();
+        const auto window = QnTimePeriod(windowStart
+            , m_sliderItem->timeSlider()->windowEnd() - windowStart);
+
+        QnActionParameters params;
+        params.setArgument(Qn::BookmarkTagRole, tag);
+        params.setArgument(Qn::ItemSliderWindowRole, window);
+        menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
+    });
+
 }
 
 #pragma endregion Slider methods

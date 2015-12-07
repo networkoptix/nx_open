@@ -24,6 +24,7 @@
     <properties>
         <release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</release.version>
         <product.title>${company.name} libcloud_db</product.title>
+        <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>
         <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email</global.libs>

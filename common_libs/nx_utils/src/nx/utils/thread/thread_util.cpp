@@ -13,6 +13,8 @@
 #   include <sys/syscall.h>
 #   include <unistd.h>
 static pid_t gettid(void) { return syscall(__NR_gettid); }
+#elif __APPLE__
+#include <pthread.h>
 #endif
 
 
@@ -25,7 +27,9 @@ uintptr_t currentThreadSystemId()
     return gettid();
 #elif _WIN32
     return GetCurrentThreadId();
-#else
-    #error "Implement for mac"
+#elif __APPLE__
+    uint64_t tid = 0;
+    pthread_threadid_np(NULL, &tid);
+    return tid;
 #endif
 }

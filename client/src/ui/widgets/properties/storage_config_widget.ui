@@ -10,13 +10,13 @@
     <height>561</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,1">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1,0,0">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
       <string>Main Storages</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -87,7 +87,7 @@
      <property name="title">
       <string>Backup Storages</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
@@ -286,6 +286,13 @@
        </layout>
       </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="backupOptionLabel">
+     <property name="text">
+      <string>Storage backup is available if there are 2 or more storages in the system.</string>
+     </property>
     </widget>
    </item>
    <item>

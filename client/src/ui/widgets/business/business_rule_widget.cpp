@@ -155,7 +155,21 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
                 || QnBusiness::requiresUserResource(m_model->actionType());
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
-        ui->actionAtLabel->setText(m_model->actionType() == QnBusiness::SendMailAction ? tr("to") : tr("at"));
+        QString actionAtLabelText;
+        switch (m_model->actionType()) {
+        case QnBusiness::SendMailAction:
+            //: "to" is from the sentence "Send e-mail _to_:"
+            actionAtLabelText = tr("to");
+            break;
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(tr("Devices"), tr("Cameras"));
+            break;
+        default:
+            //: "at" is from the sentence "Display the text _at_ these cameras"
+            actionAtLabelText = tr("at");
+            break;
+        }
+        ui->actionAtLabel->setText(actionAtLabelText);
 
         bool actionIsInstant = !QnBusiness::hasToggleState(m_model->actionType());
         ui->aggregationWidget->setVisible(actionIsInstant);
@@ -168,7 +182,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
-    if (fields & QnBusiness::ActionResourcesField) {
+    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField)) {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }

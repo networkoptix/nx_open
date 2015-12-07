@@ -360,6 +360,8 @@ private:
 
     void processBoomarksHover(QGraphicsSceneHoverEvent *event);
 
+    void updateBookmarksViewerTimestamp();
+
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
 

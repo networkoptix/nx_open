@@ -68,10 +68,11 @@ uint64_t CTimer::s_ullCPUFrequency = CTimer::readCPUFrequency();
    pthread_cond_t CTimer::m_EventCond = CreateEvent(NULL, false, false, NULL);
 #endif
 
-CTimer::CTimer():
-m_ullSchedTime(),
-m_TickCond(),
-m_TickLock()
+CTimer::CTimer()
+:
+    m_ullSchedTime(),
+    m_TickCond(),
+    m_TickLock()
 {
    #ifndef _WIN32
       pthread_mutex_init(&m_TickLock, NULL);
@@ -79,6 +80,9 @@ m_TickLock()
    #else
       m_TickLock = CreateMutex(NULL, false, NULL);
       m_TickCond = CreateEvent(NULL, false, false, NULL);
+      //memset(&m_winVersion, 0, sizeof(m_winVersion));
+      //m_winVersion.dwOSVersionInfoSize = sizeof(m_winVersion);
+      //GetVersionEx(&m_winVersion);
    #endif
 }
 
@@ -256,18 +260,22 @@ uint64_t CTimer::getTime()
    #else
       LARGE_INTEGER ccf;
       HANDLE hCurThread = ::GetCurrentThread(); 
-      DWORD_PTR dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
+      //DWORD_PTR dwOldMask = 0;
+      //if (m_winVersion.dwMajorVersion < 6)
+      //  dwOldMask = ::SetThreadAffinityMask(hCurThread, 1);
       if (QueryPerformanceFrequency(&ccf))
       {
          LARGE_INTEGER cc;
          if (QueryPerformanceCounter(&cc))
          {
-            SetThreadAffinityMask(hCurThread, dwOldMask); 
+             //if (m_winVersion.dwMajorVersion < 6)
+             //    SetThreadAffinityMask(hCurThread, dwOldMask);
             return (cc.QuadPart * 1000000ULL / ccf.QuadPart);
          }
       }
 
-      SetThreadAffinityMask(hCurThread, dwOldMask); 
+      //if (m_winVersion.dwMajorVersion < 6)
+      //    SetThreadAffinityMask(hCurThread, dwOldMask);
       return GetTickCount() * 1000ULL;
    #endif
 }

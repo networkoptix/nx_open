@@ -1170,6 +1170,15 @@ TCPServerSocket::TCPServerSocket()
     setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
+TCPServerSocket::~TCPServerSocket()
+{
+    //checking that socket is not registered in aio
+    Q_ASSERT_X(
+        !nx::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(&this->m_implDelegate)),
+        Q_FUNC_INFO,
+        "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
+}
+
 int TCPServerSocket::accept(int sockDesc)
 {
     return acceptWithTimeout( sockDesc );

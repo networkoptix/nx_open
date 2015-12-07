@@ -11,6 +11,7 @@
 #include <memory>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/thread_util.h>
 #include <utils/common/long_runnable.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
@@ -538,7 +539,7 @@ public:
             const std::shared_ptr<AIOEventHandlingData<SocketType>>& _data,
             SocketType* _socket,
             aio::EventType _eventType)
-            :
+        :
             data(_data),
             socket(_socket),
             eventType(_eventType)
@@ -612,15 +613,11 @@ public:
                         --newReadMonitorTaskCount;
                     else if (task.eventType == aio::etWrite)
                         --newWriteMonitorTaskCount;
-                    if (!addSockToPollset(
-                            task.socket,
-                            task.eventType,
-                            task.timeout,
-                            task.eventHandler))
-                    {
-                        //TODO #ak call task.eventHandler(etError) delayed
-                        assert(false);
-                    }
+                    addSockToPollset(
+                        task.socket,
+                        task.eventType,
+                        task.timeout,
+                        task.eventHandler);
                     break;
                 }
 
@@ -677,7 +674,7 @@ public:
         }
     }
 
-    bool addSockToPollset(
+    void addSockToPollset(
         SocketType* socket,
         aio::EventType eventType,
         int timeout,
@@ -686,12 +683,14 @@ public:
         std::unique_ptr<AIOEventHandlingDataHolder<SocketType>> handlingData(new AIOEventHandlingDataHolder<SocketType>(eventHandler));
         bool failedToAddToPollset = false;
         if (eventType != aio::etTimedOut)
+        {
             if (!pollSet.add(socket, eventType, handlingData.get()))
             {
                 const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
                 NX_LOG(QString::fromLatin1("Failed to add socket to pollset. %1").arg(SystemError::toString(errorCode)), cl_logWARNING);
                 failedToAddToPollset = true;
             }
+        }
         socket->impl()->eventTypeToUserData[eventType] = handlingData.get();
 
         if (failedToAddToPollset)
@@ -714,8 +713,6 @@ public:
                 eventType);
         }
         handlingData.release();
-
-        return true;
     }
 
     void removeSocketFromPollSet(SocketType* sock, aio::EventType eventType)

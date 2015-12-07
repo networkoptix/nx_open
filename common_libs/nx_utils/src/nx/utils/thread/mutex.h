@@ -56,12 +56,18 @@ public:
     void relock();
     void unlock();
 
+    //!introduced for debugging purposes
+    bool isLocked() const;
+
 private:
     QnMutex* const m_mtx;
     const char* m_sourceFile;
     int m_sourceLine;
     bool m_locked;
     int m_relockCount;
+
+    QnMutexLockerBase(const QnMutexLockerBase&);
+    QnMutexLockerBase& operator=(const QnMutexLockerBase&);
 };
 
 #define CONCATENATE_DIRECT(s1, s2) s1 ## s2

@@ -1721,9 +1721,21 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
 
-    foreach(QnWorkbenchItem *item, layout->items())
+    // Sort items to guarantee the same item placement for each time the same new layout is opened.
+    QList<QnWorkbenchItem *> sortedItems = layout->items().toList();
+    std::sort(sortedItems.begin(), sortedItems.end(), [](const QnWorkbenchItem *item1, const QnWorkbenchItem *item2) {
+        const QnLayoutItemData &data1 = item1->data();
+        const QnLayoutItemData &data2 = item2->data();
+
+        if (data1.resource.id != data2.resource.id)
+            return data1.resource.id < data2.resource.id;
+
+        return data1.resource.path < data2.resource.path;
+    });
+
+    for (QnWorkbenchItem *item: sortedItems)
         addItemInternal(item, false, !thumbnailed);
-    foreach(QnWorkbenchItem *item, layout->items())
+    for (QnWorkbenchItem *item: sortedItems)
         addZoomLinkInternal(item, item->zoomTargetItem());
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();

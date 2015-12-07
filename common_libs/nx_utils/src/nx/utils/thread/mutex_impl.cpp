@@ -37,7 +37,7 @@ void QnMutexImpl::afterMutexLocked(
     threadHoldingMutex = ::currentThreadSystemId();
     ++recursiveLockCount;
 
-#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     MutexLockKey lockKey(
         sourceFile,
         sourceLine,
@@ -45,8 +45,10 @@ void QnMutexImpl::afterMutexLocked(
         lockID,
         threadHoldingMutex );
     //recursive mutex can be locked multiple times, that's why we need stack
-    MutexLockAnalyzer::instance()->afterMutexLocked( lockKey );
     currentLockStack.push( std::move(lockKey) );
+#ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
+    MutexLockAnalyzer::instance()->afterMutexLocked(lockKey);
+#endif
 #else
     Q_UNUSED( sourceFile );
     Q_UNUSED( sourceLine );
@@ -58,6 +60,8 @@ void QnMutexImpl::beforeMutexUnlocked()
 {
 #ifdef ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK
     MutexLockAnalyzer::instance()->beforeMutexUnlocked( currentLockStack.top() );
+#endif
+#if defined(_DEBUG) || defined(ANALYZE_MUTEX_LOCKS_FOR_DEADLOCK)
     currentLockStack.pop();
 #endif
 

@@ -106,30 +106,41 @@ protected:
 TEST( Socket, AsyncOperationCancellation )
 {
     static const std::chrono::milliseconds TEST_DURATION( 200 );
-    static const int TEST_RUNS = 17;
+    static const int TEST_RUNS = 5;
+    static const int THREADS = 3;
 
-    for( int i = 0; i < TEST_RUNS; ++i )
+    std::vector<std::thread> threads(THREADS);
+    for (int i = 0; i < threads.size(); ++i)
     {
-        static const int MAX_SIMULTANEOUS_CONNECTIONS = 50;
-        static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1*1024;
+        threads[i] = std::thread(
+            [](){
+                for (int i = 0; i < TEST_RUNS; ++i)
+                {
+                    static const int MAX_SIMULTANEOUS_CONNECTIONS = 25;
+                    static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
 
-        RandomDataTcpServer server( BYTES_TO_SEND_THROUGH_CONNECTION );
-        ASSERT_TRUE( server.start() );
+                    RandomDataTcpServer server(BYTES_TO_SEND_THROUGH_CONNECTION);
+                    ASSERT_TRUE(server.start());
 
-        ConnectionsGenerator connectionsGenerator(
-            SocketAddress( QString::fromLatin1("localhost"), server.addressBeingListened().port ),
-            MAX_SIMULTANEOUS_CONNECTIONS,
-            BYTES_TO_SEND_THROUGH_CONNECTION );
-        connectionsGenerator.start();
+                    ConnectionsGenerator connectionsGenerator(
+                        SocketAddress(QString::fromLatin1("localhost"), server.addressBeingListened().port),
+                        MAX_SIMULTANEOUS_CONNECTIONS,
+                        BYTES_TO_SEND_THROUGH_CONNECTION);
+                    connectionsGenerator.start();
 
-        std::this_thread::sleep_for(TEST_DURATION);
+                    std::this_thread::sleep_for(TEST_DURATION);
 
-        connectionsGenerator.pleaseStop();
-        connectionsGenerator.join();
+                    connectionsGenerator.pleaseStop();
+                    connectionsGenerator.join();
 
-        server.pleaseStop();
-        server.join();
+                    server.pleaseStop();
+                    server.join();
+                }
+            });
     }
+
+    for (int i = 0; i < threads.size(); ++i)
+        threads[i].join();
 
     //waiting for some calls to deleted objects
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );

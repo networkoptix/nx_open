@@ -13,11 +13,11 @@
 
 int main( int argc, char **argv )
 {
-#if 1
+#if 0
     cl_log.create(
-        "c:\\tmp\\common_ut.log",
+        "c:/tmp/common_ut.log",
         50*1024*1024,
-        10,
+        1,
         cl_logDEBUG2);
 #endif
 	

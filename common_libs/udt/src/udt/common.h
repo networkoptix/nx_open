@@ -170,6 +170,10 @@ private:
 private:
    uint64_t m_ullSchedTime;             // next schedulled time
 
+//#ifdef _WIN32
+//   OSVERSIONINFO m_winVersion;
+//#endif
+
    pthread_cond_t m_TickCond;
    pthread_mutex_t m_TickLock;
 

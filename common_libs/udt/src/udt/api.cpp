@@ -830,6 +830,8 @@ int CUDTUnited::close(const UDTSOCKET u)
          SetEvent(s->m_AcceptCond);
       #endif
 
+        s->m_pUDT->close();
+
       return 0;
    }
 

@@ -31,6 +31,7 @@ QtObject {
     property color listText
     property color listSubText
     property color listSeparator
+    property color listDisabledText
 
     property color sessionItemBackground
     property color sessionItemBackgroundActive
@@ -39,7 +40,6 @@ QtObject {
     property color sessionItemIncompatibleMark
 
     property color sideNavigationBackground
-    property color sideNavigationCopyright
     property color sideNavigationSplitter
     property color sideNavigationSection
 
@@ -47,10 +47,12 @@ QtObject {
     property color popupMenuText
 
     property color dialogBackground
+    property color dialogClickBackground
     property color dialogText
     property color dialogTitleText
     property color dialogSelectedBackground
     property color dialogSelectedText
+    property color dialogButtonSplitter
 
     property color cameraBackground
     property color cameraText
@@ -112,22 +114,24 @@ QtObject {
         listText                = colorTheme.color("list.text")
         listSubText             = colorTheme.color("list.subText")
         listSeparator           = colorTheme.color("list.separator")
+        listDisabledText        = colorTheme.color("list.disabledText")
         sessionItemBackground   = colorTheme.color("sessionItem.background")
         sessionItemBackgroundActive = colorTheme.color("sessionItem.backgroundActive")
         sessionItemBackgroundIncompatible = colorTheme.color("sessionItem.backgroundIncompatible")
         sessionItemActiveMark   = colorTheme.color("sessionItem.activeMark")
         sessionItemIncompatibleMark = colorTheme.color("sessionItem.incompatibleMark")
         sideNavigationBackground = colorTheme.color("sideNavigation.background")
-        sideNavigationCopyright = colorTheme.color("sideNavigation.copyright")
         sideNavigationSplitter  = colorTheme.color("sideNavigation.splitter")
         sideNavigationSection   = colorTheme.color("sideNavigation.section")
         popupMenuBackground     = colorTheme.color("popupMenu.background")
         popupMenuText           = colorTheme.color("popupMenu.text")
         dialogBackground        = colorTheme.color("dialog.background")
+        dialogClickBackground   = colorTheme.color("dialog.clickBackground")
         dialogText              = colorTheme.color("dialog.text")
         dialogTitleText         = colorTheme.color("dialog.titleText")
         dialogSelectedBackground = colorTheme.color("dialog.selectedBackground")
         dialogSelectedText      = colorTheme.color("dialog.selectedText")
+        dialogButtonSplitter    = colorTheme.color("dialog.buttonSplitter")
         cameraBackground        = colorTheme.color("cameras.background")
         cameraText              = colorTheme.color("cameras.text")
         cameraOfflineText       = colorTheme.color("cameras.offlineText")

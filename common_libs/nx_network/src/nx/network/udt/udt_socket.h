@@ -24,23 +24,13 @@ class UdtStreamServerSocket;
 // but some sacrifice on inline function.
 namespace detail {
 class UdtSocketImpl;
-// This is a work around for incomplete type within the unique_ptr. If this type is not
-// in the namespace scope, such work around will not be needed since a non trivial ctor/dtor
-// will be perfectly enough. However once in namespace scope, a wrapper pointer is needed
-// to make C++ compiler happy. 
-
-struct UdtSocketImplPtr : public std::unique_ptr<UdtSocketImpl> {
-    NX_NETWORK_API UdtSocketImplPtr( UdtSocketImpl* impl );
-    NX_NETWORK_API ~UdtSocketImplPtr();
-};
-
 }// namespace detail
 
 // Adding a level indirection to make C++ type system happy.
 class NX_NETWORK_API UdtSocket {
 public:
     UdtSocket();
-    ~UdtSocket();
+    virtual ~UdtSocket();
 
     bool getLastError(SystemError::ErrorCode* errorCode);
     bool getRecvTimeout(unsigned int* millis);
@@ -51,14 +41,24 @@ public:
 
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
-    detail::UdtSocketImplPtr impl_;
+    detail::UdtSocketImpl* m_impl;
     friend class UdtPollSet;
+
+    UdtSocket(const UdtSocket&);
+    UdtSocket& operator=(const UdtSocket&);
 };
 
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
 class NX_NETWORK_API UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
 public:
+    UdtStreamSocket(bool natTraversal);
+    UdtStreamSocket(detail::UdtSocketImpl* impl);
+    // We must declare this trivial constructor even it is trivial.
+    // Since this will make std::unique_ptr call correct destructor for our
+    // partial, forward declaration of class UdtSocketImp;
+    virtual ~UdtStreamSocket();
+
     // AbstractSocket --------------- interface
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;
@@ -120,13 +120,6 @@ public:
         return false; // not implemented yet
     }
 
-    UdtStreamSocket( bool natTraversal );
-    UdtStreamSocket( detail::UdtSocketImpl* impl );
-    // We must declare this trivial constructor even it is trivial.
-    // Since this will make std::unique_ptr call correct destructor for our
-    // partial, forward declaration of class UdtSocketImp;
-    virtual ~UdtStreamSocket();
-
 protected:
     //!Implementation of AbstractSocket::postImpl
     virtual void postImpl( std::function<void()>&& handler ) override;
@@ -145,8 +138,15 @@ private:
     Q_DISABLE_COPY(UdtStreamSocket)
 };
 
-class NX_NETWORK_API UdtStreamServerSocket : public UdtSocket, public AbstractStreamServerSocket  {
+class NX_NETWORK_API UdtStreamServerSocket
+:
+    public UdtSocket,
+    public AbstractStreamServerSocket
+{
 public:
+    UdtStreamServerSocket();
+    virtual ~UdtStreamServerSocket();
+
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
@@ -171,9 +171,6 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
-
-    UdtStreamServerSocket();
-    virtual ~UdtStreamServerSocket();
 
 protected:
     //!Implementation of AbstractSocket::postImpl

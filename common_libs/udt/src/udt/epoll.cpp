@@ -41,7 +41,7 @@ written by
 #ifdef __linux__
    #include <sys/epoll.h>
    #include <unistd.h>
-#elif __apple__
+#elif __APPLE__
    #include <sys/event.h>
 #endif
 #include <algorithm>
@@ -56,8 +56,12 @@ written by
 
 using namespace std;
 
+
+static const int MILLIS_IN_SEC = 1000;
+static const int NSEC_IN_MS = 1000;
+
 CEPoll::CEPoll():
-m_iIDSeed(0)
+    m_iIDSeed(0)
 {
    CGuard::createMutex(m_EPollLock);
 }
@@ -77,7 +81,7 @@ int CEPoll::create()
    localid = epoll_create(1024);    //Since Linux 2.6.8, the size argument is ignored, but must be greater than zero
    if (localid < 0)
       throw CUDTException(-1, 0, errno);
-   #elif __apple__
+   #elif __APPLE__
       localid = kqueue();
       if (localid < 0)
          throw CUDTException(-1, 0, errno);
@@ -142,20 +146,20 @@ int CEPoll::add_ssock(const int eid, const SYSSOCKET& s, const int* events)
    ev.data.fd = s;
    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_ADD, s, &ev) < 0)
       throw CUDTException();
-#elif __apple__
+#elif __APPLE__
    struct kevent ev[2];
    size_t evCount=0;
    if (NULL == events)
    {
-       EV_SET(ev[evCount++], s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
-       EV_SET(ev[evCount++], s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+       EV_SET(&(ev[evCount++]), s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+       EV_SET(&(ev[evCount++]), s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
    }
    else
    {
       if (*events & UDT_EPOLL_IN)
-         EV_SET(ev[evCount++], s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
+         EV_SET(&(ev[evCount++]), s, EVFILT_READ, EV_ADD | EV_ENABLE, 0, 0, NULL);
       if (*events & UDT_EPOLL_OUT)
-         EV_SET(ev[evCount++], s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
+         EV_SET(&(ev[evCount++]), s, EVFILT_WRITE, EV_ADD | EV_ENABLE, 0, 0, NULL);
    }
 
    //adding new fd to set
@@ -196,10 +200,10 @@ int CEPoll::remove_ssock(const int eid, const SYSSOCKET& s)
    epoll_event ev;  // ev is ignored, for compatibility with old Linux kernel only.
    if (::epoll_ctl(p->second.m_iLocalID, EPOLL_CTL_DEL, s, &ev) < 0)
       throw CUDTException();
-#elif __apple__
+#elif __APPLE__
    struct kevent ev[2];
-   EV_SET(ev[0], s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
-   EV_SET(ev[1], s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
+   EV_SET(&(ev[0]), s, EVFILT_READ, EV_DELETE, 0, 0, NULL);
+   EV_SET(&(ev[1]), s, EVFILT_WRITE, EV_DELETE, 0, 0, NULL);
    kevent(p->second.m_iLocalID, ev, 2, NULL, 0, NULL);  //ignoring return code, since event is removed in any case
 #elif _WIN32
 #endif
@@ -278,7 +282,7 @@ int CEPoll::wait(const int eid, set<UDTSOCKET>* readfds, set<UDTSOCKET>* writefd
                ++ total;
             }
          }
-#elif __apple__
+#elif __APPLE__
         static const size_t MAX_EVENTS_TO_READ=128;
         struct kevent ev[MAX_EVENTS_TO_READ];
         
@@ -375,7 +379,7 @@ int CEPoll::release(const int eid)
    if (i == m_mPolls.end())
       throw CUDTException(5, 13);
 
-#if __linux__ || __apple__ 
+#if __linux__ || __APPLE__ 
    // release local/system epoll descriptor
    ::close(i->second.m_iLocalID);
 #elif _WIN32

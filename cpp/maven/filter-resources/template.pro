@@ -255,6 +255,10 @@ macx {
   !ios {
     LIBS += ${ffmpeg.libs}
   }
+
+  contains(TEMPLATE, "lib") {
+    QMAKE_LFLAGS += -undefined dynamic_lookup 
+  }
 }
 
 INCLUDEPATH += ${environment.dir}/boost_1_56_0

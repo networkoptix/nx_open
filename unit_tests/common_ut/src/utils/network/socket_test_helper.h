@@ -15,6 +15,7 @@
 #include <utils/common/joinable.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/socket.h>
+#include <nx/utils/thread/mutex.h>
 
 
 //!Reads/writes random data to/from connection
@@ -60,11 +61,15 @@ private:
     size_t m_totalBytesSent;
     size_t m_totalBytesReceived;
     int m_id;
+    bool m_accepted;
 
     void onConnected( int id, SystemError::ErrorCode );
     void startIO();
     void onDataReceived( int id, SystemError::ErrorCode errorCode, size_t bytesRead );
     void onDataSent( int id, SystemError::ErrorCode errorCode, size_t bytesWritten );
+
+    TestConnection(const TestConnection&);
+    TestConnection& operator=(const TestConnection&);
 };
 
 //!Server that listenes randome tcp-port, accepts connections, reads every connection and sends specified bytes number through every connection
@@ -90,6 +95,8 @@ public:
 private:
     std::unique_ptr<AbstractStreamServerSocket> m_serverSocket;
     const size_t m_bytesToSendThrough;
+    QnMutex m_mutex;
+    std::list<std::shared_ptr<TestConnection>> m_acceptedConnections;
 
     void onNewConnection( SystemError::ErrorCode errorCode, AbstractStreamSocket* newConnection );
     void onConnectionDone( TestConnection* connection );

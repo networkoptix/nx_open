@@ -1,13 +1,13 @@
-#include <gtest/gtest.h>
-
-#include <utils/common/cpp14.h>
-#include <utils/thread/sync_queue.h>
-#include <nx/network/system_socket.h>
-#include <nx/network/udt/udt_socket.h>
 
 #include <thread>
 
-#define ERROR_TEXT SystemError::getLastOSErrorText().toStdString()
+#include <gtest/gtest.h>
+
+#include <utils/common/cpp14.h>
+#include <nx/network/system_socket.h>
+#include <nx/network/udt/udt_socket.h>
+
+#include "simple_socket_test_helper.h"
 
 TEST( TcpSocket, KeepAliveOptions )
 {
@@ -51,152 +51,21 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-// Template multitype socket tests to ensure that every common_ut run checks
-// TCP and UDT basic functionality
+static const QByteArray kTestMessage("Ping");
+static const size_t kClientCount(3);
 
-static const SocketAddress ADDRESS1( QLatin1String( "localhost:12345" ) );
-static const SocketAddress ADDRESS2( QLatin1String( "localhost:12346" ) );
-static const QByteArray MESSAGE( "Ping" );
-static const size_t CLIENT_COUNT( 3 );
-
-template< typename ServerSocket, typename ClientSocket>
-static void socketSimpleSync()
+TEST(TcpSocket, SimpleSync)
 {
-    std::thread serverThread( []()
-    {
-        auto server = std::make_unique< ServerSocket >();
-        ASSERT_TRUE( server->setNonBlockingMode( false ) );
-        ASSERT_TRUE( server->setReuseAddrFlag( true ) );
-        ASSERT_TRUE( server->bind( ADDRESS1 ) ) << ERROR_TEXT;
-        ASSERT_TRUE( server->listen( CLIENT_COUNT ) ) << ERROR_TEXT;
-
-        for( int i = CLIENT_COUNT; i > 0; --i )
-        {
-            static const int BUF_SIZE = 128;
-
-            QByteArray buffer(BUF_SIZE, char(0));
-            std::unique_ptr< AbstractStreamSocket > client(server->accept());
-            ASSERT_TRUE(client->setNonBlockingMode(false));
-
-            int bufDataSize = 0;
-            for(;;)
-            {
-                const auto bytesRead = client->recv(
-                    buffer.data()+ bufDataSize,
-                    buffer.size()- bufDataSize);
-                ASSERT_NE(-1, bytesRead);
-                if (bytesRead == 0)
-                    break;  //connection closed
-                bufDataSize += bytesRead;
-            }
-
-            EXPECT_STREQ(MESSAGE.data(), buffer.data());
-        }
-    } );
-
-    // give the server some time to start
-    std::this_thread::sleep_for( std::chrono::microseconds( 500 ) );
-
-    std::thread clientThread( []()
-    {
-        for( int i = CLIENT_COUNT; i > 0; --i )
-        {
-            auto client = std::make_unique< ClientSocket >( false );
-            EXPECT_TRUE( client->connect( ADDRESS1, 500 ) );
-            EXPECT_EQ( client->send( MESSAGE.data(), MESSAGE.size() + 1 ),
-                       MESSAGE.size() + 1 );
-        }
-    } );
-
-    serverThread.join();
-    clientThread.join();
+    socketSimpleSync< TCPServerSocket, TCPSocket >(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount);
 }
 
-TEST( TcpSocket, SimpleSync )
+TEST(TcpSocket, SimpleAsync)
 {
-    socketSimpleSync< TCPServerSocket, TCPSocket >();
-}
-
-TEST(SocketUdt, SimpleSync)
-{
-    socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >();
-}
-
-template< typename ServerSocket, typename ClientSocket>
-static void socketSimpleAsync()
-{
-    nx::SyncQueue< SystemError::ErrorCode > serverResults;
-    nx::SyncQueue< SystemError::ErrorCode > clientResults;
-
-    auto server = std::make_unique< ServerSocket >();
-    ASSERT_TRUE( server->setNonBlockingMode( true ) );
-    ASSERT_TRUE( server->setReuseAddrFlag( true ) );
-    ASSERT_TRUE( server->bind( ADDRESS2 ) ) << ERROR_TEXT;
-    ASSERT_TRUE( server->listen( CLIENT_COUNT ) ) << ERROR_TEXT;
-
-    QByteArray serverBuffer;
-    serverBuffer.reserve( 128 );
-    std::unique_ptr< AbstractStreamSocket > client;
-    std::function< void( SystemError::ErrorCode, AbstractStreamSocket* ) > accept
-            = [ & ]( SystemError::ErrorCode code, AbstractStreamSocket* socket )
-    {
-        serverResults.push( code );
-        if( code != SystemError::noError )
-            return;
-
-        client.reset( socket );
-        ASSERT_TRUE( client->setNonBlockingMode( true ) );
-        client->readSomeAsync( &serverBuffer, [ & ]( SystemError::ErrorCode code,
-                                               size_t size )
-        {
-            if( code == SystemError::noError ) {
-                EXPECT_GT( size, 0 );
-                EXPECT_STREQ( serverBuffer.data(), MESSAGE.data() );
-                serverBuffer.resize( 0 );
-            }
-
-            client->pleaseStopSync();
-            server->acceptAsync( accept );
-            serverResults.push( code );
-        } );
-    };
-
-    server->acceptAsync( accept );
-
-    auto testClient = std::make_unique< ClientSocket >( false );
-    ASSERT_TRUE( testClient->setNonBlockingMode( true ) );
-
-    QByteArray clientBuffer;
-    clientBuffer.reserve( 128 );
-    testClient->connectAsync( ADDRESS2, [ & ]( SystemError::ErrorCode code )
-    {
-        EXPECT_EQ( code, SystemError::noError );
-        testClient->sendAsync( MESSAGE, [ & ]( SystemError::ErrorCode code,
-                                               size_t size )
-        {
-            clientResults.push( code );
-            if( code != SystemError::noError )
-                return;
-
-            EXPECT_EQ( code, SystemError::noError );
-            EXPECT_EQ( size, MESSAGE.size() );
-        } );
-    } );
-
-    ASSERT_EQ( serverResults.pop(), SystemError::noError ); // accept
-    ASSERT_EQ( clientResults.pop(), SystemError::noError ); // send
-    ASSERT_EQ( serverResults.pop(), SystemError::noError ); // recv
-
-    testClient->pleaseStopSync();
-    server->pleaseStopSync();
-}
-
-TEST( TcpSocket, SimpleAsync )
-{
-    socketSimpleAsync< TCPServerSocket, TCPSocket >();
-}
-
-TEST(SocketUdt, SimpleAsync)
-{
-    socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >();
+    socketSimpleAsync< TCPServerSocket, TCPSocket >(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount);
 }
