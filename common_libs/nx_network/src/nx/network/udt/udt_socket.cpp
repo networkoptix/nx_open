@@ -516,6 +516,10 @@ UdtSocket::~UdtSocket()
 {
     delete m_impl;
     m_impl = nullptr;
+
+    //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
+
+    assert(!nx::SocketGlobals::aioService().isSocketBeingWatched(this));
 }
 
 UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)

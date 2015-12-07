@@ -110,11 +110,11 @@ TEST( Socket, AsyncOperationCancellation )
     static const int THREADS = 3;
 
     std::vector<std::thread> threads(THREADS);
-    for (int i = 0; i < threads.size(); ++i)
+    for (size_t i = 0; i < threads.size(); ++i)
     {
         threads[i] = std::thread(
             [](){
-                for (int i = 0; i < TEST_RUNS; ++i)
+                for (int j = 0; j < TEST_RUNS; ++j)
                 {
                     static const int MAX_SIMULTANEOUS_CONNECTIONS = 25;
                     static const int BYTES_TO_SEND_THROUGH_CONNECTION = 1 * 1024;
@@ -139,7 +139,7 @@ TEST( Socket, AsyncOperationCancellation )
             });
     }
 
-    for (int i = 0; i < threads.size(); ++i)
+    for (size_t i = 0; i < threads.size(); ++i)
         threads[i].join();
 
     //waiting for some calls to deleted objects

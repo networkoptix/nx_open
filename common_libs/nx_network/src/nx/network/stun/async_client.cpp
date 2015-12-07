@@ -27,6 +27,8 @@ AsyncClient::~AsyncClient()
 		baseConnection = std::move( m_baseConnection );
         m_state = State::terminated;
     }
+    if (baseConnection)
+        baseConnection->pleaseStop();
 
     if( connectingSocket )
         connectingSocket->pleaseStopSync();
@@ -86,10 +88,6 @@ void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection )
 {
-    Q_ASSERT_X( !m_baseConnection || !connection ||
-                connection == m_baseConnection.get(),
-                Q_FUNC_INFO, "Incorrect closeConnection call" );
-
     std::vector< ConnectionHandler > disconnectHandlers;
 	std::unique_ptr< BaseConnectionType > baseConnection;
     {
@@ -98,6 +96,13 @@ void AsyncClient::closeConnection(
         closeConnectionImpl( &lock, errorCode );
 		baseConnection = std::move( m_baseConnection );
     }
+
+    Q_ASSERT_X( !baseConnection || !connection ||
+                connection == baseConnection.get(),
+                Q_FUNC_INFO, "Incorrect closeConnection call" );
+
+    if (baseConnection)
+        baseConnection->pleaseStop();
 
     for( const auto& handler : disconnectHandlers )
         handler( errorCode );
@@ -192,6 +197,8 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
 
     for( const auto& req : requestsInProgress )   req.second( code, Message() );
     for( const auto& req : requestQueue )         req.second( code, Message() );
+
+    lock->relock();
 }
 
 void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
@@ -242,6 +249,8 @@ void AsyncClient::onConnectionComplete( SystemError::ErrorCode code)
     handlers = m_connectHandlers;
     if( code != SystemError::noError )
         return closeConnectionImpl( &lock, code );
+
+    assert(!m_baseConnection);
 
     m_baseConnection.reset( new BaseConnectionType( this, std::move(m_connectingSocket) ) );
     m_baseConnection->setMessageHandler( 
