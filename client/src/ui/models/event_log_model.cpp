@@ -295,9 +295,9 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
     return resource;
 }
 
-QnUserResourcePtr QnEventLogModel::getUserResourceById(const QnUuid &id) {
-    const auto resource = getResourceById(id);
-    return (resource ? resource.dynamicCast<QnUserResource>() : QnUserResourcePtr());
+QnUserResourcePtr QnEventLogModel::getUserResourceById(const QnUuid &id)
+{
+    return getResourceById(id).dynamicCast<QnUserResource>();
 }
 
 
@@ -534,7 +534,8 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
     switch(role) {
     case Qt::ToolTipRole:
     {
-        if (index.column() == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction) {
+        if (index.column() == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
+        {
             enum { kMaxShownUsersCount = 20 };
 
             auto users = action.actionParams.additionalResources;
@@ -560,10 +561,13 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
             }
             else
             {
-                for (const auto &userId: users) {
+                for (const auto &userId: users)
+                {
+                    static const auto kRemovedUserName = tr("<User removed>");
                     const auto userResource = getUserResourceById(userId);
-                    if (!userResource.isNull())
-                        addUser(userResource->getName());
+                    const auto userName = (userResource.isNull()
+                        ? kRemovedUserName : userResource->getName());
+                    addUser(userName);
                 }
             }
 
@@ -574,12 +578,6 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
         }
         else if (index.column() != DescriptionColumn) {
             return QVariant();
-/*
-            if (action.actionType == QnBusiness::ShowOnAlarmLayoutAction) {
-                return QString::number(action.eventParams.metadata.cameraRefs.size());
-            }
-            // else go to Qt::DisplayRole
-            */
         }
 
         // else go to Qt::DisplayRole
