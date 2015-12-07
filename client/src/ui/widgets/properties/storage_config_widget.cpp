@@ -556,6 +556,10 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
 
+    if (qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Main).state != Qn::RebuildState_None
+     || qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Backup).state != Qn::RebuildState_None)
+        return error(tr("Couldn't start backup while rebuilding archive index is being processed."));
+
     return true;
 }
 
@@ -643,6 +647,7 @@ void QnStorageConfigWidget::at_serverRebuildStatusChanged( const QnMediaServerRe
         return;
 
     updateRebuildUi(pool, status);
+    updateBackupInfo();
 }
 
 void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerResourcePtr &server, const QnBackupStatusData &status ) {
