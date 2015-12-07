@@ -18,7 +18,7 @@ public:
     QnCameraBookmarkList bookmarksAtPosition(qint64 timeMs, int msecsPerDp = 0) const;
 
     void addBookmark(const QnCameraBookmark &bookmark);
-    void removeBookmark(const QnUuid &bookmarkId);
+    void removeBookmark(const QnCameraBookmark &bookmark);
 
 private:
     Q_DECLARE_PRIVATE(QnBookmarkMergeHelper)
