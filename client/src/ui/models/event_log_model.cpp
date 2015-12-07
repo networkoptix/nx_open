@@ -22,7 +22,8 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
-namespace {
+namespace
+{
     enum { kSingleUser = 1};
 }
 typedef QnBusinessActionData* QnLightBusinessActionP;
@@ -295,9 +296,12 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
     return resource;
 }
 
-QnUserResourcePtr QnEventLogModel::getUserResourceById(const QnUuid &id)
+QString QnEventLogModel::getUserNameById(const QnUuid &id)
 {
-    return getResourceById(id).dynamicCast<QnUserResource>();
+    static const auto kRemovedUserName = tr("<User removed>");
+
+    const auto userResource = getResourceById(id).dynamicCast<QnUserResource>();
+    return (userResource.isNull() ? kRemovedUserName : userResource->getName());
 }
 
 
@@ -390,12 +394,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
                 return tr("All users");
 
             if (users.size() == kSingleUser)
-            {
-                const auto userResource = getUserResourceById(users.front());
-                if (userResource.isNull())
-                    return QString();
-                return userResource->getName();
-            }
+                return getUserNameById(users.front());
 
             static const auto kUsersTempltate = tr("%1 users");
             return kUsersTempltate.arg(QString::number(users.size()));
@@ -562,13 +561,7 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
             else
             {
                 for (const auto &userId: users)
-                {
-                    static const auto kRemovedUserName = tr("<User removed>");
-                    const auto userResource = getUserResourceById(userId);
-                    const auto userName = (userResource.isNull()
-                        ? kRemovedUserName : userResource->getName());
-                    addUser(userName);
-                }
+                    addUser(getUserNameById(userId));
             }
 
             if (trimList)
@@ -576,7 +569,8 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
 
             return userNames;
         }
-        else if (index.column() != DescriptionColumn) {
+        else if (index.column() != DescriptionColumn)
+        {
             return QVariant();
         }
 
