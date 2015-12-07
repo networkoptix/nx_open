@@ -624,13 +624,23 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
 
     bool isMainPool = pool == QnServerStoragesPool::Main;
 
+    /* Here we must check actual backup schedule, not ui-selected. */
+    bool backupIsInProgress = m_server && m_server->getBackupSchedule().backupType != Qn::Backup_RealTime &&
+        qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
+
+    ui->addExtStorageToMainBtn->setEnabled(!backupIsInProgress);
+    ui->addExtStorageToBackupBtn->setEnabled(!backupIsInProgress);
+
     bool canStartRebuild =
-            reply.state == Qn::RebuildState_None
+            m_server
+        &&  reply.state == Qn::RebuildState_None
         &&  !hasChanges()
         &&  any_of(m_model->storages(), [isMainPool](const QnStorageModelInfo &info) {
                 return info.isWritable
                     && info.isBackup != isMainPool;
-            });
+            })
+        && !backupIsInProgress
+    ;
 
     if (isMainPool) {
         ui->rebuildMainWidget->loadData(reply);
@@ -655,6 +665,7 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
         return;
 
     updateBackupUi(status);
+    updateRebuildInfo();
 }
 
 void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool ) {
