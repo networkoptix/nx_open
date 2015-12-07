@@ -364,9 +364,13 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
-    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->ruleModelById(current.data(Qn::UuidRole).value<QnUuid>());
+    QnSortedBusinessRulesModel* proxyModel = dynamic_cast<QnSortedBusinessRulesModel*>(ui->tableView->model());
+    Q_ASSERT_X(proxyModel, Q_FUNC_INFO, "Make sure model is valid");
+    if (!proxyModel)
+        return;
 
-
+    QModelIndex source = proxyModel->mapToSource(current);
+    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->rule(source);
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
