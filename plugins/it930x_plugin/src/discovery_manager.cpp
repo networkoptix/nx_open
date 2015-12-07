@@ -45,11 +45,11 @@ namespace ite
 
     void * DiscoveryManager::queryInterface( const nxpl::NX_GUID& interfaceID )
     {
-        if (interfaceID == nxcip::IID_CameraDiscoveryManager2)
-        {
-            addRef();
-            return this;
-        }
+//        if (interfaceID == nxcip::IID_CameraDiscoveryManager2)
+//        {
+//            addRef();
+//            return this;
+//        }
         if (interfaceID == nxcip::IID_CameraDiscoveryManager)
         {
             addRef();
@@ -231,39 +231,36 @@ namespace ite
         return cam;
     }
 
-    int DiscoveryManager::notify(uint32_t event, uint32_t value, void * )
-    {
-        assert(0);
-        switch (event)
-        {
-            case EVENT_SEARCH:
-            {
-                if (value == EVENT_SEARCH_NEW_SEARCH)
-                {
-                    //m_needScan = true;
-                    m_blockAutoScan = true;
-                }
+//    int DiscoveryManager::notify(uint32_t event, uint32_t value, void * )
+//    {
+//        assert(0);
+//        switch (event)
+//        {
+//            case EVENT_SEARCH:
+//            {
+//                if (value == EVENT_SEARCH_NEW_SEARCH)
+//                {
+//                    //m_needScan = true;
+//                    m_blockAutoScan = true;
+//                }
 
-                return nxcip::NX_NO_ERROR;
-            }
+//                return nxcip::NX_NO_ERROR;
+//            }
 
-            default:
-                break;
-        }
+//            default:
+//                break;
+//        }
 
-        return nxcip::NX_NO_ERROR;
-    }
+//        return nxcip::NX_NO_ERROR;
+//    }
 
-    void getRxDevNames(std::vector<std::string>& devs)
-    {
+    void getRxDevNames(std::vector<std::string>& devs) {
         devs.clear();
-
         DIR * dir = ::opendir( "/dev" );
-        if (dir != NULL)
-        {
+
+        if (dir != NULL) {
             struct dirent * ent;
-            while ((ent = ::readdir( dir )) != NULL)
-            {
+            while ((ent = ::readdir( dir )) != NULL) {
                 std::string file( ent->d_name );
                 if (file.find( RxDevice::DEVICE_PATTERN ) != std::string::npos)
                     devs.push_back(file);

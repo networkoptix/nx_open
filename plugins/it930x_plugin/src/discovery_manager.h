@@ -19,7 +19,7 @@ namespace ite
     class CameraManager;
 
     //!
-    class DiscoveryManager : public DefaultRefCounter<nxcip::CameraDiscoveryManager2>
+    class DiscoveryManager : public DefaultRefCounter<nxcip::CameraDiscoveryManager>
     {
     public:
         typedef std::shared_ptr<CameraManager> CameraPtr;
@@ -47,7 +47,7 @@ namespace ite
 
         // nxcip::CameraDiscoveryManager2
 
-        virtual int notify( uint32_t event, uint32_t value, void * opt ) override;
+//        virtual int notify( uint32_t event, uint32_t value, void * opt ) override;
 
         void findAndSwapCamerasRx(CameraPtr cam1, CameraPtr cam2);
 
