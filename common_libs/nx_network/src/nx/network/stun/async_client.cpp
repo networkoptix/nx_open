@@ -196,6 +196,8 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
 
     for( const auto& req : requestsInProgress )   req.second( code, Message() );
     for( const auto& req : requestQueue )         req.second( code, Message() );
+
+    lock->relock();
 }
 
 void AsyncClient::dispatchRequestsInQueue( QnMutexLockerBase* lock )
