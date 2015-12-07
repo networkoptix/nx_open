@@ -4,6 +4,7 @@
 #include <business/business_action_parameters.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
@@ -45,9 +46,9 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
 
     if (fields.testFlag(QnBusiness::EventTypeField)) {
         bool hasToggleState = QnBusiness::hasToggleState(model->eventType());
-        ui->fixedDurationCheckBox->setEnabled(hasToggleState);
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
+        setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
