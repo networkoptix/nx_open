@@ -44,7 +44,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemActio
 
     QSet<QnUuid> targets;
     foreach (const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        if (resource->hasFlags(Qn::remote_server) && (resource->getStatus() == Qn::Incompatible || resource->getStatus() == Qn::Unauthorized))
+        if (QnMediaServerResource::isFakeServer(resource))
             targets.insert(resource->getId());
     }
 
