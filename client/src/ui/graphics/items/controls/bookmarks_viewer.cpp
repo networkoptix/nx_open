@@ -728,7 +728,9 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
         m_tooltip.reset();
     else
     {
-        const auto emitBookmarkEventFunc = [this](const QnCameraBookmark &bookmark, int eventId)
+        // TODO: #ynikitenkov Replace emitBookmarkEventFunc,
+        // emitTagEventFunc with Qt::QueuedConnection later
+        const auto emitBookmarkEventFunc= [this](const QnCameraBookmark &bookmark, int eventId)
         {
             qApp->postEvent(this, new BookmarkActionEvent(eventId, bookmark));
         };
