@@ -24,6 +24,8 @@ namespace {
     const int footerRowsCount = 1;
 }
 
+const QString QnSortedRecordingStatsModel::kForeignCameras(lit("C7139D2D-0CB2-424D-9C73-704C417B32F2"));
+
 bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModelIndex &right) const
 {
     QnCamRecordingStatsData leftData = left.data(Qn::RecordingStatsDataRole).value<QnCamRecordingStatsData>();
@@ -36,6 +38,15 @@ bool QnSortedRecordingStatsModel::lessThan(const QModelIndex &left, const QModel
             return isNulIDLeft < isNulIDRight; // keep footer without ID at the last place
         else
             return isNulIDLeft > isNulIDRight; // keep footer without ID at the last place
+    }
+
+    bool isForeignLeft = leftData.uniqueId == kForeignCameras;
+    bool isForeignRight = rightData.uniqueId == kForeignCameras;
+    if (isForeignLeft != isForeignRight) {
+        if (sortOrder() == Qt::AscendingOrder)
+            return isForeignLeft < isForeignRight;
+        else
+            return isForeignLeft > isForeignRight;
     }
 
     switch(left.column()) {
@@ -78,15 +89,17 @@ int QnRecordingStatsModel::columnCount(const QModelIndex &parent) const {
 
 QString QnRecordingStatsModel::displayData(const QModelIndex &index) const {
     const QnCamRecordingStatsData& value = m_data.at(index.row());
+    bool isForeign = (value.uniqueId == QnSortedRecordingStatsModel::kForeignCameras);
     switch(index.column()) {
     case CameraNameColumn:
-        return getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
+        return isForeign ? tr("<Cameras from other servers and removed cameras>") : 
+               getResourceName(qnResPool->getResourceByUniqueId(value.uniqueId));
     case BytesColumn:
         return formatBytesString(value.recordedBytes);
     case DurationColumn:
-        return formatDurationString(value);           
+        return isForeign ? QString() : formatDurationString(value);           
     case BitrateColumn:
-        return formatBitrateString(value.averageBitrate);
+        return isForeign ? QString() : formatBitrateString(value.averageBitrate);
     default:
         return QString();
     }
@@ -101,7 +114,7 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
             for (const QnCamRecordingStatsData &data: m_data)
                 if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(data.uniqueId))
                     cameras << camera;
-            Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
+            //Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Total %n devices",      nullptr, cameras.size()),
