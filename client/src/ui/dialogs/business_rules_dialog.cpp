@@ -137,9 +137,7 @@ namespace {
         bool lessThanByRole(const QModelIndex &left, const QModelIndex &right, int role, std::function<bool (T left, T right)> comp = std::less<T>()) const {
             T lValue = left.data(role).value<T>();
             T rValue = right.data(role).value<T>();
-            if (lValue != rValue)
-                return comp(lValue, rValue);
-            return defaultLessThan(left, right);
+            return comp(lValue, rValue);
         }
 
     private:
