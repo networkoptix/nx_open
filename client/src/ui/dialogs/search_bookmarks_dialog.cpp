@@ -103,6 +103,8 @@ private:
 
     bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
 
+    void updateCamerasText();
+
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;
 
@@ -188,6 +190,10 @@ void QnSearchBookmarksDialog::Impl::setParameters(const QString &filterText
     , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs)
 {
+    m_cameras = QnVirtualCameraResourceList();
+    m_model->setCameras(m_cameras);
+    updateCamerasText();
+
     m_ui->filterLineEdit->lineEdit()->setText(filterText);
 
     m_ui->dateEditFrom->setDate(extractDisplayDate(context(), utcStartTimeMs));
@@ -222,6 +228,15 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
     params.setArgument(Qn::ItemTimeRole, window.startTimeMs);
 
     return true;
+}
+
+void QnSearchBookmarksDialog::Impl::updateCamerasText()
+{
+    static const auto kEmptyCamerasCaption = tr("<Any camera>");
+    static const auto kCamerasTemplate = tr("camera(s)");
+    static const auto kCamerasCaptionTemplate = lit("<%1 %2>");
+    m_ui->cameraButton->setText(m_cameras.empty() ? kEmptyCamerasCaption :
+        kCamerasCaptionTemplate.arg(QString::number(m_cameras.size()), kCamerasTemplate));
 }
 
 void QnSearchBookmarksDialog::Impl::openInNewLayoutHandler()
@@ -309,11 +324,7 @@ void QnSearchBookmarksDialog::Impl::chooseCamera()
         m_model->setCameras(m_cameras);
         m_model->applyFilter();
 
-        static const QString kEmptyCamerasCaption = tr("<Any camera>");
-        static const QString kCamerasTemplate = tr("camera(s)");
-        static const QString kCamerasCaptionTemplate = lit("<%1 %2>");
-        m_ui->cameraButton->setText(m_cameras.empty() ? kEmptyCamerasCaption :
-            kCamerasCaptionTemplate.arg(QString::number(m_cameras.size()), kCamerasTemplate));
+        updateCamerasText();
     }
 }
 
@@ -359,9 +370,9 @@ QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
 {
 }
 
-void QnSearchBookmarksDialog::setParameters(const QString &filterText
-    , qint64 utcStartTimeMs
-    , qint64 utcFinishTimeMs)
+void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs
+    , const QString &filterText)
 {
     m_impl->setParameters(filterText, getStartOfTheDayMs(utcStartTimeMs)
         , getEndOfTheDayMs(utcFinishTimeMs));

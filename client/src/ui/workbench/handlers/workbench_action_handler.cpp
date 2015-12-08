@@ -119,6 +119,7 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 
 #include <utils/app_server_image_cache.h>
 
@@ -1143,6 +1144,8 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
 
     const auto parameters = menu()->currentParameters(sender());
+
+    // If time window is specified then set it
     if (parameters.hasArgument(Qn::BookmarkTagRole))
     {
         const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
@@ -1150,14 +1153,22 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
         const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
         const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
 
-        const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
-        const auto start = (correctWindow ? timelineWindow.startTimeMs : nowMs);
-
-        const auto finish = (correctWindow
-            ? timelineWindow.startTimeMs + timelineWindow.durationMs : nowMs);
-
-        m_searchBookmarksDialog->setParameters(filterText, start, finish);
+        if (correctWindow)
+        {
+            m_searchBookmarksDialog->setParameters(timelineWindow.startTimeMs
+                , timelineWindow.startTimeMs + timelineWindow.durationMs, filterText);
+            return;
+        }
     }
+
+    // Otherwise set default time window and reset other parameters
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+    const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
+    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    const auto start = (firstTimeIsNotKnown ? nowMs : firstBookmarkUtcTimeMs);
+
+    m_searchBookmarksDialog->setParameters(start, nowMs);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
