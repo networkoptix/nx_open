@@ -114,6 +114,9 @@ namespace ec2
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
         
+        if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+            return res;
+
         #undef dbManager_queryOrReturn
 
         outData->systemId = getOrCreateSystemId();
