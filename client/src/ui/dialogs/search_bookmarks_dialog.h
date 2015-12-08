@@ -11,8 +11,8 @@ public:
     virtual ~QnSearchBookmarksDialog();
 
     void setParameters(const QString &filterText
-        , const QDate &start
-        , const QDate &finish);
+        , qint64 utcStartTimeMs
+        , qint64 utcFinishTimeMs);
 
 private:
     void resizeEvent(QResizeEvent *event);

@@ -105,6 +105,7 @@ public:
 
     QnStorageResourceList getStorages() const;
     QnStorageResourceList getStoragesInLexicalOrder() const;
+    bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
@@ -213,6 +214,7 @@ private:
     mutable QnMutex m_mutexRebuild;
     mutable QnMutex m_rebuildStateMtx;
     mutable QnMutex m_localPatches;
+    mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
     bool m_storagesStatisticsReady;

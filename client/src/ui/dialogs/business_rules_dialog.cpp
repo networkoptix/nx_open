@@ -12,6 +12,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <business/business_types_comparator.h>
+
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 
@@ -36,22 +38,111 @@
 
 #include <utils/common/event_processors.h>
 
+using boost::algorithm::any_of;
+
 class QnSortedBusinessRulesModel: public QSortFilterProxyModel {
 public:
-    explicit QnSortedBusinessRulesModel(QObject *parent = 0): QSortFilterProxyModel(parent) {}
+    explicit QnSortedBusinessRulesModel(QObject *parent = 0)
+        : QSortFilterProxyModel(parent)
+        , m_filterText()
+        , m_lexComparator(new QnBusinessTypesComparator())
+    {}
+
+    void setText(const QString &text) {
+        if (m_filterText == text.trimmed())
+            return;
+        m_filterText = text.trimmed();
+        invalidateFilter();
+    }
 
 protected:
+
+
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
 
-        QnBusiness::ActionType lAction = left.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
-        QnBusiness::ActionType rAction = right.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
-        if (lAction != rAction)
-            return lAction < rAction;
+        switch (sortColumn()) {
+        case QnBusiness::ModifiedColumn:
+            return lessThanByRole<bool>(left, right, Qn::ModifiedRole);
+        case QnBusiness::DisabledColumn:
+            return lessThanByRole<bool>(left, right, Qn::DisabledRole);
 
-        QnBusiness::EventType lEvent = left.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
-        QnBusiness::EventType rEvent = right.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
-        return lEvent < rEvent;
+        case QnBusiness::EventColumn:
+            return lessThanByRole<QnBusiness::EventType>(left, right, Qn::EventTypeRole, [this](QnBusiness::EventType left, QnBusiness::EventType right) {
+                return m_lexComparator->lexicographicalLessThan(left, right);
+            });
+
+        case QnBusiness::ActionColumn:
+            return lessThanByRole<QnBusiness::ActionType>(left, right, Qn::ActionTypeRole, [this](QnBusiness::ActionType left, QnBusiness::ActionType right) {
+                return m_lexComparator->lexicographicalLessThan(left, right);
+            });
+
+        case QnBusiness::SourceColumn:
+        case QnBusiness::TargetColumn:
+        case QnBusiness::AggregationColumn:
+            return lessThanByRole<QString>(left, right, Qt::DisplayRole);
+        default:
+            break;
+        }
+        return defaultLessThan(left, right);
     }
+
+
+    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+
+        // all rules should be visible if filter is empty
+        if (m_filterText.isEmpty())
+            return true;
+
+        QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
+        Q_ASSERT_X(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
+        if (!idx.isValid())
+            return false;
+
+        auto passText = [this](const QnResourcePtr &resource){
+            return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
+        };
+
+        bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), passText);
+        QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+        if (QnBusiness::requiresCameraResource(eventType)) {
+            QnResourceList eventResources = idx.data(Qn::EventResourcesRole).value<QnResourceList>();
+
+            // rule supports any camera (assuming there is any camera that passing filter)
+            if (eventResources.isEmpty() && anyCameraPassFilter)
+                return true;
+
+            // rule contains camera passing the filter
+            if (any_of(eventResources, passText))
+                return true;
+        }
+
+        QnBusiness::ActionType actionType = idx.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+        if (QnBusiness::requiresCameraResource(actionType)) {
+            QnResourceList actionResources = idx.data(Qn::ActionResourcesRole).value<QnResourceList>();
+            if (any_of(actionResources, passText))
+                return true;
+        }
+
+        return false;
+    }
+
+private:
+    bool defaultLessThan(const QModelIndex &left, const QModelIndex &right) const {
+        return left.data(Qn::UuidRole).value<QnUuid>() < right.data(Qn::UuidRole).value<QnUuid>();
+    };
+
+    template <typename T>
+    bool lessThanByRole(const QModelIndex &left, const QModelIndex &right, int role, std::function<bool (T left, T right)> comp = std::less<T>()) const {
+        T lValue = left.data(role).value<T>();
+        T rValue = right.data(role).value<T>();
+        if (lValue != rValue)
+            return comp(lValue, rValue);
+        return defaultLessThan(left, right);
+    }
+
+private:
+    QString m_filterText;
+    QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
 };
 
 
@@ -78,15 +169,20 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     createActions();
 
     m_rulesViewModel = new QnBusinessRulesActualModel(this);
-    /* Force column width must be set before table initializing because header options are not updated. */
 
+    /* Force column width must be set before table initializing because header options are not updated. */
     QList<QnBusiness::Columns> forcedColumns;
     forcedColumns << QnBusiness::EventColumn << QnBusiness::ActionColumn << QnBusiness::AggregationColumn;
     for (QnBusiness::Columns column: forcedColumns) {
         m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
     }
 
-    ui->tableView->setModel(m_rulesViewModel);
+    QnSortedBusinessRulesModel* sortModel = new QnSortedBusinessRulesModel(this);
+    sortModel->setDynamicSortFilter(false);
+    sortModel->setSourceModel(m_rulesViewModel);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &QnSortedBusinessRulesModel::setText);
+
+    ui->tableView->setModel(sortModel);
     ui->tableView->horizontalHeader()->setVisible(true);
     ui->tableView->horizontalHeader()->setStretchLastSection(false);
 
@@ -97,10 +193,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     ui->tableView->horizontalHeader()->setSectionResizeMode(QnBusiness::TargetColumn, QHeaderView::Stretch);
     for (QnBusiness::Columns column: forcedColumns)
         ui->tableView->horizontalHeader()->setSectionResizeMode(column, QHeaderView::Fixed);
-    
+
     ui->tableView->installEventFilter(this);
 
-    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));  
+    ui->tableView->setItemDelegate(new QnBusinessRuleItemDelegate(this));
 
     connect(m_rulesViewModel, &QAbstractItemModel::dataChanged, this, &QnBusinessRulesDialog::at_model_dataChanged);
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
@@ -130,7 +226,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->filterLineEdit,                             &QLineEdit::textChanged, this, &QnBusinessRulesDialog::updateFilter);
     connect(ui->clearFilterButton,                          &QToolButton::clicked, this, &QnBusinessRulesDialog::at_clearFilterButton_clicked);
 
-    updateFilter();  
+    updateFilter();
     updateControlButtons();
 
     auto safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
@@ -210,8 +306,6 @@ void QnBusinessRulesDialog::at_deleteButton_clicked() {
     QnBusinessRuleViewModel* model = m_currentDetailsWidget->model();
     if (!model)
         return;
-    if (model->system())
-        return;
     deleteRule(model);
 }
 
@@ -270,7 +364,9 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
-    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->getRuleModel(current.row());
+    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->ruleModelById(current.data(Qn::UuidRole).value<QnUuid>());
+
+
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
@@ -280,7 +376,7 @@ void QnBusinessRulesDialog::at_tableViewport_resizeEvent() {
     QModelIndexList selectedIndices = ui->tableView->selectionModel()->selectedRows();
     if(selectedIndices.isEmpty())
         return;
-    
+
     ui->tableView->scrollTo(selectedIndices.front());
 }
 
@@ -336,7 +432,7 @@ bool QnBusinessRulesDialog::saveAll() {
         switch (btn) {
         case QMessageBox::Yes:
             foreach (QModelIndex idx, invalid_modified) {
-                m_rulesViewModel->getRuleModel(idx.row())->setDisabled(true);
+                m_rulesViewModel->rule(idx)->setDisabled(true);
             }
             break;
         case QMessageBox::No:
@@ -348,7 +444,7 @@ bool QnBusinessRulesDialog::saveAll() {
 
 
     foreach (QModelIndex idx, modified) {
-        m_rulesViewModel->saveRule(idx.row());
+        m_rulesViewModel->saveRule(idx);
     }
 
     //TODO: #GDM #Business replace with QnAppServerReplyProcessor
@@ -374,7 +470,7 @@ void QnBusinessRulesDialog::updateControlButtons() {
                 !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()
              || !m_pendingDeleteRules.isEmpty()
                 );
-    bool canDelete = hasRights && m_currentDetailsWidget->model() && !m_currentDetailsWidget->model()->system();
+    bool canDelete = hasRights && m_currentDetailsWidget->model();
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasRights);
     ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges);
@@ -391,41 +487,6 @@ void QnBusinessRulesDialog::updateControlButtons() {
     setAdvancedMode(hasRights && advancedMode());
 }
 
-bool isRuleVisible(QnBusinessRuleViewModel *ruleModel,
-                   const QString &filter,
-                   bool anyCameraPassFilter) {
-
-    // system rules should never be displayed
-    if (ruleModel->system())
-        return false;
-
-    // all rules should be visible if filter is empty
-    if (filter.isEmpty())
-        return true;
-
-    if (QnBusiness::requiresCameraResource(ruleModel->eventType())) {
-        // rule supports any camera (assuming there is any camera that passing filter)
-        if (ruleModel->eventResources().isEmpty() && anyCameraPassFilter)
-            return true;
-
-        // rule contains camera passing the filter
-        foreach (const QnResourcePtr &resource, ruleModel->eventResources()) {
-            if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
-                return true;
-        }
-    }
-
-    if (QnBusiness::requiresCameraResource(ruleModel->actionType())) {
-        foreach (const QnResourcePtr &resource, ruleModel->actionResources()) {
-            if (resource->toSearchString().contains(filter, Qt::CaseInsensitive))
-                return true;
-        }
-    }
-
-    return false;
-
-}
-
 void QnBusinessRulesDialog::updateFilter() {
     QString filter = ui->filterLineEdit->text();
     /* Don't allow empty filters. */
@@ -435,21 +496,6 @@ void QnBusinessRulesDialog::updateFilter() {
     }
 
     ui->clearFilterButton->setVisible(!filter.isEmpty());
-
-    filter = filter.trimmed();
-    bool anyCameraPassFilter = false;
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getAllCameras(QnResourcePtr(), true))  {
-        anyCameraPassFilter = camera->toSearchString().contains(filter, Qt::CaseInsensitive);
-        if (anyCameraPassFilter)
-            break;
-    }
-    
-
-    for (int i = 0; i < m_rulesViewModel->rowCount(); ++i) {
-        QnBusinessRuleViewModel *ruleModel = m_rulesViewModel->getRuleModel(i);
-        ui->tableView->setRowHidden(i, !isRuleVisible(ruleModel, filter, anyCameraPassFilter));
-    }
-
 }
 
 void QnBusinessRulesDialog::retranslateUi()
@@ -484,7 +530,7 @@ bool QnBusinessRulesDialog::tryClose(bool force) {
         hide();
         return true;
     }
-    
+
     bool hasRights = accessController()->globalPermissions() & Qn::GlobalProtectedPermission && !qnCommon->isReadOnly();
     bool hasChanges = hasRights && (
         !m_rulesViewModel->match(m_rulesViewModel->index(0, 0), Qn::ModifiedRole, true, 1, Qt::MatchExactly).isEmpty()

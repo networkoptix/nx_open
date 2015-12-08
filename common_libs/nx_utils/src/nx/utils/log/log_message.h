@@ -49,6 +49,7 @@ public:
     QnLogMessage arg(const QByteArray& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const std::string& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
     QnLogMessage arg(const QnUuid& a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
+    QnLogMessage arg(const void* a, int fieldWidth = 0, QChar fillChar = QLatin1Char(' ')) const;
 
     //!Prints integer value
     template<typename T>

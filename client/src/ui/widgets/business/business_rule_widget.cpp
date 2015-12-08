@@ -79,7 +79,7 @@ void QnBusinessRuleWidget::retranslateUi() {
         tr("<Any Device>"),
         tr("<Any Camera>")
     ));
-    
+
     ui->actionResourcesHolder->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Select at least one device"),
         tr("Select at least one camera")
@@ -111,7 +111,6 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         ui->eventStatesComboBox->setModel(m_model->eventStatesModel());
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
-    setEnabled(!m_model->system());
 
     connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
             this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));

@@ -117,14 +117,15 @@ TEST_F(HttpClientServerTest, FileDownload)
     const QUrl url(lit("http://127.0.0.1:%1/test.jpg")
         .arg(testHttpServer()->serverAddress().port));
     nx_http::HttpClient client;
+    client.setMessageBodyReadTimeoutMs(3000);
 
-    for (int i=0; i<1024; ++i)
+    for (int i=0; i<77; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         //emulating error response from server
-        if (rand() % 10 == 0)
+        if (rand() % 3 == 0)
             continue;
         nx_http::BufferType msgBody;
         while (!client.eof())
@@ -137,6 +138,7 @@ TEST_F(HttpClientServerTest, FileDownload)
                 break;
 #endif
 
+        ASSERT_EQ(fileBody.size(), msgBody.size());
         ASSERT_EQ(fileBody, msgBody);
     }
 }

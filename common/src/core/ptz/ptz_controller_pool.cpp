@@ -80,7 +80,8 @@ QnPtzControllerPool::QnPtzControllerPool(QObject *parent):
         registerResource(resource);
 }
 
-QnPtzControllerPool::~QnPtzControllerPool() {
+QnPtzControllerPool::~QnPtzControllerPool() 
+{
     while(!d->controllerByResource.isEmpty())
         unregisterResource(d->controllerByResource.begin().key());
 
@@ -91,6 +92,9 @@ QnPtzControllerPool::~QnPtzControllerPool() {
 
     d->executorThread->exit();
     d->executorThread->wait();
+
+    d->commandThreadPool->clear();
+    d->commandThreadPool->waitForDone();
 }
 
 QThread *QnPtzControllerPool::executorThread() const {
