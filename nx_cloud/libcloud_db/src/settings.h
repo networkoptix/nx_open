@@ -33,6 +33,18 @@ public:
     QString rulesXmlPath;
 };
 
+class Notification
+{
+public:
+    bool enabled;
+
+    Notification()
+    :
+        enabled(true)
+    {
+    }
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -50,8 +62,8 @@ public:
     
     const Logging& logging() const;
     const db::ConnectionOptions& dbConnectionOptions() const;
-    const QnEmailSettings& email() const;
     const Auth& auth() const;
+    const Notification& notification() const;
     const QString& cloudBackendUrl() const;
     const QString& changeUser() const;
 
@@ -67,8 +79,8 @@ private:
 
     Logging m_logging;
     db::ConnectionOptions m_dbConnectionOptions;
-    QnEmailSettings m_email;
     Auth m_auth;
+    Notification m_notification;
     QString m_cloudBackendUrl;
     QString m_changeUser;
 

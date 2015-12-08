@@ -1,3 +1,6 @@
+#ifndef NX_NETWORK_SOCKET_GLOBAL_H
+#define NX_NETWORK_SOCKET_GLOBAL_H
+
 #include <nx/utils/log/log.h>
 
 #include "aio/aioservice.h"
@@ -62,3 +65,5 @@ private:
 };
 
 } // namespace nx
+
+#endif  //NX_NETWORK_SOCKET_GLOBAL_H

@@ -18,6 +18,7 @@
 
 #include "email_manager.h"
 #include "http_handlers/activate_account_handler.h"
+#include "notification.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
 #include "version.h"
@@ -26,10 +27,9 @@
 namespace nx {
 namespace cdb {
 
-static const QString CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME =
-    lit( ":/email_templates/account_confirmation.mustache" );
-static const QString CONFIRMATION_URL_PARAM = lit( "confirmationUrl" );
-static const QString CONFIRMATION_CODE_PARAM = lit( "confirmationCode" );
+static const QString CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME = lit("activate_account");
+static const QString CONFIRMATION_URL_PARAM = lit("confirmationUrl");
+static const QString CONFIRMATION_CODE_PARAM = lit("confirmationCode");
 static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
 
 
@@ -216,33 +216,33 @@ db::DBResult AccountManager::insertAccount(
     insertEmailVerificationQuery.prepare( 
         "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
                                "VALUES ( ?, ?, ? )" );
-    insertEmailVerificationQuery.bindValue( 0, QnSql::serialized_field(accountData.id) );
-    insertEmailVerificationQuery.bindValue( 1, emailVerificationCode );
-    insertEmailVerificationQuery.bindValue( 2, QDateTime::currentDateTimeUtc().addSecs(UNCONFIRMED_ACCOUNT_EXPIRATION_SEC) );
+    insertEmailVerificationQuery.bindValue(
+        0,
+        QnSql::serialized_field(accountData.id));
+    insertEmailVerificationQuery.bindValue(
+        1,
+        emailVerificationCode);
+    insertEmailVerificationQuery.bindValue(
+        2,
+        QDateTime::currentDateTimeUtc().addSecs(UNCONFIRMED_ACCOUNT_EXPIRATION_SEC));
     if( !insertEmailVerificationQuery.exec() )
     {
         NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
             arg( connection->lastError().text() ), cl_logDEBUG1 );
         return db::DBResult::ioError;
     }
-    resultData->code.assign( emailVerificationCode.constData(), emailVerificationCode.size() );
+    resultData->code.assign(
+        emailVerificationCode.constData(),
+        emailVerificationCode.size());
 
     //sending confirmation email
-    QVariantHash emailParams;
-    QUrl confirmationUrl( m_settings.cloudBackendUrl() );   //TODO #ak use something like QN_CLOUD_BACKEND_URL;
-    confirmationUrl.setPath( ActivateAccountHandler::HANDLER_PATH );
-    confirmationUrl.setQuery( lit("code=%1").arg(QLatin1String(emailVerificationCode)) );  //TODO #ak replace with fusion::QnUrlQuery::serialized(*resultData)
-    emailParams[CONFIRMATION_URL_PARAM] = confirmationUrl.toString();
-    emailParams[CONFIRMATION_CODE_PARAM] = QString::fromStdString( resultData->code );
-    if( !m_emailManager->renderAndSendEmailAsync(
-            QString::fromStdString( accountData.email ),
-            CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME,
-            emailParams,
-            std::function<void(bool)>() ) )
-    {
-        NX_LOG( lit( "Failed to issue async account confirmation email send" ), cl_logDEBUG1 );
-        return db::DBResult::ioError;
-    }
+    ActivateAccountNotification notification;
+    notification.user_email = QString::fromStdString(accountData.email);
+    notification.type = CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME;
+    notification.message.code = QString::fromStdString(resultData->code);
+    m_emailManager->sendAsync(
+        std::move(notification),
+        std::function<void(bool)>());
 
     return db::DBResult::ok;
 }

@@ -62,18 +62,9 @@ namespace
 
     static const QLatin1String CHANGE_USER( "changeUser" );
 
-    //email settings
-    static const QLatin1String EMAIL_FROM_ADDRESS( "email/fromAddress" );
-    static const QLatin1String EMAIL_SMTP_CONNECTION_TYPE( "email/smtpConnectionType" );
-    static const QnEmail::ConnectionType DEFAULT_EMAIL_SMTP_CONNECTION_TYPE = QnEmail::ConnectionType::Tls;
-    static const QLatin1String EMAIL_SMTP_SERVER( "email/smtpServer" );
-    static const QLatin1String EMAIL_SMTP_PORT( "email/smtpPort" );
-    static const QLatin1String EMAIL_SMTP_USER( "email/smtpUser" );
-    static const QLatin1String EMAIL_SMTP_PASSWORD( "email/smtpPassword" );
-    static const QLatin1String EMAIL_SMTP_TIMEOUT( "email/smtpTimeout" );
-    static const int DEFAULT_EMAIL_SMTP_TIMEOUT = 300;
-    static const QLatin1String EMAIL_SIGNATURE( "email/signature" );
-    static const QLatin1String EMAIL_SUPPORT_ADDRESS( "email/supportAddress" );
+    //notification settings
+    static const QLatin1String NOTIFICATION_ENABLED("notification/enabled");
+    static const QLatin1String DEFAULT_NOTIFICATION_ENABLED("true");
 
     //auth settings
     static const QLatin1String AUTH_XML_PATH("auth/rulesXmlPath");
@@ -118,14 +109,14 @@ const db::ConnectionOptions& Settings::dbConnectionOptions() const
     return m_dbConnectionOptions;
 }
 
-const QnEmailSettings& Settings::email() const
-{
-    return m_email;
-}
-
 const Auth& Settings::auth() const
 {
     return m_auth;
+}
+
+const Notification& Settings::notification() const
+{
+    return m_notification;
 }
 
 const QString& Settings::cloudBackendUrl() const
@@ -211,21 +202,9 @@ void Settings::loadConfiguration()
     m_changeUser = m_settings.value( CHANGE_USER ).toString();
 
     //email
-    m_email.email = m_settings.value( EMAIL_FROM_ADDRESS ).toString();
-    m_email.server = m_settings.value( EMAIL_SMTP_SERVER ).toString();
-    m_email.port = m_settings.value( EMAIL_SMTP_PORT ).toInt();
-    m_email.user = m_settings.value( EMAIL_SMTP_USER ).toString();
-    m_email.password = m_settings.value( EMAIL_SMTP_PASSWORD ).toString();
-    m_email.timeout = m_settings.value( EMAIL_SMTP_TIMEOUT, DEFAULT_EMAIL_SMTP_TIMEOUT ).toInt();
-    m_email.signature = m_settings.value( EMAIL_SIGNATURE ).toString();
-    m_email.supportEmail = m_settings.value( EMAIL_SUPPORT_ADDRESS ).toString();
-
-    bool success = false;
-    m_email.connectionType = QnLexical::deserialized<QnEmail::ConnectionType>(
-        m_settings.value( EMAIL_SMTP_CONNECTION_TYPE, DEFAULT_EMAIL_SMTP_CONNECTION_TYPE ).toString(),
-        QnEmail::ConnectionType::Tls, &success );
-    if( !success )
-        m_email.connectionType = DEFAULT_EMAIL_SMTP_CONNECTION_TYPE;
+    m_notification.enabled = m_settings.value(
+        NOTIFICATION_ENABLED,
+        DEFAULT_NOTIFICATION_ENABLED).toString() == "true";
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(AUTH_XML_PATH, DEFAULT_AUTH_XML_PATH).toString();

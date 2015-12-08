@@ -5,98 +5,70 @@
 
 #include "email_manager.h"
 
+#include <future>
+
 #include <api/global_settings.h>
+#include <common/common_globals.h>
 #include <utils/common/cpp14.h>
-#include <nx/utils/log/log.h>
+#include <utils/common/model_functions.h>
+
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/email/email_manager_impl.h>
+#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/utils/log/log.h>
 
-#include "settings.h"
+#include "notification.h"
 
 
 namespace nx {
 namespace cdb {
 
-
-EMailManager::EMailManager( const conf::Settings& settings )
+EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_error)
 :
     m_settings( settings ),
     m_terminated( false )
 {
-    m_sendEmailThread = std::make_unique<std::thread>(
-        std::bind( &EMailManager::sedMailThreadFunc, this ) );
+    nx::cc::CloudModuleEndPointFetcher endPointFetcher(
+        "notification_module",
+        std::make_unique<nx::cc::RandomEndpointSelector>());
+    std::promise<nx_http::StatusCode::Value> endpointPromise;
+    auto endpointFuture = endpointPromise.get_future();
+    endPointFetcher.get(
+        [&endpointPromise, this](
+            nx_http::StatusCode::Value resCode,
+            SocketAddress endpoint)
+    {
+        endpointPromise.set_value(resCode);
+        m_notificationModuleEndpoint = std::move(endpoint);
+    });
+    if (endpointFuture.get() != nx_http::StatusCode::ok)
+        throw std::runtime_error("Failed to find out notification module address");
 }
 
 EMailManager::~EMailManager()
 {
+    decltype(m_ongoingRequests) ongoingRequests;
     {
-        QnMutexLocker lk( &m_mutex );
-        m_terminated = true;
+        QnMutexLocker lk(&m_mutex);
+        ongoingRequests = std::move(m_ongoingRequests);
     }
-    m_taskQueue.push( SendEmailTask() );
-    m_sendEmailThread->join();
+
+    for (auto httpRequest: ongoingRequests)
+        httpRequest->terminate();
 }
 
-bool EMailManager::sendEmailAsync(
-    QString to,
-    QString subject,
-    QString body,
-    std::function<void( bool )> completionHandler )
+void EMailManager::onSendNotificationRequestDone(
+    nx_http::AsyncHttpClientPtr client,
+    std::function<void(bool)> completionHandler)
 {
-    Q_ASSERT( !to.isEmpty() );
-    if( to.isEmpty() )
-        return false;   //bad email address
+    if (completionHandler)
+        completionHandler(
+            client->response() &&
+            (client->response()->statusLine.statusCode / 100 == nx_http::StatusCode::ok / 100));
 
-    SendEmailTask task;
-    task.email.to.push_back( std::move( to ) );
-    task.email.subject = std::move( subject );
-    task.email.body = std::move( body );
-    task.completionHandler = std::move( completionHandler );
-    m_taskQueue.push( std::move( task ) );
-    return true;
-}
-
-bool EMailManager::renderAndSendEmailAsync(
-    QString to,
-    QString templateFileName,
-    const QVariantHash& emailParams,
-    std::function<void( bool )> completionHandler )
-{
-    QString emailToSend;
-    if( !renderTemplateFromFile(
-            templateFileName,
-            emailParams,
-            &emailToSend ) )
     {
-        NX_LOG( lit("EMailManager. Failed to render confirmation email to send to %1").
-            arg( to ), cl_logWARNING );
-        return false;
-    }
-    return sendEmailAsync(
-        std::move( to ),
-        std::move( templateFileName ), //TODO #ak correct (and customizable) subject
-        std::move( emailToSend ),
-        std::move( completionHandler ) );
-}
-
-void EMailManager::sedMailThreadFunc()
-{
-    EmailManagerImpl emailSender;
-
-    for( ;; )
-    {
-        SendEmailTask task;
-        if( !m_taskQueue.pop( task ) )
-            continue;
-        if( m_terminated )
-            break;
-
-        //sending email
-        const bool result = emailSender.sendEmail(
-            m_settings.email(),
-            task.email );
-        if( task.completionHandler )
-            task.completionHandler( result );
+        QnMutexLocker lk(&m_mutex);
+        m_ongoingRequests.erase(client);
     }
 }
 
