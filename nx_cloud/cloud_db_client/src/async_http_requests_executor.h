@@ -50,7 +50,7 @@ public:
             auto request = std::move(m_runningRequests.front());
             m_runningRequests.pop_front();
             lk.unlock();
-            request->join();
+            request->pleaseStopSync();
             lk.relock();
         }
     }

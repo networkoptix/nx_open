@@ -56,7 +56,7 @@ static const size_t kClientCount(3);
 
 TEST(TcpSocket, SimpleSync)
 {
-    socketSimpleSync< TCPServerSocket, TCPSocket >(
+    socketSimpleSync<TCPServerSocket, TCPSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);
@@ -64,7 +64,18 @@ TEST(TcpSocket, SimpleSync)
 
 TEST(TcpSocket, SimpleAsync)
 {
-    socketSimpleAsync< TCPServerSocket, TCPSocket >(
+    socketSimpleAsync<TCPServerSocket, TCPSocket>(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount,
+        [&](std::unique_ptr<QnStoppableAsync> socket){
+            socket->pleaseStopSync();
+        });
+}
+
+TEST(TcpSocket, SimpleTrueAsync)
+{
+    socketSimpleTrueAsync<TCPServerSocket, TCPSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);
