@@ -267,6 +267,16 @@ AddressResolver::RequestInfo::RequestInfo(
 {
 }
 
+AddressResolver::RequestInfo::RequestInfo(RequestInfo&& right)
+:
+    address(std::move(right.address)),
+    inProgress(right.inProgress),
+    natTraversal(right.natTraversal),
+    handler(std::move(right.handler)),
+    guard(std::move(right.guard))
+{
+}
+
 void AddressResolver::dnsResolve( HaInfoIterator info )
 {
     auto functor = [ = ]( SystemError::ErrorCode code, const HostAddress& host )

@@ -1,6 +1,8 @@
 #ifndef NX_UTILS_BARRIER_HANDLER_H
 #define NX_UTILS_BARRIER_HANDLER_H
 
+#include <functional>
+
 #include "mutex.h"
 
 namespace nx {

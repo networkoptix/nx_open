@@ -153,6 +153,7 @@ private:
         RequestInfo( HostAddress _address,
                      bool _natTraversal,
                      ResolveHandler _handler );
+        RequestInfo(RequestInfo&&);
     };
 
     void dnsResolve( HaInfoIterator info );
