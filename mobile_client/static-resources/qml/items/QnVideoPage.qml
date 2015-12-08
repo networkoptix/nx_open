@@ -149,8 +149,11 @@ QnPage {
         resolutionList: player.resourceHelper.resolutions
         currentResolution: player.resourceHelper.resolution
         onQualityPicked: {
-            player.seek(player.position)
+            player.pause()
             player.resourceHelper.resolution = resolution
+            player.seek(player.position)
+            if (!d.videoNavigation.paused)
+                player.play()
         }
         onHidden: videoPlayer.forceActiveFocus()
     }
