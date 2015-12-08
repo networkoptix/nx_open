@@ -172,7 +172,20 @@ private:
     QSet<QnStorageResourcePtr> getWritableStorages() const;
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
-    void loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff);
+
+    void loadFullFileCatalogFromMedia(
+        const QnStorageResourcePtr      &storage, 
+        QnServer::ChunksCatalog         catalog, 
+        qreal                           progressCoeff,
+        QnVirtualCameraResourceList     &archiveCameraList
+    );
+
+    void loadCameraInfo(
+        const QnAbstractStorageResource::FileInfo   &fileInfo, 
+        QnVirtualCameraResourceList                 &archiveCameraList,
+        const QnStorageResourcePtr                  &storage
+    ) const;
+
     void replaceChunks(const QnTimePeriod& rebuildPeriod, const QnStorageResourcePtr &storage, const DeviceFileCatalogPtr &newCatalog, const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
     void doMigrateCSVCatalog(QnServer::ChunksCatalog catalog, QnStorageResourcePtr extraAllowedStorage);
     QMap<QString, QSet<int>> deserializeStorageFile();
