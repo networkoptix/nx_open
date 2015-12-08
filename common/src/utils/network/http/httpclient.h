@@ -83,6 +83,7 @@ namespace nx_http
         boost::optional<QString> m_userName;
         boost::optional<QString> m_userPassword;
 
+        void instanciateHttpClient();
         template<typename AsyncClientFunc>
             bool doRequest(AsyncClientFunc func);
         void instanciateHttpClient();
