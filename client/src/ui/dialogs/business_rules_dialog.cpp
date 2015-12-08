@@ -40,110 +40,114 @@
 
 using boost::algorithm::any_of;
 
-class QnSortedBusinessRulesModel: public QSortFilterProxyModel {
-public:
-    explicit QnSortedBusinessRulesModel(QObject *parent = 0)
-        : QSortFilterProxyModel(parent)
-        , m_filterText()
-        , m_lexComparator(new QnBusinessTypesComparator())
-    {}
+namespace {
 
-    void setText(const QString &text) {
-        if (m_filterText == text.trimmed())
-            return;
-        m_filterText = text.trimmed();
-        invalidateFilter();
-    }
+    class SortRulesProxyModel: public QSortFilterProxyModel {
+    public:
+        explicit SortRulesProxyModel(QObject *parent = 0)
+            : QSortFilterProxyModel(parent)
+            , m_filterText()
+            , m_lexComparator(new QnBusinessTypesComparator())
+        {}
 
-protected:
-
-
-    virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
-
-        switch (sortColumn()) {
-        case QnBusiness::ModifiedColumn:
-            return lessThanByRole<bool>(left, right, Qn::ModifiedRole);
-        case QnBusiness::DisabledColumn:
-            return lessThanByRole<bool>(left, right, Qn::DisabledRole);
-
-        case QnBusiness::EventColumn:
-            return lessThanByRole<QnBusiness::EventType>(left, right, Qn::EventTypeRole, [this](QnBusiness::EventType left, QnBusiness::EventType right) {
-                return m_lexComparator->lexicographicalLessThan(left, right);
-            });
-
-        case QnBusiness::ActionColumn:
-            return lessThanByRole<QnBusiness::ActionType>(left, right, Qn::ActionTypeRole, [this](QnBusiness::ActionType left, QnBusiness::ActionType right) {
-                return m_lexComparator->lexicographicalLessThan(left, right);
-            });
-
-        case QnBusiness::SourceColumn:
-        case QnBusiness::TargetColumn:
-        case QnBusiness::AggregationColumn:
-            return lessThanByRole<QString>(left, right, Qt::DisplayRole);
-        default:
-            break;
+        void setText(const QString &text) {
+            if (m_filterText == text.trimmed())
+                return;
+            m_filterText = text.trimmed();
+            invalidateFilter();
         }
-        return defaultLessThan(left, right);
-    }
+
+    protected:
 
 
-    virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+        virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
 
-        // all rules should be visible if filter is empty
-        if (m_filterText.isEmpty())
-            return true;
+            switch (sortColumn()) {
+            case QnBusiness::ModifiedColumn:
+                return lessThanByRole<bool>(left, right, Qn::ModifiedRole);
+            case QnBusiness::DisabledColumn:
+                return lessThanByRole<bool>(left, right, Qn::DisabledRole);
 
-        QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
-        Q_ASSERT_X(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
-        if (!idx.isValid())
+            case QnBusiness::EventColumn:
+                return lessThanByRole<QnBusiness::EventType>(left, right, Qn::EventTypeRole, [this](QnBusiness::EventType left, QnBusiness::EventType right) {
+                    return m_lexComparator->lexicographicalLessThan(left, right);
+                });
+
+            case QnBusiness::ActionColumn:
+                return lessThanByRole<QnBusiness::ActionType>(left, right, Qn::ActionTypeRole, [this](QnBusiness::ActionType left, QnBusiness::ActionType right) {
+                    return m_lexComparator->lexicographicalLessThan(left, right);
+                });
+
+            case QnBusiness::SourceColumn:
+            case QnBusiness::TargetColumn:
+            case QnBusiness::AggregationColumn:
+                return lessThanByRole<QString>(left, right, Qt::DisplayRole);
+            default:
+                break;
+            }
+            return defaultLessThan(left, right);
+        }
+
+
+        virtual bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override {
+
+            // all rules should be visible if filter is empty
+            if (m_filterText.isEmpty())
+                return true;
+
+            QModelIndex idx = sourceModel()->index(source_row, 0, source_parent);
+            Q_ASSERT_X(idx.isValid(), Q_FUNC_INFO, "index must be valid here");
+            if (!idx.isValid())
+                return false;
+
+            auto passText = [this](const QnResourcePtr &resource){
+                return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
+            };
+
+            bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), passText);
+            QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
+            if (QnBusiness::requiresCameraResource(eventType)) {
+                QnResourceList eventResources = idx.data(Qn::EventResourcesRole).value<QnResourceList>();
+
+                // rule supports any camera (assuming there is any camera that passing filter)
+                if (eventResources.isEmpty() && anyCameraPassFilter)
+                    return true;
+
+                // rule contains camera passing the filter
+                if (any_of(eventResources, passText))
+                    return true;
+            }
+
+            QnBusiness::ActionType actionType = idx.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+            if (QnBusiness::requiresCameraResource(actionType)) {
+                QnResourceList actionResources = idx.data(Qn::ActionResourcesRole).value<QnResourceList>();
+                if (any_of(actionResources, passText))
+                    return true;
+            }
+
             return false;
+        }
 
-        auto passText = [this](const QnResourcePtr &resource){
-            return resource->toSearchString().contains(m_filterText, Qt::CaseInsensitive);
+    private:
+        bool defaultLessThan(const QModelIndex &left, const QModelIndex &right) const {
+            return left.data(Qn::UuidRole).value<QnUuid>() < right.data(Qn::UuidRole).value<QnUuid>();
         };
 
-        bool anyCameraPassFilter = any_of(qnResPool->getAllCameras(QnResourcePtr(), true), passText);
-        QnBusiness::EventType eventType = idx.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
-        if (QnBusiness::requiresCameraResource(eventType)) {
-            QnResourceList eventResources = idx.data(Qn::EventResourcesRole).value<QnResourceList>();
-
-            // rule supports any camera (assuming there is any camera that passing filter)
-            if (eventResources.isEmpty() && anyCameraPassFilter)
-                return true;
-
-            // rule contains camera passing the filter
-            if (any_of(eventResources, passText))
-                return true;
+        template <typename T>
+        bool lessThanByRole(const QModelIndex &left, const QModelIndex &right, int role, std::function<bool (T left, T right)> comp = std::less<T>()) const {
+            T lValue = left.data(role).value<T>();
+            T rValue = right.data(role).value<T>();
+            if (lValue != rValue)
+                return comp(lValue, rValue);
+            return defaultLessThan(left, right);
         }
 
-        QnBusiness::ActionType actionType = idx.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
-        if (QnBusiness::requiresCameraResource(actionType)) {
-            QnResourceList actionResources = idx.data(Qn::ActionResourcesRole).value<QnResourceList>();
-            if (any_of(actionResources, passText))
-                return true;
-        }
-
-        return false;
-    }
-
-private:
-    bool defaultLessThan(const QModelIndex &left, const QModelIndex &right) const {
-        return left.data(Qn::UuidRole).value<QnUuid>() < right.data(Qn::UuidRole).value<QnUuid>();
+    private:
+        QString m_filterText;
+        QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
     };
 
-    template <typename T>
-    bool lessThanByRole(const QModelIndex &left, const QModelIndex &right, int role, std::function<bool (T left, T right)> comp = std::less<T>()) const {
-        T lValue = left.data(role).value<T>();
-        T rValue = right.data(role).value<T>();
-        if (lValue != rValue)
-            return comp(lValue, rValue);
-        return defaultLessThan(left, right);
-    }
-
-private:
-    QString m_filterText;
-    QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
-};
+}   //anonymous namespace
 
 
 QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
@@ -177,10 +181,10 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
     }
 
-    QnSortedBusinessRulesModel* sortModel = new QnSortedBusinessRulesModel(this);
+    SortRulesProxyModel* sortModel = new SortRulesProxyModel(this);
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &QnSortedBusinessRulesModel::setText);
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
 
     ui->tableView->setModel(sortModel);
     ui->tableView->horizontalHeader()->setVisible(true);
@@ -364,7 +368,7 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
-    QnSortedBusinessRulesModel* proxyModel = dynamic_cast<QnSortedBusinessRulesModel*>(ui->tableView->model());
+    SortRulesProxyModel* proxyModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model());
     Q_ASSERT_X(proxyModel, Q_FUNC_INFO, "Make sure model is valid");
     if (!proxyModel)
         return;
