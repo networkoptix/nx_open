@@ -119,13 +119,13 @@ TEST_F(HttpClientServerTest, FileDownload)
     nx_http::HttpClient client;
     client.setMessageBodyReadTimeoutMs(3000);
 
-    for (int i=0; i<1024; ++i)
+    for (int i=0; i<77; ++i)
     {
         ASSERT_TRUE(client.doGet(url));
         ASSERT_TRUE(client.response() != nullptr);
         ASSERT_EQ(nx_http::StatusCode::ok, client.response()->statusLine.statusCode);
         //emulating error response from server
-        if (rand() % 10 == 0)
+        if (rand() % 3 == 0)
             continue;
         nx_http::BufferType msgBody;
         while (!client.eof())
