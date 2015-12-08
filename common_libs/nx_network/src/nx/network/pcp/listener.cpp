@@ -13,7 +13,7 @@ Listener::Listener(Events& events)
 
 Listener::~Listener()
 {
-    m_socket->cancelAsyncIO();
+    m_socket->pleaseStopSync();
 }
 
 void Listener::readAsync()

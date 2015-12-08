@@ -9,7 +9,6 @@
 
 #include "simple_socket_test_helper.h"
 
-
 TEST( TcpSocket, KeepAliveOptions )
 {
     if( SocketFactory::isStreamSocketTypeEnforced() )
@@ -52,13 +51,12 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-
 static const QByteArray kTestMessage("Ping");
 static const size_t kClientCount(3);
 
 TEST(TcpSocket, SimpleSync)
 {
-    socketSimpleSync< TCPServerSocket, TCPSocket >(
+    socketSimpleSync<TCPServerSocket, TCPSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);
@@ -66,7 +64,18 @@ TEST(TcpSocket, SimpleSync)
 
 TEST(TcpSocket, SimpleAsync)
 {
-    socketSimpleAsync< TCPServerSocket, TCPSocket >(
+    socketSimpleAsync<TCPServerSocket, TCPSocket>(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount,
+        [&](std::unique_ptr<QnStoppableAsync> socket){
+            socket->pleaseStopSync();
+        });
+}
+
+TEST(TcpSocket, SimpleTrueAsync)
+{
+    socketSimpleTrueAsync<TCPServerSocket, TCPSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);

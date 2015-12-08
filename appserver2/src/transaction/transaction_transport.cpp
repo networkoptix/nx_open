@@ -308,14 +308,14 @@ void QnTransactionTransport::closeSocket()
 {
     if( m_outgoingDataSocket )
     {
-        m_outgoingDataSocket->terminateAsyncIO( true );
+        m_outgoingDataSocket->pleaseStopSync();
         m_outgoingDataSocket->close();
     }
 
     if( m_incomingDataSocket &&
         m_incomingDataSocket != m_outgoingDataSocket )   //they are equal in case of bidirectional connection
     {
-        m_incomingDataSocket->terminateAsyncIO( true );
+        m_incomingDataSocket->pleaseStopSync();
         m_incomingDataSocket->close();
     }
 

@@ -193,7 +193,7 @@ void MediatorAddressPublisher::terminate()
         isTerminating = true;
     }
 
-    m_timerSocket->terminateAsyncIO( true );
+    m_timerSocket->pleaseStopSync();
 }
 
 } // namespase cc

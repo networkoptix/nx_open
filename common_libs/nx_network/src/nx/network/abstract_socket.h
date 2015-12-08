@@ -17,12 +17,13 @@
 #include "nettools.h"
 #include "socket_common.h"
 #include "utils/common/systemerror.h"
-
+#include "utils/common/stoppable.h"
 
 //todo: #ak cancel asynchoronous operations
 
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class NX_NETWORK_API AbstractSocket
+    : public QnStoppableAsync
 {
 public:
 #ifdef Q_OS_WIN
@@ -154,11 +155,6 @@ public:
     */
     template<class HandlerType>
     void dispatch( HandlerType&& handler ) { dispatchImpl( std::forward<HandlerType>(handler) ); }
-    //!Terminates socket operations. This means that no operations can be executed on socket after this call
-    /*!
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
-    */
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) = 0;
 
 protected:
     virtual void postImpl( std::function<void()>&& handler ) = 0;
@@ -279,13 +275,29 @@ public:
             return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
         }
 
-    //!
+    //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
-        It is garanteed that after return of this method no async handler will be called
-        \param eventType Possible values: \a aio::etRead, \a aio::etWrite, \a aio::etTimedOut or \a aio::etNone to cancel all async aio
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
+        \param eventType event to cancel
     */
-    virtual void cancelAsyncIO( aio::EventType eventType = aio::etNone, bool waitForRunningHandlerCompletion = true ) = 0;
+    virtual void cancelIOAsync( aio::EventType eventType,
+                                std::function< void() > handler) = 0;
+
+    //!Cancels async operation and blocks until cancellation is stopped
+    /*!
+        \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
+    */
+    void cancelIOSync(aio::EventType eventType)
+    {
+        std::promise< bool > promise;
+        cancelIOAsync( eventType, [ & ](){ promise.set_value( true ); } );
+        promise.get_future().wait();
+    }
+
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop( std::function< void() > handler ) override
+    {
+        cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
+    }
 
 protected:
     virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
@@ -436,11 +448,6 @@ public:
         {
             return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
         }
-    //!
-    /*!
-        \param waitForRunningHandlerCompletion If \a true, it is garanteed that after return of this method no async handler is running
-    */
-    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion = true ) = 0;
 
 protected:
     virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;

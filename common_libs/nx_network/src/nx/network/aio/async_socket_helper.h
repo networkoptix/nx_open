@@ -117,7 +117,7 @@ public:
         //cancel ongoing async I/O. Doing this only if AsyncSocketImplHelper::eventTriggered is down the stack
         if( this->m_socket->impl()->aioThread.load() == QThread::currentThread() )
         {
-            nx::SocketGlobals::addressResolver().cancel( this, true );    //TODO #ak must not block here!
+            nx::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
 
             if( m_connectSendHandlerTerminatedFlag )
                 nx::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
@@ -280,60 +280,35 @@ public:
             timeoutMs );
     }
 
-    void cancelAsyncIO( const aio::EventType eventType, bool waitForRunningHandlerCompletion )
+    void cancelIOAsync( const aio::EventType eventType,
+                        std::function<void()> handler )
     {
-        if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, waitForRunningHandlerCompletion);
-
-         ++this->m_socket->impl()->terminated;
-        if (waitForRunningHandlerCompletion)
+        auto cancelImpl = [=]()
         {
-            QnMutex mtx;
-            QnWaitCondition cond;
-            bool done = false;
-            nx::SocketGlobals::aioService().dispatch(
-                this->m_socket,
-                [this, &mtx, &cond, &done, eventType]() {
-                    stopPollingSocket(this->m_socket, eventType);
-                    QnMutexLocker lk(&mtx);
-                    done = true;
-                    cond.wakeAll();
-                });
+            // cancelIOSync will be instant from socket's IO thread
+            nx::SocketGlobals::aioService().dispatch( this->m_socket, [=]()
+            {
+                stopPollingSocket( this->m_socket, eventType );
+                std::atomic_thread_fence( std::memory_order_acquire );
 
-            QnMutexLocker lk(&mtx);
-            while(!done)
-                cond.wait(lk.mutex());
-        }
-        else
-        {
-            nx::SocketGlobals::aioService().dispatch(
-                this->m_socket,
-                [this, eventType]() {
-                    stopPollingSocket(this->m_socket, eventType);
-                } );
-        }
-        --this->m_socket->impl()->terminated;
+                //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+                //  avoiding unnecessary removeFromWatch calls in eventTriggered
+
+                if (eventType == aio::etRead || eventType == aio::etNone)
+                    ++m_recvAsyncCallCounter;
+                if (eventType == aio::etWrite || eventType == aio::etNone)
+                    ++m_connectSendAsyncCallCounter;
+                if (eventType == aio::etTimedOut || eventType == aio::etNone)
+                    ++m_registerTimerCallCounter;
+
+                handler();
+            });
+        };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
-            nx::SocketGlobals::addressResolver().cancel(this, waitForRunningHandlerCompletion);
-
-        std::atomic_thread_fence(std::memory_order_acquire);
-        if (m_threadHandlerIsRunningIn.load(std::memory_order_relaxed) == QThread::currentThreadId())
-        {
-            //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-            //  avoiding unnecessary removeFromWatch calls in eventTriggered
-            if (eventType == aio::etRead || eventType == aio::etNone)
-                ++m_recvAsyncCallCounter;
-            if (eventType == aio::etWrite || eventType == aio::etNone)
-                ++m_connectSendAsyncCallCounter;
-            if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                ++m_registerTimerCallCounter;
-        }
+            nx::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
         else
-        {
-            //TODO #ak AIO engine does not support truly async cancellation yet
-            assert( waitForRunningHandlerCompletion );
-        }
+            cancelImpl();
     }
 
 private:
@@ -650,7 +625,9 @@ private:
     }
 
     //!Call this from within aio thread only
-    void stopPollingSocket(SocketType* sock, const aio::EventType eventType)
+    void stopPollingSocket(
+        SocketType* sock,
+        const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
         nx::SocketGlobals::aioService().cancelPostedCalls(sock, true);
@@ -686,11 +663,6 @@ public:
         //NOTE removing socket not from completion handler while completion handler is running in another thread is undefined behavour, so no synchronization here
         if( m_terminatedFlagPtr )
             *m_terminatedFlagPtr = true;
-    }
-
-    void terminate()
-    {
-        cancelAsyncIO(true);
     }
 
     virtual void eventTriggered(SocketType* sock, aio::EventType eventType) throw() override
@@ -755,13 +727,21 @@ public:
         return nx::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 
-    void cancelAsyncIO(bool waitForRunningHandlerCompletion)
+    void cancelIOAsync(std::function< void() > handler)
     {
-        nx::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, waitForRunningHandlerCompletion);
-        if( m_threadHandlerIsRunningIn.load( std::memory_order_acquire ) == QThread::currentThreadId() )
-            ++m_acceptAsyncCallCount;     //we are in aio thread, eventTriggered is down the stack
-        else
-            assert( waitForRunningHandlerCompletion );      //TODO #ak AIO engine does not support truly async cancellation yet
+        nx::SocketGlobals::aioService().dispatch(this->m_sock, [=]()
+        {
+            nx::SocketGlobals::aioService().removeFromWatch(m_sock, aio::etRead, true);
+            ++m_acceptAsyncCallCount;
+            handler();
+        } );
+    }
+
+    void cancelIOSync()
+    {
+        std::promise< bool > promise;
+        cancelIOAsync( [ & ](){ promise.set_value( true ); } );
+        promise.get_future().wait();
     }
 
 private:

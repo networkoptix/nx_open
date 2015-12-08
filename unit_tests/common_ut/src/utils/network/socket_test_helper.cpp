@@ -78,7 +78,7 @@ TestConnection::~TestConnection()
         _socket = std::move(m_socket);
     }
     if( _socket )
-        _socket->terminateAsyncIO( true );
+        _socket->pleaseStopSync();
 
     {
         std::unique_lock<std::mutex> lk(mtx1);
@@ -143,7 +143,7 @@ void TestConnection::onConnected( int id, SystemError::ErrorCode errorCode )
 
     if( errorCode != SystemError::noError )
     {
-        m_socket->terminateAsyncIO(true);
+        m_socket->pleaseStopSync();
         auto handler = std::move( m_handler );
         lk.unlock();
         return handler( id, this, errorCode );
@@ -178,7 +178,7 @@ void TestConnection::onDataReceived( int id, SystemError::ErrorCode errorCode, s
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        m_socket->terminateAsyncIO(true);
+        m_socket->pleaseStopSync();
         auto handler = std::move(m_handler);
         lk.unlock();
         return handler( id, this, errorCode );
@@ -205,7 +205,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
         return;
     if( errorCode != SystemError::noError && errorCode != SystemError::timedOut )
     {
-        m_socket->terminateAsyncIO(true);
+        m_socket->pleaseStopSync();
         auto handler = std::move( m_handler );
         lk.unlock();
         return handler( id, this, errorCode );
@@ -214,7 +214,7 @@ void TestConnection::onDataSent( int id, SystemError::ErrorCode errorCode, size_
     m_totalBytesSent += bytesWritten;
     if( m_totalBytesSent >= m_bytesToSendThrough )
     {
-        m_socket->terminateAsyncIO(true);
+        m_socket->pleaseStopSync();
         auto handler = std::move( m_handler );
         lk.unlock();
         handler( id, this, SystemError::getLastOSErrorCode() );
@@ -251,7 +251,7 @@ void RandomDataTcpServer::pleaseStop()
 void RandomDataTcpServer::join()
 {
     if( m_serverSocket )
-        m_serverSocket->terminateAsyncIO( true );
+        m_serverSocket->pleaseStopSync();
 
     QnMutexLocker lk(&m_mutex);
     auto acceptedConnections = std::move(m_acceptedConnections);

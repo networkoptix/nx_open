@@ -90,12 +90,12 @@ TEST(SocketUdt, cancelConnect)
             [&handlerCalled](SystemError::ErrorCode /*errorCode*/){
                 handlerCalled = true;
             });
-        sock.cancelAsyncIO(aio::EventType::etNone, true);
+        sock.pleaseStopSync();
 
         std::this_thread::sleep_for(std::chrono::milliseconds(rand() % 50));
     }
 
-    serverSocket.cancelAsyncIO(true);
+    serverSocket.pleaseStopSync();
 }
 
 TEST(SocketUdt_UdtPollSet, general)
@@ -120,17 +120,25 @@ TEST(SocketUdt_UdtPollSet, general)
 static const QByteArray kTestMessage("Ping");
 static const size_t kClientCount(3);
 
-TEST(SocketUdt, SimpleAsync)
+TEST(SocketUdt, SimpleSync)
 {
-    socketSimpleAsync< UdtStreamServerSocket, UdtStreamSocket >(
+    socketSimpleSync<UdtStreamServerSocket, UdtStreamSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);
 }
 
-TEST(SocketUdt, SimpleSync)
+TEST(SocketUdt, SimpleAsync)
 {
-    socketSimpleSync< UdtStreamServerSocket, UdtStreamSocket >(
+    socketSimpleAsync<UdtStreamServerSocket, UdtStreamSocket>(
+        SocketAddress("localhost:12345"),
+        kTestMessage,
+        kClientCount);
+}
+
+TEST(SocketUdt, SimpleTrueAsync)
+{
+    socketSimpleTrueAsync<UdtStreamServerSocket, UdtStreamSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount);

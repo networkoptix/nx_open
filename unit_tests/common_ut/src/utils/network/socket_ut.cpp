@@ -146,6 +146,24 @@ TEST( Socket, AsyncOperationCancellation )
     QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
 }
 
+TEST( Socket, ServerSocketSyncCancellation )
+{
+    static const int TEST_RUNS = 7;
+
+    for( int i = 0; i < TEST_RUNS; ++i )
+    {
+        std::unique_ptr<AbstractStreamServerSocket> serverSocket( SocketFactory::createStreamServerSocket() );
+        ASSERT_TRUE( serverSocket->setNonBlockingMode(true) );
+        ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
+        ASSERT_TRUE( serverSocket->listen() );
+        serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
+        serverSocket->pleaseStopSync();
+    }
+
+    //waiting for some calls to deleted objects
+    QThread::sleep( SECONDS_TO_WAIT_AFTER_TEST );
+}
+
 TEST( Socket, ServerSocketAsyncCancellation )
 {
     static const int TEST_RUNS = 7;
@@ -157,7 +175,7 @@ TEST( Socket, ServerSocketAsyncCancellation )
         ASSERT_TRUE( serverSocket->bind(SocketAddress()) );
         ASSERT_TRUE( serverSocket->listen() );
         serverSocket->acceptAsync( [](SystemError::ErrorCode, AbstractStreamSocket*){  } );
-        serverSocket->terminateAsyncIO( true );
+        QnStoppableAsync::pleaseStop( [](){}, std::move( serverSocket ) );
     }
 
     //waiting for some calls to deleted objects
@@ -227,7 +245,7 @@ TEST_F( SocketHostNameResolveTest, HostNameResolve2 )
         lk.unlock();
         if( connectionToCancel )
         {
-            connectionToCancel->terminateAsyncIO(true);
+            connectionToCancel->pleaseStopSync();
             connectionToCancel.reset();
             ++cancelledConnectionsCount;
         }
@@ -283,7 +301,7 @@ TEST( Socket, HostNameResolveCancellation )
                 done = true;
                 resolvedAddress = connection->getForeignAddress().address;
             } );
-        connection->terminateAsyncIO(true);
+        connection->pleaseStopSync();
     }
 }
 
@@ -302,7 +320,7 @@ TEST( Socket, BadHostNameResolve )
             ( SystemError::ErrorCode /*errorCode*/ ) mutable {
                 ASSERT_EQ( i, iBak );
             } );
-        connection->terminateAsyncIO(true);
+        connection->pleaseStopSync();
     }
 }
 
@@ -335,7 +353,7 @@ TEST( Socket, postCancellation )
                 } );
 
             for( const auto& sock : sockets )
-                sock->terminateAsyncIO(true);
+                sock->pleaseStopSync();
 
             //QThread::usleep( 100 );
         }

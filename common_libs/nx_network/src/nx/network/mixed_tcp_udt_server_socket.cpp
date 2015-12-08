@@ -43,6 +43,8 @@ MixedTcpUdtServerSocket::MixedTcpUdtServerSocket()
 
 MixedTcpUdtServerSocket::~MixedTcpUdtServerSocket()
 {
+    Q_ASSERT_X( false, Q_FUNC_INFO, "Fix implementation!" );
+    /*
     cancelAsyncIO( true );
     while( !m_queue.empty() )
     {
@@ -52,6 +54,7 @@ MixedTcpUdtServerSocket::~MixedTcpUdtServerSocket()
     for( AbstractStreamServerSocket* serverSock : m_socketDelegates )
         delete serverSock;
     m_socketDelegates.clear();
+    */
 }
 
 bool MixedTcpUdtServerSocket::bind(const SocketAddress& localAddress)
@@ -194,8 +197,10 @@ AbstractStreamSocket* MixedTcpUdtServerSocket::accept()
     return conn.second;
 }
 
-void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion)
+void MixedTcpUdtServerSocket::pleaseStop( std::function< void() > handler )
 {
+    Q_ASSERT_X( false, Q_FUNC_INFO, "Fix implementation!" );
+    /*
     for( size_t i = 0; i < m_socketDelegates.size(); ++i )
         m_socketDelegates[i]->cancelAsyncIO(waitForRunningHandlerCompletion);
 
@@ -206,12 +211,7 @@ void MixedTcpUdtServerSocket::cancelAsyncIO(bool waitForRunningHandlerCompletion
     m_cond.wakeAll();
     for( size_t i = 0; i < m_socketDelegates.size(); ++i )
         m_acceptingFlags[i] = false;
-}
-
-void MixedTcpUdtServerSocket::terminateAsyncIO( bool /*waitForRunningHandlerCompletion*/ )
-{
-    //TODO #ak
-    assert( false );
+    */
 }
 
 void MixedTcpUdtServerSocket::postImpl( std::function<void()>&& handler )

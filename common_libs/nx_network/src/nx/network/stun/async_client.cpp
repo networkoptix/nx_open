@@ -31,7 +31,7 @@ AsyncClient::~AsyncClient()
         baseConnection->pleaseStop();
 
     if( connectingSocket )
-        connectingSocket->terminateAsyncIO( true );
+        connectingSocket->pleaseStopSync();
 }
 
 void AsyncClient::openConnection( ConnectionHandler connectHandler,
@@ -180,7 +180,7 @@ void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
 {
     if( m_connectingSocket )
     {
-        m_connectingSocket->cancelAsyncIO();
+        m_connectingSocket->pleaseStopSync();
         m_connectingSocket = nullptr;
     }
 

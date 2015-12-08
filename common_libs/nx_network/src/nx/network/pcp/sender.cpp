@@ -10,7 +10,7 @@ Sender::Sender(const HostAddress& server)
 
 Sender::~Sender()
 {
-    m_socket->cancelAsyncIO();
+    m_socket->pleaseStopSync();
 }
 
 void Sender::send(std::shared_ptr<QByteArray> request)

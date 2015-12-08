@@ -88,10 +88,10 @@ public:
     //  What's difference between foreign address with peer address 
     virtual SocketAddress getForeignAddress() const override;
     virtual bool isConnected() const override;
-    virtual void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion = true ) override;
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
-
+    //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler) override;
 
     // AbstractStreamSocket ------ interface
     virtual bool reopen() override;
@@ -150,9 +150,7 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen( int queueLen = 128 ) ;
     virtual AbstractStreamSocket* accept() ;
-    virtual void cancelAsyncIO(bool waitForRunningHandlerCompletion) override;
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    virtual void pleaseStop( std::function< void() > handler ) override;
 
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;

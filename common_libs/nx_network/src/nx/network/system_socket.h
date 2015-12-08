@@ -171,9 +171,6 @@ public:
 
     virtual ~CommunicatingSocket();
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    void terminateAsyncIO( bool waitForRunningHandlerCompletion );
-
     //!Implementation of AbstractCommunicatingSocket::connect
     bool connect(
         const SocketAddress& remoteAddress,
@@ -195,8 +192,9 @@ public:
     //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
     void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
-    void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
-
+    void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler);
 
     void shutdown();
     virtual void close() override;
@@ -277,15 +275,12 @@ public:
      */
     static int accept(int sockDesc);
 
-    //!Implementation of AbstractSocket::terminateAsyncIO
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
-
     //!Implementation of AbstractStreamServerSocket::listen
     virtual bool listen( int queueLen ) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
-    //!Implementation of AbstractStreamServerSocket::cancelAsyncIO
-    virtual void cancelAsyncIO( bool waitForRunningHandlerCompletion ) override;
+    //!Implementation of QnStoppable::pleaseStop
+    virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl

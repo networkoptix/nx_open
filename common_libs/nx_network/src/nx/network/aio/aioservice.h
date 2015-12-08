@@ -62,10 +62,14 @@ namespace aio
             SocketType* const sock,
             aio::EventType eventToWatch,
             AIOEventHandler<SocketType>* const eventHandler,
-            std::function<void()> socketAddedToPollHandler = std::function<void()>() )
+            std::function<void()> socketAddedToPollHandler = std::function<void()>())
         {
             QnMutexLocker lk( &m_mutex );
-            watchSocketNonSafe( sock, eventToWatch, eventHandler, socketAddedToPollHandler );
+            watchSocketNonSafe(
+                sock,
+                eventToWatch,
+                eventHandler,
+                std::move(socketAddedToPollHandler));
         }
 
         //!Cancel monitoring \a sock for event \a eventType
@@ -82,10 +86,16 @@ namespace aio
         void removeFromWatch(
             SocketType* const sock,
             aio::EventType eventType,
-            bool waitForRunningHandlerCompletion = true )
+            bool waitForRunningHandlerCompletion = true,
+            std::function<void()> pollingStoppedHandler = std::function<void()>())
         {
             QnMutexLocker lk( &m_mutex );
-            removeFromWatchNonSafe( &lk, sock, eventType, waitForRunningHandlerCompletion );
+            removeFromWatchNonSafe(
+                &lk,
+                sock,
+                eventType,
+                waitForRunningHandlerCompletion, 
+                std::move(pollingStoppedHandler));
         }
 
         //!Register timeout, associated with socket \a sock
@@ -261,7 +271,8 @@ namespace aio
             QnMutexLockerBase* const /*lock*/,
             SocketType* const sock,
             aio::EventType eventType,
-            bool waitForRunningHandlerCompletion = true )
+            bool waitForRunningHandlerCompletion = true,
+            std::function<void()> pollingStoppedHandler = std::function<void()>())
         {
             SocketAIOContext<SocketType>& aioHandlingContext = getAIOHandlingContext<SocketType>();
 
@@ -271,7 +282,11 @@ namespace aio
             {
                 auto aioThread = it->second.first;
                 aioHandlingContext.sockets.erase( it );
-                aioThread->removeFromWatch( sock, eventType, waitForRunningHandlerCompletion );
+                aioThread->removeFromWatch(
+                    sock,
+                    eventType,
+                    waitForRunningHandlerCompletion,
+                    std::move(pollingStoppedHandler));
             }
         }
 

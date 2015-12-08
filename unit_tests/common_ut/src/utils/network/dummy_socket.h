@@ -34,13 +34,14 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const  override;
     virtual SOCKET_HANDLE handle() const override;
-    virtual void terminateAsyncIO( bool waitForRunningHandlerCompletion ) override;
 
     virtual bool connect(
         const SocketAddress& remoteSocketAddress,
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
     virtual SocketAddress getForeignAddress() const override;
-    virtual void cancelAsyncIO( aio::EventType eventType = aio::etNone, bool waitForRunningHandlerCompletion = true ) override;
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function<void()> cancellationDoneHandler) override;
 
     virtual bool reopen() override;
     virtual bool setNoDelay( bool value ) override;

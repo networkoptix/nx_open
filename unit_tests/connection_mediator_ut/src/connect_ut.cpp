@@ -29,7 +29,7 @@ protected:
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
-        SocketGlobals::addressResolver().resetMediatorAddress( address );
+        SocketGlobals::mediatorConnector().mockupAddress( address );
     }
 
     const SocketAddress address;

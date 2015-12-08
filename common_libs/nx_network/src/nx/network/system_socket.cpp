@@ -550,12 +550,6 @@ CommunicatingSocket::~CommunicatingSocket()
     m_aioHelper->terminate();
 }
 
-void CommunicatingSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
-{
-    m_aioHelper->terminateAsyncIO();    //all futher async operations will be ignored
-    m_aioHelper->cancelAsyncIO( aio::etNone, waitForRunningHandlerCompletion );
-}
-
 //!Implementation of AbstractCommunicatingSocket::connect
 bool CommunicatingSocket::connect( const SocketAddress& remoteAddress, unsigned int timeoutMs )
 {
@@ -763,9 +757,11 @@ void CommunicatingSocket::shutdown()
 #endif
 }
 
-void CommunicatingSocket::cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion )
+void CommunicatingSocket::cancelIOAsync(
+    aio::EventType eventType,
+    std::function<void()> cancellationDoneHandler)
 {
-    m_aioHelper->cancelAsyncIO( eventType, waitForRunningHandlerCompletion );
+    m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
 
 void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
@@ -1200,48 +1196,22 @@ bool TCPServerSocket::listen( int queueLen )
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::terminateAsyncIO( bool waitForRunningHandlerCompletion )
+void TCPServerSocket::pleaseStop( std::function<void()> completionHandler )
 {
     //TODO #ak add general implementation to Socket class and remove this method
-    if (waitForRunningHandlerCompletion)
+    m_implDelegate.dispatch( [ this, completionHandler ]()
     {
-        QnWaitCondition cond;
-        QnMutex mtx;
-        bool cancelled = false;
+        //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
 
-        m_implDelegate.dispatch(
-            [this, &cond, &mtx, &cancelled]()
-            {
-                nx::SocketGlobals::aioService().cancelPostedCalls(
-                    static_cast<Pollable*>(&m_implDelegate), true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
+        nx::SocketGlobals::aioService().cancelPostedCalls(
+            static_cast<Pollable*>(&m_implDelegate), true);
+        nx::SocketGlobals::aioService().removeFromWatch(
+            static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
+        nx::SocketGlobals::aioService().removeFromWatch(
+            static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
 
-                QnMutexLocker lk(&mtx);
-                cancelled = true;
-                cond.wakeAll();
-            } );
-
-        QnMutexLocker lk(&mtx);
-        while(!cancelled)
-            cond.wait(lk.mutex());
-    }
-    else
-    {
-        m_implDelegate.dispatch(
-            [this]()
-            {
-                //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
-                nx::SocketGlobals::aioService().cancelPostedCalls(
-                    static_cast<Pollable*>(&m_implDelegate), true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-                nx::SocketGlobals::aioService().removeFromWatch(
-                    static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
-        } );
-    }
+        completionHandler();
+    } );
 }
 
 //!Implementation of AbstractStreamServerSocket::accept
@@ -1254,12 +1224,6 @@ AbstractStreamSocket* TCPServerSocket::accept()
         return nullptr;
 
     return d->accept( recvTimeoutMs );
-}
-
-void TCPServerSocket::cancelAsyncIO( bool waitForRunningHandlerCompletion )
-{
-    TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
-    d->asyncServerSocketHelper.cancelAsyncIO(waitForRunningHandlerCompletion);
 }
 
 bool TCPServerSocket::setListen(int queueLen)

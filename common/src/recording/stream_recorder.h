@@ -26,6 +26,8 @@ extern "C"
 #include "core/resource/resource_consumer.h"
 #include "transcoding/filters/filter_helper.h"
 
+#include <boost/optional.hpp>
+
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;

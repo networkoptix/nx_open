@@ -78,7 +78,7 @@ namespace nx_api
                 handler();
             m_connectionCloseHandlers.clear();
 
-            m_streamSocket->cancelAsyncIO();
+            m_streamSocket->pleaseStopSync();
             m_streamSocket->close();
         }
 

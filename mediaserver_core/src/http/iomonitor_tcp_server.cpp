@@ -85,7 +85,7 @@ void QnIOMonitorConnectionProcessor::run()
         disconnect( camera.data(), nullptr, this, nullptr );
         lock.unlock();
         camera->inputPortListenerDetached();
-        d->socket->terminateAsyncIO(true);
+        d->socket->pleaseStopSync();
     }
 }
 

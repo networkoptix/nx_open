@@ -1,7 +1,7 @@
 #ifndef NX_CC_DNS_TABLE_H
 #define NX_CC_DNS_TABLE_H
 
-#include "utils/common/guard.h"
+#include <utils/common/guard.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/network/dns_resolver.h>
@@ -96,7 +96,13 @@ public:
                        bool natTraversal, void* requestId = nullptr );
 
     std::vector< AddressEntry > resolveSync( const HostAddress& hostName, bool natTraversal );
-    void cancel( void* requestId, bool waitForRunningHandlerCompletion = true );
+
+    //!Cancels request
+    /*!
+        if \a handler not provided the method will block until actual
+        cancelation is done
+    */
+    void cancel( void* requestId, std::function< void() > handler = nullptr );
     bool isRequestIdKnown( void* requestId ) const;
 
 private:
@@ -142,6 +148,7 @@ private:
         bool inProgress;
         bool natTraversal;
         ResolveHandler handler;
+        Guard guard;
 
         RequestInfo( HostAddress _address,
                      bool _natTraversal,

@@ -4,12 +4,12 @@
 
 #include <utils/thread/sync_queue.h>
 #include <utils/common/systemerror.h>
-
+#include <utils/common/stoppable.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
 
-template< typename ServerSocket, typename ClientSocket>
+template<typename ServerSocket, typename ClientSocket>
 static void socketSimpleSync(
     const SocketAddress& serverAddress,
     const QByteArray& testMessage,
@@ -64,11 +64,18 @@ static void socketSimpleSync(
 }
 
 
-template< typename ServerSocket, typename ClientSocket>
+static void stopSocketDefault(std::unique_ptr<QnStoppableAsync> socket)
+{
+    socket->pleaseStopSync();
+}
+
+template<typename ServerSocket, typename ClientSocket>
 static void socketSimpleAsync(
     const SocketAddress& serverAddress,
     const QByteArray& testMessage,
-    int clientCount)
+    int clientCount,
+    std::function<void(std::unique_ptr<QnStoppableAsync>)> stopSocket =
+        stopSocketDefault)
 {
     nx::SyncQueue< SystemError::ErrorCode > serverResults;
     nx::SyncQueue< SystemError::ErrorCode > clientResults;
@@ -102,7 +109,7 @@ static void socketSimpleAsync(
                 serverBuffer.resize(0);
             }
 
-            client->terminateAsyncIO(true);
+            stopSocket( std::move( client ) );
             server->acceptAsync(accept);
             serverResults.push(code);
         });
@@ -139,8 +146,29 @@ static void socketSimpleAsync(
     ASSERT_EQ(clientResults.pop(), SystemError::noError); // send
     ASSERT_EQ(serverResults.pop(), SystemError::noError); // recv
 
-    testClient->terminateAsyncIO(true);
-    server->terminateAsyncIO(true);
+    stopSocket(std::move(testClient));
+    stopSocket(std::move(server));
+}
+
+template<typename ServerSocket, typename ClientSocket>
+static void socketSimpleTrueAsync(
+    const SocketAddress& serverAddress,
+    const QByteArray& testMessage,
+    int clientCount)
+{
+    nx::SyncQueue<bool> stopQueue;
+    socketSimpleAsync<ServerSocket, ClientSocket>(
+        serverAddress, testMessage, clientCount,
+        [&](std::unique_ptr<QnStoppableAsync> socket)
+        {
+            QnStoppableAsync::pleaseStop([&](){ stopQueue.push(true); },
+                                         std::move(socket));
+        });
+
+    for (auto i = 0; i < clientCount; ++i)
+        EXPECT_EQ( stopQueue.pop(), true );
+
+    ASSERT_TRUE( stopQueue.isEmpty() );
 }
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

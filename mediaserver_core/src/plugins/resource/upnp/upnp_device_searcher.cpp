@@ -125,7 +125,7 @@ void UPNPDeviceSearcher::pleaseStop()
         it != m_socketList.end();
         ++it )
     {
-        it->second.sock->terminateAsyncIO( true );
+        it->second.sock->pleaseStopSync();
     }
     m_socketList.clear();
 
@@ -233,7 +233,7 @@ void UPNPDeviceSearcher::onSomeBytesRead(
                 }
             }
         }
-        udpSock->terminateAsyncIO( true );
+        udpSock->pleaseStopSync();
         return;
     }
 

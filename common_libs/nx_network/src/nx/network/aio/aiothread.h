@@ -187,7 +187,7 @@ public:
             eventHandler,
             timeoutMs,
             nullptr,
-            socketAddedToPollHandler));
+            std::move(socketAddedToPollHandler)));
         if (currentThreadSystemId() != systemThreadId())  //if eventTriggered is lower on stack, socket will be added to pollset before next poll call
             m_impl->pollSet.interrupt();
     }
@@ -203,7 +203,8 @@ public:
     void removeFromWatch(
         SocketType* const sock,
         aio::EventType eventType,
-        bool waitForRunningHandlerCompletion )
+        bool waitForRunningHandlerCompletion,
+        std::function<void()> pollingStoppedHandler = std::function<void()>())
     {
         //NOTE m_impl->aioServiceMutex is locked down the stack
 
@@ -270,7 +271,9 @@ public:
                 sock,
                 eventType,
                 nullptr,
-                0));
+                0,
+                nullptr,
+                std::move(pollingStoppedHandler)));
             m_impl->pollSet.interrupt();
         }
     }
@@ -482,7 +485,7 @@ public:
         PostAsyncCallTask(
             SocketType* const _socket,
             std::function<void()>&& _postHandler)
-            :
+        :
             SocketAddRemoveTask(
                 TaskType::tCallFunc,
                 _socket,
@@ -505,7 +508,7 @@ public:
         CancelPostedCallsTask(
             SocketSequenceType socketSequence,
             std::atomic<int>* const _taskCompletionEvent = nullptr)
-            :
+        :
             SocketAddRemoveTask(
                 TaskType::tCancelPostedCalls,
                 nullptr,
@@ -526,7 +529,7 @@ public:
         aio::EventType eventType;
 
         PeriodicTaskData()
-            :
+        :
             socket(NULL),
             eventType(aio::etNone)
         {
