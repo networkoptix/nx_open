@@ -2,6 +2,7 @@
 #include <nx/utils/log/log.h>
 #include "utils/common/util.h"
 #include "storage_manager.h"
+#include "utils/common/systemerror.h"
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
 static const int SPACE_CLEARANCE_INTERVAL = 15;
@@ -60,9 +61,11 @@ void QnFileDeletor::init(const QString& tmpRoot)
 
 bool QnFileDeletor::internalDeleteFile(const QString& fileName)
 {
-    if (!QFile::remove(fileName))
-        return false;
-    return true;
+    bool rez = QFile::remove(fileName);
+    if (rez)
+        return true;
+    auto lastErr = SystemError::getLastOSErrorCode();
+    return lastErr == SystemError::fileNotFound || lastErr == SystemError::pathNotFound;
 }
 
 void QnFileDeletor::deleteDirRecursive(const QString& dirName)
@@ -80,13 +83,10 @@ void QnFileDeletor::deleteDirRecursive(const QString& dirName)
 
 void QnFileDeletor::deleteFile(const QString& fileName)
 {
-    if (QFile::exists(fileName))
+    if (!internalDeleteFile(fileName))
     {
-        if (!internalDeleteFile(fileName))
-        {
-            NX_LOG(lit("Can't delete file right now. Postpone deleting. Name=%1").arg(fileName), cl_logWARNING);
-            postponeFile(fileName);
-        }
+        NX_LOG(lit("Can't delete file right now. Postpone deleting. Name=%1").arg(fileName), cl_logWARNING);
+        postponeFile(fileName);
     }
 }
 
@@ -141,7 +141,7 @@ void QnFileDeletor::processPostponedFiles()
     QSet<QString> newList;
     for (QSet<QString>::Iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
     {
-        if (QFile::exists(*itr) && !internalDeleteFile(*itr))
+        if (!internalDeleteFile(*itr))
             newList << *itr;
     }
     if (newList.isEmpty())

@@ -9,6 +9,7 @@
 #include "utils/common/buffered_file.h"
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
+#include <common/common_module.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -74,11 +75,13 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 #endif
     }
     
+    /*
     if (openMode & QIODevice::WriteOnly) 
     {
         QDir dir;
         dir.mkpath(QnFile::absolutePath(fileName));
     }
+    */
 
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
@@ -133,6 +136,12 @@ bool QnFileStorageResource::checkWriteCap() const
     if (hasFlags(Qn::deprecated))
         return false;
     
+    QnMutexLocker lock(&m_writeTestMutex);
+    if (!m_writeCapCached.is_initialized()) 
+        m_writeCapCached = testWriteCapInternal();
+    return *m_writeCapCached;
+
+    /*
     QString localDirPath = m_localPath.isEmpty() ? getPath() : m_localPath;
     QDir dir(localDirPath);
     
@@ -154,6 +163,7 @@ bool QnFileStorageResource::checkWriteCap() const
         dir.remove(localDirPath);
     
     return result;
+    */
 }
 
 bool QnFileStorageResource::checkDBCap() const
@@ -377,7 +387,8 @@ void QnFileStorageResource::setUrl(const QString& url)
 QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
-    m_capabilities(0)
+    m_capabilities(0),
+    m_cachedTotalSpace(QnStorageResource::UnknownSize)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -460,11 +471,14 @@ qint64 QnFileStorageResource::getTotalSpace()
     if (!initOrUpdate())
         return QnStorageResource::UnknownSize;
 
-    return getDiskTotalSpace(
+    QnMutexLocker locker (&m_writeTestMutex);
+    if (m_cachedTotalSpace <= 0)
+        m_cachedTotalSpace = getDiskTotalSpace(
         m_localPath.isEmpty() ?
         getPath() :
         m_localPath
-    );
+        );
+    return m_cachedTotalSpace;
 }
 
 QnAbstractStorageResource::FileInfoList QnFileStorageResource::getFileList(const QString& dirName)
@@ -502,7 +516,17 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     return QnFile::getFileSize(translateUrlToLocal(url));
 }
 
-bool QnFileStorageResource::isAvailable() const 
+bool QnFileStorageResource::testWriteCapInternal() const
+{
+    QString fileName(lit("%1%2.tmp"));
+    QString localGuid = qnCommon->moduleGUID().toString();
+    localGuid = localGuid.mid(1, localGuid.length() - 2);
+    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
+    QFile file(fileName);
+    return file.open(QIODevice::WriteOnly);
+}
+
+bool QnFileStorageResource::isAvailable() const
 {
     if (!m_valid)
         m_dirty = true;
@@ -513,6 +537,13 @@ bool QnFileStorageResource::isAvailable() const
     if(!isStorageDirMounted())
         return false;
 
+    QnMutexLocker lock(&m_writeTestMutex);
+    //m_hasFreeSpaceCached = getFreeSpace() > 0;
+    m_writeCapCached = testWriteCapInternal(); // update cached value periodically
+    m_cachedTotalSpace = getDiskTotalSpace(m_localPath.isEmpty() ? getPath() : m_localPath ); // update cached value periodically
+    return *m_writeCapCached;
+
+    /*
     QString tmpDir = closeDirPath(translateUrlToLocal(getPath())) + QString("tmp") + QString::number(rand());
     QDir dir(tmpDir);
     if (dir.exists()) {
@@ -536,8 +567,8 @@ bool QnFileStorageResource::isAvailable() const
             return false;
         }
     }
-
     return false;
+    */
 }
 
 QString QnFileStorageResource::removeProtocolPrefix(const QString& url)

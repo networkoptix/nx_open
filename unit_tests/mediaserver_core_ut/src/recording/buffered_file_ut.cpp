@@ -14,9 +14,11 @@ void doTestInternal(int systemFlags)
 {
     const QByteArray kTestFileName("test_data1.bin");
     const QByteArray kTestPattern("1234567890");
-    const int kPatternRepCnt = 1000 * 499;
+    const int kPatternRepCnt = 2000 * 499;
 
     // write file
+
+    QFile::remove(kTestFileName);
 
     std::unique_ptr<QBufferedFile> testFile(
         new QBufferedFile(

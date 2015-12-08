@@ -2197,7 +2197,9 @@ void MediaServerProcess::run()
     QnPlDlinkResourceSearcher dlinkSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&dlinkSearcher);
 #endif
-#ifdef ENABLE_DROID
+//#ifdef ENABLE_DROID
+#if 0
+    // not supported any more
     QnPlIpWebCamResourceSearcher plIpWebCamResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&plIpWebCamResourceSearcher);
 

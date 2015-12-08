@@ -110,7 +110,7 @@ public:
     void clearSpace(bool forced=false);
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
     
-    void clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
+    bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
     void clearMaxDaysData();
     void clearMaxDaysData(QnServer::ChunksCatalog catalogIdx);
 
