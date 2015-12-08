@@ -14,6 +14,7 @@
 #include <core/resource/media_server_user_attributes.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 
 #include <server/server_storage_manager.h>
 
@@ -134,16 +135,20 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     connect(qnServerStorageManager, &QnServerStorageManager::serverBackupFinished,          this, &QnStorageConfigWidget::at_serverBackupFinished);
 
     connect(qnServerStorageManager, &QnServerStorageManager::storageAdded,                  this, [this](const QnStorageResourcePtr &storage) {
-        if (m_server && storage->getParentServer() == m_server)
+        if (m_server && storage->getParentServer() == m_server) {
             m_model->addStorage(QnStorageModelInfo(storage));
+            emit hasChangesChanged();
+        }
     });
 
     connect(qnServerStorageManager, &QnServerStorageManager::storageChanged,                this, [this](const QnStorageResourcePtr &storage) {
         m_model->updateStorage(QnStorageModelInfo(storage));
+        emit hasChangesChanged();
     });
 
     connect(qnServerStorageManager, &QnServerStorageManager::storageRemoved,                this, [this](const QnStorageResourcePtr &storage) {
         m_model->removeStorage(QnStorageModelInfo(storage));
+        emit hasChangesChanged();
     });
 
 
@@ -153,17 +158,21 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 
         updateBackupInfo();
         updateRebuildInfo();
+        updateBackupWidgetsVisibility();
     });
 
     m_updateStatusTimer->setInterval(updateStatusTimeoutMs);
     connect(m_updateStatusTimer, &QTimer::timeout, this, [this] {
-        qnServerStorageManager->checkStoragesStatus(m_server);
+        if (isVisible())
+            qnServerStorageManager->checkStoragesStatus(m_server);
     });
 
     at_backupTypeComboBoxChange(ui->comboBoxBackupType->currentIndex());
 
+    QnResourceChangesListener *cameraBackupTypeListener = new QnResourceChangesListener(this);
+    cameraBackupTypeListener->connectToResources<QnVirtualCameraResource>(&QnVirtualCameraResource::backupQualitiesChanged, this, &QnStorageConfigWidget::updateBackupInfo);
+
     retranslateUi();
-    updateBackupWidgetsVisibility();
 }
 
 void QnStorageConfigWidget::retranslateUi() {
@@ -353,7 +362,17 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
     if (m_server == server)
         return;
 
+    if (m_server)
+        disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
+
     m_server = server;
+
+    if (m_server)
+        connect(m_server, &QnMediaServerResource::backupScheduleChanged, this, [this]() {
+            /* Current changes may be lost, it's OK. */
+            m_backupSchedule = m_server->getBackupSchedule();
+            emit hasChangesChanged();
+        });
 }
 
 void QnStorageConfigWidget::updateRebuildInfo() {
@@ -540,6 +559,10 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
             tr("In Realtime mode all data is backed up on continuously")
             , tr("Previous footage will not be backed up!"));
         return error(message);
+
+    } else if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
+        if (!m_backupSchedule.isValid())
+            return error(tr("Backup Schedule is invalid."));
     }
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
@@ -554,6 +577,10 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
 
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
+
+    if (qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Main).state != Qn::RebuildState_None
+     || qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Backup).state != Qn::RebuildState_None)
+        return error(tr("Couldn't start backup while rebuilding archive index is being processed."));
 
     return true;
 }
@@ -619,13 +646,23 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
 
     bool isMainPool = pool == QnServerStoragesPool::Main;
 
+    /* Here we must check actual backup schedule, not ui-selected. */
+    bool backupIsInProgress = m_server && m_server->getBackupSchedule().backupType != Qn::Backup_RealTime &&
+        qnServerStorageManager->backupStatus(m_server).state != Qn::BackupState_None;
+
+    ui->addExtStorageToMainBtn->setEnabled(!backupIsInProgress);
+    ui->addExtStorageToBackupBtn->setEnabled(!backupIsInProgress);
+
     bool canStartRebuild =
-            reply.state == Qn::RebuildState_None
+            m_server
+        &&  reply.state == Qn::RebuildState_None
         &&  !hasChanges()
         &&  any_of(m_model->storages(), [isMainPool](const QnStorageModelInfo &info) {
                 return info.isWritable
                     && info.isBackup != isMainPool;
-            });
+            })
+        && !backupIsInProgress
+    ;
 
     if (isMainPool) {
         ui->rebuildMainWidget->loadData(reply);
@@ -642,6 +679,7 @@ void QnStorageConfigWidget::at_serverRebuildStatusChanged( const QnMediaServerRe
         return;
 
     updateRebuildUi(pool, status);
+    updateBackupInfo();
 }
 
 void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerResourcePtr &server, const QnBackupStatusData &status ) {
@@ -649,10 +687,14 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
         return;
 
     updateBackupUi(status);
+    updateRebuildInfo();
 }
 
 void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServerResourcePtr &server, QnServerStoragesPool pool ) {
     if (server != m_server)
+        return;
+
+    if (!isVisible())
         return;
 
     bool isMain = (pool == QnServerStoragesPool::Main);
@@ -666,6 +708,9 @@ void QnStorageConfigWidget::at_serverRebuildArchiveFinished( const QnMediaServer
 
 void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResourcePtr &server ) {
     if (server != m_server)
+        return;
+
+    if (!isVisible())
         return;
 
     if (!m_backupCancelled)

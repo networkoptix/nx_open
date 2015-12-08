@@ -4,6 +4,7 @@
 #include <business/business_action_parameters.h>
 
 #include <utils/common/scoped_value_rollback.h>
+#include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
 namespace {
@@ -25,6 +26,14 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     connect(ui->tagsLineEdit, &QLineEdit::textChanged,      this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->durationSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
+
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
+    {
+        // Prolonged type of event has changed. In case of instant
+        // action event state should be updated
+        if (checked)
+            model()->setEventState(QnBusiness::UndefinedState);
+    });
 }
 
 QnBookmarkBusinessActionWidget::~QnBookmarkBusinessActionWidget()
@@ -45,9 +54,9 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewMode
 
     if (fields.testFlag(QnBusiness::EventTypeField)) {
         bool hasToggleState = QnBusiness::hasToggleState(model->eventType());
-        ui->fixedDurationCheckBox->setEnabled(hasToggleState);
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
+        setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {

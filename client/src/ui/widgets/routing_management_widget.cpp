@@ -448,7 +448,7 @@ void QnRoutingManagementWidget::reportUrlEditingError(int error) {
 
 void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server->getStatus() == Qn::Incompatible)
+    if (!server || QnMediaServerResource::isFakeServer(server))
         return;
 
     m_serverListModel->addResource(resource);
@@ -456,7 +456,7 @@ void QnRoutingManagementWidget::at_resourcePool_resourceAdded(const QnResourcePt
 
 void QnRoutingManagementWidget::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
-    if (!server || server->getStatus() == Qn::Incompatible)
+    if (!server || QnMediaServerResource::isFakeServer(server))
         return;
 
     m_serverListModel->removeResource(resource);

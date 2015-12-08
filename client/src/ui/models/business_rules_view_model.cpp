@@ -240,17 +240,14 @@ void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
     delete ruleModel;
 }
 
-void QnBusinessRulesViewModel::deleteRule(const QnUuid& id) {
-    deleteRule(ruleModelById(id));
-}
-
 QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(const QnUuid& id) {
-    foreach (QnBusinessRuleViewModel* rule, m_rules) {
-        if (rule->id() == id) {
+    Q_ASSERT_X(!id.isNull(), Q_FUNC_INFO, "Method must be called for existing rules only");
+    for (QnBusinessRuleViewModel* rule: m_rules)
+    {
+        if (rule->id() == id)
             return rule;
-        }
     }
-    return NULL;
+    return nullptr;
 }
 
 bool QnBusinessRulesViewModel::isIndexValid( const QModelIndex &index ) const {

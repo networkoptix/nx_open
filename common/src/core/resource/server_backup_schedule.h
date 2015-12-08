@@ -14,6 +14,8 @@ struct QnServerBackupSchedule {
 
     static const int defaultBackupBitrate;
     QnServerBackupSchedule();
+
+    bool isValid() const;
 };
 
 #define QnServerBackupSchedule_Fields  \

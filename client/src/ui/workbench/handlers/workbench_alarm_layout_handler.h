@@ -6,6 +6,9 @@
 
 #include <utils/common/connective.h>
 
+class QnWorkbenchLayout;
+class QnWorkbenchItem;
+
 class QnWorkbenchAlarmLayoutHandler: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
 
@@ -19,4 +22,6 @@ private:
 
     QnWorkbenchLayout* findOrCreateAlarmLayout();
     bool alarmLayoutExists() const;
+
+    void jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item);
 };

@@ -544,7 +544,9 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            Q_ASSERT_X(newStatus == Qn::Incompatible || m_originalGuid.isNull(), Q_FUNC_INFO, "Incompatible servers should not take any status but incompatible");
+            Q_ASSERT_X(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
+                       Q_FUNC_INFO,
+                       "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
         QnResource::setStatus(newStatus, silenceMode);

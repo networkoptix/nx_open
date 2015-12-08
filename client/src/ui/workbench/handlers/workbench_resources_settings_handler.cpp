@@ -40,7 +40,7 @@ void QnWorkbenchResourcesSettingsHandler::at_cameraSettingsAction_triggered() {
 
 void QnWorkbenchResourcesSettingsHandler::at_serverSettingsAction_triggered() {
     QnMediaServerResourceList servers = menu()->currentParameters(sender()).resources().filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server) {
-        return server->getStatus() != Qn::Incompatible;
+        return !QnMediaServerResource::isFakeServer(server);
     });
 
     Q_ASSERT_X(servers.size() == 1, Q_FUNC_INFO, "Invalid action condition");

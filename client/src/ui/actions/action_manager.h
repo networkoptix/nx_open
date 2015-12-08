@@ -35,7 +35,7 @@ public:
 
     /**
      * Default constructor.
-     * 
+     *
      * \param parent                    Context-aware parent of this action manager.
      */
     QnActionManager(QObject *parent = NULL);
@@ -51,8 +51,8 @@ public:
     void registerAction(QnAction *action);
 
     /**
-     * Registers action id as an alias for another action id. 
-     * 
+     * Registers action id as an alias for another action id.
+     *
      * \param sourceId                  Alias id.
      * \param targetId                  Id of the target action.
      */
@@ -79,7 +79,7 @@ public:
 
     /**
      * Triggers the action with the given id.
-     * 
+     *
      * \param id                        Id of the action to trigger.
      * \param parameters                Parameters to pass to action handler.
      */
@@ -88,7 +88,7 @@ public:
 
     /**
      * Triggers the action with the given id if possible
-     * 
+     *
      * \param id                        Id of the action to trigger.
      * \param parameters                Parameters to pass to action handler.
      * \returns                         Was action triggered or not.
@@ -139,14 +139,12 @@ public:
 
     /**
      * This function replaces one action in the given menu with another one.
-     * 
+     *
      * \param menu                      Menu to replace the action in.
      * \param targetId                  Id of the action to be replaced.
      * \param targetAction              Replacement action.
      */
     void redirectAction(QMenu *menu, Qn::ActionId sourceId, QAction *targetAction);
-
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
     void menuAboutToShow(QMenu* menu);
@@ -154,6 +152,8 @@ signals:
 
 protected:
     friend class QnAction;
+
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
 
     void copyAction(QAction *dst, QnAction *src, bool forwardSignals = true);
 
@@ -163,6 +163,9 @@ protected:
 
     /** Setup proper connections between menu and the manager. */
     QMenu* integrateMenu(QMenu *menu, const QnActionParameters &parameters);
+
+    /** Hide all menus that are currently opened. */
+    void hideAllMenus();
 private slots:
     void at_menu_destroyed(QObject *menu);
 
@@ -170,13 +173,13 @@ private:
     /** Root action. Also contained in the maps. */
     QnAction *m_root;
 
-    /** Mapping from action id to action instance. */ 
+    /** Mapping from action id to action instance. */
     QHash<Qn::ActionId, QnAction *> m_actionById;
 
     /** Mapping from action to action id. */
     QHash<QnAction *, Qn::ActionId> m_idByAction;
 
-    /** Mapping from a menu created by this manager to the parameters that were 
+    /** Mapping from a menu created by this manager to the parameters that were
      * passed to it at construction time. NULL key is used for shortcut actions. */
     QHash<QObject *, QnActionParameters> m_parametersByMenu;
 

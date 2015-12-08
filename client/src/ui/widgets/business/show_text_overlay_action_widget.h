@@ -8,11 +8,12 @@ namespace Ui {
     class ShowTextOverlayActionWidget;
 }
 
+// TODO: #ynikitenkov Refactor this and find common parts with bookmarks action widget.
 class QnShowTextOverlayActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnShowTextOverlayActionWidget(QWidget *parent = 0);
     ~QnShowTextOverlayActionWidget();

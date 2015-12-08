@@ -42,12 +42,13 @@ public:
     void addOrUpdateRule(const QnBusinessEventRulePtr &rule);
 
     void deleteRule(QnBusinessRuleViewModel* ruleModel);
-    void deleteRule(const QnUuid &id);
 
     void forceColumnMinWidth(QnBusiness::Columns column, int width);
 
-    QnBusinessRuleViewModel* ruleModelById(const QnUuid &id);
     QnBusinessRuleViewModel *rule(const QModelIndex &index) const;
+
+protected:
+    QnBusinessRuleViewModel* ruleModelById(const QnUuid &id);
 
 private:
     bool isIndexValid(const QModelIndex &index) const;

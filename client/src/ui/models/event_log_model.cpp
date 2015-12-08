@@ -9,6 +9,7 @@
 #include <business/business_types_comparator.h>
 
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/common/ui_resource_name.h>
@@ -21,6 +22,10 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
+namespace
+{
+    enum { kSingleUser = 1};
+}
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
 QHash<QnUuid, QnResourcePtr> QnEventLogModel::m_resourcesHash;
@@ -291,6 +296,15 @@ QnResourcePtr QnEventLogModel::getResourceById(const QnUuid &id) {
     return resource;
 }
 
+QString QnEventLogModel::getUserNameById(const QnUuid &id)
+{
+    static const auto kRemovedUserName = tr("<User removed>");
+
+    const auto userResource = getResourceById(id).dynamicCast<QnUserResource>();
+    return (userResource.isNull() ? kRemovedUserName : userResource->getName());
+}
+
+
 QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionData &action) {
     QnUuid resId;
     switch(column) {
@@ -316,6 +330,12 @@ QVariant QnEventLogModel::iconData(const Column& column, const QnBusinessActionD
                     return qnResIconCache->icon(QnResourceIconCache::User);
                 else
                     return qnResIconCache->icon(QnResourceIconCache::Users);
+            }
+            else if (actionType == QnBusiness::ShowOnAlarmLayoutAction) {
+                const auto &users = action.actionParams.additionalResources;
+                const bool multipleUsers = (users.empty() || (users.size() > kSingleUser));
+                return qnResIconCache->icon(multipleUsers ?
+                    QnResourceIconCache::Users : QnResourceIconCache::User);
             }
         }
         resId = action.actionParams.actionResourceId;
@@ -367,10 +387,26 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             return action.actionParams.emailAddress;
         else if (actionType == QnBusiness::ShowPopupAction)
             return getUserGroupString(action.actionParams.userGroup);
+        else if (actionType == QnBusiness::ShowOnAlarmLayoutAction) {
+            // For ShowOnAlarmLayoutAction action type additionalResources contains users list
+            const auto &users = action.actionParams.additionalResources;
+            if (users.empty())
+                return tr("All users");
+
+            if (users.size() == kSingleUser)
+                return getUserNameById(users.front());
+
+            static const auto kUsersTempltate = tr("%1 users");
+            return kUsersTempltate.arg(QString::number(users.size()));
+        }
         else
             return getResourceNameString(action.actionParams.actionResourceId);
     }
     case DescriptionColumn: {
+        if (action.actionType == QnBusiness::ShowOnAlarmLayoutAction) {
+            return getResourceNameString(action.actionParams.actionResourceId);
+        }
+
         QnBusiness::EventType eventType = action.eventParams.eventType;
         QString result;
 
@@ -381,6 +417,7 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         else {
             result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
         }
+
 
         if (!QnBusiness::hasToggleState(eventType)) {
             int count = action.aggregationCount;
@@ -495,9 +532,44 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
 
     switch(role) {
     case Qt::ToolTipRole:
-        if (index.column() != DescriptionColumn)
+    {
+        if (index.column() == ActionCameraColumn &&  action.actionType == QnBusiness::ShowOnAlarmLayoutAction)
+        {
+            enum { kMaxShownUsersCount = 20 };
+
+            const auto users = action.actionParams.additionalResources;
+
+            QStringList userNames;
+            if (users.empty())
+            {
+                const auto userResources = qnResPool->getResources<QnUserResource>();
+                for (const auto &resource: userResources)
+                    userNames.append(resource->getName());
+            }
+            else
+            {
+                for (const auto &userId: users)
+                    userNames.append(getUserNameById(userId));
+            }
+
+            if (userNames.size() > kMaxShownUsersCount)
+            {
+                const auto diffCount = (kMaxShownUsersCount - userNames.size());
+
+                userNames = userNames.mid(0, kMaxShownUsersCount);
+                userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
+            }
+
+            static const auto kDelimiter = lit("\n");
+            return userNames.join(kDelimiter);
+        }
+        else if (index.column() != DescriptionColumn)
+        {
             return QVariant();
+        }
+
         // else go to Qt::DisplayRole
+    }
     case Qt::DisplayRole:
         return QVariant(textData(column, action));
     case Qt::DecorationRole:
