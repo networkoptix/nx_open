@@ -206,7 +206,7 @@ TEST( StunMessageSerialization, Authentification )
     ASSERT_TRUE( miAttr );
     ASSERT_TRUE( nonceAttr );
 
-    static const Buffer MESSAGE =
+    const Buffer MESSAGE =
         Buffer( "0001" "003C" "2112A442" ) + // request: binding, length, magic cookie
         DEFAULT_TID +                        // transaction id (rev)
         Buffer( "0006" "0005" ) + user.toHex().toUpper() + Buffer( "00000000" ) +

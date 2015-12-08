@@ -13,7 +13,7 @@ void QnStoppableAsync::pleaseStopImpl( std::vector< UniquePtr > stoppables,
 {
     Q_ASSERT_X( completionHandler, Q_FUNC_INFO,
                 "There is no other way to understend if QnStoppableAsync if stopped, "
-                "but this handler" )
+                "but this handler" );
 
     std::vector< QnStoppableAsync* > tmpStoppables;
     for( auto& ptr : stoppables )
