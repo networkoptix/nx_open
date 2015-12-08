@@ -5,7 +5,7 @@ from notifications import api
 from django.core.exceptions import ValidationError
 
 import logging
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))

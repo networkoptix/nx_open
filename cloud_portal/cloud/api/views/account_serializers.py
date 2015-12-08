@@ -3,7 +3,7 @@ from rest_framework import serializers
 import logging
 import django
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer

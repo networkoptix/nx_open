@@ -4,7 +4,7 @@ from django.conf import settings
 import logging
 import traceback
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 def api_success(data=None, status_code=status.HTTP_200_OK):
@@ -17,11 +17,11 @@ def api_success(data=None, status_code=status.HTTP_200_OK):
 
 class APIException(Exception):
     error_text = 'Unexpected error'
-    error_code = 500
+    error_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     error_data = None
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    def __init__(self, error_text, error_code=None, error_data = None,
+    def __init__(self, error_text, error_code=None, error_data=None,
                  status_code=status.HTTP_500_INTERNAL_SERVER_ERROR):
         if error_code is None:
             error_code = status_code
@@ -41,42 +41,42 @@ class APIException(Exception):
 
 class APIInternalException(APIException):
     # 500 error - internal server error
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APIInternalException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class APIServiceException(APIException):
     # 503 error - service unavailable
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APIServiceException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                   status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class APINotFoundException(APIException):
     # 404 error - service unavailable
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APINotFoundException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                    status_code=status.HTTP_404_NOT_FOUND)
 
 
 class APINotAuthorisedException(APIException):
     # 401 error - service unavailable
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APINotAuthorisedException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                         status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 class APIRequestException(APIException):
     # 400 error - bad request
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APIRequestException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                   status_code=status.HTTP_400_BAD_REQUEST)
 
 
 class APILogicException(APIException):
     # 200. but some error occurred
-    def __init__(self, error_text, error_data = None, error_code=None):
+    def __init__(self, error_text, error_data=None, error_code=None):
         super(APILogicException, self).__init__(error_text, error_data=error_data, error_code=error_code,
                                                 status_code=status.HTTP_200_OK)
 
@@ -89,9 +89,9 @@ def validate_response(func):
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
 
-        logger.debug(response.status_code)
-        logger.debug(response.text)
-        logger.debug('------------------------------------------------------------')
+        __django__.debug(response.status_code)
+        __django__.debug(response.text)
+        __django__.debug('------------------------------------------------------------')
 
         if response.status_code == status.HTTP_204_NO_CONTENT:  # No content
             return None
@@ -142,14 +142,12 @@ def handle_exceptions(func):
                 return Response(data, status=status.HTTP_200_OK)
             return data
         except APIException as error:
-            logger.error('APIException. \nStatus: ' + str(error.status_code) +
-                         '\nMessage:' + str(error.error_text) +
-                         '\nError code:' + str(error.error_code) +
-                         '\nCall Stack: \n' + traceback.format_exc())
+            __django__.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nCall Stack: \n{3}'.
+                         format(error.status_code,error.error_text,error.error_code,traceback.format_exc()))
             return error.response()
         except:
             detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()
-            logger.error(detailed_error)
+            __django__.error(detailed_error)
 
             if not settings.DEBUG:
                 detailed_error = 'Unexpected error somewhere inside'
@@ -158,6 +156,4 @@ def handle_exceptions(func):
                 'resultCode': status.HTTP_500_INTERNAL_SERVER_ERROR,
                 'errorText': detailed_error
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        pass
-
     return handler

@@ -6,17 +6,17 @@ from api.controllers.cloud_api import Account
 
 import notifications
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 class AccountBackend(object):
     @staticmethod
     def authenticate(username=None, password=None):
 
-        logger.debug("authentificate " + username)
+        __django__.debug("authentificate " + username)
 
         checkuser = Account.get(username, password)
-        logger.debug(checkuser)
+        __django__.debug(checkuser)
 
         if checkuser:
             return models.Account.objects.get(email=username)

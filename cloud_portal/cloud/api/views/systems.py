@@ -5,7 +5,7 @@ from api.controllers import cloud_api
 from api.helpers.exceptions import handle_exceptions, api_success
 import logging
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 @api_view(['GET'])
