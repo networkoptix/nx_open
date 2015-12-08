@@ -537,37 +537,31 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
         {
             enum { kMaxShownUsersCount = 20 };
 
-            auto users = action.actionParams.additionalResources;
-            const auto kOldSize = users.size();
-            const bool trimList = (kOldSize > kMaxShownUsersCount);
-            if (trimList)
-                users.resize(kMaxShownUsersCount);
+            const auto users = action.actionParams.additionalResources;
 
-            QString userNames;
-            bool isFirstUser = true;
-            const auto addUser = [&isFirstUser, &userNames](const QString &name)
-            {
-                static const auto kUserNameLineTemplate = lit("\n%1");
-                userNames += (isFirstUser ? name : kUserNameLineTemplate.arg(name));
-                isFirstUser = false;
-            };
-
+            QStringList userNames;
             if (users.empty())
             {
                 const auto userResources = qnResPool->getResources<QnUserResource>();
                 for (const auto &resource: userResources)
-                    addUser(resource->getName());
+                    userNames.append(resource->getName());
             }
             else
             {
                 for (const auto &userId: users)
-                    addUser(getUserNameById(userId));
+                    userNames.append(getUserNameById(userId));
             }
 
-            if (trimList)
-                addUser(tr("and %1 user(s) more...", nullptr, kOldSize));
+            if (userNames.size() > kMaxShownUsersCount)
+            {
+                const auto diffCount = (kMaxShownUsersCount - userNames.size());
 
-            return userNames;
+                userNames = userNames.mid(0, kMaxShownUsersCount);
+                userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
+            }
+
+            static const auto kDelimiter = lit("\n");
+            return userNames.join(kDelimiter);
         }
         else if (index.column() != DescriptionColumn)
         {
