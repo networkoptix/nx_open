@@ -4,8 +4,8 @@
 ***********************************************************/
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
-#include <memory>
 #include <mutex>
 #include <thread>
 #include <vector>
@@ -157,14 +157,14 @@ TEST(HttpClient, DISABLED_fileDownload2)
         }
     };
 
-    for (int i = 0; i < THREADS*2; ++i)
+    for (int i = 0; i < THREADS; ++i)
         clients.emplace_back(false, std::make_shared<nx_http::HttpClient>());
 
     for (int i = 0; i < THREADS; ++i)
         threads.emplace_back(std::thread(threadFunc));
 
-    const auto beginTime = std::chrono::monotonic_clock::now();
-    while (beginTime + TEST_DURATION > std::chrono::monotonic_clock::now())
+    const auto beginTime = std::chrono::steady_clock::now();
+    while (beginTime + TEST_DURATION > std::chrono::steady_clock::now())
     {
         std::unique_lock<std::mutex> lk(mtx);
         const int pos = rand() % clients.size();
