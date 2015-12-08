@@ -2480,8 +2480,8 @@ void QnWorkbenchUi::createSliderWidget()
 
         bookmarksViewer->setReadOnly(readonly);
 
-        const auto currentUser = context()->user();
-        const bool userIsAdmin = (currentUser && currentUser->isAdmin());
+
+        const bool userIsAdmin = accessController()->hasGlobalPermissions(Qn::GlobalAdminPermissions);
         bookmarksViewer->setAllowClickOnTag(userIsAdmin);
     };
 
