@@ -1146,23 +1146,23 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
 
     // If time window is specified then set it
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     if (parameters.hasArgument(Qn::BookmarkTagRole))
     {
         const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
 
         const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
-        const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
+        const bool correctWindow = timelineWindow.isValid();
 
         if (correctWindow)
         {
-            m_searchBookmarksDialog->setParameters(timelineWindow.startTimeMs
-                , timelineWindow.startTimeMs + timelineWindow.durationMs, filterText);
+            const auto endTimeMs = (timelineWindow.isInfinite() ? nowMs : timelineWindow.endTimeMs());
+            m_searchBookmarksDialog->setParameters(timelineWindow.startTimeMs, endTimeMs, filterText);
             return;
         }
     }
 
     // Otherwise set default time window and reset other parameters
-    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
     const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);

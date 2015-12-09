@@ -9,6 +9,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/workbench/workbench.h>
@@ -169,7 +170,7 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         , this, &Impl::customContextMenuRequested);
 
     connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this
-        , [this](const QModelIndex &index)
+        , [this](const QModelIndex & /* index */)
     {
         openInNewLayoutHandler();
     });
@@ -233,10 +234,22 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
 void QnSearchBookmarksDialog::Impl::updateCamerasText()
 {
     static const auto kEmptyCamerasCaption = tr("<Any camera>");
-    static const auto kCamerasTemplate = tr("camera(s)");
-    static const auto kCamerasCaptionTemplate = lit("<%1 %2>");
-    m_ui->cameraButton->setText(m_cameras.empty() ? kEmptyCamerasCaption :
-        kCamerasCaptionTemplate.arg(QString::number(m_cameras.size()), kCamerasTemplate));
+
+    if (m_cameras.empty())
+    {
+        m_ui->cameraButton->setText(kEmptyCamerasCaption);
+        return;
+    }
+
+    const auto devicesStringSet = QnCameraDeviceStringSet(
+        tr("<%n device(s)>", nullptr, m_cameras.size())
+        , tr("<%n camera(s)>", nullptr, m_cameras.size())
+        , tr("<%n IO module(s)>", nullptr, m_cameras.size()));
+
+    const auto caption = QnDeviceDependentStrings::getNameFromSet(
+        devicesStringSet, m_cameras);
+
+    m_ui->cameraButton->setText(caption);
 }
 
 void QnSearchBookmarksDialog::Impl::openInNewLayoutHandler()
