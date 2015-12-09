@@ -25,8 +25,8 @@
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
-        <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>
-        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <linux.oslibs>-lssl -lcrypto -lavcodec -lavformat -lavutil -lswscale -lvpx -lquazip -lfaac</linux.oslibs>
+        <mac.oslibs>-lssl -lcrypto -lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
         <global.defines/>
         <!--Specific os defines-->

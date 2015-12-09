@@ -6,6 +6,8 @@
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
 
+#include <boost/optional/optional.hpp>
+
 extern "C"
 {
     #include <libavformat/avformat.h>
