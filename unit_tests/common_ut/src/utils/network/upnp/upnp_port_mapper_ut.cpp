@@ -43,6 +43,15 @@ private:
     std::queue< T > m_queue;
 };
 
+SocketAddress popAddress( SyncQueue< SocketAddress >* queue7001 )
+{
+    auto address = queue7001->pop();
+    if( address.address == HostAddress() ) // external IP is not resolved yet
+        address = queue7001->pop(); // wait for the next notification
+
+    return address;
+}
+
 TEST( UpnpPortMapper, NormalUsage )
 {
     TimerManager timerManager;
@@ -56,7 +65,7 @@ TEST( UpnpPortMapper, NormalUsage )
                  [&]( SocketAddress info )
                  { queue7001.push( info ); } ) );
 
-    const auto map7001 = queue7001.pop();
+    const auto map7001 = popAddress( &queue7001 );
     EXPECT_EQ( map7001.address.toString(), lit( "12.34.56.78" ) );
     EXPECT_EQ( clientMock.mappings().size(), 1 );
 
@@ -104,7 +113,7 @@ TEST( UpnpPortMapper, ReuseExisting )
                  { queue7001.push( std::move( info ) ); } ) );
 
     // existed mapping should be in use
-    EXPECT_EQ( queue7001.pop().toString(), lit( "12.34.56.78:6666" ) );
+    EXPECT_EQ( popAddress( &queue7001 ).toString(), lit( "12.34.56.78:6666" ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
 
     // existed mapping should be removed when if need
@@ -125,7 +134,7 @@ TEST( UpnpPortMapper, CheckMappings )
                  [&]( SocketAddress info )
                  { queue7001.push( std::move(info) ); } ) );
 
-    EXPECT_EQ( queue7001.pop().address.toString(), lit( "12.34.56.78" ) );
+    EXPECT_EQ( popAddress( &queue7001 ).address.toString(), lit( "12.34.56.78" ) );
     EXPECT_EQ( clientMock.mappingsCount(), 1 );
     clientMock.mappings().clear();
 

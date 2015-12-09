@@ -365,11 +365,12 @@ void PortMapper::makeMapping( Device& device, quint16 inPort,
         }
 
         const auto callback = request->second;
+        const auto externalIp = device.externalIp;
         device.mapped[ PortId( inPort, protocol ) ] = desiredPort;
         device.engagedPorts.insert( PortId( desiredPort, protocol ) );
 
         lk.unlock();
-        callback( SocketAddress( device.externalIp, desiredPort ) );
+        callback( SocketAddress( externalIp, desiredPort ) );
     } );
 }
 
