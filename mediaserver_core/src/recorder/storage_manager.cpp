@@ -309,6 +309,7 @@ public:
 
             assert(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
+            m_owner->updateCameraHistory();
         }
     }
 };
