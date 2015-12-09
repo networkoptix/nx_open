@@ -31,8 +31,8 @@ int QnFusionRestHandler::executeGet(const QString& path, const QnRequestParamLis
     return nx_http::StatusCode::notImplemented;
 }
 
-int QnFusionRestHandler::genericError( int errCode, const QString &error, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format, bool extraFormatting ) {
-
+int QnFusionRestHandler::genericError( int errCode, const QString &error, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format, bool extraFormatting )
+{
     QnRestResult restResult;
     restResult.setError(QnRestResult::CantProcessRequest, error);
     QnFusionRestHandlerDetail::serialize(restResult, result, contentType, format, extraFormatting);

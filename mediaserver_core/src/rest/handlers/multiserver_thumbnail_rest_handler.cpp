@@ -21,7 +21,8 @@
 
 #include <utils/media/frame_info.h>
 
-namespace {
+namespace
+{
     QString urlPath;
 }
 
@@ -93,7 +94,8 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
         QByteArray encodedData = QnGetImageHelper::encodeImage(outFrame, imageFormat);
         result.append(encodedData);
     }
-    else if (request.imageFormat == QnThumbnailRequestData::RawFormat) {
+    else if (request.imageFormat == QnThumbnailRequestData::RawFormat)
+    {
         Q_ASSERT_X(false, Q_FUNC_INFO, "Method is not implemeted");
         //TODO: #rvasilenko implement me!!!
     }
