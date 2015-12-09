@@ -35,10 +35,12 @@ public:
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(
         api::AccountData accountData,
-        std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler) override;
+        std::function<void(
+            api::ResultCode,
+            api::AccountConfirmationCode)> completionHandler) override;
     //!Implementation of api::AccountManager::activateAccount
     virtual void activateAccount(
-        api::AccountActivationCode activationCode,
+        api::AccountConfirmationCode activationCode,
         std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of api::AccountManager::getAccount
     virtual void getAccount(
@@ -46,6 +48,11 @@ public:
     virtual void updateAccount(
         api::AccountUpdateData accountData,
         std::function<void(api::ResultCode)> completionHandler) override;
+    virtual void resetPassword(
+        api::AccountEmail accountEmail,
+        std::function<void(
+            api::ResultCode,
+            api::AccountConfirmationCode)> completionHandler) override;
 };
 
 

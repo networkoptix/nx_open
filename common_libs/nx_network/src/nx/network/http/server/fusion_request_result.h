@@ -37,7 +37,8 @@ public:
     {
         ecNoDetail = 0,
         ecResponseSerializationError,
-        ecDeserializationError
+        ecDeserializationError,
+        ecNotAcceptable
     };
 
     FusionRequestErrorClass resultCode;

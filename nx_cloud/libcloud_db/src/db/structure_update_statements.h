@@ -37,7 +37,7 @@ CREATE TABLE account (                                              \
 );                                                                  \
                                                                     \
 CREATE TABLE email_verification (                                   \
-    account_id          BLOB(16) NOT NULL,                          \
+    account_id          BLOB(16) NOT NULL PRIMARY KEY,              \
     verification_code   TEXT NOT NULL,                              \
     expiration_date     DATETIME NOT NULL,                          \
     FOREIGN KEY( account_id ) REFERENCES account ( id )             \
@@ -109,6 +109,23 @@ static const char addCustomizationToAccount[] =
 ALTER TABLE account ADD COLUMN customization VARCHAR(255);          \
 UPDATE account set customization = 'default';                       \
 ";
+
+
+//#CLOUD-73
+static const char kAddTemporaryAccountPassword[] =
+"                                                                   \
+CREATE TABLE account_password (                                     \
+    id                          BLOB(16) NOT NULL PRIMARY KEY,      \
+    account_id                  BLOB(16) NOT NULL,                  \
+    password_ha1                TEXT NOT NULL,                      \
+    realm                       TEXT NOT NULL,                      \
+    expiration_timestamp_utc    INTEGER,                            \
+    max_use_count               INTEGER,                            \
+    use_count                   INTEGER,                            \
+    access_rights               TEXT                                \
+);                                                                  \
+";
+
 
 }   //db
 }   //cdb

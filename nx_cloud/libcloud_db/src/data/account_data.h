@@ -33,9 +33,9 @@ public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
-class AccountActivationCode
+class AccountConfirmationCode
 :
-    public api::AccountActivationCode,
+    public api::AccountConfirmationCode,
     public stree::AbstractResourceReader
 {
 public:
@@ -59,6 +59,15 @@ public:
     std::string email;
 
     AccountUpdateDataWithEmail(AccountUpdateData&& rhs);
+};
+
+class AccountEmail
+:
+    public api::AccountEmail,
+    public stree::AbstractResourceReader
+{
+public:
+    virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
 //#define AccountUpdateDataWithEmail_Fields (passwordHa1)(fullName)(customization)(email)

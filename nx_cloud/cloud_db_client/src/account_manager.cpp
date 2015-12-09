@@ -21,18 +21,18 @@ AccountManager::AccountManager(cc::CloudModuleEndPointFetcher* const cloudModule
 
 void AccountManager::registerNewAccount(
     api::AccountData accountData,
-    std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler)
+    std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
     accountData.customization = QN_CUSTOMIZATION_NAME;
     executeRequest(
         kAccountRegisterPath,
         std::move(accountData),
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::AccountActivationCode()));
+        std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));
 }
 
 void AccountManager::activateAccount(
-    api::AccountActivationCode activationCode,
+    api::AccountConfirmationCode activationCode,
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
@@ -60,6 +60,17 @@ void AccountManager::updateAccount(
         std::move(accountData),
         completionHandler,
         completionHandler);
+}
+
+void AccountManager::resetPassword(
+    api::AccountEmail accountEmail,
+    std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
+{
+    executeRequest(
+        kAccountPasswordResetPath,
+        std::move(accountEmail),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));
 }
 
 }   //cl

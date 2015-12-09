@@ -32,6 +32,7 @@
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/update_account_handler.h"
+#include "http_handlers/reset_password_handler.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
@@ -277,6 +278,12 @@ void CloudDBProcess::registerApiHandlers(
         UpdateAccountHttpHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
             return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<ResetPasswordHttpHandler>(
+        ResetPasswordHttpHandler::kHandlerPath,
+        [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
+            return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
         } );
 
     //systems

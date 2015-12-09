@@ -45,9 +45,9 @@ protected:
     api::ResultCode addAccount(
         api::AccountData* const accountData,
         std::string* const password,
-        api::AccountActivationCode* const activationCode);
+        api::AccountConfirmationCode* const activationCode);
     api::ResultCode activateAccount(
-        const api::AccountActivationCode& activationCode);
+        const api::AccountConfirmationCode& activationCode);
     api::ResultCode getAccount(
         const std::string& email,
         const std::string& password,
@@ -59,6 +59,9 @@ protected:
         const std::string& email,
         const std::string& password,
         api::AccountUpdateData updateData);
+    api::ResultCode resetAccountPassword(
+        const std::string& email,
+        std::string* const confirmationCode);
 
     api::ResultCode bindRandomSystem(
         const std::string& email,

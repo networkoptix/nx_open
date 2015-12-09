@@ -31,14 +31,14 @@ bool AccountData::getAsVariant( int resID, QVariant* const value ) const
     }
 }
 
-bool AccountActivationCode::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
+bool AccountConfirmationCode::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     //TODO #ak
     return false;
 }
 
 
-bool AccountUpdateData::getAsVariant(int resID, QVariant* const value) const
+bool AccountUpdateData::getAsVariant(int /*resID*/, QVariant* const /*value*/) const
 {
     //TODO #ak
     return false;
@@ -49,6 +49,20 @@ AccountUpdateDataWithEmail::AccountUpdateDataWithEmail(AccountUpdateData&& rhs)
 :
     AccountUpdateData(std::move(rhs))
 {
+}
+
+
+bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
+{
+    switch (resID)
+    {
+        case attr::accountEmail:
+            *value = QString::fromStdString(email);
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 

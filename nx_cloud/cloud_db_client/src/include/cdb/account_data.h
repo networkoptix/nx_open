@@ -46,7 +46,7 @@ public:
     }
 };
 
-class AccountActivationCode
+class AccountConfirmationCode
 {
 public:
     std::string code;
@@ -59,6 +59,14 @@ public:
     boost::optional<std::string> fullName;
     boost::optional<std::string> customization;
 };
+
+
+class AccountEmail
+{
+public:
+    std::string email;
+};
+
 
 }   //api
 }   //cdb

@@ -17,7 +17,7 @@ namespace cdb {
 
 class ActivateAccountHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::AccountActivationCode>
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountConfirmationCode>
 {
 public:
     static const QString kHandlerPath;
@@ -26,7 +26,7 @@ public:
         AccountManager* const accountManager,
         const AuthorizationManager& authorizationManager )
     :
-        AbstractFiniteMsgBodyHttpHandler<data::AccountActivationCode>(
+        AbstractFiniteMsgBodyHttpHandler<data::AccountConfirmationCode>(
             EntityType::account,
             DataActionType::update,
             authorizationManager,

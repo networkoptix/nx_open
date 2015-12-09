@@ -47,11 +47,11 @@ public:
     void addAccount(
         const AuthorizationInfo& authzInfo,
         data::AccountData accountData,
-        std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler );
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
     //!On success, account moved to "activated" state
     void activate(
         const AuthorizationInfo& authzInfo,
-        data::AccountActivationCode emailVerificationCode,
+        data::AccountConfirmationCode emailVerificationCode,
         std::function<void(api::ResultCode)> completionHandler );
     
     //!Retrieves account corresponding to authorization data \a authzInfo
@@ -62,6 +62,10 @@ public:
         const AuthorizationInfo& authzInfo,
         data::AccountUpdateData accountData,
         std::function<void(api::ResultCode)> completionHandler);
+    void resetPassword(
+        const AuthorizationInfo& authzInfo,
+        data::AccountEmail accountEmail,
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
@@ -80,22 +84,22 @@ private:
     nx::db::DBResult insertAccount(
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
-        data::AccountActivationCode* const resultData );
+        data::AccountConfirmationCode* const resultData );
     void accountAdded(
         bool requestSourceSecured,
         nx::db::DBResult resultCode,
         data::AccountData accountData,
-        data::AccountActivationCode resultData,
-        std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler );
+        data::AccountConfirmationCode resultData,
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
 
     //verify_account DB operations
     nx::db::DBResult verifyAccount(
         QSqlDatabase* const tran,
-        const data::AccountActivationCode& verificationCode,
+        const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
     void accountVerified(
         nx::db::DBResult resultCode,
-        data::AccountActivationCode verificationCode,
+        data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
         std::function<void(api::ResultCode)> completionHandler );
 

@@ -49,7 +49,7 @@ AccountManager::AccountManager(
 void AccountManager::addAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountData accountData,
-    std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler )
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler )
 {
     if (const auto existingAccount = m_cache.find(accountData.email))
     {
@@ -57,7 +57,7 @@ void AccountManager::addAccount(
             arg(accountData.email), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::alreadyExists,
-            data::AccountActivationCode());
+            data::AccountConfirmationCode());
     }
 
 
@@ -68,7 +68,7 @@ void AccountManager::addAccount(
     authzInfo.get(attr::secureSource, &requestSourceSecured);
 
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountData, data::AccountActivationCode>(
+    m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
         std::bind(&AccountManager::accountAdded, this, requestSourceSecured, _1, _2, _3, std::move(completionHandler)) );
@@ -76,11 +76,11 @@ void AccountManager::addAccount(
 
 void AccountManager::activate(
     const AuthorizationInfo& /*authzInfo*/,
-    data::AccountActivationCode emailVerificationCode,
+    data::AccountConfirmationCode emailVerificationCode,
     std::function<void(api::ResultCode)> completionHandler )
 {
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountActivationCode, std::string>(
+    m_dbManager->executeUpdate<data::AccountConfirmationCode, std::string>(
         std::bind( &AccountManager::verifyAccount, this, _1, _2, _3 ),
         std::move( emailVerificationCode ),
         std::bind( &AccountManager::accountVerified, this, _1, _2, _3, std::move( completionHandler ) ) );
@@ -128,6 +128,14 @@ void AccountManager::updateAccount(
         std::bind(&AccountManager::updateAccountInDB, this, _1, _2),
         std::move(updateDataWithEmail),
         std::bind(&AccountManager::accountUpdated, this, _1, _2, std::move(completionHandler)));
+}
+
+void AccountManager::resetPassword(
+    const AuthorizationInfo& authzInfo,
+    data::AccountEmail accountEmail,
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+{
+
 }
 
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
@@ -190,7 +198,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 db::DBResult AccountManager::insertAccount(
     QSqlDatabase* const connection,
     const data::AccountData& accountData,
-    data::AccountActivationCode* const resultData )
+    data::AccountConfirmationCode* const resultData )
 {
     //TODO #ak should return specific error if email address already used for account
 
@@ -251,8 +259,8 @@ void AccountManager::accountAdded(
     bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
-    data::AccountActivationCode resultData,
-    std::function<void(api::ResultCode, data::AccountActivationCode)> completionHandler )
+    data::AccountConfirmationCode resultData,
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler )
 {
     accountData.statusCode = api::AccountStatus::awaitingActivation;
 
@@ -270,12 +278,12 @@ void AccountManager::accountAdded(
         : api::ResultCode::dbError,
         requestSourceSecured
             ? std::move(resultData)
-            : data::AccountActivationCode());
+            : data::AccountConfirmationCode());
 }
 
 nx::db::DBResult AccountManager::verifyAccount(
     QSqlDatabase* const connection,
-    const data::AccountActivationCode& verificationCode,
+    const data::AccountConfirmationCode& verificationCode,
     std::string* const resultAccountEmail )
 {
     QSqlQuery getAccountByVerificationCode( *connection );
@@ -327,7 +335,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 
 void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
-    data::AccountActivationCode /*verificationCode*/,
+    data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
     std::function<void(api::ResultCode)> completionHandler )
 {

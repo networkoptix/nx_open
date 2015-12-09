@@ -23,7 +23,7 @@ TEST_F(CdbFunctionalTest, api_conventions)
 
     api::AccountData account1;
     std::string account1Password;
-    api::AccountActivationCode activationCode;
+    api::AccountConfirmationCode activationCode;
     auto result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
 

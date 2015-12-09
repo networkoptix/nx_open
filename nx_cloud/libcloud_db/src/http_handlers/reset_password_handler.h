@@ -1,10 +1,10 @@
 /**********************************************************
-* 16 may 2015
+* dec 9, 2015
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef cloud_db_add_account_handler_h
-#define cloud_db_add_account_handler_h
+#ifndef cloud_db_reset_password_handler_h
+#define cloud_db_reset_password_handler_h
 
 #include <memory>
 
@@ -20,33 +20,31 @@
 namespace nx {
 namespace cdb {
 
-
 class AccountManager;
 
-class AddAccountHttpHandler
+class ResetPasswordHttpHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountConfirmationCode>
+    public AbstractFiniteMsgBodyHttpHandler<data::AccountEmail, data::AccountConfirmationCode>
 {
 public:
     static const QString kHandlerPath;
 
-    AddAccountHttpHandler(
+    ResetPasswordHttpHandler(
         AccountManager* const accountManager,
-        const AuthorizationManager& authorizationManager )
+        const AuthorizationManager& authorizationManager)
     :
-        AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountConfirmationCode>(
+        AbstractFiniteMsgBodyHttpHandler<data::AccountEmail, data::AccountConfirmationCode>(
             EntityType::account,
-            DataActionType::insert,
+            DataActionType::update,
             authorizationManager,
             std::bind(
-                &AccountManager::addAccount, accountManager,
-                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3 ) )
+                &AccountManager::resetPassword, accountManager,
+                std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
     {
     }
 };
 
-
 }   //cdb
 }   //nx
 
-#endif  //cloud_db_add_account_handler_h
+#endif  //cloud_db_reset_password_handler_h

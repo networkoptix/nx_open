@@ -78,31 +78,37 @@ void serializeToUrlQuery(const AccountData& data, QUrlQuery* const urlQuery)
 
 
 ////////////////////////////////////////////////////////////
-//// class AccountActivationCode
+//// class AccountConfirmationCode
 ////////////////////////////////////////////////////////////
 
-MAKE_FIELD_NAME_STR_CONST(AccountActivationCode, code)
+MAKE_FIELD_NAME_STR_CONST(AccountConfirmationCode, code)
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountActivationCode* const data)
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountConfirmationCode* const data)
 {
-    if (!urlQuery.hasQueryItem(AccountActivationCode_code_field))
+    if (!urlQuery.hasQueryItem(AccountConfirmationCode_code_field))
         return false;
-    data->code = urlQuery.queryItemValue(AccountActivationCode_code_field).toStdString();
+    data->code = urlQuery.queryItemValue(AccountConfirmationCode_code_field).toStdString();
     return true;
 }
 
-void serializeToUrlQuery(const AccountActivationCode& data, QUrlQuery* const urlQuery)
+void serializeToUrlQuery(const AccountConfirmationCode& data, QUrlQuery* const urlQuery)
 {
     urlQuery->addQueryItem(
-        AccountActivationCode_code_field,
+        AccountConfirmationCode_code_field,
         QString::fromStdString(data.code));
 }
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (AccountData)(AccountActivationCode),
+    (AccountData),
     (json)(sql_record),
-    _Fields )
+    _Fields,
+    (optional, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (AccountConfirmationCode),
+    (json)(sql_record),
+    _Fields)
 
 
 ////////////////////////////////////////////////////////////
@@ -158,6 +164,33 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* dat
 
     return true;
 }
+
+////////////////////////////////////////////////////////////
+//// class AccountEmail
+////////////////////////////////////////////////////////////
+
+MAKE_FIELD_NAME_STR_CONST(AccountEmail, email)
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountEmail* const data)
+{
+    if (!urlQuery.hasQueryItem(AccountUpdateData_passwordHa1_field))
+        return false;
+    data->email = urlQuery.queryItemValue(AccountEmail_email_field).toStdString();
+    return true;
+}
+
+void serializeToUrlQuery(const AccountEmail& data, QUrlQuery* const urlQuery)
+{
+    urlQuery->addQueryItem(
+        AccountEmail_email_field,
+        QString::fromStdString(data.email));
+}
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (AccountEmail),
+    (json),
+    _Fields)
+
 
 }   //api
 }   //cdb
