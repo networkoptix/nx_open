@@ -12,13 +12,13 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryRestHandler::buildHistoryData(c
     std::vector<int> scanPos;
     scanPos.resize(chunks.size());
     qint64 currentTime = 0;
-    int prevIndex = -1;    
+    int prevIndex = -1;
     while(1)
     {
         int index = -1;
         qint64 minNextTime = INT64_MAX;
         int nextIndex = -1;
-        for (int i = 0; i < scanPos.size(); ++i) 
+        for (int i = 0; i < scanPos.size(); ++i)
         {
             int& pos = scanPos[i];
             const QnTimePeriodList& periods = chunks[i].periods;
@@ -73,6 +73,6 @@ int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestP
         outputData.push_back(std::move(outputRecord));
     }
 
-    QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType);
+    QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format);
     return nx_http::StatusCode::ok;
 }

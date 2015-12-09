@@ -8,7 +8,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
 
 #include <database/server_db.h>
 
@@ -35,12 +34,6 @@ namespace
     QUrl getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
         QUrl apiUrl(server->getApiUrl());
         apiUrl.setPath(L'/' + QnMultiserverBookmarksRestHandlerPrivate::urlPath + L'/' + operations[static_cast<int>(operation)]);
-
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator()) {
-            apiUrl.setUserName(admin->getName());
-            apiUrl.setPassword(QString::fromUtf8(admin->getDigest()));
-        }
-
         return apiUrl;
     }
 
@@ -48,7 +41,10 @@ namespace
     void sendAsyncRequest(const QnMediaServerResourcePtr &server, QUrl url, Context *ctx) {
         auto requestCompletionFunc = [ctx] (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody ) {
             QN_UNUSED(osErrorCode, statusCode, msgBody);
-            ctx->requestProcessed();
+            ctx->executeGuarded([ctx]()
+            {
+                ctx->requestProcessed();
+            });
         };
 
         runMultiserverDownloadRequest(url, server, requestCompletionFunc, ctx);

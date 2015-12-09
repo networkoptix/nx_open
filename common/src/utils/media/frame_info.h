@@ -39,7 +39,7 @@ public:
         std::atomic<int> externalRefCounter;
         //!Sequence counter incremented by the decoder to invalidate references to the picture
         /*!
-            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved 
+            QnAbstractPictureDataRef implementation should save sequence number at object instanciation and compare saved
             value this one to check, whether its reference is still valid
         */
         std::atomic<int> sequence;
@@ -47,7 +47,7 @@ public:
         std::atomic<int> usageCounter;
 
         SynchronizationContext()
-        :   
+        :
             externalRefCounter(0),
             sequence(0),
             usageCounter(0)
@@ -192,7 +192,7 @@ public:
     QnAbstractMediaData::MediaFlags flags;
 
     /** Pixel width to pixel height ratio. Some videos have non-square pixels, we support that. */
-    double sample_aspect_ratio; 
+    double sample_aspect_ratio;
 
     /** Number of the video channel in video layout. */
     int channel;
@@ -226,8 +226,8 @@ struct CLVideoDecoderOutput
     unsigned char* C2;
     unsigned char* C3;
 
-    int width; // image width 
-    int height;// image height 
+    int width; // image width
+    int height;// image height
 
     int stride1; // image width in memory of C1 component
     int stride2;
@@ -254,23 +254,23 @@ private:
 
 struct CLVideoData
 {
-    CodecID codec; 
+    CodecID codec;
 
     //out frame info;
     //client needs only define ColorSpace out_type; decoder will setup ather variables
-    //CLVideoDecoderOutput outFrame; 
+    //CLVideoDecoderOutput outFrame;
 
     const unsigned char* inBuffer; // pointer to compressed data
     int bufferLength; // compressed data len
 
-    // is this frame is Intra frame. for JPEG should always be true; not nesseserally to take care about it; 
+    // is this frame is Intra frame. for JPEG should always be true; not nesseserally to take care about it;
     //decoder just ignores this flag
     // for user purpose only
-    int keyFrame; 
-    bool useTwice; // some decoders delays frame by one 
+    int keyFrame;
+    bool useTwice; // some decoders delays frame by one
 
-    int width; // image width 
-    int height;// image height 
+    int width; // image width
+    int height;// image height
 };
 
 class ScreenshotInterface

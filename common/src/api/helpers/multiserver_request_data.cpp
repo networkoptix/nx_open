@@ -3,8 +3,9 @@
 #include <utils/common/model_functions.h>
 
 namespace {
-    const QString localKey(lit("local"));
-    const QString formatKey(lit("format"));
+    const QString localKey                  (lit("local"));
+    const QString formatKey                 (lit("format"));
+    const QString extraFormattingKey        (lit("extraFormatting"));
 
     Qn::SerializationFormat defaultFormat() {
 #ifdef _DEBUG
@@ -18,15 +19,18 @@ namespace {
 QnMultiserverRequestData::QnMultiserverRequestData()
     : isLocal(false)
     , format(defaultFormat())
+    , extraFormatting(false)
 {}
 
 QnMultiserverRequestData::QnMultiserverRequestData( const QnMultiserverRequestData &src )
     : isLocal(src.isLocal)
     , format(src.format)
+    , extraFormatting(src.extraFormatting)
 {}
 
 void QnMultiserverRequestData::loadFromParams(const QnRequestParamList& params) {
     isLocal = params.contains(localKey);
+    extraFormatting = params.contains(extraFormattingKey);
     QnLexical::deserialize(params.value(formatKey), &format);
 }
 
@@ -34,6 +38,8 @@ QnRequestParamList QnMultiserverRequestData::toParams() const {
     QnRequestParamList result;
     if (isLocal)
         result.insert(localKey, QString());
+    if (extraFormatting)
+        result.insert(extraFormattingKey, QString());
     result.insert(formatKey,    QnLexical::serialized(format));
     return result;
 }

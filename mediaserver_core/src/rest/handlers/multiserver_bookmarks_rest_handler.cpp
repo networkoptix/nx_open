@@ -59,7 +59,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
 
             QnGetBookmarkTagsRequestContext context(request, ownerPort);
             QnCameraBookmarkTagList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
-            QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
+            QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format, request.extraFormatting);
             return nx_http::StatusCode::ok;
         }
     default:
@@ -70,7 +70,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
 
             QnGetBookmarksRequestContext context(request, ownerPort);
             QnCameraBookmarkList outputData = QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
-            QnFusionRestHandlerDetail::serialize(outputData, params, result, contentType, request.format);
+            QnFusionRestHandlerDetail::serialize(outputData, result, contentType, request.format, request.extraFormatting);
             return nx_http::StatusCode::ok;
         }
     }

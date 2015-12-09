@@ -49,21 +49,21 @@ void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->customTextEdit, after);
 }
 
-void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model || m_updating)
+void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields.testFlag(QnBusiness::EventTypeField)) {
-        bool hasToggleState = QnBusiness::hasToggleState(model->eventType());
+        bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
-        const auto params = model->actionParams();
+        const auto params = model()->actionParams();
 
         ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
         if (ui->fixedDurationCheckBox->isChecked())

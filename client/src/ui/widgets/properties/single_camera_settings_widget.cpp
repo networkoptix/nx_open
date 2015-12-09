@@ -9,6 +9,7 @@
 #include <QtGui/QDesktopServices>
 
 #include <camera/single_thumbnail_loader.h>
+#include <camera/camera_thumbnail_manager.h>
 
 //TODO: #GDM #Common ask: what about constant MIN_SECOND_STREAM_FPS moving out of this module
 #include <core/dataprovider/live_stream_provider.h>
@@ -412,31 +413,31 @@ void QnSingleCameraSettingsWidget::updateFromResource(bool silent) {
 
             ui->cameraScheduleWidget->endUpdate(); //here gridParamsChanged() can be called that is connected to updateMaxFps() method
 
-            
+
             ui->expertSettingsWidget->updateFromResources(cameras);
 
             if (!m_imageProvidersByResourceId.contains(m_camera->getId()))
                 m_imageProvidersByResourceId[m_camera->getId()] = new QnSingleThumbnailLoader(
-                    m_camera, 
-                    m_camera->getParentResource().dynamicCast<QnMediaServerResource>(),
+                    m_camera,
                     -1,
                     -1,
-                    fisheyeThumbnailSize, 
-                    QnSingleThumbnailLoader::JpgFormat,
+                    fisheyeThumbnailSize,
+                    QnThumbnailRequestData::JpgFormat,
+                    QSharedPointer<QnCameraThumbnailManager>(),
                     this);
             ui->fisheyeSettingsWidget->updateFromParams(m_camera->getDewarpingParams(), m_imageProvidersByResourceId[m_camera->getId()]);
         }
     }
 
     setTabEnabledSafe(Qn::FisheyeCameraSettingsTab, ui->imageControlWidget->isFisheye());
-    
+
     updateMotionWidgetFromResource();
     updateMotionAvailability();
     updateIpAddressText();
     updateWebPageText();
     ui->advancedSettingsWidget->updateFromResource();
     ui->ioPortSettingsWidget->updateFromResource(m_camera);
-    
+
     updateRecordingParamsAvailability();
 
     setHasDbChanges(false);
@@ -570,7 +571,7 @@ void QnSingleCameraSettingsWidget::showMaxFpsWarningIfNeeded() {
         default:
             break;
         }
-    
+
     }
 
     bool hasChanges = false;
@@ -609,7 +610,7 @@ void QnSingleCameraSettingsWidget::updateRecordingParamsAvailability()
 {
     if (!m_camera)
         return;
-    
+
     ui->cameraScheduleWidget->setRecordingParamsAvailability(m_camera->hasVideo(0) && !m_camera->hasParam(lit("noRecordingParams")));
 }
 
@@ -684,7 +685,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
     default:
         return false;
     }
-    
+
 }
 
 void QnSingleCameraSettingsWidget::setExportScheduleButtonEnabled(bool enabled) {
@@ -793,14 +794,14 @@ void QnSingleCameraSettingsWidget::updateIpAddressText() {
 void QnSingleCameraSettingsWidget::updateWebPageText() {
     if(m_camera) {
         QString webPageAddress = QString(QLatin1String("http://%1")).arg(m_camera->getHostAddress());
-        
+
         QUrl url = QUrl::fromUserInput(m_camera->getUrl());
         if(url.isValid()) {
             QUrlQuery query(url);
             int port = query.queryItemValue(lit("http_port")).toInt();
             if(port == 0)
                 port = url.port(80);
-            
+
             if (port != 80 && port > 0)
                 webPageAddress += QLatin1Char(':') + QString::number(url.port());
         }

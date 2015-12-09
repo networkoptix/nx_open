@@ -38,14 +38,8 @@ QModelIndex QnBusinessRulesViewModel::index(int row, int column, const QModelInd
     if (!hasIndex(row, column, parent))
         return QModelIndex();
 
-    QnBusinessRuleViewModel* internalPointer = qBetween(0, row, m_rules.size())
-        ? m_rules[row]
-        : nullptr;
-
-    Q_ASSERT_X(internalPointer, Q_FUNC_INFO, "Pointer must exist here");
-
-    return (internalPointer != nullptr)
-        ? createIndex(row, column, internalPointer)
+    return qBetween(0, row, m_rules.size())
+        ? createIndex(row, column)
         : QModelIndex();
 }
 
@@ -65,17 +59,17 @@ int QnBusinessRulesViewModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant QnBusinessRulesViewModel::data(const QModelIndex &index, int role) const {
-    /* Check invalid indices. */
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
-        return QVariant();
-    return m_rules[index.row()]->data(index.column(), role);
+    auto ruleModel = rule(index);
+    return ruleModel
+        ? ruleModel->data(index.column(), role)
+        : QVariant();
 }
 
 bool QnBusinessRulesViewModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    /* Check invalid indices. */
-    if (!index.isValid() || index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+    auto ruleModel = rule(index);
+    if (!ruleModel)
         return false;
-    return m_rules[index.row()]->setData(index.column(), value, role);
+    return ruleModel->setData(index.column(), value, role);
 }
 
 QVariant QnBusinessRulesViewModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -178,9 +172,11 @@ QSize QnBusinessRulesViewModel::columnSizeHint(QnBusiness::Columns column) const
     return QSize(m_forcedWidthByColumn[column], 1);
 }
 
-void QnBusinessRulesViewModel::addRuleModelInternal(QnBusinessRuleViewModel* ruleModel) {
-    connect(ruleModel, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
-        this, SLOT(at_rule_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
+void QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel) {
+    QnUuid id = ruleModel->id();
+    connect(ruleModel, &QnBusinessRuleViewModel::dataChanged, this, [this, id](QnBusiness::Fields fields) {
+        at_rule_dataChanged(id, fields);
+    });
 
     int row = m_rules.size();
     beginInsertRows(QModelIndex(), row, row);
@@ -192,14 +188,12 @@ void QnBusinessRulesViewModel::addRuleModelInternal(QnBusinessRuleViewModel* rul
 
 void QnBusinessRulesViewModel::clear() {
     beginResetModel();
-    for (QnBusinessRuleViewModel* rule: m_rules)
-        delete rule; //TODO: #GDM replace with shared pointers
     m_rules.clear();
     endResetModel();
 }
 
 void QnBusinessRulesViewModel::createRule() {
-    QnBusinessRuleViewModel* ruleModel = new QnBusinessRuleViewModel(this);
+    QnBusinessRuleViewModelPtr ruleModel(new QnBusinessRuleViewModel(this));
     ruleModel->setModified(true);
     addRuleModelInternal(ruleModel);
 }
@@ -213,41 +207,33 @@ void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rul
     if (rule->isSystem())
         return;
 
-    QnBusinessRuleViewModel* ruleModel = ruleModelById(rule->id());
+    QnBusinessRuleViewModelPtr ruleModel = ruleModelById(rule->id());
     if (!ruleModel) {
-        ruleModel = new QnBusinessRuleViewModel(this);
+        ruleModel = QnBusinessRuleViewModelPtr(new QnBusinessRuleViewModel(this));
         addRuleModelInternal(ruleModel);
     }
     ruleModel->loadFromRule(rule);
 }
 
-void QnBusinessRulesViewModel::deleteRule(QnBusinessRuleViewModel *ruleModel) {
+void QnBusinessRulesViewModel::deleteRule(const QnBusinessRuleViewModelPtr &ruleModel) {
     if (!ruleModel)
         return;
 
     int row = m_rules.indexOf(ruleModel);
     if (row < 0)
         return;
+
     beginRemoveRows(QModelIndex(), row, row);
     m_rules.removeAt(row);
     endRemoveRows();
-
-#ifdef _DEBUG
-    for (int i = 0; i < rowCount(); ++i)
-        Q_ASSERT_X(rule(index(i, 0)) != ruleModel, Q_FUNC_INFO, "Security check");
-#endif
-
-    delete ruleModel;
 }
 
-QnBusinessRuleViewModel* QnBusinessRulesViewModel::ruleModelById(const QnUuid& id) {
-    Q_ASSERT_X(!id.isNull(), Q_FUNC_INFO, "Method must be called for existing rules only");
-    for (QnBusinessRuleViewModel* rule: m_rules)
-    {
+QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::ruleModelById(const QnUuid& id) const {
+    for (QnBusinessRuleViewModelPtr rule: m_rules) {
         if (rule->id() == id)
             return rule;
     }
-    return nullptr;
+    return QnBusinessRuleViewModelPtr();
 }
 
 bool QnBusinessRulesViewModel::isIndexValid( const QModelIndex &index ) const {
@@ -256,14 +242,22 @@ bool QnBusinessRulesViewModel::isIndexValid( const QModelIndex &index ) const {
         && hasIndex(index.row(), index.column(), index.parent());
 }
 
-QnBusinessRuleViewModel * QnBusinessRulesViewModel::rule( const QModelIndex &index ) const {
-    if (!isIndexValid(index))
-        return nullptr;
-    return static_cast<QnBusinessRuleViewModel *>(index.internalPointer());
+QnBusinessRuleViewModelPtr QnBusinessRulesViewModel::rule( const QModelIndex &index ) const {
+    if (index.model() == this) {
+        return qBetween(0, index.row(), m_rules.size())
+            ? m_rules[index.row()]
+            : QnBusinessRuleViewModelPtr();
+    }
+
+    return ruleModelById(index.data(Qn::UuidRole).value<QnUuid>());
 }
 
-void QnBusinessRulesViewModel::at_rule_dataChanged(QnBusinessRuleViewModel *source, QnBusiness::Fields fields) {
-    int row = m_rules.indexOf(source);
+void QnBusinessRulesViewModel::at_rule_dataChanged(const QnUuid &id, QnBusiness::Fields fields) {
+    auto model = ruleModelById(id);
+    if (!model)
+        return;
+
+    int row = m_rules.indexOf(model);
     if (row < 0)
         return;
 

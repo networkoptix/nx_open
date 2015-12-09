@@ -14,7 +14,7 @@ static const int MAX_GOP_LEN = 100;
 QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serverDelegate, qint64 ceilTime)
 {
     QnCompressedVideoDataPtr video;
-    for (int i = 0; i < 20 && !video; ++i) 
+    for (int i = 0; i < 20 && !video; ++i)
     {
         QnAbstractMediaDataPtr media = serverDelegate.getNextData();
         if (!media || media->timestamp == DATETIME_NOW)
@@ -25,7 +25,7 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(QnServerArchiveDelegate& serv
     // if ceilTime specified try frame with time > requested time (round time to ceil)
     if (ceilTime != (qint64)AV_NOPTS_VALUE && video && video->timestamp < ceilTime - 1000ll)
     {
-        for (int i = 0; i < MAX_GOP_LEN; ++i) 
+        for (int i = 0; i < MAX_GOP_LEN; ++i)
         {
             QnAbstractMediaDataPtr media2 = serverDelegate.getNextData();
             if (!media2 || media2->timestamp == DATETIME_NOW)
@@ -70,11 +70,11 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnVirtualCameraResour
 }
 
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time, 
-                                                                   bool useHQ, 
-                                                                   RoundMethod roundMethod, 
-                                                                   const QSharedPointer<QnVirtualCameraResource>& res, 
-                                                                   QnServerArchiveDelegate& serverDelegate, 
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
+                                                                   bool useHQ,
+                                                                   QnThumbnailRequestData::RoundMethod roundMethod,
+                                                                   const QnVirtualCameraResourcePtr &res,
+                                                                   QnServerArchiveDelegate& serverDelegate,
                                                                    int prefferedChannel)
 {
     auto camera = qnCameraPool->getVideoCamera(res);
@@ -82,13 +82,13 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
 
     QnConstCompressedVideoDataPtr video;
-    if (time == DATETIME_NOW) 
+    if (time == DATETIME_NOW)
     {
         // get live data
         if (camera)
             video = camera->getLastVideoFrame(useHQ, prefferedChannel);
     }
-    else if (time == LATEST_IMAGE)
+    else if (time == QnThumbnailRequestData::kLatestThumbnail)
     {
         // get latest data
         if (camera) {
@@ -114,16 +114,16 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
             serverDelegate.open(res);
             serverDelegate.seek(time, true);
         }
-        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == IFrameAfterTime ? time : AV_NOPTS_VALUE);
+        video = getNextArchiveVideoPacket(serverDelegate, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod ? time : AV_NOPTS_VALUE);
 
         if (!video) {
-            video = camera->getFrameByTime(useHQ, time, roundMethod == IFrameAfterTime, prefferedChannel); // try approx frame from GOP keeper
+            video = camera->getFrameByTime(useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
             time = DATETIME_NOW;
         }
         if (!video)
-            video = camera->getFrameByTime(!useHQ, time, roundMethod == IFrameAfterTime, prefferedChannel); // try approx frame from GOP keeper
+            video = camera->getFrameByTime(!useHQ, time, roundMethod == QnThumbnailRequestData::KeyFrameAfterMethod, prefferedChannel); // try approx frame from GOP keeper
     }
-    if (!video) 
+    if (!video)
         return QSharedPointer<CLVideoDecoderOutput>();
 
     CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
@@ -138,7 +138,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
         }
     }
     else {
-        bool precise = roundMethod == Precise;
+        bool precise = roundMethod == QnThumbnailRequestData::PreciseMethod;
         for (int i = 0; i < MAX_GOP_LEN && !gotFrame && video; ++i)
         {
             gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= time);
@@ -152,7 +152,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(qint64 time,
     return outFrame;
 }
 
-QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualCameraResourcePtr& res, qint64 time, const QSize& size, RoundMethod roundMethod, int rotation)
+QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnVirtualCameraResourcePtr& res, qint64 time, const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation)
 {
     if (!res)
         return QSharedPointer<CLVideoDecoderOutput>();
@@ -235,7 +235,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
 
 QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImageWithCertainQuality(
     bool useHQ, const QnVirtualCameraResourcePtr& res, qint64 time,
-    const QSize& size, RoundMethod roundMethod, int rotation )
+    const QSize& size, QnThumbnailRequestData::RoundMethod roundMethod, int rotation )
 {
     QSize dstSize = size;
 
