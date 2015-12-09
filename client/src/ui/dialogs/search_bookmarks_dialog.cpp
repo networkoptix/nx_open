@@ -235,9 +235,11 @@ void QnSearchBookmarksDialog::Impl::updateCamerasText()
 {
     if (m_cameras.empty())
     {
-        static const auto kEmptyCamerasCaption = tr("<Any camera>");
+        static const auto kAnyDevicesStringsSet = QnCameraDeviceStringSet(
+            tr("<Any device>"), tr("<Any camera>"), tr("<Any IO module>"));
 
-        m_ui->cameraButton->setText(kEmptyCamerasCaption);
+        m_ui->cameraButton->setText(QnDeviceDependentStrings::getNameFromSet(
+            kAnyDevicesStringsSet, qnResPool->getResources<QnVirtualCameraResource>()));
         return;
     }
 
