@@ -90,7 +90,11 @@ namespace {
     }
 
     bool itemBelongsToValidLayout(QnWorkbenchItem *item) {
-        return (item && item->layout() && item->layout()->resource() && item->layout()->resource()->resourcePool());
+        return (item
+            && item->layout()
+            && item->layout()->resource()
+            && item->layout()->resource()->resourcePool()
+            && !item->layout()->resource()->getParentId().isNull());
     }
 
     GraphicsLabel *createGraphicsLabel() {

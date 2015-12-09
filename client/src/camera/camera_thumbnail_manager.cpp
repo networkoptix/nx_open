@@ -61,9 +61,12 @@ void QnCameraThumbnailManager::selectResource(const QnResourcePtr &resource) {
     emit thumbnailReadyDelayed(resource->getId(), thumbnail);
 }
 
+QPixmap QnCameraThumbnailManager::statusPixmap( ThumbnailStatus status ) {
+    return m_statusPixmaps[status];
+}
 
 QPixmap QnCameraThumbnailManager::scaledPixmap(const QPixmap &pixmap) const {
-    Q_ASSERT(!m_thumnailSize.isNull());
+    /* Check if no scaling required. */
     if (m_thumnailSize.isNull())
         return pixmap;
 
@@ -109,7 +112,7 @@ int QnCameraThumbnailManager::loadThumbnailForResource(const QnResourcePtr &reso
                 -1,
                 m_thumnailSize,
                 QLatin1String("jpg"),
-                QnMediaServerConnection::IFrameAfterTime,
+                QnThumbnailRequestData::KeyFrameAfterMethod,
                 this,
                 SLOT(at_thumbnailReceived(int, const QImage&, int)));
 }

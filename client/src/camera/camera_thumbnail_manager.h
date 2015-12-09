@@ -1,5 +1,4 @@
-#ifndef CAMERA_THUMBNAIL_MANAGER_H
-#define CAMERA_THUMBNAIL_MANAGER_H
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QHash>
@@ -12,11 +11,22 @@ class QnCameraThumbnailManager : public QObject
 {
     Q_OBJECT
 public:
+    enum ThumbnailStatus {
+        None,
+        Loading,
+        Loaded,
+        NoData,
+        NoSignal,
+        Refreshing
+    };
+
     explicit QnCameraThumbnailManager(QObject *parent = 0);
     virtual ~QnCameraThumbnailManager();
-    
+
     void selectResource(const QnResourcePtr &resource);
     void setThumbnailSize(const QSize &size);
+
+    QPixmap statusPixmap(ThumbnailStatus status);
 signals:
     void thumbnailReady(const QnUuid &resourceId, const QPixmap& thumbnail);
 
@@ -27,14 +37,7 @@ private slots:
 
 private:
     Q_SIGNAL void thumbnailReadyDelayed(const QnUuid &resourceId, const QPixmap& thumbnail);
-    enum ThumbnailStatus {
-        None,
-        Loading,
-        Loaded,
-        NoData,
-        NoSignal,
-        Refreshing
-    };
+
 
     int loadThumbnailForResource(const QnResourcePtr &resource);
 
@@ -56,5 +59,3 @@ private:
     QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
     QTimer *m_refreshingTimer;
 };
-
-#endif // CAMERA_THUMBNAIL_MANAGER_H

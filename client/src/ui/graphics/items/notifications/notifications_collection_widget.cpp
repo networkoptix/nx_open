@@ -10,6 +10,7 @@
 #include <business/business_strings_helper.h>
 
 #include <camera/single_thumbnail_loader.h>
+#include <camera/camera_thumbnail_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
@@ -47,7 +48,7 @@
 
 namespace {
     const qreal widgetHeight = 24;
-    const QSize thumbnailSize(0, 100);
+    const QSize kDefaultThumbnailSize(0, QnThumbnailRequestData::kMinimumSize);
 
     /** We limit the maximal number of notification items to prevent crashes due
      * to reaching GDI resource limit. */
@@ -151,11 +152,13 @@ void QnBlinkingImageButtonWidget::at_particle_visibleChanged() {
 // ---------------------- QnNotificationsCollectionWidget -------------------
 
 
-QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context) :
-    base_type(parent, flags),
-    QnWorkbenchContextAware(context)
+QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem *parent, Qt::WindowFlags flags, QnWorkbenchContext* context)
+    : base_type(parent, flags)
+    , QnWorkbenchContextAware(context)
+    , m_headerWidget(new GraphicsWidget(this))
+    , m_statusPixmapManager(new QnCameraThumbnailManager())
 {
-    m_headerWidget = new GraphicsWidget(this);
+    m_statusPixmapManager->setThumbnailSize(kDefaultThumbnailSize);
 
     qreal buttonSize = QApplication::style()->pixelMetric(QStyle::PM_ToolBarIconSize, NULL, NULL);
 
@@ -245,22 +248,18 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item,
                                                            const QnVirtualCameraResourcePtr &camera,
-                                                           const QnMediaServerResourcePtr &server,
                                                            qint64 msecSinceEpoch) {
-    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(camera,
-        server,
-        msecSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat, item);
+    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(camera, msecSinceEpoch, -1, kDefaultThumbnailSize, QnThumbnailRequestData::JpgFormat, m_statusPixmapManager, item);
     item->setImageProvider(loader);
 }
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item,
                                                            const QnVirtualCameraResourceList &cameraList,
-                                                           const QnMediaServerResourcePtr &server,
                                                            qint64 msecSinceEpoch)
 {
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList) {
-        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(camera, server, msecSinceEpoch, -1, thumbnailSize, QnSingleThumbnailLoader::JpgFormat));
+        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(camera, msecSinceEpoch, -1, kDefaultThumbnailSize, QnThumbnailRequestData::JpgFormat, m_statusPixmapManager));
         providers.push_back(std::move(provider));
     }
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, multiThumbnailSpacing, item));
@@ -329,7 +328,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInAlarmLayoutAction,
             QnActionParameters(alarmCameras)
             );
-        loadThumbnailForItem(item, alarmCameras, source);
+        loadThumbnailForItem(item, alarmCameras);
     }
 
     else
@@ -341,7 +340,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource).withArgument(Qn::ItemTimeRole, timestampMs)
         );
-        loadThumbnailForItem(item, camera, source, timestampMs);
+        loadThumbnailForItem(item, camera, timestampMs);
         break;
     }
 
@@ -358,7 +357,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::OpenInNewLayoutAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, camera, source);
+        loadThumbnailForItem(item, camera);
         break;
     }
 
@@ -377,7 +376,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             Qn::CameraSettingsAction,
             QnActionParameters(resource)
         );
-        loadThumbnailForItem(item, camera, source);
+        loadThumbnailForItem(item, camera);
         break;
     }
 
@@ -437,7 +436,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 Qn::OpenInNewLayoutAction,
                 QnActionParameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs)
                 );
-            loadThumbnailForItem(item, sourceCameras, source, timestampMs);
+            loadThumbnailForItem(item, sourceCameras, timestampMs);
         }
         break;
     }
