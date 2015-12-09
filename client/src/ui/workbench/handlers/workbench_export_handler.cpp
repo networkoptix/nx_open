@@ -191,14 +191,14 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
 
 QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActionParameters &parameters)
 {
-    if(parameters.size() == 1) 
+    if(parameters.size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
 
-    if((parameters.size() == 0) && display()->widgets().size() == 1) 
+    if((parameters.size() == 0) && display()->widgets().size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
 
     QnMediaResourceWidget * const widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
-    if (!widget) 
+    if (!widget)
     {
         QMessageBox::critical(mainWindow(), tr("Unable to export file."),
             tr("Exactly one item must be selected for export, but %n item(s) are currently selected."
@@ -218,22 +218,35 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
     /// At first we check if resource parameter is presented
     const auto virtualCamResource = extractResource(parameters);
-    auto mediaResource = (virtualCamResource ? virtualCamResource.dynamicCast<QnMediaResource>() : QnMediaResourcePtr());
-    auto dataProvider = (virtualCamResource ? virtualCamResource->createDataProvider(Qn::CR_Default) : nullptr);
+    auto widget = extractMediaWidget(parameters);
 
-    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
-    auto widget = (virtualCamResource ? nullptr : extractMediaWidget(parameters));
-    /// if not resource parameter is presented we try to use widget current information
-    if (widget)
-    {
-        mediaResource = widget->resource();
-        dataProvider = widget->display()->dataProvider();
-    }
+    auto mediaResource = (virtualCamResource ? virtualCamResource.dynamicCast<QnMediaResource>()
+        : (widget ? widget->resource() : QnMediaResourcePtr()));
+    auto dataProvider = (virtualCamResource ? virtualCamResource->createDataProvider(Qn::CR_Default)
+        : (widget ? widget->display()->dataProvider() : nullptr));
 
     if (!mediaResource || !dataProvider)
         return;
 
-    QnLayoutItemData itemData = (widget ? widget->item()->data() : QnLayoutItemData());
+    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
+
+    // Creates default layout item data (if there is no widget
+    // selected - bookmarks export, for example). Media resource
+    // is used because it should be presented to export data
+    const auto createDefaultLayoutItemData =
+        [this](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
+    {
+        const auto resource = mediaResource->toResourcePtr();
+
+        QnLayoutItemData result;
+        result.resource.path = resource->getUniqueId();
+        result.resource.id = resource->getId();
+        result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
+        return result;
+    };
+
+    QnLayoutItemData itemData = (widget ? widget->item()->data()
+        : createDefaultLayoutItemData(mediaResource));
 
     bool wasLoggedIn = !context()->user().isNull();
 
@@ -244,7 +257,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             QMessageBox::warning(
                 mainWindow(),
                 tr("Warning!"),
-                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n' 
+                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n'
               + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
               + tr("Do you want to continue?"),
                 QMessageBox::Yes | QMessageBox::No,
@@ -252,7 +265,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 ) == QMessageBox::No)
         return;
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return;
@@ -296,7 +309,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     QnImageFilterHelper imageParameters;
 
     while (true) {
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -334,7 +347,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
             transcodeCheckbox = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
-            if (transcodeCheckbox) 
+            if (transcodeCheckbox)
             {
                 dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &transcodeCheckbox, delegate);
             }
@@ -343,7 +356,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (!dialog->exec())
             return;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -356,7 +369,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         binaryExport = isBinaryExportSupported()
             ? selectedFilter.contains(binaryFilterName())
             : false;
-        
+
         if (comboBox)
             timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
@@ -383,7 +396,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                         mainWindow(),
                         tr("AVI format is not recommended"),
                         tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
-                           "Do you want to continue?"), 
+                           "Do you want to continue?"),
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -401,7 +414,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         imageParameters.setVideoLayout(mediaResource->getVideoLayout());
 
         auto videoLayout = mediaResource->getVideoLayout();
-        bool doTranscode = transcodeCheckbox || 
+        bool doTranscode = transcodeCheckbox ||
                            timestampPos != Qn::NoCorner ||
                            (!binaryExport && videoLayout && videoLayout->channelCount() > 1);
 
@@ -423,7 +436,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                             tr("Selected format is not recommended"),
                             tr("Selected format is not recommended for this camera due to video downscaling. "
                             "We recommend to export selected video either to the '.nov' or '.exe' format. "
-                            "Do you want to continue?"), 
+                            "Do you want to continue?"),
                             QMessageBox::Yes | QMessageBox::No
                             );
                         if (result != QMessageBox::Yes)
@@ -434,7 +447,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
                 }
             }
-            if (!transcodeWarnShown) 
+            if (!transcodeWarnShown)
             {
                 transcodeWarnShown = true;
                 QMessageBox::StandardButton button = QMessageBox::question(
@@ -450,7 +463,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -482,7 +495,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         break;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
      if (wasLoggedIn && !context()->user())
         return;
@@ -642,7 +655,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         mediaFileFilter += filterSeparator + binaryFilterName();
 
     while (true) {
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -662,7 +675,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         if (!dialog->exec())
             return false;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -690,7 +703,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             }
         }
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -701,7 +714,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         break;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return false;
@@ -735,8 +748,8 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning!"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n' 
-          + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n' 
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n'
+          + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
           + tr("Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No
             );
@@ -744,7 +757,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
             return;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return;
