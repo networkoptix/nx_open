@@ -562,7 +562,7 @@ private:
 
     bool event(QEvent *event) override;
 
-    void updateTimestampInner(qint64 timestamp);
+    void updateTimestampInternal(qint64 timestamp);
 
 private:
     typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
@@ -675,7 +675,7 @@ void QnBookmarksViewer::Impl::setAllowClickOnTag(bool allow)
     m_allowClickOnTag = allow;
 }
 
-void QnBookmarksViewer::Impl::updateTimestampInner(qint64 timestamp)
+void QnBookmarksViewer::Impl::updateTimestampInternal(qint64 timestamp)
 {
     m_updateDelayedTimer.reset();
 
@@ -706,13 +706,13 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
     if (m_bookmarks.empty() || m_forceUpdateTimer.hasExpired(kUpdateDelay))
     {
         // Updates tooltips immediately
-        updateTimestampInner(timestamp);
+        updateTimestampInternal(timestamp);
         return;
     }
 
     const auto updateTimeStamp = [this, timestamp]()
     {
-        updateTimestampInner(timestamp);
+        updateTimestampInternal(timestamp);
     };
 
     m_updateDelayedTimer.reset(executeDelayedParented(updateTimeStamp, kUpdateDelay, this));
