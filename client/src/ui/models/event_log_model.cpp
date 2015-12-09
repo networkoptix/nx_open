@@ -440,8 +440,8 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             if (count > 1)
             {
                 const auto countString = tr("%1 (%n times)"
-                    , "%1 is description of event. Will be replace runtime", count);
-                return countString.arg(count);
+                    , "%1 is description of event. Will be replaced in runtime", count);
+                return countString.arg(result);
             }
         }
         return result;
