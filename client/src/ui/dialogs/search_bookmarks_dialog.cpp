@@ -233,10 +233,10 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
 
 void QnSearchBookmarksDialog::Impl::updateCamerasText()
 {
-    static const auto kEmptyCamerasCaption = tr("<Any camera>");
-
     if (m_cameras.empty())
     {
+        static const auto kEmptyCamerasCaption = tr("<Any camera>");
+
         m_ui->cameraButton->setText(kEmptyCamerasCaption);
         return;
     }
