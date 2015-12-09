@@ -371,6 +371,7 @@ public:
 
             assert(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
+            m_owner->updateCameraHistory();
         }
     }
 };
@@ -393,7 +394,7 @@ public:
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
-            if (fileStorage->isAvailable())
+            if (status == Qn::Online)
             {
                 const auto space = QString::number(fileStorage->getTotalSpace());
                 if (fileStorage->setProperty(Qn::SPACE, space))
@@ -1258,9 +1259,12 @@ void QnStorageManager::clearSpace(bool forced)
         updateCameraHistory();
     }
 
-    for(const QnStorageResourcePtr& storage: storages)
-        clearOldestSpace(storage, true);
-    for(const QnStorageResourcePtr& storage: storages)
+    QnStorageResourceList delAgainList;
+    for(const QnStorageResourcePtr& storage: storages) {
+        if (!clearOldestSpace(storage, true))
+            delAgainList << storage;
+    }
+    for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false);
 
     // 3. Remove empty dirs
@@ -1541,20 +1545,20 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
     }
 }
 
-void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
+bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
 {
     if (storage->getSpaceLimit() == 0)
-        return; // unlimited
+        return true; // unlimited. nothing to delete
 
 
     QString dir = storage->getUrl();
 
     if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
-        return;
+        return true; // nothing to delete
 
     qint64 freeSpace = storage->getFreeSpace();
     if (freeSpace == -1)
-        return;
+        return true; // nothing to delete
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
 
     while (toDelete > 0)
@@ -1592,7 +1596,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
         qint64 freeSpace = storage->getFreeSpace();
         if (freeSpace == -1)
-            return;
+            return true; // nothing to delete
         toDelete = storage->getSpaceLimit() - freeSpace;
     }
 
@@ -1606,6 +1610,8 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     else {
         m_diskFullWarned[storage->getId()] = false;
     }
+
+    return toDelete <= 0;
 }
 
 void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
