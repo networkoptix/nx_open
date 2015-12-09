@@ -292,6 +292,7 @@ public:
                 if (m_scanTasks.isEmpty()) 
                 {
                     // not data to process left                
+                    m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
                     if (fullscanProcessed) {
                         if (!QnResource::isStopping())
@@ -309,7 +310,6 @@ public:
 
             assert(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
-            m_owner->updateCameraHistory();
         }
     }
 };
