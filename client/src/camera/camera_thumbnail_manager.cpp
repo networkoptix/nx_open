@@ -16,11 +16,11 @@
 
 namespace {
 
-    QSize kDefaultThumbnailSize(0, 200);
+    const QSize kDefaultThumbnailSize(0, 200);
 
-    int kUpdateThumbnailsPeriodMs = 10 * 1000;
+    const int kUpdateThumbnailsPeriodMs = 10 * 1000;
 
-    rest::Handle kInvalidHandle = 0;
+    const rest::Handle kInvalidHandle = 0;
 }
 
 QnCameraThumbnailManager::ThumbnailData::ThumbnailData()
