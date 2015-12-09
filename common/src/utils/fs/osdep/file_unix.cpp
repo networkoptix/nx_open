@@ -81,7 +81,7 @@ bool QnFile::open(const QIODevice::OpenMode& mode, unsigned int systemDependentF
     makeUnixOpenFlags( mode, &sysFlags );
     int handle = ::open( m_fileName.toUtf8(), sysFlags | O_LARGEFILE | systemDependentFlags, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP );
 
-    if (handle == -1 && (openMode & QIODevice::WriteOnly) && errno == ENOENT)
+    if (handle == -1 && (mode & QIODevice::WriteOnly) && errno == ENOENT)
     {
         QDir dir;
         if (dir.mkpath(QnFile::absolutePath(m_fileName))) 
