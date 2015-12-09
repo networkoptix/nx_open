@@ -434,14 +434,14 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
             result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
         }
 
-
         if (!QnBusiness::hasToggleState(eventType))
         {
             int count = action.aggregationCount;
             if (count > 1)
             {
-                QString countString = tr("%1 times").arg(count);
-                result += lit(" (%1)").arg(countString);
+                const auto countString = tr("%1 (%n times)"
+                    , "%1 is description of event. Will be replace runtime", count);
+                return countString.arg(count);
             }
         }
         return result;
