@@ -164,7 +164,8 @@
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
-                "Cellinx|STH795"
+                "Cellinx|STH795",
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -518,7 +519,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XPTZ"
+                "VISTA|VK2-1080XPTZ","VISTA|VK2-1080XVRDPTPMF"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -623,7 +624,7 @@
                     }
                 }
             },
-			"onvifPtzDigitsAfterDecimalPoint": 0
+            "onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [
@@ -925,6 +926,12 @@
             "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }

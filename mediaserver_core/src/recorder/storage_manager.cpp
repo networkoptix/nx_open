@@ -1398,18 +1398,22 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
 void QnStorageManager::testOfflineStorages()
 {
-    QMutexLocker lock(&m_mutexStorages);
-    if (!m_testStorageThread->isRunning())
+    QMutexLocker lock( &m_testStorageThreadMutex );
+    if (m_testStorageThread && !m_testStorageThread->isRunning())
         m_testStorageThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
 {
-    if (m_testStorageThread) {
-        m_testStorageThread->stop();
-        delete m_testStorageThread;
-        m_testStorageThread = 0;
+    {
+        QMutexLocker lock( &m_testStorageThreadMutex );
+        if (m_testStorageThread) {
+            m_testStorageThread->stop();
+            delete m_testStorageThread;
+            m_testStorageThread = 0;
+        }
     }
+
     m_rebuildCancelled = true;
     if (m_rebuildArchiveThread) {
         m_rebuildArchiveThread->stop();
