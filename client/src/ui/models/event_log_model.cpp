@@ -25,6 +25,8 @@
 namespace
 {
     enum { kSingleUser = 1};
+
+    const auto kDelimiter = lit("\n");
 }
 typedef QnBusinessActionData* QnLightBusinessActionP;
 
@@ -402,26 +404,42 @@ QString QnEventLogModel::textData(const Column& column,const QnBusinessActionDat
         else
             return getResourceNameString(action.actionParams.actionResourceId);
     }
-    case DescriptionColumn: {
-        if (action.actionType == QnBusiness::ShowOnAlarmLayoutAction) {
+    case DescriptionColumn:
+    {
+        switch(action.actionType)
+        {
+        case QnBusiness::ShowOnAlarmLayoutAction:
             return getResourceNameString(action.actionParams.actionResourceId);
+
+        case QnBusiness::ShowTextOverlayAction:
+        {
+            const auto text = action.actionParams.text.trimmed();
+            if (!text.isEmpty())
+                return text;
+        }
+        default:
+            break;
         }
 
         QnBusiness::EventType eventType = action.eventParams.eventType;
         QString result;
 
-        if (eventType == QnBusiness::CameraMotionEvent) {
+        if (eventType == QnBusiness::CameraMotionEvent)
+        {
             if (action.hasFlags(QnBusinessActionData::MotionExists))
                 result = tr("Motion video");
         }
-        else {
+        else
+        {
             result = QnBusinessStringsHelper::eventDetails(action.eventParams, lit("\n"));
         }
 
 
-        if (!QnBusiness::hasToggleState(eventType)) {
+        if (!QnBusiness::hasToggleState(eventType))
+        {
             int count = action.aggregationCount;
-            if (count > 1) {
+            if (count > 1)
+            {
                 QString countString = tr("%1 times").arg(count);
                 result += lit(" (%1)").arg(countString);
             }
@@ -560,7 +578,6 @@ QVariant QnEventLogModel::data(const QModelIndex &index, int role) const {
                 userNames.append(tr("and %1 user(s) more...", nullptr, diffCount));
             }
 
-            static const auto kDelimiter = lit("\n");
             return userNames.join(kDelimiter);
         }
         else if (index.column() != DescriptionColumn)
