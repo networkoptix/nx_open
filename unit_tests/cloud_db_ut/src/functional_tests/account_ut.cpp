@@ -14,6 +14,7 @@
 #include <data/account_data.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/http/server/fusion_request_result.h>
 #include <utils/common/model_functions.h>
 
 #include "test_setup.h"
@@ -153,6 +154,36 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
     //trying to add account with same email once again
     result = addActivatedAccount(&account1, &account1Password);
     ASSERT_EQ(result, api::ResultCode::alreadyExists);
+
+    //checking correct error message
+    auto client = nx_http::AsyncHttpClient::create();
+    QUrl url;
+    url.setHost(endpoint().address.toString());
+    url.setPort(endpoint().port);
+    url.setScheme("http");
+    url.setPath("/account/register");
+    std::promise<void> donePromise;
+    auto doneFuture = donePromise.get_future();
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done,
+        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
+            donePromise.set_value();
+        },
+        Qt::DirectConnection);
+    client->doPost(url, "application/json", QJson::serialized(account1));
+
+    doneFuture.wait();
+    ASSERT_TRUE(client->response() != nullptr);
+    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+
+    bool success = false;
+    nx_http::FusionRequestResult requestResult =
+        QJson::deserialized<nx_http::FusionRequestResult>(
+            client->fetchMessageBodyBuffer(),
+            nx_http::FusionRequestResult(),
+            &success);
+    ASSERT_TRUE(success);
+    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.resultCode);
 }
 
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)
