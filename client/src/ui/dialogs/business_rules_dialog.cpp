@@ -130,14 +130,16 @@ namespace {
 
     private:
         bool defaultLessThan(const QModelIndex &left, const QModelIndex &right) const {
-            return left.data(Qn::UuidRole).value<QnUuid>() < right.data(Qn::UuidRole).value<QnUuid>();
+            return left.data(Qt::DisplayRole).toString() < right.data(Qt::DisplayRole).toString();
         };
 
         template <typename T>
         bool lessThanByRole(const QModelIndex &left, const QModelIndex &right, int role, std::function<bool (T left, T right)> comp = std::less<T>()) const {
             T lValue = left.data(role).value<T>();
             T rValue = right.data(role).value<T>();
-            return comp(lValue, rValue);
+            if (lValue != rValue)
+                return comp(lValue, rValue);
+            return defaultLessThan(left, right);
         }
 
     private:
