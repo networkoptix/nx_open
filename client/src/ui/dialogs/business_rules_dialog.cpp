@@ -287,8 +287,7 @@ void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
 }
 
 void QnBusinessRulesDialog::at_beforeModelChanged() {
-   // bool enabled = accessController()->globalPermissions() & Qn::GlobalProtectedPermission;
-    m_currentDetailsWidget->setModel(NULL);
+    m_currentDetailsWidget->setModel(QnBusinessRuleViewModelPtr());
     m_pendingDeleteRules.clear();
     m_deleting.clear();
     updateControlButtons();
@@ -305,7 +304,7 @@ void QnBusinessRulesDialog::at_newRuleButton_clicked() {
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
-    QnBusinessRuleViewModel* model = m_currentDetailsWidget->model();
+    QnBusinessRuleViewModelPtr model = m_currentDetailsWidget->model();
     if (!model)
         return;
     deleteRule(model);
@@ -366,13 +365,7 @@ void QnBusinessRulesDialog::at_resources_deleted( int handle, ec2::ErrorCode err
 void QnBusinessRulesDialog::at_tableView_currentRowChanged(const QModelIndex &current, const QModelIndex &previous) {
     Q_UNUSED(previous)
 
-    SortRulesProxyModel* proxyModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model());
-    Q_ASSERT_X(proxyModel, Q_FUNC_INFO, "Make sure model is valid");
-    if (!proxyModel)
-        return;
-
-    QModelIndex source = proxyModel->mapToSource(current);
-    QnBusinessRuleViewModel* ruleModel = m_rulesViewModel->rule(source);
+    QnBusinessRuleViewModelPtr ruleModel = m_rulesViewModel->rule(current);
     m_currentDetailsWidget->setModel(ruleModel);
 
     updateControlButtons();
@@ -463,7 +456,7 @@ bool QnBusinessRulesDialog::saveAll() {
     return true;
 }
 
-void QnBusinessRulesDialog::deleteRule(QnBusinessRuleViewModel* ruleModel) {
+void QnBusinessRulesDialog::deleteRule(const QnBusinessRuleViewModelPtr &ruleModel) {
     if (!ruleModel->id().isNull())
         m_pendingDeleteRules.append(ruleModel->id());
     m_rulesViewModel->deleteRule(ruleModel);

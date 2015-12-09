@@ -74,7 +74,7 @@ private slots:
     void updateControlButtons();
 
     void updateFilter();
-    
+
     void retranslateUi();
 
 private:
@@ -84,7 +84,7 @@ private:
 
     bool saveAll();
 
-    void deleteRule(QnBusinessRuleViewModel* ruleModel);
+    void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
 
     bool advancedMode() const;
     void setAdvancedMode(bool value);
