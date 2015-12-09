@@ -22,7 +22,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnThumbnailRequestData::ThumbnailForma
                                           (QnThumbnailRequestData::RawFormat,               "raw")
                                           );
 
-namespace {
+namespace
+{
     const QString physicalIdKey     (lit("physicalId"));
     const QString macKey            (lit("mac"));
     const QString cameraIdKey       (lit("cameraId"));
@@ -66,7 +67,8 @@ void QnThumbnailRequestData::loadFromParams( const QnRequestParamList& params )
     else if (params.contains(cameraIdKey))
         camera = qnResPool->getResourceById(QnUuid::fromStringSafe(params.value(cameraIdKey))).dynamicCast<QnVirtualCameraResource>();
 
-    if (params.contains(timeKey)) {
+    if (params.contains(timeKey))
+    {
         QString timeValue = params.value(timeKey);
         if (timeValue == kLatestTimeValue)
             msecSinceEpoch = kLatestThumbnail;
