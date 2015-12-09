@@ -16,7 +16,7 @@
 #include <utils/common/string.h>
 #include <utils/common/delayed.h>
 
-#include <QTextDocument>
+#include <QtGui/QTextDocument>
 
 namespace
 {
