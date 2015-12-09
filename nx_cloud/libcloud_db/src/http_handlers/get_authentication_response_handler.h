@@ -24,7 +24,7 @@ class GetAuthenticationResponseHandler
     public AbstractFiniteMsgBodyHttpHandler<data::AuthRequest, api::AuthResponse>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     GetAuthenticationResponseHandler(
         AuthenticationProvider* const authProvider,

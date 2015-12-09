@@ -23,7 +23,7 @@ class BindSystemHandler
     public AbstractFiniteMsgBodyHttpHandler<data::SystemRegistrationData, data::SystemData>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     BindSystemHandler(
         SystemManager* const systemManager,

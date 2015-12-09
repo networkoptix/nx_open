@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString GetCdbNonceHandler::HANDLER_PATH(AUTH_GET_NONCE_PATH);
+const QString GetCdbNonceHandler::kHandlerPath(kAuthGetNoncePath);
 
 }   //cdb
 }   //nx

@@ -28,7 +28,7 @@ class ShareSystemHttpHandler
     public AbstractFiniteMsgBodyHttpHandler<data::SystemSharing>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     ShareSystemHttpHandler(
         SystemManager* const systemManager,

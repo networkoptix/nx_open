@@ -27,7 +27,7 @@ class PingHandler
     public AbstractFiniteMsgBodyHttpHandler<void, api::ModuleInfo>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     PingHandler(const AuthorizationManager& authorizationManager)
     :

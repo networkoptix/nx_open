@@ -125,9 +125,9 @@ int CloudDBProcess::executeApplication()
             &dbManager);
     
         QnAuthMethodRestrictionList authRestrictionList;
-        authRestrictionList.allow( PingHandler::HANDLER_PATH, AuthMethod::noAuth );
-        authRestrictionList.allow( AddAccountHttpHandler::HANDLER_PATH, AuthMethod::noAuth );
-        authRestrictionList.allow( ActivateAccountHandler::HANDLER_PATH, AuthMethod::noAuth );
+        authRestrictionList.allow( PingHandler::kHandlerPath, AuthMethod::noAuth );
+        authRestrictionList.allow( AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth );
+        authRestrictionList.allow( ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth );
 
         AuthenticationManager authenticationManager( 
             accountManager,
@@ -249,82 +249,82 @@ void CloudDBProcess::registerApiHandlers(
     AuthenticationProvider* const authProvider)
 {
     msgDispatcher->registerRequestProcessor<PingHandler>(
-        PingHandler::HANDLER_PATH,
+        PingHandler::kHandlerPath,
         [&authorizationManager]() -> std::unique_ptr<PingHandler> {
             return std::make_unique<PingHandler>( authorizationManager );
         } );
 
     //accounts
     msgDispatcher->registerRequestProcessor<AddAccountHttpHandler>(
-        AddAccountHttpHandler::HANDLER_PATH,
+        AddAccountHttpHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<AddAccountHttpHandler> {
             return std::make_unique<AddAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<ActivateAccountHandler>(
-        ActivateAccountHandler::HANDLER_PATH,
+        ActivateAccountHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<ActivateAccountHandler> {
             return std::make_unique<ActivateAccountHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetAccountHttpHandler>(
-        GetAccountHttpHandler::HANDLER_PATH,
+        GetAccountHttpHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<GetAccountHttpHandler> {
             return std::make_unique<GetAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<UpdateAccountHttpHandler>(
-        UpdateAccountHttpHandler::HANDLER_PATH,
+        UpdateAccountHttpHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<UpdateAccountHttpHandler> {
             return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     //systems
     msgDispatcher->registerRequestProcessor<BindSystemHandler>(
-        BindSystemHandler::HANDLER_PATH,
+        BindSystemHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<BindSystemHandler> {
             return std::make_unique<BindSystemHandler>( systemManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetSystemsHandler>(
-        GetSystemsHandler::HANDLER_PATH,
+        GetSystemsHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<GetSystemsHandler> {
             return std::make_unique<GetSystemsHandler>( systemManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<UnbindSystemHandler>(
-        UnbindSystemHandler::HANDLER_PATH,
+        UnbindSystemHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<UnbindSystemHandler> {
             return std::make_unique<UnbindSystemHandler>( systemManager, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<ShareSystemHttpHandler>(
-        ShareSystemHttpHandler::HANDLER_PATH,
+        ShareSystemHttpHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<ShareSystemHttpHandler> {
             return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
         } );
 
     msgDispatcher->registerRequestProcessor<UpdateSystemSharingHandler>(
-        UpdateSystemSharingHandler::HANDLER_PATH,
+        UpdateSystemSharingHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemSharingHandler> {
             return std::make_unique<UpdateSystemSharingHandler>(systemManager, authorizationManager);
         });
 
     msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
-        GetCloudUsersOfSystemHandler::HANDLER_PATH,
+        GetCloudUsersOfSystemHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
             return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
         } );
 
     //authentication
     msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
-        GetCdbNonceHandler::HANDLER_PATH,
+        GetCdbNonceHandler::kHandlerPath,
         [authProvider, &authorizationManager]() -> std::unique_ptr<GetCdbNonceHandler> {
             return std::make_unique<GetCdbNonceHandler>( authProvider, authorizationManager );
         } );
 
     msgDispatcher->registerRequestProcessor<GetAuthenticationResponseHandler>(
-        GetAuthenticationResponseHandler::HANDLER_PATH,
+        GetAuthenticationResponseHandler::kHandlerPath,
         [authProvider, &authorizationManager]() -> std::unique_ptr<GetAuthenticationResponseHandler> {
             return std::make_unique<GetAuthenticationResponseHandler>( authProvider, authorizationManager );
         } );

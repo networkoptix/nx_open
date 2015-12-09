@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString ActivateAccountHandler::HANDLER_PATH(ACCOUNT_ACTIVATE_PATH);
+const QString ActivateAccountHandler::kHandlerPath(kAccountActivatePath);
 
 }   //cdb
 }   //nx

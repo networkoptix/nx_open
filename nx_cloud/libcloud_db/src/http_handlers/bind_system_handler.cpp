@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString BindSystemHandler::HANDLER_PATH(SYSTEM_BIND_PATH);
+const QString BindSystemHandler::kHandlerPath(kSystemBindPath);
 
 }   //cdb
 }   //nx

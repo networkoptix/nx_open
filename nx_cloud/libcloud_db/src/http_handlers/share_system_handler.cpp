@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString ShareSystemHttpHandler::HANDLER_PATH = QLatin1String(SYSTEM_SHARE_PATH);
+const QString ShareSystemHttpHandler::kHandlerPath = QLatin1String(kSystemSharePath);
 
 }   //cdb
 }   //nx

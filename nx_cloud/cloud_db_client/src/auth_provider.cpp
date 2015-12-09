@@ -23,7 +23,7 @@ void AuthProvider::getCdbNonce(
     std::function<void(api::ResultCode, api::NonceData)> completionHandler)
 {
     executeRequest(
-        AUTH_GET_NONCE_PATH,
+        kAuthGetNoncePath,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::NonceData()));
 }
@@ -33,7 +33,7 @@ void AuthProvider::getAuthenticationResponse(
     std::function<void(api::ResultCode, api::AuthResponse)> completionHandler)
 {
     executeRequest(
-        AUTH_GET_AUTHENTICATION_PATH,
+        kAuthGetAuthenticationPath,
         authRequest,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AuthResponse()));

@@ -23,7 +23,7 @@ class GetCdbNonceHandler
     public AbstractFiniteMsgBodyHttpHandler<void, api::NonceData>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     GetCdbNonceHandler(
         AuthenticationProvider* const authProvider,

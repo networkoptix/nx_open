@@ -22,7 +22,7 @@ class UpdateSystemSharingHandler
     public AbstractFiniteMsgBodyHttpHandler<data::SystemSharing>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     UpdateSystemSharingHandler(
         SystemManager* const systemManager,

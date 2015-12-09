@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString GetCloudUsersOfSystemHandler::HANDLER_PATH(SYSTEM_GET_CLOUD_USERS_PATH);
+const QString GetCloudUsersOfSystemHandler::kHandlerPath(kSystemGetCloudUsersPath);
 
 }   //cdb
 }   //nx

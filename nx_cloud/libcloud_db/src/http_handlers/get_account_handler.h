@@ -24,7 +24,7 @@ class GetAccountHttpHandler
     public AbstractFiniteMsgBodyHttpHandler<void, data::AccountData>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     GetAccountHttpHandler(
         AccountManager* const accountManager,

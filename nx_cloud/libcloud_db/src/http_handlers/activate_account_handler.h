@@ -20,7 +20,7 @@ class ActivateAccountHandler
     public AbstractFiniteMsgBodyHttpHandler<data::AccountActivationCode>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     ActivateAccountHandler(
         AccountManager* const accountManager,

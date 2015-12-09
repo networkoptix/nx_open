@@ -23,7 +23,7 @@ class UnbindSystemHandler
     public AbstractFiniteMsgBodyHttpHandler<data::SystemID>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     UnbindSystemHandler(
         SystemManager* const systemManager,

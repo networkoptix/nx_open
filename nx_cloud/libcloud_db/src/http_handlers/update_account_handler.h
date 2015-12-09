@@ -27,7 +27,7 @@ class UpdateAccountHttpHandler
     public AbstractFiniteMsgBodyHttpHandler<data::AccountUpdateData>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     UpdateAccountHttpHandler(
         AccountManager* const accountManager,

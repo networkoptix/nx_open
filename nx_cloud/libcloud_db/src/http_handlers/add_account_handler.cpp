@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString AddAccountHttpHandler::HANDLER_PATH = QLatin1String(ACCOUNT_REGISTER_PATH);
+const QString AddAccountHttpHandler::kHandlerPath = QLatin1String(kAccountRegisterPath);
 
 }   //cdb
 }   //nx

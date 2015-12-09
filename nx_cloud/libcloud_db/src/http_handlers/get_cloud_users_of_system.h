@@ -22,7 +22,7 @@ class GetCloudUsersOfSystemHandler
     public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingList>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     GetCloudUsersOfSystemHandler(
         SystemManager* const systemManager,

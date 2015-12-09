@@ -28,7 +28,7 @@ class AddAccountHttpHandler
     public AbstractFiniteMsgBodyHttpHandler<data::AccountData, data::AccountActivationCode>
 {
 public:
-    static const QString HANDLER_PATH;
+    static const QString kHandlerPath;
 
     AddAccountHttpHandler(
         AccountManager* const accountManager,

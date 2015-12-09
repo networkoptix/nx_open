@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString GetAuthenticationResponseHandler::HANDLER_PATH(AUTH_GET_AUTHENTICATION_PATH);
+const QString GetAuthenticationResponseHandler::kHandlerPath(kAuthGetAuthenticationPath);
 
 }   //cdb
 }   //nx

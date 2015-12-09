@@ -55,7 +55,7 @@ void Connection::ping(
     std::function<void(api::ResultCode, api::ModuleInfo)> completionHandler)
 {
     executeRequest(
-        PING_PATH,
+        kPingPath,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::ModuleInfo()));
 }

@@ -10,22 +10,23 @@
 namespace nx {
 namespace cdb {
 
-extern const char* ACCOUNT_REGISTER_PATH;
-extern const char* ACCOUNT_ACTIVATE_PATH;
-extern const char* ACCOUNT_GET_PATH;
-extern const char* ACCOUNT_UPDATE_PATH;
+extern const char* kAccountRegisterPath;
+extern const char* kAccountActivatePath;
+extern const char* kAccountGetPath;
+extern const char* kAccountUpdatePath;
+extern const char* kAccountPasswordResetPath;
 
-extern const char* SYSTEM_BIND_PATH;
-extern const char* SYSTEM_UNBIND_PATH;
-extern const char* SYSTEM_GET_PATH;
-extern const char* SYSTEM_SHARE_PATH;
-extern const char* SYSTEM_GET_CLOUD_USERS_PATH;
-extern const char* SYSTEM_UPDATE_SHARING_PATH;
+extern const char* kSystemBindPath;
+extern const char* kSystemUnbindPath;
+extern const char* kSystemGetPath;
+extern const char* kSystemSharePath;
+extern const char* kSystemGetCloudUsersPath;
+extern const char* kSystemUpdateSharingPath;
 
-extern const char* AUTH_GET_NONCE_PATH;
-extern const char* AUTH_GET_AUTHENTICATION_PATH;
+extern const char* kAuthGetNoncePath;
+extern const char* kAuthGetAuthenticationPath;
 
-extern const char* PING_PATH;
+extern const char* kPingPath;
 
 }
 }

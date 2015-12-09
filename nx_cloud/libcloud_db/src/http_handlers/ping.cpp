@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString PingHandler::HANDLER_PATH = QLatin1String(PING_PATH);
+const QString PingHandler::kHandlerPath = QLatin1String(kPingPath);
 
 }   //cdb
 }   //nx

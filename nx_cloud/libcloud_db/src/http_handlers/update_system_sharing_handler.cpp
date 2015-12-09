@@ -11,7 +11,7 @@
 namespace nx {
 namespace cdb {
 
-const QString UpdateSystemSharingHandler::HANDLER_PATH(SYSTEM_UPDATE_SHARING_PATH);
+const QString UpdateSystemSharingHandler::kHandlerPath(kSystemUpdateSharingPath);
 
 }   //cdb
 }   //nx

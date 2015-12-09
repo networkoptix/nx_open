@@ -26,7 +26,7 @@ void SystemManager::bindSystem(
 {
     registrationData.customization = QN_CUSTOMIZATION_NAME;
     executeRequest(
-        SYSTEM_BIND_PATH,
+        kSystemBindPath,
         std::move(registrationData),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemData()));
@@ -37,7 +37,7 @@ void SystemManager::unbindSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        SYSTEM_UNBIND_PATH,
+        kSystemUnbindPath,
         api::SystemID(systemID),
         completionHandler,
         completionHandler);
@@ -47,7 +47,7 @@ void SystemManager::getSystems(
     std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
 {
     executeRequest(
-        SYSTEM_GET_PATH,
+        kSystemGetPath,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
 }
@@ -57,7 +57,7 @@ void SystemManager::shareSystem(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        SYSTEM_SHARE_PATH,
+        kSystemSharePath,
         sharingData,
         completionHandler,
         completionHandler);
@@ -67,7 +67,7 @@ void SystemManager::getCloudUsersOfSystem(
     std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
 {
     executeRequest(
-        SYSTEM_GET_CLOUD_USERS_PATH,
+        kSystemGetCloudUsersPath,
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
 }
@@ -77,7 +77,7 @@ void SystemManager::getCloudUsersOfSystem(
     std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
 {
     executeRequest(
-        SYSTEM_GET_CLOUD_USERS_PATH,
+        kSystemGetCloudUsersPath,
         api::SystemID(systemID),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
@@ -88,7 +88,7 @@ void SystemManager::updateSharing(
     std::function<void(api::ResultCode)> completionHandler)
 {
     executeRequest(
-        SYSTEM_UPDATE_SHARING_PATH,
+        kSystemUpdateSharingPath,
         std::move(sharing),
         completionHandler,
         completionHandler);
