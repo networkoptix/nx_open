@@ -486,7 +486,7 @@ namespace
     }
 
     /// @class BookmarkActionEvent
-    /// @brief Stores parameteres for bookmark action generation
+    /// @brief Stores parameters for bookmark action generation
     class BookmarkActionEvent : public QEvent
     {
     public:
@@ -562,7 +562,7 @@ private:
 
     bool event(QEvent *event) override;
 
-    void updateTimeStampImpl(qint64 timestamp);
+    void updateTimestampInner(qint64 timestamp);
 
 private:
     typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
@@ -675,7 +675,7 @@ void QnBookmarksViewer::Impl::setAllowClickOnTag(bool allow)
     m_allowClickOnTag = allow;
 }
 
-void QnBookmarksViewer::Impl::updateTimeStampImpl(qint64 timestamp)
+void QnBookmarksViewer::Impl::updateTimestampInner(qint64 timestamp)
 {
     m_updateDelayedTimer.reset();
 
@@ -706,13 +706,13 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
     if (m_bookmarks.empty() || m_forceUpdateTimer.hasExpired(kUpdateDelay))
     {
         // Updates tooltips immediately
-        updateTimeStampImpl(timestamp);
+        updateTimestampInner(timestamp);
         return;
     }
 
     const auto updateTimeStamp = [this, timestamp]()
     {
-        updateTimeStampImpl(timestamp);
+        updateTimestampInner(timestamp);
     };
 
     m_updateDelayedTimer.reset(executeDelayedParented(updateTimeStamp, kUpdateDelay, this));
