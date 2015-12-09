@@ -4,8 +4,11 @@
 #include <QtCore/QHash>
 #include <QtGui/QImage>
 
+#include <api/server_rest_connection_fwd.h>
+
 #include <core/resource/resource_fwd.h>
-#include "utils/common/id.h"
+
+#include <utils/common/uuid.h>
 
 class QnCameraThumbnailManager : public QObject
 {
@@ -16,14 +19,13 @@ public:
         Loading,
         Loaded,
         NoData,
-        NoSignal,
         Refreshing
     };
 
     explicit QnCameraThumbnailManager(QObject *parent = 0);
     virtual ~QnCameraThumbnailManager();
 
-    void selectResource(const QnResourcePtr &resource);
+    void selectResource(const QnVirtualCameraResourcePtr &camera);
     void setThumbnailSize(const QSize &size);
 
     QPixmap statusPixmap(ThumbnailStatus status);
@@ -33,28 +35,27 @@ signals:
 private slots:
     void at_resPool_statusChanged(const QnResourcePtr &resource);
     void at_resPool_resourceRemoved(const QnResourcePtr &resource);
-    void at_thumbnailReceived(int status, const QImage& thumbnail, int handle);
 
 private:
     Q_SIGNAL void thumbnailReadyDelayed(const QnUuid &resourceId, const QPixmap& thumbnail);
 
+    rest::Handle loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera);
 
-    int loadThumbnailForResource(const QnResourcePtr &resource);
-
-    bool isUpdateRequired(const QnResourcePtr &resource, const ThumbnailStatus status) const;
+    bool isUpdateRequired(const QnVirtualCameraResourcePtr &camera, const ThumbnailStatus status) const;
     void forceRefreshThumbnails();
 
     QPixmap scaledPixmap(const QPixmap &pixmap) const;
+    void updateStatusPixmaps();
 
     struct ThumbnailData {
-        ThumbnailData(): status(None), loadingHandle(0) {}
+        ThumbnailData();
 
         QImage thumbnail;
         ThumbnailStatus status;
-        int loadingHandle;
+        rest::Handle loadingHandle;
     };
 
-    QHash<QnResourcePtr, ThumbnailData> m_thumbnailByResource;
+    QHash<QnVirtualCameraResourcePtr, ThumbnailData> m_thumbnailByCamera;
     QSize m_thumnailSize;
     QHash<ThumbnailStatus, QPixmap> m_statusPixmaps;
     QTimer *m_refreshingTimer;

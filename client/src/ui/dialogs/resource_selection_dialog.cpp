@@ -255,17 +255,21 @@ void QnResourceSelectionDialog::updateThumbnail(const QModelIndex &index) {
     QModelIndex baseIndex = index.column() == Qn::NameColumn
         ? index
         : index.sibling(index.row(), Qn::NameColumn);
-        
+
     QString toolTip = baseIndex.data(Qt::ToolTipRole).toString();
     ui->detailsLabel->setText(toolTip);
 
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
-        m_tooltipResourceId = resource->getId();
-        m_thumbnailManager->selectResource(resource);
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        m_tooltipResourceId = camera->getId();
+        m_thumbnailManager->selectResource(camera);
         ui->screenshotWidget->show();
-    } else
+    }
+    else
+    {
         ui->screenshotWidget->hide();
+    }
 }
 
 void QnResourceSelectionDialog::at_resourceModel_dataChanged() {

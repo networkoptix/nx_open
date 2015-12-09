@@ -21,6 +21,7 @@ QnSingleThumbnailLoader::QnSingleThumbnailLoader(const QnVirtualCameraResourcePt
     , m_request()
 {
     Q_ASSERT_X(camera, Q_FUNC_INFO, "Camera must exist here");
+    Q_ASSERT_X(qnCommon->currentServer(), Q_FUNC_INFO, "We must be connected here");
 
     m_request.camera = camera;
     m_request.msecSinceEpoch = msecSinceEpoch;
@@ -59,6 +60,12 @@ QImage QnSingleThumbnailLoader::image() const {
 }
 
 void QnSingleThumbnailLoader::doLoadAsync() {
+    if (!qnCommon->currentServer())
+    {
+        emit imageLoaded(QByteArray());
+        return;
+    }
+
     auto handle = qnCommon->currentServer()->serverRestConnection()->cameraThumbnailAsync(m_request,  [this] (bool success, rest::Handle id, const QByteArray &imageData)
     {
         Q_UNUSED(id);
