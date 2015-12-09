@@ -13,6 +13,7 @@
 
 #include <data/account_data.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <utils/common/model_functions.h>
 
 #include "test_setup.h"
@@ -369,7 +370,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
     ASSERT_EQ(api::ResultCode::ok, result); //old password is still active
 }
 
-TEST(data, deserialization)
+TEST_F(CdbFunctionalTest, usingPostMethod)
 {
     const QByteArray testData =
         "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
@@ -379,6 +380,28 @@ TEST(data, deserialization)
     auto accountData = QJson::deserialized<data::AccountData>(
         testData, data::AccountData(), &success);
     ASSERT_TRUE(success);
+
+    waitUntilStarted();
+
+    auto client = nx_http::AsyncHttpClient::create();
+    QUrl url;
+    url.setHost(endpoint().address.toString());
+    url.setPort(endpoint().port);
+    url.setScheme("http");
+    url.setPath("/account/register");
+    std::promise<void> donePromise;
+    auto doneFuture = donePromise.get_future();
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done, 
+        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
+            donePromise.set_value();
+        },
+        Qt::DirectConnection);
+    client->doPost(url, "application/json", testData);
+
+    doneFuture.wait();
+    ASSERT_TRUE(client->response() != nullptr);
+    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
 }
 
 }   //cdb

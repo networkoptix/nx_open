@@ -198,9 +198,6 @@ public:
 
         if (result.resultCode == FusionRequestErrorClass::noError)
         {
-            //requests returning some data MUST be issues with GET method
-            Q_ASSERT(m_requestMethod == nx_http::Method::GET);
-
             //serializing outputData
             nx::Buffer serializedData;
             if (serializeToAnyFusionFormat(outputData, m_outputDataFormat, &serializedData))
