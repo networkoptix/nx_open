@@ -248,8 +248,17 @@ void QnNotificationsCollectionWidget::setBlinker(QnBlinkingImageButtonWidget *bl
 
 void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget *item,
                                                            const QnVirtualCameraResourcePtr &camera,
-                                                           qint64 msecSinceEpoch) {
-    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(camera, msecSinceEpoch, -1, kDefaultThumbnailSize, QnThumbnailRequestData::JpgFormat, m_statusPixmapManager, item);
+                                                           qint64 msecSinceEpoch)
+{
+    QnSingleThumbnailLoader *loader = new QnSingleThumbnailLoader(
+          camera
+        , msecSinceEpoch
+        , QnThumbnailRequestData::kDefaultRotation
+        , kDefaultThumbnailSize
+        , QnThumbnailRequestData::JpgFormat
+        , m_statusPixmapManager
+        , item
+        );
     item->setImageProvider(loader);
 }
 
@@ -259,7 +268,14 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(QnNotificationWidget 
 {
     QnMultiImageProvider::Providers providers;
     for (const auto& camera: cameraList) {
-        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(camera, msecSinceEpoch, -1, kDefaultThumbnailSize, QnThumbnailRequestData::JpgFormat, m_statusPixmapManager));
+        std::unique_ptr<QnImageProvider> provider(new QnSingleThumbnailLoader(
+              camera
+            , msecSinceEpoch
+            , QnThumbnailRequestData::kDefaultRotation
+            , kDefaultThumbnailSize
+            , QnThumbnailRequestData::JpgFormat
+            , m_statusPixmapManager
+            ));
         providers.push_back(std::move(provider));
     }
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, multiThumbnailSpacing, item));
