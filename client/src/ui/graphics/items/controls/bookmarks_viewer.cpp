@@ -14,11 +14,14 @@
 #include <ui/actions/action_parameters.h>
 
 #include <utils/common/string.h>
+#include <utils/common/delayed.h>
 
 #include <QTextDocument>
 
 namespace
 {
+    enum { kUpdateDelay = 150 };
+
     enum { kTopPositionIndex = 0 };
 
     enum
@@ -483,7 +486,7 @@ namespace
     }
 
     /// @class BookmarkActionEvent
-    /// @brief Stores paramteres for bookmark action generation
+    /// @brief Stores parameteres for bookmark action generation
     class BookmarkActionEvent : public QEvent
     {
     public:
@@ -559,6 +562,8 @@ private:
 
     bool event(QEvent *event) override;
 
+    void updateTimeStampImpl(qint64 timestamp);
+
 private:
     typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
 
@@ -576,6 +581,10 @@ private:
     QnCameraBookmarkList m_bookmarks;
     bool m_readonly;
     bool m_allowClickOnTag;
+
+    typedef QScopedPointer<QTimer> QTimerPtr;
+    QTimerPtr m_updateDelayedTimer;
+    QElapsedTimer m_forceUpdateTimer;
 };
 
 enum { kInvalidTimstamp = -1 };
@@ -600,6 +609,9 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_bookmarks()
     , m_readonly(false)
     , m_allowClickOnTag(false)
+
+    , m_updateDelayedTimer()
+    , m_forceUpdateTimer()
 {
 }
 
@@ -663,11 +675,14 @@ void QnBookmarksViewer::Impl::setAllowClickOnTag(bool allow)
     m_allowClickOnTag = allow;
 }
 
-void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
+void QnBookmarksViewer::Impl::updateTimeStampImpl(qint64 timestamp)
 {
+    m_updateDelayedTimer.reset();
+
     if (m_targetTimestamp == timestamp)
         return;
 
+    m_forceUpdateTimer.invalidate();
     const auto newBookmarks = m_getBookmarks(timestamp);
     if (m_bookmarks == newBookmarks)
         return;
@@ -680,6 +695,27 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
 
     m_targetTimestamp = timestamp;
     updateOnWindowChange();
+}
+
+void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
+{
+    const bool differentBookmarks = (m_getBookmarks(timestamp) != m_bookmarks);
+    if (differentBookmarks && !m_forceUpdateTimer.isValid())
+        m_forceUpdateTimer.start();
+
+    if (m_bookmarks.empty() || m_forceUpdateTimer.hasExpired(kUpdateDelay))
+    {
+        // Updates tooltips immediately
+        updateTimeStampImpl(timestamp);
+        return;
+    }
+
+    const auto updateTimeStamp = [this, timestamp]()
+    {
+        updateTimeStampImpl(timestamp);
+    };
+
+    m_updateDelayedTimer.reset(executeDelayedParented(updateTimeStamp, kUpdateDelay, this));
 }
 
 void QnBookmarksViewer::Impl::updateOnWindowChange()
@@ -702,6 +738,8 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
 
 void QnBookmarksViewer::Impl::resetBookmarks()
 {
+    m_updateDelayedTimer.reset();
+
     if (m_targetTimestamp == kInvalidTimstamp)
         return;
 
@@ -725,7 +763,9 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 
 
     if (trimmedBookmarks.empty())
+    {
         m_tooltip.reset();
+    }
     else
     {
         // TODO: #ynikitenkov Replace emitBookmarkEventFunc,
@@ -744,8 +784,20 @@ void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
             , m_colors, emitTagEventFunc, emitBookmarkEventFunc, m_owner));
     }
 
-    if (m_tooltip && m_hoverProcessor)
-        m_hoverProcessor->addTargetItem(m_tooltip.data());
+    if (m_tooltip)
+    {
+        HoverFocusProcessor *processor = new HoverFocusProcessor(m_tooltip.data());
+        processor->addTargetItem(m_tooltip.data());
+        connect(processor, &HoverFocusProcessor::hoverEntered, this
+            , [this]()
+        {
+            m_updateDelayedTimer.reset();
+            m_forceUpdateTimer.invalidate();
+        });
+
+        if (m_hoverProcessor)
+            m_hoverProcessor->addTargetItem(m_tooltip.data());
+    }
 }
 
 bool QnBookmarksViewer::Impl::event(QEvent *event)
