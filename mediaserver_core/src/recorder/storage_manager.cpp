@@ -13,6 +13,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_history.h>
+#include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 
@@ -314,7 +315,6 @@ public:
                     )
                 );
 
-
                 qDebug() << "rebuild archive time for storage" 
                          << scanData.storage->getUrl() 
                          << "is:" << t.elapsed() << "msec";
@@ -328,11 +328,11 @@ public:
                     // not data to process left                
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
-                    if (fullscanProcessed) {
+
+                    if (fullscanProcessed) 
+                    {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
-                        if (!m_fullScanCanceled)
-                            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
 
                         QnVirtualCameraResourceList camerasToAdd;
                         for (const auto &camera : archiveCameras)
@@ -360,7 +360,22 @@ public:
                                 ec2::DummyHandler::instance(), 
                                 &ec2::DummyHandler::onRequestDone
                             );
+
+                        for (const auto &camera : camerasToAdd) 
+                        {
+                            QnResourcePtr existCamRes = qnResPool->getResourceById(
+                                camera->getId()
+                            );
+                            if (existCamRes && existCamRes->getTypeId() != camera->getTypeId()) 
+                                qnResPool->removeResource(existCamRes);
+                            QnCommonMessageProcessor::instance()->updateResource(camera);
+                        }
+
                         archiveCameras.clear();
+                        m_owner->updateCameraHistory();
+
+                        if (!m_fullScanCanceled)
+                            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
                     }
                     else if (partialScanProcessed)
                         emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
