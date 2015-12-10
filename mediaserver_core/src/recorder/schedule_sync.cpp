@@ -524,6 +524,8 @@ void QnScheduleSync::run()
             return;
 
         renewSchedule();
+        if (m_schedule.backupType == Qn::BackupType::Backup_RealTime)
+            updateLastSyncChunk();
 
         auto isItTimeForSync = [this] ()
         {

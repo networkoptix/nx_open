@@ -68,7 +68,7 @@ private:
     // mounts network (smb) folder to temporary local path
     // returns not 0 if something went wrong, 0 otherwise
     int mountTmpDrive() const;
-
+    bool testWriteCapInternal() const;
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource
@@ -84,6 +84,10 @@ private:
     mutable QnMutex     m_mutexPermission;
     mutable int         m_capabilities;
     mutable QString     m_localPath;
+
+    mutable qint64      m_cachedTotalSpace;
+    mutable boost::optional<bool> m_writeCapCached;
+    mutable QnMutex      m_writeTestMutex;
 };
 typedef QSharedPointer<QnFileStorageResource> QnFileStorageResourcePtr;
 
