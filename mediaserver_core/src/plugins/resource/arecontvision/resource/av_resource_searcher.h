@@ -4,10 +4,10 @@
 #ifdef ENABLE_ARECONT
 
 #include "core/resource_management/resource_searcher.h"
+#include "plugins/resource/arecontvision/resource/av_resource.h"
 
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
-
 public:
     QnPlArecontResourceSearcher();
 
@@ -21,6 +21,10 @@ protected:
     // return the manufacture of the server
     virtual QString manufacture() const;
 
+private:
+    QnNetworkResourcePtr findResourceHelper(
+        const QnPlAreconVisionResourcePtr &resource
+    );
 };
 
 #endif

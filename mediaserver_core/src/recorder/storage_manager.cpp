@@ -316,7 +316,7 @@ public:
                 );
 
                 qDebug() << "rebuild archive time for storage" 
-                         << scanData.storage->getUrl() 
+                         << scanData.storage->getUrl()  
                          << "is:" << t.elapsed() << "msec";
             }
             
@@ -659,8 +659,7 @@ void QnStorageManager::loadCameraInfo(
 
     auto camTypeId = qnResTypePool->getLikeResourceTypeId(
         "", 
-        //newCamera->getName()
-        "ARCHIVE_CAMERA"
+        QnArchiveCamResource::cameraName()
     );
     if (camTypeId.isNull())
         return;

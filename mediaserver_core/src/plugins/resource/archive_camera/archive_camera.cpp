@@ -2,35 +2,8 @@
 
 const QString kArchiveCamName = QLatin1String("ARCHIVE_CAMERA");
 
-QnResourcePtr QnArchiveCamResourceSearcher::createResource(
-    const QnUuid            &resourceTypeId, 
-    const QnResourceParams  &params
-) 
-{
-    return QnResourcePtr();
-}
-
-QList<QnResourcePtr> 
-QnArchiveCamResourceSearcher::checkHostAddr(
-    const QUrl              &url, 
-    const QAuthenticator    &auth, 
-    bool                    doMultichannelCheck
-) 
-{
-    return QList<QnResourcePtr>();
-}
-
-QString QnArchiveCamResourceSearcher::manufacture() const 
-{
-    return kArchiveCamName;
-}
-
-
 QnArchiveCamResource::QnArchiveCamResource()
-{
-    //setMAC(QnMacAddress(mac));
-    //setHostAddress(remoteEndpoint.address.toString());
-}
+{}
 
 bool QnArchiveCamResource::checkIfOnlineAsync(
     std::function<void(bool)>&& completionHandler
@@ -38,6 +11,11 @@ bool QnArchiveCamResource::checkIfOnlineAsync(
 {
     completionHandler(false);
     return false;
+}
+
+QString QnArchiveCamResource::cameraName() 
+{
+    return kArchiveCamName;
 }
 
 QString QnArchiveCamResource::getDriverName() const 

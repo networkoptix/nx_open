@@ -8,12 +8,15 @@
 #include "../tools/AVJpegHeader.h"
 #include "utils/network/nettools.h"
 #include "utils/common/sleep.h"
+#include "utils/common/log.h"
 #include "core/resource/camera_resource.h"
+#include "plugins/resource/archive_camera/archive_camera.h"
 
 #include "plugins/resource/mdns/mdns_resource_searcher.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
 #include "utils/network/socket.h"
+#include "core/resource_management/resource_pool.h"
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -29,6 +32,46 @@ QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
 QString QnPlArecontResourceSearcher::manufacture() const
 {
     return QnPlAreconVisionResource::MANUFACTURE;
+}
+
+QnNetworkResourcePtr 
+QnPlArecontResourceSearcher::findResourceHelper(const QnPlAreconVisionResourcePtr &resource)
+{
+    QString model;
+    QString model_release;
+
+    if (!resource->getParamPhysical(lit("model"), model))
+        return QnNetworkResourcePtr(0);
+
+    if (!resource->getParamPhysical(lit("model=releasename"), model_release))
+        return QnNetworkResourcePtr(0);
+
+    if (model_release != model) {
+        //this camera supports release name
+        model = model_release;
+    }
+    else
+    {
+        //old camera; does not support release name; but must support fullname
+        if (resource->getParamPhysical(lit("model=fullname"), model_release))
+            model = model_release;
+    }
+
+    QnNetworkResourcePtr result(resource->createResourceByName(model));
+    if (result)
+    {
+        result->setName(model);
+        result->setHostAddress(resource->getHostAddress());
+        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
+        result->setMAC(resource->getMAC());
+        result->setFlags(resource->flags());
+    }
+    else
+    {
+        NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
+    }
+
+    return result;
 }
 
 // returns all available devices
@@ -112,17 +155,12 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 /*/
 
                 // in any case let's HTTP do it's job at very end of discovery
-                QnNetworkResourcePtr resource( new QnPlAreconVisionResource() );
-                //resource->setName("AVUNKNOWN");
-                resource->setTypeId(qnResTypePool->getResourceTypeId(QnPlAreconVisionResource::MANUFACTURE, QLatin1String("ArecontVision_Abstract")));
-
+                QnPlAreconVisionResourcePtr resource( new QnPlAreconVisionResource() );
                 if (resource==0)
                     continue;
 
                 resource->setHostAddress(remoteEndpoint.address.toString());
                 resource->setMAC(QnMacAddress(mac));
-                resource->setName(QLatin1String("ArecontVision_Abstract"));
-
 
                 bool need_to_continue = false;
                 for(const QnResourcePtr& res: result)
@@ -132,19 +170,33 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                         need_to_continue = true; //already has such
                         break;
                     }
-
                 }
-
                 if (need_to_continue)
                     continue;
 
-                result.push_back(resource);
+                auto rpRes = qnResPool->getResourceByUniqueId(resource->getUniqueId());
+                if (rpRes)
+                {
+                    auto rpResTypeId = rpRes->getTypeId();
+                    auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId(
+                        "", 
+                        QnArchiveCamResource::cameraName()
+                    );
+                    if (archiveCamTypeId != rpResTypeId)
+                    {
+                        result.push_back(rpRes);
+                        continue;
+                    }
+                }
+
+                QnNetworkResourcePtr resultRes = findResourceHelper(resource);
+                if (resultRes)
+                    result.push_back(resultRes);
             }
 
             //QnSleep::msleep(2); // to avoid 100% cpu usage
 
         }
-
     }
     return result;
 
