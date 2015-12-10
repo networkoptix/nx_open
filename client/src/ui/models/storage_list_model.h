@@ -1,15 +1,22 @@
 #pragma once
 
+#include <array>
+
 #include <QtCore/QSortFilterProxyModel>
+
+#include <api/model/storage_space_reply.h>
+#include <api/model/rebuild_archive_reply.h>
 
 #include <client/client_color_types.h>
 
 #include <core/resource/resource_fwd.h>
 
+#include <server/server_storage_manager_fwd.h>
+
 #include <ui/customization/customized.h>
 #include <ui/models/storage_model_info.h>
 #include <ui/workbench/workbench_context_aware.h>
-#include "api/model/storage_space_reply.h"
+
 
 class QnStorageListModel : public Customized<QAbstractListModel> {
     Q_OBJECT
@@ -38,6 +45,8 @@ public:
     QnStorageModelInfo storage(const QModelIndex &index) const;
     QnStorageModelInfoList storages() const;
 
+    void updateRebuildInfo(QnServerStoragesPool pool, const QnStorageScanData &rebuildStatus);
+
     /** Check if the storage can be moved from this model to another. */
     bool canMoveStorage(const QnStorageModelInfo& data) const;
 
@@ -51,8 +60,10 @@ public:
 
     bool isReadOnly() const;
     void setReadOnly(bool readOnly);
+
 protected:
     virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
+
 private:
     QString displayData(const QModelIndex &index, bool forcedText) const;
     QVariant fontData(const QModelIndex &index) const;
@@ -61,8 +72,13 @@ private:
     QVariant checkstateData(const QModelIndex &index) const;
 
     void sortStorages();
+
+    bool isStorageInRebuild(const QnStorageModelInfo& storage) const;
+
 private:
     QnStorageModelInfoList m_storages;
+    std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
+
     bool m_readOnly;
     QBrush m_linkBrush;
     QFont m_linkFont;
