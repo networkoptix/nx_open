@@ -200,7 +200,7 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
     {
         encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
         if (encoded < 0)
-            return -3; // TODO: need refactor. add enum with error codes
+            return -3; //< TODO: needs refactor. add enum with error codes
         memmove(m_decodedBuffer, m_decodedBuffer + encoderFrameSize, m_decodedBufferSize - encoderFrameSize);
         m_decodedBufferSize -= encoderFrameSize;
     }
