@@ -38,9 +38,9 @@ namespace {
     static const int MIN_COL_WIDTH = 16;
 
 
-    class QnStoragesPoolFilterModel: public QSortFilterProxyModel {
+    class StoragesPoolFilterModel: public QSortFilterProxyModel {
     public:
-        QnStoragesPoolFilterModel(bool isMainPool, QObject *parent = nullptr)
+        StoragesPoolFilterModel(bool isMainPool, QObject *parent = nullptr)
             : QSortFilterProxyModel(parent)
             , m_isMainPool(isMainPool)
         {}
@@ -58,6 +58,20 @@ namespace {
         bool m_isMainPool;
     };
 
+    class StorageTableItemDelegate: public QStyledItemDelegate
+    {
+        typedef QStyledItemDelegate base_type;
+
+    public:
+        explicit StorageTableItemDelegate(QObject *parent = NULL): base_type(parent) {}
+
+        virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
+        {
+            QSize result = base_type::sizeHint(option, index);
+            result.setWidth(result.width() + COLUMN_SPACING);
+            return result;
+        }
+    };
 
     const qint64 minDeltaForMessageMs = 1000ll * 3600 * 24;
     const qint64 updateStatusTimeoutMs = 5 * 1000;
@@ -68,21 +82,6 @@ QnStorageConfigWidget::StoragePool::StoragePool()
     : rebuildCancelled(false)
 {}
 
-
-class QnStorageTableItemDelegate: public QStyledItemDelegate
-{
-    typedef QStyledItemDelegate base_type;
-
-public:
-    explicit QnStorageTableItemDelegate(QObject *parent = NULL): base_type(parent) {}
-
-    virtual QSize sizeHint(const QStyleOptionViewItem & option, const QModelIndex & index) const override
-    {
-        QSize result = base_type::sizeHint(option, index);
-        result.setWidth(result.width() + COLUMN_SPACING);
-        return result;
-    }
-};
 
 QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     : base_type(parent)
@@ -99,9 +98,9 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 {
     ui->setupUi(this);
 
-    ui->comboBoxBackupType->addItem(tr("By schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("In realtime"), Qn::Backup_RealTime);
-    ui->comboBoxBackupType->addItem(tr("On demand"), Qn::Backup_Manual);
+    ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
+    ui->comboBoxBackupType->addItem(tr("In Realtime"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
     ui->storagesWarningLabel->hide();
@@ -239,9 +238,9 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
 void QnStorageConfigWidget::setupGrid(QTableView* tableView, bool isMainPool)
 {
-    tableView->setItemDelegate(new QnStorageTableItemDelegate(this));
+    tableView->setItemDelegate(new StorageTableItemDelegate(this));
 
-    QnStoragesPoolFilterModel* filterModel = new QnStoragesPoolFilterModel(isMainPool, this);
+    StoragesPoolFilterModel* filterModel = new StoragesPoolFilterModel(isMainPool, this);
     filterModel->setSourceModel(m_model.data());
     tableView->setModel(filterModel);
 
@@ -566,7 +565,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     }
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
-        return storage.isWritable && storage.isUsed && storage.isBackup;
+        return storage.isWritable && storage.isUsed && storage.isBackup && storage.isOnline;
     }))
         return error(tr("Select at least one backup storage."));
 

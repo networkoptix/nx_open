@@ -123,7 +123,9 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case CheckBoxColumn:
         return QString();
     case UrlColumn:
-        return urlPath(storageData.url);
+        return storageData.isOnline || !storageData.isWritable
+            ? urlPath(storageData.url)
+            : tr("%1 (Indexing...)").arg(urlPath(storageData.url));
     case TypeColumn:
         return storageData.storageType;
     case TotalSpaceColumn:
@@ -260,12 +262,25 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
 }
 
 Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
-    QnStorageModelInfo storageData = storage(index);
 
-    Qt::ItemFlags flags = Qt::NoItemFlags;
-    flags |= Qt::ItemIsSelectable;
+    auto isEnabled = [this](const QModelIndex &index) {
+        if (m_readOnly)
+            return false;
 
-    if (storageData.isWritable || index.column() == RemoveActionColumn)
+        if (index.column() == RemoveActionColumn)
+            return true;
+
+        QnStorageModelInfo storageData = storage(index);
+        if (!storageData.isWritable)
+            return false;
+
+        return (storageData.isOnline || index.column() == ChangeGroupActionColumn);
+    };
+
+
+    Qt::ItemFlags flags = Qt::ItemIsSelectable;
+
+    if (isEnabled(index))
         flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
