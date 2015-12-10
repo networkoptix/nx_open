@@ -66,6 +66,21 @@ bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
 }
 
 
+TemporaryAccountPassword::TemporaryAccountPassword()
+:
+    expirationTimestampUtc(0),
+    maxUseCount(0),
+    useCount(0)
+{
+}
+
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (TemporaryAccountPassword),
+    (sql_record),
+    _Fields)
+
+
 //QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 //    (AccountUpdateDataWithEmail),
 //    (sql_record),

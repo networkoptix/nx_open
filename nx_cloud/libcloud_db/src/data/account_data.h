@@ -8,7 +8,7 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
@@ -69,6 +69,27 @@ class AccountEmail
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
+
+class TemporaryAccountPassword
+{
+public:
+    QnUuid accountID;
+    std::string passwordHa1;
+    std::string realm;
+    std::uint32_t expirationTimestampUtc;
+    int maxUseCount;
+    int useCount;
+    std::string accessRights;
+
+    TemporaryAccountPassword();
+};
+
+#define TemporaryAccountPassword_Fields (accountID)(passwordHa1)(realm) \
+    (expirationTimestampUtc)(maxUseCount)(useCount)(accessRights)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (TemporaryAccountPassword),
+    (sql_record))
 
 //#define AccountUpdateDataWithEmail_Fields (passwordHa1)(fullName)(customization)(email)
 //

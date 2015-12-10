@@ -408,11 +408,12 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
-    dbStructureUpdater.addUpdateScript(db::createAccountData);
-    dbStructureUpdater.addUpdateScript(db::createSystemData);
-    dbStructureUpdater.addUpdateScript(db::systemToAccountMapping);
-    dbStructureUpdater.addUpdateScript(db::addCustomizationToSystem);
-    dbStructureUpdater.addUpdateScript(db::addCustomizationToAccount);
+    dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
+    dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
+    dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);
+    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToSystem);
+    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
+    dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
     return dbStructureUpdater.updateStructSync();
 }
 

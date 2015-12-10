@@ -11,8 +11,9 @@
 #include <vector>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <utils/db/db_manager.h>
 #include <nx/network/buffer.h>
+#include <nx/utils/thread/mutex.h>
+#include <utils/db/db_manager.h>
 
 #include "access_control/auth_types.h"
 #include "cache.h"
@@ -76,6 +77,7 @@ private:
     EMailManager* const m_emailManager;
     //!map<email, account>
     Cache<std::string, data::AccountData> m_cache;
+    mutable QnMutex m_mutex;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts( QSqlDatabase* connection, int* const dummy );
@@ -110,6 +112,21 @@ private:
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );
+
+    nx::db::DBResult generatePasswordResetCode(
+        QSqlDatabase* const tran,
+        const data::AccountEmail& accountEmail,
+        data::AccountConfirmationCode* const confirmationCode);
+    void passwordResetCodeGenerated(
+        bool requestSourceSecured,
+        nx::db::DBResult resultCode,
+        data::AccountEmail accountEmail,
+        data::AccountConfirmationCode resultData,
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+
+    nx::db::DBResult addTempPassword(
+        QSqlDatabase* const connection,
+        data::TemporaryAccountPassword tempPasswordData);
 };
 
 }   //cdb

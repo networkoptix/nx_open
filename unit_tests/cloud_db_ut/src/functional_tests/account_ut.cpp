@@ -297,7 +297,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 }
 
 //checks that password reset code is valid for changing password only
-TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
+TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
 {
     waitUntilStarted();
 
