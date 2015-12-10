@@ -237,9 +237,11 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
             contentType = httpClient->contentType();
             messageBody = httpClient->fetchMessageBodyBuffer();
         }
-        m_runningRequests.erase(itr); // free last reference to the object
+        lock.unlock();
         if (callback)
             callback(requestId, systemError, statusCode, contentType, messageBody);
+        lock.relock();
+        m_runningRequests.remove(requestId); // free last reference to the object
     };
     
     connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);

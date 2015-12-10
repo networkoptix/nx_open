@@ -102,6 +102,34 @@ QStringList QnCameraAdvancedParameter::getRange() const {
     return range.split(L',', QString::SkipEmptyParts);
 }
 
+QStringList QnCameraAdvancedParameter::getInternalRange() const {
+    Q_ASSERT(dataType == DataType::Enumeration);
+    return internalRange.split(L',', QString::SkipEmptyParts);
+}
+
+QString QnCameraAdvancedParameter::fromInternalRange(const QString& value) const
+{
+    const auto outer = getRange();
+    const auto inner = getInternalRange();
+    for (int i = 0; i < qMin(outer.size(), inner.size()); ++i) {
+        if (inner[i] == value)
+            return outer[i];
+    }
+    return value;
+}
+
+QString QnCameraAdvancedParameter::toInternalRange(const QString& value) const
+{
+    const auto outer = getRange();
+    const auto inner = getInternalRange();
+    for (int i = 0; i < qMin(outer.size(), inner.size()); ++i) {
+        if (outer[i] == value)
+            return inner[i];
+    }
+    return value;
+}
+
+
 void QnCameraAdvancedParameter::getRange(double &min, double &max) const {
     Q_ASSERT(dataType == DataType::Number);
     QStringList values = range.split(L',');
