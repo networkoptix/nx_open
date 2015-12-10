@@ -48,6 +48,11 @@ QnObject {
         property alias mediaPlayer: playerLoader.item
         property bool resetUrlOnConnect: false
 
+        /* Qt MediaPlayer fails to play video if media source is frequently changed at first video load.
+           Workaround it by blocking redundant URL update at first video load.
+         */
+        property bool firstPlay: true
+
         onPausedChanged: failureTimer.updateTimer()
     }
 
@@ -207,7 +212,10 @@ QnObject {
         screenSize: Qt.size(mainWindow.width, mainWindow.height)
         resourceId: player.resourceId
 
-        onMediaUrlChanged: console.log("Media URL changed: " + mediaUrl)
+        onMediaUrlChanged: {
+            d.firstPlay = true
+            console.log("Media URL changed: " + mediaUrl)
+        }
     }
 
     QnCameraChunkProvider {
@@ -283,10 +291,14 @@ QnObject {
         timelinePositionRequest(d.position)
         d.updateTimeline = true
 
-        if (d.position == -1 && resourceHelper.position == -1)
-            resourceHelper.updateUrl()
-        else
+        if (d.position == -1 && resourceHelper.position == -1) {
+            if (!d.firstPlay)
+                resourceHelper.updateUrl()
+            else
+                d.firstPlay = false
+        } else {
             resourceHelper.position = d.position
+        }
 
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()

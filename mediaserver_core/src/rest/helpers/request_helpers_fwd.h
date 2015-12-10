@@ -1,8 +1,0 @@
-#pragma once
-
-struct QnMultiserverRequestContext;
-struct QnGetBookmarksRequestContext;
-struct QnGetBookmarkTagsRequestContext;
-struct QnUpdateBookmarkRequestContext;
-struct QnDeleteBookmarkRequestContext;
-

@@ -81,7 +81,6 @@ protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private slots:
-    void at_provider_imageChanged(const QImage &image);
     void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
 private:
@@ -104,7 +103,7 @@ public:
     QString text() const;
 
     void addActionButton(const QIcon &icon,
-                         const QString &tooltip = QString(), 
+                         const QString &tooltip = QString(),
                          Qn::ActionId actionId = Qn::NoAction,
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);

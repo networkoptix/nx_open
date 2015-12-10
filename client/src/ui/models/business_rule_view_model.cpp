@@ -6,6 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <business/business_action_parameters.h>
 #include <business/business_strings_helper.h>
@@ -29,7 +30,6 @@
 #include <utils/app_server_notification_cache.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-#include "core/resource_management/resource_pool.h"
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
@@ -77,19 +77,19 @@ namespace QnBusiness {
     }
 }
 
-
-QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
-    base_type(parent),
-    QnWorkbenchContextAware(parent),
-    m_modified(false),
-    m_eventType(QnBusiness::CameraDisconnectEvent),
-    m_eventState(QnBusiness::UndefinedState),
-    m_actionType(QnBusiness::ShowPopupAction),
-    m_aggregationPeriodSec(defaultAggregationPeriodSec),
-    m_disabled(false),
-    m_eventTypesModel(new QStandardItemModel(this)),
-    m_eventStatesModel(new QStandardItemModel(this)),
-    m_actionTypesModel(new QStandardItemModel(this))
+QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , m_id(QnUuid::createUuid())
+    , m_modified(false)
+    , m_eventType(QnBusiness::CameraDisconnectEvent)
+    , m_eventState(QnBusiness::UndefinedState)
+    , m_actionType(QnBusiness::ShowPopupAction)
+    , m_aggregationPeriodSec(defaultAggregationPeriodSec)
+    , m_disabled(false)
+    , m_eventTypesModel(new QStandardItemModel(this))
+    , m_eventStatesModel(new QStandardItemModel(this))
+    , m_actionTypesModel(new QStandardItemModel(this))
 {
 
     for (QnBusiness::EventType eventType: QnBusiness::allEvents()) {
@@ -114,9 +114,8 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     updateEventStateModel();
 }
 
-QnBusinessRuleViewModel::~QnBusinessRuleViewModel() {
-
-}
+QnBusinessRuleViewModel::~QnBusinessRuleViewModel()
+{}
 
 QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
     if (column == QnBusiness::DisabledColumn) {
@@ -309,7 +308,7 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     updateActionTypesModel();//TODO: #GDM #Business connect on dataChanged?
 
-    emit dataChanged(this, QnBusiness::AllFieldsMask);
+    emit dataChanged(QnBusiness::AllFieldsMask);
 }
 
 static QVector<QnUuid> toIdList(const QnResourceList& list)
@@ -354,7 +353,7 @@ void QnBusinessRuleViewModel::setModified(bool value) {
         return;
 
     m_modified = value;
-    emit dataChanged(this, QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::ModifiedField);
 }
 
 QnBusiness::EventType QnBusinessRuleViewModel::eventType() const {
@@ -404,7 +403,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
     updateActionTypesModel();
     updateEventStateModel();
 
-    emit dataChanged(this, fields);
+    emit dataChanged(fields);
     //TODO: #GDM #Business check others, params and resources should be merged
 }
 
@@ -423,7 +422,7 @@ void QnBusinessRuleViewModel::setEventResources(const QnResourceList &value) {
     m_eventResources = newValue;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::EventResourcesField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::EventResourcesField | QnBusiness::ModifiedField);
 }
 
 QnBusinessEventParameters QnBusinessRuleViewModel::eventParams() const {
@@ -433,16 +432,6 @@ QnBusinessEventParameters QnBusinessRuleViewModel::eventParams() const {
 void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &params)
 {
     bool hasChanges = !(m_eventParams == params);
-    /*
-    bool hasChanges = false;
-    for (int i = 0; i < (int) params.CountParam; ++i)
-    {
-        //if (m_eventParams[i] == params[i])
-        //    continue;
-        m_eventParams[i] = params[i];
-        hasChanges = true;
-    }
-    */
 
     if (!hasChanges)
         return;
@@ -450,7 +439,7 @@ void QnBusinessRuleViewModel::setEventParams(const QnBusinessEventParameters &pa
     m_eventParams = params;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::EventParamsField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::EventParamsField | QnBusiness::ModifiedField);
 }
 
 QnBusiness::EventState QnBusinessRuleViewModel::eventState() const {
@@ -464,8 +453,7 @@ void QnBusinessRuleViewModel::setEventState(QnBusiness::EventState state) {
     m_eventState = state;
     m_modified = true;
 
-    QnBusiness::Fields fields = QnBusiness::EventStateField | QnBusiness::ModifiedField;
-    emit dataChanged(this, fields);
+    emit dataChanged(QnBusiness::EventStateField | QnBusiness::ModifiedField);
 }
 
 QnBusiness::ActionType QnBusinessRuleViewModel::actionType() const {
@@ -518,7 +506,7 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
         fields |= QnBusiness::ActionParamsField;
     }
 
-    emit dataChanged(this, fields);
+    emit dataChanged(fields);
 }
 
 QnResourceList QnBusinessRuleViewModel::actionResources() const {
@@ -535,7 +523,7 @@ void QnBusinessRuleViewModel::setActionResources(const QnResourceList &value) {
     m_actionResources = newValue;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::ActionResourcesField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::ActionResourcesField | QnBusiness::ModifiedField);
 }
 
 bool QnBusinessRuleViewModel::isActionProlonged() const {
@@ -554,7 +542,7 @@ void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &
     m_actionParams = params;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::ActionParamsField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::ActionParamsField | QnBusiness::ModifiedField);
 }
 
 int QnBusinessRuleViewModel::aggregationPeriod() const {
@@ -568,7 +556,7 @@ void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
     m_aggregationPeriodSec = msecs;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::AggregationField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::AggregationField | QnBusiness::ModifiedField);
 }
 
 bool QnBusinessRuleViewModel::disabled() const {
@@ -582,7 +570,7 @@ void QnBusinessRuleViewModel::setDisabled(const bool value) {
     m_disabled = value;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::AllFieldsMask); // all fields should be redrawn
+    emit dataChanged(QnBusiness::AllFieldsMask); // all fields should be redrawn
 }
 
 QString QnBusinessRuleViewModel::comments() const {
@@ -596,7 +584,7 @@ void QnBusinessRuleViewModel::setComments(const QString value) {
     m_comments = value;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::CommentsField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::CommentsField | QnBusiness::ModifiedField);
 }
 
 QString QnBusinessRuleViewModel::schedule() const {
@@ -610,7 +598,7 @@ void QnBusinessRuleViewModel::setSchedule(const QString value) {
     m_schedule = value;
     m_modified = true;
 
-    emit dataChanged(this, QnBusiness::ScheduleField | QnBusiness::ModifiedField);
+    emit dataChanged(QnBusiness::ScheduleField | QnBusiness::ModifiedField);
 }
 
 QStandardItemModel* QnBusinessRuleViewModel::eventTypesModel() {

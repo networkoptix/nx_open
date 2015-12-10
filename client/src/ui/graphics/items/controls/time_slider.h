@@ -29,7 +29,7 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
 class QnBookmarksViewer;
-class QnPendingOperation;
+class QnBookmarkMergeHelper;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -279,16 +279,6 @@ private:
         bool selecting;
     };
 
-    struct BookmarkCluster {
-        qint64 startTimeMs;
-        qint64 endTimeMs;
-        int firstBookmarkIndex;
-        int lastBookmarkIndex;
-
-        BookmarkCluster();
-        BookmarkCluster(const QnCameraBookmark &bookmark, int index);
-    };
-
 private:
     Marker markerFromPosition(const QPointF &pos, qreal maxDistance = 1.0) const;
     QPointF positionFromMarker(Marker marker) const;
@@ -396,8 +386,7 @@ private:
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
-    QList<BookmarkCluster> m_mergedBookmarks;
-    QnPendingOperation *m_mergeBookmarksPendingOperation;
+    QScopedPointer<QnBookmarkMergeHelper> m_bookmarkMergeHelper;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

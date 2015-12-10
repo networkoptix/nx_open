@@ -14,7 +14,6 @@
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnEventLogModel;
-class QnBusinessRuleViewModel;
 
 namespace Ui {
     class EventLogDialog;
@@ -58,12 +57,11 @@ private:
     void updateHeaderWidth();
     bool isFilterExist() const;
     void requestFinished();
-    bool isCameraMatched(QnBusinessRuleViewModel* ruleModel) const;
     void updateActionList(bool instantOnly);
 
     /**
      * Get data from server
-     * 
+     *
      * \param fromMsec start date. UTC msecs
      * \param toMsec end date. UTC msecs. Can be DATETIME_NOW
      */

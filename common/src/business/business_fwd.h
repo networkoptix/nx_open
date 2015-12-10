@@ -25,7 +25,6 @@ typedef QList<QnPanicBusinessAction> QnPanicBusinessActionList;
 
 class QnBusinessActionData;
 typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
-typedef std::vector<QnBusinessActionData> QnBusinessActionDataList;
 typedef QSharedPointer<QnBusinessActionDataList> QnBusinessActionDataListPtr;
 
 typedef QMap<QString, QVariant> QnBusinessParams;
@@ -108,7 +107,7 @@ public:
 
         /** Server started */
         ServerStartEvent = 9,
-        
+
         /** Not enough licenses */
         LicenseIssueEvent = 10,
 
@@ -132,7 +131,7 @@ public:
     enum ActionType {
         UndefinedAction         = 0,
 
-        /** 
+        /**
          * Change camera output state.
          *
          * Parameters:
@@ -150,8 +149,8 @@ public:
         /** Activate panic recording mode. */
         PanicRecordingAction    = 5,
 
-        /** 
-         * Send an email. This action can be executed from any endpoint. 
+        /**
+         * Send an email. This action can be executed from any endpoint.
          *
          * Parameters:
          * - emailAddress (string, required)

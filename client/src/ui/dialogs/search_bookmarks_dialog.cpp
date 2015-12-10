@@ -9,6 +9,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/workbench/workbench.h>
@@ -103,6 +104,8 @@ private:
 
     bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
 
+    void updateCamerasText();
+
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;
 
@@ -167,7 +170,7 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         , this, &Impl::customContextMenuRequested);
 
     connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this
-        , [this](const QModelIndex &index)
+        , [this](const QModelIndex & /* index */)
     {
         openInNewLayoutHandler();
     });
@@ -188,6 +191,10 @@ void QnSearchBookmarksDialog::Impl::setParameters(const QString &filterText
     , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs)
 {
+    m_cameras = QnVirtualCameraResourceList();
+    m_model->setCameras(m_cameras);
+    updateCamerasText();
+
     m_ui->filterLineEdit->lineEdit()->setText(filterText);
 
     m_ui->dateEditFrom->setDate(extractDisplayDate(context(), utcStartTimeMs));
@@ -222,6 +229,29 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
     params.setArgument(Qn::ItemTimeRole, window.startTimeMs);
 
     return true;
+}
+
+void QnSearchBookmarksDialog::Impl::updateCamerasText()
+{
+    if (m_cameras.empty())
+    {
+        static const auto kAnyDevicesStringsSet = QnCameraDeviceStringSet(
+            tr("<Any device>"), tr("<Any camera>"), tr("<Any IO module>"));
+
+        m_ui->cameraButton->setText(QnDeviceDependentStrings::getNameFromSet(
+            kAnyDevicesStringsSet, qnResPool->getResources<QnVirtualCameraResource>()));
+        return;
+    }
+
+    const auto devicesStringSet = QnCameraDeviceStringSet(
+        tr("<%n device(s)>", nullptr, m_cameras.size())
+        , tr("<%n camera(s)>", nullptr, m_cameras.size())
+        , tr("<%n IO module(s)>", nullptr, m_cameras.size()));
+
+    const auto caption = QnDeviceDependentStrings::getNameFromSet(
+        devicesStringSet, m_cameras);
+
+    m_ui->cameraButton->setText(caption);
 }
 
 void QnSearchBookmarksDialog::Impl::openInNewLayoutHandler()
@@ -309,11 +339,7 @@ void QnSearchBookmarksDialog::Impl::chooseCamera()
         m_model->setCameras(m_cameras);
         m_model->applyFilter();
 
-        static const QString kEmptyCamerasCaption = tr("<Any camera>");
-        static const QString kCamerasTemplate = tr("camera(s)");
-        static const QString kCamerasCaptionTemplate = lit("<%1 %2>");
-        m_ui->cameraButton->setText(m_cameras.empty() ? kEmptyCamerasCaption :
-            kCamerasCaptionTemplate.arg(QString::number(m_cameras.size()), kCamerasTemplate));
+        updateCamerasText();
     }
 }
 
@@ -359,9 +385,9 @@ QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
 {
 }
 
-void QnSearchBookmarksDialog::setParameters(const QString &filterText
-    , qint64 utcStartTimeMs
-    , qint64 utcFinishTimeMs)
+void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs
+    , const QString &filterText)
 {
     m_impl->setParameters(filterText, getStartOfTheDayMs(utcStartTimeMs)
         , getEndOfTheDayMs(utcFinishTimeMs));
