@@ -12,6 +12,7 @@ class DWCommonCameraProxy
 {
 public:
     DWCommonCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    virtual ~DWCommonCameraProxy() {}
 
     virtual QnCameraAdvancedParamValueList getParamsList() const = 0;
     virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = 0) = 0;
