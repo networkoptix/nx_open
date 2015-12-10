@@ -12,7 +12,7 @@
 #include <QSharedPointer>
 
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
-#include <core/dataprovider/abstract_streamdataprovider.h>
+#include <core/dataprovider/abstract_stream_data_provider.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 
 

@@ -1,19 +1,20 @@
 #include <QtCore/QMap>
 
 #include "rtsp_data_consumer.h"
-#include "core/datapacket/media_data_packet.h"
-#include "rtsp_connection.h"
-#include "utils/common/util.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "camera/video_camera.h"
-#include "camera/camera_pool.h"
-#include "utils/common/sleep.h"
-#include "network/rtpsession.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
-#include "utils/common/synctime.h"
-#include "core/resource/security_cam_resource.h"
-#include "recorder/recording_manager.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+
+#include <core/datapacket/media_data_packet.h>
+#include <rtsp/rtsp_connection.h>
+#include <utils/common/util.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <camera/video_camera.h>
+#include <camera/camera_pool.h>
+#include <utils/common/sleep.h>
+#include <network/rtpsession.h>
+#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <utils/common/synctime.h>
+#include <core/resource/security_cam_resource.h>
+#include <recorder/recording_manager.h>
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
 

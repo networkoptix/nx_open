@@ -4,7 +4,7 @@
 #include <QtCore/QtGlobal>
 
 #include "core/dataconsumer/abstract_data_consumer.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include "core/dataprovider/abstract_media_stream_data_provider.h"
 
 class QnDesktopDataProvider;
 

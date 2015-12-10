@@ -1,22 +1,25 @@
-#ifndef abstract_archive_stream_reader_h1907
-#define abstract_archive_stream_reader_h1907
+#ifndef ABSTRACT_ARCHIVE_STREAM_READER_H
+#define ABSTRACT_ARCHIVE_STREAM_READER_H
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_ARCHIVE
 
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 
-#include "abstract_archive_delegate.h"
-#include "abstract_navigator.h"
+#include <plugins/resource/archive/abstract_archive_delegate.h>
+#include <plugins/resource/archive/abstract_navigator.h>
 
 class QnTimePeriod;
 class QnTimePeriodList;
 
-class QnAbstractArchiveReader : public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
+class QnAbstractArchiveStreamReader: public QnAbstractMediaStreamDataProvider, public QnAbstractNavigator
 {
-    Q_OBJECT
+    Q_OBJECT;
+
 public:
-    QnAbstractArchiveReader(const QnResourcePtr& dev);
-    virtual ~QnAbstractArchiveReader();
+    QnAbstractArchiveStreamReader(const QnResourcePtr& dev);
+    virtual ~QnAbstractArchiveStreamReader();
 
     QnAbstractNavigator *navDelegate() const;
     void setNavDelegate(QnAbstractNavigator* navDelegate);
@@ -119,4 +122,4 @@ private:
 
 #endif // ENABLE_ARCHIVE
 
-#endif //abstract_archive_stream_reader_h1907
+#endif // ABSTRACT_ARCHIVE_STREAM_READER_H

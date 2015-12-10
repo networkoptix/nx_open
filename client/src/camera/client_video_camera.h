@@ -11,7 +11,7 @@
 class QnlTimeSource;
 class QnStatistics;
 class QnResource;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnTimePeriod;
 
 class QnClientVideoCamera : public QObject {
@@ -89,7 +89,7 @@ private:
 
     QnlTimeSource* m_extTimeSrc;
     QnStreamRecorder* m_exportRecorder;
-    QnAbstractArchiveReader* m_exportReader;
+    QnAbstractArchiveStreamReader* m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };

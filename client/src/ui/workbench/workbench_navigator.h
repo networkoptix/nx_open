@@ -28,7 +28,7 @@ class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnThumbnailsLoader;
 class QnCameraDataManager;
 class QnCachingCameraDataLoader;

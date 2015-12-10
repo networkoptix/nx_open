@@ -9,7 +9,7 @@
 #include <utils/common/synctime.h>
 
 #include <core/datapacket/video_data_packet.h>
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"

@@ -6,7 +6,7 @@
 #include <QtCore/QTextStream>
 
 #include "utils/common/id.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include "core/dataprovider/abstract_media_stream_data_provider.h"
 
 class QnScheduleTask
 {

@@ -1,6 +1,6 @@
 #include "resource_display.h"
 #include <cassert>
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -29,7 +29,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_dataProvider = resource->createDataProvider(Qn::CR_Default);
 
     if(m_dataProvider != NULL) {
-        m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
+        m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider);
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
 
         if(m_mediaProvider != NULL) {

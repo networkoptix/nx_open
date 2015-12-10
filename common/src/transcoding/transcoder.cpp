@@ -5,18 +5,18 @@
 #include <utils/math/math.h>
 #include <core/resource/media_resource.h>
 
-#include "ffmpeg_transcoder.h"
-#include "ffmpeg_video_transcoder.h"
-#include "ffmpeg_audio_transcoder.h"
+#include <transcoding/ffmpeg_transcoder.h>
+#include <transcoding/ffmpeg_video_transcoder.h>
+#include <transcoding/ffmpeg_audio_transcoder.h>
 
-#include "filters/abstract_image_filter.h"
-#include "filters/tiled_image_filter.h"
-#include "filters/scale_image_filter.h"
-#include "filters/rotate_image_filter.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/dataprovider/abstract_streamdataprovider.h"
-#include "core/resource/camera_resource.h"
-#include "utils/serialization/json.h"
+#include <transcoding/filters/abstract_image_filter.h>
+#include <transcoding/filters/tiled_image_filter.h>
+#include <transcoding/filters/scale_image_filter.h>
+#include <transcoding/filters/rotate_image_filter.h>
+#include <core/datapacket/media_data_packet.h>
+#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <core/resource/camera_resource.h>
+#include <utils/serialization/json.h>
 
 // ---------------------------- QnCodecTranscoder ------------------
 QnCodecTranscoder::QnCodecTranscoder(CodecID codecId)

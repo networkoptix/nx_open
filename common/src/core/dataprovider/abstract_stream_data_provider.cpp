@@ -1,4 +1,4 @@
-#include "abstract_streamdataprovider.h"
+#include "abstract_stream_data_provider.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 

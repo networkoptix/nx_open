@@ -1,4 +1,4 @@
-#include "media_streamdataprovider.h"
+#include "abstract_media_stream_data_provider.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 

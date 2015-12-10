@@ -1,5 +1,7 @@
-#ifndef avi_stream_reader_h1901
-#define avi_stream_reader_h1901
+#ifndef ARCHIVE_STREAM_READER_H
+#define ARCHIVE_STREAM_READER_H
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_ARCHIVE
 
@@ -13,7 +15,7 @@ class FrameTypeExtractor;
 #include <utils/thread/wait_condition.h>
 #include <recording/playbackmask_helper.h>
 
-class QnArchiveStreamReader : public QnAbstractArchiveReader
+class QnArchiveStreamReader: public QnAbstractArchiveStreamReader
 {
     Q_OBJECT;
 
@@ -194,5 +196,4 @@ private:
 
 #endif // ENABLE_ARCHIVE
 
-#endif //avi_stream_reader_h1901
-
+#endif // ARCHIVE_STREAM_READER_H

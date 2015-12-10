@@ -2,7 +2,7 @@
 
 #include <utils/common/log.h>
 
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
@@ -37,7 +37,7 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
 {
     if (m_reader) {
         m_reader->addDataProcessor(&m_camdispay);
-        if (dynamic_cast<QnAbstractArchiveReader*>(m_reader)) {
+        if (dynamic_cast<QnAbstractArchiveStreamReader*>(m_reader)) {
             connect(m_reader, SIGNAL(streamPaused()), &m_camdispay, SLOT(onReaderPaused()), Qt::DirectConnection);
             connect(m_reader, SIGNAL(streamResumed()), &m_camdispay, SLOT(onReaderResumed()), Qt::DirectConnection);
             connect(m_reader, SIGNAL(prevFrameOccured()), &m_camdispay, SLOT(onPrevFrameOccured()), Qt::DirectConnection);
@@ -150,7 +150,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
     if (m_exportRecorder == 0)
     {
         QnAbstractStreamDataProvider* tmpReader = m_resource->toResource()->createDataProvider(Qn::CR_Default);
-        m_exportReader = dynamic_cast<QnAbstractArchiveReader*> (tmpReader);
+        m_exportReader = dynamic_cast<QnAbstractArchiveStreamReader*> (tmpReader);
         if (!m_exportReader)
         {
             delete tmpReader;

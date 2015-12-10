@@ -23,7 +23,7 @@
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
 QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
-    QnAbstractArchiveReader(dev),
+    QnAbstractArchiveStreamReader(dev),
 //protected
     m_currentTime(0),
     m_topIFrameTime(-1),
@@ -980,7 +980,7 @@ bool QnArchiveStreamReader::isSingleShotMode() const
 
 void QnArchiveStreamReader::pleaseStop()
 {
-    QnAbstractArchiveReader::pleaseStop();
+    QnAbstractArchiveStreamReader::pleaseStop();
     if (m_delegate)
         m_delegate->beforeClose();
     m_singleShowWaitCond.wakeAll();
@@ -1274,7 +1274,7 @@ bool QnArchiveStreamReader::isPaused() const
         return m_stopCond;
     }
     else {
-        return QnAbstractArchiveReader::isPaused();
+        return QnAbstractArchiveStreamReader::isPaused();
     }
 }
 
@@ -1286,7 +1286,7 @@ void QnArchiveStreamReader::pause()
         m_stopCond = true; // for VMAX
     }
     else {
-        QnAbstractArchiveReader::pause();
+        QnAbstractArchiveStreamReader::pause();
     }
 }
 
@@ -1298,7 +1298,7 @@ void QnArchiveStreamReader::resume()
         m_stopWaitCond.wakeAll();
     }
     else {
-        QnAbstractArchiveReader::resume();
+        QnAbstractArchiveStreamReader::resume();
     }
 }
 

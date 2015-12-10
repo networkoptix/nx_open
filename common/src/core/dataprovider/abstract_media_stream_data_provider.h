@@ -1,12 +1,14 @@
-#ifndef QnMediaStreamDataProvider_514
-#define QnMediaStreamDataProvider_514
+#ifndef ABSTRACT_MEDIA_STREAM_DATA_PROVIDER
+#define ABSTRACT_MEDIA_STREAM_DATA_PROVIDER
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QSharedPointer>
-#include "core/dataprovider/statistics.h"
-#include "abstract_streamdataprovider.h"
-#include "utils/camera/camera_diagnostics.h"
+#include <core/dataprovider/statistics.h>
+#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <utils/camera/camera_diagnostics.h>
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -72,4 +74,4 @@ typedef QSharedPointer<QnAbstractMediaStreamDataProvider> QnAbstractMediaStreamD
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif //QnMediaStreamDataProvider_514
+#endif // ABSTRACT_MEDIA_STREAM_DATA_PROVIDER

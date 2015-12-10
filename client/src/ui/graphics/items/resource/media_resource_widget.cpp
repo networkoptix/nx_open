@@ -993,7 +993,7 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & DisplayMotion) {
-        if (QnAbstractArchiveReader *reader = m_display->archiveReader())
+        if (QnAbstractArchiveStreamReader *reader = m_display->archiveReader())
             reader->setSendMotion(options() & DisplayMotion);
 
         buttonBar()->setButtonsChecked(MotionSearchButton, options() & DisplayMotion);

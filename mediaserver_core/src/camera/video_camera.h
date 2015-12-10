@@ -11,9 +11,9 @@
 #include <core/resource/resource_consumer.h>
 #include <core/datapacket/video_data_packet.h>
 #include <core/datapacket/audio_data_packet.h>
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "streaming/hls/hls_live_playlist_manager.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <streaming/hls/hls_live_playlist_manager.h>
+#include <core/dataprovider/live_stream_provider.h>
 
 
 class QnVideoCameraGopKeeper;

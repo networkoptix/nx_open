@@ -6,7 +6,7 @@
 #include <common/common_globals.h>
 #include "motion/motion_helper.h"
 #include "storage_manager.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include "core/dataprovider/live_stream_provider.h"
 #include "core/resource/resource.h"
 #include "core/resource/camera_resource.h"

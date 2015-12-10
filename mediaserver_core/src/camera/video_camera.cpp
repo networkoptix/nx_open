@@ -8,7 +8,7 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include <core/datapacket/media_data_packet.h>
 #include <core/dataprovider/cpull_media_stream_provider.h>
 #include <core/dataprovider/live_stream_provider.h>

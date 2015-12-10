@@ -8,7 +8,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "recording/stream_recorder.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include "camera/camera_pool.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "plugins/resource/archive/archive_stream_reader.h"

@@ -15,7 +15,7 @@
 
 #include <core/datapacket/abstract_data_packet.h>
 #include <core/datapacket/media_data_packet.h>
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/avi_archive_custom_data.h>

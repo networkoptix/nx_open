@@ -11,7 +11,7 @@
 #include "utils/common/sleep.h"
 #include <core/datapacket/video_data_packet.h>
 
-QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr &dev):
+QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev),
     m_cycleMode(true),
     m_needToSleep(0),
@@ -21,61 +21,61 @@ QnAbstractArchiveReader::QnAbstractArchiveReader(const QnResourcePtr &dev):
 {
 }
 
-QnAbstractArchiveReader::~QnAbstractArchiveReader()
+QnAbstractArchiveStreamReader::~QnAbstractArchiveStreamReader()
 {
     stop();
     delete m_delegate;
 }
 
-QnAbstractNavigator *QnAbstractArchiveReader::navDelegate() const
+QnAbstractNavigator *QnAbstractArchiveStreamReader::navDelegate() const
 {
     return m_navDelegate;
 }
 
 // ------------------- Audio tracks -------------------------
 
-unsigned int QnAbstractArchiveReader::getCurrentAudioChannel() const
+unsigned int QnAbstractArchiveStreamReader::getCurrentAudioChannel() const
 {
     return 0;
 }
 
-CameraDiagnostics::Result QnAbstractArchiveReader::diagnoseMediaStreamConnection()
+CameraDiagnostics::Result QnAbstractArchiveStreamReader::diagnoseMediaStreamConnection()
 {
     //TODO/IMPL
     return CameraDiagnostics::Result( CameraDiagnostics::ErrorCode::unknown );
 }
 
-QStringList QnAbstractArchiveReader::getAudioTracksInfo() const
+QStringList QnAbstractArchiveStreamReader::getAudioTracksInfo() const
 {
     return QStringList();
 }
 
-bool QnAbstractArchiveReader::setAudioChannel(unsigned int /*num*/)
+bool QnAbstractArchiveStreamReader::setAudioChannel(unsigned int /*num*/)
 {
     return false;
 }
 
-void QnAbstractArchiveReader::setNavDelegate(QnAbstractNavigator* navDelegate)
+void QnAbstractArchiveStreamReader::setNavDelegate(QnAbstractNavigator* navDelegate)
 {
     m_navDelegate = navDelegate;
 }
 
-QnAbstractArchiveDelegate* QnAbstractArchiveReader::getArchiveDelegate() const
+QnAbstractArchiveDelegate* QnAbstractArchiveStreamReader::getArchiveDelegate() const
 {
     return m_delegate;
 }
 
-void QnAbstractArchiveReader::setCycleMode(bool value)
+void QnAbstractArchiveStreamReader::setCycleMode(bool value)
 {
     m_cycleMode = value;
 }
 
-bool QnAbstractArchiveReader::open()
+bool QnAbstractArchiveStreamReader::open()
 {
     return m_delegate && m_delegate->open(m_resource);
 }
 
-void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)
+void QnAbstractArchiveStreamReader::jumpToPreviousFrame(qint64 usec)
 {
     if (usec != DATETIME_NOW)
         jumpTo(qMax(0ll, usec - 200 * 1000), usec-1);
@@ -83,7 +83,7 @@ void QnAbstractArchiveReader::jumpToPreviousFrame(qint64 usec)
         jumpTo(usec, 0);
 }
 
-quint64 QnAbstractArchiveReader::lengthUsec() const
+quint64 QnAbstractArchiveStreamReader::lengthUsec() const
 {
     if (m_delegate)
         return m_delegate->endTime() - m_delegate->startTime();
@@ -91,7 +91,7 @@ quint64 QnAbstractArchiveReader::lengthUsec() const
         return AV_NOPTS_VALUE;
 }
 
-void QnAbstractArchiveReader::run()
+void QnAbstractArchiveStreamReader::run()
 {
     initSystemThreadId();
 

@@ -13,7 +13,7 @@
 #include "core/datapacket/audio_data_packet.h"
 #include "core/datapacket/video_data_packet.h"
 #include "core/resource/resource_fwd.h"
-#include "media_streamdataprovider.h"
+#include "abstract_media_stream_data_provider.h"
 #include <core/resource/resource_media_layout.h>
 #include <utils/common/safe_direct_connection.h>
 

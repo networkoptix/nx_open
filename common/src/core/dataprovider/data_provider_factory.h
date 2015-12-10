@@ -3,7 +3,7 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <core/dataprovider/abstract_streamdataprovider.h>
+#include <core/dataprovider/abstract_stream_data_provider.h>
 
 class QnDataProviderFactory {
 public:

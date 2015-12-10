@@ -14,7 +14,7 @@
 #include "network/rtp_stream_parser.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
-#include "core/dataprovider/media_streamdataprovider.h"
+#include <core/dataprovider/abstract_media_stream_data_provider.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/resource_media_layout.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
