@@ -33,7 +33,7 @@ public:
     virtual QnCameraAdvancedParamValueList getParamsList() const override;
     //virtual bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value) override;
     virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = 0) override;
-    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &params) override {}
+    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &) override {}
 private:
     QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
     QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;
