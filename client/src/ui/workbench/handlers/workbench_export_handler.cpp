@@ -237,6 +237,9 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
         result.resource.id = resource->getId();
         result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
         result.combinedGeometry = QRect(0, 0, 1, 1);
+        result.rotation = resource->hasProperty(QnMediaResource::rotationKey())
+            ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
+            : 0;
         return result;
     };
 
