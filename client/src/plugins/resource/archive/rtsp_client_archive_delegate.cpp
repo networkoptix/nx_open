@@ -660,7 +660,7 @@ QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
 {
     if (!m_audioLayout) {
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
-        for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
+        for (QMap<int, QnNxRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
             QnConstMediaContextPtr context = itr.value()->mediaContext();
             if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
@@ -690,10 +690,10 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
 
     QnAbstractMediaDataPtr result;
 
-    QMap<int, QnFfmpegRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
+    QMap<int, QnNxRtpParserPtr>::iterator itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
-        itr = m_parsers.insert(channelNum, QnFfmpegRtpParserPtr(new QnFfmpegRtpParser()));
-    QnFfmpegRtpParserPtr parser = itr.value();
+        itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(new QnNxRtpParser()));
+    QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
     parser->processData(data, 0, dataSize, RtspStatistic(), gotData);
     *parserPosition = parser->position();

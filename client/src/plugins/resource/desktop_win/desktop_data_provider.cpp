@@ -26,7 +26,7 @@ extern "C"
 #include <core/datapacket/media_data_packet.h>
 #include <core/datapacket/av_codec_media_context.h>
 #include "win_audio_device_info.h"
-#include "decoders/audio/ffmpeg_audio.h"
+#include "decoders/audio/ffmpeg_audio_decoder.h"
 #include "utils/common/synctime.h"
 #include "utils/common/log.h"
 #include "utils/media/ffmpeg_helper.h"
@@ -499,7 +499,7 @@ bool QnDesktopDataProvider::init()
         m_audioCodecCtx = avcodec_alloc_context3(audioCodec);
         m_audioCodecCtx->codec_id = audioCodec->id;
         m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-        m_audioCodecCtx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
+        m_audioCodecCtx->sample_fmt = QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channelCount();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.sampleRate();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};

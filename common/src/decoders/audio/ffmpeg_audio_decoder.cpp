@@ -1,4 +1,4 @@
-#include "ffmpeg_audio.h"
+#include "ffmpeg_audio_decoder.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -12,9 +12,9 @@ struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-bool CLFFmpegAudioDecoder::m_first_instance = true;
+bool QnFfmpegAudioDecoder::m_first_instance = true;
 
-AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
+AVSampleFormat QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
 {
     if (fmt.sampleSize() == 8)
         return AV_SAMPLE_FMT_U8;
@@ -30,7 +30,7 @@ AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& 
 
 // ================================================
 
-CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
+QnFfmpegAudioDecoder::QnFfmpegAudioDecoder(QnCompressedAudioDataPtr data):
     c(0),
     m_codec(data->compressionType)
 {
@@ -83,7 +83,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
     avcodec_open2(c, codec, NULL);
 }
 
-CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
+QnFfmpegAudioDecoder::~QnFfmpegAudioDecoder(void)
 {
     QnFfmpegHelper::deleteAvCodecContext(c);
     c = 0;
@@ -91,7 +91,7 @@ CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bit stream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no over reading happens for damaged MPEG streams.
-bool CLFFmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& result)
+bool QnFfmpegAudioDecoder::decode(QnCompressedAudioDataPtr& data, QnByteArray& result)
 {
     result.clear();
 

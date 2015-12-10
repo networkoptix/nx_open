@@ -139,7 +139,7 @@ QSize findSavedResolution(const QnConstCompressedVideoDataPtr& video)
 
 bool QnVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 {
-    CLFFmpegVideoDecoder decoder(video->compressionType, video, false);
+    QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     QSharedPointer<CLVideoDecoderOutput> decodedVideoFrame( new CLVideoDecoderOutput() );
     decoder.decode(video, &decodedVideoFrame);
     //bool lineAmountSpecified = false;

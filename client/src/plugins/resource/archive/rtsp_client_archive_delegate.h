@@ -4,7 +4,7 @@
 #include <atomic>
 #include <utils/common/uuid.h>
 #include <network/rtpsession.h>
-#include <network/ffmpeg_rtp_parser.h>
+#include <network/nx_rtp_parser.h>
 
 #include <core/resource/resource_media_layout.h>
 
@@ -112,7 +112,7 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
-    QMap<int, QnFfmpegRtpParserPtr> m_parsers;
+    QMap<int, QnNxRtpParserPtr> m_parsers;
     
     struct {
         QString username;

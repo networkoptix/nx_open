@@ -30,7 +30,7 @@
 #include "transcoding/filters/crop_image_filter.h"
 #include "transcoding/filters/tiled_image_filter.h"
 
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "export/sign_helper.h"
 #include "transcoding/filters/scale_image_filter.h"
 
@@ -683,7 +683,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     // determine real width and height
                     QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
-                    CLFFmpegVideoDecoder decoder(mediaData->compressionType, vd, false);
+                    QnFfmpegVideoDecoder decoder(mediaData->compressionType, vd, false);
                     decoder.decode(vd, &outFrame);
                     if (m_role == Role_FileExport) 
                     {

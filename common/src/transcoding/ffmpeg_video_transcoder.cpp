@@ -4,7 +4,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "core/datapacket/video_data_packet.h"
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
@@ -155,9 +155,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
     
-    CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
+    QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
+        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     if (result)
         *result = QnCompressedVideoDataPtr();

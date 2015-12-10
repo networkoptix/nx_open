@@ -11,7 +11,7 @@
 #include <core/datapacket/audio_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 
-#include <decoders/video/abstractdecoder.h>
+#include <decoders/video/abstract_video_decoder.h>
 
 #include "video_stream_display.h"
 #include <map>

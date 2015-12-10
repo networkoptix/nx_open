@@ -9,7 +9,7 @@
 #include "core/datapacket/audio_data_packet.h"
 
 
-class CLAbstractAudioDecoder;
+class QnAbstractAudioDecoder;
 class QnCompressedAudioData;
 
 /*!
@@ -66,7 +66,7 @@ private:
     enum SampleConvertMethod {SampleConvert_None, SampleConvert_Float2Int32, SampleConvert_Float2Int16, SampleConvert_Int32ToInt16};
 
     QnMutex m_guiSync;
-    QMap<CodecID, CLAbstractAudioDecoder*> m_decoder;
+    QMap<CodecID, QnAbstractAudioDecoder*> m_decoder;
 
     int m_bufferMs;
     int m_prebufferMs;

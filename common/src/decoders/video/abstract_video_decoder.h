@@ -1,5 +1,5 @@
-#ifndef clabstractvideodecoder_h_2155
-#define clabstractvideodecoder_h_2155
+#ifndef ABSTRACT_VIDEO_DECODER_H
+#define ABSTRACT_VIDEO_DECODER_H
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -12,15 +12,15 @@
 
 class QGLContext;
 
-//!Abstract interface. Every video decoder MUST implement this interface
+//!Abstract interface. Every video decoder MUST implement this interface.
 /*!
-    Implementation of this class does not have to be thread-safe
+    Implementation of this class does not have to be thread-safe.
 
     Decoder can perform picture scaling (but it is not required that decoder support this).
     To use it, call setOutPictureSize with desired output size. Decoder may ignore this value or may align value to some border and perform scaling.\n
     Methods getWidth() and getHeight() return actual picture size (after scaling).\n
     Methods getOriginalPictureSize() return picture size before any scaling but after frame cropping (if required).\n
-    To find out, whether decoder supports scaling, one must check output picture size
+    To find out, whether decoder supports scaling, one must check output picture size.
 */
 class QnAbstractVideoDecoder
 {
@@ -116,7 +116,7 @@ protected:
     bool m_needRecreate;
 };
 
-class CLVideoDecoderFactory
+class QnVideoDecoderFactory
 {
 public:
     // TODO: #Elric #enum
@@ -152,4 +152,4 @@ private:
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif //clabstractvideodecoder_h_2155
+#endif // ABSTRACT_VIDEO_DECODER_H

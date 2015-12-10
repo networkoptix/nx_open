@@ -1,4 +1,4 @@
-#include "ffmpeg_rtp_parser.h"
+#include "nx_rtp_parser.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -10,7 +10,7 @@
 #include "rtpsession.h"
 
 
-QnFfmpegRtpParser::QnFfmpegRtpParser()
+QnNxRtpParser::QnNxRtpParser()
 :
     QnRtpVideoStreamParser(),
     m_nextDataPacketBuffer(nullptr),
@@ -19,17 +19,17 @@ QnFfmpegRtpParser::QnFfmpegRtpParser()
 
 }
 
-QnFfmpegRtpParser::~QnFfmpegRtpParser()
+QnNxRtpParser::~QnNxRtpParser()
 {
 
 }
 
-void QnFfmpegRtpParser::setSDPInfo(QList<QByteArray>)
+void QnNxRtpParser::setSDPInfo(QList<QByteArray>)
 {
 
 }
 
-bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, bool& gotData)
+bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, bool& gotData)
 {
     gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)

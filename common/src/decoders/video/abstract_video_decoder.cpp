@@ -1,4 +1,4 @@
-#include "abstractdecoder.h"
+#include "abstract_video_decoder.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -15,13 +15,13 @@ extern "C"
 #include <plugins/plugin_manager.h>
 #include <decoders/abstractvideodecoderplugin.h>
 
-#include "ffmpeg.h"
+#include "ffmpeg_video_decoder.h"
 #include "ipp_h264_decoder.h"
 
 
-CLVideoDecoderFactory::CLCodecManufacture CLVideoDecoderFactory::m_codecManufacture = AUTO;
+QnVideoDecoderFactory::CLCodecManufacture QnVideoDecoderFactory::m_codecManufacture = AUTO;
 
-QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
+QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
     const QnCompressedVideoDataPtr& data,
     bool mtDecoding,
     const QGLContext* glContext,
@@ -65,7 +65,7 @@ QnAbstractVideoDecoder* CLVideoDecoderFactory::createDecoder(
         case FFMPEG:
         default:
         {
-            return new CLFFmpegVideoDecoder( data->compressionType, data, mtDecoding, &swDecoderCount );
+            return new QnFfmpegVideoDecoder( data->compressionType, data, mtDecoding, &swDecoderCount );
         }
     }
 

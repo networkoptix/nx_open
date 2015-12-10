@@ -18,7 +18,7 @@ extern "C"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 #include "ui/common/geometry.h"
 
@@ -458,7 +458,7 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
-            CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+            QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 

@@ -1,11 +1,11 @@
-#ifndef cl_ffmpeg_h2026
-#define cl_ffmpeg_h2026
+#ifndef FFMPEG_VIDEO_DECODER_H
+#define FFMPEG_VIDEO_DECODER_H
 
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtGui/QImage>
 
-#include "abstractdecoder.h"
+#include "abstract_video_decoder.h"
 #include "core/datapacket/video_data_packet.h"
 
 #ifdef _USE_DXVA
@@ -19,20 +19,18 @@ struct AVCodecContext;
 struct AVFrame;
 struct MpegEncContext;
 
-// TODO mike: Rename class and files to QnFfmpegVideoDecoder.
-
-// client of this class is responsible for encoded data buffer meet ffmpeg restrictions
-// ( see comment to decode functions for details ).
-class CLFFmpegVideoDecoder
-:
-    public QnAbstractVideoDecoder
+/**
+ * Client of this class is responsible for encoded data buffer to meet ffmpeg
+ * restrictions (see the comment for decoding functions for details).
+ */
+class QnFfmpegVideoDecoder: public QnAbstractVideoDecoder
 {
 public:
     /*!
-        \param swDecoderCount Atomically incremented in constructor and atommically decremented in destructor
+        \param swDecoderCount Atomically incremented in constructor and atomically decremented in destructor
     */
-    CLFFmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
-    ~CLFFmpegVideoDecoder();
+    QnFfmpegVideoDecoder(CodecID codec, const QnConstCompressedVideoDataPtr& data, bool mtDecoding, QAtomicInt* const swDecoderCount = NULL);
+    ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void showMotion(bool show);
@@ -123,4 +121,4 @@ private:
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif //cl_ffmpeg_h
+#endif FFMPEG_VIDEO_DECODER_H

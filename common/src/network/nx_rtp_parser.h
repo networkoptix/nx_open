@@ -1,7 +1,5 @@
-#ifndef __FFMPEG_RTP_PARSER_H
-#define __FFMPEG_RTP_PARSER_H
-
-// TODO mike: Rename class and files to QnNxRtpParser.
+#ifndef NX_RTP_PARSER_H
+#define NX_RTP_PARSER_H
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -11,11 +9,11 @@
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 
-class QnFfmpegRtpParser: public QnRtpVideoStreamParser
+class QnNxRtpParser: public QnRtpVideoStreamParser
 {
 public:
-    QnFfmpegRtpParser();
-    virtual ~QnFfmpegRtpParser();
+    QnNxRtpParser();
+    virtual ~QnNxRtpParser();
 
     virtual void setSDPInfo(QList<QByteArray> sdpInfo) override;
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
@@ -28,8 +26,8 @@ private:
     QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;
 };
-typedef QSharedPointer<QnFfmpegRtpParser> QnFfmpegRtpParserPtr;
+typedef QSharedPointer<QnNxRtpParser> QnNxRtpParserPtr;
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif // __FFMPEG_RTP_PARSER_H
+#endif // NX_RTP_PARSER_H
