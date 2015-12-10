@@ -55,13 +55,6 @@ namespace {
     static const qint64 maxRecordingDurationMsec = 1000 * 60 * 30;
 
     static const QString filterSeparator(QLatin1String(";;"));
-
-
-    QnVirtualCameraResourcePtr extractResource(const QnActionParameters &parameters)
-    {
-        const auto result = parameters.resource();
-        return result.dynamicCast<QnVirtualCameraResource>();
-    }
 }
 
 // -------------------------------------------------------------------------- //
@@ -197,60 +190,76 @@ QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActi
     if((parameters.size() == 0) && display()->widgets().size() == 1)
         return dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
 
-    QnMediaResourceWidget * const widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
-    if (!widget)
-    {
-        QMessageBox::critical(mainWindow(), tr("Unable to export file."),
-            tr("Exactly one item must be selected for export, but %n item(s) are currently selected."
-            , "", parameters.size()));
-    }
-    return widget;
+    return dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
 }
 
-//TODO: #GDM Monstrous function, refactor required
-//TODO: #ynikitenkov refactor to use QnResourcePtr
-void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
+void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
+    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
 
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
+    /* Either resource or widget must be provided */
+    if (!mediaResource && !widget)
+    {
+        QMessageBox::critical(
+              mainWindow()
+            , tr("Unable to export file.")
+            , tr("Exactly one item must be selected for export, but %n item(s) are currently selected." , "", parameters.size())
+            );
         return;
+    }
 
-    /// At first we check if resource parameter is presented
-    const auto virtualCamResource = extractResource(parameters);
-    auto widget = extractMediaWidget(parameters);
+    if (!mediaResource)
+        mediaResource = widget->resource();
 
-    auto mediaResource = (virtualCamResource ? virtualCamResource.dynamicCast<QnMediaResource>()
-        : (widget ? widget->resource() : QnMediaResourcePtr()));
-    auto dataProvider = (virtualCamResource ? virtualCamResource->createDataProvider(Qn::CR_Default)
-        : (widget ? widget->display()->dataProvider() : nullptr));
+    QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+    auto dataProvider = camera
+        ? camera->createDataProvider(Qn::CR_Default)
+        : widget
+        ? widget->display()->dataProvider()
+        : nullptr;
 
     if (!mediaResource || !dataProvider)
         return;
-
-    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
 
     // Creates default layout item data (if there is no widget
     // selected - bookmarks export, for example). Media resource
     // is used because it should be presented to export data
     const auto createDefaultLayoutItemData =
-        [this](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
+        [](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
     {
         const auto resource = mediaResource->toResourcePtr();
 
         QnLayoutItemData result;
+        result.uuid = QnUuid::createUuid();
         result.resource.path = resource->getUniqueId();
         result.resource.id = resource->getId();
         result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
+        result.combinedGeometry = QRect(0, 0, 1, 1);
         return result;
     };
 
-    QnLayoutItemData itemData = (widget ? widget->item()->data()
-        : createDefaultLayoutItemData(mediaResource));
-
-    bool wasLoggedIn = !context()->user().isNull();
+    QnLayoutItemData itemData = widget
+        ? widget->item()->data()
+        : createDefaultLayoutItemData(mediaResource);
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    exportTimeSelection(mediaResource, dataProvider, itemData, period);
+}
+
+
+//TODO: #GDM Monstrous function, refactor required
+//TODO: #ynikitenkov refactor to use QnResourcePtr
+void QnWorkbenchExportHandler::exportTimeSelection(
+      const QnMediaResourcePtr &mediaResource
+    , const QnAbstractStreamDataProvider *dataProvider
+    , const QnLayoutItemData &itemData
+    , const QnTimePeriod &period
+    )
+{
+    bool wasLoggedIn = !context()->user().isNull();
 
     // TODO: #Elric implement more precise estimation
     if(period.durationMs > maxRecordingDurationMsec &&
@@ -331,8 +340,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QComboBox* comboBox = 0;
         bool transcodeCheckbox = false;
-        const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
-        if (mediaResource->hasVideo(archive)) {
+        if (mediaResource->hasVideo(dataProvider)) {
             comboBox = new QComboBox(dialog.data());
             comboBox->addItem(tr("No Timestamp"), Qn::NoCorner);
             comboBox->addItem(tr("Top Left Corner (requires transcoding)"), Qn::TopLeftCorner);
@@ -420,10 +428,11 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         if(doTranscode)
         {
-            if (virtualCamResource && !transcodeWarnShown)
+            const QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+            if (camera && !transcodeWarnShown)
             {
                 const int bigValue = std::numeric_limits<int>::max();
-                for (const auto& stream: virtualCamResource->mediaStreams().streams)
+                for (const auto& stream: camera->mediaStreams().streams)
                 {
                     auto filters = imageParameters.createFilterChain(stream.getResolution(), QSize(bigValue, bigValue));
                     const QSize resultResolution = imageParameters.updatedResolution( filters, stream.getResolution() );
@@ -503,7 +512,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
 
-    if (binaryExport) {
+    if (binaryExport)
+    {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
             existingLayout = qnResPool->getResourceByUrl(fileName).dynamicCast<QnLayoutResource>();
@@ -512,38 +522,37 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
 
-        itemData.uuid = QnUuid::createUuid();
+        Q_ASSERT_X(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
-        return;
     }
+    else
+    {
+        QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
+        exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+        exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+        exportProgressDialog->setModal(false);
 
-    QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
-    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
-    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setModal(false);
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
 
-    QnClientVideoCamera* camera = new QnClientVideoCamera(mediaResource);
+        QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
+            mediaResource,
+            period,
+            fileName,
+            imageParameters,
+            serverTimeZone,
+            this);
 
-    qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
+        connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
 
-    QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
-                                              camera,
-                                              period,
-                                              fileName,
-                                              imageParameters,
-                                              serverTimeZone,
-                                              this);
+        connect(tool,   &QnClientVideoCameraExportTool::finished,       this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
+        connect(tool,   &QnClientVideoCameraExportTool::finished,       exportProgressDialog,   &QnProgressDialog::deleteLater);
+        connect(tool,   &QnClientVideoCameraExportTool::rangeChanged,   exportProgressDialog,   &QnProgressDialog::setRange);
+        connect(tool,   &QnClientVideoCameraExportTool::valueChanged,   exportProgressDialog,   &QnProgressDialog::setValue);
 
-    connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
-
-    connect(tool,   &QnClientVideoCameraExportTool::finished,       this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
-    connect(tool,   &QnClientVideoCameraExportTool::finished,       exportProgressDialog,   &QnProgressDialog::deleteLater);
-    connect(tool,   &QnClientVideoCameraExportTool::rangeChanged,   exportProgressDialog,   &QnProgressDialog::setRange);
-    connect(tool,   &QnClientVideoCameraExportTool::valueChanged,   exportProgressDialog,   &QnProgressDialog::setValue);
-
-    tool->start();
-    exportProgressDialog->show();
+        tool->start();
+        exportProgressDialog->show();
+    }
 }
 
 void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename) {
