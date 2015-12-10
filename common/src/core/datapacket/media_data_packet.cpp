@@ -7,8 +7,6 @@
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
 
-#include <plugins/camera_plugin.h>
-
 #ifdef Q_OS_MAC
 #include <smmintrin.h>
 #endif
@@ -264,17 +262,11 @@ bool QnMetaDataV1::isEmpty() const
 #endif
 }
 
-void QnMetaDataV1::assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration )
+void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration )
 {
-    if( motionPicture.pixelFormat() != nxcip::PIX_FMT_MONOBLACK )
-        return;
+    assert( m_data.size() == MD_WIDTH * MD_HEIGHT / CHAR_BIT );
 
-    assert( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
-
-    if( motionPicture.xStride(0)*CHAR_BIT == motionPicture.width() )
-        memcpy( m_data.data(), motionPicture.data(), MD_WIDTH*MD_HEIGHT/CHAR_BIT );
-    else
-        assert( false );
+    memcpy( m_data.data(), data, MD_WIDTH * MD_HEIGHT / CHAR_BIT );
 
     m_firstTimestamp = timestamp;
     m_duration = duration;

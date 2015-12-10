@@ -1,6 +1,8 @@
 #ifndef abstract_media_data_h_112
 #define abstract_media_data_h_112
 
+// TODO mike: CURRENT move
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <memory>
@@ -224,9 +226,10 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     /** returns true if no motion detected */
     bool isEmpty() const;
 
-    //!Copies \a motionPicture data
-    void assign( const nxcip::Picture& motionPicture, qint64 timestamp, qint64 duration );
-
+    /**
+     * @param data Should contain MD_WIDTH * MD_HEIGHT / CHAR_BIT bytes.
+     */
+    void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration );
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 

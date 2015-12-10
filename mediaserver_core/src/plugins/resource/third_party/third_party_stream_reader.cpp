@@ -532,7 +532,16 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
                     {
                         //adding motion data
                         QnMetaDataV1Ptr motion( new QnMetaDataV1() );
-                        motion->assign( *srcMotionData, srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                        const nxcip::Picture& motionPicture = *srcMotionData;
+
+                        if( motionPicture.pixelFormat() == nxcip::PIX_FMT_MONOBLACK )
+                        {
+                            assert( motionPicture.width() == MD_HEIGHT && motionPicture.height() == MD_WIDTH );
+                            assert( motionPicture.xStride(0) * CHAR_BIT == motionPicture.width() );
+
+                            motion->assign( motionPicture.data(), srcVideoPacket->timestamp(), DEFAULT_MOTION_DURATION );
+                        }
+
                         motion->timestamp = srcVideoPacket->timestamp();
                         motion->channelNumber = packet->channelNumber();
                         motion->flags |= QnAbstractMediaData::MediaFlags_LIVE;
