@@ -33,10 +33,6 @@ class QIODevice;
 
 struct AVCodecContext;
 
-namespace nxcip {
-    class Picture;
-}
-
 // TODO: #Elric #enum
 enum MediaQuality { 
     MEDIA_Quality_High = 1,  // high quality
