@@ -27,6 +27,10 @@ QnClientVideoCameraExportTool::QnClientVideoCameraExportTool(
     connect(m_camera,     &QnClientVideoCamera::exportStopped,    this,   &QnClientVideoCameraExportTool::at_camera_exportStopped);
 }
 
+QnClientVideoCameraExportTool::~QnClientVideoCameraExportTool()
+{}
+
+
 void QnClientVideoCameraExportTool::start() {
     emit rangeChanged(0, 100);
     emit valueChanged(0);

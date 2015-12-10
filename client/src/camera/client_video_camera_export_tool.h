@@ -24,6 +24,8 @@ public:
             const QnImageFilterHelper &imageParameters,
             qint64 serverTimeZoneMs,
             QObject *parent = 0);
+    virtual ~QnClientVideoCameraExportTool();
+
 
     /**
      * @brief start                             Start exporting.
