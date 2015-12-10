@@ -551,6 +551,16 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
+    if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
+        return storage.isWritable && storage.isUsed && storage.isBackup && storage.isOnline;
+    }))
+        return error(tr("Select at least one backup storage."));
+
+    if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
+        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+    }))
+        return error(tr("Select at least one camera with archive to backup"));
+
     if (m_backupSchedule.backupType == Qn::Backup_RealTime)
     {
         static const auto kMessageWithWarningTemplate = lit("<html>%1<br><font color = red>%2</font></html>");
@@ -563,16 +573,6 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         if (!m_backupSchedule.isValid())
             return error(tr("Backup Schedule is invalid."));
     }
-
-    if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
-        return storage.isWritable && storage.isUsed && storage.isBackup && storage.isOnline;
-    }))
-        return error(tr("Select at least one backup storage."));
-
-    if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
-    }))
-        return error(tr("Select at least one camera with archive to backup"));
 
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
