@@ -17,10 +17,6 @@ angular.module('cloudApp', [
             templateUrl: 'views/register.html',
             controller: 'LoginCtrl'
         })
-        .when('/register/success', {
-            templateUrl: 'views/register_success.html',
-            controller: 'LoginCtrl'
-        })
         .when('/systems', {
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'

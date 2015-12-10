@@ -1,5 +1,5 @@
 <div>
-    <div class="alert alert-success" ng-if="process.success" ng-bind-html="successMessage">
+    <div class="alert alert-success" ng-if="successMessage && process.success" ng-bind-html="successMessage">
     </div>
 
     <div class="alert alert-danger" ng-if="process.error" ng-bind-html="errorMessage || errorPrefix + ' ' + process.errorMessage">

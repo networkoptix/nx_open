@@ -1,21 +1,29 @@
 <div ng-controller="LoginCtrl">
     <div class="modal-body" >
+        <process-alert process="login" ></process-alert>
+
         <form name="loginForm">
             <div class="form-group">
                 <label for="email">Email address</label>
-                <input type="email" class="form-control" ng-model="email" id="email" name="email" placeholder="Email">
+                <input type="email" class="form-control" ng-model="email" id="email" name="email"
+                       placeholder="Email" required>
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" ng-model="password" name="password" id="password" placeholder="Password">
+                <input type="password" class="form-control" ng-model="password" name="password" id="password"
+                       placeholder="Password" required>
             </div>
             <div class="checkbox">
-                <label ><input type="checkbox" ng-model="remember" name="remember" id="remember" disabled> Remember me</label>
+                <label ><input type="checkbox" ng-model="remember" name="remember" id="remember"
+                               disabled> Remember me</label>
             </div>
         </form>
     </div>
     <div class="modal-footer">
-        <a href="#/restore_password" ng-click="$parent.close()">Restore password</a>
-        <button type="button" class="btn btn-default" ng-click="login()">Login</button>
+        <a href="#/restore_password" ng-click="$parent.close()">I forgot my password </a>
+
+        <process-button process="login"
+                        disabled="!loginForm.$valid"
+                        button-text="'Sign in'"></process-button>
     </div>
 </div>

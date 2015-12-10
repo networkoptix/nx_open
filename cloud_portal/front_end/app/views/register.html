@@ -5,7 +5,11 @@
 
 
 <div class="row" >
-    <form name="registerForm" class="form-horizontal">
+    <process-alert process="register"
+                   success-message="'Your account was successfully registered. Please, check your email to confirm it'"
+                   error-prefix="'Some error has happened:'"></process-alert>
+
+    <form name="registerForm" class="form-horizontal" ng-if="!register.success">
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
             <div class="col-sm-9">
@@ -47,6 +51,10 @@
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
                 <button type="button" class="btn btn-default" ng-click="register()">Sign up</button>
+
+                <process-button process="register"
+                                disabled="!registerForm.$valid"
+                                button-text="'Sign up'"></process-button>
             </div>
         </div>
     </form>

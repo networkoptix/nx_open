@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, $location, $sessionStorage) {
+    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage) {
 
         cloudApi.account().then(function(account){
             if(account){
@@ -17,34 +17,23 @@ angular.module('cloudApp')
         $scope.session = $sessionStorage;
         $scope.email = '';
         $scope.password = '';
-        $scope.login = function(){
-            cloudApi.login($scope.email,$scope.password).then(function(){
 
+        $scope.login = process.init(function() {
+            return cloudApi.login($scope.email, $scope.password);
+        });
+        $scope.login.promise.then(function(){
                 if($scope.password) { // TODO: This is dirty security hole, but I need this to make "Open in client" work
-                    $scope.session.password = $scope.password;
-                }
+                $scope.session.password = $scope.password;
+            }
+            $location.path('/systems');
+            document.location.reload();
+        });
 
-                $location.path('/systems');
-                document.location.reload();
-            },errorHandler);
-        };
 
         $scope.firstName = '';
         $scope.lastName = '';
-        $scope.register = function(){
-            cloudApi.
-                register($scope.email,$scope.password,$scope.firstName,$scope.lastName,$scope.subscribe).
-                then(function(result){
-                    $location.path('/register/success');
-                },errorHandler);
-        };
 
-        $scope.restorePassword = function(){
-            cloudApi.
-                restorePassword($scope.email).
-                then(function(result){
-                    $location.path('/restore/send');
-                },errorHandler);
-        };
-
+        $scope.register = process.init(function() {
+            return cloudApi.register($scope.email,$scope.password,$scope.firstName,$scope.lastName,$scope.subscribe);
+        });
     });

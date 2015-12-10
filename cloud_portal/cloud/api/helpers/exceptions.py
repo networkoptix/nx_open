@@ -2,6 +2,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.conf import settings
 import logging
+import json
 import traceback
 
 __django__ = logging.getLogger('django')
@@ -101,7 +102,7 @@ def validate_response(func):
         try:
             response_data = response.json()
         except ValueError:
-            raise APIInternalException('No JSON data from cloud_db: ' + response.text)
+            raise APIInternalException('No JSON data from cloud_db ' + response.text)
 
         errors = {
             status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,
@@ -142,8 +143,12 @@ def handle_exceptions(func):
                 return Response(data, status=status.HTTP_200_OK)
             return data
         except APIException as error:
-            __django__.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nCall Stack: \n{3}'.
-                         format(error.status_code,error.error_text,error.error_code,traceback.format_exc()))
+            __django__.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.
+                             format(error.status_code,
+                                    error.error_text,
+                                    error.error_code,
+                                    json.dumps(error.error_data, indent=4, separators=(',', ': ')),
+                                    traceback.format_exc()))
             return error.response()
         except:
             detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()
