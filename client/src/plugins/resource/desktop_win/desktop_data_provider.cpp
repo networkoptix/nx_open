@@ -20,11 +20,11 @@ extern "C"
 {
     #include <libavformat/avformat.h>
     #include <libavcodec/avcodec.h>
-
-    int av_set_string3(void *obj, const char *name, const char *val, int alloc, const AVOption **o_out);
+    #include <libavutil/opt.h>
 }
 
-#include "core/datapacket/media_data_packet.h"
+#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/av_codec_media_context.h>
 #include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio.h"
 #include "utils/common/synctime.h"
@@ -32,7 +32,7 @@ extern "C"
 #include "utils/media/ffmpeg_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
-// I have used intrisicts for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
+// I have used intrinsics for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler
 static void stereoAudioMux(qint16* a1, qint16* a2, int lenInShort)
 {
     __m128i* audio1 = (__m128i*) a1;
@@ -468,9 +468,9 @@ bool QnDesktopDataProvider::init()
         m_videoCodecCtx->sample_aspect_ratio.den = 1;
     }
 
-    // TODO mike: CURRENT create(av)
-    m_videoContext = QnMediaContextPtr(new QnMediaContext(m_videoCodecCtx));
-    
+    const auto videoContext = new QnAvCodecMediaContext(m_videoCodecCtx);
+    m_videoContext = QnConstMediaContextPtr(videoContext);
+
     if (avcodec_open(m_videoCodecCtx, videoCodec) < 0)
     {
         m_lastErrorStr = tr("Could not initialize video encoder.");
@@ -507,8 +507,8 @@ bool QnDesktopDataProvider::init()
         m_audioCodecCtx->bit_rate = 64000 * m_audioCodecCtx->channels;
         //m_audioCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
         
-        // TODO mike: CURRENT create(av)
-        m_audioContext = QnMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        const auto audioContext = new QnAvCodecMediaContext(m_audioCodecCtx);
+        m_audioContext = QnConstMediaContextPtr(audioContext);
 
         if (avcodec_open(m_audioCodecCtx, audioCodec) < 0)
         {
@@ -524,6 +524,10 @@ bool QnDesktopDataProvider::init()
                 return false;
             }
         }
+
+        // QnMediaContext was created before open() call to avoid encoder specific fields.
+        // Transfer extradata manually.
+        audioContext->setExtradata(m_audioCodecCtx->extradata, m_audioCodecCtx->extradata_size);
     }
 
     if (m_audioCodecCtx)
@@ -537,7 +541,7 @@ bool QnDesktopDataProvider::init()
 
 
     m_grabber->start(QThread::HighestPriority);
-    foreach(EncodedAudioInfo* info, m_audioInfo)
+    foreach (EncodedAudioInfo* info, m_audioInfo)
     {
         if (!info->start())
         {
@@ -547,28 +551,12 @@ bool QnDesktopDataProvider::init()
     }
 
     // QnMediaContext was created before open() call to avoid encoder specific fields.
-    // Transfer extradata field manually.
+    // Transfer extradata manually.
+    videoContext->setExtradata(m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
 
-    // TODO mike: Design a way to assign extradata; assert extradata was null.
-
-    if (m_videoCodecCtx->extradata_size)
-    {
-        m_videoContext->ctx()->extradata_size = m_videoCodecCtx->extradata_size;
-        m_videoContext->ctx()->extradata = (uint8_t*) av_malloc(m_videoCodecCtx->extradata_size);
-        memcpy(m_videoContext->ctx()->extradata, m_videoCodecCtx->extradata, m_videoCodecCtx->extradata_size);
-    }
-
-    if (m_audioCodecCtx && m_audioCodecCtx->extradata_size)
-    {
-        m_audioContext->ctx()->extradata_size = m_audioCodecCtx->extradata_size;
-        m_audioContext->ctx()->extradata = (uint8_t*) av_malloc(m_audioCodecCtx->extradata_size);
-        memcpy(m_audioContext->ctx()->extradata, m_audioCodecCtx->extradata, m_audioCodecCtx->extradata_size);
-    }
-
-    //m_videoCodecCtxPtr = QnMediaContextPtr(new QnMediaContext(m_videoCodecCtx));
-    //m_videoCodecCtxPtr->ctx()->stats_out = 0;
-    //m_videoCodecCtxPtr->ctx()->coded_frame = 0;
-
+    //m_videoContext = QnMediaContextPtr(new QnAvCodecMediaContext(m_videoCodecCtx));
+    //m_videoContext->ctx()->stats_out = 0;
+    //m_videoContext->ctx()->coded_frame = 0;
 
     return true;
 }
@@ -775,9 +763,9 @@ void QnDesktopDataProvider::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
-    QnFfmpegHelper::deleteCodecContext(m_audioCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_audioCodecCtx);
     m_audioCodecCtx = 0;
 
     if (m_frame) {
@@ -818,7 +806,7 @@ QnConstResourceAudioLayoutPtr QnDesktopDataProvider::getAudioLayout()
     if (m_audioCodecCtx && m_audioLayout->channelCount() == 0)
     {
         QnResourceAudioLayout::AudioTrack track;
-        track.codecContext = QnMediaContextPtr(new QnMediaContext(m_audioCodecCtx));
+        track.codecContext = QnConstMediaContextPtr(new QnAvCodecMediaContext(m_audioCodecCtx));
         m_audioLayout->setAudioTrackInfo(track);
     }
     return m_audioLayout;

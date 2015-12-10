@@ -24,7 +24,7 @@ protected:
     int receiveData(quint8* buffer, int size);
 private:
     std::unique_ptr<AbstractStreamSocket> m_tcpSock;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
 };
 
 #endif // #ifdef ENABLE_TEST_CAMERA

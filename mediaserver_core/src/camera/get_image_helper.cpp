@@ -228,7 +228,7 @@ QByteArray QnGetImageHelper::encodeImage(const QSharedPointer<CLVideoDecoderOutp
         result.append((const char*) m_videoEncodingBuffer, encoded);
         qFreeAligned(m_videoEncodingBuffer);
     }
-    QnFfmpegHelper::deleteCodecContext(videoEncoderCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(videoEncoderCodecCtx);
 
     return result;
 }

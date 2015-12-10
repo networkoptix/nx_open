@@ -74,7 +74,7 @@ public:
 
     virtual void setArchiveDelegate(QnAbstractArchiveDelegate* contextDelegate) override;
 
-    virtual QnMediaContextPtr getCodecContext() const override;
+    virtual QnConstMediaContextPtr getCodecContext() const override;
 
     virtual void startPaused(qint64 startTime) override;
 
@@ -161,7 +161,7 @@ private:
     QnAbstractMediaDataPtr m_afterMotionData;
     QnAbstractMediaDataPtr m_nextData;
     QQueue<QnAbstractMediaDataPtr> m_skippedMetadata;
-    QnMediaContextPtr m_codecContext;
+    QnConstMediaContextPtr m_codecContext;
 
     mutable QnMutex m_playbackMaskSync;
     QnPlaybackMaskHelper m_playbackMaskHelper;

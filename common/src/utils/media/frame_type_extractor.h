@@ -5,8 +5,8 @@ class VC1SequenceHeader;
 
 extern "C"
 {
-    // For enum CodecID, struct AVCodecContext.
-    #include <libavcodec/avcodec.h>
+// For enum CodecID, struct AVCodecContext.
+#include <libavcodec/avcodec.h>
 }
 
 #include <core/datapacket/media_context.h>
@@ -14,14 +14,14 @@ extern "C"
 class FrameTypeExtractor
 {
 public:
-    FrameTypeExtractor(const QnMediaContextPtr& context);
+    FrameTypeExtractor(const QnConstMediaContextPtr& context);
     FrameTypeExtractor(CodecID id, bool nalPrefixes = true);
     ~FrameTypeExtractor();
 
-    enum FrameType {UnknownFrameType, I_Frame, P_Frame, B_Frame};
+    enum FrameType { UnknownFrameType, I_Frame, P_Frame, B_Frame };
     FrameType getFrameType(const quint8* data, int dataLen);
 
-    QnMediaContextPtr getContext() const { return m_context; }
+    QnConstMediaContextPtr getContext() const { return m_context; }
     CodecID getCodec() const { return m_codecId; }
 
 private:
@@ -34,7 +34,7 @@ private:
     void decodeWMVSequence(const quint8* data, int size);
 
 private:
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
 
     CodecID m_codecId;
     VC1SequenceHeader* m_vcSequence;

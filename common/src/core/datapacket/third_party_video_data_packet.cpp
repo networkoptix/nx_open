@@ -11,7 +11,7 @@
 
 
 QnThirdPartyCompressedVideoData::QnThirdPartyCompressedVideoData(nxcip::MediaDataPacket* videoPacket,
-    QnMediaContextPtr ctx )
+    QnConstMediaContextPtr ctx )
 :
     QnCompressedVideoData( ctx ),
     m_mediaPacket( videoPacket )

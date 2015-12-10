@@ -36,8 +36,8 @@ public:
 
 private:
     bool m_gotLivePacket;
-    QnMediaContextPtr m_contextSent;
-    QMap<CodecID, QnMediaContextPtr> m_generatedContexts;
+    QnConstMediaContextPtr m_contextSent;
+    QMap<CodecID, QnConstMediaContextPtr> m_generatedContexts;
     QnConstAbstractMediaDataPtr m_media;
     const char* m_curDataBuffer;
     QByteArray m_codecCtxData;
@@ -46,7 +46,7 @@ private:
     bool m_eofReached;
     bool m_isLastDataContext;
 
-    QnMediaContextPtr getGeneratedContext(CodecID compressionType);
+    QnConstMediaContextPtr getGeneratedContext(CodecID compressionType);
 };
 
 typedef QSharedPointer<QnRtspFfmpegEncoder> QnRtspFfmpegEncoderPtr;

@@ -23,7 +23,7 @@ public:
     */
     QnThirdPartyCompressedVideoData(
         nxcip::MediaDataPacket* videoPacket,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
     /*!
         \note Calls \a videoPacket->releaseRef
     */

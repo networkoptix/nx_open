@@ -21,6 +21,7 @@
     <name>HD Witness Common Library Unit Tests</name>
 
     <properties>
+        <guid>${common_ut.guid}</guid>
         <product.title>HD Witness Common Library Unit Tests</product.title>
         <root.dir>${basedir}/../..</root.dir>
         <!--Specify the project to test-->      

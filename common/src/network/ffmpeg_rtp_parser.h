@@ -1,6 +1,8 @@
 #ifndef __FFMPEG_RTP_PARSER_H
 #define __FFMPEG_RTP_PARSER_H
 
+// TODO mike: Rename class and files to QnNxRtpParser.
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QByteArray>
@@ -8,7 +10,6 @@
 
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
-
 
 class QnFfmpegRtpParser: public QnRtpVideoStreamParser
 {
@@ -20,9 +21,9 @@ public:
     virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
 
     qint64 position() const { return m_position; }
-    QnMediaContextPtr mediaContext() const { return m_context; }
+    QnConstMediaContextPtr mediaContext() const { return m_context; }
 private:
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     QnAbstractMediaDataPtr m_nextDataPacket;
     QnByteArray* m_nextDataPacketBuffer;
     qint64 m_position;

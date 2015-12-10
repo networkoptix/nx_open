@@ -2,7 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/audio_data_packet.h"
+#include <core/datapacket/audio_data_packet.h>
+#include <core/datapacket/av_codec_media_context.h>
 #include "utils/media/audio_processor.h"
 #include "utils/media/ffmpeg_helper.h"
 
@@ -35,8 +36,8 @@ QnFfmpegAudioTranscoder::~QnFfmpegAudioTranscoder()
     if (m_resampleCtx)
         audio_resample_close(m_resampleCtx);
 
-    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
-    QnFfmpegHelper::deleteCodecContext(m_decoderContext);
+    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_decoderContext);
 }
 
 bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
@@ -52,7 +53,7 @@ bool QnFfmpegAudioTranscoder::open(const QnConstCompressedAudioDataPtr& audio)
     return open(audio->context);
 }
 
-bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& context)
+bool QnFfmpegAudioTranscoder::open(const QnConstMediaContextPtr& context)
 {
     assert(context);
 
@@ -92,15 +93,13 @@ bool QnFfmpegAudioTranscoder::open(const QnMediaContextPtr& context)
 
     avCodec = avcodec_find_decoder(context->getCodecId());
     m_decoderContext = avcodec_alloc_context3(0);
-    // TODO mike: CURRENT copy av
-    avcodec_copy_context(m_decoderContext, context->ctx());
+    QnFfmpegHelper::mediaContextToAvCodecContext(m_decoderContext, context);
     if (avcodec_open2(m_decoderContext, avCodec, 0) < 0)
     {
         m_lastErrMessage = tr("Could not initialise audio decoder.");
         return false;
     }
-    // TODO mike: CURRENT create(av)
-    m_context = QnMediaContextPtr(new QnMediaContext(m_encoderCtx));
+    m_context = QnConstMediaContextPtr(new QnAvCodecMediaContext(m_encoderCtx));
     m_frameNum = 0;
     return true;
 }

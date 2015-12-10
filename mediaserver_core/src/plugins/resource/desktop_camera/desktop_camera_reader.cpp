@@ -168,7 +168,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     if (result) {
         result->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         result->opaque = 0;
-        if (result->dataType == QnAbstractMediaData::AUDIO && result->context && result->context->ctx() && !m_audioLayout)
+        if (result->dataType == QnAbstractMediaData::AUDIO && result->context && !m_audioLayout)
         {
             QnMutexLocker lock( &m_audioLayoutMutex );
             m_audioLayout.reset( new QnResourceCustomAudioLayout() );

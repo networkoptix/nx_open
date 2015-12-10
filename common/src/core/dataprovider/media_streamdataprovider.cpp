@@ -190,9 +190,9 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
     }
 }
 
-QnMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
+QnConstMediaContextPtr QnAbstractMediaStreamDataProvider::getCodecContext() const
 {
-    return QnMediaContextPtr();
+    return QnConstMediaContextPtr(nullptr);
 }
 
 CameraDiagnostics::Result QnAbstractMediaStreamDataProvider::diagnoseMediaStreamConnection()

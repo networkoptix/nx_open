@@ -8,138 +8,142 @@
 #include "nalUnits.h"
 #include "bitStream.h"
 #include "core/resource/storage_resource.h"
-#include <utils/media/codec_helper.h>
+#include <utils/media/av_codec_helper.h>
+#include <core/datapacket/av_codec_media_context.h>
+#include <core/datapacket/basic_media_context.h>
 
-void QnFfmpegHelper::appendCtxField(QByteArray *dst, QnFfmpegHelper::CodecCtxField field, const char* data, int size)
+extern "C"
 {
-    char f = (char) field;
-    dst->append(&f, 1);
-    int size1 = htonl(size);
-    dst->append((const char*) &size1, 4);
-    dst->append((const char*) data, size);
+#include <libavutil/error.h>
 }
 
-void QnFfmpegHelper::serializeCodecContext(const AVCodecContext *ctx, QByteArray *data)
+QnFfmpegHelper::StaticHolder QnFfmpegHelper::StaticHolder::instance;
+
+void QnFfmpegHelper::copyAvCodecContextField(void **fieldPtr, const void* data, size_t size)
 {
-    data->clear();
-    data->append((const char*) &ctx->codec_id, 4);
-    
-    if (ctx->rc_eq) 
-        appendCtxField(data, Field_RC_EQ, ctx->rc_eq, (int) strlen(ctx->rc_eq)+1); // +1 because of include \0 byte
-    if (ctx->extradata) 
-        appendCtxField(data, Field_EXTRADATA, (const char*) ctx->extradata, ctx->extradata_size);
-    if (ctx->intra_matrix) 
-        appendCtxField(data, Field_INTRA_MATRIX, (const char*) ctx->intra_matrix, 64 * sizeof(int16_t));
-    if (ctx->inter_matrix)
-        appendCtxField(data, Field_INTER_MATRIX, (const char*) ctx->inter_matrix, 64 * sizeof(int16_t));
-    if (ctx->rc_override)
-        appendCtxField(data, Field_OVERRIDE, (const char*) ctx->rc_override, ctx->rc_override_count * sizeof(*ctx->rc_override));
+    assert(fieldPtr);
 
-    if (ctx->channels > 0)
-        appendCtxField(data, Field_Channels, (const char*) &ctx->channels, sizeof(int));
-    if (ctx->sample_rate > 0)
-        appendCtxField(data, Field_SampleRate, (const char*) &ctx->sample_rate, sizeof(int));
-    if (ctx->sample_fmt != AV_SAMPLE_FMT_NONE)
-        appendCtxField(data, Field_Sample_Fmt, (const char*) &ctx->sample_fmt, sizeof(AVSampleFormat));
-    if (ctx->bits_per_coded_sample > 0)
-        appendCtxField(data, Field_BitsPerSample, (const char*) &ctx->bits_per_coded_sample, sizeof(int));
-    if (ctx->coded_width > 0)
-        appendCtxField(data, Field_CodedWidth, (const char*) &ctx->coded_width, sizeof(int));
-    if (ctx->coded_height > 0)
-        appendCtxField(data, Field_CodedHeight, (const char*) &ctx->coded_height, sizeof(int));
-}
+    av_freep(fieldPtr);
 
-AVCodecContext *QnFfmpegHelper::deserializeCodecContext(const char *data, int dataLen)
-{
-    AVCodec* codec = 0;
-    // TODO: #vasilenko avoid using deprecated methods
-    AVCodecContext* ctx = (AVCodecContext*) avcodec_alloc_context();
-
-    QByteArray tmpArray(data, dataLen);
-    QBuffer buffer(&tmpArray);
-    buffer.open(QIODevice::ReadOnly);
-    CodecID codecId = CODEC_ID_NONE;
-    int readed = buffer.read((char*) &codecId, 4);
-    if (readed < 4)
-        goto error_label;
-    codec = avcodec_find_decoder(codecId);
-
-    if (codec == 0)
-        goto error_label;
-    
-    char objectType;
-    
-    while (1)
+    if (size > 0)
     {
-        int readed = buffer.read(&objectType, 1);
-        if (readed < 1)
-            break;
-        CodecCtxField field = (CodecCtxField) objectType;
-        int size;
-        if (buffer.read((char*) &size, 4) != 4)
-            goto error_label;
-        size = ntohl(size);
-        char* fieldData = (char*) av_malloc(size);
-        readed = buffer.read(fieldData, size);
-        if (readed != size) {
-            av_free(fieldData);
-            goto error_label;
-        }
+        assert(data);
+        *fieldPtr = av_malloc(size);
+        assert(*fieldPtr);
+        memcpy(*fieldPtr, data, size);
+    }
+}
 
-        switch (field)
-        {
-            case Field_RC_EQ:
-                ctx->rc_eq = fieldData;
-                break;
-            case Field_EXTRADATA:
-                ctx->extradata = (quint8*) fieldData;
-                ctx->extradata_size = size;
-                break;
-            case Field_INTRA_MATRIX:
-                ctx->intra_matrix = (quint16*) fieldData;
-                break;
-            case Field_INTER_MATRIX: 
-                ctx->inter_matrix = (quint16*) fieldData;
-                break;
-            case Field_OVERRIDE:
-                ctx->rc_override = (RcOverride*) fieldData;
-                ctx->rc_override_count = size / sizeof(*ctx->rc_override);
-                break;
-            case Field_Channels:
-                ctx->channels = *(int*) fieldData;
-                av_free(fieldData);
-                break;
-            case Field_SampleRate:
-                ctx->sample_rate = *(int*) fieldData;
-                av_free(fieldData);
-                break;
-            case Field_Sample_Fmt:
-                ctx->sample_fmt = *(AVSampleFormat*) fieldData;
-                av_free(fieldData);
-                break;
-            case Field_BitsPerSample:
-                ctx->bits_per_coded_sample = *(int*) fieldData;
-                av_free(fieldData);
-                break;
-            case Field_CodedWidth:
-                ctx->coded_width = *(int*) fieldData;
-                av_free(fieldData);
-                break;
-            case Field_CodedHeight:
-                ctx->coded_height = *(int*) fieldData;
-                av_free(fieldData);
-                break;
-        }
+void QnFfmpegHelper::mediaContextToAvCodecContext(
+    AVCodecContext* av, const QnConstMediaContextPtr& media)
+{
+    assert(av);
+
+    // NOTE: Here explicit runtime type dispatching is used instead of a more complex visitor-based pattern.
+    // Generation of AVCodecContext from QnMediaContext cannot be done in QnMediaContext because that class
+    // should not depend on ffmpeg's implementation which is required to do this job.
+    auto avCodecMediaContext = std::dynamic_pointer_cast<const QnAvCodecMediaContext>(media);
+    if (avCodecMediaContext)
+    {
+        int r = avcodec_copy_context(av, avCodecMediaContext->getAvCodecContext());
+        assert(r == 0);
+        return;
     }
 
-    ctx->codec_id = codecId;
-    ctx->codec_type = codec->type;
-    return ctx;
+    AVCodec* const codec = findAvCodec(media->getCodecId());
+    assert(codec);
+    int r = avcodec_get_context_defaults3(av, codec);
+    assert(r == 0);
+    av->codec = codec;
+    // codec_type is copied by avcodec_get_context_defaults3() above.
+    Q_ASSERT_X(av->codec_type == media->getCodecType(), Q_FUNC_INFO, "codec_type is not the same.");
 
-error_label:
-    qWarning() << Q_FUNC_INFO << __LINE__ << "Parse error in deserialize CodecContext";
-    QnFfmpegHelper::deleteCodecContext(ctx);
-    return nullptr;
+    copyMediaContextFieldsToAvCodecContext(av, media);
+}
+
+void QnFfmpegHelper::copyMediaContextFieldsToAvCodecContext(
+    AVCodecContext* av, const QnConstMediaContextPtr& media)
+{
+    av->codec_id = media->getCodecId();
+    av->codec_type = media->getCodecType();
+
+    copyAvCodecContextField((void**) &av->rc_eq, media->getRcEq(),
+        media->getRcEq() == nullptr? 0 :
+        strlen(media->getRcEq()) + 1);
+
+    copyAvCodecContextField((void**) &av->extradata, media->getExtradata(),
+        media->getExtradataSize());
+    av->extradata_size = media->getExtradataSize();
+
+    copyAvCodecContextField((void**) &av->intra_matrix, media->getIntraMatrix(),
+        media->getIntraMatrix() == nullptr? 0 : 
+        sizeof(av->intra_matrix[0]) * QnAvCodecHelper::kMatrixLength);
+
+    copyAvCodecContextField((void**) &av->inter_matrix, media->getInterMatrix(),
+        media->getInterMatrix() == nullptr? 0 : 
+        sizeof(av->inter_matrix[0]) * QnAvCodecHelper::kMatrixLength);
+
+    copyAvCodecContextField((void**) &av->rc_override, media->getRcOverride(),
+        sizeof(av->rc_override[0]) * media->getRcOverrideCount());
+    av->rc_override_count = media->getRcOverrideCount();
+
+    av->channels = media->getChannels();
+    av->sample_rate = media->getSampleRate();
+    av->sample_fmt = media->getSampleFmt();
+    av->bits_per_coded_sample = media->getBitsPerCodedSample();
+    av->coded_width = media->getCodedWidth();
+    av->coded_height = media->getCodedHeight();
+    av->width = media->getWidth();
+    av->height = media->getHeight();
+    av->bit_rate = media->getBitRate();
+    av->channel_layout = media->getChannelLayout();
+    av->block_align = media->getBlockAlign();
+}
+
+AVCodec* QnFfmpegHelper::findAvCodec(CodecID codecId)
+{
+    AVCodec* codec = avcodec_find_decoder(codecId);
+
+    if (!codec || codec->id != codecId)
+        return &StaticHolder::instance.avCodec;
+
+    return codec;
+}
+
+AVCodecContext* QnFfmpegHelper::createAvCodecContext(CodecID codecId)
+{
+    AVCodec* codec = findAvCodec(codecId);
+    assert(codec);
+    AVCodecContext* context = avcodec_alloc_context3(codec);
+    assert(context);
+    context->codec = codec;
+    context->codec_id = codecId;
+    return context;
+}
+
+AVCodecContext* QnFfmpegHelper::createAvCodecContext(const AVCodecContext* context)
+{
+    assert(context);
+
+    AVCodecContext* newContext = avcodec_alloc_context3(nullptr);
+    assert(newContext);
+    int r = avcodec_copy_context(newContext, context);
+    assert(r == 0);
+    return newContext;
+}
+
+void QnFfmpegHelper::deleteAvCodecContext(AVCodecContext* context)
+{
+    if (!context)
+        return;
+
+    avcodec_close(context);
+    av_freep(&context->rc_override);
+    av_freep(&context->intra_matrix);
+    av_freep(&context->inter_matrix);
+    av_freep(&context->extradata);
+    av_freep(&context->rc_eq);
+    av_freep(&context);
 }
 
 static qint32 ffmpegReadPacket(void *opaque, quint8* buf, int size)
@@ -245,17 +249,13 @@ void QnFfmpegHelper::closeFfmpegIOContext(AVIOContext* ioContext)
     }
 }
 
-void QnFfmpegHelper::deleteCodecContext(AVCodecContext* ctx)
+QString QnFfmpegHelper::getErrorStr(int errnum)
 {
-    if (!ctx)
-        return;
-    avcodec_close(ctx);
-    av_freep(&ctx->rc_override);
-    av_freep(&ctx->intra_matrix);
-    av_freep(&ctx->inter_matrix);
-    av_freep(&ctx->extradata);
-    av_freep(&ctx->rc_eq);
-    av_freep(&ctx);
+    static const int AV_ERROR_MAX_STRING_SIZE = 64; //< Taken from newer Ffmpeg impl.
+    QByteArray result(AV_ERROR_MAX_STRING_SIZE, '\0');
+    if (av_strerror(errnum, result.data(), result.size()) != 0)
+        return QString(QString::fromLatin1("Unknown FFMPEG error with code %d")).arg(errnum);
+    return QString::fromLatin1(result);
 }
 
 #endif // ENABLE_DATA_PROVIDERS

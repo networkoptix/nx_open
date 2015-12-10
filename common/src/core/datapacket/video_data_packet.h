@@ -27,7 +27,7 @@ public:
     QnMetaDataV1Ptr motion;
     qint64 pts;
 
-    QnCompressedVideoData( QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+    QnCompressedVideoData( QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
 
     //!Implementation of QnAbstractMediaData::clone
     /*!
@@ -53,12 +53,12 @@ public:
     QnWritableCompressedVideoData(
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
     QnWritableCompressedVideoData(
         QnAbstractAllocator* allocator,
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
 
     //!Implementation of QnAbstractMediaData::clone
     virtual QnWritableCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;

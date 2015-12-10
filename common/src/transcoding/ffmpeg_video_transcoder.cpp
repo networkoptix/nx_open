@@ -56,7 +56,7 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     m_encoderCtx = 0;
 
     for (int i = 0; i < m_videoDecoders.size(); ++i) {

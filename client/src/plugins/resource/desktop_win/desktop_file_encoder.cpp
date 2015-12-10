@@ -871,10 +871,10 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
 
-    QnFfmpegHelper::deleteCodecContext(m_audioCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_audioCodecCtx);
     m_audioCodecCtx = 0;
 
     if (m_formatCtx)

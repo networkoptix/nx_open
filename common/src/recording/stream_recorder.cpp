@@ -145,7 +145,7 @@ void QnStreamRecorder::close()
 
 
         auto fileSize = 
-            m_startDateTime != qint64(AV_NOPTS_VALUE) ? 
+            (m_startDateTime != qint64(AV_NOPTS_VALUE) && m_recordingContextVector[i].formatCtx) ? 
                 QnFfmpegHelper::getFileSizeByIOContext(
                     m_recordingContextVector[i].formatCtx->pb
                 ) : 0;
@@ -676,8 +676,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 }
                 else if (!m_forceDefaultCtx && mediaData->context && mediaData->context->getWidth() > 0)
                 {
-                    // TODO mike: CURRENT copy av
-                    avcodec_copy_context(videoCodecCtx, mediaData->context->ctx());
+                    QnFfmpegHelper::mediaContextToAvCodecContext(videoCodecCtx, mediaData->context);
                 }
                 else if (m_role == Role_FileExport || m_role == Role_FileExportWithEmptyContext)
                 {
@@ -729,7 +728,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                 audioStream->id = DEFAULT_AUDIO_STREAM_ID + j;
                 CodecID srcAudioCodec = CODEC_ID_NONE;
-                QnMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(j).codecContext;
+                QnConstMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(j).codecContext;
                 if (!mediaContext) {
                     m_lastError = InvalidAudioCodecError;
                     NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
@@ -740,8 +739,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
                 if (m_dstAudioCodec == CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
                 {
-                    // TODO mike: CURRENT copy av
-                    avcodec_copy_context(audioStream->codec, mediaContext->ctx());
+                    QnFfmpegHelper::mediaContextToAvCodecContext(audioStream->codec, mediaContext);
 
                     // avoid FFMPEG bug for MP3 mono. block_align hardcoded inside ffmpeg for stereo channels and it is cause problem
                     if (srcAudioCodec == CODEC_ID_MP3 && audioStream->codec->channels == 1)
@@ -779,7 +777,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 m_recordingContextVector[i].formatCtx->pb = nullptr;
                 avformat_close_input(&m_recordingContextVector[i].formatCtx);
                 m_lastError = IncompatibleCodecError;
-                NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format.").arg(m_container), cl_logERROR);
+                NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
+                    arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)), cl_logERROR);
                 return false;
             }
         }

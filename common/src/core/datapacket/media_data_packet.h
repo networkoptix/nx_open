@@ -3,11 +3,6 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-extern "C"
-{
-#include "libavcodec/avcodec.h"
-}
-
 #include <memory>
 
 #include <QtCore/QVector>
@@ -103,7 +98,7 @@ struct QnAbstractMediaData : public QnAbstractDataPacket
     CodecID compressionType;
     MediaFlags flags;
     quint32 channelNumber;     // video or audio channel number; some devices might have more than one sensor
-    QnMediaContextPtr context;
+    QnConstMediaContextPtr context;
     int opaque;
 protected:
     void assign(const QnAbstractMediaData* other);

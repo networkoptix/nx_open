@@ -1,12 +1,12 @@
-#include "codec_helper.h"
+#include "av_codec_helper.h"
 
-static inline QByteArray codecIDToByteArray(CodecID codecId)
+static const char* codecIdToLiteral(CodecID codecId)
 {
     switch (codecId)
     {
         /* video codecs */
         case CODEC_ID_MPEG1VIDEO: return "MPEG1VIDEO";
-        case CODEC_ID_MPEG2VIDEO: return "MPEG2VIDEO"; ///< preferred ID for MPEG-1/2 video decoding
+        case CODEC_ID_MPEG2VIDEO: return "MPEG2VIDEO"; //< Preferred id for MPEG-1/2 video decoding.
         case CODEC_ID_MPEG2VIDEO_XVMC: return "MPEG2VIDEO-XVMC";
         case CODEC_ID_H261: return "H261";
         case CODEC_ID_H263: return "H263";
@@ -240,7 +240,7 @@ static inline QByteArray codecIDToByteArray(CodecID codecId)
 
         /* audio codecs */
         case CODEC_ID_MP2: return "MP2";
-        case CODEC_ID_MP3: return "MP3"; ///< preferred ID for decoding MPEG audio layer 1: return ""; 2 or 3
+        case CODEC_ID_MP3: return "MP3"; //< Preferred id for decoding MPEG audio layer 1: return ""; 2 or 3.
         case CODEC_ID_AAC: return "AAC";
         case CODEC_ID_AC3: return "Dolby";
         case CODEC_ID_DTS: return "DTS";
@@ -259,7 +259,7 @@ static inline QByteArray codecIDToByteArray(CodecID codecId)
         case CODEC_ID_SHORTEN: return "SHORTEN";
         case CODEC_ID_ALAC: return "ALAC";
         case CODEC_ID_WESTWOOD_SND1: return "WESTWOOD";
-        case CODEC_ID_GSM: return "GSM"; ///< as in Berlin toast format
+        case CODEC_ID_GSM: return "GSM"; //< As in Berlin toast format.
         case CODEC_ID_QDM2: return "QDM2";
         case CODEC_ID_COOK: return "COOK";
         case CODEC_ID_TRUESPEECH: return "TRUESPEECH";
@@ -271,7 +271,7 @@ static inline QByteArray codecIDToByteArray(CodecID codecId)
         case CODEC_ID_IMC: return "IMC";
         case CODEC_ID_MUSEPACK7: return "MUSEPACK7";
         case CODEC_ID_MLP: return "MLP";
-        case CODEC_ID_GSM_MS: return "GSM_MS"; /* as found in WAV */
+        case CODEC_ID_GSM_MS: return "GSM_MS"; //< As found in WAV.
         case CODEC_ID_ATRAC3: return "ATRAC3";
         case CODEC_ID_VOXWARE: return "VOXWARE";
         case CODEC_ID_APE: return "APE";
@@ -298,7 +298,7 @@ static inline QByteArray codecIDToByteArray(CodecID codecId)
         /* subtitle codecs */
         case CODEC_ID_DVD_SUBTITLE: return "DVD_SUBTITLE";
         case CODEC_ID_DVB_SUBTITLE: return "DVB_SUBTITLE";
-        case CODEC_ID_TEXT: return "TEXT";  ///< raw UTF-8 text
+        case CODEC_ID_TEXT: return "TEXT"; //< Raw UTF-8 text.
         case CODEC_ID_XSUB: return "XSUB";
         case CODEC_ID_SSA: return "SSA";
         case CODEC_ID_MOV_TEXT: return "MOV_TEXT";
@@ -310,52 +310,26 @@ static inline QByteArray codecIDToByteArray(CodecID codecId)
         /* other specific kind of codecs (generally used for attachments) */
         case CODEC_ID_TTF: return "TTF";
 
-        case CODEC_ID_PROBE: return "PROBE"; ///< codec_id is not known (like CODEC_ID_NONE) but lavf should attempt to identify it
+        // codec_id is not known (like CODEC_ID_NONE) but lavf should attempt to
+        // identify it.
+        case CODEC_ID_PROBE: return "PROBE";
 
-        case CODEC_ID_MPEG2TS: return "MPEG2TS"; /**< _FAKE_ codec to indicate a raw MPEG-2 TS
-                                          * stream (only used by libavformat) */
-        case CODEC_ID_FFMETADATA: return "FFMETADATA";   ///< Dummy codec for streams containing only metadata information.
+        // _FAKE_ codec to indicate a raw MPEG-2 TS stream (only used by 
+        // libavformat).
+        case CODEC_ID_MPEG2TS: return "MPEG2TS";
 
-        case CODEC_ID_NONE:
+        // Dummy codec for streams containing only metadata information.
+        case CODEC_ID_FFMETADATA: return "FFMETADATA";
+
+        case CODEC_ID_NONE: return "";
+
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Unregistered enum CodecID value.");
             return "";
     }
 }
 
-QString codecIDToString(CodecID codecID)
+QString QnAvCodecHelper::codecIdToString(CodecID codecId)
 {
-    return QString::fromLatin1(codecIDToByteArray(codecID));
+    return QString::fromLatin1(codecIdToLiteral(codecId));
 }
-
-QString getAudioCodecDescription(const QnConstMediaContextPtr& context)
-{
-    QString result;
-    QString codecStr = codecIDToString(context->getCodecId());
-    if (!codecStr.isEmpty())
-    {
-        result += codecStr;
-        result += QLatin1Char(' ');
-    }
-
-    // result += QString::number(c->getSampleRate() / 1000)+ QLatin1String("Khz ");
-    if (context->getChannels() == 3)
-        result += QLatin1String("2.1");
-    else if (context->getChannels() == 6)
-        result += QLatin1String("5.1");
-    else if (context->getChannels() == 8)
-        result += QLatin1String("7.1");
-    else if (context->getChannels() == 2)
-        result += QLatin1String("stereo");
-    else if (context->getChannels() == 1)
-        result += QLatin1String("mono");
-    else
-        result += QString::number(context->getChannels());
-
-    return result;
-}
-
-void mediaContextToAvCodecContext(AVCodecContext* av, const QnMediaContext* media)
-{
-    // TODO mike: Implement and consider moving to some other unit.
-}
-

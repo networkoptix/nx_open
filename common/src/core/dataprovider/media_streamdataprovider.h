@@ -31,7 +31,7 @@ public:
     virtual bool needKeyData(int channel) const;
     virtual bool needKeyData() const;
 
-    virtual QnMediaContextPtr getCodecContext() const;
+    virtual QnConstMediaContextPtr getCodecContext() const;
 
     //!Tests connection to media stream
     /*!

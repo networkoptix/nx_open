@@ -12,10 +12,14 @@
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
-}
+// For typedef struct AVIOContext.
+#include <libavformat/avio.h>
+};
 
+struct AVPacket;
+struct AVCodecContext;
 struct AVFormatContext;
+struct AVStream;
 class QnCustomResourceVideoLayout;
 class QnAviAudioLayout;
 
@@ -75,7 +79,7 @@ protected:
     AVFormatContext* getFormatContext();
 private:
     bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
-    QnMediaContextPtr getCodecContext(AVStream* stream);
+    QnConstMediaContextPtr getCodecContext(AVStream* stream);
     bool reopen();
 protected:
     AVFormatContext* m_formatContext;
@@ -91,7 +95,7 @@ private:
     QnCustomResourceVideoLayoutPtr m_videoLayout;
     QnResourceAudioLayoutPtr m_audioLayout;
     QVector<int> m_indexToChannel;
-    QList<QnMediaContextPtr> m_contexts;
+    QList<QnConstMediaContextPtr> m_contexts;
 
     qint64 m_startTime;
     bool m_useAbsolutePos;

@@ -38,7 +38,7 @@ private:
     bool m_auHeaderExists;
 
     AACCodec m_aacHelper;
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
 };
 

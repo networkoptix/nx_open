@@ -2,14 +2,15 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
+#include <core/datapacket/video_data_packet.h>
+#include <core/datapacket/av_codec_media_context.h>
 
 #include "network/ffmpeg_sdp.h"
 #include "network/rtpsession.h"
 #include "network/rtp_stream_parser.h"
 
 #include "utils/common/util.h"
-#include "utils/media/ffmpeg_helper.h"
+
 #include "utils/network/socket.h"
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
@@ -20,7 +21,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_eofReached(false),
     m_isLastDataContext(false)
 {
-
+    // Do nothing.
 }    
 
 void QnRtspFfmpegEncoder::init()
@@ -30,17 +31,17 @@ void QnRtspFfmpegEncoder::init()
     m_eofReached = false;
 }
 
-QnMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
+QnConstMediaContextPtr QnRtspFfmpegEncoder::getGeneratedContext(CodecID compressionType)
 {
-    QMap<CodecID, QnMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
-    QnMediaContextPtr result;
+    QMap<CodecID, QnConstMediaContextPtr>::iterator itr = m_generatedContexts.find(compressionType);
+    QnConstMediaContextPtr result;
     if (itr != m_generatedContexts.end())
     {
         result = itr.value();
     }
     else
     {
-        result = QnMediaContextPtr(new QnMediaContext(compressionType));
+        result = QnConstMediaContextPtr(new QnAvCodecMediaContext(compressionType));
         m_generatedContexts.insert(compressionType, result);
     }
 
@@ -59,7 +60,7 @@ void QnRtspFfmpegEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
     QnConstMetaDataV1Ptr metadata = std::dynamic_pointer_cast<const QnMetaDataV1>(m_media);
     if (!metadata && m_media->compressionType)
     {
-        QnMediaContextPtr currentContext = m_media->context;
+        QnConstMediaContextPtr currentContext = m_media->context;
         if (!currentContext)
             currentContext = getGeneratedContext(m_media->compressionType);
         assert(currentContext);

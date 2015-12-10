@@ -20,7 +20,7 @@ public:
     void setBitsPerSample(int value);
     void setSampleFormat(AVSampleFormat sampleFormat);
 private:
-    QnMediaContextPtr m_context;
+    QnConstMediaContextPtr m_context;
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
     int m_frequency;
     int m_channels;

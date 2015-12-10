@@ -108,7 +108,7 @@ private:
     quint8* m_videoBuf;
     int m_videoBufSize;
     AVCodecContext* m_videoCodecCtx;
-    QnMediaContextPtr m_videoContext;
+    QnConstMediaContextPtr m_videoContext;
     AVFrame* m_frame;
     int m_desktopNum;
 
@@ -117,7 +117,7 @@ private:
     // single audio objects
     quint8* m_encodedAudioBuf;
     AVCodecContext* m_audioCodecCtx;
-    QnMediaContextPtr m_audioContext;
+    QnConstMediaContextPtr m_audioContext;
     int m_audioFramesCount;
     double m_audioFrameDuration;
     qint64 m_storedAudioPts;

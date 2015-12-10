@@ -11,7 +11,8 @@
 
 extern "C"
 {
-    #include <libavformat/avformat.h>
+// For const AV_NOPTS_VALUE.
+#include <libavutil/avutil.h>
 }
 
 #include <QtCore/QDateTime>

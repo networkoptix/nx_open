@@ -31,9 +31,9 @@ class QnResourceAudioLayout: public QnResourceLayout {
 public:
     struct AudioTrack {
         AudioTrack() {} 
-        AudioTrack(const QnMediaContextPtr& codecContext, const QString &description): codecContext(codecContext), description(description) {}
+        AudioTrack(const QnConstMediaContextPtr& codecContext, const QString &description): codecContext(codecContext), description(description) {}
 
-        QnMediaContextPtr codecContext;
+        QnConstMediaContextPtr codecContext;
         QString description;
     };
 

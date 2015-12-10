@@ -1,69 +1,79 @@
 #ifndef MEDIA_CONTEXT_H
 #define MEDIA_CONTEXT_H
 
+#include <memory>
 #include <QString>
-#include <QSharedPointer>
+#include <QByteArray>
 
 extern "C"
 {
-// For struct AVCodecContext, enum CodecID.
 #include <libavcodec/avcodec.h>
 }
 
-// TODO mike: Check that non-const smart pointer is not used after refactoring - QnMediaContext is immutable.
 class QnMediaContext;
-typedef std::shared_ptr<QnMediaContext> QnMediaContextPtr;
 typedef std::shared_ptr<const QnMediaContext> QnConstMediaContextPtr;
 
-class QnMediaContext {
+/** abstract
+ * Basically, an interface with getters for AVCodecContext fields which are
+ * transferred from Server to Client with a media stream.
+ */
+class QnMediaContext
+{
 public:
-    QnMediaContext(const AVCodecContext* ctx);
+    virtual ~QnMediaContext() {};
 
-    // TODO mike: Refactor to remove this method.
-    AVCodecContext* ctx() const;
+    /// Clone all fields except extradata, which is set empty (null).
+    virtual QnMediaContext* cloneWithoutExtradata() const = 0;
 
-    QnMediaContext(const quint8* payload, int dataSize);
-    QnMediaContext(const QByteArray& payload);
-        
-    QnMediaContext(CodecID codecId);
-    virtual ~QnMediaContext();
+    /// NOTE: Deserialization is the responsibility of descendants.
+    virtual QByteArray serialize() const = 0;
 
-    QString getCodecName() const;
-
+    /// Check equality of a number of fields.
     bool isSimilarTo(const QnConstMediaContextPtr& other) const;
 
-    QnMediaContext* cloneWithoutExtradata() const;
+    // Can be empty, but never null.
+    QString getCodecName() const;
 
-    QByteArray serialize() const;
+    // Can be empty, but never null.
+    QString getAudioCodecDescription() const;
 
-    // TODO mike: codec_type was obtained via ffmpeg; now should be transfered from server as a field of type enum AVMediaType.
-    /**
-     * Fields defined in ffmpeg's AVCodecContext.
-     */
+    //--------------------------------------------------------------------------
+    /// Fields defined in ffmpeg's AVCodecContext.
     //@{
-    CodecID getCodecId() const;
-    AVMediaType getCodecType() const;
-    int getExtradataSize() const;
-    quint8* getExtradata() const;
-    int getSampleRate() const;
-    int getChannels() const;
-    AVSampleFormat getSampleFmt() const;
-    int getBitRate() const;
-    quint64 getChannelLayout() const;
-    int getBlockAlign() const;
-    int getBitsPerCodedSample() const;
-    PixelFormat getPixFmt() const;
-    int getWidth() const;
-    int getHeight() const;
-    int getCodedWidth() const;
-    int getCodedHeight() const;
+
+    virtual CodecID getCodecId() const = 0;
+    virtual AVMediaType getCodecType() const = 0;
+
+    /// Nul-terminated ASCII string; can be null.
+    virtual const char* getRcEq() const = 0;
+
+    /// Can be null (empty) or contain getExtradataSize() bytes.
+    virtual const quint8* getExtradata() const = 0;
+    virtual int getExtradataSize() const = 0;
+    
+    /// Can be null (empty) or contain QnAvCodecHelper::kMatrixLength items.
+    virtual const quint16* getIntraMatrix() const = 0; 
+
+    /// Can be null (empty) or contain QnAvCodecHelper::kMatrixLength items.
+    virtual const quint16* getInterMatrix() const = 0;
+
+    /// Can be null (empty) or contain getRcOverrideCount() items.
+    virtual const RcOverride* getRcOverride() const = 0;
+    virtual int getRcOverrideCount() const = 0;
+
+    virtual int getChannels() const = 0;
+    virtual int getSampleRate() const = 0;
+    virtual AVSampleFormat getSampleFmt() const = 0;
+    virtual int getBitsPerCodedSample() const = 0;
+    virtual int getCodedWidth() const = 0;
+    virtual int getCodedHeight() const = 0;
+    virtual int getWidth() const = 0;
+    virtual int getHeight() const = 0;
+    virtual int getBitRate() const = 0;
+    virtual quint64 getChannelLayout() const = 0;
+    virtual int getBlockAlign() const = 0;
+
     //@}
-
-protected:
-    QnMediaContext() {}
-
-private:
-    AVCodecContext* m_ctx;
 };
 
 #endif // MEDIA_CONTEXT_H

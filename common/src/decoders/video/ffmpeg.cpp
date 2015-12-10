@@ -15,6 +15,8 @@
 
 #include "utils/media/frame_type_extractor.h"
 
+#include <core/datapacket/av_codec_media_context.h>
+
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;
 bool CLFFmpegVideoDecoder::m_first_instance = true;
@@ -69,9 +71,8 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
 
     if (data->context)
     {
-        // TODO mike: CURRENT copy av
-        m_passedContext = avcodec_alloc_context3(0);
-        avcodec_copy_context(m_passedContext, data->context->ctx());
+        m_passedContext = avcodec_alloc_context3(nullptr);
+        QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
     }
 
     // XXX Debug, should be passed in constructor
@@ -87,7 +88,7 @@ CLFFmpegVideoDecoder::~CLFFmpegVideoDecoder(void)
 {
     closeDecoder();
 
-    QnFfmpegHelper::deleteCodecContext(m_passedContext);
+    QnFfmpegHelper::deleteAvCodecContext(m_passedContext);
     m_passedContext = 0;
 
     if( m_swDecoderCount )
@@ -117,7 +118,7 @@ AVCodec* CLFFmpegVideoDecoder::findCodec(CodecID codecId)
 
 void CLFFmpegVideoDecoder::closeDecoder()
 {
-    QnFfmpegHelper::deleteCodecContext(m_context);
+    QnFfmpegHelper::deleteAvCodecContext(m_context);
     m_context = 0;
 #ifdef _USE_DXVA
     m_decoderContext.close();
@@ -192,7 +193,7 @@ void CLFFmpegVideoDecoder::openDecoder(const QnConstCompressedVideoDataPtr& data
         avcodec_copy_context(m_context, m_passedContext);
     }
 
-    m_frameTypeExtractor = new FrameTypeExtractor(QnMediaContextPtr(new QnMediaContext(m_context)));
+    m_frameTypeExtractor = new FrameTypeExtractor(QnConstMediaContextPtr(new QnAvCodecMediaContext(m_context)));
 
 #ifdef _USE_DXVA
     if (m_codecId == CODEC_ID_H264)
@@ -243,18 +244,17 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //openDecoder();
     //return;
 
-    // TODO mike: CURRENT copy av
-    if (m_passedContext && data->context->ctx())
-        avcodec_copy_context(m_passedContext, data->context->ctx());
+    if (m_passedContext && data->context)
+        QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
+
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
     {
         m_currentWidth = m_passedContext->width;
         m_currentHeight = m_passedContext->height;
     }
     
-    
     // I have improved resetDecoder speed (I have left only minimum operations) because of REW. REW calls reset decoder on each GOP.
-    QnFfmpegHelper::deleteCodecContext(m_context);
+    QnFfmpegHelper::deleteAvCodecContext(m_context);
     m_context = 0;
     m_context = avcodec_alloc_context3(m_passedContext ? 0 : m_codec);
 

@@ -4,12 +4,11 @@
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
-#include "utils/media/ffmpeg_helper.h"
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/safe_direct_connection.h"
-#include <utils/media/codec_helper.h>
+#include <utils/media/av_codec_helper.h>
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
@@ -330,9 +329,9 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
     if (m_totalAudioFrames++ == 0 &&    // only once
         getRole() == Qn::CR_LiveVideo) // only primary stream
     {
-        // save only onece
+        // save only once
         const auto savedCodec = m_cameraRes->getProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME);
-        const auto actualCodec = codecIDToString(audioData->compressionType);
+        const QString actualCodec = QnAvCodecHelper::codecIdToString(audioData->compressionType);
         if (savedCodec.isEmpty())
         {
             m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);

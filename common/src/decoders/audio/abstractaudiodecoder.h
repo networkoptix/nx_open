@@ -7,6 +7,8 @@
 #include "core/datapacket/media_data_packet.h"
 #include "core/datapacket/audio_data_packet.h"
 
+// TODO mike: Rename class and files to QnAbstractAudioDecoder.
+
 class CLAbstractAudioDecoder;
 
 class CLAbstractAudioDecoder

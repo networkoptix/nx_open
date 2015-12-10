@@ -696,7 +696,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;
-    QnFfmpegHelper::deleteCodecContext(videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(videoCodecCtx);
     av_free(frame);
 
     return generatedFrame;

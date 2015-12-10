@@ -41,7 +41,7 @@ QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData( QnAbstractDataPacketPtr* c
 
     if( m_isFirstPacket && isH264SeqHeaderInExtraData( videoPacket ) )
     {
-        m_newContext = QnMediaContextPtr(!videoPacket->context? nullptr :
+        m_newContext = QnConstMediaContextPtr(!videoPacket->context? nullptr :
             videoPacket->context->cloneWithoutExtradata());
 
         //reading sequence header from extradata

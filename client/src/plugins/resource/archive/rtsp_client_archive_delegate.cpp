@@ -14,6 +14,7 @@ extern "C"
 #include <api/network_proxy_factory.h>
 
 #include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/basic_media_context.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
@@ -26,7 +27,7 @@ extern "C"
 #include <utils/common/util.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <utils/media/codec_helper.h>
+#include <utils/media/av_codec_helper.h>
 #include <network/rtp_stream_parser.h>
 #include <network/ffmpeg_sdp.h>
 #include <QtConcurrent/QtConcurrentFilter>
@@ -312,10 +313,13 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QList<QByteArray>& audioSD
             int configPos = audioSDP[i].indexOf("config=");
             if (configPos > 0) {
                 m_audioLayout.reset( new QnResourceCustomAudioLayout() );
-                QByteArray contextData = QByteArray::fromBase64(audioSDP[i].mid(configPos + 7));
-                QnMediaContextPtr context(new QnMediaContext(contextData));
-                if (context->getCodecType() == AVMEDIA_TYPE_AUDIO)
-                    m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context)));
+                QnConstMediaContextPtr context(QnBasicMediaContext::deserialize(
+                    QByteArray::fromBase64(audioSDP[i].mid(configPos + 7))));
+                if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
+                {
+                    m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(
+                        context, context->getAudioCodecDescription()));
+                }
             }
         }
     }
@@ -666,9 +670,12 @@ QnConstResourceAudioLayoutPtr QnRtspClientArchiveDelegate::getAudioLayout()
         m_audioLayout.reset( new QnResourceCustomAudioLayout() );
         for (QMap<int, QnFfmpegRtpParserPtr>::const_iterator itr = m_parsers.begin(); itr != m_parsers.end(); ++itr)
         {
-            QnMediaContextPtr context = itr.value()->mediaContext();
+            QnConstMediaContextPtr context = itr.value()->mediaContext();
             if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO)
-                m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(context, getAudioCodecDescription(context)));
+            {
+                m_audioLayout->addAudioTrack(QnResourceAudioLayout::AudioTrack(
+                    context, context->getAudioCodecDescription()));
+            }
         }
     }
     return m_audioLayout;

@@ -39,7 +39,7 @@ public:
     //QnCodecAudioFormat format;
     quint64 duration;
 
-    QnCompressedAudioData(const QnMediaContextPtr& ctx);
+    QnCompressedAudioData(const QnConstMediaContextPtr& ctx);
 
     void assign(const QnCompressedAudioData* other);
 };
@@ -59,12 +59,12 @@ public:
     QnWritableCompressedAudioData(
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
     QnWritableCompressedAudioData(
         QnAbstractAllocator* allocator,
         unsigned int alignment = CL_MEDIA_ALIGNMENT,
         unsigned int capacity = 0,
-        QnMediaContextPtr ctx = QnMediaContextPtr(0) );
+        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
 
     //!Implementation of QnAbstractMediaData::clone
     virtual QnWritableCompressedAudioData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;

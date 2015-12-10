@@ -2,8 +2,9 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/audio_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include <core/datapacket/audio_data_packet.h>
+#include <core/datapacket/video_data_packet.h>
+#include <core/datapacket/basic_media_context.h>
 
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
@@ -43,13 +44,12 @@ bool QnFfmpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int
     const bool isCodecContext = ntohl(rtpHeader->ssrc) & 1; // odd numbers - codec context, even numbers - data
     if (isCodecContext)
     {
-        // TODO mike: CURRENT create(payload)
-        QnMediaContextPtr context(new QnMediaContext(payload, dataSize));
-        m_context = context;
+        m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(
+            QByteArray((const char*) payload, dataSize)));
     }
     else
     {
-        QnMediaContextPtr context = m_context;
+        QnConstMediaContextPtr context = m_context;
 
         if (rtpHeader->padding)
             dataSize -= ntohl(rtpHeader->padding);

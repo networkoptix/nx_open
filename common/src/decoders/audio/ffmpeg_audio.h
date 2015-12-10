@@ -5,6 +5,8 @@
 
 #include "abstractaudiodecoder.h"
 
+// TODO mike: Rename class and files to QnFfmpegAudioDecoder.
+
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
 

@@ -249,9 +249,9 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
                 }
             }
 
-            if (video->context && video->context->ctx()) {
-                // TODO mike: CURRENT copy av
-                avcodec_copy_context(m_videoEncoderCodecCtx, video->context->ctx());
+            if (video->context)
+            {
+                QnFfmpegHelper::mediaContextToAvCodecContext(m_videoEncoderCodecCtx, video->context);
                 m_videoEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
             }
 
@@ -302,18 +302,19 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
         if (m_aTranscoder)
         {
             QnFfmpegAudioTranscoderPtr ffmpegAudioTranscoder = m_aTranscoder.dynamicCast<QnFfmpegAudioTranscoder>();
-            if (ffmpegAudioTranscoder->getCodecContext()) {
+            if (ffmpegAudioTranscoder->getCodecContext())
+            {
                 avcodec_copy_context(m_audioEncoderCodecCtx, ffmpegAudioTranscoder->getCodecContext());
-                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
+                m_audioEncoderCodecCtx->stats_out = nullptr; //< To avoid double free since avcodec_copy_context does not copy this field.
             }
             m_audioEncoderCodecCtx->bit_rate = m_aTranscoder->getBitrate();
         }
         else 
         {
-            // TODO mike: CURRENT copy av
-            if (audio->context && audio->context->ctx()) {
-                avcodec_copy_context(m_audioEncoderCodecCtx, audio->context->ctx());
-                m_audioEncoderCodecCtx->stats_out = NULL;   //to avoid double free since avcodec_copy_context does not copy this field
+            if (audio->context)
+            {
+                QnFfmpegHelper::mediaContextToAvCodecContext(m_audioEncoderCodecCtx, audio->context);
+                m_audioEncoderCodecCtx->stats_out = nullptr; //< To avoid double free since avcodec_copy_context does not copy this field.
             }
             //m_audioEncoderCodecCtx->bit_rate = 1024 * 96;
         }

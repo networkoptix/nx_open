@@ -2,7 +2,8 @@
 
 #include "testcamera_stream_reader.h"
 
-#include "core/datapacket/video_data_packet.h"
+#include <core/datapacket/video_data_packet.h>
+#include <core/datapacket/basic_media_context.h>
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 
@@ -68,7 +69,8 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
 
         if (readed == size)
         {
-            m_context = QnMediaContextPtr(new QnMediaContext(ctxData, size));
+            QByteArray payloadArray((const char *) ctxData, size);
+            m_context = QnConstMediaContextPtr(QnBasicMediaContext::deserialize(payloadArray));
         }    
         delete [] ctxData;
         return getNextData();

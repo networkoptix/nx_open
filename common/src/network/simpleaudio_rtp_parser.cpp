@@ -5,9 +5,9 @@
 #include "rtp_stream_parser.h"
 #include "rtpsession.h"
 #include "utils/common/synctime.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/audio_data_packet.h"
-
+#include <core/datapacket/media_data_packet.h>
+#include <core/datapacket/audio_data_packet.h>
+#include <core/datapacket/av_codec_media_context.h>
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     QnRtpAudioStreamParser(),
@@ -55,14 +55,15 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         }   
     }
     
-    // TODO mike: CURRENT fields
-    m_context = QnMediaContextPtr(new QnMediaContext(m_codecId));
-    m_context->ctx()->channels = m_channels;
-    m_context->ctx()->sample_rate = m_frequency;
-    m_context->ctx()->sample_fmt = m_sampleFormat;
-    m_context->ctx()->time_base.num = 1;
-    m_context->ctx()->bits_per_coded_sample = m_bits_per_coded_sample;
-    m_context->ctx()->time_base.den = m_frequency;
+    const auto context = new QnAvCodecMediaContext(m_codecId);
+    m_context = QnConstMediaContextPtr(context);
+    const auto av = context->getAvCodecContext();
+    av->channels = m_channels;
+    av->sample_rate = m_frequency;
+    av->sample_fmt = m_sampleFormat;
+    av->time_base.num = 1;
+    av->bits_per_coded_sample = m_bits_per_coded_sample;
+    av->time_base.den = m_frequency;
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;

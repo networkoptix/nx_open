@@ -1222,7 +1222,7 @@ double QnArchiveStreamReader::getSpeed() const
     return m_speed;
 }
 
-QnMediaContextPtr QnArchiveStreamReader::getCodecContext() const
+QnConstMediaContextPtr QnArchiveStreamReader::getCodecContext() const
 {
     return m_codecContext;
 }

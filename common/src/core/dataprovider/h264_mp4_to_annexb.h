@@ -31,7 +31,7 @@ protected:
 
 private:
     bool m_isFirstPacket;
-    QnMediaContextPtr m_newContext;
+    QnConstMediaContextPtr m_newContext;
 
     void readH264SeqHeaderFromExtraData(
         const QnAbstractMediaDataPtr& data,

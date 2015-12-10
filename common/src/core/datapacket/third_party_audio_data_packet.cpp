@@ -9,7 +9,7 @@
 
 QnThirdPartyCompressedAudioData::QnThirdPartyCompressedAudioData(
     nxcip::MediaDataPacket* audioPacket,
-    QnMediaContextPtr ctx )
+    QnConstMediaContextPtr ctx )
 :
     QnCompressedAudioData( ctx ),
     m_audioPacket( audioPacket )

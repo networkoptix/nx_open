@@ -19,7 +19,8 @@ struct AVCodecContext;
 struct AVFrame;
 struct MpegEncContext;
 
-// TODO mike: Rename class and file to QnFfmpegVideoDecoder.
+// TODO mike: Rename class and files to QnFfmpegVideoDecoder.
+
 // client of this class is responsible for encoded data buffer meet ffmpeg restrictions
 // ( see comment to decode functions for details ).
 class CLFFmpegVideoDecoder

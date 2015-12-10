@@ -12,8 +12,6 @@ struct AVCodecContext;
 
 #define INBUF_SIZE 4096
 
-extern int MAX_AUDIO_FRAME_SIZE; // TODO: #Elric this is totally evil.
-
 bool CLFFmpegAudioDecoder::m_first_instance = true;
 
 AVSampleFormat CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(const QnAudioFormat& fmt)
@@ -58,8 +56,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
     if (data->context)
     {
-        // TODO mike: CURRENT copy av
-        avcodec_copy_context(c, data->context->ctx());
+        QnFfmpegHelper::mediaContextToAvCodecContext(c, data->context);
     }
     else {
         Q_ASSERT_X(false, Q_FUNC_INFO, "Audio packets without codec is deprecated!");
@@ -88,7 +85,7 @@ CLFFmpegAudioDecoder::CLFFmpegAudioDecoder(QnCompressedAudioDataPtr data):
 
 CLFFmpegAudioDecoder::~CLFFmpegAudioDecoder(void)
 {
-    QnFfmpegHelper::deleteCodecContext(c);
+    QnFfmpegHelper::deleteAvCodecContext(c);
     c = 0;
 }
 

@@ -53,6 +53,7 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
+        <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
         
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>

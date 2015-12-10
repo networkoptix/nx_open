@@ -78,7 +78,7 @@ QnCodecAudioFormat::QnCodecAudioFormat(const QnConstMediaContextPtr& c)
 //// class QnCompressedAudioData
 ////////////////////////////////////////////////////////////
 
-QnCompressedAudioData::QnCompressedAudioData(const QnMediaContextPtr& ctx)
+QnCompressedAudioData::QnCompressedAudioData(const QnConstMediaContextPtr& ctx)
 :
     QnAbstractMediaData( AUDIO ),
     duration( 0 )
@@ -100,7 +100,7 @@ void QnCompressedAudioData::assign(const QnCompressedAudioData* other)
 QnWritableCompressedAudioData::QnWritableCompressedAudioData(
     unsigned int alignment,
     unsigned int capacity,
-    QnMediaContextPtr ctx )
+    QnConstMediaContextPtr ctx )
 :   //TODO #ak delegate constructor
     QnCompressedAudioData( ctx ),
     m_data( alignment, capacity )
@@ -111,7 +111,7 @@ QnWritableCompressedAudioData::QnWritableCompressedAudioData(
     QnAbstractAllocator* allocator,
     unsigned int alignment,
     unsigned int capacity,
-    QnMediaContextPtr ctx )
+    QnConstMediaContextPtr ctx )
 :
     QnCompressedAudioData( ctx ),
     m_data( allocator, alignment, capacity )
