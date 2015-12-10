@@ -106,7 +106,7 @@ def activate(request):
 @handle_exceptions
 def restore_password(request):
 
-    if 'code' not in request.data and 'user_email' not in request.data :
+    if 'code' not in request.data and 'user_email' not in request.data:
         raise APIRequestException('Required parameters are absent')
 
     if 'code' in request.data:

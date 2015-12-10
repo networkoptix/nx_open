@@ -9,11 +9,6 @@ angular.module('cloudApp')
             }
         });
 
-        function errorHandler(result){
-            alert("some error " + (result.data.errorText || result.data.detail));
-            console.error(result);
-        }
-
         $scope.session = $sessionStorage;
         $scope.email = '';
         $scope.password = '';
@@ -29,11 +24,15 @@ angular.module('cloudApp')
             document.location.reload();
         });
 
-
-        $scope.firstName = '';
-        $scope.lastName = '';
+        $scope.account = {
+            email:'',
+            password:'',
+            firstName:'',
+            lastName:'',
+            subscribe:true
+        };
 
         $scope.register = process.init(function() {
-            return cloudApi.register($scope.email,$scope.password,$scope.firstName,$scope.lastName,$scope.subscribe);
+            return cloudApi.register($scope.account.email,$scope.account.password,$scope.account.firstName,$scope.account.lastName,$scope.account.subscribe);
         });
     });

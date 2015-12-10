@@ -33,8 +33,3 @@ class AccountUpdaterSerializer(serializers.ModelSerializer):  # ModelSerializer
     class Meta:
         model = Account
         fields = ('first_name', 'last_name', 'subscribe')
-
-    @staticmethod
-    def validate_email(value):
-        django.core.validators.validate_email(value)
-        return value

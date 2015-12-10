@@ -88,3 +88,7 @@ body {
     font-size: 14px;
     padding: 6px 12px;
 }
+
+.alert-danger{
+    white-space: pre-wrap;
+}

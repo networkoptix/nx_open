@@ -30,7 +30,7 @@ angular.module('cloudApp')
             return cloudApi.activate($scope.data.activateCode);
         });
 
-        if($scope.activateCode){
+        if($scope.data.activateCode){
             $scope.activate.run();
         }
     });

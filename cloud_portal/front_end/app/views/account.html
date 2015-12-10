@@ -1,10 +1,14 @@
-<div class="alert alert-success" ng-if="accountChangedSuccess">Account settings were saved</div>
-<div class="alert alert-danger" ng-if="accountChangedError">Error while saving account settings</div>
-
-<div class="alert alert-success" ng-if="passwordChangedSuccess">Password was saved</div>
-<div class="alert alert-danger" ng-if="passwordChangedError">Error while changing password</div>
 
 <div class="row" >
+    <process-alert process="save"
+                   success-message="'Your account was successfully saved.'"
+                   error-prefix="'Couldn\'t save your data:'"></process-alert>
+
+    <process-alert process="changePassword"
+                   success-message="'Your password was successfully changed.'"
+                   error-prefix="'Couldn\'t change your password:'"></process-alert>
+
+
     <form name="accountForm" class="form-horizontal">
 
         <div class="form-group">
@@ -37,7 +41,10 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="button" class="btn btn-default" ng-click="save()">Save</button>
+
+                <process-button process="save"
+                                disabled="!accountForm.$valid"
+                                button-text="'Save'"></process-button>
             </div>
         </div>
     </form>
@@ -61,7 +68,9 @@
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
-                <button type="button" class="btn btn-default" ng-click="changePassword()">Change password</button>
+                <process-button process="changePassword"
+                                disabled="!passwordForm.$valid"
+                                button-text="'Change password'"></process-button>
             </div>
         </div>
     </form>

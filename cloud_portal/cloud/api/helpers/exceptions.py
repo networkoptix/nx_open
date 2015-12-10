@@ -102,7 +102,7 @@ def validate_response(func):
         try:
             response_data = response.json()
         except ValueError:
-            raise APIInternalException('No JSON data from cloud_db ' + response.text)
+            raise APIInternalException('No JSON data from cloud_db (code:' + str(response.status_code) + ") " + response.text)
 
         errors = {
             status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,

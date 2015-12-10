@@ -17,6 +17,10 @@ angular.module('cloudApp', [
             templateUrl: 'views/register.html',
             controller: 'LoginCtrl'
         })
+        .when('/account', {
+            templateUrl: 'views/account.html',
+            controller: 'AccountCtrl'
+        })
         .when('/systems', {
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'

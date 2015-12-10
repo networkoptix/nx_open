@@ -1,11 +1,11 @@
 <div class="row" >
-    <div ng-if="activateCode">
+    <div ng-if="data.activateCode">
         <process-alert process="activate"
                        process-message="'Activating account ...'"
                        success-message="'Your account was successfully activated.'"
                        error-prefix="'Couldn\'t activate your account:'"></process-alert>
     </div>
-    <div ng-if="!restoreCode&&!activateCode">
+    <div ng-if="!data.restoreCode && !data.activateCode">
         <process-alert process="restore"
                        intro-message="'You are going to restore your password. Please, enter your account email.'"
                        success-message="'Confirmation link was send to your email. Check it for creating a new password'"
@@ -32,7 +32,7 @@
             </div>
         </form>
     </div>
-    <div ng-if="restoreCode&&!activateCode">
+    <div ng-if="data.restoreCode && !data.activateCode">
         <process-alert process="change"
                        intro-message="'Please, enter new password for your account.'"
                        success-message="'Password successfully saved'"
