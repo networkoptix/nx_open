@@ -8,3 +8,7 @@ notifications_config = {
         'subject': '[CLOUD] Restore your password'
     },
 }
+
+notifications_module_config = {
+    'portal_url':'http://cloud-demo.hdw.mx/static/index.html#'
+}

@@ -4,11 +4,12 @@ from rest_framework.response import Response
 from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdaterSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
+import base64
 import logging
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, api_success
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 @api_view(['POST'])
@@ -17,7 +18,7 @@ logger = logging.getLogger('django')
 def register(request):
     serializer = CreateAccountSerializer(data=request.data)
     if not serializer.is_valid():
-        raise APIRequestException('Wrong form parameters', error_data = serializer.errors)
+        raise APIRequestException('Wrong form parameters', error_data=serializer.errors)
     serializer.save()
     return api_success()
 
@@ -30,7 +31,6 @@ def login(request):
     # return user
 
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
-
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
 
@@ -55,7 +55,7 @@ def logout(request):
 @handle_exceptions
 def index(request):
 
-    logger.debug("index")
+    __django__.debug("index")
 
     """
     List all snippets, or create a new snippet.
@@ -94,11 +94,44 @@ def change_password(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def activate(request):
-    return api_success(status_code=status.HTTP_501_NOT_IMPLEMENTED)
+    if 'code' not in request.data:
+        raise APIRequestException('Activation code is absent')
+    code = request.data['code']
+    Account.activate(code)
+    return api_success()
 
 
 @api_view(['POST'])
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def restore_password(request):
-    return api_success(status_code=status.HTTP_501_NOT_IMPLEMENTED)
+
+    if 'code' not in request.data and 'user_email' not in request.data :
+        raise APIRequestException('Required parameters are absent')
+
+    if 'code' in request.data:
+        code = request.data['code']
+
+        try:
+            (temp_password, user_email) = base64.b64decode(code).split(":")
+        except TypeError:
+            raise APIRequestException('Activation code has wrong structure')
+
+        if not user_email or user_email is None or user_email == '':
+            raise APIRequestException('Activation code has wrong structure',
+                                      {'code': code})
+
+        if 'new_password' not in request.data:
+            raise APIRequestException('New password is absent')
+
+        new_password = request.data['new_password']
+
+        if new_password == '':
+            raise APIRequestException('New password is empty')
+
+        Account.change_password(user_email, temp_password, new_password)
+    else:
+        user_email = request.data['user_email']
+        Account.reset_password(user_email)
+
+    return api_success()

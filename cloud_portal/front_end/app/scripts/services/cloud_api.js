@@ -68,17 +68,23 @@ angular.module('cloudApp')
                     old_password:oldPassword
                 });
             },
-
-
-            activate:function(){
-                throw "not implemented";
-                return $http.get(apiBase + '/account/activate');
+            restorePasswordRequest:function(user_email){
+                return $http.post(apiBase + '/account/restorePassword',{
+                    user_email:user_email
+                });
             },
-            restorePassword:function(){
-                throw "not implemented";
-                return $http.get(apiBase + '/account/restorePassword');
+            restorePassword:function(code, newPassword){
+                return $http.post(apiBase + '/account/restorePassword',{
+                    code:code,
+                    new_password:newPassword
+                });
             },
 
+            activate:function(code){
+                return $http.post(apiBase + '/account/activate',{
+                    code:code
+                });
+            },
 
             systems:function(){
                 return $http.get(apiBase + '/systems');

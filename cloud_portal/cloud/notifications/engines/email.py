@@ -1,8 +1,7 @@
-from notifications.helpers.emailSend import sendEmail
 import codecs
 import pystache
 from django.core.mail import EmailMessage
-from notifications.config import notifications_config
+from notifications.config import notifications_config, notifications_module_config
 import json
 
 
@@ -21,7 +20,7 @@ def send(email, msg_type, message):
         msg_type = 'unknown'
 
     message_template = read_template(msg_type)
-    message_body = pystache.render(message_template, {"message": message})
+    message_body = pystache.render(message_template, {"message": message, "config": notifications_module_config})
 
     email_template = read_template('email_body')
     email_body = pystache.render(email_template, {"message_body": message_body})

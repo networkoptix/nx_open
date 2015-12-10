@@ -5,7 +5,7 @@ from hashlib import md5
 from cloud import settings
 from api.helpers.exceptions import validate_response
 
-logger = logging.getLogger('django')
+__django__ = logging.getLogger('django')
 
 
 class System(object):
@@ -38,7 +38,7 @@ class Account(object):
         # django.utils.http.urlencode(params)
         request = settings.CLOUD_CONNECT['url'] + '/account/register'
 
-        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
+        return requests.post(request, json=params)
 
     @staticmethod
     @validate_response
@@ -53,7 +53,25 @@ class Account(object):
         }
         request = settings.CLOUD_CONNECT['url'] + '/account/update'
 
-        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
+    def reset_password(user_email):
+        params = {
+            'email': user_email
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/reset_password'
+        return requests.post(request, json=params)
+
+    @staticmethod
+    @validate_response
+    def activate(code):
+        params = {
+            'code': code
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/activate'
+        return requests.post(request, json=params)
 
     @staticmethod
     @validate_response
@@ -64,7 +82,7 @@ class Account(object):
         }
         request = settings.CLOUD_CONNECT['url'] + '/account/update'
 
-        return requests.post(request, data=params, auth=HTTPDigestAuth(email, password))
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response

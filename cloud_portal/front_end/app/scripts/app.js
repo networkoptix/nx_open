@@ -25,10 +25,22 @@ angular.module('cloudApp', [
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'
         })
-        .when('/account', {
-            templateUrl: 'views/account.html',
-            controller: 'AccountCtrl'
+
+
+        .when('/activate/:activateCode', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl'
         })
+        .when('/restore_password/', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl'
+        })
+        .when('/restore_password/:restoreCode', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl'
+        })
+
+
         .when('/debug', {
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'

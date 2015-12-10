@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, $location,$sessionStorage) {
+    .controller('LoginCtrl', function ($scope, cloudApi, $location, $sessionStorage) {
 
         cloudApi.account().then(function(account){
             if(account){
@@ -38,4 +38,13 @@ angular.module('cloudApp')
                     $location.path('/register/success');
                 },errorHandler);
         };
+
+        $scope.restorePassword = function(){
+            cloudApi.
+                restorePassword($scope.email).
+                then(function(result){
+                    $location.path('/restore/send');
+                },errorHandler);
+        };
+
     });
