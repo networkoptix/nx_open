@@ -645,11 +645,9 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
     if (!(m_options & WindowRotationForbidden))
         result |= RotateButton;
 
-    if(itemBelongsToValidLayout(item())) {
-        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
-            result |= CloseButton;
-    }
+    Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+    if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+        result |= CloseButton;
 
     return result;
 }

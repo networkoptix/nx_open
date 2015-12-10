@@ -382,7 +382,6 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     QnStreamRecorder::Role role = QnStreamRecorder::Role_FileExport;
     if (resource->toResource()->hasFlags(Qn::utc))
         role = QnStreamRecorder::Role_FileExportWithEmptyContext;
-    QnLayoutItemData itemData = m_layout->getItem(resource->toResource()->getId());
 
     qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
 

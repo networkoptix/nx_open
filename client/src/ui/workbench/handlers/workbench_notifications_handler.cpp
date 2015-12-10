@@ -143,16 +143,17 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     case QnSystemHealth::StoragesAreFull:
     case QnSystemHealth::ArchiveRebuildFinished:
     case QnSystemHealth::ArchiveRebuildCanceled:
+    case QnSystemHealth::ArchiveFastScanFinished:
     case QnSystemHealth::NoPrimaryTimeServer:
     case QnSystemHealth::SystemIsReadOnly:
         return true;
 
     default:
         break;
-
     }
-    qnWarning("Unknown system health message");
-    return false;
+
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Unknown system health message");
+    return true;
 }
 
 void QnWorkbenchNotificationsHandler::setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible) {

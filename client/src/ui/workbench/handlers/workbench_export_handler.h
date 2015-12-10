@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_EXPORT_HANDLER_H
-#define WORKBENCH_EXPORT_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -7,6 +6,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 class QnTimePeriod;
+class QnAbstractStreamDataProvider;
 
 /**
  * @brief The QnWorkbenchExportHandler class            Handler for video and layout export related actions.
@@ -44,6 +44,12 @@ private:
 
     QnMediaResourceWidget *extractMediaWidget(const QnActionParameters &parameters);
 
+    void exportTimeSelection(
+          const QnMediaResourcePtr &mediaResource
+        , const QnAbstractStreamDataProvider *dataProvider
+        , const QnLayoutItemData &itemData
+        , const QnTimePeriod &period);
+
 private slots:
     void at_exportTimeSelectionAction_triggered();
 
@@ -54,5 +60,3 @@ private slots:
 private:
     QSet<QString> m_filesIsUse;
 };
-
-#endif // WORKBENCH_EXPORT_HANDLER_H
