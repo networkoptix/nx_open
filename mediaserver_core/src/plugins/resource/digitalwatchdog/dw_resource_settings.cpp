@@ -1,5 +1,3 @@
-#include <atomic>
-
 #include "dw_resource_settings.h"
 
 #include <core/resource/camera_advanced_param.h>
@@ -202,7 +200,7 @@ QString parseParamFromHttpResponse(const QnCameraAdvancedParameter& cameraAdvPar
 QnCameraAdvancedParamValueList QnPravisCameraProxy::getParamsList() const
 {
     QnCameraAdvancedParamValueList result;
-    std::atomic<int> workers = 0;
+    int workers = 0;
     
     QnMutex waitMutex;
     QnWaitCondition waitCond;
