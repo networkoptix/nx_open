@@ -66,7 +66,7 @@ void QnSingleThumbnailLoader::doLoadAsync() {
         return;
     }
 
-    auto handle = qnCommon->currentServer()->serverRestConnection()->cameraThumbnailAsync(m_request,  [this] (bool success, rest::Handle id, const QByteArray &imageData)
+    auto handle = qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(m_request,  [this] (bool success, rest::Handle id, const QByteArray &imageData)
     {
         Q_UNUSED(id);
         if (!success)

@@ -121,7 +121,7 @@ rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCam
     if (!qnCommon->currentServer())
         return kInvalidHandle;
 
-    return qnCommon->currentServer()->serverRestConnection()->cameraThumbnailAsync(request,  [this, request] (bool success, rest::Handle id, const QByteArray &imageData)
+    return qnCommon->currentServer()->restConnection()->cameraThumbnailAsync(request,  [this, request] (bool success, rest::Handle id, const QByteArray &imageData)
     {
         if (!m_thumbnailByCamera.contains(request.camera))
             return;
