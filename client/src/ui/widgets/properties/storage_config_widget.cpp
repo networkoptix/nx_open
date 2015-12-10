@@ -641,6 +641,8 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)
 {
+    m_model->updateRebuildInfo(pool, reply);
+
     using boost::algorithm::any_of;
 
     bool isMainPool = pool == QnServerStoragesPool::Main;

@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/pending_operation.h>
 #include <ui/camera_thumbnail_provider.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 class QnActiveCameraThumbnailLoaderPrivate : public QObject {
     Q_OBJECT
@@ -29,6 +30,7 @@ public:
 
     QnCameraThumbnailProvider *imageProvider;
 
+    QnThumbnailRequestData request;
     int requestId;
     bool requestNextAfterReply;
     QElapsedTimer fetchTimer;
@@ -39,7 +41,4 @@ public:
     void requestRefresh();
 
     QSize currentSize() const;
-
-private slots:
-    void at_thumbnailReceived(int status, const QImage &image, int handle);
 };
