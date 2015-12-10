@@ -170,7 +170,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 return false;
             }
 
-            QnAbstractArchiveReader* archiveReader = dynamic_cast<QnAbstractArchiveReader*>(dp.data());
+            QnAbstractArchiveStreamReader* archiveReader = dynamic_cast<QnAbstractArchiveStreamReader*>(dp.data());
             if( !archiveReader || !archiveReader->open() )
             {
                 NX_LOG( lit("StreamingChunkTranscoder::transcodeAsync. Failed (2) to create archive data provider (resource %1)").
