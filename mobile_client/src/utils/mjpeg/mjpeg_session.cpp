@@ -8,6 +8,7 @@
 
 #include <utils/common/delayed.h>
 #include <utils/common/util.h>
+#include <utils/thread/mutex.h>
 
 #if defined(Q_OS_IOS) || defined(Q_OS_MAC) || defined(Q_OS_ANDROID)
 #define USE_LIBJPEG
@@ -72,7 +73,7 @@ public:
 
     QnMjpegSession *q_ptr;
 
-    mutable QMutex mutex;
+    mutable QnMutex mutex;
 
     QUrl url;
     QByteArray previousFrameData;
@@ -80,6 +81,8 @@ public:
     qint64 frameTimestampUSec;
     QQueue<FrameData> frameQueue;
     QSemaphore queueSemaphore;
+
+    qint64 finalTimestampMs;
 
     QNetworkAccessManager *networkAccessManager;
     QNetworkReply *reply;
@@ -117,6 +120,7 @@ public:
     void disconnect();
 
     void at_reply_readyRead();
+    void at_reply_error();
     void at_reply_finished();
 
     bool processHeaders();
@@ -131,6 +135,7 @@ QnMjpegSessionPrivate::QnMjpegSessionPrivate(QnMjpegSession *parent)
     : QObject(parent)
     , q_ptr(parent)
     , queueSemaphore(maxFrameQueueSize)
+    , finalTimestampMs(-1)
     , networkAccessManager(nullptr)
     , reply(nullptr)
     , state(QnMjpegSession::Stopped)
@@ -139,13 +144,17 @@ QnMjpegSessionPrivate::QnMjpegSessionPrivate(QnMjpegSession *parent)
 {}
 
 void QnMjpegSessionPrivate::setState(QnMjpegSession::State state) {
-    if (this->state == state)
-        return;
+    {
+        QnMutexLocker lock(&mutex);
 
-    this->state = state;
+        if (this->state == state)
+            return;
+
+        this->state = state;
+    }
 
     Q_Q(QnMjpegSession);
-    q->stateChanged();
+    emit q->stateChanged();
 }
 
 void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, qint64 timestampMs, int presentationTime) {
@@ -156,7 +165,7 @@ void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, qint64
 
     queueSemaphore.acquire();
     {
-        QMutexLocker lock(&mutex);
+        QnMutexLocker lock(&mutex);
         if (state != QnMjpegSession::Playing) {
             queueSemaphore.release();
             return;
@@ -166,11 +175,11 @@ void QnMjpegSessionPrivate::decodeAndEnqueueFrame(const QByteArray &data, qint64
     }
 
     Q_Q(QnMjpegSession);
-    q->frameEnqueued();
+    emit q->frameEnqueued();
 }
 
 bool QnMjpegSessionPrivate::dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime) {
-    QMutexLocker lock(&mutex);
+    QnMutexLocker lock(&mutex);
 
     if (frameQueue.isEmpty())
         return false;
@@ -213,7 +222,7 @@ bool QnMjpegSessionPrivate::connect() {
 
     QObject::connect(reply, &QNetworkReply::readyRead, this, &QnMjpegSessionPrivate::at_reply_readyRead);
     QObject::connect(reply, &QNetworkReply::finished, this, &QnMjpegSessionPrivate::at_reply_finished);
-    QObject::connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &QnMjpegSessionPrivate::at_reply_finished);
+    QObject::connect(reply, static_cast<void (QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error), this, &QnMjpegSessionPrivate::at_reply_error);
 
     return true;
 }
@@ -275,7 +284,7 @@ void QnMjpegSessionPrivate::at_reply_readyRead() {
     }
 }
 
-void QnMjpegSessionPrivate::at_reply_finished() {
+void QnMjpegSessionPrivate::at_reply_error() {
     if (reply != sender())
         return;
 
@@ -284,6 +293,20 @@ void QnMjpegSessionPrivate::at_reply_finished() {
 
     if (state == QnMjpegSession::Connecting || QnMjpegSession::Playing)
         connect();
+}
+
+void QnMjpegSessionPrivate::at_reply_finished() {
+    if (reply != sender())
+        return;
+
+    reply->deleteLater();
+    reply = nullptr;
+
+    if (state == QnMjpegSession::Connecting)
+        connect();
+
+    Q_Q(QnMjpegSession);
+    q->finished();
 }
 
 bool QnMjpegSessionPrivate::processHeaders() {
@@ -462,6 +485,13 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     if (!previousFrameData.isEmpty())
         decodeAndEnqueueFrame(previousFrameData, previousFrameTimestampUSec / 1000, framePresentationTimeMSec);
 
+    if (finalTimestampMs > 0 && frameTimestampUSec > finalTimestampMs * 1000) {
+        disconnect();
+        Q_Q(QnMjpegSession);
+        q->finished();
+        return ParseOk;
+    }
+
     previousFrameTimestampUSec = frameTimestampUSec;
     frameTimestampUSec = 0;
 
@@ -488,7 +518,7 @@ QnMjpegSession::~QnMjpegSession() {
 QUrl QnMjpegSession::url() const {
     Q_D(const QnMjpegSession);
 
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock(&d->mutex);
 
     return d->url;
 }
@@ -497,7 +527,7 @@ void QnMjpegSession::setUrl(const QUrl &url) {
     Q_D(QnMjpegSession);
 
     {
-        QMutexLocker lock(&d->mutex);
+        QnMutexLocker lock(&d->mutex);
 
         if (d->url == url)
             return;
@@ -511,7 +541,7 @@ void QnMjpegSession::setUrl(const QUrl &url) {
 QnMjpegSession::State QnMjpegSession::state() const {
     Q_D(const QnMjpegSession);
 
-    QMutexLocker lock(&d->mutex);
+    QnMutexLocker lock(&d->mutex);
 
     return d->state;
 }
@@ -520,6 +550,29 @@ bool QnMjpegSession::dequeueFrame(QImage *image, qint64 *timestamp, int *present
     Q_D(QnMjpegSession);
 
     return d->dequeueFrame(image, timestamp, presentationTime);
+}
+
+qint64 QnMjpegSession::finalTimestampMs() const {
+    Q_D(const QnMjpegSession);
+
+    QnMutexLocker lock(&d->mutex);
+
+    return d->finalTimestampMs;
+}
+
+void QnMjpegSession::setFinalTimestampMs(qint64 finalTimestampMs) {
+    Q_D(QnMjpegSession);
+
+    {
+        QnMutexLocker lock(&d->mutex);
+
+        if (d->finalTimestampMs == finalTimestampMs)
+            return;
+
+        d->finalTimestampMs = finalTimestampMs;
+    }
+
+    emit finalTimestampChanged();
 }
 
 void QnMjpegSession::start() {
@@ -532,8 +585,8 @@ void QnMjpegSession::stop() {
     Q_D(QnMjpegSession);
 
     {
-        QMutexLocker lock(&d->mutex);
         d->setState(Disconnecting);
+        QnMutexLocker lock(&d->mutex);
         d->queueSemaphore.release(maxFrameQueueSize - d->queueSemaphore.available());
     }
 

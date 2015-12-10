@@ -91,7 +91,9 @@ QSize QnImageFilterHelper::updatedResolution(const QList<QnAbstractImageFilterPt
     return result;
 }
 
-QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution) const
+const QSize QnImageFilterHelper::defaultResolutionLimit(8192, 8192);
+
+QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSize& srcResolution, const QSize& resolutionLimit) const
 {
     static const float MIN_STEP_CHANGE_COEFF = 0.95f;
     static const float ASPECT_RATIO_COMPARISION_PRECISION = 0.01f;
@@ -126,7 +128,6 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
         result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset, m_timeMs));
 
     //verifying that output resolution is supported by codec
-    const QSize resolutionLimit( 8192, 8192 );
 
     //adjusting output resolution if needed
     for( qreal prevResizeRatio = 1.0; prevResizeRatio > 0.07; )

@@ -42,6 +42,7 @@
 #include <array>
 #include <sstream>
 #include "database/server_db.h"
+#include "common/common_globals.h"
 
 //static const qint64 BALANCE_BY_FREE_SPACE_THRESHOLD = 1024*1024 * 500;
 //static const int OFFLINE_STORAGES_TEST_INTERVAL = 1000 * 30;
@@ -52,6 +53,9 @@ namespace {
     static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
     static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
     static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
+   
+    const QString SCAN_ARCHIVE_NORMAL_PREFIX = lit("NORMAL_");
+    const QString SCAN_ARCHIVE_BACKUP_PREFIX = lit("BACKUP_");
 
     const std::chrono::seconds WRITE_INFO_FILES_INTERVAL(60);
 }
@@ -59,21 +63,32 @@ namespace {
 class ArchiveScanPosition
 {
 public:
-    ArchiveScanPosition(): m_catalog(QnServer::LowQualityCatalog) {}
-    ArchiveScanPosition(const QnStorageResourcePtr& storage, QnServer::ChunksCatalog catalog, const QString& cameraUniqueId):
-        m_storagePath(storage->getUrl()),
-        m_catalog(catalog), 
-        m_cameraUniqueId(cameraUniqueId) 
+    ArchiveScanPosition(QnServer::StoragePool role) 
+        : m_role(role),
+          m_catalog(QnServer::LowQualityCatalog)
+    {}
+
+    ArchiveScanPosition(QnServer::StoragePool       role,
+                        const QnStorageResourcePtr  &storage, 
+                        QnServer::ChunksCatalog     catalog, 
+                        const QString               &cameraUniqueId) 
+        : m_role(role), 
+          m_storagePath(storage->getUrl()),
+          m_catalog(catalog), 
+          m_cameraUniqueId(cameraUniqueId) 
     {}
 
     void save() {
         QString serializedData(lit("%1;;%2;;%3"));
-        serializedData = serializedData.arg(m_storagePath).arg(QnLexical::serialized(m_catalog)).arg(m_cameraUniqueId);
-        MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, serializedData);
+        serializedData = serializedData.arg(m_storagePath)
+                                       .arg(QnLexical::serialized(m_catalog))
+                                       .arg(m_cameraUniqueId);
+        MSSettings::roSettings()->setValue(settingName(m_role), serializedData);
         MSSettings::roSettings()->sync();
     }
+
     void load() {
-        QString serializedData = MSSettings::roSettings()->value(SCAN_ARCHIVE_FROM).toString();
+        QString serializedData = MSSettings::roSettings()->value(settingName(m_role)).toString();
         QStringList data = serializedData.split(";;");
         if (data.size() == 3) {
             m_storagePath = data[0];
@@ -81,10 +96,19 @@ public:
             m_cameraUniqueId = data[2];
         }
     }
-    static void reset() {
-        MSSettings::roSettings()->setValue(SCAN_ARCHIVE_FROM, QString());
+
+    static QString settingName(QnServer::StoragePool role)
+    {
+        return role == QnServer::StoragePool::Normal ? 
+                       SCAN_ARCHIVE_NORMAL_PREFIX + SCAN_ARCHIVE_FROM : 
+                       SCAN_ARCHIVE_BACKUP_PREFIX + SCAN_ARCHIVE_FROM;
+    }
+
+    static void reset(QnServer::StoragePool role) {
+        MSSettings::roSettings()->setValue(settingName(role), QString());
         MSSettings::roSettings()->sync();
     }
+
     bool isEmpty() const { return m_cameraUniqueId.isEmpty(); }
     bool operator<(const ArchiveScanPosition& other) {
         if (m_storagePath != other.m_storagePath)
@@ -94,16 +118,17 @@ public:
         return m_cameraUniqueId < other.m_cameraUniqueId;
     }
 private:
-    QString m_storagePath;
-    QnServer::ChunksCatalog m_catalog;
-    QString m_cameraUniqueId;
+    const QnServer::StoragePool m_role;
+    QString                     m_storagePath;
+    QnServer::ChunksCatalog     m_catalog;
+    QString                     m_cameraUniqueId;
 };
 
 
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
-
+    typedef QnLongRunnable base_type;
     struct ScanData
     {
         ScanData(): partialScan(false) {}
@@ -114,8 +139,8 @@ private:
         bool partialScan;
     };
     QnStorageManager* m_owner;
-    CLThreadQueue<ScanData> m_scanTasks;
-    QnMutex m_mutex;
+    QQueue<ScanData> m_scanTasks;
+    mutable QnMutex m_mutex;
     QnWaitCondition m_waitCond;
     bool m_fullScanCanceled;
 
@@ -124,32 +149,46 @@ public:
     {
     }
 
-    void addStorageToScan(const QnStorageResourcePtr& storage, bool partialScan)
+    virtual ~ScanMediaFilesTask()
+    {
+        stop();
+    }
+
+    bool hasFullScanTasks() const
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& task: m_scanTasks) {
+            if (!task.partialScan)
+                return true;
+        }
+        return false;
+    }
+
+    void addStorageToScanUnsafe(const QnStorageResourcePtr& storage, bool partialScan)
     {
         ScanData scanData(storage, partialScan);
         if (m_scanTasks.contains(scanData))
             return;
         if (m_scanTasks.isEmpty())
-            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, QString(), 0.0));
+            m_owner->setRebuildInfo(QnStorageScanData(partialScan ? Qn::RebuildState_PartialScan : Qn::RebuildState_FullScan, storage->getUrl(), 0.0));
         if (partialScan)
             storage->addFlags(Qn::storage_fastscan);
-        m_scanTasks.push(std::move(scanData));
+        m_scanTasks.push_back(std::move(scanData));
+    }
+
+    void addStorageToScan(const QnStorageResourcePtr& storage, bool partialScan)
+    {
+        QnMutexLocker lock(&m_mutex);
+        addStorageToScanUnsafe(storage, partialScan);
         m_waitCond.wakeAll();
     }
 
-    bool hasFullScanTasks()
+    void addStoragesToScan(const QVector<QnStorageResourcePtr>& storages, bool partialScan)
     {
-        m_scanTasks.lock();
-        bool result = false;
-        for (int i = m_scanTasks.size()-1; i >= 0; --i) {
-            if (!m_scanTasks.atUnsafe(i).partialScan) {
-                result = true;
-                break;
-            }
-
-        }
-        m_scanTasks.unlock();
-        return result;
+        QnMutexLocker lock(&m_mutex);
+        for (auto storage: storages)
+            addStorageToScanUnsafe(storage, partialScan);
+        m_waitCond.wakeAll();
     }
 
     void cancelFullScanTasks()
@@ -157,14 +196,33 @@ public:
         m_fullScanCanceled = true;
     }
 
-    
+    virtual void pleaseStop() override
+    {
+        base_type::pleaseStop();
+        m_waitCond.wakeAll();
+    }
+
     virtual void run() override
     {
+        bool fullscanProcessed = false;
+        bool partialScanProcessed = false;
         while (!needToStop())
         {
-            if (m_fullScanCanceled)
-                m_scanTasks.detachDataByCondition([](const ScanData& data, const QVariant&) { return !data.partialScan; });
+            if (m_fullScanCanceled) 
+            {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_scanTasks.erase(std::remove_if(m_scanTasks.begin(), m_scanTasks.end(), [](const ScanData& data) { return !data.partialScan; }), m_scanTasks.end());
+                    ArchiveScanPosition::reset(m_owner->m_role);
+                }
+                m_fullScanCanceled = false;
+                fullscanProcessed = false;
+                m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
+                emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildCanceled);
+            }
 
+
+            /*
             {
                 QnMutexLocker lock( &m_mutex );
                 if (m_scanTasks.isEmpty()) {
@@ -175,15 +233,22 @@ public:
                     continue;
                 }
             }
+            */
 
-            ScanData scanData = m_scanTasks.front();
-            if (!scanData.storage) {
-                m_scanTasks.removeFirst(1); // detached
-                continue;
+            ScanData scanData;
+            {
+                QnMutexLocker lock(&m_mutex);
+                while (m_scanTasks.isEmpty() && !needToStop()) {
+                    m_waitCond.wait(&m_mutex);
+                }
+                if (needToStop())
+                    break;
+                scanData = m_scanTasks.front();
             }
 
             if (scanData.partialScan)
             {
+                partialScanProcessed = true;
                 QMap<DeviceFileCatalogPtr, qint64> catalogToScan; // key - catalog, value - start scan time;
                 {
                     QnMutexLocker lock(&m_owner->m_mutexCatalog);
@@ -211,6 +276,7 @@ public:
             }
             else 
             {
+                fullscanProcessed = true;
                 QElapsedTimer t;
                 t.restart();
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 0.0));
@@ -219,7 +285,29 @@ public:
                 m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_FullScan, scanData.storage->getUrl(), 1.0));
                 qDebug() << "rebuild archive time for storage" << scanData.storage->getUrl() << "is:" << t.elapsed() << "msec";
             }
-            m_scanTasks.removeFirst(1);
+            
+            {
+                QnMutexLocker lock(&m_mutex);
+                m_scanTasks.pop_front();
+                if (m_scanTasks.isEmpty()) 
+                {
+                    // not data to process left                
+                    m_owner->updateCameraHistory();
+                    m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 1.0));
+                    if (fullscanProcessed) {
+                        if (!QnResource::isStopping())
+                            ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
+                        if (!m_fullScanCanceled)
+                            emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
+                    }
+                    else if (partialScanProcessed)
+                        emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
+
+                    fullscanProcessed = false;
+                    partialScanProcessed = false;
+                }
+            }
+
             assert(qnBackupStorageMan->scheduleSync());
             qnBackupStorageMan->scheduleSync()->updateLastSyncChunk();
         }
@@ -244,7 +332,7 @@ public:
             if (fileStorage->getStatus() != status)
                 m_owner->changeStorageStatus(fileStorage, status);
 
-            if (fileStorage->isAvailable())
+            if (status == Qn::Online)
             {
                 const auto space = QString::number(fileStorage->getTotalSpace());
                 if (fileStorage->setProperty(Qn::SPACE, space))
@@ -400,17 +488,23 @@ QnStorageScanData QnStorageManager::rebuildInfo() const
 
 QnStorageScanData QnStorageManager::rebuildCatalogAsync()
 {
-    QnStorageScanData result(Qn::RebuildState_FullScan, QString(), 0.0);
-    QnMutexLocker lock( &m_mutexRebuild );
-
-    if (!m_rebuildArchiveThread->hasFullScanTasks()) 
+    QnStorageScanData result = rebuildInfo();
+    if (!m_rebuildArchiveThread->hasFullScanTasks())
     {
+        QnMutexLocker lock( &m_mutexRebuild );
         m_rebuildCancelled = false;
+        QVector<QnStorageResourcePtr> storagesToScan;
         for(const QnStorageResourcePtr& storage: getStoragesInLexicalOrder()) {
             if (storage->getStatus() == Qn::Online)
-                m_rebuildArchiveThread->addStorageToScan(storage, false);
+                storagesToScan << storage;
         }
+        if (storagesToScan.isEmpty())
+            return result;
+        if (result.state <= Qn::RebuildState_None)
+            result = QnStorageScanData(Qn::RebuildState_FullScan, storagesToScan.first()->getUrl(), 0.0);
+        m_rebuildArchiveThread->addStoragesToScan(storagesToScan, false);
     }
+
     return result;
 }
 
@@ -430,6 +524,10 @@ bool QnStorageManager::needToStopMediaScan() const
 
 void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
 {
+    QnMutexLocker lock( &m_rebuildStateMtx );
+    m_archiveRebuildInfo = data;
+
+    /*
     bool isRebuildFinished = false;
     {
         QnMutexLocker lock( &m_rebuildStateMtx );
@@ -440,15 +538,16 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     }
     if (isRebuildFinished) {
         if (!QnResource::isStopping())
-            ArchiveScanPosition::reset(); // do not reset position if server is going to restart
+            ArchiveScanPosition::reset(m_role); // do not reset position if server is going to restart
         bool isCancel = data.state == Qn::RebuildState_Canceled;
         emit rebuildFinished(isCancel);
     }
+    */
 }
 
 void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &storage, QnServer::ChunksCatalog catalog, qreal progressCoeff)
 {
-    ArchiveScanPosition scanPos;
+    ArchiveScanPosition scanPos(m_role);
     scanPos.load(); // load from persistent storage
 
     QnAbstractStorageResource::FileInfoList list = 
@@ -493,7 +592,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             return; // cancel rebuild
 
         QString cameraUniqueId = fi.fileName();
-        ArchiveScanPosition currentPos(storage, catalog, cameraUniqueId);
+        ArchiveScanPosition currentPos(m_role, storage, catalog, cameraUniqueId);
         if (currentPos < scanPos) {
             // already scanned
         }
@@ -972,27 +1071,13 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 
 void QnStorageManager::updateCameraHistory() 
 {
-    std::vector<QnUuid> archivedListNew = 
-        qnNormalStorageMan->getCamerasWithArchive();
-
-    std::vector<QnUuid> archivedListNewBackup = 
-        qnBackupStorageMan->getCamerasWithArchive();
-
-    std::sort(archivedListNew.begin(), archivedListNew.end());
-    std::sort(archivedListNewBackup.begin(), archivedListNewBackup.end());
-
-    std::vector<QnUuid> resultNewList;
-    std::set_union(archivedListNew.cbegin(),
-                   archivedListNew.cend(),
-                   archivedListNewBackup.cbegin(),
-                   archivedListNewBackup.cend(),
-                   std::back_inserter(resultNewList));
+    auto archivedListNew = getCamerasWithArchive();
 
     std::vector<QnUuid> archivedListOld = 
         qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
-
     std::sort(archivedListOld.begin(), archivedListOld.end());
-    if (archivedListOld == resultNewList) 
+
+    if (archivedListOld == archivedListNew) 
         return;
 
     const ec2::AbstractECConnectionPtr& appServerConnection = 
@@ -1047,9 +1132,12 @@ void QnStorageManager::clearSpace(bool forced)
         updateCameraHistory();
     }
 
-    for(const QnStorageResourcePtr& storage: storages)
-        clearOldestSpace(storage, true);
-    for(const QnStorageResourcePtr& storage: storages)
+    QnStorageResourceList delAgainList;
+    for(const QnStorageResourcePtr& storage: storages) {
+        if (!clearOldestSpace(storage, true))
+            delAgainList << storage;
+    }
+    for(const QnStorageResourcePtr& storage: delAgainList)
         clearOldestSpace(storage, false);
 
     // 3. Remove empty dirs
@@ -1164,6 +1252,20 @@ QnStorageManager::StorageMap QnStorageManager::getAllStorages() const
     QnMutexLocker lock( &m_mutexStorages ); 
     return m_storageRoots; 
 } 
+
+bool QnStorageManager::hasRebuildingStorages() const
+{
+    bool result = false;
+    for (const auto &storage : getWritableStorages()) 
+    {
+        if (storage->hasFlags(Qn::storage_fastscan)) 
+        {
+            result = true;
+            break;
+        }
+    }
+    return result || m_archiveRebuildInfo.state == Qn::RebuildState_FullScan;
+}
 
 QnStorageResourceList QnStorageManager::getStorages() const 
 {
@@ -1316,20 +1418,20 @@ void QnStorageManager::findTotalMinTime(const bool useMinArchiveDays, const File
     }
 }
 
-void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
+bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays)
 {
     if (storage->getSpaceLimit() == 0)
-        return; // unlimited
+        return true; // unlimited. nothing to delete
 
 
     QString dir = storage->getUrl();
 
     if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile))
-        return;
+        return true; // nothing to delete
 
     qint64 freeSpace = storage->getFreeSpace();
     if (freeSpace == -1)
-        return;
+        return true; // nothing to delete
     qint64 toDelete = storage->getSpaceLimit() - freeSpace;
 
     while (toDelete > 0)
@@ -1367,7 +1469,7 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
         qint64 freeSpace = storage->getFreeSpace();
         if (freeSpace == -1)
-            return;
+            return true; // nothing to delete
         toDelete = storage->getSpaceLimit() - freeSpace;
     }
 
@@ -1381,6 +1483,8 @@ void QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
     else {
         m_diskFullWarned[storage->getId()] = false;
     }
+
+    return toDelete <= 0;
 }
 
 void QnStorageManager::at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs)
@@ -1440,8 +1544,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 void QnStorageManager::testStoragesDone()
 {
     m_firstStorageTestDone = true;
-    
-    ArchiveScanPosition rebuildPos;
+    ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
         rebuildCatalogAsync(); // continue to rebuild
@@ -1525,18 +1628,22 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
 void QnStorageManager::testOfflineStorages()
 {
-    QnMutexLocker lock( &m_mutexStorages );
-    if (!m_testStorageThread->isRunning())
+    QnMutexLocker lock( &m_testStorageThreadMutex );
+    if (m_testStorageThread && !m_testStorageThread->isRunning())
         m_testStorageThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
 {
-    if (m_testStorageThread) {
-        m_testStorageThread->stop();
-        delete m_testStorageThread;
-        m_testStorageThread = 0;
+    {
+        QnMutexLocker lock( &m_testStorageThreadMutex );
+        if (m_testStorageThread) {
+            m_testStorageThread->stop();
+            delete m_testStorageThread;
+            m_testStorageThread = 0;
+        }
     }
+
     m_rebuildCancelled = true;
     if (m_rebuildArchiveThread) {
         m_rebuildArchiveThread->stop();
@@ -2017,7 +2124,7 @@ bool QnStorageManager::isStorageAvailable(const QnStorageResourcePtr& storage) c
 }
 
 
-std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchiveHelper() const
 {
     QnMutexLocker locker(&m_mutexCatalog);
     std::set<QString> internalData;
@@ -2030,6 +2137,27 @@ std::vector<QnUuid> QnStorageManager::getCamerasWithArchive() const
             result.push_back(cam->getId());
     }
     return result;
+}
+
+std::vector<QnUuid> QnStorageManager::getCamerasWithArchive()
+{
+    std::vector<QnUuid> archivedListNormal = 
+        qnNormalStorageMan->getCamerasWithArchiveHelper();
+
+    std::vector<QnUuid> archivedListBackup = 
+        qnBackupStorageMan->getCamerasWithArchiveHelper();
+
+    std::sort(archivedListNormal.begin(), archivedListNormal.end());
+    std::sort(archivedListBackup.begin(), archivedListBackup.end());
+
+    std::vector<QnUuid> resultList;
+    std::set_union(archivedListNormal.cbegin(),
+                   archivedListNormal.cend(),
+                   archivedListBackup.cbegin(),
+                   archivedListBackup.cend(),
+                   std::back_inserter(resultList));
+
+    return resultList;
 }
 
 void QnStorageManager::getCamerasWithArchiveInternal(std::set<QString>& result, const FileCatalogMap& catalogMap ) const

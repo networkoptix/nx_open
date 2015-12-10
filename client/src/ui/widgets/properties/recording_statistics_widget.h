@@ -85,7 +85,6 @@ private:
     QAction *m_clipboardAction;
     Qt::MouseButton m_lastMouseButton;
     QnRecordingStatsReply m_allData;
-    QnRecordingStatsReply m_hiddenCameras;
 
     QVector<QnStorageSpaceData> m_availStorages;
 

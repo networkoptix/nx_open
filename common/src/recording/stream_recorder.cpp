@@ -186,6 +186,7 @@ void QnStreamRecorder::close()
 
     markNeedKeyData();
     m_firstTime = true;
+    m_prevAudioFormat.reset();
 
     if (m_recordingFinished) {
         // close may be called multiple times, so we have to reset flag m_recordingFinished
@@ -342,10 +343,10 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
     {
         // TODO: m_firstTime should not be used to guard comparison with m_prevAudioFormat.
         QnCodecAudioFormat audioFormat(md->context);
-        if (!m_firstTime && audioFormat != m_prevAudioFormat) {
+        if (!m_prevAudioFormat.is_initialized())
+            m_prevAudioFormat = audioFormat;
+        else if (m_prevAudioFormat != audioFormat)
             close(); // restart recording file if audio format is changed
-        }
-        m_prevAudioFormat = audioFormat; 
     }
     
     QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);

@@ -3,11 +3,14 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/style/skin.h>
 #include <ui/common/palette.h>
 #include <ui/processors/hover_processor.h>
 #include <ui/graphics/items/generic/separator.h>
 #include <ui/graphics/items/generic/proxy_label.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/controls/bookmark_tags_control.h>
 #include <ui/actions/action_parameters.h>
 
 #include <utils/common/string.h>
@@ -16,10 +19,31 @@
 
 namespace
 {
-    enum 
+    enum { kTopPositionIndex = 0 };
+
+    enum
     {
-        kBookmarkFrameWidth = 250
-        , kHalfBookmarkFrameWidth = kBookmarkFrameWidth / 2
+        kBorderRadius = 2
+        , kBookmarkFrameWidth = 250
+
+        , kBaseMargin = 10
+        , kBaseHorizontalMargins = kBaseMargin
+        , kBaseTopMargin = 12
+        , kBaseBottomMargin = kBaseMargin
+
+        , kItemsHorMargin = 4
+        , kItemsTopMargin = 0
+        , kItemsBottomMargin = 10
+
+        , kTotalHorMargin = kBaseHorizontalMargins + kItemsHorMargin
+    };
+
+    enum
+    {
+        kBookmarksUpdateEventId = QEvent::User + 1
+        , kBookmarkEditActionEventId
+        , kBookmarkRemoveActionEventId
+        , kBookmarkPlayActionEventId
     };
 
     enum LabelParamIds
@@ -33,7 +57,7 @@ namespace
     {
         bool bold;
         int fontSize;
-        int topPadding;
+        int topMargin;
 
         LabelParams(bool initBold
             , int initFontSize
@@ -42,99 +66,53 @@ namespace
 
     LabelParams::LabelParams(bool initBold
         , int initFontSize
-        , int initTopPadding)
+        , int initTopMargin)
         : bold(initBold)
         , fontSize(initFontSize)
-        , topPadding(initTopPadding)
+        , topMargin(initTopMargin)
     {}
 
     /// Array of parameters for label. Indexed by LabelParamIds enum
-    const LabelParams kLabelParams[] = 
+    const LabelParams kLabelParams[] =
     {
-        LabelParams(true, 16, 2)        /// For name label
-        , LabelParams(false, 12, 2)     /// For description label
-        , LabelParams(false, 12, 4)     /// For tags label
+        LabelParams(true, 16, 0)        /// For name label
+        , LabelParams(false, 12, 4)     /// For description label
+        , LabelParams(true, 12, 15)     /// For tags label
     };
 
-    const QString kEditActionAnchorName = lit("e");
-    const QString kRemoveActoinAnchorName = lit("r");
-    const QString kLinkTemplate = lit("<a href = \"%1\">%2</a>");
-
-    class QnBookmarksViewerStrings
-    {
-        Q_DECLARE_TR_FUNCTIONS(QnBookmarkTooltipActionResuourceStrings)
-    public:
-        static const QString editCaption() { return tr("Edit"); }
-        static const QString removeCaption() { return tr("Remove"); }
-    };
-
-    template<typename WidgetType>
-    void removeWidget(WidgetType *&widget
-        , QGraphicsLinearLayout *layout)
-    {
-        if (!widget || !layout)
-            return;
-
-        layout->removeItem(widget);
-        delete widget;
-
-        widget = nullptr;
-    }
-
-    /// @brief Updates label text. If text is empty it removes label, otherwise tries to recreate it
-    int renewLabel(int insertionIndex
-        
-        , QnProxyLabel *&label
-        , const QString &text
-        
-        , QGraphicsItem *parent
+    int placeLabel(QnProxyLabel *label
+        , const QColor &textColor
         , QGraphicsLinearLayout *layout
-
+        , int insertionIndex
         , LabelParamIds labelParamsId)
     {
-        const QString trimmedText = text.trimmed();
+        label->setIndent(0);
+        label->setMargin(0);
+        layout->insertItem(insertionIndex, label);
 
-        if (text.isEmpty())
-        {
-            removeWidget(label, layout);
-            return insertionIndex;
-        }
-        
-        const bool noLabel = !label;
         const LabelParams &params = kLabelParams[labelParamsId];
-        if (noLabel)
-        {
-            label = new QnProxyLabel(parent);
-            label->setIndent(0);
-            label->setMargin(0);
-            layout->insertItem(insertionIndex, label);
-            if (insertionIndex > 0 && params.topPadding)
-                layout->setItemSpacing(insertionIndex - 1, params.topPadding);
-        }
+        if (insertionIndex > 0 && params.topMargin)
+            layout->setItemSpacing(insertionIndex - 1, params.topMargin);
 
-        label->setText(trimmedText);
 
-        if (noLabel)
-        {
-            QFont font = label->font();
-            font.setBold(params.bold);
-            font.setPixelSize(params.fontSize);
-            label->setFont(font);
+        QFont font = label->font();
+        font.setBold(params.bold);
+        font.setPixelSize(params.fontSize);
+        label->setFont(font);
 
-            setPaletteColor(label, QPalette::Background, Qt::transparent);
+        setPaletteColor(label, QPalette::Background, Qt::transparent);
+        setPaletteColor(label, QPalette::WindowText, textColor);
 
-            const auto labelSize = kBookmarkFrameWidth - label->geometry().x() * 2;
-
-            label->setWordWrap(true);
-            label->setPreferredWidth(labelSize);
-            label->setAlignment(Qt::AlignLeft);
-            label->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
-        }
+        const auto labelSize = kBookmarkFrameWidth - kTotalHorMargin * 2;
+        label->setWordWrap(true);
+        label->setPreferredWidth(labelSize);
+        label->setAlignment(Qt::AlignLeft);
+        label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Maximum);
 
         if (label->textFormat() == Qt::RichText)    /// Workaround for wrong sizeHint when rendering 'complex' html
         {
             QTextDocument td;
-            td.setHtml(trimmedText);
+            td.setHtml(label->text());
             td.setTextWidth(label->minimumWidth());
             td.setDocumentMargin(0);
 
@@ -145,351 +123,333 @@ namespace
         return (insertionIndex + 1);
     }
 
-    ///
-
-    typedef std::function<void (const QString &)> ButtonLabelHandlerType;
-    QnProxyLabel *createButtonLabel(const QString &caption
-        , const QString &id
+    int createTagsControl(int insertionIndex
+        , const QnCameraBookmarkTags &tags
+        , const QColor &commonTextColor
         , QGraphicsItem *parent
-        , const ButtonLabelHandlerType &handler)
+        , QGraphicsLinearLayout *layout
+        , QnBookmarksViewer *viewer
+        , LabelParamIds paramsId)
     {
-        QnProxyLabel *label = new QnProxyLabel(parent);
-        label->setText(kLinkTemplate.arg(id, caption));
-        label->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        label->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-        QObject::connect(label, &QnProxyLabel::linkActivated, label, [handler](const QString &id) { handler(id); });
-        
+        if (tags.empty())
+            return insertionIndex;
+
+        const auto tagsControl = new QnBookmarkTagsControl(tags, parent);
+
+        QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
+            , viewer, [viewer](const QString &tag)
+        {
+            viewer->tagClicked(tag);
+            viewer->resetBookmarks();   /// Hides tooltip
+        });
+        return placeLabel(tagsControl, commonTextColor, layout, insertionIndex, paramsId);
+    }
+
+    int createLabel(int insertionIndex
+        , const QString &text
+        , const QColor &textColor
+        , QGraphicsItem *parent
+        , QGraphicsLinearLayout *layout
+        , LabelParamIds labelParamsId)
+    {
+        const QString trimmedText = text.trimmed();
+
+        if (text.isEmpty())
+            return insertionIndex;
+
+        const auto label = new QnProxyLabel(parent);
+
+        label->setText(trimmedText);
+
+        return placeLabel(label, textColor, layout, insertionIndex, labelParamsId);
+    }
+
+    void insertButtonsSeparator(const QColor &color
+        , int index
+        , QGraphicsItem *item
+        , QGraphicsLinearLayout *layout)
+    {
+        enum
+        {
+            kButtonSeparatorWidth = 1
+            , kSeparatorSpacingBefore = 15
+        };
+
+        const auto separator = new QnSeparator(kButtonSeparatorWidth, color, item);
+        if (index > 0)
+            layout->setItemSpacing(index - 1, kSeparatorSpacingBefore);
+        layout->insertItem(index, separator);
+    }
+
+    void insertBookmarksSeparator(int index
+        , const QnBookmarkColors &colors
+        , QGraphicsItem *parent
+        , QGraphicsLinearLayout *layout)
+    {
+        SeparatorAreas areas(1, SeparatorAreaProperties(2, colors.bookmarksSeparatorTop));
+        areas.append(SeparatorAreaProperties(1, colors.bookmarksSeparatorBottom));
+
+        const auto separator = new QnSeparator(areas, parent);
+        layout->insertItem(index, separator);
+    }
+
+    ///
+
+    void insertMoreItemsMessage(const QString &moreItemsText
+        , const QnBookmarkColors &colors
+        , QGraphicsLinearLayout *layout
+        , QGraphicsItem *parent)
+    {
+        insertBookmarksSeparator(kTopPositionIndex, colors, parent, layout);
+
+        enum
+        {
+            kMoreItemsItemHeight = 40
+            , kFontPixelSize = 11
+        };
+
+        auto label = new QnProxyLabel(moreItemsText, parent);
+        label->setMinimumSize(kBookmarkFrameWidth, kMoreItemsItemHeight);
+
+        QFont font = label->font();
+        font.setPixelSize(kFontPixelSize);
+        font.setBold(true);
+        label->setFont(font);
+        label->setAlignment(Qt::AlignCenter);
+        label->setWordWrap(true);
+
         setPaletteColor(label, QPalette::Background, Qt::transparent);
+        setPaletteColor(label, QPalette::WindowText, colors.moreItemsText);
 
-        return label;
+        layout->insertItem(kTopPositionIndex, label);
     }
 
     ///
 
-    class ProcessorHolder : private boost::noncopyable
-    {
-    public:
-        ProcessorHolder(HoverFocusProcessor *processor
-            , QGraphicsItem *item);
+    typedef std::function<void (const QnCameraBookmark &bookmark
+        , int eventId)> EmitBookmarkEventFunc;
 
-        ~ProcessorHolder();
-
-    private:
-        HoverFocusProcessor * const m_processor;
-        QGraphicsItem * const m_item;
-    };
-
-    ProcessorHolder::ProcessorHolder(HoverFocusProcessor *processor
-        , QGraphicsItem *item)
-        : m_processor(processor)
-        , m_item(item)
-    {
-        if (m_processor)
-            m_processor->addTargetItem(item);
-    }
-
-    ProcessorHolder::~ProcessorHolder()
-    {
-        if (m_processor)
-            m_processor->removeTargetItem(m_item);
-    }
-
-    ///
-
+    /// TODO: #ynikitenkov Move to separate file (for signals etc)
     class BookmarkToolTipFrame : public QnToolTipWidget
     {
-        typedef std::function<void (const QnCameraBookmark &)> BookmarkActionFunctionType;
+        Q_DECLARE_TR_FUNCTIONS(BookmarkToolTipFrame)
+
     public:
-        static BookmarkToolTipFrame *create(
-            const QnBookmarkColors &colors
-            , const BookmarkActionFunctionType &editActionFunc
-            , const BookmarkActionFunctionType &removeActionFunc
-            , HoverFocusProcessor *hoverProcessor
-            , BookmarkToolTipFrame *&firstItemRef
-            , BookmarkToolTipFrame *next
-            , QGraphicsItem *parent);
+        BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
+            , bool showMoreTooltip
+            , const QnBookmarkColors &colors
+            , const EmitBookmarkEventFunc &emitBookmarkEvent
+            , bool readonly
+            , QnBookmarksViewer *parent);
 
         virtual ~BookmarkToolTipFrame();
 
-        ///
-
-        void updateBookmark(const QnCameraBookmark &bookmark
-            , const QnBookmarkColors &colors);
-
-        const QnCameraBookmark &bookmark() const;
-        
         void setPosition(const QnBookmarksViewer::PosAndBoundsPair &params);
 
-        BookmarkToolTipFrame *next() const;        
+    private:
+        void updatePosition();
 
     private:
-        BookmarkToolTipFrame(
-            const QnBookmarkColors &colors
-            , const BookmarkActionFunctionType &editActionFunc
-            , const BookmarkActionFunctionType &removeActionFunc
-            , HoverFocusProcessor *hoverProcessor
-            , BookmarkToolTipFrame *&firstItemRef
-            , QGraphicsItem *parent);
+        QGraphicsLinearLayout *createButtonsLayout(const QnCameraBookmark &bookmark);
 
-        BookmarkToolTipFrame *prev() const;
+        QGraphicsLinearLayout *createBookmarksLayout(const QnCameraBookmark &bookmark
+            , const QnBookmarkColors &colors
+            , QnBookmarksViewer *viewer);
 
-        void setNext(BookmarkToolTipFrame *next
-            , bool allowReverseSet);
-
-        void setPrev(BookmarkToolTipFrame *prev
-            , bool allowReverseSet);
-
-        void onBookmarkAction(const QString &anchorName);
+        QGraphicsLinearLayout *createLeftCountLayout(int bookmarksLeft
+            , const QnBookmarkColors &colors);
 
     private:
-        const BookmarkActionFunctionType m_editAction;
-        const BookmarkActionFunctionType m_removeAction;
+        const EmitBookmarkEventFunc m_emitBookmarkEvent;
+        const bool m_readonly;
 
-        ProcessorHolder m_processorHolder;
-
-        QnCameraBookmark m_bookmark;
-        BookmarkToolTipFrame *&m_firstItemRef;
-        BookmarkToolTipFrame *m_next;
-        BookmarkToolTipFrame *m_prev;
-
-        QGraphicsLinearLayout *m_layout;
-        QnProxyLabel *m_name;
-        QnProxyLabel *m_description;
-        QnProxyLabel *m_tags;
-        QnSeparator * const m_buttonsSeparator;
+        QGraphicsLinearLayout *m_mainLayout;
+        QnBookmarksViewer::PosAndBoundsPair m_posOnTimeline;
     };
 
-    BookmarkToolTipFrame *BookmarkToolTipFrame::create(
-        const QnBookmarkColors &colors
-        , const BookmarkActionFunctionType &editActionFunc
-        , const BookmarkActionFunctionType &removeActionFunc
-        , HoverFocusProcessor *hoverProcessor
-        , BookmarkToolTipFrame *&firstItemRef
-        , BookmarkToolTipFrame *prev
-        , QGraphicsItem *parent)
-    {
-        BookmarkToolTipFrame *result = new BookmarkToolTipFrame(colors, 
-            editActionFunc, removeActionFunc, hoverProcessor, firstItemRef, parent);
-        result->setNext(nullptr, true);
-        result->setPrev(prev, true);
-        return result;
-    }
+    BookmarkToolTipFrame::BookmarkToolTipFrame(const QnCameraBookmarkList &bookmarks
+        , bool showMoreTooltip
+        , const QnBookmarkColors &colors
+        , const EmitBookmarkEventFunc &emitBookmarkEvent
+        , bool readonly
+        , QnBookmarksViewer *parent)
 
-    BookmarkToolTipFrame::BookmarkToolTipFrame(
-        const QnBookmarkColors &colors
-        , const BookmarkActionFunctionType &editActionFunc
-        , const BookmarkActionFunctionType &removeActionFunc
-        , HoverFocusProcessor *hoverProcessor
-        , BookmarkToolTipFrame *&firstItemRef
-        , QGraphicsItem *parent)
         : QnToolTipWidget(parent)
-        , m_editAction(editActionFunc)
-        , m_removeAction(removeActionFunc)
-        
-        , m_processorHolder(hoverProcessor, this)
 
-        , m_bookmark()
-        , m_firstItemRef(firstItemRef)
-        , m_next(nullptr)
-        , m_prev(nullptr)
-
-        , m_layout(new QGraphicsLinearLayout(Qt::Vertical, this))
-        , m_name(nullptr)
-        , m_description(nullptr)
-        , m_tags(nullptr)
-        , m_buttonsSeparator(new QnSeparator(colors.separator, this))
-    {   
-        setPreferredWidth(kBookmarkFrameWidth);
+        , m_emitBookmarkEvent(emitBookmarkEvent)
+        , m_readonly(readonly)
+        , m_mainLayout(new QGraphicsLinearLayout(Qt::Vertical))
+        , m_posOnTimeline()
+    {
+        setMaximumWidth(kBookmarkFrameWidth);
+        setMinimumWidth(kBookmarkFrameWidth);
         setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
 
-        QGraphicsLinearLayout *actionsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
-        QnProxyLabel *editActionLabel =
-            createButtonLabel(QnBookmarksViewerStrings::editCaption(), kEditActionAnchorName, this
-            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1));
-        QnProxyLabel *removeActionLabel =
-            createButtonLabel(QnBookmarksViewerStrings::removeCaption(), kRemoveActoinAnchorName, this
-            , std::bind(&BookmarkToolTipFrame::onBookmarkAction, this, std::placeholders::_1));
-        actionsLayout->addItem(removeActionLabel);
-        actionsLayout->addStretch();
-        actionsLayout->addItem(editActionLabel);
-        
-        enum 
+        setRoundingRadius(kBorderRadius);
+        setWindowColor(colors.tooltipBackground);
+        setFrameColor(colors.tooltipBackground);
+
+        setLayout(m_mainLayout);
+        m_mainLayout->setContentsMargins(0, 0, 0, 0);
+        m_mainLayout->setSpacing(0);
+
+        bool addSeparator = false;
+        for (const auto &bookmark: bookmarks)
         {
-            kBorderRadius = 2
-            , kBaseMargin = 14
-            , kHorizontalMargins = kBaseMargin - kBorderRadius
-            , kTopMargin = 9
-            , kBottomMargin = 7
-            , kSeparatorMargin = kBottomMargin
-        };
+            if (addSeparator)
+                insertBookmarksSeparator(kTopPositionIndex, colors, this, m_mainLayout);
 
-        setContentsMargins(kBorderRadius, kBorderRadius, kBorderRadius, kBorderRadius);
+            m_mainLayout->insertItem(kTopPositionIndex
+                , createBookmarksLayout(bookmark, colors, parent));
+            addSeparator = true;
+        }
 
-        m_layout->setSpacing(0);
-        m_layout->setContentsMargins(kHorizontalMargins, kTopMargin
-            , kHorizontalMargins, kBottomMargin);
+        if (showMoreTooltip)
+        {
+            static const auto kMoreItemsCaption = tr("Zoom timeline\nto view more bookmarks", "Use '\n' to split message in two lines (required)");
+            insertMoreItemsMessage(kMoreItemsCaption, colors, m_mainLayout, this);
+        }
 
-        m_layout->addStretch(0);
-        m_layout->setItemSpacing(0, kBaseMargin);
-
-        m_layout->addItem(m_buttonsSeparator);
-        m_layout->setItemSpacing(1, kSeparatorMargin);
-
-        m_layout->addItem(actionsLayout);
-        m_layout->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Maximum);
+        connect(this, &BookmarkToolTipFrame::geometryChanged, this, [this]()
+        {
+            updatePosition();
+        });
     }
 
     BookmarkToolTipFrame::~BookmarkToolTipFrame()
     {
-        BookmarkToolTipFrame * const prevFrame = prev();
-        BookmarkToolTipFrame * const nextFrame = next();
-
-        if (prevFrame)
-            prevFrame->setNext(nextFrame, true);
-        
-        if (nextFrame)
-        {
-            nextFrame->setPrev(prevFrame, true);
-        }
-        else if (!prevFrame)
-        {
-            m_firstItemRef = nullptr;
-        }
     }
 
-    BookmarkToolTipFrame *BookmarkToolTipFrame::next() const
+    QGraphicsLinearLayout *createVertLayout(int horMargin
+        , int topMargin
+        , int bottomMargin)
     {
-        return m_next;
+        QGraphicsLinearLayout *layout = new QGraphicsLinearLayout(Qt::Vertical);
+
+        layout->setSpacing(0);
+        layout->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+        layout->setContentsMargins(horMargin, topMargin, horMargin, bottomMargin);
+
+        return layout;
     }
 
-    BookmarkToolTipFrame *BookmarkToolTipFrame::prev() const
-    {
-        return m_prev;
-    }
 
-    void BookmarkToolTipFrame::setNext(BookmarkToolTipFrame *next
-        , bool allowReverseSet)
+    QGraphicsLinearLayout *BookmarkToolTipFrame::createButtonsLayout(const QnCameraBookmark &bookmark)
     {
-        m_next = next;
-        if (m_next && allowReverseSet)
-            m_next->setPrev(this, false);
-    }
+        auto buttonsLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+        buttonsLayout->setMinimumWidth(kBookmarkFrameWidth - kBaseMargin * 2);
+        buttonsLayout->setSpacing(0);
 
-    void BookmarkToolTipFrame::setPrev(BookmarkToolTipFrame *prev
-        , bool allowReverseSet)
-    {
-        m_prev = prev;
-
-        if (!m_prev)
+        const auto createButton =
+            [this, bookmark](const char *iconName , int eventId)
         {
-            m_firstItemRef = this; /// updates pointer to first member of linked list
-        }
-        else if (allowReverseSet)
+            enum { kSize = 30 };
+
+            auto button = new QnImageButtonWidget(this);
+            button->setIcon(qnSkin->icon(iconName));
+            button->setClickableButtons(Qt::LeftButton);
+            button->setMaximumSize(kSize, kSize);
+
+            enum { kAnimationInstantSpeed = 1000 };
+            button->setAnimationSpeed(kAnimationInstantSpeed);    // For instant hover state change
+
+            QObject::connect(button, &QnImageButtonWidget::clicked, button
+                , [this, eventId, bookmark]() { m_emitBookmarkEvent(bookmark, eventId); });
+
+            return button;
+        };
+
+        buttonsLayout->addItem(createButton("bookmark/tooltip/play.png"
+            , kBookmarkPlayActionEventId));
+
+        if (!m_readonly)
         {
-            m_prev->setNext(this, false);
+            buttonsLayout->addItem(createButton("bookmark/tooltip/edit.png"
+                , kBookmarkEditActionEventId));
+
+            enum { kSpacerStretch = 1000 };
+            buttonsLayout->addStretch(kSpacerStretch);
+            buttonsLayout->addItem(createButton("bookmark/tooltip/delete.png"
+                , kBookmarkRemoveActionEventId));
         }
+        return buttonsLayout;
+    }
+
+    QGraphicsLinearLayout *BookmarkToolTipFrame::createBookmarksLayout(const QnCameraBookmark &bookmark
+        , const QnBookmarkColors &colors
+        , QnBookmarksViewer *viewer)
+    {
+        const auto layout = createVertLayout(kBaseHorizontalMargins, kBaseTopMargin, kBaseBottomMargin);
+        const auto bookmarkItemsLayout = createVertLayout(kItemsHorMargin
+            , kItemsTopMargin, kItemsBottomMargin);
+
+        enum
+        {
+            kMaxHeaderLength = 64
+            , kMaxBodyLength = 96
+        };
+
+        enum { kFirstPosition = 0 };
+        int position = createLabel(kFirstPosition, elideString(bookmark.name, kMaxHeaderLength)
+            , colors.text, this, bookmarkItemsLayout, kNameLabelIndex);
+
+        position = createLabel(position, elideString(bookmark.description, kMaxBodyLength)
+            , colors.text, this, bookmarkItemsLayout, kDescriptionLabelIndex);
+
+        if (!bookmark.tags.empty())
+        {
+            enum { kMaxTags = 16 };
+            const auto &trimmedTags = (bookmark.tags.size() <= kMaxTags ? bookmark.tags
+                : QnCameraBookmarkTags::fromList(bookmark.tags.toList().mid(0, kMaxTags)));
+
+            position = createTagsControl(position, trimmedTags, colors.text, this
+                , bookmarkItemsLayout, viewer, kTagsIndex);
+        }
+
+        if (position)
+            insertButtonsSeparator(colors.buttonsSeparator, position, this, bookmarkItemsLayout);
+
+        layout->addItem(bookmarkItemsLayout);
+        layout->addItem(createButtonsLayout(bookmark));
+        return layout;
     }
 
     void BookmarkToolTipFrame::setPosition(const QnBookmarksViewer::PosAndBoundsPair &params)
     {
-        enum 
+        m_posOnTimeline = params;
+        updatePosition();
+    }
+
+    void BookmarkToolTipFrame::updatePosition()
+    {
+        enum
         {
             kTailHeight = 10
             , kTailWidth = 20
             , kHalfTailWidth = kTailWidth / 2
             , kTailOffset = 15
-            , kSpacerHeight = 2
             , kTailDefaultOffsetLeft = kTailOffset + kHalfTailWidth
             , kTailDefaultOffsetRight = kBookmarkFrameWidth - kTailDefaultOffsetLeft
         };
 
         setTailWidth(kTailWidth);
 
-        const auto pos = params.first;
-        const auto bounds = params.second;
+        const auto pos = m_posOnTimeline.first;
+        const auto bounds = m_posOnTimeline.second;
 
-        const bool isFirstItem = !prev();
-        const auto height = geometry().height();
-        const auto totalHeight = height + (isFirstItem ? kTailHeight : kSpacerHeight);
+        const auto totalHeight = geometry().height() + kTailHeight;
         const auto currentPos = pos - QPointF(0, totalHeight);
 
         const auto leftSideDistance = (pos.x() - bounds.first);
         const auto rightSideDistance = (bounds.second - pos.x());
 
         const qreal finalTailOffset = ((leftSideDistance - kTailDefaultOffsetLeft) < 0 ? leftSideDistance
-            : (rightSideDistance - kTailDefaultOffsetRight < 0 ? kBookmarkFrameWidth - rightSideDistance 
-                : kTailDefaultOffsetLeft));
-        
-        if (isFirstItem)
-        {
-            setTailPos(QPointF(finalTailOffset, totalHeight));
-            pointTo(pos);
-        }
-        else
-            setPos(currentPos - QPointF(finalTailOffset, 0));
+            : (rightSideDistance - kTailDefaultOffsetRight < 0 ? kBookmarkFrameWidth - rightSideDistance
+            : kTailDefaultOffsetLeft));
 
-        if (m_next)
-            m_next->setPosition(QnBookmarksViewer::PosAndBoundsPair(currentPos, bounds));
+        setTailPos(QPointF(finalTailOffset, totalHeight));
+        pointTo(pos);
     }
-
-    void BookmarkToolTipFrame::onBookmarkAction(const QString &anchorName)
-    {
-        const auto callActon = (anchorName == kEditActionAnchorName ? m_editAction : m_removeAction);
-        callActon(m_bookmark);
-    }
-
-    void BookmarkToolTipFrame::updateBookmark(const QnCameraBookmark &bookmark
-        , const QnBookmarkColors &colors)
-    {
-        setWindowColor(colors.tooltipBackground);
-        setFrameColor(colors.tooltipBackground);
-
-        m_buttonsSeparator->setLineColor(colors.separator);
-        m_bookmark = bookmark;
-
-        enum { kFirstPosition = 0 };
-        enum 
-        {
-            kMaxHeaderLength = 64
-            , kMaxBodyLength = 512
-        };
-
-        int position = renewLabel(kFirstPosition, m_name, elideString(bookmark.name, kMaxHeaderLength)
-            , this, m_layout, kNameLabelIndex);
-        position = renewLabel(position, m_description, elideString(bookmark.description, kMaxBodyLength)
-            , this, m_layout, kDescriptionLabelIndex);
-
-        enum { kMaxTags = 16 };
-        QStringList tagsList;
-        for (const auto &tag: bookmark.tags)
-        {
-            static const QString tagTemplate = lit("<table cellspacing = \"-1\" cellpadding=\"5\" style = \"margin-top: 4;float: left;display:inline-block; border-style: solid; border-color: %1;border-width:1;\"><tr><td>%2</td></tr></table>");
-            tagsList.push_back(tagTemplate.arg(colors.tags.name(QColor::HexRgb), tag));
-            if (tagsList.size() >= kMaxTags)
-                break;
-        }
-
-        static const QString htmlTemplate = lit("<html><body>%1</body></html>");
-        const auto tags = (tagsList.empty() ? QString() : htmlTemplate.arg(tagsList.join(lit(""))));
-        position = renewLabel(position, m_tags, tags
-            , this, m_layout, kTagsIndex);
-    }
-
-    const QnCameraBookmark &BookmarkToolTipFrame::bookmark() const
-    {
-        return m_bookmark;
-    }
-
-    /// 
-
-    enum
-    {
-        kBookmarksUpdateEventId = QEvent::User + 1
-        , kBookmarkUpdatePositionEventId
-        , kBookmarksResetEventId
-        , kBookmarkEditActionEventId
-        , kBookmarkRemoveActionEventId
-    };
 
     ///
 
@@ -520,7 +480,7 @@ namespace
         return m_bookmarks;
     }
 
-    /// 
+    ///
 
     /// @class BookmarkActionEvent
     /// @brief Stores paramteres for bookmark action generation
@@ -566,6 +526,8 @@ public:
 
     ///
 
+    void setReadOnly(bool readonly);
+
     void setTargetTimestamp(qint64 timestamp);
 
     void updateOnWindowChange();
@@ -575,32 +537,32 @@ public:
     bool isHovered() const;
 
     void setHoverProcessor(HoverFocusProcessor *processor);
-    
+
     ///
 
     void setColors(const QnBookmarkColors &colors);
 
     const QnBookmarkColors &colors() const;
 
-private:
-    void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
-
-    void updatePositionImpl(const QnBookmarksViewer::PosAndBoundsPair &params);
-
-    void updateBookmarks(QnCameraBookmarkList bookmarks);
-
-    void updateBookmarksImpl(QnCameraBookmarkList bookmarks);
-
-    bool event(QEvent *event) override;
-
     void emitBookmarkEvent(const QnCameraBookmark &bookmark
         , int eventId);
 
-    void resetBookmarksImpl();
+    void resetBookmarks();
 
 private:
+    void updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params);
+
+    void updateBookmarks(QnCameraBookmarkList bookmarks);
+
+    bool event(QEvent *event) override;
+
+private:
+    typedef QScopedPointer<BookmarkToolTipFrame> BookmarkToolTipFramePtr;
+
     const GetBookmarksFunc m_getBookmarks;
     const GetPosOnTimelineFunc m_getPos;
+
+    BookmarkToolTipFramePtr m_tooltip;
 
     QnBookmarksViewer * const m_owner;
     HoverFocusProcessor *m_hoverProcessor;
@@ -609,9 +571,7 @@ private:
     qint64 m_targetTimestamp;
 
     QnCameraBookmarkList m_bookmarks;
-    BookmarkToolTipFrame *m_headFrame;
-
-    QnBookmarksViewer::PosAndBoundsPair m_futurePosition;
+    bool m_readonly;
 };
 
 enum { kInvalidTimstamp = -1 };
@@ -621,9 +581,11 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , QnBookmarksViewer *owner)
 
     : QObject(owner)
-    
+
     , m_getBookmarks(getBookmarksFunc)
     , m_getPos(getPosFunc)
+
+    , m_tooltip()
 
     , m_owner(owner)
     , m_hoverProcessor(nullptr)
@@ -632,9 +594,7 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
     , m_targetTimestamp(kInvalidTimstamp)
 
     , m_bookmarks()
-    , m_headFrame(nullptr)
-
-    , m_futurePosition()
+    , m_readonly(false)
 {
 }
 
@@ -644,18 +604,10 @@ QnBookmarksViewer::Impl::~Impl()
 
 void QnBookmarksViewer::Impl::setColors(const QnBookmarkColors &colors)
 {
-    bool bkgChanged = (m_colors.tooltipBackground != colors.background);
-
-    m_colors = colors;
-    if (!bkgChanged)
+    if (m_colors != colors)
         return;
 
-    BookmarkToolTipFrame *tooltip = m_headFrame;
-    while(tooltip)
-    {
-        tooltip->updateBookmark(tooltip->bookmark(), colors);
-        tooltip = tooltip->next();
-    }
+    m_colors = colors;
 }
 
 const QnBookmarkColors &QnBookmarksViewer::Impl::colors() const
@@ -677,10 +629,18 @@ void QnBookmarksViewer::Impl::setHoverProcessor(HoverFocusProcessor *processor)
     if (!m_hoverProcessor)
         return;
 
+    if (m_tooltip)
+        m_hoverProcessor->addTargetItem(m_tooltip.data());
+
     QObject::connect(m_hoverProcessor, &HoverFocusProcessor::hoverLeft, this, [this]()
     {
-        qApp->postEvent(this, new QEvent(static_cast<QEvent::Type>(kBookmarksResetEventId)));
+        resetBookmarks();
     });
+}
+
+void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
+{
+    m_readonly = readonly;
 }
 
 void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
@@ -694,15 +654,12 @@ void QnBookmarksViewer::Impl::setTargetTimestamp(qint64 timestamp)
 
     if (newBookmarks.empty())
     {
-        resetBookmarksImpl();
+        resetBookmarks();
         return;
     }
 
-    m_owner->setVisible(false);
-
     m_targetTimestamp = timestamp;
-    updateBookmarksImpl(newBookmarks);
-    updatePosition(m_getPos(m_targetTimestamp));
+    updateOnWindowChange();
 }
 
 void QnBookmarksViewer::Impl::updateOnWindowChange()
@@ -714,121 +671,80 @@ void QnBookmarksViewer::Impl::updateOnWindowChange()
     const auto bounds = params.second;
     if (params.first.isNull() || ((bounds.second - bounds.first) < kBookmarkFrameWidth))
     {
-        updateBookmarksImpl(QnCameraBookmarkList());
+        updateBookmarks(QnCameraBookmarkList());
         return;
     }
 
-    if (m_bookmarks.empty())
-    {
-        m_owner->setVisible(false);
-        updateBookmarksImpl(m_getBookmarks(m_targetTimestamp));
-        updatePosition(params);
-    }
-    else
-        updatePositionImpl(params);
+    updateBookmarks(m_getBookmarks(m_targetTimestamp));
+
+    updatePosition(params);
 }
 
-void QnBookmarksViewer::Impl::resetBookmarksImpl()
+void QnBookmarksViewer::Impl::resetBookmarks()
 {
     if (m_targetTimestamp == kInvalidTimstamp)
         return;
 
     m_targetTimestamp = kInvalidTimstamp;
-    updateBookmarksImpl(QnCameraBookmarkList());
+    updateBookmarks(QnCameraBookmarkList());
 }
-
 
 void QnBookmarksViewer::Impl::updateBookmarks(QnCameraBookmarkList bookmarks)
 {
-    qApp->postEvent(this, new UpdateBokmarksEvent(bookmarks));
-}
+    if (m_bookmarks == bookmarks)
+        return;
 
-void QnBookmarksViewer::Impl::updateBookmarksImpl(QnCameraBookmarkList bookmarks)
-{
     m_bookmarks = bookmarks;
 
-    int tooltipsCount = 0;
+    enum { kMaxBookmarksCount = 3 };
 
-    /// removes all old frames, updates newly added
-    typedef std::list<QnCameraBookmarkList::iterator> BookmarksItsContainer;
+    const int bookmarksCount = std::min<int>(m_bookmarks.size(), kMaxBookmarksCount);
+    const int bookmarksLeft = m_bookmarks.size() - bookmarksCount;
+    const auto &trimmedBookmarks = (bookmarksLeft
+        ? m_bookmarks.mid(0, kMaxBookmarksCount) : m_bookmarks);
 
-    BookmarkToolTipFrame *lastFrame = nullptr;
-    for(BookmarkToolTipFrame *frame = m_headFrame; frame; )
+
+    if (trimmedBookmarks.empty())
+        m_tooltip.reset();
+    else
     {
-        const QnUuid frameBookmarkId = frame->bookmark().guid;
-        const auto itNewBookmark = std::find_if(bookmarks.begin(), bookmarks.end()
-            , [&frameBookmarkId](const QnCameraBookmark &bookmark) { return (bookmark.guid == frameBookmarkId);});
+        const auto emitBookmarkEventFunc = [this](const QnCameraBookmark &bookmark, int eventId)
+            { emitBookmarkEvent(bookmark, eventId); };
 
-        BookmarkToolTipFrame * const next = frame->next();
-        if (itNewBookmark == bookmarks.end())       /// If not found in the new list of bookmarks
-        {
-            frame->setParentItem(nullptr);
-            delete frame;
-        }
-        else
-        {
-            ++tooltipsCount;
-            frame->updateBookmark(*itNewBookmark, m_colors);
-            bookmarks.erase(itNewBookmark);
-            lastFrame = frame;
-        }
-
-        frame = next;
+        m_tooltip.reset(new BookmarkToolTipFrame(trimmedBookmarks, (bookmarksLeft > 0)
+            , m_colors, emitBookmarkEventFunc, m_readonly, m_owner));
     }
 
-    /// Adds new frames
-    for(const auto& bookmark : bookmarks)
-    {
-        enum { kMaxTooltipsCount = 6 };
-        if (tooltipsCount >= kMaxTooltipsCount)
-            break;
-
-        ++tooltipsCount;
-        lastFrame = BookmarkToolTipFrame::create(m_colors
-            , [this](const QnCameraBookmark &bookmark) { emitBookmarkEvent(bookmark, kBookmarkEditActionEventId); }
-            , [this](const QnCameraBookmark &bookmark) { emitBookmarkEvent(bookmark, kBookmarkRemoveActionEventId); }
-            , m_hoverProcessor, m_headFrame, lastFrame, m_owner);
-        lastFrame->updateBookmark(bookmark, m_colors);
-     }
+    if (m_tooltip && m_hoverProcessor)
+        m_hoverProcessor->addTargetItem(m_tooltip.data());
 }
 
 bool QnBookmarksViewer::Impl::event(QEvent *event)
 {
-    switch(event->type())
+    const int eventType = event->type();
+    switch(eventType)
     {
-    case kBookmarksUpdateEventId: 
+    case kBookmarksUpdateEventId:
     {
         const auto updateEvent = static_cast<UpdateBokmarksEvent *>(event);
-        updateBookmarksImpl(updateEvent->bookmarks());
-        break;
-    }
-    case kBookmarkUpdatePositionEventId:
-    {
-        if (!m_bookmarks.empty())
-            updatePositionImpl(m_futurePosition);
-
-        m_owner->setVisible(true);
-        break;
-    }
-    case kBookmarksResetEventId:
-    {
-        resetBookmarksImpl();
+        updateBookmarks(updateEvent->bookmarks());
         break;
     }
     case kBookmarkEditActionEventId:
-    {
-        const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
-        emit m_owner->editBookmarkClicked(bookmarkActionEvent->bookmark());
-        resetBookmarksImpl();
-
-        break;
-    }
     case kBookmarkRemoveActionEventId:
+    case kBookmarkPlayActionEventId:
     {
         const auto bookmarkActionEvent = static_cast<BookmarkActionEvent *>(event);
-        emit m_owner->removeBookmarkClicked(bookmarkActionEvent->bookmark());
-        resetBookmarksImpl();
+        const auto &bookmark = bookmarkActionEvent->bookmark();
 
+        if (eventType == kBookmarkEditActionEventId)
+            emit m_owner->editBookmarkClicked(bookmark);
+        else if (eventType == kBookmarkRemoveActionEventId)
+            emit m_owner->removeBookmarkClicked(bookmark);
+        else
+            emit m_owner->playBookmark(bookmark);
+
+        resetBookmarks();
         break;
     }
     default:
@@ -846,14 +762,8 @@ void QnBookmarksViewer::Impl::emitBookmarkEvent(const QnCameraBookmark &bookmark
 
 void QnBookmarksViewer::Impl::updatePosition(const QnBookmarksViewer::PosAndBoundsPair &params)
 {
-    m_futurePosition = params;
-    qApp->postEvent(this, new QEvent(static_cast<QEvent::Type>(kBookmarkUpdatePositionEventId)));
-}
-
-void QnBookmarksViewer::Impl::updatePositionImpl(const QnBookmarksViewer::PosAndBoundsPair &params)
-{
-    if (m_headFrame)
-        m_headFrame->setPosition(params);
+    if (m_tooltip)
+        m_tooltip->setPosition(params);
 }
 
 ///
@@ -865,9 +775,14 @@ QnBookmarksViewer::QnBookmarksViewer(const GetBookmarksFunc &getBookmarksFunc
     , m_impl(new Impl(getBookmarksFunc, getPosFunc, this))
 {
 }
-    
+
 QnBookmarksViewer::~QnBookmarksViewer()
 {
+}
+
+void QnBookmarksViewer::setReadOnly(bool readonly)
+{
+    m_impl->setReadOnly(readonly);
 }
 
 void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)
@@ -882,7 +797,7 @@ void QnBookmarksViewer::updateOnWindowChange()
 
 void QnBookmarksViewer::resetBookmarks()
 {
-    qApp->postEvent(m_impl, new QEvent(static_cast<QEvent::Type>(kBookmarksResetEventId)));
+    m_impl->resetBookmarks();
 }
 
 void QnBookmarksViewer::setHoverProcessor(HoverFocusProcessor *processor)

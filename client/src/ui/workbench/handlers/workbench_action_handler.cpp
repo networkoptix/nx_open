@@ -173,7 +173,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
 {
     connect(m_tourTimer,                                        SIGNAL(timeout()),                              this,   SLOT(at_tourTimer_timeout()));
     connect(context(),                                          SIGNAL(userChanged(const QnUserResourcePtr &)), this,   SLOT(at_context_userChanged(const QnUserResourcePtr &)), Qt::QueuedConnection);
-    
+
     connect(workbench(),                                        SIGNAL(itemChanged(Qn::ItemRole)),              this,   SLOT(at_workbench_itemChanged(Qn::ItemRole)));
     connect(workbench(),                                        SIGNAL(cellSpacingChanged()),                   this,   SLOT(at_workbench_cellSpacingChanged()));
     connect(workbench(),                                        SIGNAL(currentLayoutChanged()),                 this,   SLOT(at_workbench_currentLayoutChanged()));
@@ -188,7 +188,7 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenFileAction),                         SIGNAL(triggered()),    this,   SLOT(at_openFileAction_triggered()));
     connect(action(Qn::OpenLayoutAction),                       SIGNAL(triggered()),    this,   SLOT(at_openLayoutAction_triggered()));
     connect(action(Qn::OpenFolderAction),                       SIGNAL(triggered()),    this,   SLOT(at_openFolderAction_triggered()));
-    
+
     connect(action(Qn::PreferencesGeneralTabAction),            SIGNAL(triggered()),    this,   SLOT(at_preferencesGeneralTabAction_triggered()));
     connect(action(Qn::PreferencesLicensesTabAction),           SIGNAL(triggered()),    this,   SLOT(at_preferencesLicensesTabAction_triggered()));
     connect(action(Qn::PreferencesSmtpTabAction),               SIGNAL(triggered()),    this,   SLOT(at_preferencesSmtpTabAction_triggered()));
@@ -219,14 +219,14 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::OpenCurrentLayoutInNewWindowAction),     SIGNAL(triggered()),    this,   SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(Qn::OpenNewTabAction),                       SIGNAL(triggered()),    this,   SLOT(at_openNewTabAction_triggered()));
     connect(action(Qn::OpenNewWindowAction),                    SIGNAL(triggered()),    this,   SLOT(at_openNewWindowAction_triggered()));
-    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));   
+    connect(action(Qn::UserSettingsAction),                     SIGNAL(triggered()),    this,   SLOT(at_userSettingsAction_triggered()));
     connect(action(Qn::MediaFileSettingsAction),                &QAction::triggered,    this,   &QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(Qn::CameraIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_cameraIssuesAction_triggered()));
     connect(action(Qn::CameraBusinessRulesAction),              SIGNAL(triggered()),    this,   SLOT(at_cameraBusinessRulesAction_triggered()));
     connect(action(Qn::CameraDiagnosticsAction),                SIGNAL(triggered()),    this,   SLOT(at_cameraDiagnosticsAction_triggered()));
     connect(action(Qn::LayoutSettingsAction),                   SIGNAL(triggered()),    this,   SLOT(at_layoutSettingsAction_triggered()));
-    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));    
-    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));    
+    connect(action(Qn::CurrentLayoutSettingsAction),            SIGNAL(triggered()),    this,   SLOT(at_currentLayoutSettingsAction_triggered()));
+    connect(action(Qn::ServerAddCameraManuallyAction),          SIGNAL(triggered()),    this,   SLOT(at_serverAddCameraManuallyAction_triggered()));
     connect(action(Qn::PingAction),                             SIGNAL(triggered()),    this,   SLOT(at_pingAction_triggered()));
     connect(action(Qn::ServerLogsAction),                       SIGNAL(triggered()),    this,   SLOT(at_serverLogsAction_triggered()));
     connect(action(Qn::ServerIssuesAction),                     SIGNAL(triggered()),    this,   SLOT(at_serverIssuesAction_triggered()));
@@ -346,13 +346,13 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
     data.zoomTargetUuid = params.zoomUuid;
-    
+
     if (!qFuzzyIsNull(params.rotation)) {
         data.rotation = params.rotation;
     }
     else {
         QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-        if (!forcedRotation.isEmpty()) 
+        if (!forcedRotation.isEmpty())
             data.rotation = forcedRotation.toInt();
     }
     data.contrastParams = params.contrastParams;
@@ -917,7 +917,7 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
                         break;
                 }
                 if (hasLocal)
-                    QMessageBox::warning(mainWindow(), 
+                    QMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
             }
@@ -1141,6 +1141,23 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
+
+    const auto parameters = menu()->currentParameters(sender());
+    if (parameters.hasArgument(Qn::BookmarkTagRole))
+    {
+        const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
+
+        const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+        const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
+
+        const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+        const auto start = (correctWindow ? timelineWindow.startTimeMs : nowMs);
+
+        const auto finish = (correctWindow
+            ? timelineWindow.startTimeMs + timelineWindow.durationMs : nowMs);
+
+        m_searchBookmarksDialog->setParameters(filterText, start, finish);
+    }
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1189,7 +1206,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         return;
 
     bool isSearchLayout = workbench()->currentLayout()->isSearchLayout();
-    
+
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
     QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
 
@@ -1218,7 +1235,7 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
         qint64 endDelta = period.endTimeMs() - localPeriods.last().endTimeMs();
         if (endDelta > 0) { // user selected period after the last chunk
             period.durationMs -= endDelta;
-        }       
+        }
     }
 
 
@@ -1384,7 +1401,7 @@ void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
     if (!checked)
     {
         const auto currentWidget = navigator()->currentWidget();
-        canSaveBookmarksMode = (!currentWidget 
+        canSaveBookmarksMode = (!currentWidget
             || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
     }
 
@@ -1411,7 +1428,7 @@ void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
         dialog.reset(new QnWorkbenchStateDependentDialog<QnMediaFileSettingsDialog>(mainWindow()));
     else
         dialog.reset(new QnMediaFileSettingsDialog(mainWindow()));
-    
+
     dialog->updateFromResource(media);
     if (dialog->exec()) {
         dialog->submitToResource(media);
@@ -1619,7 +1636,7 @@ bool QnWorkbenchActionHandler::validateResourceName(const QnResourcePtr &resourc
             ? tr("User already exists.")
             : tr("Video Wall already exists");
 
-        QString message = checkedFlags == Qn::user 
+        QString message = checkedFlags == Qn::user
             ? tr("User with the same name already exists")
             : tr("Video Wall with the same name already exists.");
 
@@ -1703,7 +1720,7 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
                 server->setName(name);
             });
         }
-        
+
         if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
             qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
                 camera->setName(name);
@@ -1746,7 +1763,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
         /* These can be simply deleted from resource pool. */
         for (const QnLayoutResourcePtr &layout: localLayouts) {
             remoteResources.removeOne(layout);
-            qnResPool->removeResource(layout); 
+            qnResPool->removeResource(layout);
         }
 
         qnResourcesChangesManager->deleteResources(remoteResources);
@@ -1773,9 +1790,9 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
 
     QnVirtualCameraResourceList cameras = resources.filtered<QnVirtualCameraResource>();
 
-    /* Check that we are deleting online auto-found cameras */ 
+    /* Check that we are deleting online auto-found cameras */
     QnVirtualCameraResourceList onlineAutoDiscoveredCameras = cameras.filtered([](const QnVirtualCameraResourcePtr &camera){
-        return camera->getStatus() != Qn::Offline 
+        return camera->getStatus() != Qn::Offline
             && !camera->isManuallyAdded();
     });
 
@@ -1795,7 +1812,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
                 onlineAutoDiscoveredCameras
             );
     }
-    else 
+    else
     /* Second version - some cameras are auto-discovered, some not. */
     if (cameras.size() == resources.size() && !onlineAutoDiscoveredCameras.isEmpty()) {
         question =
@@ -1812,7 +1829,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             );
     }
     else
-    /* Third version - no auto-discovered cameras in the list. */        
+    /* Third version - no auto-discovered cameras in the list. */
     if (cameras.size() == resources.size()) {
         question =
             QnDeviceDependentStrings::getNameFromSet(
@@ -1829,14 +1846,14 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
     }
     else
     /* Forth version - cameras and other items. */
-    {        
+    {
         question =
             tr("Do you really want to delete the following %n items?", "", resources.size());
     }
-    
+
     if (moreResourceToDelete.isEmpty())
         return;
-    
+
     int helpId = Qn::Empty_Help;
     for (const QnResourcePtr &resource: resources) {
         if (resource->hasFlags(Qn::live_cam)) {
@@ -1877,7 +1894,7 @@ void QnWorkbenchActionHandler::at_newUserAction_triggered() {
         if(!dialog->exec())
             return;
         dialog->submitToResource();
-    } while (!validateResourceName(user, user->getName())); 
+    } while (!validateResourceName(user, user->getName()));
 
     user->setId(QnUuid::createUuid());
     user->setTypeByName(lit("User"));
@@ -1957,7 +1974,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
         ((permissions & Qn::WriteEmailPermission) ? QnUserSettingsDialog::Editable : zero);
     emailFlags &= flags;
 
-    QnUserSettingsDialog::ElementFlags enabledFlags =  
+    QnUserSettingsDialog::ElementFlags enabledFlags =
         ((permissions & Qn::WriteAccessRightsPermission) ? QnUserSettingsDialog::Editable | QnUserSettingsDialog::Visible : zero);
     enabledFlags &= flags;
 
@@ -1983,7 +2000,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (!(permissions & Qn::SavePermission))
         return;
-    
+
     qnResourcesChangesManager->saveUser(user, [&dialog](const QnUserResourcePtr &) {
         dialog->submitToResource();
     });
@@ -1995,7 +2012,7 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
 
     if (user != context()->user() || newPassword.isEmpty() || newPassword == currentPassword)
         return;
-    
+
 
     /* Password was changed. Change it in global settings and hope for the best. */
     QUrl url = QnAppServerConnectionFactory::url();
@@ -2010,8 +2027,8 @@ void QnWorkbenchActionHandler::at_userSettingsAction_triggered() {
     url.setUserName(user->getName());
 
     QnConnectionDataList savedConnections = qnSettings->customConnections();
-    if (!savedConnections.isEmpty() 
-        && !savedConnections.first().url.password().isEmpty() 
+    if (!savedConnections.isEmpty()
+        && !savedConnections.first().url.password().isEmpty()
         && qnUrlEqual(savedConnections.first().url, url))
     {
         QnConnectionData current = savedConnections.takeFirst();
@@ -2108,7 +2125,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
     connect(cache, &QnAppServerImageCache::fileUploaded,   cache,              &QObject::deleteLater);
     connect(cache, &QnAppServerImageCache::fileUploaded,   this, [this, checkCondition](const QString &filename, QnAppServerFileCache::OperationResult status) {
         if (!checkCondition())
-            return;   
+            return;
 
         if (status == QnAppServerFileCache::OperationResult::sizeLimitExceeded) {
             QMessageBox::warning(mainWindow(), tr("Error"), tr("Picture is too big. Maximum size is %1 Mb").arg(QnAppServerFileCache::maximumFileSize() / (1024*1024))
@@ -2132,7 +2149,7 @@ void QnWorkbenchActionHandler::at_setAsBackgroundAction_triggered() {
 void QnWorkbenchActionHandler::setCurrentLayoutBackground(const QString &filename) {
     QnWorkbenchLayout* wlayout = workbench()->currentLayout();
     QnLayoutResourcePtr layout = wlayout->resource();
-    
+
     layout->setBackgroundImageFilename(filename);
     if (qFuzzyCompare(layout->backgroundOpacity(), 0.0))
         layout->setBackgroundOpacity(0.7);
@@ -2177,7 +2194,7 @@ void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
     action(Qn::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
     //if (!action(Qn::TogglePanicModeAction)->isChecked()) {
 
-    bool enabled = 
+    bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
     action(Qn::TogglePanicModeAction)->setEnabled(enabled);
@@ -2187,7 +2204,7 @@ void QnWorkbenchActionHandler::at_panicWatcher_panicModeChanged() {
 
 void QnWorkbenchActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {
     // TODO: #Elric totally evil copypasta and hacky workaround.
-    bool enabled = 
+    bool enabled =
         context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
         (accessController()->globalPermissions() & Qn::GlobalPanicPermission);
 
@@ -2262,7 +2279,7 @@ void QnWorkbenchActionHandler::at_workbench_itemChanged(Qn::ItemRole role) {
 }
 
 void QnWorkbenchActionHandler::at_whatsThisAction_triggered() {
-    if (QWhatsThis::inWhatsThisMode()) 
+    if (QWhatsThis::inWhatsThisMode())
         QWhatsThis::leaveWhatsThisMode();
     else
         QWhatsThis::enterWhatsThisMode();
@@ -2337,7 +2354,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
 
         if (updateRequested)
             component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
-        
+
         messageParts << component;
     }
 
@@ -2359,7 +2376,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
     connect(updateButton, &QPushButton::clicked, this, [this] {
         menu()->trigger(Qn::SystemUpdateAction);
     }, Qt::QueuedConnection);
-    
+
     messageBox->exec();
 }
 
@@ -2395,7 +2412,7 @@ void QnWorkbenchActionHandler::checkIfStatisticsReportAllowed() {
 
     QMessageBox::information(
         mainWindow(),
-        tr("Anonymous Usage Statistics"),                                   
+        tr("Anonymous Usage Statistics"),
         tr("System sends anonymous usage and crash statistics to the software development team to help us improve your user experience.\n"
            "If you would like to disable this feature you can do so in the System Settings dialog.")
            );
@@ -2427,7 +2444,7 @@ void QnWorkbenchActionHandler::at_queueAppRestartAction_triggered() {
         QMessageBox::critical(
                     mainWindow(),
                     tr("Launcher process not found."),
-                    tr("Cannot restart the client.") + L'\n' 
+                    tr("Cannot restart the client.") + L'\n'
                   + tr("Please close the application and start it again using the shortcut in the start menu.")
                     );
         return;

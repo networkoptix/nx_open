@@ -33,8 +33,8 @@
 
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
-    const int defaultActionDuration = 5000;
-    const int defaultAggregationPeriod = 60;
+    const int defaultActionDurationMs = 5000;
+    const int defaultAggregationPeriodSec = 60;
 }
 
 namespace QnBusiness {
@@ -85,9 +85,8 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent):
     m_eventType(QnBusiness::CameraDisconnectEvent),
     m_eventState(QnBusiness::UndefinedState),
     m_actionType(QnBusiness::ShowPopupAction),
-    m_aggregationPeriod(defaultAggregationPeriod),
+    m_aggregationPeriodSec(defaultAggregationPeriodSec),
     m_disabled(false),
-    m_system(false),
     m_eventTypesModel(new QStandardItemModel(this)),
     m_eventStatesModel(new QStandardItemModel(this)),
     m_actionTypesModel(new QStandardItemModel(this))
@@ -173,7 +172,7 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
             }
         }
         case QnBusiness::AggregationColumn:
-            return m_aggregationPeriod;
+            return m_aggregationPeriodSec;
         default:
             break;
         }
@@ -182,13 +181,15 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
         break;
 
     case Qt::BackgroundRole:
-        if (m_system || m_disabled || isValid())
+        if (m_disabled || isValid())
             break;
 
         if (!isValid(column))
             return QBrush(qnGlobals->businessRuleInvalidColumnBackgroundColor());
         return QBrush(qnGlobals->businessRuleInvalidBackgroundColor());
 
+    case Qn::UuidRole:
+        return qVariantFromValue(m_id);
     case Qn::ModifiedRole:
         return m_modified;
     case Qn::DisabledRole:
@@ -218,9 +219,6 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const {
 }
 
 bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, int role) {
-    if (m_system)
-        return false;
-
     if (column == QnBusiness::DisabledColumn && role == Qt::CheckStateRole) {
         Qt::CheckState checked = (Qt::CheckState)value.toInt();
         setDisabled(checked == Qt::Unchecked);
@@ -303,12 +301,11 @@ void QnBusinessRuleViewModel::loadFromRule(QnBusinessEventRulePtr businessRule) 
 
     m_actionParams = businessRule->actionParams();
 
-    m_aggregationPeriod = businessRule->aggregationPeriod();
+    m_aggregationPeriodSec = businessRule->aggregationPeriod();
 
     m_disabled = businessRule->isDisabled();
     m_comments = businessRule->comment();
     m_schedule = businessRule->schedule();
-    m_system = businessRule->isSystem();
 
     updateActionTypesModel();//TODO: #GDM #Business connect on dataChanged?
 
@@ -334,7 +331,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setActionType(m_actionType);
     rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
     rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
-    rule->setAggregationPeriod(m_aggregationPeriod);
+    rule->setAggregationPeriod(m_aggregationPeriodSec);
     rule->setDisabled(m_disabled);
     rule->setComment(m_comments);
     rule->setSchedule(m_schedule);
@@ -399,7 +396,7 @@ void QnBusinessRuleViewModel::setEventType(const QnBusiness::EventType value) {
             m_actionType = QnBusiness::ShowPopupAction;
             fields |= QnBusiness::ActionTypeField | QnBusiness::ActionResourcesField | QnBusiness::ActionParamsField;
         } else if (isActionProlonged() && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {
-            m_actionParams.durationMs = defaultActionDuration;
+            m_actionParams.durationMs = defaultActionDurationMs;
             fields |= QnBusiness::ActionParamsField;
         }
     }
@@ -494,21 +491,21 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
         fields |= QnBusiness::ActionResourcesField;
 
     if (!QnBusiness::allowsAggregation(m_actionType)) {
-        m_aggregationPeriod = 0;
+        m_aggregationPeriodSec = 0;
         fields |= QnBusiness::AggregationField;
     } else {
         /*
          *  If action is "send email" default units for aggregation period should be hours, not minutes.
          *  Works only if aggregation period was not changed from default value.
          */
-        if (value == QnBusiness::SendMailAction && m_aggregationPeriod == defaultAggregationPeriod) {
-            m_aggregationPeriod = defaultAggregationPeriod * 60;
+        if (value == QnBusiness::SendMailAction && m_aggregationPeriodSec == defaultAggregationPeriodSec) {
+            m_aggregationPeriodSec = defaultAggregationPeriodSec * 60;
             fields |= QnBusiness::AggregationField;
-        } else if (wasEmailAction && m_aggregationPeriod == defaultAggregationPeriod * 60) {
-            m_aggregationPeriod = defaultAggregationPeriod;
+        } else if (wasEmailAction && m_aggregationPeriodSec == defaultAggregationPeriodSec * 60) {
+            m_aggregationPeriodSec = defaultAggregationPeriodSec;
             fields |= QnBusiness::AggregationField;
         } else if (aggregationWasDisabled) {
-            m_aggregationPeriod = defaultAggregationPeriod;
+            m_aggregationPeriodSec = defaultAggregationPeriodSec;
             fields |= QnBusiness::AggregationField;
         }
     }
@@ -516,6 +513,9 @@ void QnBusinessRuleViewModel::setActionType(const QnBusiness::ActionType value) 
     if (QnBusiness::hasToggleState(m_eventType) && !isActionProlonged() && m_eventState == QnBusiness::UndefinedState) {
         m_eventState = allowedEventStates(m_eventType).first();
         fields |= QnBusiness::EventStateField;
+    } else if (!QnBusiness::hasToggleState(m_eventType) && QnBusiness::supportsDuration(m_actionType) && m_actionParams.durationMs <= 0) {
+        m_actionParams.durationMs = defaultActionDurationMs;
+        fields |= QnBusiness::ActionParamsField;
     }
 
     emit dataChanged(this, fields);
@@ -558,14 +558,14 @@ void QnBusinessRuleViewModel::setActionParams(const QnBusinessActionParameters &
 }
 
 int QnBusinessRuleViewModel::aggregationPeriod() const {
-    return m_aggregationPeriod;
+    return m_aggregationPeriodSec;
 }
 
 void QnBusinessRuleViewModel::setAggregationPeriod(int msecs) {
-    if (m_aggregationPeriod == msecs)
+    if (m_aggregationPeriodSec == msecs)
         return;
 
-    m_aggregationPeriod = msecs;
+    m_aggregationPeriodSec = msecs;
     m_modified = true;
 
     emit dataChanged(this, QnBusiness::AggregationField | QnBusiness::ModifiedField);
@@ -583,10 +583,6 @@ void QnBusinessRuleViewModel::setDisabled(const bool value) {
     m_modified = true;
 
     emit dataChanged(this, QnBusiness::AllFieldsMask); // all fields should be redrawn
-}
-
-bool QnBusinessRuleViewModel::system() const {
-    return m_system;
 }
 
 QString QnBusinessRuleViewModel::comments() const {
@@ -982,19 +978,19 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     if (QnBusiness::hasToggleState(m_actionType))
         return tr("Not Applied");
 
-    if (m_aggregationPeriod <= 0)
+    if (m_aggregationPeriodSec <= 0)
         return tr("Instant");
 
-    if (m_aggregationPeriod >= DAY && m_aggregationPeriod % DAY == 0)
-        return tr("Every %n days", "", m_aggregationPeriod / DAY);
+    if (m_aggregationPeriodSec >= DAY && m_aggregationPeriodSec % DAY == 0)
+        return tr("Every %n days", "", m_aggregationPeriodSec / DAY);
 
-    if (m_aggregationPeriod >= HOUR && m_aggregationPeriod % HOUR == 0)
-        return tr("Every %n hours", "", m_aggregationPeriod / HOUR);
+    if (m_aggregationPeriodSec >= HOUR && m_aggregationPeriodSec % HOUR == 0)
+        return tr("Every %n hours", "", m_aggregationPeriodSec / HOUR);
 
-    if (m_aggregationPeriod >= MINUTE && m_aggregationPeriod % MINUTE == 0)
-        return tr("Every %n minutes", "", m_aggregationPeriod / MINUTE);
+    if (m_aggregationPeriodSec >= MINUTE && m_aggregationPeriodSec % MINUTE == 0)
+        return tr("Every %n minutes", "", m_aggregationPeriodSec / MINUTE);
 
-    return tr("Every %n seconds", "", m_aggregationPeriod);
+    return tr("Every %n seconds", "", m_aggregationPeriodSec);
 }
 
 QString QnBusinessRuleViewModel::toggleStateToModelString(QnBusiness::EventState value) {

@@ -154,8 +154,8 @@ public:
         RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
-        RebuildState_PartialScan = 3,
-        RebuildState_Canceled    = 4,
+        RebuildState_PartialScan = 3
+        //RebuildState_Canceled    = 4,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RebuildState)
 
@@ -540,6 +540,7 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 

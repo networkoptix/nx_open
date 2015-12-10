@@ -12,20 +12,26 @@ QnSavedSessionsModel::QnSavedSessionsModel(QObject *parent)
     loadFromSettings();
 
     if (QnModuleFinder *moduleFinder = QnModuleFinder::instance()) {
-        connect(moduleFinder, &QnModuleFinder::moduleChanged, this, [this, moduleFinder](const QnModuleInformation &moduleInformation) {
+        auto updateModuleWithAddress = [this](const QnModuleInformation &moduleInformation, const SocketAddress &address) {
+            for (QString id: m_sessionIdByAddress.values(address)) {
+                auto it = std::find_if(m_savedSessions.begin(), m_savedSessions.end(), [&id](const QnLoginSession &session) -> bool {
+                    return session.id == id;
+                });
+
+                if (it == m_savedSessions.end())
+                    continue;
+
+                it->systemName = moduleInformation.systemName;
+                QModelIndex idx = index(std::distance(m_savedSessions.begin(), it));
+                emit dataChanged(idx, idx);
+            }
+        };
+
+        connect(moduleFinder, &QnModuleFinder::moduleAddressFound, this, updateModuleWithAddress);
+        connect(moduleFinder, &QnModuleFinder::moduleChanged, this, [this, moduleFinder, updateModuleWithAddress](const QnModuleInformation &moduleInformation) {
             for (const SocketAddress &address: moduleFinder->moduleAddresses(moduleInformation.id)) {
-                for (QString id: m_sessionIdByAddress.values(address)) {
-                    auto it = std::find_if(m_savedSessions.begin(), m_savedSessions.end(), [&id](const QnLoginSession &session) -> bool {
-                        return session.id == id;
-                    });
-
-                    if (it == m_savedSessions.end())
-                        continue;
-
-                    it->systemName = moduleInformation.systemName;
-                    QModelIndex idx = index(std::distance(m_savedSessions.begin(), it));
-                    emit dataChanged(idx, idx);
-                }
+                for (QString id: m_sessionIdByAddress.values(address))
+                    updateModuleWithAddress(moduleInformation, address);
             }
         });
     }

@@ -44,7 +44,9 @@ namespace ec2
 {
     //!This parameter holds difference between local system time and synchronized time
     static const QByteArray TIME_DELTA_PARAM_NAME = "sync_time_delta";
-    static const QByteArray TIME_PRIORITY_KEY_PARAM_NAME = "time_priority_key";
+    static const QByteArray LOCAL_TIME_PRIORITY_KEY_PARAM_NAME = "time_priority_key";
+    //!Time priority correspinding to saved synchronised time
+    static const QByteArray USED_TIME_PRIORITY_KEY_PARAM_NAME = "used_time_priority_key";
 
     template<class Function>
     class CustomRunnable
@@ -72,6 +74,48 @@ namespace ec2
     CustomRunnable<Function>* make_custom_runnable( Function&& function )
     {
         return new CustomRunnable<Function>( std::move( function ) );
+    }
+
+    /*!
+        \param syncTimeToLocalDelta local_time - sync_time
+    */
+    bool saveSyncTime(
+        QnDbManager* const dbManagerPtr,
+        qint64 syncTimeToLocalDelta,
+        const TimePriorityKey& syncTimeKey)
+    {
+        return
+            dbManagerPtr->saveMiscParam(
+                TIME_DELTA_PARAM_NAME,
+                QByteArray::number(syncTimeToLocalDelta)) &&
+            dbManagerPtr->saveMiscParam(
+                USED_TIME_PRIORITY_KEY_PARAM_NAME,
+                QByteArray::number(syncTimeKey.toUInt64()));
+    }
+
+    /*!
+        \param syncTimeToLocalDelta local_time - sync_time
+    */
+    bool loadSyncTime(
+        QnDbManager* const dbManagerPtr,
+        qint64* const syncTimeToLocalDelta,
+        TimePriorityKey* const syncTimeKey)
+    {
+        QByteArray syncTimeToLocalDeltaStr;
+        if (!dbManagerPtr->readMiscParam(
+                TIME_DELTA_PARAM_NAME,
+                &syncTimeToLocalDeltaStr))
+            return false;
+
+        QByteArray syncTimeKeyStr;
+        if (!dbManagerPtr->readMiscParam(
+                USED_TIME_PRIORITY_KEY_PARAM_NAME,
+                &syncTimeKeyStr))
+            return false;
+
+        *syncTimeToLocalDelta = syncTimeToLocalDeltaStr.toLongLong();
+        syncTimeKey->fromUInt64(syncTimeKeyStr.toULongLong());
+        return true;
     }
 
 
@@ -443,10 +487,11 @@ namespace ec2
                     //saving synchronized time to DB
                     if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
                         Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-                            &QnDbManager::saveMiscParam,
+                            &saveSyncTime,
                             QnDbManager::instance(),
-                            TIME_DELTA_PARAM_NAME,
-                            QByteArray::number(0) ) ) );
+                            0,
+                            m_usedTimeSyncInfo.timePriorityKey) ) );
+
 
                     if( !synchronizingByCurrentServer )
                     {
@@ -670,10 +715,10 @@ namespace ec2
         m_timeSynchronized = true;
         if( QnDbManager::instance() && QnDbManager::instance()->isInitialized() )
             Ec2ThreadPool::instance()->start( make_custom_runnable( std::bind(
-                &QnDbManager::saveMiscParam,
+                &saveSyncTime,
                 QnDbManager::instance(),
-                TIME_DELTA_PARAM_NAME,
-                QByteArray::number(QDateTime::currentMSecsSinceEpoch() - curSyncTime) ) ) );
+                QDateTime::currentMSecsSinceEpoch() - curSyncTime,
+                m_usedTimeSyncInfo.timePriorityKey) ) );
         lock->unlock();
         {
             WhileExecutingDirectCall callGuard( this );
@@ -1082,7 +1127,7 @@ namespace ec2
 
         //restoring local time priority from DB
         QByteArray timePriorityStr;
-        if( QnDbManager::instance()->readMiscParam( TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr ) )
+        if (QnDbManager::instance()->readMiscParam(LOCAL_TIME_PRIORITY_KEY_PARAM_NAME, &timePriorityStr))
         {
             const quint64 restoredPriorityKeyVal = timePriorityStr.toULongLong();
             TimePriorityKey restoredPriorityKey;
@@ -1108,17 +1153,26 @@ namespace ec2
         {
             //saving time sync information to DB
             const qint64 curSyncTime = m_usedTimeSyncInfo.syncTime + m_monotonicClock.elapsed() - m_usedTimeSyncInfo.monotonicClockValue;
-            QnDbManager::instance()->saveMiscParam( TIME_DELTA_PARAM_NAME, QByteArray::number(QDateTime::currentMSecsSinceEpoch() - curSyncTime) );
+            saveSyncTime(
+                QnDbManager::instance(),
+                QDateTime::currentMSecsSinceEpoch() - curSyncTime,
+                m_usedTimeSyncInfo.timePriorityKey);
         }
         else
         {
             //restoring time sync information from DB
-            QByteArray timeDeltaStr;
-            if( QnDbManager::instance()->readMiscParam( TIME_DELTA_PARAM_NAME, &timeDeltaStr ) )
+            qint64 timeDelta = 0;
+            TimePriorityKey savedPriorityKey;
+            if (loadSyncTime(QnDbManager::instance(), &timeDelta, &savedPriorityKey))
             {
-                m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - timeDeltaStr.toLongLong();
-                NX_LOG( lit("TimeSynchronizationManager. Successfully restored synchronized time %1 (delta %2) from DB").
-                    arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).arg(timeDeltaStr.toLongLong()), cl_logINFO );
+                m_usedTimeSyncInfo.syncTime = QDateTime::currentMSecsSinceEpoch() - timeDelta;
+                m_usedTimeSyncInfo.timePriorityKey = savedPriorityKey;
+                m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSynchronizedWithInternetServer;
+                m_usedTimeSyncInfo.timePriorityKey.flags &= ~Qn::TF_peerTimeSetByUser;
+                NX_LOG( lit("TimeSynchronizationManager. Successfully restored synchronized time %1 (delta %2, key 0x%3) from DB").
+                    arg(QDateTime::fromMSecsSinceEpoch(m_usedTimeSyncInfo.syncTime).toString(Qt::ISODate)).
+                    arg(timeDelta).
+                    arg(savedPriorityKey.toUInt64(), 0, 16), cl_logINFO );
             }
         }
 
@@ -1222,6 +1276,13 @@ namespace ec2
             {
                 forceTimeResync();
             }
+
+            if (QnDbManager::instance() && QnDbManager::instance()->isInitialized())
+                Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
+                    &saveSyncTime,
+                    QnDbManager::instance(),
+                    QDateTime::currentMSecsSinceEpoch() - getSyncTime(),
+                    m_usedTimeSyncInfo.timePriorityKey)));
         }
 
         QnMutexLocker lk(&m_mutex);
@@ -1238,7 +1299,7 @@ namespace ec2
             Ec2ThreadPool::instance()->start(make_custom_runnable(std::bind(
                 &QnDbManager::saveMiscParam,
                 QnDbManager::instance(),
-                TIME_PRIORITY_KEY_PARAM_NAME,
+                LOCAL_TIME_PRIORITY_KEY_PARAM_NAME,
                 QByteArray::number(m_localTimePriorityKey.toUInt64()))));
     }
 }

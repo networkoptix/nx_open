@@ -14,12 +14,14 @@
 #include <utils/common/app_info.h>
 #include <network/module_finder.h>
 #include <network/multicast_module_finder.h>
+#include <network/router.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 
 #include "mobile_client_message_processor.h"
 #include "mobile_client_meta_types.h"
 #include "mobile_client_settings.h"
+#include "mobile_client_translation_manager.h"
 
 #include <version.h>
 
@@ -36,16 +38,22 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     QGuiApplication::setApplicationName(lit(QN_APPLICATION_NAME));
     QGuiApplication::setApplicationVersion(lit(QN_APPLICATION_VERSION));
 
+    // We should load translations before major client's services are started to prevent races
+    QnMobileClientTranslationManager *translationManager = new QnMobileClientTranslationManager();
+    translationManager->updateTranslation();
+
     /* Init singletons. */
     QnCommonModule *common = new QnCommonModule(this);
     common->setModuleGUID(QnUuid::createUuid());
 
+    common->store<QnTranslationManager>(translationManager);
     common->store<QnMobileClientSettings>(new QnMobileClientSettings);
     common->store<QnSessionManager>(new QnSessionManager());
 
     common->store<QnLongRunnablePool>(new QnLongRunnablePool());
     common->store<QnGlobalSettings>(new QnGlobalSettings());
     common->store<QnMobileClientMessageProcessor>(new QnMobileClientMessageProcessor());
+    common->store<QnCameraHistoryPool>(new QnCameraHistoryPool());
     common->store<QnRuntimeInfoManager>(new QnRuntimeInfoManager());
     common->store<QnMobileClientCameraFactory>(new QnMobileClientCameraFactory());
 
@@ -64,6 +72,8 @@ QnMobileClientModule::QnMobileClientModule(QObject *parent) :
     common->store<QnModuleFinder>(moduleFinder);
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
     moduleFinder->start();
+
+    common->store<QnRouter>(new QnRouter(moduleFinder));
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this, [moduleFinder](Qt::ApplicationState state) {
         switch (state) {

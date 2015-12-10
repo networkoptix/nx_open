@@ -5,11 +5,13 @@
 
 #include <core/resource/camera_bookmark.h>
 
+#include <ui/workaround/sharp_pixmap_painting.h>
+
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
 #include <utils/common/scoped_painter_rollback.h>
 
-namespace 
+namespace
 {
     enum
     {
@@ -46,12 +48,11 @@ QnHtmlTextItemOptions::QnHtmlTextItemOptions(const QColor &initBackgroundColor
 {
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq) \
-    , (backgroundColor)(maxWidth)(borderRadius)(horPadding)(vertPadding)(autosize));
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnHtmlTextItemOptions, (eq), QnHtmlTextItemOptions_Fields);
 
 ///
 
-class QnHtmlTextItemPrivate 
+class QnHtmlTextItemPrivate
 {
     Q_DECLARE_PUBLIC(QnHtmlTextItem)
     QnHtmlTextItem *q_ptr;
@@ -94,11 +95,11 @@ void QnHtmlTextItemPrivate::updatePixmap() {
     td.setDocumentMargin(0);
     td.setIndentWidth(0);
     td.setHtml(html);
-    
+
     const auto docWidth = td.documentLayout()->documentSize().width();
 
     if ((docWidth > maxTextWidth) || !options.autosize)
-        td.setTextWidth(maxTextWidth);  
+        td.setTextWidth(maxTextWidth);
 
     td.defaultTextOption().setWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
 
@@ -133,19 +134,8 @@ QnHtmlTextItem::QnHtmlTextItem(const QString &html
     setHtml(html);
 }
 
-QnHtmlTextItem::~QnHtmlTextItem() 
+QnHtmlTextItem::~QnHtmlTextItem()
 {
-}
-
-void QnHtmlTextItem::setHtml(const QString &html)
-{
-    Q_D(QnHtmlTextItem);
-    
-    const bool updatePixmap = (d->html != html);
-    d->html = html;
-
-    if (updatePixmap)
-        d->updatePixmap();
 }
 
 void QnHtmlTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) {
@@ -153,7 +143,32 @@ void QnHtmlTextItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *op
     Q_UNUSED(widget);
 
     Q_D(QnHtmlTextItem);
+    paintPixmapSharp(painter, d->pixmap);
+}
 
-    if (!d->pixmap.isNull())
-        painter->drawPixmap(0, 0, d->pixmap);
+QString QnHtmlTextItem::html() const {
+    Q_D(const QnHtmlTextItem);
+    return d->html;
+}
+
+void QnHtmlTextItem::setHtml(const QString &html)
+{
+    Q_D(QnHtmlTextItem);
+    if (d->html == html)
+        return;
+    d->html = html;
+    d->updatePixmap();
+}
+
+QnHtmlTextItemOptions QnHtmlTextItem::options() const {
+    Q_D(const QnHtmlTextItem);
+    return d->options;
+}
+
+void QnHtmlTextItem::setOptions( const QnHtmlTextItemOptions &options ) {
+    Q_D(QnHtmlTextItem);
+    if (d->options == options)
+        return;
+    d->options = options;
+    d->updatePixmap();
 }

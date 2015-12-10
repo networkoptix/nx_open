@@ -1,5 +1,4 @@
-#ifndef QN_GLOBAL_SETTINGS_H
-#define QN_GLOBAL_SETTINGS_H
+#pragma once
 
 #include <utils/thread/mutex.h>
 #include <QtCore/QObject>
@@ -52,8 +51,11 @@ public:
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
 
-    Qn::CameraBackupQualities defaultBackupQualities() const;
-    void setDefauldBackupQualities(Qn::CameraBackupQualities value);
+    Qn::CameraBackupQualities backupQualities() const;
+    void setBackupQualities(Qn::CameraBackupQualities value);
+
+    bool backupNewCamerasByDefault() const;
+    void setBackupNewCamerasByDefault(bool value);
 
     bool isStatisticsAllowedDefined() const;
     bool isStatisticsAllowed() const;
@@ -66,6 +68,7 @@ signals:
     void emailSettingsChanged();
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
+    void updateNotificationsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -83,7 +86,8 @@ private:
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
-    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_defaultBackupQualitiesAdaptor;
+    QnResourcePropertyAdaptor<Qn::CameraBackupQualities> *m_backupQualitiesAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_backupNewCamerasByDefaultAdaptor;
     QnResourcePropertyAdaptor<QnOptionalBool> *m_statisticsAllowedAdaptor;
 
     // set of email settings adaptors
@@ -114,5 +118,3 @@ private:
 };
 
 #define qnGlobalSettings QnGlobalSettings::instance()
-
-#endif // QN_GLOBAL_SETTINGS_H

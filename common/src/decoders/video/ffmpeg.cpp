@@ -64,7 +64,7 @@ CLFFmpegVideoDecoder::CLFFmpegVideoDecoder(CodecID codec_id, const QnConstCompre
     m_swDecoderCount(swDecoderCount),
     m_prevSampleAspectRatio( 1.0 ),
     m_forcedMtDecoding(false),
-    m_prevTimestamp(false),
+    m_prevTimestamp(AV_NOPTS_VALUE),
     m_spsFound(false)
 {
     m_mtDecoding = mtDecoding;
@@ -245,8 +245,10 @@ void CLFFmpegVideoDecoder::resetDecoder(const QnConstCompressedVideoDataPtr& dat
     //return;
 
     if (m_passedContext && data->context)
+	{
+        m_codec = findCodec(data->context->getCodecId());
         QnFfmpegHelper::mediaContextToAvCodecContext(m_passedContext, data->context);
-
+    }
     if (m_passedContext && m_passedContext->width > 8 && m_passedContext->height > 8 && m_currentWidth == -1)
     {
         m_currentWidth = m_passedContext->width;
@@ -346,6 +348,12 @@ void CLFFmpegVideoDecoder::forceMtDecoding(bool value)
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)
 {
+    if (data && m_codecId!= data->compressionType) {
+        if (m_codecId != CODEC_ID_NONE && data->context)
+            resetDecoder(data);
+        m_codecId = data->compressionType;
+    }
+
     CLVideoDecoderOutput* const outFrame = outFramePtr->data();
     AVFrame* copyFromFrame = m_frame;
     int got_picture = 0;
@@ -517,6 +525,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         AVPacket avpkt;
         avpkt.data = 0;
         avpkt.size = 0;
+        avpkt.pts = avpkt.dts = m_prevTimestamp;
         avcodec_decode_video2(m_context, m_frame, &got_picture, &avpkt); // flush
     }
 
@@ -571,7 +580,7 @@ bool CLFFmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                 else {
                     av_picture_copy((AVPicture*) outFrame, (AVPicture*) (m_frame), m_context->pix_fmt, m_context->width, m_context->height);
                 }
-
+                // pkt_dts and pkt_pts are mixed up after decoding in ffmpeg. So, we have to use dts here instead of pts
                 outFrame->pkt_dts = (quint64)m_frame->pkt_dts != AV_NOPTS_VALUE ? m_frame->pkt_dts : m_frame->pkt_pts;
             }
         }

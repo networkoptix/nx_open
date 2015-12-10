@@ -28,6 +28,7 @@ QnPage {
         readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
+        property bool cameraWarningVisible: (showOfflineStatus || cameraUnauthorized || d.failed) && !player.playing
 
         property bool resumeOnActivate: false
         property bool resumeAtLive: false
@@ -60,7 +61,7 @@ QnPage {
         }
 
         function updateOfflineDisplay() {
-            if (showOfflineStatus) {
+            if (cameraWarningVisible) {
                 if (serverOffline) {
                     exitFullscreen()
                     navigationLoader.opacity = 0.0
@@ -190,31 +191,29 @@ QnPage {
         }
 
         function clearScreenshotSource() {
+            screenshotDelay.stop()
             screenshotSource = ""
         }
 
         function bindScreenshotSource() {
             screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
         }
+
+        function bindScreenshotSourceDelayed() {
+            screenshotDelay.start()
+        }
+
+        Timer {
+            id: screenshotDelay
+            interval: 150
+            onTriggered: video.bindScreenshotSource()
+        }
     }
 
     Loader {
         id: dummyLoader
 
-        visible: {
-            if (d.cameraUnauthorized)
-                return true
-
-            var offline = d.serverOffline || d.cameraOffline
-
-            if (!offline && d.failed)
-                return true
-
-            if (offline && d.showOfflineStatus)
-                return true
-
-            return false
-        }
+        visible: d.cameraWarningVisible
 
         sourceComponent: visible ? dummyComponent : undefined
 
@@ -306,7 +305,7 @@ QnPage {
             if (!loading)
                 return
 
-            video.bindScreenshotSource()
+            video.bindScreenshotSourceDelayed()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
@@ -316,7 +315,7 @@ QnPage {
                 return
             }
 
-            video.bindScreenshotSource()
+            video.bindScreenshotSourceDelayed()
             thumbnailLoader.forceLoadThumbnail(player.position)
         }
 
@@ -363,10 +362,15 @@ QnPage {
             onPausedChanged: {
                 setKeepScreenOn(!paused)
 
-                if (paused)
+                if (paused) {
                     mediaPlayer.pause()
+                    return
+                }
+
+                if (d.resumeAtLive)
+                    mediaPlayer.playLive()
                 else
-                    mediaPlayer.play(d.resumeAtLive ? -1 : timelinePosition)
+                    mediaPlayer.play()
             }
         }
     }

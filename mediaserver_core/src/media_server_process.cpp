@@ -221,7 +221,6 @@
 #include "rest/handlers/backup_control_rest_handler.h"
 #include <database/server_db.h>
 
-
 #ifdef __arm__
 #include "nx1/info.h"
 #endif
@@ -1214,23 +1213,37 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
 
 
 void MediaServerProcess::updateStatisticsAllowedSettings() {
-    static const QString STATISTICS_REPORT_ALLOWED = lit("statisticsReportAllowed");
-
-    const auto confStats = MSSettings::roSettings()->value(STATISTICS_REPORT_ALLOWED);
-    if (confStats.isNull()) 
-        return;
 
     {   /* Security check */
         const auto admin = qnResPool->getAdministrator();
         Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
-        if (!admin) 
+        if (!admin)
             return;
     }
 
-    qnGlobalSettings->setStatisticsAllowed(confStats.toBool());
-    qnGlobalSettings->synchronizeNow();
-    MSSettings::roSettings()->remove(STATISTICS_REPORT_ALLOWED);
-    MSSettings::roSettings()->sync();
+    auto setValue = [this](bool value) {
+        qnGlobalSettings->setStatisticsAllowed(value);
+        qnGlobalSettings->synchronizeNow();
+    };
+
+    /* Hardcoded constant from v2.3.2 */
+    static const QString statisticsReportAllowed = lit("statisticsReportAllowed");
+
+    /* Value set by installer has the greatest priority */
+    const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
+    if (!confStats.isNull()) {
+        setValue(confStats.toBool());
+        /* Cleanup installer value. */
+        MSSettings::roSettings()->remove(statisticsReportAllowed);
+        MSSettings::roSettings()->sync();
+    } else
+    /* If user didn't make the decision in the current version, check if he made it in the previous version */
+    if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
+        bool value;
+        if (QnLexical::deserialize(m_mediaServer->getProperty(statisticsReportAllowed), &value))
+            setValue(value);
+        propertyDictionary->removeProperty(m_mediaServer->getId(), statisticsReportAllowed);
+    }
 }
 
 
@@ -1352,17 +1365,17 @@ void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& s
     qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
-void MediaServerProcess::at_storageManager_rebuildFinished(bool isCanceled) {
+void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, isCanceled);
+    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
 }
 
 void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
     if (isStopping())
         return;
     QnBusiness::EventReason reason = QnBusiness::NoReason;
-    switch(code) 
+    switch(code)
     {
         case QnServer::BackupResultCode::Failed:
             reason = QnBusiness::BackupFailed;
@@ -1573,6 +1586,7 @@ void MediaServerProcess::run()
     }
 
     QScopedPointer<QnServerMessageProcessor> messageProcessor(new QnServerMessageProcessor());
+    QScopedPointer<QnCameraHistoryPool> historyPool(new QnCameraHistoryPool());
     QScopedPointer<QnRuntimeInfoManager> runtimeInfoManager(new QnRuntimeInfoManager());
 
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer() );
@@ -1626,11 +1640,11 @@ void MediaServerProcess::run()
             QnServer::StoragePool::Normal
         )
     );
-    
+
     std::unique_ptr<QnStorageManager> backupStorageManager(
         new QnStorageManager(
             QnServer::StoragePool::Backup
-        ) 
+        )
     );
 
     std::unique_ptr<QnFileDeletor> fileDeletor( new QnFileDeletor() );
@@ -1678,7 +1692,7 @@ void MediaServerProcess::run()
 
     struct stat st;
     memset(&st, 0, sizeof(st));
-    const bool hddPresent = 
+    const bool hddPresent =
         ::stat("/dev/sda", &st) == 0 ||
         ::stat("/dev/sdb", &st) == 0 ||
         ::stat("/dev/sdc", &st) == 0 ||
@@ -1829,7 +1843,7 @@ void MediaServerProcess::run()
     PluginManager::instance()->loadPlugins( MSSettings::roSettings() );
 
     using namespace std::placeholders;
-    for (const auto storagePlugin : 
+    for (const auto storagePlugin :
          PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
     {
         QnStoragePluginFactory::instance()->registerStoragePlugin(
@@ -1840,7 +1854,7 @@ void MediaServerProcess::run()
                 storagePlugin
             ),
             false
-        );                    
+        );
     }
 
     QnStoragePluginFactory::instance()->registerStoragePlugin(
@@ -1895,7 +1909,7 @@ void MediaServerProcess::run()
         QCoreApplication::quit();
         return;
     }
-    
+
     std::unique_ptr<QnMulticast::HttpServer> multicastHttp(new QnMulticast::HttpServer(qnCommon->moduleGUID().toQUuid(), m_universalTcpListener));
 
     using namespace std::placeholders;
@@ -2023,7 +2037,7 @@ void MediaServerProcess::run()
     MSSettings::roSettings()->sync();
     Q_ASSERT_X(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
-    
+
     if (needToStop()) {
         stopObjects();
         return;
@@ -2113,7 +2127,9 @@ void MediaServerProcess::run()
     QnPlDlinkResourceSearcher dlinkSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&dlinkSearcher);
 #endif
-#ifdef ENABLE_DROID
+//#ifdef ENABLE_DROID
+#if 0
+    // not supported any more
     QnPlIpWebCamResourceSearcher plIpWebCamResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&plIpWebCamResourceSearcher);
 
@@ -2391,7 +2407,7 @@ void MediaServerProcess::run()
     ec2Connection.reset();
     QnAppServerConnectionFactory::setEC2ConnectionFactory( nullptr );
     ec2ConnectionFactory.reset();
-    
+
     mserverResourceDiscoveryManager.reset();
 
     av_lockmgr_register(NULL);

@@ -20,32 +20,18 @@
 
 namespace
 {
-    enum 
+    enum
     {
-        kCaptionMaxLength = 128
-        , kDescriptionMaxLength = 256
+        kCaptionMaxLength = 64
+        , kDescriptionMaxLength = 96
         , kMaxItemWidth = 250
     };
 
-    QString makePTag(const QString &text
-        , int pixelSize
-        , bool isBold = false
-        , bool isItalic = false)
-    {
-        static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
 
-        if (text.isEmpty())
-            return QString();
-
-        const QString boldValue = (isBold ? lit("bold") : lit("normal"));
-        const QString italicValue (isItalic ? lit("italic") : lit("normal"));
-        
-        return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, text);
-    }
 
     enum { kBookmarksFilterPrecisionMs = 5 * 60 * 1000 };
 
-    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs, const QString &text = QString()) {
+    QnCameraBookmarkSearchFilter constructBookmarksFilter(qint64 positionMs) {
         if (positionMs <= 0)
             return QnCameraBookmarkSearchFilter::invalidFilter();
 
@@ -58,8 +44,6 @@ namespace
 
         /* Seek forward twice as long so when the mid point changes, next period will be preloaded. */
         result.endTimeMs = mid + kBookmarksFilterPrecisionMs * 2;
-
-        result.text = text;
 
         return result;
     }
@@ -87,7 +71,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
 
     , m_counter()
     , m_navigator(navigator)
-    
+
     , m_currentMode(kUndefinedMode)
     , m_data()
 
@@ -101,7 +85,7 @@ QnCompositeTextOverlay::QnCompositeTextOverlay(const QnVirtualCameraResourcePtr 
     initBookmarksMode();
 
     connect(this, &QnCompositeTextOverlay::modeChanged
-        , this, &QnCompositeTextOverlay::currentModeChanged);
+        , this, &QnCompositeTextOverlay::at_modeChanged);
 }
 
 QnCompositeTextOverlay::~QnCompositeTextOverlay()
@@ -118,10 +102,9 @@ void QnCompositeTextOverlay::setMode(Mode mode)
     if (mode == m_currentMode)
         return;
 
-    const Mode prevMode = m_currentMode;
     m_currentMode = mode;
 
-    setItems(removeOutdatedItems(m_currentMode));
+    setTextItems(removeOutdatedItems(m_currentMode));
 
     emit modeChanged();
 }
@@ -138,21 +121,45 @@ void QnCompositeTextOverlay::addModeData(Mode mode
         *it = internalData;
 
     if (mode == m_currentMode)
-        addItem(data);
+        addTextItem(data);
 }
 
 void QnCompositeTextOverlay::removeModeData(Mode mode
     , const QnUuid &id)
 {
     auto &currentData = m_data[mode];
-    const auto it = findModeData(mode, id);
+    auto it = findModeData(mode, id);
     if (it == currentData.end())
         return;
+
+    enum { kMinDataLifetimeMs = 5000 };
+
+    // Do not remove data too fast (for short prolonged actions, for instance)
+    const auto dataTimestamp = it->first;
+    const auto currentLifetime = (m_counter.elapsed() - dataTimestamp);
+    if (currentLifetime < kMinDataLifetimeMs)
+    {
+        auto &dataToBeUpdated = it->second;
+        if (m_currentMode == mode)
+        {
+            // Sets timeout to remove item automatically
+            dataToBeUpdated.timeout = (kMinDataLifetimeMs - currentLifetime);
+            addTextItem(dataToBeUpdated);   // replaces existing data
+        }
+        else
+        {
+            // do not change timestamp, but set timeout to be sure
+            // we delete item on next mode switch
+            dataToBeUpdated.timeout = kMinDataLifetimeMs;
+        }
+
+        return;
+    }
 
     currentData.erase(it);
 
     if (m_currentMode == mode)
-        removeItem(id);
+        removeTextItem(id);
 }
 
 void QnCompositeTextOverlay::setModeData(Mode mode
@@ -166,7 +173,7 @@ void QnCompositeTextOverlay::setModeData(Mode mode
     m_data[mode] = data;
 
     if (m_currentMode == mode)
-        setItems(removeOutdatedItems(m_currentMode));
+        setTextItems(removeOutdatedItems(m_currentMode));
 }
 
 void QnCompositeTextOverlay::resetModeData(Mode mode)
@@ -195,31 +202,29 @@ void QnCompositeTextOverlay::initTextMode()
         if (businessAction->actionType() != QnBusiness::ShowTextOverlayAction)
             return;
 
-        /// TODO: #ynikitenkov Replace with businessAction->actionResourceId == cameraId
         const auto &actionParams = businessAction->getParams();
-        if (!businessAction->getResources().contains(cameraId))
+        if (actionParams.actionResourceId != cameraId)
             return;
 
+        enum { kDefaultInstantActionTimeoutMs = 5000 };
+
         const auto state = businessAction->getToggleState();
-        const bool isInstantAction = (state == QnBusiness::UndefinedState);
+        const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
+        const int timeout = (isInstantAction
+            ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
+            : QnOverlayTextItemData::kInfinite);
+
         const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
 
-        if (state == QnBusiness::InactiveState)
+
+        if (!isInstantAction && (state == QnBusiness::InactiveState))
         {
-            /// qDebug() << "Remove " << actionId; // For future debug
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
 
             return;
         }
 
-        /// qDebug() << "Added: " << actionId; // For future debug
-        enum { kDefaultInstantActionTimeoutMs = 5000 };
-        const int timeout = (isInstantAction
-            ? (actionParams.durationMs ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
-            : QnOverlayTextItemData::kInfinite);
-
-
-        enum 
+        enum
         {
             kDescriptionPixelFontSize = 13
             , kCaptionPixelFontSize = 16
@@ -238,14 +243,20 @@ void QnCompositeTextOverlay::initTextMode()
             const auto desciption = elideString(
                 QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
 
+            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  // Do not add empty text items
+                return;
+
             static const auto kComplexHtml = lit("%1%2");
-            text = kComplexHtml.arg(makePTag(caption, kCaptionPixelFontSize, true)
-                , makePTag(desciption, kDescriptionPixelFontSize));
+            text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)
+                , htmlFormattedParagraph(desciption, kDescriptionPixelFontSize));
         }
         else
         {
+            if (text.trimmed().isEmpty()) // Do not add empty text items
+                return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            text = elideString(kTextHtml.arg(makePTag(actionParams.text, 13)), kDescriptionMaxLength);
+            const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
+            text = kTextHtml.arg(htmlFormattedParagraph(elided, 13));
         }
 
         const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
@@ -258,11 +269,9 @@ void QnCompositeTextOverlay::initTextMode()
 
 void QnCompositeTextOverlay::initBookmarksMode()
 {
-    //// TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
+    // TODO: #ynikitenkov Refactor this according to logic in QnWorkbenchNavigator (use cache of bookmark queries)
 
     connect(m_navigator, &QnWorkbenchNavigator::positionChanged, this, &QnCompositeTextOverlay::updateBookmarksFilter);
-    connect(m_navigator->bookmarksSearchStrategy(), &QnSearchQueryStrategy::queryUpdated
-        , this, &QnCompositeTextOverlay::updateBookmarksFilter);
 
     /* Update bookmarks by timer to preload new bookmarks smoothly when playing archive. */
     m_updateQueryFilterTimer.reset([this]()
@@ -278,7 +287,7 @@ void QnCompositeTextOverlay::initBookmarksMode()
     m_updateBookmarksTimer.reset([this]()
     {
         enum { kUpdateBookmarksPeriodMs = 1000 };
-        
+
         QTimer* timer = new QTimer(this);
         timer->setInterval(kUpdateBookmarksPeriodMs);
         connect(timer, &QTimer::timeout, this, &QnCompositeTextOverlay::updateBookmarks);
@@ -305,13 +314,13 @@ void QnCompositeTextOverlay::setColors(const QnCompositeTextOverlayColors &color
     setModeData(m_currentMode, tmp);
 }
 
-void QnCompositeTextOverlay::currentModeChanged()
+void QnCompositeTextOverlay::at_modeChanged()
 {
     const bool bookmarksEnabled = (mode() == kBookmarksMode);
     if (m_bookmarksQuery.isNull() != bookmarksEnabled)
         return;
 
-    if (bookmarksEnabled) 
+    if (bookmarksEnabled)
     {
         m_bookmarksQuery = qnCameraBookmarksManager->createQuery();
 
@@ -319,8 +328,8 @@ void QnCompositeTextOverlay::currentModeChanged()
             , &QnCompositeTextOverlay::updateBookmarks);
         updateBookmarksFilter();
         m_bookmarksQuery->setCamera(m_camera);
-    } 
-    else 
+    }
+    else
     {
         if (m_bookmarksQuery)
             disconnect(m_bookmarksQuery, nullptr, this, nullptr);
@@ -332,7 +341,7 @@ void QnCompositeTextOverlay::currentModeChanged()
 
 void QnCompositeTextOverlay::updateBookmarks()
 {
-    if (!m_bookmarksQuery) 
+    if (!m_bookmarksQuery)
     {
         resetModeData(QnCompositeTextOverlay::kBookmarksMode);
         return;
@@ -353,8 +362,7 @@ void QnCompositeTextOverlay::updateBookmarksFilter()
     if (!m_bookmarksQuery)
         return;
 
-    m_bookmarksQuery->setFilter(constructBookmarksFilter(m_getUtcCurrentTimeMs()
-        , m_navigator->bookmarksSearchStrategy()->query()));
+    m_bookmarksQuery->setFilter(constructBookmarksFilter(m_getUtcCurrentTimeMs()));
 }
 
 QnOverlayTextItemDataList QnCompositeTextOverlay::removeOutdatedItems(Mode mode)
@@ -373,7 +381,7 @@ QnOverlayTextItemDataList QnCompositeTextOverlay::removeOutdatedItems(Mode mode)
         const auto timeout = itemData.timeout;
         const auto timestamp = internalData.first;
 
-        const bool timeoutExpired = ((timeout > 0) 
+        const bool timeoutExpired = ((timeout > 0)
             && ((currentTimestamp - timestamp) > timeout));
 
         if (timeoutExpired)
@@ -418,15 +426,18 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
     const auto timestamp = m_counter.elapsed();
     for (const auto bookmark: bookmarks)
     {
-        enum 
+        enum
         {
             kCaptionPixelSize = 16
             , kDescriptionPixeSize = 12
         };
 
+        if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
+            continue;
+
         const auto bookmarkHtml = kBookTemplate.arg(
-            makePTag(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
-            , makePTag(elideString(bookmark.description, kDescriptionMaxLength), kDescriptionPixeSize));
+            htmlFormattedParagraph(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
+            , htmlFormattedParagraph(elideString(bookmark.description, kDescriptionMaxLength), kDescriptionPixeSize));
 
         const auto itemData = QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options);
         data.insert(itemData.id, InternalData(timestamp, itemData));

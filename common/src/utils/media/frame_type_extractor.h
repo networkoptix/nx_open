@@ -1,6 +1,8 @@
 #ifndef FRAME_TYPE_EXTRACTOR_H
 #define FRAME_TYPE_EXTRACTOR_H
 
+#ifdef ENABLE_DATA_PROVIDERS
+
 class VC1SequenceHeader;
 
 extern "C"
@@ -40,6 +42,8 @@ private:
     VC1SequenceHeader* m_vcSequence;
     bool m_dataWithNalPrefixes;
 };
+
+#endif // ENABLE_DATA_PROVIDERS
 
 #endif // FRAME_TYPE_EXTRACTOR_H
 

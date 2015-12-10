@@ -1,5 +1,4 @@
-#ifndef SYSTEM_HEALTH_H
-#define SYSTEM_HEALTH_H
+#pragma once
 
 #include <QtCore/QString>
 #include <QtCore/QObject>
@@ -16,17 +15,20 @@ namespace QnSystemHealth {
         NoPrimaryTimeServer,
         SystemIsReadOnly,
 
-        // These messages are sent from server
+        /* These messages are sent from server */
         EmailSendError,
         StoragesNotConfigured,
         StoragesAreFull,
         ArchiveRebuildFinished,
         ArchiveRebuildCanceled,
+        ArchiveFastScanFinished,
 
-        NotDefined,
+        //NotDefined,
 
-        MessageTypeCount = ArchiveRebuildFinished
+        Count
     };
+
+    bool isMessageVisible(MessageType message);
 }
 
-#endif // SYSTEM_HEALTH_H
+Q_DECLARE_METATYPE(QnSystemHealth::MessageType);

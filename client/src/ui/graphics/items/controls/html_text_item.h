@@ -27,18 +27,24 @@ struct QnHtmlTextItemOptions
 
 QN_FUSION_DECLARE_FUNCTIONS(QnHtmlTextItemOptions, (eq));
 
+#define QnHtmlTextItemOptions_Fields (backgroundColor)(maxWidth)(borderRadius)(horPadding)(vertPadding)(autosize)
+
 class QnHtmlTextItem : public QGraphicsWidget {
     Q_OBJECT
 
     typedef QGraphicsWidget base_type;
 public:
-    QnHtmlTextItem(const QString &html
+    QnHtmlTextItem(const QString &html = QString()
         , const QnHtmlTextItemOptions &options = QnHtmlTextItemOptions()
         , QGraphicsItem *parent = nullptr);
 
     ~QnHtmlTextItem();
 
+    QString html() const;
     void setHtml(const QString &html);
+
+    QnHtmlTextItemOptions options() const;
+    void setOptions(const QnHtmlTextItemOptions &options);
 
 private:
     virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;

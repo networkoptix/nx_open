@@ -6,6 +6,7 @@
 #include "core/dataprovider/spush_media_stream_provider.h"
 #include "utils/network/simple_http_client.h"
 #include "network/multicodec_rtp_reader.h"
+#include "dlink_resource.h"
 
 class PlDlinkStreamReader: public CLServerPushStreamReader
 {
@@ -29,15 +30,13 @@ private:
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
 
     QString getRTPurl(int profileId) const;
-    QString getQualityString(const QnLiveStreamParams& params) const;
-    bool isTextQualities(const QStringList& qualities) const;
+    QByteArray getQualityString(const QnLiveStreamParams& params) const;
+    bool isTextQualities(const QList<QByteArray>& qualities) const;
 private:
     QnMulticodecRtpReader m_rtpReader;
-    CLSimpleHTTPClient* mHttpClient;
-
-    bool m_h264;
-    bool m_mpeg4;
+    std::unique_ptr<CLSimpleHTTPClient> m_HttpClient;
     QSize m_resolution;
+    QnDlink_ProfileInfo m_profile;
 };
 
 #endif // ENABLE_DLINK

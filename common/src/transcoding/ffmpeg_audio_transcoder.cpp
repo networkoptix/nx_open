@@ -196,16 +196,17 @@ int QnFfmpegAudioTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
         return 0;
 
     int encoderFrameSize = m_encoderCtx->frame_size * sampleSize(m_encoderCtx->sample_fmt) * m_encoderCtx->channels;
-    if (m_decodedBufferSize < encoderFrameSize)
-        return 0;
 
     // TODO: #vasilenko avoid using deprecated methods
-    int encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
-    if (encoded < 0)
-        return -3;
-
-    memmove(m_decodedBuffer, m_decodedBuffer + encoderFrameSize, m_decodedBufferSize - encoderFrameSize);
-    m_decodedBufferSize -= encoderFrameSize;
+    int encoded = 0;
+    while (encoded == 0 && m_decodedBufferSize >= encoderFrameSize) 
+    {
+        encoded = avcodec_encode_audio(m_encoderCtx, m_audioEncodingBuffer, FF_MIN_BUFFER_SIZE, (const short*) m_decodedBuffer);
+        if (encoded < 0)
+            return -3; // TODO: need refactor. add enum with error codes
+        memmove(m_decodedBuffer, m_decodedBuffer + encoderFrameSize, m_decodedBufferSize - encoderFrameSize);
+        m_decodedBufferSize -= encoderFrameSize;
+    }
 
     if (encoded == 0)
         return 0;

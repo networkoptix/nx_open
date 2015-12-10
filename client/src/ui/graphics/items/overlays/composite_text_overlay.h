@@ -72,7 +72,7 @@ private:
 
     void initBookmarksMode();
 
-    void currentModeChanged();
+    void at_modeChanged();
 
     void updateBookmarks();
     

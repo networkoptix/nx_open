@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -13,17 +13,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>de</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Eingabe %1</translation>
     </message>
 </context>
 <context>
@@ -259,10 +248,6 @@
         <translation>Überschrift: %1</translation>
     </message>
     <message>
-        <source>Input port: %1</source>
-        <translation>Input Port: %1</translation>
-    </message>
-    <message>
         <source>MAC #%1: %2 </source>
         <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
         <translation>MAC #%1: %2 </translation>
@@ -372,6 +357,50 @@
     <message>
         <source>Recording on IO modules is disabled:</source>
         <translation>Aufnahme auf den IO Modulen ist deaktiviert:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -579,6 +608,10 @@
     <message>
         <source>IO Module initialization process in progress.</source>
         <translation>IO Modul-Initialisierungsprozess im Gange.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -836,27 +869,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>Voreinstellung #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Kann IO Port Einstellungen nicht initialisieren</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -1081,109 +1093,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Email Adresse nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>Keine Lizenzen</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Email Server nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Einige Benutzer haben keine Emailadressen gesetzt</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Verbindung zu Server verloren</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Fehler beim Emailversand</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Email Adresse für Benutzer %1 wurde nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Wählen Sie den Server mit dem andere Benutzer ihre Zeit synchronisieren</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Wiederaufbau des Archivindex ist abgeschlossen</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Emailadresse wurde nicht gesetzt.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Emailserver nicht gesetzt.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Einige Benutzer haben keine Emailadresse angegeben.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Speicher ist voll auf folgendem Server:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Für den folgenden Server wurde kein Speichermedium konfiguriert:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Sie haben keine Lizenz.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Sie können keine Kameravideos aufzeichnen.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Der Wiederaufbau des Archivindexes wurde auf folgenden Servern abgeschlossen:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Speichermedien sind voll</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Speichermedien sind nicht konfiguriert</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Serverzeit ist nicht synchronisiert und die aktuelle Zeit kann nicht automatisch abgerufen werden.</translation>
-    </message>
-    <message>
-        <source>System is in safe mode</source>
-        <translation>System ist im abgesicherten Modus</translation>
-    </message>
-    <message>
-        <source>The system is running in safe mode.</source>
-        <translation>Das System wird im abgesicherten Modus ausgeführt.</translation>
-    </message>
-    <message>
-        <source>Any configuration changes except license activation are impossible.</source>
-        <translation>Jegliche Konfigurationsänderungen, außer Lizenzaktivierung, sind ausgeschlossen.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1208,17 +1117,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Ungültiger Parameter</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Eingabe %1</translation>
     </message>
 </context>
 <context>

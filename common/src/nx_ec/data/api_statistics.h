@@ -10,6 +10,7 @@
 #include "api_client_info_data.h"
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
+#include "api_layout_data.h"
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
@@ -39,7 +40,7 @@ namespace ec2 {
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \
     (scheduleEnabled)(motionType)(motionMask)(scheduleTasks)(audioEnabled)(secondaryStreamQuality) \
-        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)
+        (controlEnabled)(dewarpingParams)(minArchiveDays)(maxArchiveDays)(preferedServerId)(backupType)
 
     struct ApiStorageDataStatistics
         : ApiStorageData
@@ -47,7 +48,8 @@ namespace ec2 {
         ApiStorageDataStatistics();
         ApiStorageDataStatistics(ApiStorageData&& data);
     };
-#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageDataStatistics_Fields (id)(parentId)(spaceLimit)(usedForWriting) \
+    (storageType)(isBackup)(addParams)
 
     struct ApiMediaServerDataStatistics
 		: ApiMediaServerDataEx
@@ -59,7 +61,8 @@ namespace ec2 {
         ApiStorageDataStatisticsList storages;
     };
 #define ApiMediaServerDataStatistics_Fields (id)(parentId)(status)(storages)(addParams) \
-    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy)
+    (flags)(not_used)(version)(systemInfo)(maxCameras)(allowAutoRedundancy) \
+    (backupType)(backupDaysOfTheWeek)(backupStart)(backupDuration)(backupBitrate)
 
 	struct ApiLicenseStatistics
 	{
@@ -89,8 +92,9 @@ namespace ec2 {
         ApiClientInfoDataList               clients;
         ApiLicenseStatisticsList            licenses;
         ApiMediaServerDataStatisticsList    mediaservers;
+        ApiLayoutDataList                   layouts;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)
 
     struct ApiStatisticsServerInfo
     {

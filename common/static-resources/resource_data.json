@@ -73,12 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
-	{
+    {
             "keys": [
                 "ArecontVision|??05", "ArecontVision|?155"
             ],
             "isRTSPSupported": false
-	},
+    },
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -165,7 +165,8 @@
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
                 "*|DW-CP04",
-                "Cellinx|STH795"
+                "Cellinx|STH795",
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -519,7 +520,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XPTZ"
+                "VISTA|VK2-1080XPTZ","VISTA|VK2-1080XVRDPTPMF"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -624,7 +625,7 @@
                     }
                 }
             },
-			"onvifPtzDigitsAfterDecimalPoint": 0
+            "onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [
@@ -926,6 +927,18 @@
             "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": [
+                "*Grandeye*|EVO-05NxD"
+            ],
+            "relayInputCountForced": 1
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }

@@ -744,7 +744,7 @@ void QnDesktopDataProvider::run()
     if (!m_capturingStopped)
         stopCapturing();
 
-    cl_log.log(QLatin1String("flushing video buffer"), cl_logALWAYS);
+    cl_log.log(QLatin1String("flushing video buffer"), cl_logDEBUG2);
     do {
     } while (processData(true) > 0); // flush buffers
 

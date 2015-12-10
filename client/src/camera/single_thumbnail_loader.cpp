@@ -39,8 +39,9 @@ QImage QnSingleThumbnailLoader::image() const {
 }
 
 void QnSingleThumbnailLoader::doLoadAsync() {
-    if (    !m_server 
-        ||  !m_server->apiConnection() 
+    if (    !m_server
+        ||  !m_server->apiConnection()
+        ||  m_server->getStatus() != Qn::Online
         ||  !m_camera
         )
         return;

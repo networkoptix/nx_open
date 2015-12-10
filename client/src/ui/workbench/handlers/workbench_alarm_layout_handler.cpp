@@ -20,24 +20,27 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 
-class QnAlarmLayoutResource: public QnLayoutResource {
-public:
-    QnAlarmLayoutResource():
-        QnLayoutResource(qnResTypePool)
-    {
-        Q_ASSERT_X(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
+namespace {
+    class QnAlarmLayoutResource: public QnLayoutResource {
+        Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
+    public:
+        QnAlarmLayoutResource():
+            QnLayoutResource(qnResTypePool)
+        {
+            Q_ASSERT_X(qnResPool->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 
-        setId(QnUuid::createUuid());
-        addFlags(Qn::local);
-        setName(tr("Alarms"));
-        setCellSpacing(0.1, 0.1);
-        setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission));
-        setUserCanEdit(true);
-    }
-};
+            setId(QnUuid::createUuid());
+            addFlags(Qn::local);
+            setName(tr("Alarms"));
+            setCellSpacing(0.1, 0.1);
+            setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission | Qn::WritePermission | Qn::AddRemoveItemsPermission));
+            setUserCanEdit(true);
+        }
+    };
 
-typedef QnSharedResourcePointer<QnAlarmLayoutResource> QnAlarmLayoutResourcePtr;
-typedef QnSharedResourcePointerList<QnAlarmLayoutResource> QnAlarmLayoutResourceList;
+    typedef QnSharedResourcePointer<QnAlarmLayoutResource> QnAlarmLayoutResourcePtr;
+    typedef QnSharedResourcePointerList<QnAlarmLayoutResource> QnAlarmLayoutResourceList;
+}
 
 QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
     : base_type(parent)
@@ -63,7 +66,6 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
 
         //TODO: #GDM code duplication
         QnBusinessEventParameters params = businessAction->getRuntimeParams();
-        QnBusiness::EventType eventType = params.eventType;
 
         QnVirtualCameraResourceList targetCameras = qnResPool->getResources<QnVirtualCameraResource>(businessAction->getResources());
         if (businessAction->getParams().useSource) {
@@ -72,8 +74,11 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent)
             targetCameras << qnResPool->getResources<QnVirtualCameraResource>(params.metadata.cameraRefs);
         }
 
-        if (!targetCameras.isEmpty())
-            openCamerasInAlarmLayout(targetCameras, businessAction->getParams().forced);
+        /* If forced, open layout instantly */
+        if (businessAction->getParams().forced)
+            openCamerasInAlarmLayout(targetCameras, true);
+        else if (alarmLayoutExists())
+            openCamerasInAlarmLayout(targetCameras, false);
     });
 
 }
@@ -82,11 +87,20 @@ QnWorkbenchAlarmLayoutHandler::~QnWorkbenchAlarmLayoutHandler()
 {}
 
 void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCameraResourceList &cameras, bool switchToLayout ) {
+    if (cameras.isEmpty())
+        return;
+
     auto layout = findOrCreateAlarmLayout();
     if (!layout)
         return;
 
-    for (const QnVirtualCameraResourcePtr &camera: cameras) {
+    // Sort items to guarantee the same item placement for the same set of cameras.
+    QnVirtualCameraResourceList sortedCameras = cameras;
+    std::sort(sortedCameras.begin(), sortedCameras.end(), [](const QnVirtualCameraResourcePtr &camera1, const QnVirtualCameraResourcePtr &camera2) {
+        return camera1->getId() < camera2->getId();
+    });
+
+    for (const QnVirtualCameraResourcePtr &camera: sortedCameras) {
         if (!layout->items(camera->getUniqueId()).isEmpty())
             continue;
 
@@ -132,4 +146,16 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
     }
 
     return workbenchAlarmLayout;
+}
+
+bool QnWorkbenchAlarmLayoutHandler::alarmLayoutExists() const {
+    if (!context()->user())
+        return false;
+
+    QnAlarmLayoutResourceList layouts = qnResPool->getResources<QnAlarmLayoutResource>();
+    Q_ASSERT_X(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
+    if (layouts.empty())
+        return false;
+
+    return QnWorkbenchLayout::instance(QnLayoutResourcePtr(layouts.first())) != nullptr;
 }

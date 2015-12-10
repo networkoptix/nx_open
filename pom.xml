@@ -287,7 +287,7 @@
                     <value>true</value>
                 </property>
                 <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
+                    <missing>customization/${customization}/android.skip</missing>
                 </file>
             </activation>
             <modules>
@@ -307,7 +307,7 @@
                     <value>true</value>
                 </property>
                 <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
+                    <missing>customization/${customization}/ios.skip</missing>
                 </file>
             </activation>
             <modules>
@@ -834,10 +834,7 @@
                 <property>
                     <name>newmobile</name>
                     <value>true</value>
-                </property>
-                <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
-                </file>                
+                </property>               
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
@@ -856,7 +853,7 @@
                     <value>android</value>
                 </property>
                 <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
+                    <missing>customization/${customization}/android.skip</missing>
                 </file>                
             </activation>
             <build>
@@ -908,7 +905,7 @@
                     <value>ios</value>
                 </property>
                 <file>
-                    <missing>customization/${customization}/mobile.skip</missing>
+                    <missing>customization/${customization}/ios.skip</missing>
                 </file>                
             </activation>
             <build>
