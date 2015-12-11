@@ -32,6 +32,7 @@
 #include "http_handlers/bind_system_handler.h"
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/update_account_handler.h"
+#include "http_handlers/reset_password_handler.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
@@ -279,6 +280,12 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<UpdateAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
+    msgDispatcher->registerRequestProcessor<ResetPasswordHttpHandler>(
+        ResetPasswordHttpHandler::kHandlerPath,
+        [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
+            return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
+        } );
+
     //systems
     msgDispatcher->registerRequestProcessor<BindSystemHandler>(
         BindSystemHandler::kHandlerPath,
@@ -401,11 +408,12 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
 {
     //updating DB structure to actual state
     nx::db::DBStructureUpdater dbStructureUpdater(dbManager);
-    dbStructureUpdater.addUpdateScript(db::createAccountData);
-    dbStructureUpdater.addUpdateScript(db::createSystemData);
-    dbStructureUpdater.addUpdateScript(db::systemToAccountMapping);
-    dbStructureUpdater.addUpdateScript(db::addCustomizationToSystem);
-    dbStructureUpdater.addUpdateScript(db::addCustomizationToAccount);
+    dbStructureUpdater.addUpdateScript(db::kCreateAccountData);
+    dbStructureUpdater.addUpdateScript(db::kCreateSystemData);
+    dbStructureUpdater.addUpdateScript(db::kSystemToAccountMapping);
+    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToSystem);
+    dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
+    dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
     return dbStructureUpdater.updateStructSync();
 }
 

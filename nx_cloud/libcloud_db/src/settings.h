@@ -6,6 +6,7 @@
 #ifndef NX_CLOUD_DB_SETTING_H
 #define NX_CLOUD_DB_SETTING_H
 
+#include <chrono>
 #include <list>
 #include <map>
 
@@ -45,6 +46,12 @@ public:
     }
 };
 
+class AccountManager
+{
+public:
+    std::chrono::seconds passwordResetCodeExpirationTimeout;
+};
+
 
 /*!
     \note Values specified via command-line have priority over conf file (or win32 registry) values
@@ -64,6 +71,7 @@ public:
     const db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
+    const AccountManager& accountManager() const;
     const QString& cloudBackendUrl() const;
     const QString& changeUser() const;
 
@@ -81,6 +89,7 @@ private:
     db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;
+    AccountManager m_accountManager;
     QString m_cloudBackendUrl;
     QString m_changeUser;
 
