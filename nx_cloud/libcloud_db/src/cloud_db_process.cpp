@@ -131,8 +131,8 @@ int CloudDBProcess::executeApplication()
         authRestrictionList.allow( ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth );
 
         AuthenticationManager authenticationManager( 
-            accountManager,
-            systemManager,
+            &accountManager,
+            &systemManager,
             authRestrictionList,
             streeManager);
 

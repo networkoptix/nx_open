@@ -19,7 +19,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, api_conventions)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::AccountData account1;
     std::string account1Password;

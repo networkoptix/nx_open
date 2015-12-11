@@ -7,13 +7,16 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
 #include <utils/serialization/lexical.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
 #include "account_manager.h"
+#include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
 
@@ -31,6 +34,44 @@ SystemManager::SystemManager(
     //pre-filling cache
     if (fillCache() != db::DBResult::ok)
         throw std::runtime_error("Failed to pre-load systems cache");
+}
+
+
+SystemManager::~SystemManager()
+{
+}
+
+void SystemManager::authenticateByName(
+    const nx_http::StringType& username,
+    std::function<bool(const nx::Buffer&)> validateHa1Func,
+    stree::AbstractResourceWriter* const authProperties,
+    std::function<void(bool)> completionHandler)
+{
+    bool result = false;
+    auto scopedGuard = makeScopedGuard(
+        [/*std::move*/ completionHandler, &result]() {
+        completionHandler(result);
+    });
+
+    QnMutexLocker lk(&m_mutex);
+
+    auto systemData = m_cache.find(QnUuid::fromStringSafe(username));
+    if (!systemData)
+        return;
+
+    if (!validateHa1Func(nx_http::calcHa1(
+            username,
+            AuthenticationManager::realm(),
+            nx::String(systemData->authKey.c_str()))))
+    {
+        return;
+    }
+
+    authProperties->put(
+        cdb::attr::authSystemID,
+        QVariant::fromValue(QnUuid(systemData->id)));
+
+    result = true;
 }
 
 void SystemManager::bindSystemToAccount(

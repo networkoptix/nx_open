@@ -23,6 +23,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "access_control/auth_types.h"
+#include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
 #include "data/data_filter.h"
 #include "data/system_data.h"
@@ -41,6 +42,8 @@ class AccountManager;
     \note All data can be cached
 */
 class SystemManager
+:
+    public AbstractAuthenticationDataProvider
 {
 public:
     /*!
@@ -50,6 +53,13 @@ public:
     SystemManager(
         const AccountManager& accountManager,
         nx::db::DBManager* const dbManager) throw(std::runtime_error);
+    virtual ~SystemManager();
+
+    virtual void authenticateByName(
+        const nx_http::StringType& username,
+        std::function<bool(const nx::Buffer&)> validateHa1Func,
+        stree::AbstractResourceWriter* const authProperties,
+        std::function<void(bool)> completionHandler) override;
 
     //!Binds system to an account associated with \a authzInfo
     void bindSystemToAccount(

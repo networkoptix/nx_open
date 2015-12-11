@@ -46,8 +46,6 @@ CdbFunctionalTest::CdbFunctionalTest()
     *b = strdup("--notification/enabled=false");
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
-    
-    start();
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()
@@ -71,6 +69,12 @@ void CdbFunctionalTest::start()
             return m_cdbInstance->exec();
         });
     cdbInstantiatedCreatedFuture.wait();
+}
+
+void CdbFunctionalTest::startAndWaitUntilStarted()
+{
+    start();
+    waitUntilStarted();
 }
 
 void CdbFunctionalTest::waitUntilStarted()
@@ -110,6 +114,12 @@ void CdbFunctionalTest::restart()
     stop();
     start();
     waitUntilStarted();
+}
+
+void CdbFunctionalTest::addArg(const char* arg)
+{
+    auto b = std::back_inserter(m_args);
+    *b = strdup(arg);
 }
 
 SocketAddress CdbFunctionalTest::endpoint() const
@@ -171,19 +181,22 @@ api::ResultCode CdbFunctionalTest::addAccount(
 }
 
 api::ResultCode CdbFunctionalTest::activateAccount(
-    const api::AccountConfirmationCode& activationCode)
+    const api::AccountConfirmationCode& activationCode,
+    std::string* const accountEmail)
 {
     //activating account
     auto connection = connectionFactory()->createConnection("", "");
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result) = makeSyncCall<api::ResultCode>(
+    nx::cdb::api::AccountEmail response;
+    std::tie(result, response) = makeSyncCall<api::ResultCode, nx::cdb::api::AccountEmail>(
         std::bind(
             &nx::cdb::api::AccountManager::activateAccount,
             connection->accountManager(),
             activationCode,
             std::placeholders::_1));
+    *accountEmail = response.email;
     return result;
 }
 
@@ -216,9 +229,12 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
-    resCode = activateAccount(activationCode);
+    std::string email;
+    resCode = activateAccount(activationCode, &email);
     if (resCode != api::ResultCode::ok)
         return resCode;
+
+    assert(accountData->email == email);
 
     resCode = getAccount(
         accountData->email,

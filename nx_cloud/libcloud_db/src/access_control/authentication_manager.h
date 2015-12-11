@@ -6,6 +6,7 @@
 #ifndef cloud_db_authentication_manager_h
 #define cloud_db_authentication_manager_h
 
+#include <functional>
 #include <random>
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
@@ -21,6 +22,7 @@ namespace cdb {
 class AccountManager;
 class SystemManager;
 class StreeManager;
+class AbstractAuthenticationDataProvider;
 
 //!Performs authentication based on various parameters
 /*!
@@ -34,8 +36,8 @@ class AuthenticationManager
 {
 public:
     AuthenticationManager(
-        const AccountManager& accountManager,
-        const SystemManager& systemManager,
+        AccountManager* const accountManager,
+        SystemManager* const systemManager,
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
@@ -48,19 +50,17 @@ public:
     static nx::String realm(); 
 
 private:
-    const AccountManager& m_accountManager;
-    const SystemManager& m_systemManager;
     const QnAuthMethodRestrictionList& m_authRestrictionList;
     const StreeManager& m_stree;
     std::random_device m_rd;
     std::uniform_int_distribution<size_t> m_dist;
+    std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
     bool validateNonce(const nx_http::StringType& nonce);
-    bool findHa1(
-        const stree::AbstractResourceReader& authSearchResult,
+    bool AuthenticationManager::authenticateInDataManagers(
         const nx_http::StringType& username,
-        nx::Buffer* const ha1,
-        stree::AbstractResourceWriter* const authProperties ) const;
+        std::function<bool(const nx::Buffer&)> validateHa1Func,
+        stree::AbstractResourceWriter* const authProperties);
     void addWWWAuthenticateHeader(
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();

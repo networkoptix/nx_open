@@ -52,6 +52,8 @@ namespace nx
 
     /** Extracts zero terminated string from Buffer without trailing 0 bytes if any */
     String NX_NETWORK_API bufferToString( const Buffer& buffer );
+
+    std::string NX_NETWORK_API toStdString(const Buffer& str);
 }
 
 #endif  //NX_BUFFER_H

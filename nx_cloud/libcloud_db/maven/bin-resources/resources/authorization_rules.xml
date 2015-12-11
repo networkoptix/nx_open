@@ -21,6 +21,10 @@
                     <set resName="user.ha1" resValue="111111111111111"/>
                 </sequence> -->
             </condition>
+
+            <condition resName="request.path">
+                <set value="/account/reset_password" resName="authenticated" resValue="true"/>
+            </condition>
         </sequence>
 
         <sequence value="authorization">

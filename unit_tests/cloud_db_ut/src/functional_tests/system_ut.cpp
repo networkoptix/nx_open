@@ -14,7 +14,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::AccountData account1;
     std::string account1Password;
@@ -162,7 +162,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     //creating two accounts
     api::AccountData account1;
@@ -474,7 +474,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 TEST_F(CdbFunctionalTest, system_sharing_owner)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     //creating account
     api::AccountData account1;

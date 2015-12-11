@@ -11,9 +11,12 @@
 #include <QtCore/QDateTime>
 #include <QtSql/QSqlQuery>
 
+#include <cloud_db_client/src/cdb_request_path.h>
+#include <cloud_db_client/src/data/types.h>
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/guard.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
@@ -47,6 +50,76 @@ AccountManager::AccountManager(
         throw std::runtime_error( "Failed to fill account cache" );
 }
 
+AccountManager::~AccountManager()
+{
+}
+
+void AccountManager::authenticateByName(
+    const nx_http::StringType& username,
+    std::function<bool(const nx::Buffer&)> validateHa1Func,
+    stree::AbstractResourceWriter* const authProperties,
+    std::function<void(bool)> completionHandler)
+{
+    bool result = false;
+    auto scopedGuard = makeScopedGuard(
+        [/*std::move*/ completionHandler, &result](){
+            completionHandler(result);
+        });
+
+    QnMutexLocker lk(&m_mutex);
+
+    auto account = m_cache.find(toStdString(username));
+    if (!account)
+        return;
+    if (validateHa1Func(account->passwordHa1.c_str()))
+    {
+        authProperties->put(
+            cdb::attr::authAccountEmail,
+            username);
+        result = true;
+        return;
+    }
+
+    auto tmpPasswordsRange = m_accountPassword.equal_range(toStdString(username));
+    if (tmpPasswordsRange.first == m_accountPassword.end())
+        return;
+
+    for (auto it = tmpPasswordsRange.first; it != tmpPasswordsRange.second; )
+    {
+        auto curIt = it++;
+        if (!checkTemporaryPasswordForExpiration(&lk, curIt))
+            continue;
+
+        if (validateHa1Func(curIt->second.passwordHa1.c_str()))
+        {
+            authProperties->put(
+                cdb::attr::authAccountEmail,
+                username);
+            result = true;
+
+            ++curIt->second.useCount;
+            checkTemporaryPasswordForExpiration(&lk, curIt);
+            return;
+        }
+    }
+}
+
+bool AccountManager::checkTemporaryPasswordForExpiration(
+    QnMutexLockerBase* const /*lk*/,
+    std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter)
+{
+    if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
+        passwordIter->second.expirationTimestampUtc > 0 &&
+        passwordIter->second.expirationTimestampUtc <= ::time(NULL))
+    {
+        //TODO #ak remove password from DB
+        m_accountPassword.erase(passwordIter);
+        return false;
+    }
+
+    return true;
+}
+
 void AccountManager::addAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountData accountData,
@@ -78,7 +151,7 @@ void AccountManager::addAccount(
 void AccountManager::activate(
     const AuthorizationInfo& /*authzInfo*/,
     data::AccountConfirmationCode emailVerificationCode,
-    std::function<void(api::ResultCode)> completionHandler )
+    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler )
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountConfirmationCode, std::string>(
@@ -142,7 +215,7 @@ void AccountManager::resetPassword(
     authzInfo.get(attr::secureSource, &requestSourceSecured);
 
     using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::AccountEmail, data::AccountConfirmationCode>(
+    m_dbManager->executeUpdate<data::AccountEmail, data::TemporaryAccountPassword>(
         std::bind(&AccountManager::generatePasswordResetCode, this, _1, _2, _3),
         std::move(accountEmail),
         std::bind(&AccountManager::passwordResetCodeGenerated, this, 
@@ -164,23 +237,40 @@ db::DBResult AccountManager::fillCache()
     using namespace std::placeholders;
     m_dbManager->executeSelect<int>(
         std::bind( &AccountManager::fetchAccounts, this, _1, _2 ),
-        [&cacheFilledPromise]( db::DBResult dbResult, int /*dummy*/ ) {
+        [&cacheFilledPromise]( db::DBResult dbResult, int /*dummyResult*/ ) {
             cacheFilledPromise.set_value( dbResult );
         } );
+
+    //waiting for completion
+    future.wait();
+    const auto result = future.get();
+    if (result != db::DBResult::ok)
+        return result;
+
+
+    //reading temporary passwords
+    cacheFilledPromise = std::promise<db::DBResult>();
+    future = cacheFilledPromise.get_future();
+    using namespace std::placeholders;
+    m_dbManager->executeSelect<int>(
+        std::bind(&AccountManager::fetchTemporaryPasswords, this, _1, _2),
+        [&cacheFilledPromise](db::DBResult dbResult, int /*dummyResult*/) {
+            cacheFilledPromise.set_value(dbResult);
+        });
 
     //waiting for completion
     future.wait();
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const /*dummy*/ )
+db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const /*dummyResult*/ )
 {
-    QSqlQuery readAccountsQuery( *connection );
+    QSqlQuery readAccountsQuery(*connection);
     readAccountsQuery.prepare(
         "SELECT id, email, password_ha1 as passwordHa1, "
                "full_name as fullName, customization, status_code as statusCode "
         "FROM account" );
-    if( !readAccountsQuery.exec() )
+    if (!readAccountsQuery.exec())
     {
         NX_LOG( lit( "Failed to read account list from DB. %1" ).
             arg( connection->lastError().text() ), cl_logWARNING );
@@ -190,14 +280,59 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
     std::vector<data::AccountData> accounts;
     QnSql::fetch_many( readAccountsQuery, &accounts );
 
-    for( auto& account: accounts )
+    for (auto& account : accounts)
     {
         auto emailCopy = account.email;
-        if( !m_cache.insert( std::move(emailCopy), std::move(account) ) )
+        if (!m_cache.insert(std::move(emailCopy), std::move(account)))
         {
             assert( false );
         }
     }
+
+    return db::DBResult::ok;
+}
+
+class TemporaryAccountPasswordWithEmail
+:
+    public data::TemporaryAccountPassword
+{
+public:
+    std::string email;
+};
+
+#define TemporaryAccountPasswordWithEmail_Fields TemporaryAccountPassword_Fields (email)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (TemporaryAccountPasswordWithEmail),
+    (sql_record),
+    _Fields)
+
+
+db::DBResult AccountManager::fetchTemporaryPasswords(QSqlDatabase* connection, int* const /*dummyResult*/)
+{
+    QSqlQuery readPasswordsQuery(*connection);
+    readPasswordsQuery.prepare(
+        "SELECT ap.id,                                                          \
+            ap.account_id as accountID,                                         \
+            a.email,                                                            \
+            ap.password_ha1 as passwordHa1,                                     \
+            ap.realm,                                                           \
+            ap.expiration_timestamp_utc as expirationTimestampUtc,              \
+            ap.max_use_count as maxUseCount,                                    \
+            ap.use_count as useCount,                                           \
+            ap.access_rights as accessRights                                    \
+         FROM account_password ap LEFT JOIN account a ON ap.account_id=a.id");
+    if (!readPasswordsQuery.exec())
+    {
+        NX_LOG(lit("Failed to read temporary passwords from DB. %1").
+            arg(connection->lastError().text()), cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+
+    std::vector<TemporaryAccountPasswordWithEmail> tmpPasswords;
+    QnSql::fetch_many(readPasswordsQuery, &tmpPasswords);
+    for (auto& tmpPassword: tmpPasswords)
+        m_accountPassword.emplace(std::move(tmpPassword.email), std::move(tmpPassword));
 
     return db::DBResult::ok;
 }
@@ -344,16 +479,21 @@ void AccountManager::accountVerified(
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
-    std::function<void(api::ResultCode)> completionHandler )
+    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler )
 {
-    if( resultCode == db::DBResult::ok )
-    {
-        m_cache.atomicUpdate(
-            accountEmail,
-            []( api::AccountData& account ){ account.statusCode = api::AccountStatus::activated; } );
-    }
+    if( resultCode != db::DBResult::ok )
+        return completionHandler(
+            fromDbResultCode(resultCode),
+            api::AccountEmail());
 
-    completionHandler( fromDbResultCode( resultCode ) );
+    m_cache.atomicUpdate(
+        accountEmail,
+        []( api::AccountData& account ){ account.statusCode = api::AccountStatus::activated; } );
+    api::AccountEmail response;
+    response.email = accountEmail;
+    completionHandler(
+        fromDbResultCode(resultCode),
+        std::move(response));
 }
 
 nx::db::DBResult AccountManager::updateAccountInDB(
@@ -423,42 +563,39 @@ void AccountManager::accountUpdated(
 nx::db::DBResult AccountManager::generatePasswordResetCode(
     QSqlDatabase* const connection,
     const data::AccountEmail& accountEmail,
-    data::AccountConfirmationCode* const confirmationCode)
+    data::TemporaryAccountPassword* const tempPasswordData)
 {
     auto account = m_cache.find(accountEmail.email);
     if (!account)
     {
-        NX_LOG(lm("/account/password_reset (%1). Account not found").arg(accountEmail.email), cl_logDEBUG1);
+        NX_LOG(lm("%1 (%2). Account not found").
+            arg(kAccountPasswordResetPath).arg(accountEmail.email), cl_logDEBUG1);
         return db::DBResult::notFound;
     }
 
-    data::TemporaryAccountPassword tempPasswordData;
-    tempPasswordData.accountID = account->id;
-    tempPasswordData.realm = AuthenticationManager::realm().constData();
+    tempPasswordData->accountID = account->id;
+    tempPasswordData->realm = AuthenticationManager::realm().constData();
     std::string tempPassword(10 + (rand() % 10), 'c');
     std::generate(
         tempPassword.begin(),
         tempPassword.end(),
-        [](){return 'a' + (rand() % 'z');});
-    tempPasswordData.passwordHa1 = nx_http::calcHa1(
+        [](){return 'a' + (rand() % ('z'-'a'));});
+    tempPasswordData->password = tempPassword;
+    tempPasswordData->passwordHa1 = nx_http::calcHa1(
         accountEmail.email.c_str(),
-        tempPasswordData.realm.c_str(),
+        tempPasswordData->realm.c_str(),
         tempPassword.c_str()).constData();
-    tempPasswordData.expirationTimestampUtc =
+    tempPasswordData->expirationTimestampUtc =
         ::time(NULL) +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
-    tempPasswordData.maxUseCount = 1;
+    tempPasswordData->maxUseCount = 1;
     //tempPassword.accessRights = TODO #ak updateAccount only;
 
-    nx::db::DBResult result = addTempPassword(
+    nx::db::DBResult result = insertTempPassword(
         connection,
-        std::move(tempPasswordData));
+        *tempPasswordData);
     if (result != db::DBResult::ok)
         return result;
-
-    auto resetCodeStr = tempPassword + ":" + accountEmail.email;
-    confirmationCode->code = QByteArray::fromRawData(
-        resetCodeStr.data(), resetCodeStr.size()).toBase64().constData();
 
     return db::DBResult::ok;
 }
@@ -467,28 +604,38 @@ void AccountManager::passwordResetCodeGenerated(
     bool requestSourceSecured,
     nx::db::DBResult resultCode,
     data::AccountEmail accountEmail,
-    data::AccountConfirmationCode resultData,
+    data::TemporaryAccountPassword resultData,
     std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
 {
     if (resultCode != db::DBResult::ok)
+    {
+        NX_LOG(lm("/account/reset_password (%1). Failed to save password reset code. DB error: %2").
+            arg(accountEmail.email).arg((int)resultCode), cl_logDEBUG1);
         return completionHandler(
             fromDbResultCode(resultCode),
             data::AccountConfirmationCode());
+    }
 
-    //TODO #ak placing temporary password to internal cache
+    data::AccountConfirmationCode confirmationCode;
+    auto resetCodeStr = resultData.password + ":" + accountEmail.email;
+    confirmationCode.code = QByteArray::fromRawData(
+        resetCodeStr.data(), resetCodeStr.size()).toBase64().constData();
+
+    //placing temporary password to internal cache
     {
-        //QnMutexLocker lk(&m_mutex);
-        //m_accountPassword.emplace(accountEmail.email, );
+        QnMutexLocker lk(&m_mutex);
+        resultData.password.clear();
+        m_accountPassword.emplace(accountEmail.email, std::move(resultData));
     }
 
     return completionHandler(
         api::ResultCode::ok,
         requestSourceSecured
-            ? std::move(resultData)
+            ? std::move(confirmationCode)
             : data::AccountConfirmationCode());
 }
 
-nx::db::DBResult AccountManager::addTempPassword(
+nx::db::DBResult AccountManager::insertTempPassword(
     QSqlDatabase* const connection,
     data::TemporaryAccountPassword tempPasswordData)
 {

@@ -5,6 +5,7 @@
 
 #include "authentication_manager.h"
 
+#include <future>
 #include <limits>
 
 #include <boost/optional.hpp>
@@ -13,6 +14,7 @@
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 
+#include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
 #include "managers/account_manager.h"
 #include "managers/system_manager.h"
@@ -28,17 +30,17 @@ namespace cdb {
 using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
-    const AccountManager& accountManager,
-    const SystemManager& systemManager,
+    AccountManager* const accountManager,
+    SystemManager* const systemManager,
     const QnAuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
-    m_accountManager(accountManager),
-    m_systemManager(systemManager),
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
     m_dist(0, std::numeric_limits<size_t>::max())
 {
+    m_authDataProviders.push_back(accountManager);
+    m_authDataProviders.push_back(systemManager);
 }
 
 bool AuthenticationManager::authenticate(
@@ -97,23 +99,36 @@ bool AuthenticationManager::authenticate(
         return false;
     }
 
-    nx::Buffer ha1;
-    if (!findHa1(
-            authResult,
-            authzHeader->userid(),
-            &ha1,
-            authProperties))
+    const auto userID = authzHeader->userid();
+    std::function<bool(const nx::Buffer&)> validateHa1Func = std::bind(
+        &validateAuthorization,
+        request.requestLine.method,
+        userID,
+        boost::none,
+        std::placeholders::_1,
+        std::move(authzHeader.get()));
+
+    //analyzing authSearchResult for password or ha1 pesence
+    if (auto foundHa1 = authResult.get(attr::ha1))
     {
-        addWWWAuthenticateHeader(wwwAuthenticate);
-        return false;
+        if (validateHa1Func(foundHa1.get().toString().toLatin1()))
+            return true;
+    }
+    if (auto password = authResult.get(attr::userPassword))
+    {
+        if (validateHa1Func(calcHa1(
+                userID,
+                realm(),
+                password.get().toString())))
+        {
+            return true;
+        }
     }
 
-    return validateAuthorization(
-        request.requestLine.method,
-        authzHeader->userid(),
-        boost::none,
-        ha1,
-        authzHeader.get());
+    return authenticateInDataManagers(
+        userID,
+        std::move(validateHa1Func),
+        authProperties);
 }
 
 nx::String AuthenticationManager::realm()
@@ -128,48 +143,28 @@ bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
     return nonce.size() < 31;
 }
 
-bool AuthenticationManager::findHa1(
-    const stree::AbstractResourceReader& authSearchResult,
+bool AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
-    nx::Buffer* const ha1,
-    stree::AbstractResourceWriter* const authProperties) const
+    std::function<bool(const nx::Buffer&)> validateHa1Func,
+    stree::AbstractResourceWriter* const authProperties)
 {
-    //TODO #ak analyzing authSearchResult for password or ha1 pesence
-    if (auto foundHa1 = authSearchResult.get(attr::ha1))
+    //TODO #ak AuthenticationManager has to become async sometimes...
+
+    for (AbstractAuthenticationDataProvider* authDataProvider: m_authDataProviders)
     {
-        *ha1 = foundHa1.get().toString().toLatin1();
-        return true;
-    }
-    if (auto password = authSearchResult.get(attr::userPassword))
-    {
-        *ha1 = calcHa1(
+        std::promise<bool> authPromise;
+        auto authFuture = authPromise.get_future();
+        authDataProvider->authenticateByName(
             username,
-            realm(),
-            password.get().toString());
-        return true;
+            validateHa1Func,
+            authProperties,
+            [&authPromise](bool authResult) { authPromise.set_value(authResult); });
+        authFuture.wait();
+        if (authFuture.get())
+            return true;
     }
 
-    if (auto accountData = m_accountManager.findAccountByUserName(
-            std::string(username.constData(), username.size())))
-    {
-        *ha1 = accountData.get().passwordHa1.c_str();
-        authProperties->put(
-            cdb::attr::authAccountEmail,
-            QString::fromStdString(accountData.get().email));
-    }
-    else if (auto systemData = m_systemManager.findSystemByID(QnUuid::fromStringSafe(username)))
-    {
-        //TODO #ak successfull system authentication should activate system
-        *ha1 = calcHa1(
-            username,
-            realm(),
-            nx::String(systemData.get().authKey.c_str()));
-        authProperties->put(
-            cdb::attr::authSystemID,
-            QVariant::fromValue(QnUuid(systemData.get().id)));
-    }
-
-    return true;
+    return false;
 }
 
 void AuthenticationManager::addWWWAuthenticateHeader(

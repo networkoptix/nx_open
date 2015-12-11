@@ -61,4 +61,9 @@ namespace nx
     {
         return String( buffer.constData(), stringLength( buffer ) );
     }
+
+    std::string toStdString(const Buffer& str)
+    {
+        return std::string(str.constData(), str.size());
+    }
 }

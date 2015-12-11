@@ -74,6 +74,7 @@ class TemporaryAccountPassword
 {
 public:
     QnUuid accountID;
+    std::string password;
     std::string passwordHa1;
     std::string realm;
     std::uint32_t expirationTimestampUtc;

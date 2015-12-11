@@ -31,10 +31,13 @@ public:
     ~CdbFunctionalTest();
 
     void start();
+    void startAndWaitUntilStarted();
     void waitUntilStarted();
     void stop();
     //!restarts process
     void restart();
+
+    void addArg(const char* arg);
 
     SocketAddress endpoint() const;
 
@@ -47,7 +50,8 @@ protected:
         std::string* const password,
         api::AccountConfirmationCode* const activationCode);
     api::ResultCode activateAccount(
-        const api::AccountConfirmationCode& activationCode);
+        const api::AccountConfirmationCode& activationCode,
+        std::string* const accountEmail);
     api::ResultCode getAccount(
         const std::string& email,
         const std::string& password,

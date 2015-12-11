@@ -16,6 +16,7 @@
 #include <utils/db/db_manager.h>
 
 #include "access_control/auth_types.h"
+#include "access_control/abstract_authentication_data_provider.h"
 #include "cache.h"
 #include "data/account_data.h"
 #include "managers_types.h"
@@ -34,6 +35,8 @@ namespace conf
     \note Methods of this class are re-enterable
 */
 class AccountManager
+:
+    public AbstractAuthenticationDataProvider
 {
 public:
     /*!
@@ -43,6 +46,13 @@ public:
         const conf::Settings& settings,
         nx::db::DBManager* const dbManager,
         EMailManager* const emailManager ) throw( std::runtime_error );
+    virtual ~AccountManager();
+
+    virtual void authenticateByName(
+        const nx_http::StringType& username,
+        std::function<bool(const nx::Buffer&)> validateHa1Func,
+        stree::AbstractResourceWriter* const authProperties,
+        std::function<void(bool)> completionHandler) override;
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
     void addAccount(
@@ -53,7 +63,7 @@ public:
     void activate(
         const AuthorizationInfo& authzInfo,
         data::AccountConfirmationCode emailVerificationCode,
-        std::function<void(api::ResultCode)> completionHandler );
+        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
     
     //!Retrieves account corresponding to authorization data \a authzInfo
     void getAccount(
@@ -78,9 +88,12 @@ private:
     //!map<email, account>
     Cache<std::string, data::AccountData> m_cache;
     mutable QnMutex m_mutex;
+    //map<email, temporary password>
+    std::multimap<std::string, data::TemporaryAccountPassword> m_accountPassword;
 
     nx::db::DBResult fillCache();
-    nx::db::DBResult fetchAccounts( QSqlDatabase* connection, int* const dummy );
+    nx::db::DBResult fetchAccounts(QSqlDatabase* connection, int* const dummyResult);
+    nx::db::DBResult fetchTemporaryPasswords(QSqlDatabase* connection, int* const dummyResult);
 
     //add_account DB operations
     nx::db::DBResult insertAccount(
@@ -103,7 +116,7 @@ private:
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
-        std::function<void(api::ResultCode)> completionHandler );
+        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
 
     nx::db::DBResult updateAccountInDB(
         QSqlDatabase* const tran,
@@ -116,17 +129,21 @@ private:
     nx::db::DBResult generatePasswordResetCode(
         QSqlDatabase* const tran,
         const data::AccountEmail& accountEmail,
-        data::AccountConfirmationCode* const confirmationCode);
+        data::TemporaryAccountPassword* const confirmationCode);
     void passwordResetCodeGenerated(
         bool requestSourceSecured,
         nx::db::DBResult resultCode,
         data::AccountEmail accountEmail,
-        data::AccountConfirmationCode resultData,
+        data::TemporaryAccountPassword resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
-    nx::db::DBResult addTempPassword(
+    nx::db::DBResult insertTempPassword(
         QSqlDatabase* const connection,
         data::TemporaryAccountPassword tempPasswordData);
+
+    bool checkTemporaryPasswordForExpiration(
+        QnMutexLockerBase* const lk,
+        std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter);
 };
 
 }   //cdb

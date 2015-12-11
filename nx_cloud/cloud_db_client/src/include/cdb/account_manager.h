@@ -32,7 +32,7 @@ public:
     //!Activate account supplying code returned by \a AccountManager::registerNewAccount
     virtual void activateAccount(
         api::AccountConfirmationCode activationCode,
-        std::function<void(api::ResultCode)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler) = 0;
     //!Fetches account info if credentails are account credentials
     /*!
         \note Required access role: account
