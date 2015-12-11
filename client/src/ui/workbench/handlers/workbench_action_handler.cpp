@@ -2364,7 +2364,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
+            component = setWarningStyleHtml(component);
 
         messageParts << component;
     }

@@ -26,5 +26,5 @@ void QnStorageRebuildWidget::loadData( const QnStorageScanData &data ) {
         ui->progressBar->setValue(data.progress * 100 + 0.5);
 
     ui->stopButton->setEnabled(data.state == Qn::RebuildState_FullScan);
-    setVisible(data.state == Qn::RebuildState_FullScan);
+    setVisible(data.state == Qn::RebuildState_PartialScan || data.state == Qn::RebuildState_FullScan);
 }

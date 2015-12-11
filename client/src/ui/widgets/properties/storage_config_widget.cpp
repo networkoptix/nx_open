@@ -5,6 +5,8 @@
 #include <api/model/backup_status_reply.h>
 #include <api/model/rebuild_archive_reply.h>
 
+#include <boost/range/algorithm/count_if.hpp>
+
 #include <camera/camera_data_manager.h>
 
 #include <core/resource/client_storage_resource.h>
@@ -120,7 +122,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     connect(ui->rebuildBackupWidget,        &QnStorageRebuildWidget::cancelRequested, this, [this]{ cancelRebuild(false); });
 
     connect(ui->pushButtonSchedule,         &QPushButton::clicked, this, &QnStorageConfigWidget::at_openBackupSchedule_clicked);
-    connect(ui->camerasToBackupButton,      &QPushButton::clicked,  this, [this]{
+    connect(ui->camerasToBackupButton,      &QPushButton::clicked, this, [this]{
         menu()->trigger(Qn::OpenBackupCamerasAction);
         updateBackupInfo();
     });
@@ -261,9 +263,6 @@ void QnStorageConfigWidget::at_backupTypeComboBoxChange(int index)
 
     m_backupSchedule.backupType = currentBackupType;
     ui->pushButtonSchedule->setEnabled(currentBackupType == Qn::Backup_Schedule);
-    ui->backupTimeLabel->setVisible(currentBackupType != Qn::Backup_RealTime);
-
-
     emit hasChangesChanged();
 }
 
@@ -552,24 +551,16 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return error(tr("Backup is already in progress."));
 
     if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
-        return storage.isWritable && storage.isUsed && storage.isBackup && storage.isOnline;
+        return storage.isWritable && storage.isUsed && storage.isBackup;
     }))
         return error(tr("Select at least one backup storage."));
-
+/*
     if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
         return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
     }))
         return error(tr("Select at least one camera with archive to backup"));
-
-    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
-    {
-        static const auto kMessageWithWarningTemplate = lit("<html>%1<br><font color = red>%2</font></html>");
-        const auto message = kMessageWithWarningTemplate.arg(
-            tr("In Realtime mode all data is backed up on continuously")
-            , tr("Previous footage will not be backed up!"));
-        return error(message);
-
-    } else if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
+*/
+    if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
         if (!m_backupSchedule.isValid())
             return error(tr("Backup Schedule is invalid."));
     }
@@ -607,13 +598,14 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
         return info.isBackup;
     });
 
-    bool backupIsPossible = any_of(m_model->storages(), [this](const QnStorageModelInfo &info) {
-        return m_model->canMoveStorage(info);
-    });
+    /* Notify about backup possibility if there are less than two valid storages in the system. */
+    bool backupIsPossible = !isReadOnly()
+        && !backupIsActive
+        && boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info) { return info.isWritable; }) <= 1;
 
     ui->backupStoragesGroupBox->setVisible(backupIsActive);
     ui->backupControls->setVisible(backupIsActive);
-    ui->backupOptionLabel->setVisible(!backupIsPossible);
+    ui->backupOptionLabel->setVisible(backupIsPossible);
 }
 
 
@@ -631,10 +623,15 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     bool canStartBackup = this->canStartBackup(reply, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
 
+    bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
+
     //TODO: #GDM discuss texts
-    QString backedUpTo = reply.backupTimeMs > 0
+    QString backedUpTo = realtime
+        ? tr("In Realtime mode all data is backed up on continuously.") + L' ' + setWarningStyleHtml(tr("Previous footage will not be backed up!"))
+        : reply.backupTimeMs > 0
         ? tr("Archive backup is created up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
         : tr("Backup was never started.");
+
     ui->backupTimeLabel->setText(backedUpTo);
 
     ui->backupStartButton->setEnabled(canStartBackup);
@@ -642,7 +639,31 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     ui->stackedWidgetBackupInfo->setCurrentWidget(backupInProgress ? ui->backupProgressPage : ui->backupPreparePage);
     ui->comboBoxBackupType->setEnabled(!backupInProgress);
 
+    updateCamerasLabel();
 }
+
+
+void QnStorageConfigWidget::updateCamerasLabel()
+{
+    if (!m_server)
+        return;
+
+    auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr &camera) {
+        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+    };
+
+    QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(m_server, true);
+    QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
+
+    bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
+    //TODO: #GDM device-dependent-strings
+    QString lineTotal = (selectedCameras.size() > 0)
+        ? tr("%n of %1 are selected", "", selectedCameras.size()).arg(serverCameras.size())
+        : setWarningStyleHtml(tr("No any cameras selected"));
+
+    ui->camerasLabel->setText(lineTotal);
+}
+
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)
 {
