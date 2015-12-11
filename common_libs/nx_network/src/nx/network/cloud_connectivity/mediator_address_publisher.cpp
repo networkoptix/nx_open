@@ -95,14 +95,6 @@ bool MediatorAddressPublisher::isCloudReady()
             NX_LOGX( lit( "No authorization info yet" ), cl_logDEBUG1 );
             return false;
         }
-
-        m_stunClient->openConnection(
-            nullptr,
-            [ this ]( SystemError::ErrorCode code )
-            {
-                QnMutexLocker lk( &m_mutex );
-                m_publishedAddresses.clear();
-            } );
     }
 
     return m_stunClient && m_stunAuthorization;
@@ -134,6 +126,7 @@ void MediatorAddressPublisher::pingReportedAddresses()
         {
             NX_LOGX( *error, cl_logERROR );
             m_pingedAddresses.clear();
+            m_publishedAddresses.clear();
             return setupUpdateTimer();
         }
 
@@ -175,6 +168,8 @@ void MediatorAddressPublisher::publishPingedAddresses()
         if( const auto error = AsyncClient::hasError( code, response ) )
         {
             NX_LOGX( *error, cl_logERROR );
+            m_pingedAddresses.clear();
+            m_publishedAddresses.clear();
             return setupUpdateTimer();
         }
 

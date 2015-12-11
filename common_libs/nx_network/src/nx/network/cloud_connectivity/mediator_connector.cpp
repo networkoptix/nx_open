@@ -86,29 +86,8 @@ stun::AsyncClient* MediatorConnector::client()
     QnMutexLocker lk( &m_mutex );
     if( !m_client && m_endpoint )
     {
-        m_client = std::make_unique< stun::AsyncClient >( *m_endpoint );
-        m_client->openConnection(
-            [ this ]( SystemError::ErrorCode code )
-            {
-                if( code == SystemError::noError )
-                {
-                    NX_LOGX( lit( "Mediator connection is estabilished" ),
-                             cl_logDEBUG1 );
-                }
-                else
-                {
-                    NX_LOGX( lit( "Mediator connection has failed: %1" )
-                             .arg( SystemError::toString( code ) ),
-                             cl_logDEBUG1 );
-                }
-
-            },
-            [ this ]( SystemError::ErrorCode code )
-            {
-                NX_LOGX( lit( "Mediator connection has been lost: %1" )
-                         .arg( SystemError::toString( code ) ),
-                         cl_logDEBUG1 );
-            } );
+        m_client = std::make_unique< stun::AsyncClient >();
+        m_client->connect( *m_endpoint );
     }
 
     return m_client.get();

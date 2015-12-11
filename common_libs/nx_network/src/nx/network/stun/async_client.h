@@ -37,33 +37,31 @@ public:
     typedef BaseConnectionType ConnectionType;
 
     typedef std::function< void( SystemError::ErrorCode ) > ConnectionHandler;
-    typedef std::function< void( const Message& ) > IndicationHandler;
+    typedef std::function< void( Message ) > IndicationHandler;
     typedef std::function< void( SystemError::ErrorCode, Message )> RequestHandler;
 
-    static const struct Timeouts { uint send, recv; } DEFAULT_TIMEOUTS;
+    static const struct Timeouts { uint send, recv, reconnect; } DEFAULT_TIMEOUTS;
 
-    AsyncClient( const SocketAddress& endpoint, bool useSsl = false,
-                 Timeouts timeouts = DEFAULT_TIMEOUTS );
+    AsyncClient( Timeouts timeouts = DEFAULT_TIMEOUTS );
     ~AsyncClient();
 
     Q_DISABLE_COPY( AsyncClient );
 
-    //!Asynchronously openes connection to the server, specified during initialization
+    //!Asynchronously openes connection to the server
     /*!
-        \param connectHandler Will be called once to deliver connection completeness
-        \param disconnectHandler Will be called on disconnect (may be repeated if reconnected)
-        \return \a false, if could not start asynchronous operation
-        \note It is valid to call any time to add connect and disconnect handlers
+        \param endpoint Address to use
+        \note shell be called only once (to provide address) reconnect will
+              happen automatically
     */
-    void openConnection( ConnectionHandler connectHandler = nullptr,
-                         ConnectionHandler disconnectHandler = nullptr );
+    void connect( SocketAddress endpoint, bool useSsl = false );
 
     //!Subscribes for certain indications
     /*!
         \param method Is monitoring indication type
         \param handler Will be called for each indication message
+        \return true on success, false if this methed is already monitored
     */
-    void monitorIndocations( int method, IndicationHandler handler );
+    bool monitorIndications( int method, IndicationHandler handler );
 
     //!Sends message asynchronously
     /*!
@@ -74,7 +72,7 @@ public:
         \note It is valid to call this method independent of \a openConnection
             (connection will be opened automaticly)
     */
-    void sendRequest( Message request, RequestHandler requestHandler );
+    void sendRequest( Message request, RequestHandler handler );
 
     //! \note Required by \a nx_api::BaseServerConnection
     virtual void closeConnection(
@@ -93,9 +91,7 @@ private:
         terminated,
     };
 
-    void openConnectionImpl( QnMutexLockerBase* lock,
-                             ConnectionHandler* currentHandler = nullptr );
-
+    void openConnectionImpl( QnMutexLockerBase* lock );
     void closeConnectionImpl( QnMutexLockerBase* lock,
                               SystemError::ErrorCode code );
 
@@ -104,27 +100,25 @@ private:
     void processMessage( Message message );
 
 private:
-    const SocketAddress m_endpoint;
-    const bool m_useSsl;
     const Timeouts m_timeouts;
-    std::unique_ptr< BaseConnectionType > m_baseConnection;
 
     QnMutex m_mutex;
+    boost::optional<SocketAddress> m_endpoint;
+    bool m_useSsl;
     State m_state;
-    std::vector< ConnectionHandler > m_connectHandlers;
-    std::vector< ConnectionHandler > m_disconnectHandlers;
+
+    std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
+    std::unique_ptr<BaseConnectionType> m_baseConnection;
+    std::unique_ptr<AbstractStreamSocket> m_connectingSocket;
+
+    std::list<std::pair<Message, RequestHandler>> m_requestQueue;
     #ifdef _DEBUG
-        std::map< int, std::vector< IndicationHandler > > m_indicationHandlers;
+        std::map<int, IndicationHandler> m_indicationHandlers;
+        std::map<Buffer,RequestHandler> m_requestsInProgress;
     #else
-        std::unordered_map< int, std::vector< IndicationHandler > > m_indicationHandlers;
+        std::unordered_map<int, IndicationHandler> m_indicationHandlers;
+        std::unordered_map<Buffer, RequestHandler> m_requestsInProgress;
     #endif
-
-    struct Credentials { String userName; String key; };
-    boost::optional< Credentials > m_credentials;
-
-    std::unique_ptr< AbstractStreamSocket > m_connectingSocket;
-    std::list< std::pair< Message, RequestHandler > > m_requestQueue;
-    std::map< Buffer, RequestHandler > m_requestsInProgress;
 };
 
 } // namespase stun

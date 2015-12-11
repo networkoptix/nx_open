@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
 #include <common/common_globals.h>
 #include <utils/thread/sync_queue.h>
@@ -12,6 +13,26 @@ namespace nx {
 namespace stun {
 namespace test {
 
+class TestServer
+    : public SocketServer
+{
+public:
+    TestServer() : SocketServer( false ) {}
+
+    std::vector<std::shared_ptr<ServerConnection>> connections;
+
+protected:
+    virtual std::shared_ptr<ServerConnection> createConnection(
+            std::unique_ptr<AbstractStreamSocket> _socket) override
+    {
+        auto connection = SocketServer::createConnection(std::move(_socket));
+        connections.push_back(connection);
+        return connection;
+    };
+};
+
+const AsyncClient::Timeouts CLIENT_TIMEOUTS = { 100, 100, 500 };
+
 class StunClientServerTest
         : public ::testing::Test
 {
@@ -24,59 +45,69 @@ protected:
 
     StunClientServerTest()
         : address( lit( "127.0.0.1"), newPort() )
-        , client( address )
+        , client( CLIENT_TIMEOUTS )
     {
+    }
+
+    SystemError::ErrorCode sendTestRequestSync()
+    {
+        Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
+        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
+        client.sendRequest( std::move( request ), waiter.pusher() );
+        return waiter.pop().first;
     }
 
     void startServer()
     {
-        server = std::make_unique< SocketServer >( false );
+        server = std::make_unique< TestServer >();
         EXPECT_TRUE( server->bind( address ) );
         EXPECT_TRUE( server->listen() );
     }
 
-    void stopServer()
+    SystemError::ErrorCode sendIndicationSync( int method )
     {
-        server.reset();
+        SyncQueue< SystemError::ErrorCode > sendWaiter;
+        const auto connection = server->connections.front();
+        connection->sendMessage(
+            Message( Header( MessageClass::indication, method ) ),
+            sendWaiter.pusher() );
+
+        return sendWaiter.pop();
     }
 
     const SocketAddress address;
     AsyncClient client;
-    std::unique_ptr< SocketServer > server;
+    std::unique_ptr< TestServer > server;
 };
 
 TEST_F( StunClientServerTest, Connectivity )
 {
-    SyncQueue< SystemError::ErrorCode > connected;
-    SyncQueue< SystemError::ErrorCode > disconnected;
+    EXPECT_EQ( sendTestRequestSync(), SystemError::notConnected ); // no address
 
-    // 1. try to connect with no server
-    client.openConnection( connected.pusher(), disconnected.pusher() );
+    client.connect( address );
+    EXPECT_THAT( sendTestRequestSync(), testing::AnyOf(
+        SystemError::connectionRefused, SystemError::connectionReset,
+        SystemError::timedOut ) ); // no server to connect
 
-    auto r = connected.pop();
-    ASSERT_TRUE( r == SystemError::connectionRefused || r == SystemError::timedOut );
-    EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( disconnected.isEmpty() );
-
-    // 2. connect to normal server, eg reconnect
     startServer();
+    EXPECT_EQ( sendTestRequestSync(), SystemError::noError ); // ok
+    EXPECT_EQ( server->connections.size(), 1 );
 
-    client.openConnection();
+    server.reset();
+    EXPECT_THAT( sendTestRequestSync(), testing::AnyOf(
+        SystemError::connectionRefused, SystemError::connectionReset,
+        SystemError::timedOut ) ); // no server to connect
 
-    ASSERT_EQ( SystemError::noError, connected.pop() );
-    EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( disconnected.isEmpty() );
-
-    // 3. remove server and see what's gonna happen
-    stopServer();
-
-    ASSERT_EQ( SystemError::connectionReset, disconnected.pop() );
-    EXPECT_TRUE( connected.isEmpty() );
-    EXPECT_TRUE( disconnected.isEmpty() );
+    startServer();
+    EXPECT_EQ( server->connections.size(), 0 );
+    std::this_thread::sleep_for( std::chrono::milliseconds(
+        CLIENT_TIMEOUTS.reconnect * 2 ) ); // automatic reconnect is expected
+    EXPECT_EQ( server->connections.size(), 1 );
 }
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
+    client.connect( address );
     // try to sendRequest with no server
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
@@ -126,6 +157,27 @@ TEST_F( StunClientServerTest, RequestResponse )
         ASSERT_EQ( error->getCode(), 404 );
         ASSERT_EQ( error->getString(), String( "Method is not supported" ) );
     }
+}
+
+TEST_F( StunClientServerTest, Indications )
+{
+    startServer();
+
+    SyncQueue< Message > recvWaiter;
+    client.connect( address );
+    client.monitorIndications( 0xAB, recvWaiter.pusher() );
+    client.monitorIndications( 0xCD, recvWaiter.pusher() );
+
+    EXPECT_EQ( sendTestRequestSync(), SystemError::noError );
+    EXPECT_EQ( server->connections.size(), 1 );
+
+    EXPECT_EQ( sendIndicationSync( 0xAB ), SystemError::noError );
+    EXPECT_EQ( sendIndicationSync( 0xCD ), SystemError::noError );
+    EXPECT_EQ( sendIndicationSync( 0xAD ), SystemError::noError );
+
+    EXPECT_EQ( recvWaiter.pop().header.method, 0xAB );
+    EXPECT_EQ( recvWaiter.pop().header.method, 0xCD );
+    EXPECT_TRUE( recvWaiter.isEmpty() ); // 3rd indication is not subscribed
 }
 
 } // namespace test
