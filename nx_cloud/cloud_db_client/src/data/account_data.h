@@ -37,16 +37,16 @@ void serializeToUrlQuery(const AccountData&, QUrlQuery* const urlQuery);
 
 
 ////////////////////////////////////////////////////////////
-//// class AccountActivationCode
+//// class AccountConfirmationCode
 ////////////////////////////////////////////////////////////
 
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountActivationCode* const data);
-void serializeToUrlQuery(const AccountActivationCode&, QUrlQuery* const urlQuery);
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountConfirmationCode* const data);
+void serializeToUrlQuery(const AccountConfirmationCode&, QUrlQuery* const urlQuery);
 
-#define AccountActivationCode_Fields (code)
+#define AccountConfirmationCode_Fields (code)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (AccountData)(AccountActivationCode),
+    (AccountData)(AccountConfirmationCode),
     (json)(sql_record) )
 
 
@@ -58,6 +58,21 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data);
 void serializeToUrlQuery(const AccountUpdateData&, QUrlQuery* const urlQuery);
 
 bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
+
+
+////////////////////////////////////////////////////////////
+//// class AccountEmail
+////////////////////////////////////////////////////////////
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountEmail* const data);
+void serializeToUrlQuery(const AccountEmail&, QUrlQuery* const urlQuery);
+
+#define AccountEmail_Fields (email)
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (AccountEmail),
+    (json))
+
 
 }   //api
 }   //cdb

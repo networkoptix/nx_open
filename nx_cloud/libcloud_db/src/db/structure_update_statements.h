@@ -13,7 +13,7 @@ namespace db {
 
 
 //!Account table
-static const char createAccountData[] =
+static const char kCreateAccountData[] =
 "                                                                   \
 CREATE TABLE account_status (                                       \
     code                INTEGER PRIMARY KEY,                        \
@@ -37,7 +37,7 @@ CREATE TABLE account (                                              \
 );                                                                  \
                                                                     \
 CREATE TABLE email_verification (                                   \
-    account_id          BLOB(16) NOT NULL,                          \
+    account_id          BLOB(16) NOT NULL PRIMARY KEY,              \
     verification_code   TEXT NOT NULL,                              \
     expiration_date     DATETIME NOT NULL,                          \
     FOREIGN KEY( account_id ) REFERENCES account ( id )             \
@@ -45,7 +45,7 @@ CREATE TABLE email_verification (                                   \
 );                                                                  \
 ";
 
-static const char createSystemData[] =
+static const char kCreateSystemData[] =
 "                                                                                   \
 CREATE TABLE system_status (                                                        \
     code                INTEGER PRIMARY KEY,                                        \
@@ -68,7 +68,7 @@ CREATE TABLE system (                                                           
 );                                                                                  \
 ";
 
-static const char systemToAccountMapping[] = 
+static const char kSystemToAccountMapping[] = 
 "                                                                                   \
 CREATE TABLE access_role (                                                          \
     id                  INTEGER PRIMARY KEY,                                        \
@@ -96,7 +96,7 @@ CREATE UNIQUE INDEX system_to_account_primary                                   
 
 
 //#CLOUD-123
-static const char addCustomizationToSystem[] =
+static const char kAddCustomizationToSystem[] =
 "                                                                   \
 ALTER TABLE system ADD COLUMN customization VARCHAR(255);           \
 UPDATE system set customization = 'default';                        \
@@ -104,11 +104,29 @@ UPDATE system set customization = 'default';                        \
 
 
 //#CLOUD-124
-static const char addCustomizationToAccount[] =
+static const char kAddCustomizationToAccount[] =
 "                                                                   \
 ALTER TABLE account ADD COLUMN customization VARCHAR(255);          \
 UPDATE account set customization = 'default';                       \
 ";
+
+
+//#CLOUD-73
+static const char kAddTemporaryAccountPassword[] =
+"                                                                   \
+CREATE TABLE account_password (                                     \
+    id                          BLOB(16) NOT NULL PRIMARY KEY,      \
+    account_id                  BLOB(16) NOT NULL,                  \
+    password_ha1                TEXT NOT NULL,                      \
+    realm                       TEXT NOT NULL,                      \
+    expiration_timestamp_utc    INTEGER,                            \
+    max_use_count               INTEGER,                            \
+    use_count                   INTEGER,                            \
+    access_rights               TEXT,                               \
+    FOREIGN KEY( account_id ) REFERENCES account( id ) ON DELETE CASCADE           \
+);                                                                  \
+";
+
 
 }   //db
 }   //cdb

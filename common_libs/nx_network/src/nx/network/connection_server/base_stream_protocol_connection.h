@@ -39,14 +39,7 @@ namespace nx_api
         class SerializerType
     > class BaseStreamProtocolConnection
     :
-		public BaseServerConnection<CustomConnectionType>/*
-        public BaseServerConnection<
-            BaseStreamProtocolConnection<
-                CustomConnectionType,
-                MessageType,
-                ParserType,
-                SerializerType>>
-				*/
+		public BaseServerConnection<CustomConnectionType>
     {
     public:
         typedef BaseStreamProtocolConnection<
@@ -54,7 +47,6 @@ namespace nx_api
             MessageType,
             ParserType,
             SerializerType> SelfType;
-        //typedef BaseStreamProtocolConnection<CustomConnectionType, CustomConnectionManagerType> SelfType;
         typedef BaseServerConnection<CustomConnectionType> BaseType;
         //!Type of messages used by this connection class. Request/response/indication is sub-class of message, so no difference at this level
         typedef MessageType message_type;

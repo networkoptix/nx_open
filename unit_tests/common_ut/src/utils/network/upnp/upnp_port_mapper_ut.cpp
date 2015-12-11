@@ -43,7 +43,7 @@ private:
     std::queue< T > m_queue;
 };
 
-SocketAddress popAddress( SyncQueue< SocketAddress >* queue7001 )
+static SocketAddress popAddress( SyncQueue< SocketAddress >* queue7001 )
 {
     auto address = queue7001->pop();
     if( address.address == HostAddress() ) // external IP is not resolved yet

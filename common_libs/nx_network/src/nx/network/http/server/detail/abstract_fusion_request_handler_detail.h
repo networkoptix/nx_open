@@ -93,12 +93,27 @@ protected:
         }
         //}
 
-        if( (inputDataFormat && !isFormatSupported( *inputDataFormat )) ||
-            !isFormatSupported( m_outputDataFormat ) )
+        if (inputDataFormat && !isFormatSupported(*inputDataFormat))
         {
-            requestCompleted(
-                nx_http::StatusCode::notAcceptable,
-                std::unique_ptr<nx_http::AbstractMsgBodySource>() );
+            FusionRequestResult result(
+                FusionRequestErrorClass::badRequest,
+                FusionRequestResult::ecNotAcceptable,
+                lit("Input format %1 not supported. Input data attributes can be specified in url or by %2 POST message body").
+                    arg(Qn::serializationFormatToHttpContentType(*inputDataFormat)).
+                    arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+            requestCompleted(std::move(result));
+            return false;
+        }
+
+        if (!isFormatSupported(m_outputDataFormat))
+        {
+            FusionRequestResult result(
+                FusionRequestErrorClass::badRequest,
+                FusionRequestResult::ecNotAcceptable,
+                lit("Output format %1 not supported. Only %2 is supported").
+                    arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat)).
+                    arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+            requestCompleted(std::move(result));
             return false;
         }
 
@@ -183,9 +198,6 @@ public:
 
         if (result.resultCode == FusionRequestErrorClass::noError)
         {
-            //requests returning some data MUST be issues with GET method
-            Q_ASSERT(m_requestMethod == nx_http::Method::GET);
-
             //serializing outputData
             nx::Buffer serializedData;
             if (serializeToAnyFusionFormat(outputData, m_outputDataFormat, &serializedData))
@@ -262,7 +274,8 @@ private:
             FusionRequestResult result(
                 FusionRequestErrorClass::badRequest,
                 FusionRequestResult::ecDeserializationError,
-                QString()); //TODO #ak error message
+                lit("Error deserializing input of type %1").
+                    arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
             this->requestCompleted(std::move(result));
             return;
         }

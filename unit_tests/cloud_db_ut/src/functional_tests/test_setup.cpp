@@ -130,7 +130,7 @@ api::ModuleInfo CdbFunctionalTest::moduleInfo() const
 api::ResultCode CdbFunctionalTest::addAccount(
     api::AccountData* const accountData,
     std::string* const password,
-    api::AccountActivationCode* const activationCode)
+    api::AccountConfirmationCode* const activationCode)
 {
     if (accountData->email.empty())
     {
@@ -161,7 +161,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
 
     //adding account
     api::ResultCode result = api::ResultCode::ok;
-    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountActivationCode>(
+    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
         std::bind(
             &nx::cdb::api::AccountManager::registerNewAccount,
             connection->accountManager(),
@@ -171,7 +171,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
 }
 
 api::ResultCode CdbFunctionalTest::activateAccount(
-    const api::AccountActivationCode& activationCode)
+    const api::AccountConfirmationCode& activationCode)
 {
     //activating account
     auto connection = connectionFactory()->createConnection("", "");
@@ -208,7 +208,7 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     api::AccountData* const accountData,
     std::string* const password)
 {
-    api::AccountActivationCode activationCode;
+    api::AccountConfirmationCode activationCode;
     auto resCode = addAccount(
         accountData,
         password,
@@ -242,6 +242,30 @@ api::ResultCode CdbFunctionalTest::updateAccount(
                 connection->accountManager(),
                 std::move(updateData),
                 std::placeholders::_1));
+
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::resetAccountPassword(
+    const std::string& email,
+    std::string* const confirmationCode)
+{
+    auto connection = connectionFactory()->createConnection(email, std::string());
+
+    api::AccountEmail accountEmail;
+    accountEmail.email = email;
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::AccountConfirmationCode accountConfirmationCode;
+    std::tie(resCode, accountConfirmationCode) =
+        makeSyncCall<api::ResultCode, api::AccountConfirmationCode>(
+            std::bind(
+                &nx::cdb::api::AccountManager::resetPassword,
+                connection->accountManager(),
+                std::move(accountEmail),
+                std::placeholders::_1));
+
+    *confirmationCode = accountConfirmationCode.code;
 
     return resCode;
 }

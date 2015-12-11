@@ -37,10 +37,16 @@ namespace nx_http
 
         switch( m_httpStreamReader.state() ) 
         {
-            case HttpStreamReader::pullingLineEndingBeforeMessageBody:
-            case HttpStreamReader::readingMessageBody:
+            //TODO #ak currently, always reading full message before going futher.
+            //  Have to add support for infinite request message body to async server
+            //case HttpStreamReader::pullingLineEndingBeforeMessageBody:
+            //case HttpStreamReader::readingMessageBody:
             case HttpStreamReader::messageDone:
                 *m_msg = m_httpStreamReader.message();
+                if (m_msg->type == MessageType::request)
+                    m_msg->request->messageBody = m_httpStreamReader.fetchMessageBody();
+                else if (m_msg->type == MessageType::response)
+                    m_msg->response->messageBody = m_httpStreamReader.fetchMessageBody();
                 return ParserState::done;
 
             case HttpStreamReader::parseError:

@@ -74,7 +74,10 @@ void MediatorConnector::enable( bool waitComplete )
     {
         QnMutexLocker lk( &m_mutex );
         if( m_promise )
+        {
+            lk.unlock();
             m_promise->get_future().wait();
+        }
     }
 }
 

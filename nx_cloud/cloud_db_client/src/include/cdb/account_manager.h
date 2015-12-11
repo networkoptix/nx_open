@@ -28,10 +28,10 @@ public:
     */
     virtual void registerNewAccount(
         api::AccountData accountData,
-        std::function<void(api::ResultCode, api::AccountActivationCode)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler) = 0;
     //!Activate account supplying code returned by \a AccountManager::registerNewAccount
     virtual void activateAccount(
-        api::AccountActivationCode activationCode,
+        api::AccountConfirmationCode activationCode,
         std::function<void(api::ResultCode)> completionHandler) = 0;
     //!Fetches account info if credentails are account credentials
     /*!
@@ -42,6 +42,9 @@ public:
     virtual void updateAccount(
         api::AccountUpdateData accountData,
         std::function<void(api::ResultCode)> completionHandler) = 0;
+    virtual void resetPassword(
+        api::AccountEmail accountEmail,
+        std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler) = 0;
 };
 
 }   //api

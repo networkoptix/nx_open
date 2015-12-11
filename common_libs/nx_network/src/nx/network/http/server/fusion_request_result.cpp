@@ -14,6 +14,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorClass,
     (FusionRequestErrorClass::noError, "noError")
     (FusionRequestErrorClass::badRequest, "badRequest")
     (FusionRequestErrorClass::unauthorized, "unauthorized")
+    (FusionRequestErrorClass::logicError, "logicError")
     (FusionRequestErrorClass::ioError, "ioError")
     (FusionRequestErrorClass::internalError, "internalError")
     )
@@ -44,7 +45,13 @@ nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
         case FusionRequestErrorClass::noError:
             return nx_http::StatusCode::ok;
         case FusionRequestErrorClass::badRequest:
-            return nx_http::StatusCode::badRequest;
+            switch (errorDetail)
+            {
+                case ecNotAcceptable:
+                    return nx_http::StatusCode::notAcceptable;
+                default:
+                    return nx_http::StatusCode::badRequest;
+            }
         case FusionRequestErrorClass::unauthorized:
             return nx_http::StatusCode::ok;
         case FusionRequestErrorClass::logicError:

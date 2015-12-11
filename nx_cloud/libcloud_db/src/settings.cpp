@@ -66,6 +66,10 @@ namespace
     const QLatin1String kNotificationEnabled("notification/enabled");
     const QLatin1String kDefaultNotificationEnabled("true");
 
+    const QLatin1String kPasswordResetCodeExpirationTimeout("accountManager/passwordResetCodeExpirationTimeoutSec");
+    const std::chrono::seconds kDefaultPasswordResetCodeExpirationTimeout(86400);
+    
+
     //auth settings
     const QLatin1String kAuthXmlPath("auth/rulesXmlPath");
     const QLatin1String kDefaultAuthXmlPath(":/authorization_rules.xml");
@@ -117,6 +121,11 @@ const Auth& Settings::auth() const
 const Notification& Settings::notification() const
 {
     return m_notification;
+}
+
+const AccountManager& Settings::accountManager() const
+{
+    return m_accountManager;
 }
 
 const QString& Settings::cloudBackendUrl() const
@@ -205,6 +214,12 @@ void Settings::loadConfiguration()
     m_notification.enabled = m_settings.value(
         kNotificationEnabled,
         kDefaultNotificationEnabled).toString() == "true";
+
+    //accountManager
+    m_accountManager.passwordResetCodeExpirationTimeout =
+        std::chrono::seconds(m_settings.value(
+            kPasswordResetCodeExpirationTimeout,
+            kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
