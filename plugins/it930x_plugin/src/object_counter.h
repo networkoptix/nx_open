@@ -4,7 +4,7 @@
 #if 0
 #define debug_printf printf
 #else
-void debug_printf(const char * , ...);
+inline void debug_printf(const char * , ...) {}
 #endif
 
 #ifdef COUNT_OBJECTS

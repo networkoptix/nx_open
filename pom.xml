@@ -331,6 +331,7 @@
                 <!--module>storage_plugins/ftpstorageplugin</module-->
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
+                <module>plugins/it930x_plugin</module>
                 <module>mediaserver</module>
                 <module>mediaserver_core</module>
                 <!--<module>mediaproxy</module> -->

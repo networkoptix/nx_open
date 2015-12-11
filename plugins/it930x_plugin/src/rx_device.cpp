@@ -7,13 +7,6 @@
 #include "rx_device.h"
 #include "camera_manager.h"
 
-#if 1
-void debug_printf(const char * , ...)
-{
-
-}
-#endif
-
 namespace ite
 {
     std::mutex It930x::m_rcMutex;
@@ -61,7 +54,7 @@ namespace ite
             std::lock_guard<std::mutex> lock(m_cam->get_mutex());
             m_cam->rxDeviceRef().reset();
             m_cam = nullptr;
-        }        
+        }
         stopReader();
         m_txDev.reset();
         open();

@@ -254,13 +254,16 @@ namespace ite
 //        return nxcip::NX_NO_ERROR;
 //    }
 
-    void getRxDevNames(std::vector<std::string>& devs) {
+    void getRxDevNames(std::vector<std::string>& devs)
+    {
         devs.clear();
         DIR * dir = ::opendir( "/dev" );
 
-        if (dir != NULL) {
+        if (dir != NULL)
+        {
             struct dirent * ent;
-            while ((ent = ::readdir( dir )) != NULL) {
+            while ((ent = ::readdir( dir )) != NULL)
+            {
                 std::string file( ent->d_name );
                 if (file.find( RxDevice::DEVICE_PATTERN ) != std::string::npos)
                     devs.push_back(file);
