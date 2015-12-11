@@ -9,7 +9,14 @@ SocketGlobals::SocketGlobals()
 
 SocketGlobals::~SocketGlobals()
 {
-    m_addressPublisher.terminate();
+    std::promise< void > promise;
+    BarrierHandler barrier([&](){ promise.set_value(); });
+
+    m_addressResolver.pleaseStop( barrier.fork() );
+    m_addressPublisher.pleaseStop( barrier.fork() );
+    m_mediatorConnector.pleaseStop( barrier.fork() );
+
+    promise.get_future().wait();
 }
 
 void SocketGlobals::init()

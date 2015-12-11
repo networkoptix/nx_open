@@ -53,6 +53,12 @@ bool AsyncClient::monitorIndications( int method, IndicationHandler handler )
     return m_indicationHandlers.emplace( method, std::move(handler) ).second;
 }
 
+bool AsyncClient::ignoreIndications( int method )
+{
+    QnMutexLocker lock( &m_mutex );
+    return m_indicationHandlers.erase( method );
+}
+
 void AsyncClient::sendRequest( Message request, RequestHandler handler )
 {
     QnMutexLocker lock( &m_mutex );

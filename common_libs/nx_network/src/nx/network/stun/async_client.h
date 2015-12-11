@@ -36,7 +36,6 @@ public:
 
     typedef BaseConnectionType ConnectionType;
 
-    typedef std::function< void( SystemError::ErrorCode ) > ConnectionHandler;
     typedef std::function< void( Message ) > IndicationHandler;
     typedef std::function< void( SystemError::ErrorCode, Message )> RequestHandler;
 
@@ -62,6 +61,14 @@ public:
         \return true on success, false if this methed is already monitored
     */
     bool monitorIndications( int method, IndicationHandler handler );
+
+    //!Stops monitoring for certain indications
+    /*!
+        \param method Is monitoring indication type
+        \note does not affect indications in progress
+        \return true on success, false if this method was not monitored
+    */
+    bool ignoreIndications( int method );
 
     //!Sends message asynchronously
     /*!

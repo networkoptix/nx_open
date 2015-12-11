@@ -5,6 +5,7 @@
 #include <utils/thread/sync_queue.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/stun/async_client.h>
+#include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/server_connection.h>
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
@@ -45,7 +46,7 @@ protected:
 
     StunClientServerTest()
         : address( lit( "127.0.0.1"), newPort() )
-        , client( CLIENT_TIMEOUTS )
+        , client( std::make_shared<AsyncClient>( CLIENT_TIMEOUTS ) )
     {
     }
 
@@ -53,7 +54,7 @@ protected:
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        client.sendRequest( std::move( request ), waiter.pusher() );
+        client->sendRequest( std::move( request ), waiter.pusher() );
         return waiter.pop().first;
     }
 
@@ -76,7 +77,7 @@ protected:
     }
 
     const SocketAddress address;
-    AsyncClient client;
+    std::shared_ptr< AsyncClient > client;
     std::unique_ptr< TestServer > server;
 };
 
@@ -84,7 +85,7 @@ TEST_F( StunClientServerTest, Connectivity )
 {
     EXPECT_EQ( sendTestRequestSync(), SystemError::notConnected ); // no address
 
-    client.connect( address );
+    client->connect( address );
     EXPECT_THAT( sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
         SystemError::timedOut ) ); // no server to connect
@@ -107,25 +108,13 @@ TEST_F( StunClientServerTest, Connectivity )
 
 TEST_F( StunClientServerTest, RequestResponse )
 {
-    client.connect( address );
-    // try to sendRequest with no server
-    {
-        Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
-
-        SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        client.sendRequest( std::move( request ), waiter.pusher() );
-
-        const auto result = waiter.pop();
-        ASSERT_TRUE( result.first == SystemError::connectionRefused ||
-                     result.first == SystemError::timedOut );
-    }
-
+    client->connect( address );
     startServer();
     {
         Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        client.sendRequest( std::move( request ), waiter.pusher() );
+        client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );
@@ -143,7 +132,7 @@ TEST_F( StunClientServerTest, RequestResponse )
         Message request( Header( MessageClass::request, 0xFFF /* unknown */ ) );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
-        client.sendRequest( std::move( request ), waiter.pusher() );
+        client->sendRequest( std::move( request ), waiter.pusher() );
 
         const auto result = waiter.pop();
         ASSERT_EQ( result.first, SystemError::noError );
@@ -164,9 +153,9 @@ TEST_F( StunClientServerTest, Indications )
     startServer();
 
     SyncQueue< Message > recvWaiter;
-    client.connect( address );
-    client.monitorIndications( 0xAB, recvWaiter.pusher() );
-    client.monitorIndications( 0xCD, recvWaiter.pusher() );
+    client->connect( address );
+    client->monitorIndications( 0xAB, recvWaiter.pusher() );
+    client->monitorIndications( 0xCD, recvWaiter.pusher() );
 
     EXPECT_EQ( sendTestRequestSync(), SystemError::noError );
     EXPECT_EQ( server->connections.size(), 1 );
@@ -178,6 +167,40 @@ TEST_F( StunClientServerTest, Indications )
     EXPECT_EQ( recvWaiter.pop().header.method, 0xAB );
     EXPECT_EQ( recvWaiter.pop().header.method, 0xCD );
     EXPECT_TRUE( recvWaiter.isEmpty() ); // 3rd indication is not subscribed
+}
+
+struct TestUser
+    : public AsyncClientUser
+{
+    TestUser( std::shared_ptr<AsyncClient> client )
+        : AsyncClientUser(std::move(client)) {}
+
+    void request()
+    {
+        Message request( Header( MessageClass::request, MethodType::bindingMethod ) );
+        sendRequest( std::move( request ), responses.pusher() );
+    }
+
+    SyncMultiQueue< SystemError::ErrorCode, Message > responses;
+};
+
+static const size_t USER_COUNT = 3;
+static const size_t REQUEST_COUNT = 10;
+static const size_t REQUEST_RATIO = 5;
+
+TEST_F( StunClientServerTest, AsyncClientUser )
+{
+    startServer();
+    client->connect( address );
+    for( size_t uc = 0; uc < USER_COUNT; ++uc )
+    {
+        auto user = std::make_shared<TestUser>( client );
+        for( size_t rc = 0; rc < REQUEST_COUNT * REQUEST_RATIO; ++rc )
+            user->request();
+        for( size_t rc = 0; rc < REQUEST_COUNT; ++rc ) // only part is waited
+            EXPECT_EQ( user->responses.pop().first, SystemError::noError );
+        user->pleaseStopSync();
+    }
 }
 
 } // namespace test
