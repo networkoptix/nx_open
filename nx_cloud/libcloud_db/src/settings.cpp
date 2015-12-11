@@ -219,7 +219,7 @@ void Settings::loadConfiguration()
     m_accountManager.passwordResetCodeExpirationTimeout =
         std::chrono::seconds(m_settings.value(
             kPasswordResetCodeExpirationTimeout,
-            kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
+            (qlonglong)kDefaultPasswordResetCodeExpirationTimeout.count()).toInt());
 
     //auth
     m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
