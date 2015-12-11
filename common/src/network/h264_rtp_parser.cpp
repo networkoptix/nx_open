@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 #include "utils/common/synctime.h"
 #include "utils/common/log.h"
 
@@ -156,7 +156,7 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics)
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const QnRtspStatistic& statistics)
 {
     int addheaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
@@ -231,7 +231,7 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
+bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     quint8* rtpBuffer = rtpBufferBase + bufferOffset;

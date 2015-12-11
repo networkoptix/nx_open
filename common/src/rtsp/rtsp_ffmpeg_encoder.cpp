@@ -6,7 +6,7 @@
 #include <core/datapacket/av_codec_media_context.h>
 
 #include "network/ffmpeg_sdp.h"
-#include "network/rtpsession.h"
+#include "network/rtsp_session.h"
 #include "network/rtp_stream_parser.h"
 
 #include "utils/common/util.h"

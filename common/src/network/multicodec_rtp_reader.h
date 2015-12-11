@@ -13,7 +13,7 @@
 #include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
 
-#include "network/rtpsession.h"
+#include "network/rtsp_session.h"
 
 #include <business/business_fwd.h>
 #include "rtp_stream_parser.h"
@@ -84,7 +84,7 @@ private:
     {
         TrackInfo(): ioDevice(0), parser(0) {}
         ~TrackInfo() { delete parser; }
-        RTPIODevice* ioDevice; // external reference. do not delete
+        QnRtspIoDevice* ioDevice; // external reference. do not delete
         QnRtpStreamParser* parser;
     };
 
@@ -93,15 +93,15 @@ private:
     void clearKeyData(int channelNum);
     QnAbstractMediaDataPtr getNextDataUDP();
     QnAbstractMediaDataPtr getNextDataTCP();
-    void processTcpRtcp(RTPIODevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
+    void processTcpRtcp(QnRtspIoDevice* ioDevice, quint8* buffer, int bufferSize, int bufferCapacity);
     void buildClientRTCPReport(quint8 chNumber);
     QnAbstractMediaDataPtr getNextDataInternal();
-    RTPSession::TransportType getRtpTransport() const;
+    QnRtspClient::TransportType getRtpTransport() const;
 private slots:
     void at_packetLost(quint32 prev, quint32 next);
     void at_propertyChanged(const QnResourcePtr & res, const QString & key);
 private:
-    RTPSession m_RtpSession;
+    QnRtspClient m_RtpSession;
     QVector<bool> m_gotKeyDataInfo;
     QVector<TrackInfo> m_tracks;
 

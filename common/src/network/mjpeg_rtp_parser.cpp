@@ -4,7 +4,7 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 #include "utils/common/synctime.h"
 
 #if 0
@@ -369,7 +369,7 @@ void QnMjpegRtpParser::setSDPInfo(QList<QByteArray> lines)
     }
 }
 
-bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
+bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;

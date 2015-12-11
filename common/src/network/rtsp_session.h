@@ -1,5 +1,7 @@
-#ifndef rtp_session_h_1935_h
-#define rtp_session_h_1935_h
+#ifndef RTSP_SESSION_H
+#define RTSP_SESSION_H
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -28,7 +30,7 @@ extern "C"
 //#define DEBUG_TIMINGS
 //#define _DUMP_STREAM
 
-class RTPSession;
+class QnRtspClient;
 
 static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
@@ -36,10 +38,10 @@ static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 4;
 static const int RTSP_FFMPEG_MAX_HEADER_SIZE = RTSP_FFMPEG_GENERIC_HEADER_SIZE + RTSP_FFMPEG_METADATA_HEADER_SIZE;
 static const int MAX_RTP_PACKET_SIZE = 1024 * 16;
 
-class RtspStatistic 
+class QnRtspStatistic 
 {
 public:
-    RtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
+    QnRtspStatistic(): timestamp(0), nptTime(0), localtime(0), receivedPackets(0), receivedOctets(0), ssrc(0) {}
     bool isEmpty() const { return timestamp == 0 && nptTime == 0; }
 
     quint32 timestamp;
@@ -59,12 +61,12 @@ public:
     /*!
         \note Overflow of \a rtpTime is not handled here, so be sure to update \a statistics often enough (twice per \a rtpTime full cycle)
     */
-    qint64 getUsecTime(quint32 rtpTime, const RtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
+    qint64 getUsecTime(quint32 rtpTime, const QnRtspStatistic& statistics, int rtpFrequency, bool recursiveAllowed = true);
     QString getResID() const { return m_resId; }
 private:
     double cameraTimeToLocalTime(double cameraTime); // time in seconds since 1.1.1970
     bool isLocalTimeChanged();
-    bool isCameraTimeChanged(const RtspStatistic& statistics);
+    bool isCameraTimeChanged(const QnRtspStatistic& statistics);
     void reset();
 private:
     qint64 m_lastTime;
@@ -99,15 +101,15 @@ private:
 #endif
 };
 
-class RTPIODevice
+class QnRtspIoDevice
 {
 public:
-    explicit RTPIODevice(RTPSession* owner, bool useTCP);
-    virtual ~RTPIODevice();
+    explicit QnRtspIoDevice(QnRtspClient* owner, bool useTCP);
+    virtual ~QnRtspIoDevice();
     virtual qint64 read(char * data, qint64 maxSize );
     
-    const RtspStatistic& getStatistic() { return m_statistic;}
-    void setStatistic(const RtspStatistic& value) { m_statistic = value; }
+    const QnRtspStatistic& getStatistic() { return m_statistic;}
+    void setStatistic(const QnRtspStatistic& value) { m_statistic = value; }
     AbstractCommunicatingSocket* getMediaSocket();
     AbstractDatagramSocket* getRtcpSocket() const { return m_rtcpSocket; }
     void setTcpMode(bool value);
@@ -120,27 +122,27 @@ public:
 private:
     void processRtcpData();
 private:
-    RTPSession* m_owner;
+    QnRtspClient* m_owner;
     bool m_tcpMode;
-    RtspStatistic m_statistic;
+    QnRtspStatistic m_statistic;
     AbstractDatagramSocket* m_mediaSocket;
     AbstractDatagramSocket* m_rtcpSocket;
     quint32 ssrc;
     quint8 m_rtpTrackNum;
 };
 
-class RTPSession: public QObject
+class QnRtspClient: public QObject
 {
     Q_OBJECT;
 public:
-    //typedef QMap<int, QScopedPointer<RTPIODevice> > RtpIoTracks;
+    //typedef QMap<int, QScopedPointer<QnRtspIoDevice> > RtpIoTracks;
 
     enum TrackType {TT_VIDEO, TT_VIDEO_RTCP, TT_AUDIO, TT_AUDIO_RTCP, TT_METADATA, TT_METADATA_RTCP, TT_UNKNOWN, TT_UNKNOWN2};
     enum TransportType {TRANSPORT_UDP, TRANSPORT_TCP, TRANSPORT_AUTO };
 
     struct SDPTrackInfo
     {
-        SDPTrackInfo(const QString& _codecName, const QByteArray& _trackTypeStr, const QByteArray& _setupURL, int _mapNum, int _trackNum, RTPSession* owner, bool useTCP):
+        SDPTrackInfo(const QString& _codecName, const QByteArray& _trackTypeStr, const QByteArray& _setupURL, int _mapNum, int _trackNum, QnRtspClient* owner, bool useTCP):
             codecName(_codecName), setupURL(_setupURL), mapNum(_mapNum), trackNum(_trackNum)
         {
             QByteArray trackTypeStr = _trackTypeStr.toLower();
@@ -157,7 +159,7 @@ public:
             else
                 trackType = TT_UNKNOWN;
 
-            ioDevice = new RTPIODevice(owner, useTCP);
+            ioDevice = new QnRtspIoDevice(owner, useTCP);
             ioDevice->setRtpTrackNum(_trackNum * 2);
             interleaved = QPair<int,int>(-1,-1);
         }
@@ -174,7 +176,7 @@ public:
         int trackNum;
         QPair<int,int> interleaved;
 
-        RTPIODevice* ioDevice;
+        QnRtspIoDevice* ioDevice;
     };
 
     static QString mediaTypeToStr(TrackType tt);
@@ -182,8 +184,8 @@ public:
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
     typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
-    RTPSession( std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
-    ~RTPSession();
+    QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
+    ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
     CameraDiagnostics::Result open(const QString& url, qint64 startTime = AV_NOPTS_VALUE);
@@ -194,7 +196,7 @@ public:
     * @param positionEnd end position at mksec
     * @param scale playback speed
     */
-    RTPSession::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
+    QnRtspClient::TrackMap play(qint64 positionStart, qint64 positionEnd, double scale);
 
     // returns true if there is no error delivering STOP
     bool stop();
@@ -273,7 +275,7 @@ public:
 
     void sendBynaryResponse(quint8* buffer, int size);
 
-    RtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
+    QnRtspStatistic parseServerRTCPReport(quint8* srcBuffer, int srcBufferSize, bool* gotStatistics);
     int buildClientRTCPReport(quint8 *dstBuffer, int bufferLen);
 
     void setUsePredefinedTracks(int numOfVideoChannel);
@@ -357,7 +359,7 @@ private:
 
     QElapsedTimer m_keepAliveTime;
 
-    friend class RTPIODevice;
+    friend class QnRtspIoDevice;
     QMap<QByteArray, QByteArray> m_additionAttrs;
     QAuthenticator m_auth;
     QString m_proxyAddr;
@@ -398,4 +400,4 @@ private:
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif //rtp_session_h_1935_h
+#endif // RTSP_SESSION_H

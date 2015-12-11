@@ -1,13 +1,13 @@
-#include "statistics.h"
+#include "media_stream_statistics.h"
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-QnStatistics::QnStatistics()
+QnMediaStreamStatistics::QnMediaStreamStatistics()
 {
     resetStatistics();
 }
 
-void QnStatistics::resetStatistics()
+void QnMediaStreamStatistics::resetStatistics()
 {
     QnMutexLocker locker( &m_mutex );
     m_startTime = QDateTime::currentDateTime();
@@ -16,12 +16,12 @@ void QnStatistics::resetStatistics()
     m_badsensor = false;
 
     for (int i = 0; i < CL_STAT_END; ++i)
-        m_events[i].ammount = 0;
+        m_events[i].amount = 0;
 
     for (int i = 0; i < CL_STATS_NUM; ++i)
     {
         m_stat[i].frames = 0;
-        m_stat[i].totaldata = 0;
+        m_stat[i].total_data = 0;
     }
 
     m_current_stat = 0;
@@ -37,7 +37,7 @@ void QnStatistics::resetStatistics()
 
 }
 
-void QnStatistics::stop()
+void QnMediaStreamStatistics::stop()
 {
     if (!m_runing) return; 
     QnMutexLocker locker( &m_mutex );
@@ -45,7 +45,7 @@ void QnStatistics::stop()
     m_runing = false;
 }
 
-void QnStatistics::onData(unsigned int datalen)
+void QnMediaStreamStatistics::onData(unsigned int datalen)
 {
     if (!m_runing) return; 
     QnMutexLocker locker( &m_mutex );
@@ -74,7 +74,7 @@ void QnStatistics::onData(unsigned int datalen)
         {
             int index  = (m_current_stat + i + 1)%CL_STATS_NUM;
             m_stat[index].frames = 0;
-            m_stat[index].totaldata = 0;
+            m_stat[index].total_data = 0;
         }
 
         m_current_stat = (m_current_stat + ststat_num)%CL_STATS_NUM;
@@ -87,7 +87,7 @@ void QnStatistics::onData(unsigned int datalen)
         {
             if (i!=m_current_stat)
             {
-                total_bytes += m_stat[i].totaldata;
+                total_bytes += m_stat[i].total_data;
                 total_frames += m_stat[i].frames;
             }
         }
@@ -101,60 +101,60 @@ void QnStatistics::onData(unsigned int datalen)
     if (datalen)
     {
         m_stat[m_current_stat].frames++;
-        m_stat[m_current_stat].totaldata += datalen;
+        m_stat[m_current_stat].total_data += datalen;
     }
 
 }
 
-float QnStatistics::getBitrateMbps() const
+float QnMediaStreamStatistics::getBitrateMbps() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_bitrateMbps;
 }
 
-float QnStatistics::getFrameRate() const
+float QnMediaStreamStatistics::getFrameRate() const
 {
     QnMutexLocker locker( &m_mutex );
     return m_framerate;
 }
 
-int QnStatistics::getFrameSize() const
+int QnMediaStreamStatistics::getFrameSize() const
 {
     return getBitrateMbps()/8*1024 / getFrameRate();
 }
 
-void QnStatistics::onBadSensor()
+void QnMediaStreamStatistics::onBadSensor()
 {
     if (!m_runing) return; 
     m_badsensor = true;
 }
-bool QnStatistics::badSensor() const
+bool QnMediaStreamStatistics::badSensor() const
 {
     return m_badsensor;
 }
 
-void QnStatistics::onEvent(QnStatisticsEvent event)
+void QnMediaStreamStatistics::onEvent(QnMediaStreamStatisticsEvent event)
 {
     if (!m_runing) return; 
     QnMutexLocker locker( &m_mutex );
 
     QDateTime current = QDateTime::currentDateTime();
-    m_events[event].ammount++;
+    m_events[event].amount++;
 
-    if (m_events[event].ammount==1)
-        m_events[event].firtTime = current;
+    if (m_events[event].amount==1)
+        m_events[event].firstTime = current;
 
     m_events[event].lastTime = current;
 
 }
 
-unsigned long QnStatistics::totalEvents(QnStatisticsEvent event) const
+unsigned long QnMediaStreamStatistics::totalEvents(QnMediaStreamStatisticsEvent event) const
 {
     QnMutexLocker locker( &m_mutex );
-    return m_events[event].ammount;
+    return m_events[event].amount;
 }
 
-float QnStatistics::eventsPerHour(QnStatisticsEvent event) const
+float QnMediaStreamStatistics::eventsPerHour(QnMediaStreamStatisticsEvent event) const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
@@ -164,22 +164,22 @@ float QnStatistics::eventsPerHour(QnStatisticsEvent event) const
         seconds = 1; // // to avoid devision by zero
 
     float hours = seconds/3600.0;
-    return m_events[event].ammount/hours;
+    return m_events[event].amount/hours;
 }
 
-QDateTime QnStatistics::firstOccurred(QnStatisticsEvent event) const
+QDateTime QnMediaStreamStatistics::firstOccurred(QnMediaStreamStatisticsEvent event) const
 {
     QnMutexLocker locker( &m_mutex );
-    return m_events[event].firtTime;
+    return m_events[event].firstTime;
 }
 
-QDateTime QnStatistics::lastOccurred(QnStatisticsEvent event) const
+QDateTime QnMediaStreamStatistics::lastOccurred(QnMediaStreamStatisticsEvent event) const
 {
     QnMutexLocker locker( &m_mutex );
     return m_events[event].lastTime;
 }
 
-float QnStatistics::getavBitrate() const
+float QnMediaStreamStatistics::getavBitrate() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
@@ -192,7 +192,7 @@ float QnStatistics::getavBitrate() const
 
 }
 
-float QnStatistics::getavFrameRate() const
+float QnMediaStreamStatistics::getavFrameRate() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
@@ -205,7 +205,7 @@ float QnStatistics::getavFrameRate() const
 
 }
 
-unsigned long QnStatistics::totalSecs() const
+unsigned long QnMediaStreamStatistics::totalSecs() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = m_runing ? QDateTime::currentDateTime() : m_stopTime;
@@ -213,19 +213,19 @@ unsigned long QnStatistics::totalSecs() const
 
 }
 
-void QnStatistics::onLostConnection()
+void QnMediaStreamStatistics::onLostConnection()
 {
     QnMutexLocker locker( &m_mutex );
     m_connectionLost = true;
     m_connectionLostTime = QDateTime::currentDateTime();
 }
 
-bool QnStatistics::isConnectionLost() const
+bool QnMediaStreamStatistics::isConnectionLost() const
 {
     return m_connectionLost;
 }
 
-int QnStatistics::connectionLostSec() const
+int QnMediaStreamStatistics::connectionLostSec() const
 {
     QnMutexLocker locker( &m_mutex );
     QDateTime current = QDateTime::currentDateTime();

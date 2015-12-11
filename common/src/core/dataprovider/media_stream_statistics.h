@@ -1,5 +1,7 @@
-#ifndef QN_STATISTICS_H
-#define QN_STATISTICS_H
+#ifndef MEDIA_STREAM_STATISTICS_H
+#define MEDIA_STREAM_STATISTICS_H
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -11,32 +13,35 @@
 #define CL_STATS_NUM  (CL_STATISTICS_WINDOW_MS/CL_STATISTICS_UPDATE_PERIOD_MS + 1)
 
 // TODO: #Elric #enum
-enum QnStatisticsEvent
+enum QnMediaStreamStatisticsEvent
 {
     CL_STAT_DATA,
     CL_STAT_FRAME_LOST,
     CL_STAT_CAMRESETED,
-    CL_STAT_END// must not be used in onEvent
+    CL_STAT_END //< Must not be used in onEvent.
 };
 
-class QN_EXPORT QnStatistics
+class QN_EXPORT QnMediaStreamStatistics
 {
-
     struct EventStat
     {
-        QDateTime firtTime;
+        EventStat(): amount(0) {}
+
+        QDateTime firstTime;
         QDateTime lastTime;
-        unsigned long ammount;
+        unsigned long amount;
     };
 
     struct StatHelper
     {
-        unsigned long totaldata;
+        StatHelper(): total_data(0), frames(0) {}
+
+        unsigned long total_data;
         unsigned long frames;
     };
 
 public:
-    QnStatistics();
+    QnMediaStreamStatistics();
 
     void resetStatistics(); // resets statistics; and make it runing
     void stop(); // stops the statistic;
@@ -56,11 +61,11 @@ public:
     bool isConnectionLost() const;
     int connectionLostSec() const;
 
-    void onEvent(QnStatisticsEvent event);
-    unsigned long totalEvents(QnStatisticsEvent event) const;
-    float eventsPerHour(QnStatisticsEvent event) const;
-    QDateTime firstOccurred(QnStatisticsEvent event) const;
-    QDateTime lastOccurred(QnStatisticsEvent event) const;
+    void onEvent(QnMediaStreamStatisticsEvent event);
+    unsigned long totalEvents(QnMediaStreamStatisticsEvent event) const;
+    float eventsPerHour(QnMediaStreamStatisticsEvent event) const;
+    QDateTime firstOccurred(QnMediaStreamStatisticsEvent event) const;
+    QDateTime lastOccurred(QnMediaStreamStatisticsEvent event) const;
 
     // ========
 
@@ -90,4 +95,4 @@ private:
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif //log_h_109
+#endif // MEDIA_STREAM_STATISTICS_H

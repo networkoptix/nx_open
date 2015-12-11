@@ -7,7 +7,7 @@
 #include <core/datapacket/basic_media_context.h>
 
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 
 
 QnNxRtpParser::QnNxRtpParser()
@@ -29,7 +29,7 @@ void QnNxRtpParser::setSDPInfo(QList<QByteArray>)
 
 }
 
-bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const RtspStatistic&, bool& gotData)
+bool QnNxRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int dataSize, const QnRtspStatistic&, bool& gotData)
 {
     gotData = false;
     if (dataSize < RtpHeader::RTP_HEADER_SIZE)

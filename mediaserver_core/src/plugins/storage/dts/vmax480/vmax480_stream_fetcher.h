@@ -87,7 +87,7 @@ private:
     static const int OPEN_ALL = 0xffff;
 
     QnNetworkResource* m_res;
-    typedef QMap<QnVmax480DataConsumer*, CLDataQueue*> ConsumersMap;
+    typedef QMap<QnVmax480DataConsumer*, QnDataPacketQueue*> ConsumersMap;
 
     mutable QnMutex m_mutex;
     QProcess* m_vMaxProxy;

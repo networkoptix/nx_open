@@ -3,7 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 #include "utils/common/synctime.h"
 #include <core/datapacket/media_data_packet.h>
 #include <core/datapacket/audio_data_packet.h>
@@ -70,7 +70,7 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;

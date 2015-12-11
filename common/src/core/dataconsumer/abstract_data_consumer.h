@@ -1,14 +1,16 @@
 #ifndef abstract_data_consumer_h_2111
 #define abstract_data_consumer_h_2111
 
+// TODO mike: CURRENT move
+
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "abstract_data_receptor.h"
-#include "utils/common/long_runnable.h"
-#include "../datapacket/data_queue.h"
+#include <core/dataconsumer/abstract_data_receptor.h>
+#include <utils/common/long_runnable.h>
+#include <core/datapacket/data_packet_queue.h>
 
 class QN_EXPORT QnAbstractDataConsumer
-:
+:                                                         
     public QnLongRunnable,
     public QnAbstractDataReceptor
 {
@@ -38,7 +40,7 @@ protected:
     virtual void endOfRun();
 
 protected:
-    CLDataQueue m_dataQueue;
+    QnDataPacketQueue m_dataQueue;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

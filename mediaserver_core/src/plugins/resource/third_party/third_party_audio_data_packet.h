@@ -3,12 +3,14 @@
 * akolesnikov
 ***********************************************************/
 
+// TODO mike: Try to move to mediaserver_core.
+
 #ifndef THIRD_PARTY_AUDIO_DATA_PACKET_H
 #define THIRD_PARTY_AUDIO_DATA_PACKET_H
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "audio_data_packet.h"
+#include <core/datapacket/audio_data_packet.h>
 
 #include <plugins/camera_plugin.h>
 

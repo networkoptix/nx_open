@@ -25,11 +25,12 @@ extern "C"
 
 #include <core/datapacket/media_data_packet.h>
 #include <core/datapacket/av_codec_media_context.h>
-#include "win_audio_device_info.h"
-#include "decoders/audio/ffmpeg_audio_decoder.h"
-#include "utils/common/synctime.h"
-#include "utils/common/log.h"
-#include "utils/media/ffmpeg_helper.h"
+#include <core/dataconsumer/abstract_data_consumer.h>
+#include <plugins/resource/desktop_win/win_audio_device_info.h>
+#include <decoders/audio/ffmpeg_audio_decoder.h>
+#include <utils/common/synctime.h>
+#include <utils/common/log.h>
+#include <utils/media/ffmpeg_helper.h>
 
 // mux audio 1 and audio 2 to audio1 buffer
 // I have used intrinsics for SSE. It is portable for MSVC, GCC (mac, linux), Intel compiler

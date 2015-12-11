@@ -5,17 +5,17 @@
 #include <algorithm>
 #include <QtCore/QTextStream>
 
-#include "core/datapacket/third_party_audio_data_packet.h"
-#include "core/datapacket/third_party_video_data_packet.h"
+#include <plugins/resource/third_party/third_party_audio_data_packet.h>
+#include <plugins/resource/third_party/third_party_video_data_packet.h>
 #include <core/datapacket/av_codec_media_context.h>
-#include "network/multicodec_rtp_reader.h"
-#include "plugins/plugin_tools.h"
-#include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
+#include <network/multicodec_rtp_reader.h>
+#include <plugins/plugin_tools.h>
+#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
-#include "utils/common/log.h"
-#include "utils/media/ffmpeg_helper.h"
-#include "utils/network/http/httptypes.h"
-#include "version.h"
+#include <utils/common/log.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <utils/network/http/httptypes.h>
+#include <version.h>
 #include <utils/media/frame_type_extractor.h>
 
 namespace

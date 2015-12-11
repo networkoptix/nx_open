@@ -1,13 +1,13 @@
 #ifndef stream_reader_514
 #define stream_reader_514
 
+// TODO mike: CURRENT move
+
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include "utils/common/long_runnable.h"
 #include "../resource/resource_consumer.h"
 #include "../datapacket/abstract_data_packet.h"
-#include "../resource/param.h"
-#include "../dataconsumer/abstract_data_consumer.h"
 #include "../resource/resource_media_layout.h"
 
 class QnAbstractStreamDataProvider;

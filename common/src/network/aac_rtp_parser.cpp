@@ -11,7 +11,7 @@
 #include <core/datapacket/av_codec_media_context.h>
 
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 
 QnAacRtpParser::QnAacRtpParser():
     QnRtpAudioStreamParser()
@@ -95,7 +95,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;

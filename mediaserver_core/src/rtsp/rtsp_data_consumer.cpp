@@ -9,7 +9,7 @@
 #include <camera/video_camera.h>
 #include <camera/camera_pool.h>
 #include <utils/common/sleep.h>
-#include <network/rtpsession.h>
+#include <network/rtsp_session.h>
 #include <core/dataprovider/abstract_stream_data_provider.h>
 #include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>

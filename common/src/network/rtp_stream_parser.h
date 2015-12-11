@@ -6,12 +6,12 @@
 #include <QtCore/QIODevice>
 #include "core/datapacket/media_data_packet.h"
 #include "core/resource/resource_media_layout.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 
 #include <deque>
 
-class RTPIODevice;
-class RtspStatistic;
+class QnRtspIoDevice;
+class QnRtspStatistic;
 
 #pragma pack(push, 1)
 struct RtpHeader
@@ -54,7 +54,7 @@ public:
     void setTimeHelper(QnRtspTimeHelper* timeHelper);
 
     virtual QnAbstractMediaDataPtr nextData() = 0;
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) = 0;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) = 0;
 
     int logicalChannelNum() const { return m_logicalChannelNum; }
     void setLogicalChannelNum(int value) { m_logicalChannelNum = value; }

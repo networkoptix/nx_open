@@ -37,7 +37,7 @@ public:
     virtual ~QnVideoCameraGopKeeper();
     QnAbstractMediaStreamDataProvider* getLiveReader();
 
-    int copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq);
+    int copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq);
 
     // QnAbstractDataConsumer
     virtual bool canAcceptData() const;
@@ -147,7 +147,7 @@ bool QnVideoCameraGopKeeper::processData(const QnAbstractDataPacketPtr& /*data*/
     return true;
 }
 
-int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, CLDataQueue& dstQueue, int cseq)
+int QnVideoCameraGopKeeper::copyLastGop(qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
 {
     int rez = 0;
     QnMutexLocker lock( &m_queueMtx );
@@ -425,7 +425,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReader(QnServer::ChunksCatalog cat
     return getLiveReaderNonSafe( catalog );
 }
 
-int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, CLDataQueue& dstQueue, int cseq)
+int QnVideoCamera::copyLastGop(bool primaryLiveStream, qint64 skipTime, QnDataPacketQueue& dstQueue, int cseq)
 {
     if (primaryLiveStream)
         return m_primaryGopKeeper->copyLastGop(skipTime, dstQueue, cseq);

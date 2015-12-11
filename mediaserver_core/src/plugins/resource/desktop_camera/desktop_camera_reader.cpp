@@ -142,7 +142,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         if (bufferSize == packetSize)
         {
             bool gotData;
-            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, RtspStatistic(), gotData);
+            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, QnRtspStatistic(), gotData);
             result = m_parsers[streamIndex].nextData();
             if (result)
                 result->channelNumber = streamIndex;

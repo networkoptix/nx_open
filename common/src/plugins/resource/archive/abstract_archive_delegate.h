@@ -1,5 +1,7 @@
-#ifndef __ABSTRACT_ARCHIVE_DELEGATE_H
-#define __ABSTRACT_ARCHIVE_DELEGATE_H
+#ifndef ABSTRACT_ARCHIVE_DELEGATE_H
+#define ABSTRACT_ARCHIVE_DELEGATE_H
+
+// TODO mike: CURRENT move
 
 #ifdef ENABLE_ARCHIVE
 
@@ -9,8 +11,8 @@
 
 #include <core/resource/resource_fwd.h>
 #include "core/resource/resource_media_layout.h"
-#include "core/datapacket/abstract_data_packet.h"
-#include "motion/abstract_motion_archive.h"
+#include <core/datapacket/abstract_data_packet.h>
+#include <motion/abstract_motion_archive.h>
 
 
 class QnAbstractArchiveDelegate: public QObject
@@ -109,4 +111,4 @@ typedef QSharedPointer<QnAbstractArchiveDelegate> QnAbstractArchiveDelegatePtr;
 
 #endif // ENABLE_ARCHIVE
 
-#endif
+#endif // ABSTRACT_ARCHIVE_DELEGATE_H

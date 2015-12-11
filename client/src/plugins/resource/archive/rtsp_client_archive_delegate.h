@@ -1,9 +1,11 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
+// TODO mike: CURRENT move
+
 #include <atomic>
 #include <utils/common/uuid.h>
-#include <network/rtpsession.h>
+#include <network/rtsp_session.h>
 #include <network/nx_rtp_parser.h>
 
 #include <core/resource/resource_media_layout.h>
@@ -75,12 +77,12 @@ private:
     QString getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
     void checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
     void checkMinTimeFromOtherServer(const QnVirtualCameraResourcePtr &camera);
-    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const;
+    void setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const;
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QnMutex m_mutex;
-    RTPSession m_rtspSession;
-    RTPIODevice* m_rtpData;
+    QnRtspClient m_rtspSession;
+    QnRtspIoDevice* m_rtpData;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
     QMap<quint32, quint16> m_prevTimestamp;

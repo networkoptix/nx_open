@@ -1016,7 +1016,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     qreal mbps = 0.0;
 
     for(int i = 0; i < channelCount(); i++) {
-        const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        const QnMediaStreamStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));

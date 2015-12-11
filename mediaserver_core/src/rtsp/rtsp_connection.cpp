@@ -24,7 +24,7 @@
 #include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
-#include "network/rtpsession.h"
+#include "network/rtsp_session.h"
 #include "recorder/recording_manager.h"
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"

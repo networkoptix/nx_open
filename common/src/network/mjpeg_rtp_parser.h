@@ -8,7 +8,7 @@
 
 #include "core/datapacket/video_data_packet.h"
 #include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include "rtsp_session.h"
 //#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 
@@ -19,7 +19,7 @@ public:
     virtual ~QnMjpegRtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
     
 private:
     int makeHeaders(quint8 *p, int type, int w, int h, const quint8 *lqt, const quint8 *cqt, u_short dri);

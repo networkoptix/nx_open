@@ -146,7 +146,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
 
 }
 
-const QnStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel) const
+const QnMediaStreamStatistics* QnAbstractMediaStreamDataProvider::getStatistics(int channel) const
 {
     return &m_stat[channel];
 }

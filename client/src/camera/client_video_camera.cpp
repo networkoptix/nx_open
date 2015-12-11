@@ -121,7 +121,7 @@ QnCamDisplay* QnClientVideoCamera::getCamDisplay()
     return &m_camdispay;
 }
 
-const QnStatistics* QnClientVideoCamera::getStatistics(int channel)
+const QnMediaStreamStatistics* QnClientVideoCamera::getStatistics(int channel)
 {
     if (m_reader)
         return m_reader->getStatistics(channel);

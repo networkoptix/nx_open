@@ -9,7 +9,7 @@
 #include <recording/stream_recorder.h>
 
 class QnlTimeSource;
-class QnStatistics;
+class QnMediaStreamStatistics;
 class QnResource;
 class QnAbstractArchiveStreamReader;
 class QnTimePeriod;
@@ -44,7 +44,7 @@ public:
 
     QnAbstractStreamDataProvider* getStreamreader();
 
-    const QnStatistics* getStatistics(int channel = 0);
+    const QnMediaStreamStatistics* getStatistics(int channel = 0);
     QnCamDisplay* getCamDisplay();
 
     qint64 getCurrentTime() const;

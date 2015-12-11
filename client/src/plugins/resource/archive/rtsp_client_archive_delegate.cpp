@@ -6,7 +6,8 @@
 
 extern "C"
 {
-    #include <libavcodec/avcodec.h>
+// For declarations only.
+#include <libavcodec/avcodec.h>
 }
 
 #include <api/app_server_connection.h>
@@ -157,7 +158,7 @@ struct ArchiveTimeCheckInfo
 
 void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
-    RTPSession otherRtspSession;
+    QnRtspClient otherRtspSession;
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
     if (otherRtspSession.open(QnRtspClientArchiveDelegate::getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError) 
         return;
@@ -269,7 +270,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
             endTime = m_forcedEndTime;
 
         m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
-        RTPSession::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
+        QnRtspClient::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
         if (!trackInfo.isEmpty())
             m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
@@ -283,7 +284,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
 
     if (m_opened) {
 
-        QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(RTPSession::TT_AUDIO);
+        QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);
 
         QString vLayout = m_rtspSession.getVideoLayout();
@@ -695,7 +696,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
         itr = m_parsers.insert(channelNum, QnNxRtpParserPtr(new QnNxRtpParser()));
     QnNxRtpParserPtr parser = itr.value();
     bool gotData = false;
-    parser->processData(data, 0, dataSize, RtspStatistic(), gotData);
+    parser->processData(data, 0, dataSize, QnRtspStatistic(), gotData);
     *parserPosition = parser->position();
     if (gotData) {
         result = parser->nextData();
@@ -825,7 +826,7 @@ void QnRtspClientArchiveDelegate::setMultiserverAllowed(bool value)
     m_isMultiserverAllowed = value;
 }
 
-void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, RTPSession* session, bool usePredefinedTracks) const {
+void QnRtspClientArchiveDelegate::setupRtspSession(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session, bool usePredefinedTracks) const {
     if (usePredefinedTracks) {
         int numOfVideoChannels = 1;
         QnConstResourceVideoLayoutPtr videoLayout = camera->getVideoLayout(0);

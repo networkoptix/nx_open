@@ -6,9 +6,10 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <QtCore/QSharedPointer>
-#include <core/dataprovider/statistics.h>
+#include <core/dataprovider/media_stream_statistics.h>
 #include <core/dataprovider/abstract_stream_data_provider.h>
 #include <utils/camera/camera_diagnostics.h>
+#include <core/datapacket/media_data_packet.h>
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
@@ -26,7 +27,7 @@ public:
     virtual ~QnAbstractMediaStreamDataProvider();
 
 
-    const QnStatistics* getStatistics(int channel) const;
+    const QnMediaStreamStatistics* getStatistics(int channel) const;
     float getBitrateMbps() const;
 
     virtual void setNeedKeyData();
@@ -57,7 +58,7 @@ protected:
     void checkTime( const QnAbstractMediaDataPtr& data );
     void resetTimeCheck();
 protected:
-    QnStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
+    QnMediaStreamStatistics m_stat[CL_MAX_CHANNEL_NUMBER];
     int m_gotKeyFrame[CL_MAX_CHANNEL_NUMBER];
 
     int mFramesLost;
