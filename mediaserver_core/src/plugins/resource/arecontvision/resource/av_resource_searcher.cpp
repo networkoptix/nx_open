@@ -39,12 +39,10 @@ QnNetworkResourcePtr
 QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
                                                 const SocketAddress &addr)
 {
+    QnNetworkResourcePtr result;
     auto rpRes = qnResPool->getResourceByUniqueId(QnMacAddress(mac.data()).toString());
 
-    QnNetworkResourcePtr result;
-    auto archiveCamTypeId = qnResTypePool->getResourceTypeId("", QnArchiveCamResource::cameraName());
-
-    if (rpRes && rpRes->getTypeId() != archiveCamTypeId) 
+    if (rpRes)  
     {
         result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getName()));
         result->setMAC(QnMacAddress(mac.data()));
