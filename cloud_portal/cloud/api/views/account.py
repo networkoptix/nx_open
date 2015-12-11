@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
 import base64
 import logging
-import timezone
+from django.utils import timezone
 from django.db.models import Model
 import api
 from api.controllers.cloud_api import Account
