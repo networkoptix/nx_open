@@ -69,7 +69,7 @@ def index(request):
         serializer = AccountUpdaterSerializer(request.user, data=request.data)
             
         if not serializer.is_valid():
-            raise APIRequestException(serializer.errors)
+            raise APIRequestException('Wrong form parameters', error_data=serializer.errors)
         
         Account.update(request.user.email, request.session['password'], request.user.first_name, request.user.last_name)
         # if not success:

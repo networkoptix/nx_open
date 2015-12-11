@@ -63,7 +63,7 @@ angular.module('cloudApp')
                 });
             },
             changePassword:function(newPassword,oldPassword){
-                return $http.get(apiBase + '/account/changePassword',{
+                return $http.post(apiBase + '/account/changePassword',{
                     new_password:newPassword,
                     old_password:oldPassword
                 });

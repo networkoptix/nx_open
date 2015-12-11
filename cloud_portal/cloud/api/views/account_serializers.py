@@ -7,7 +7,7 @@ __django__ = logging.getLogger('django')
 
 
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
-    password = serializers.CharField(required=True, allow_blank=True, max_length=255)
+    password = serializers.CharField(required=True, allow_blank=False, max_length=255)
     email = serializers.CharField(required=True, allow_blank=False, max_length=255)
     first_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
