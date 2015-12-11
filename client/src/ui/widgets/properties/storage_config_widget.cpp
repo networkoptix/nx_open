@@ -621,8 +621,11 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 {
     QString status;
 
-    if (reply.progress >= 0)
+    bool backupInProgress = reply.state == Qn::BackupState_InProgress;
+    if (backupInProgress)
         ui->progressBarBackup->setValue(reply.progress * 100 + 0.5);
+    else
+        ui->progressBarBackup->setValue(0);
 
     QString backupInfo;
     bool canStartBackup = this->canStartBackup(reply, &backupInfo);
@@ -635,8 +638,10 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     ui->backupTimeLabel->setText(backedUpTo);
 
     ui->backupStartButton->setEnabled(canStartBackup);
-    ui->backupStopButton->setEnabled(reply.state == Qn::BackupState_InProgress);
-    ui->stackedWidgetBackupInfo->setCurrentWidget(reply.state == Qn::BackupState_InProgress ? ui->backupProgressPage : ui->backupPreparePage);
+    ui->backupStopButton->setEnabled(backupInProgress);
+    ui->stackedWidgetBackupInfo->setCurrentWidget(backupInProgress ? ui->backupProgressPage : ui->backupPreparePage);
+    ui->comboBoxBackupType->setEnabled(!backupInProgress);
+
 }
 
 void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply)
