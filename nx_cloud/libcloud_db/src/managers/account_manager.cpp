@@ -434,7 +434,7 @@ nx::db::DBResult AccountManager::generatePasswordResetCode(
 
     data::TemporaryAccountPassword tempPasswordData;
     tempPasswordData.accountID = account->id;
-    tempPasswordData.realm = AuthenticationManager::realm();
+    tempPasswordData.realm = AuthenticationManager::realm().constData();
     std::string tempPassword(10 + (rand() % 10), 'c');
     std::generate(
         tempPassword.begin(),
@@ -443,7 +443,7 @@ nx::db::DBResult AccountManager::generatePasswordResetCode(
     tempPasswordData.passwordHa1 = nx_http::calcHa1(
         accountEmail.email.c_str(),
         tempPasswordData.realm.c_str(),
-        tempPassword.c_str());
+        tempPassword.c_str()).constData();
     tempPasswordData.expirationTimestampUtc =
         ::time(NULL) +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
