@@ -53,6 +53,13 @@ namespace {
     const QString ldapAdminPassword(lit("ldapAdminPassword"));
     const QString ldapSearchBase(lit("ldapSearchBase"));
     const QString ldapSearchFilter(lit("ldapSearchFilter"));
+
+    const QString kEc2ConnectionKeepAliveTimeout(lit("ec2ConnectionKeepAliveTimeoutSec"));
+    const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
+    const QString kEc2KeepAliveProbeCount(lit("ec2KeepAliveProbeCount"));
+    const int kEc2KeepAliveProbeCountDefault = 3;
+    const QString kEc2AliveUpdateInterval(lit("ec2AliveUpdateIntervalSec"));
+    const int kEc2AliveUpdateIntervalDefault = 60;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -86,6 +93,23 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchBase, QString(), this);
     m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(ldapSearchFilter, QString(), this);
 
+    QList<QnAbstractResourcePropertyAdaptor*> ec2Adaptors;
+    m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2ConnectionKeepAliveTimeout,
+        kEc2ConnectionKeepAliveTimeoutDefault,
+        this);
+    ec2Adaptors << m_ec2ConnectionKeepAliveTimeoutAdaptor;
+    m_ec2KeepAliveProbeCountAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2KeepAliveProbeCount,
+        kEc2KeepAliveProbeCountDefault,
+        this);
+    ec2Adaptors << m_ec2KeepAliveProbeCountAdaptor;
+    m_ec2AliveUpdateIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2AliveUpdateInterval,
+        kEc2AliveUpdateIntervalDefault,
+        this);
+    ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
+
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
         << m_serverAdaptor
@@ -117,7 +141,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << emailAdaptors
         << ldapAdaptors
         << m_auditTrailEnabledAdaptor
-        ;
+        << ec2Adaptors;
 
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
@@ -129,6 +153,12 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
     for(QnAbstractResourcePropertyAdaptor* adaptor: ldapAdaptors)
         connect(adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::ldapSettingsChanged, Qt::QueuedConnection);
+
+    for(auto adaptor: ec2Adaptors)
+        connect(
+            adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+            this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
+            Qt::QueuedConnection);
 
     connect(qnResPool,                              &QnResourcePool::resourceAdded,                     this,   &QnGlobalSettings::at_resourcePool_resourceAdded);
     connect(qnResPool,                              &QnResourcePool::resourceRemoved,                   this,   &QnGlobalSettings::at_resourcePool_resourceRemoved);
@@ -279,4 +309,39 @@ bool QnGlobalSettings::isUpdateNotificationsEnabled() const {
 
 void QnGlobalSettings::setUpdateNotificationsEnabled(bool updateNotificationsEnabled) {
     m_updateNotificationsEnabledAdaptor->setValue(updateNotificationsEnabled);
+}
+
+std::chrono::seconds QnGlobalSettings::connectionKeepAliveTimeout() const
+{
+    return std::chrono::seconds(m_ec2ConnectionKeepAliveTimeoutAdaptor->value());
+}
+
+void QnGlobalSettings::setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout)
+{
+    m_ec2ConnectionKeepAliveTimeoutAdaptor->setValue(newTimeout.count());
+}
+
+int QnGlobalSettings::keepAliveProbeCount() const
+{
+    return m_ec2KeepAliveProbeCountAdaptor->value();
+}
+
+void QnGlobalSettings::setKeepAliveProbeCount(int newProbeCount)
+{
+    m_ec2KeepAliveProbeCountAdaptor->setValue(newProbeCount);
+}
+
+std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const
+{
+    return std::chrono::seconds(m_ec2AliveUpdateIntervalAdaptor->value());
+}
+
+void QnGlobalSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) const
+{
+    m_ec2AliveUpdateIntervalAdaptor->setValue(newInterval.count());
+}
+
+const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
+{
+    return m_allAdaptors;
 }

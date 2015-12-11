@@ -1,6 +1,8 @@
 #ifndef QN_GLOBAL_SETTINGS_H
 #define QN_GLOBAL_SETTINGS_H
 
+#include <chrono>
+
 #include <QtCore/QMutex>
 #include <QtCore/QObject>
 
@@ -50,6 +52,22 @@ public:
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
+
+    std::chrono::seconds connectionKeepAliveTimeout() const;
+    void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
+
+    int keepAliveProbeCount() const;
+    void setKeepAliveProbeCount(int newProbeCount);
+
+    std::chrono::seconds aliveUpdateInterval() const;
+    void setAliveUpdateInterval(std::chrono::seconds newInterval) const;
+
+    /*!
+        \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
+        \note returned list is not changed during \a QnGlobalSettings instance life-time
+    */
+    const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
+
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -57,6 +75,7 @@ signals:
     void serverAutoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
+    void ec2ConnectionSettingsChanged();
 
 private:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
@@ -89,6 +108,9 @@ private:
     QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
 
+    QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
+    QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
+    QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

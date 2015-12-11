@@ -101,7 +101,11 @@ class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent = NULL);
+    QnAbstractResourcePropertyAdaptor(
+        const QString &key,
+        const QVariant& defaultValue,
+        QnAbstractResourcePropertyHandler *handler,
+        QObject *parent = NULL);
     virtual ~QnAbstractResourcePropertyAdaptor();
 
     const QString &key() const;
@@ -111,15 +115,17 @@ public:
 
     QVariant value() const;
     QString serializedValue() const;
-    void setValue(const QVariant &value);
     bool testAndSetValue(const QVariant &expectedValue, const QVariant &newValue);
+    virtual void setValue(const QVariant& value) = 0;
 
     void synchronizeNow();
+
 signals:
     void valueChanged();
 
 protected:
     virtual QString defaultSerializedValue() const;
+    void setValueInternal(const QVariant& value);
 
 private:
     void loadValue(const QString &serializedValue);
@@ -137,6 +143,7 @@ private:
 
 private:
     const QString m_key;
+    const QVariant m_defaultValue;
     const QScopedPointer<QnAbstractResourcePropertyHandler> m_handler;
     QAtomicInt m_pendingSave;
 
@@ -152,7 +159,7 @@ class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
 public:
     QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL): 
-        QnAbstractResourcePropertyAdaptor(key, handler, parent),
+        QnAbstractResourcePropertyAdaptor(key, QVariant::fromValue(defaultValue), handler, parent),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
     {
@@ -169,8 +176,13 @@ public:
         }
     }
 
+    virtual void setValue(const QVariant& value) override {
+        //converting incoming value to expected type
+        base_type::setValueInternal(QVariant::fromValue(value.value<T>()));
+    }
+
     void setValue(const T &value) {
-        base_type::setValue(QVariant::fromValue(value));
+        base_type::setValueInternal(QVariant::fromValue(value));
     }
 
     bool testAndSetValue(const T &expectedValue, const T &newValue) {
