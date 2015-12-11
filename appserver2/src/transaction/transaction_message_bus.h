@@ -161,6 +161,7 @@ namespace ec2
 
     public slots:
         void dropConnections();
+        void reconnectAllPeers();
 
     private:
         friend class QnTransactionTransport;
@@ -254,6 +255,8 @@ namespace ec2
         int distanceToPeer(const QnUuid& dstPeer) const;
         void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
         void sendDelayedAliveTran();
+        void reconnectAllPeers(QMutexLocker* const /*lock*/);
+    
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();

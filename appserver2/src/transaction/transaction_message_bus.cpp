@@ -300,7 +300,7 @@ QnTransactionMessageBus::QnTransactionMessageBus(Qn::PeerType peerType)
 
     connect(
         QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-        this, &QnTransactionMessageBus::dropConnections);
+        this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
 }
 
 void QnTransactionMessageBus::start()
@@ -1648,11 +1648,23 @@ void QnTransactionMessageBus::dropConnections()
 {
     QMutexLocker lock(&m_mutex);
     m_remoteUrls.clear();
-    for(QnTransactionTransport* transport: m_connections) {
+    reconnectAllPeers(&lock);
+}
+
+void QnTransactionMessageBus::reconnectAllPeers()
+{
+    QMutexLocker lock(&m_mutex);
+    reconnectAllPeers(&lock);
+}
+
+void QnTransactionMessageBus::reconnectAllPeers(QMutexLocker* const /*lock*/)
+{
+    for (QnTransactionTransport* transport : m_connections)
+    {
         qWarning() << "Disconnected from peer" << transport->remoteAddr();
         transport->setState(QnTransactionTransport::Error);
     }
-    for (auto transport: m_connectingConnections) 
+    for (auto transport : m_connectingConnections)
         transport->setState(ec2::QnTransactionTransport::Error);
 }
 
