@@ -44,7 +44,7 @@ private:
 private:
     bool m_hasZoom;
 
-    QScopedPointer<DWCommonCameraProxy> m_cameraProxy;
+    QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
 };
 
 #endif //ENABLE_ONVIF

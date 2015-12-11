@@ -10,14 +10,13 @@
 namespace {
     const QRegExp DW_RES_SETTINGS_FILTER(lit("[{},']"));
     const int kHttpReadTimeout = 1000 * 10;
-    const int kTransportUserError = 0;
 
     const int kPravisHttpPort = 10080;
-    const int kNoUserError = 0;
-    const int kUserParseError = 0;
+    const int kNoError = 0;
+    const int kParseError = -1;
 }
 
-DWCommonCameraProxy::DWCommonCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
+DWAbstractCameraProxy::DWAbstractCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
     m_host(host),
     m_port(port),
     m_timeout(timeout),
@@ -27,7 +26,7 @@ DWCommonCameraProxy::DWCommonCameraProxy(const QString& host, int port, unsigned
 
 // --------------- QnWin4NetCameraProxy ------------------
 QnWin4NetCameraProxy::QnWin4NetCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
-    DWCommonCameraProxy(host, port, timeout, auth)
+    DWAbstractCameraProxy(host, port, timeout, auth)
 {
 }
 
@@ -155,7 +154,7 @@ QnCameraAdvancedParamValueList QnWin4NetCameraProxy::getParamsList() const {
 // -------------------- QnPravisCameraProxy --------------------
 
 QnPravisCameraProxy::QnPravisCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth):
-    DWCommonCameraProxy(host, port, timeout, auth)
+    DWAbstractCameraProxy(host, port, timeout, auth)
 {
 }
 
@@ -176,6 +175,8 @@ void QnPravisCameraProxy::addToFlatParams(const QnCameraAdvancedParamGroup& grou
 
 QString parseParamFromHttpResponse(const QnCameraAdvancedParameter& cameraAdvParam, nx_http::BufferType msgBody)
 {
+    // camera returns result as human readable page. The page format depends on parameter name.
+    // There are two different formats so far. Param value follows after the prefix
     const QByteArray pattern1 = (cameraAdvParam.id != "wdrmode" ? "byte(" : "camfw_setting_param");
 
     for (auto line: msgBody.split('\n'))
@@ -265,12 +266,12 @@ int httpResultErrCode(const QByteArray& msgBody)
 {
     int idx1 = msgBody.indexOf("<status>");
     if (idx1 == -1)
-        return kUserParseError;
+        return kParseError;
     idx1 += QByteArray("<status>").length();
 
     int idx2 = msgBody.indexOf("</status>");
     if (idx2 == -1)
-        return kUserParseError;
+        return kParseError;
 
     return msgBody.mid(idx1, idx2 - idx1).toInt();
 }
@@ -305,7 +306,7 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
         {
             {
                 QnMutexLocker lock(&waitMutex);
-                if (statusCode == nx_http::StatusCode::ok &&  httpResultErrCode(msgBody) == kNoUserError)
+                if (statusCode == nx_http::StatusCode::ok &&  httpResultErrCode(msgBody) == kNoError)
                 {
                     QnCameraAdvancedParamValue param;
                     param.value = value;
