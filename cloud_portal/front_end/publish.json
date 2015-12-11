@@ -29,5 +29,19 @@
                 "dest": "/opt/networkoptix/cloud_portal/static/"
             }
         ]
+    },
+    "all": {
+        "options": {
+            "host": "cloud-demo.hdw.mx",
+            "username": "root",
+            "password": "VhhK4l1SwbMTHlLIWlBNXHLIBv0S1SNA"
+        },
+        "files": [
+            {
+                "cwd": "../cloud/",
+                "src": ["**"],
+                "dest": "/opt/networkoptix/cloud_portal/"
+            }
+        ]
     }
 }

@@ -557,6 +557,13 @@ module.exports = function (grunt) {
         'scp:frontend'
     ]);
 
+
+    grunt.registerTask('deploy', [
+        'publish',
+        'scp:all'
+    ]);
+
+
     grunt.registerTask('pub', [
         'publish'
     ]);

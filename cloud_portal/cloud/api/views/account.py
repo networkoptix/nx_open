@@ -6,8 +6,11 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
 import base64
 import logging
+import timezone
+from django.db.models import Model
+import api
 from api.controllers.cloud_api import Account
-from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, api_success
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success
 
 __django__ = logging.getLogger('django')
 
@@ -97,7 +100,18 @@ def activate(request):
     if 'code' not in request.data:
         raise APIRequestException('Activation code is absent')
     code = request.data['code']
-    Account.activate(code)
+    user_data = Account.activate(code)
+
+    if 'email' not in user_data:
+        raise APIInternalException('No email from cloud_db')
+
+    email = user_data['email']
+    try:
+        user = api.models.Account.objects.get(email=email)
+        user.activated_date = timezone.now()
+        user.save(update_fields=['activated_date'])
+    except Model.DoesNotExist:
+        raise APIInternalException('No email in portal_db')
     return api_success()
 
 
