@@ -6,8 +6,12 @@
 #include "core/resource_management/resource_searcher.h"
 #include "plugins/resource/arecontvision/resource/av_resource.h"
 
+#include <array>
+
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
+    typedef std::array<unsigned char, 6> MacArray;
+
 public:
     QnPlArecontResourceSearcher();
 
@@ -22,9 +26,8 @@ protected:
     virtual QString manufacture() const;
 
 private:
-    QnNetworkResourcePtr findResourceHelper(
-        const QnPlAreconVisionResourcePtr &resource
-    );
+    QnNetworkResourcePtr findResourceHelper(const MacArray &mac, 
+                                            const SocketAddress &addr);
 };
 
 #endif

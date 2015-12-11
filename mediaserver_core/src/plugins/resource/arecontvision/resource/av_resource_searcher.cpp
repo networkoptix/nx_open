@@ -20,6 +20,7 @@
 
 #define CL_BROAD_CAST_RETRY 1
 
+
 extern QString getValueFromString(const QString& line);
 
 QnPlArecontResourceSearcher::QnPlArecontResourceSearcher()
@@ -35,40 +36,67 @@ QString QnPlArecontResourceSearcher::manufacture() const
 }
 
 QnNetworkResourcePtr 
-QnPlArecontResourceSearcher::findResourceHelper(const QnPlAreconVisionResourcePtr &resource)
+QnPlArecontResourceSearcher::findResourceHelper(const MacArray &mac,
+                                                const SocketAddress &addr)
 {
-    QString model;
-    QString model_release;
+    auto rpRes = qnResPool->getResourceByUniqueId(QnMacAddress(mac.data()).toString());
 
-    if (!resource->getParamPhysical(lit("model"), model))
-        return QnNetworkResourcePtr(0);
+    QnNetworkResourcePtr result;
+    auto archiveCamTypeId = qnResTypePool->getResourceTypeId("", QnArchiveCamResource::cameraName());
 
-    if (!resource->getParamPhysical(lit("model=releasename"), model_release))
-        return QnNetworkResourcePtr(0);
-
-    if (model_release != model) {
-        //this camera supports release name
-        model = model_release;
-    }
-    else
+    if (rpRes && rpRes->getTypeId() != archiveCamTypeId) 
     {
-        //old camera; does not support release name; but must support fullname
-        if (resource->getParamPhysical(lit("model=fullname"), model_release))
+        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(rpRes->getName()));
+        result->setMAC(QnMacAddress(mac.data()));
+        result->setHostAddress(addr.address.toString());
+        result->setName(rpRes->getName());
+
+        auto rpAVres = rpRes.dynamicCast<QnPlAreconVisionResource>();
+        if (rpAVres)
+        {
+            (result.dynamicCast<QnPlAreconVisionResource>())->setModel(rpAVres->getModel());
+            result->setFlags(rpAVres->flags());
+        }
+    }
+    else 
+    {
+        QString model;
+        QString model_release;
+
+        result = QnNetworkResourcePtr(new QnPlAreconVisionResource());
+        result->setMAC(QnMacAddress(mac.data()));
+        result->setHostAddress(addr.address.toString());
+
+        if (!result->getParamPhysical(lit("model"), model))
+            return QnNetworkResourcePtr(0);
+
+        if (!result->getParamPhysical(lit("model=releasename"), model_release))
+            return QnNetworkResourcePtr(0);
+
+        if (model_release != model) {
+            //this camera supports release name
             model = model_release;
-    }
+        }
+        else
+        {
+            //old camera; does not support release name; but must support fullname
+            if (result->getParamPhysical(lit("model=fullname"), model_release))
+                model = model_release;
+        }
 
-    QnNetworkResourcePtr result(resource->createResourceByName(model));
-    if (result)
-    {
-        result->setName(model);
-        result->setHostAddress(resource->getHostAddress());
-        (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
-        result->setMAC(resource->getMAC());
-        result->setFlags(resource->flags());
-    }
-    else
-    {
-        NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
+        result = QnNetworkResourcePtr(QnPlAreconVisionResource::createResourceByName(model));
+        if (result)
+        {
+            result->setName(model);
+            (result.dynamicCast<QnPlAreconVisionResource>())->setModel(model);
+            result->setMAC(QnMacAddress(mac.data()));
+            result->setHostAddress(addr.address.toString());
+        }
+        else
+        {
+            NX_LOG( lit("Found unknown resource! %1").arg(model), cl_logWARNING);
+            return QnNetworkResourcePtr(0);
+        }
     }
 
     return result;
@@ -118,8 +146,8 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (memcmp(data, "Arecont_Vision-AV2000", 21 )!=0)
                     continue; // this responde id not from arecont camera
 
-                unsigned char mac[6];
-                memcpy(mac,data + 22,6);
+                MacArray mac;
+                memcpy(mac.data(), data + 22,6);
 
                 /*/
                 QString smac = MACToString(mac);
@@ -155,17 +183,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 /*/
 
                 // in any case let's HTTP do it's job at very end of discovery
-                QnPlAreconVisionResourcePtr resource( new QnPlAreconVisionResource() );
-                if (resource==0)
-                    continue;
-
-                resource->setHostAddress(remoteEndpoint.address.toString());
-                resource->setMAC(QnMacAddress(mac));
-
                 bool need_to_continue = false;
-                for(const QnResourcePtr& res: result)
+                for(const QnResourcePtr& res: result) 
                 {
-                    if (res->getUniqueId() == resource->getUniqueId())
+                    if (memcmp(res->getUniqueId().toLatin1().constData(), mac.data(), 6) == 0) 
                     {
                         need_to_continue = true; //already has such
                         break;
@@ -174,28 +195,10 @@ QnResourceList QnPlArecontResourceSearcher::findResources()
                 if (need_to_continue)
                     continue;
 
-                auto rpRes = qnResPool->getResourceByUniqueId(resource->getUniqueId());
-                if (rpRes)
-                {
-                    auto rpResTypeId = rpRes->getTypeId();
-                    auto archiveCamTypeId = qnResTypePool->getLikeResourceTypeId(
-                        "", 
-                        QnArchiveCamResource::cameraName()
-                    );
-                    if (archiveCamTypeId != rpResTypeId)
-                    {
-                        result.push_back(rpRes);
-                        continue;
-                    }
-                }
-
-                QnNetworkResourcePtr resultRes = findResourceHelper(resource);
+                QnNetworkResourcePtr resultRes = findResourceHelper(mac, remoteEndpoint);
                 if (resultRes)
                     result.push_back(resultRes);
             }
-
-            //QnSleep::msleep(2); // to avoid 100% cpu usage
-
         }
     }
     return result;
