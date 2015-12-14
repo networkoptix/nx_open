@@ -1,5 +1,5 @@
-#ifndef MEDIATOR_CONNECTIONS_H
-#define MEDIATOR_CONNECTIONS_H
+#ifndef NX_CC_MEDIATOR_CONNECTIONS_H
+#define NX_CC_MEDIATOR_CONNECTIONS_H
 
 #include <nx/network/stun/async_client_user.h>
 
@@ -10,7 +10,7 @@ namespace cc {
 class MediatorConnector;
 
 /** Provides client related STUN functionality */
-class MediatorClientConnection
+class NX_NETWORK_API MediatorClientConnection
     : public stun::AsyncClientUser
 {
     MediatorClientConnection(std::shared_ptr<stun::AsyncClient> client);
@@ -21,7 +21,7 @@ public:
 };
 
 /** Provides system related STUN functionality */
-class MediatorSystemConnection
+class NX_NETWORK_API MediatorSystemConnection
     : public stun::AsyncClientUser
 {
     MediatorSystemConnection(std::shared_ptr<stun::AsyncClient> client,
@@ -45,4 +45,4 @@ private:
 } // namespase cc
 } // namespase nx
 
-#endif // MEDIATOR_CONNECTIONS_H
+#endif // NX_CC_MEDIATOR_CONNECTIONS_H
