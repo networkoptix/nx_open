@@ -10,7 +10,7 @@
 // TCP and UDT basic functionality
 
 template<typename ServerSocket, typename ClientSocket>
-static void socketSimpleSync(
+void socketSimpleSync(
     const SocketAddress& serverAddress,
     const QByteArray& testMessage,
     int clientCount)
@@ -64,18 +64,12 @@ static void socketSimpleSync(
 }
 
 
-static void stopSocketDefault(std::unique_ptr<QnStoppableAsync> socket)
-{
-    socket->pleaseStopSync();
-}
-
-template<typename ServerSocket, typename ClientSocket>
-static void socketSimpleAsync(
+template<typename ServerSocket, typename ClientSocket, typename StopSocketFunc>
+void socketSimpleAsync(
     const SocketAddress& serverAddress,
     const QByteArray& testMessage,
     int clientCount,
-    std::function<void(std::unique_ptr<QnStoppableAsync>)> stopSocket =
-        stopSocketDefault)
+    StopSocketFunc stopSocket)
 {
     nx::SyncQueue< SystemError::ErrorCode > serverResults;
     nx::SyncQueue< SystemError::ErrorCode > clientResults;

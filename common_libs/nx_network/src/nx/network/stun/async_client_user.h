@@ -7,7 +7,7 @@ namespace nx {
 namespace stun {
 
 /** Shared \class AsyncClient usadge wrapper */
-class AsyncClientUser
+class NX_NETWORK_API AsyncClientUser
     : public std::enable_shared_from_this<AsyncClientUser>
     , public QnStoppableAsync
 {

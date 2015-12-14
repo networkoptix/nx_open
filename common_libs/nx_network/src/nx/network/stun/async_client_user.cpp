@@ -29,7 +29,7 @@ void AsyncClientUser::sendRequest(Message request,
 {
 
 
-    auto wrapper = [](const std::shared_ptr<AsyncClientUser>& self,
+    auto wrapper = [this](const std::shared_ptr<AsyncClientUser>& self,
                       const AsyncClient::RequestHandler& handler,
                       SystemError::ErrorCode code, Message message)
     {

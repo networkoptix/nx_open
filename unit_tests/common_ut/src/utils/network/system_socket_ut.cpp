@@ -68,7 +68,7 @@ TEST(TcpSocket, SimpleAsync)
         SocketAddress("localhost:12345"),
         kTestMessage,
         kClientCount,
-        [&](std::unique_ptr<QnStoppableAsync> socket){
+        [this](std::unique_ptr<QnStoppableAsync> socket){
             socket->pleaseStopSync();
         });
 }

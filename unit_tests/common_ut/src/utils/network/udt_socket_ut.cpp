@@ -133,7 +133,10 @@ TEST(SocketUdt, SimpleAsync)
     socketSimpleAsync<UdtStreamServerSocket, UdtStreamSocket>(
         SocketAddress("localhost:12345"),
         kTestMessage,
-        kClientCount);
+        kClientCount,
+        [this](std::unique_ptr<QnStoppableAsync> socket) {
+            socket->pleaseStopSync();
+        });
 }
 
 TEST(SocketUdt, SimpleTrueAsync)
