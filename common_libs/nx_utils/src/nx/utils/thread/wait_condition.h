@@ -22,7 +22,9 @@ public:
 	QnWaitCondition();
     ~QnWaitCondition();
     
-    bool wait( QnMutex* mutex, unsigned long time = ULONG_MAX );
+    //!Deprecated, use \a QnWaitCondition::wait(QnMutexLockerBase*, unsigned long)
+    bool wait(QnMutex* mutex, unsigned long time = ULONG_MAX);
+    bool wait(QnMutexLockerBase* lock, unsigned long time = ULONG_MAX);
     void wakeAll();
     void wakeOne();
 

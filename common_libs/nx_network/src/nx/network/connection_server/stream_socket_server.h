@@ -15,6 +15,9 @@
 #include <nx/network/abstract_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
+
 
 template<class _ConnectionType>
 class StreamConnectionHolder
@@ -36,43 +39,63 @@ class StreamServerConnectionHolder
 public:
     typedef _ConnectionType ConnectionType;
 
+    StreamServerConnectionHolder()
+    :
+        m_connectionsBeingClosedCount(0)
+    {
+    }
+
     virtual ~StreamServerConnectionHolder()
     {
         //we MUST be sure to remove all connections
         std::map<ConnectionType*, std::shared_ptr<ConnectionType>> connections;
         {
-            std::lock_guard<std::mutex> lk( m_mutex );
+            QnMutexLocker lk(&m_mutex);
             connections.swap( m_connections );
         }
         for (auto& connection: connections)
             connection.first->pleaseStop();
         connections.clear();
+
+        //waiting connections being cancelled through closeConnection call to finish...
+        QnMutexLocker lk(&m_mutex);
+        while (m_connectionsBeingClosedCount > 0)
+            m_cond.wait(&lk);
     }
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
         ConnectionType* connection ) override
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        QnMutexLocker lk(&m_mutex);
         auto connectionIter = m_connections.find(connection);
-        Q_ASSERT(connectionIter != m_connections.end());
         if (connectionIter == m_connections.end())
             return;
         auto connectionCtx = std::move(*connectionIter);
         m_connections.erase(connectionIter);
+
+        ++m_connectionsBeingClosedCount;
         lk.unlock();
+
         //TODO #ak introduce non-blocking implementation when async cancellation is available
         connectionCtx.first->pleaseStop();
+        connectionCtx.second.reset();
+
+        lk.relock();
+        --m_connectionsBeingClosedCount;
+        m_cond.wakeAll();
     }
 
 protected:
-    std::mutex m_mutex;
+    QnMutex m_mutex;
+    QnWaitCondition m_cond;
+    int m_connectionsBeingClosedCount;
     //TODO #ak this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
 
     void saveConnection( std::shared_ptr<ConnectionType> connection )
     {
-        std::unique_lock<std::mutex> lk( m_mutex );
+        QnMutexLocker lk(&m_mutex);
         m_connections.emplace( connection.get(), std::move( connection ) );
     }
 };
