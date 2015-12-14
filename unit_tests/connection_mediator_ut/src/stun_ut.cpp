@@ -50,7 +50,8 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 
 TEST_F( StunCustomTest, Ping )
 {
-    AsyncClient client( address );
+    AsyncClient client;
+    client.connect( address );
 
     stun::Message request( Header( MessageClass::request, stun::cc::methods::ping ) );
     request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
@@ -85,7 +86,8 @@ TEST_F( StunCustomTest, Ping )
 
 TEST_F( StunCustomTest, BindConnect )
 {
-    AsyncClient msClient( address );
+    AsyncClient msClient;
+    msClient.connect( address );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::bind ) );
         request.newAttribute< stun::cc::attrs::SystemId >( SYSTEM_ID );
@@ -104,7 +106,8 @@ TEST_F( StunCustomTest, BindConnect )
         ASSERT_EQ( result.second.header.messageClass, MessageClass::successResponse );
     }
 
-    AsyncClient connectClient( address );
+    AsyncClient connectClient;
+    connectClient.connect( address );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
         request.newAttribute< stun::cc::attrs::ClientId >( "SomeClient" );

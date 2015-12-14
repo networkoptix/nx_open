@@ -12,7 +12,7 @@ namespace nx
 {
     bool operator==( const std::string& left, const nx::String& right )
     {
-        if( left.size() != right.size() )
+        if( left.size() != static_cast<size_t>(right.size()) )
             return false;
         return memcmp( left.data(), right.constData(), left.size() ) == 0;
     }
