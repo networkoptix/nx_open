@@ -43,6 +43,8 @@ static const std::chrono::seconds ALIVE_UPDATE_INTERVAL_OVERHEAD(10);
 static const int ALIVE_UPDATE_PROBE_COUNT = 2;
 static const int ALIVE_RESEND_TIMEOUT_MAX = 1000 * 5; // resend alive data after a random delay in range min..max
 static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
+//!introduced to make discovery interval dependent of peer alive update interval
+static const int PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR = 3;
 
 QString printTransaction(const char* prefix, const QnAbstractTransaction& tran, const QnTransactionTransportHeader &transportHeader, QnTransactionTransport* sender)
 {
@@ -1328,7 +1330,9 @@ void QnTransactionMessageBus::doPeriodicTasks()
             if (!connectInfo.discoveredPeer.isNull() ) 
             {
                 if (connectInfo.discoveredTimeout.elapsed() > 
-                        std::chrono::milliseconds(3 * QnGlobalSettings::instance()->aliveUpdateInterval()).count())
+                        std::chrono::milliseconds(
+                            PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
+                            QnGlobalSettings::instance()->aliveUpdateInterval()).count())
                 {
                     connectInfo.discoveredPeer = QnUuid();
                     connectInfo.discoveredTimeout.restart();

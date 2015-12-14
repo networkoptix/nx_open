@@ -5,8 +5,6 @@
 
 #include "settings.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/user_resource.h>
 #include <nx1/info.h>
 #include <utils/common/app_info.h>
 
