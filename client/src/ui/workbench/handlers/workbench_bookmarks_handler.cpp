@@ -51,7 +51,7 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
     /*
-     * This check can be safely omitted in release - it is better to add bookmark on another server than do not 
+     * This check can be safely omitted in release - it is better to add bookmark on another server than do not
      * add bookmark at all.
      * //TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
      */
@@ -120,10 +120,13 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
+    const auto message = (bookmark.name.trimmed().isEmpty()
+        ? tr("Are you sure you want to delete this bookmark?")
+        : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
+
     if (QMessageBox::information(mainWindow(),
-            tr("Confirm Deletion"),
-            tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
-            QMessageBox::Ok | QMessageBox::Cancel, 
+            tr("Confirm Deletion"), message,
+            QMessageBox::Ok | QMessageBox::Cancel,
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
