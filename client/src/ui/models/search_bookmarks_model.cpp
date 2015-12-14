@@ -66,6 +66,8 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    const QnVirtualCameraResourceList &cameras() const;
+
     void applyFilter();
 
     void sort(int column
@@ -140,6 +142,11 @@ void QnSearchBookmarksModel::Impl::setFilterText(const QString &text)
     m_filter.text = text;
 }
 
+const QnVirtualCameraResourceList &QnSearchBookmarksModel::Impl::cameras() const
+{
+    return m_cameras;
+}
+
 void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList &cameras)
 {
     m_cameras = cameras;
@@ -147,8 +154,9 @@ void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList 
 
 void QnSearchBookmarksModel::Impl::applyFilter()
 {
-    if (m_cameras.empty())
-        m_cameras = qnResPool->getAllCameras(QnResourcePtr(), true);
+    m_beginResetModel();
+    m_bookmarks.clear();
+    m_endResetModel();
 
     m_bookmarksManager->getBookmarksAsync(m_cameras.toSet(), m_filter
         , [this](bool success, const QnCameraBookmarkList &bookmarks)
@@ -286,6 +294,11 @@ void QnSearchBookmarksModel::setCameras(const QnVirtualCameraResourceList &camer
     m_impl->setCameras(cameras);
 }
 
+const QnVirtualCameraResourceList &QnSearchBookmarksModel::cameras() const
+{
+    return m_impl->cameras();
+}
+
 int QnSearchBookmarksModel::rowCount(const QModelIndex &parent) const
 {
     return m_impl->rowCount(parent);
@@ -319,7 +332,7 @@ QVariant QnSearchBookmarksModel::data(const QModelIndex &index, int role) const
 QVariant QnSearchBookmarksModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if ((orientation != Qt::Horizontal) || (role != Qt::DisplayRole) || (section >= kColumnsCount))
-        return Base::headerData(section, orientation, role);
+        return QAbstractItemModel::headerData(section, orientation, role);
 
     static const QString kColumnHeaderNames[] = {tr("Name"), tr("Start time"), tr("Length"), tr("Tags"), tr("Camera")};
     return kColumnHeaderNames[section];

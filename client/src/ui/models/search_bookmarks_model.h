@@ -32,6 +32,8 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    const QnVirtualCameraResourceList &cameras() const;
+
     /// QAbstractItemModel overrides
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -51,7 +53,6 @@ public:
         int role = Qt::DisplayRole) const override;
 
 private:
-    typedef QAbstractItemModel Base;
     class Impl;
 
     Impl * const m_impl;
