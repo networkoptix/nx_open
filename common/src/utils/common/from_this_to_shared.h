@@ -20,7 +20,7 @@ public:
 
 private:
     /** Weak reference to this, to make conversion to shared pointer possible. */
-    mutable QWeakPointer<T> m_weakPointer;
+    QWeakPointer<T> m_weakPointer;
 
     /* Private API for QnSharedResourcePointer. */
 
@@ -36,7 +36,7 @@ private:
         m_weakPointer = pointer;
     }
 
-    void resetWeakPointer() const
+    void resetWeakPointer()
     {
         m_weakPointer.clear();
     }
