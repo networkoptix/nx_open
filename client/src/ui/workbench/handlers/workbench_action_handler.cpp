@@ -245,7 +245,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::BookmarksModeAction),                    &QAction::toggled,      this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -1401,28 +1400,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-}
-
-void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
-    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
-    const bool checked = bookmarkModeAction->isChecked();
-    const bool enabled = bookmarkModeAction->isEnabled();
-
-    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
-    if (!checked)
-    {
-        const auto currentWidget = navigator()->currentWidget();
-        canSaveBookmarksMode = (!currentWidget
-            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
-    }
-
-    if (enabled && canSaveBookmarksMode)
-        context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
-
-    if (checked)
-        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
-
-    navigator()->setBookmarksModeEnabled(checked);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
