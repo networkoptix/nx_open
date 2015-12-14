@@ -15,6 +15,7 @@ public:
     template<class Deleter>
     QnSharedResourcePointer(Resource *ptr, Deleter d): base_type(ptr, d) { initialize(*this); }
 
+    // copy 
     QnSharedResourcePointer(const QSharedPointer<Resource> &other): base_type(other) {}
 
     QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<Resource> &other) {
@@ -29,6 +30,48 @@ public:
     QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<OtherResource> &other) {
         base_type::operator=(other);
         return *this;
+    }
+
+    // move 
+    template<typename T>
+    struct has_resetWeakPointer {
+        template<typename U>
+        static std::true_type test(decltype(std::declval<U>.resetWeakPointer()) *dummy=0);
+
+        template<typename U>
+        static std::false_type test(...);
+        
+        enum {value = std::is_same<std::true_type, decltype(test<T>(0))>::value};
+    };
+
+    template<typename OtherResource>
+    typename std::enable_if<has_resetWeakPointer<OtherResource>::value, 
+                            QnSharedResourcePointer<Resource>&>::type &operator=(QSharedPointer<OtherResource> &&other) {
+        other->resetWeakPointer();
+        base_type::operator=(std::move(other));
+        return *this;
+    }
+
+    template<typename OtherResource>
+    typename std::enable_if<!has_resetWeakPointer<OtherResource>::value, 
+                            QnSharedResourcePointer<Resource>&>::type &operator=(QSharedPointer<OtherResource> &&other) {
+        base_type::operator=(std::move(other));
+        return *this;
+    }
+
+    template<typename OtherResource> 
+    QnSharedResourcePointer(QSharedPointer<OtherResource> &&other, 
+                            typename std::enable_if<has_resetWeakPointer<OtherResource>::value>::type *dummy=0) {
+        Q_UNUSED(dummy);
+        other->resetWeakPointer();
+        base_type(std::move(other));
+    }
+
+    template<class OtherResource>
+    QnSharedResourcePointer(QSharedPointer<OtherResource> &&other, 
+                            typename std::enable_if<!has_resetWeakPointer<OtherResource>::value>::type *dummy=0) {
+        Q_UNUSED(dummy);
+        base_type(std::move(other));
     }
 
     template<class OtherResource>
