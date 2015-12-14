@@ -73,6 +73,10 @@ private:
 
     void sortStorages();
 
+    /* Check if the whole section is in rebuild. */
+    bool isStoragePoolInRebuild(const QnStorageModelInfo& storage) const;
+
+    /* Check if the current storage is in rebuild. */
     bool isStorageInRebuild(const QnStorageModelInfo& storage) const;
 
 private:

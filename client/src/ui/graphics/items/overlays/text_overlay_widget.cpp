@@ -29,8 +29,8 @@ QnTextOverlayWidget::QnTextOverlayWidget(QGraphicsWidget *parent)
 {
     enum
     {
-        kDefaultHorMargin = 0
-        , kDefaultBottomMargin = 35
+        kDefaultHorMargin = 2
+        , kDefaultBottomMargin = 37
         , kDefaultTopMargin = 28
     };
 

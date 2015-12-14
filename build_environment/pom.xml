@@ -194,6 +194,13 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>${bespin.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
+                </dependency>
             </dependencies>
         </profile>
 
@@ -296,13 +303,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>${bespin.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -320,28 +320,6 @@
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>unix-noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>1.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>
