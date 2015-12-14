@@ -45,7 +45,8 @@ public:
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-        stree::AbstractResourceWriter* authProperties ) override;
+        stree::AbstractResourceWriter* authProperties,
+        std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody) override;
         
     static nx::String realm(); 
 

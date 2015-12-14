@@ -11,8 +11,12 @@
 #include <boost/optional.hpp>
 
 #include <utils/common/app_info.h>
+#include <utils/common/guard.h>
+#include <utils/serialization/json.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/server/fusion_request_result.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -47,15 +51,28 @@ bool AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
     boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-    stree::AbstractResourceWriter* authProperties)
+    stree::AbstractResourceWriter* authProperties,
+    std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
 {
+    bool authResult = false;
+    auto guard = makeScopedGuard([&msgBody, &authResult](){
+        if (authResult)
+            return;
+        nx_http::FusionRequestResult result;
+        result.resultCode = nx_http::FusionRequestErrorClass::unauthorized;
+        result.errorText = "unauthorized";
+        *msgBody = std::make_unique<nx_http::BufferSource>(
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            QJson::serialized(result));
+    });
+
     //TODO #ak use QnAuthHelper class to support all that authentication types
 
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
-        return true;
+        return (authResult = true);
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
-        return false;
+        return (authResult = false);
 
     const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
 
@@ -69,7 +86,7 @@ bool AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    stree::ResourceContainer authResult;
+    stree::ResourceContainer authTraversalResult;
     stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
         inputRes.put(attr::userName, authzHeader->userid());
@@ -78,11 +95,11 @@ bool AuthenticationManager::authenticate(
     m_stree.search(
         StreeOperation::authentication,
         stree::MultiSourceResourceReader(socketResources, httpRequestResources, inputRes),
-        &authResult);
-    if (auto authenticated = authResult.get(attr::authenticated))
+        &authTraversalResult);
+    if (auto authenticated = authTraversalResult.get(attr::authenticated))
     {
         if (authenticated.get().toBool())
-            return true;
+            return (authResult = true);
     }
 
     if (!authzHeader ||
@@ -90,13 +107,13 @@ bool AuthenticationManager::authenticate(
         (authzHeader->userid().isEmpty()))
     {
         addWWWAuthenticateHeader(wwwAuthenticate);
-        return false;
+        return (authResult = false);
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
         addWWWAuthenticateHeader(wwwAuthenticate);
-        return false;
+        return (authResult = false);
     }
 
     const auto userID = authzHeader->userid();
@@ -109,26 +126,31 @@ bool AuthenticationManager::authenticate(
         std::move(authzHeader.get()));
 
     //analyzing authSearchResult for password or ha1 pesence
-    if (auto foundHa1 = authResult.get(attr::ha1))
+    if (auto foundHa1 = authTraversalResult.get(attr::ha1))
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
-            return true;
+            return (authResult = true);
     }
-    if (auto password = authResult.get(attr::userPassword))
+    if (auto password = authTraversalResult.get(attr::userPassword))
     {
         if (validateHa1Func(calcHa1(
                 userID,
                 realm(),
                 password.get().toString())))
         {
-            return true;
+            return (authResult = true);
         }
     }
 
-    return authenticateInDataManagers(
-        userID,
-        std::move(validateHa1Func),
-        authProperties);
+    if (!authenticateInDataManagers(
+            userID,
+            std::move(validateHa1Func),
+            authProperties))
+    {
+        return (authResult = false);
+    }
+
+    return (authResult = true);
 }
 
 nx::String AuthenticationManager::realm()

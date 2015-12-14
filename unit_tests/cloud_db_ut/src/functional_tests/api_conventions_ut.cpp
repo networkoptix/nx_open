@@ -8,6 +8,7 @@
 #include <utils/common/model_functions.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <cloud_db_client/src/data/account_data.h>
 
 #include "test_setup.h"
 #include "version.h"
@@ -16,7 +17,7 @@
 namespace nx {
 namespace cdb {
 
-TEST_F(CdbFunctionalTest, api_conventions)
+TEST_F(CdbFunctionalTest, api_conventions_general)
 {
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
@@ -66,6 +67,77 @@ TEST_F(CdbFunctionalTest, api_conventions)
         ASSERT_EQ(
             (int)api::ResultCode::forbidden,
             requestResult.errorDetail);
+    }
+}
+
+TEST_F(CdbFunctionalTest, api_conventions_usingPostMethod)
+{
+    const QByteArray testData =
+        "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
+        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
+
+    bool success = false;
+    auto accountData = QJson::deserialized<api::AccountData>(
+        testData, api::AccountData(), &success);
+    ASSERT_TRUE(success);
+
+    startAndWaitUntilStarted();
+
+    auto client = nx_http::AsyncHttpClient::create();
+    QUrl url;
+    url.setHost(endpoint().address.toString());
+    url.setPort(endpoint().port);
+    url.setScheme("http");
+    url.setPath("/account/register");
+    std::promise<void> donePromise;
+    auto doneFuture = donePromise.get_future();
+    QObject::connect(
+        client.get(), &nx_http::AsyncHttpClient::done,
+        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
+            donePromise.set_value();
+        },
+        Qt::DirectConnection);
+    client->doPost(url, "application/json", testData);
+
+    doneFuture.wait();
+    ASSERT_TRUE(client->response() != nullptr);
+    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+}
+
+TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
+{
+    startAndWaitUntilStarted();
+
+    for (int i = 0; i < 2; ++i)
+    {
+        nx_http::HttpClient client;
+        QUrl url;
+        url.setHost(endpoint().address.toString());
+        url.setPort(endpoint().port);
+        url.setScheme("http");
+        url.setPath("/account/get");
+        if (i == 1)
+        {
+            url.setUserName("invalid");
+            url.setPassword("password");
+        }
+        ASSERT_TRUE(client.doGet(url));
+        ASSERT_TRUE(client.response() != nullptr);
+        ASSERT_EQ(
+            nx_http::StatusCode::unauthorized,
+            client.response()->statusLine.statusCode);
+
+        nx_http::BufferType msgBody;
+        while (!client.eof())
+            msgBody += client.fetchMessageBodyBuffer();
+
+        ASSERT_FALSE(msgBody.isEmpty());
+        nx_http::FusionRequestResult requestResult =
+            QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+
+        ASSERT_EQ(
+            nx_http::FusionRequestErrorClass::unauthorized,
+            requestResult.resultCode);
     }
 }
 

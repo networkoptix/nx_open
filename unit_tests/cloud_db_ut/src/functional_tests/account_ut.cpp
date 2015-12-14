@@ -417,39 +417,5 @@ TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
     }
 }
 
-TEST_F(CdbFunctionalTest, usingPostMethod)
-{
-    const QByteArray testData =
-        "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
-        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
-
-    bool success = false;
-    auto accountData = QJson::deserialized<data::AccountData>(
-        testData, data::AccountData(), &success);
-    ASSERT_TRUE(success);
-
-    startAndWaitUntilStarted();
-
-    auto client = nx_http::AsyncHttpClient::create();
-    QUrl url;
-    url.setHost(endpoint().address.toString());
-    url.setPort(endpoint().port);
-    url.setScheme("http");
-    url.setPath("/account/register");
-    std::promise<void> donePromise;
-    auto doneFuture = donePromise.get_future();
-    QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done, 
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
-            donePromise.set_value();
-        },
-        Qt::DirectConnection);
-    client->doPost(url, "application/json", testData);
-
-    doneFuture.wait();
-    ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
-}
-
 }   //cdb
 }   //nx
