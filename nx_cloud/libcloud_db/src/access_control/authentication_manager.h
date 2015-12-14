@@ -57,7 +57,7 @@ private:
     std::vector<AbstractAuthenticationDataProvider*> m_authDataProviders;
 
     bool validateNonce(const nx_http::StringType& nonce);
-    bool AuthenticationManager::authenticateInDataManagers(
+    bool authenticateInDataManagers(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         stree::AbstractResourceWriter* const authProperties);

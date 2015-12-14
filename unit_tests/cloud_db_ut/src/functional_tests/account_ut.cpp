@@ -309,7 +309,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
     const std::chrono::seconds expirationPeriod(5);
 
     addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");
-    addArg(QByteArray::number(expirationPeriod.count()).constData());
+    addArg(QByteArray::number((unsigned int)expirationPeriod.count()).constData());
 
     startAndWaitUntilStarted();
 
