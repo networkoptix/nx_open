@@ -749,12 +749,12 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
         client->response() == nullptr ||
         client->response()->statusLine.statusCode != nx_http::StatusCode::ok)
     {
-        const auto msg = client->fetchMessageBodyBuffer();
-        bool portEnabled = msg.indexOf("auxin=on") != -1;
+        portEnabled = false;
     }
     else
     {
-        portEnabled = false;
+        const auto msg = client->fetchMessageBodyBuffer();
+        portEnabled = msg.indexOf("auxin=on") != -1;
     }
 
     if (m_inputPortState != portEnabled)
