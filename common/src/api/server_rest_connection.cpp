@@ -47,6 +47,15 @@ Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, 
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
 }
 
+Handle ServerConnection::saveCloudSystemCredentials(const QString &cloudSystemID, const QString &cloudAuthKey, Result<EmptyResponseType>::type callback, QThread *targetThread)
+{
+    QnRequestParamList params;
+    params << QnRequestParam("cloudSystemID", cloudSystemID);
+    params << QnRequestParam("cloudAuthKey", cloudAuthKey);
+
+    return executeGet(lit("/api/saveCloudSystemCredentials"), params, callback, targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
