@@ -1,289 +1,121 @@
-/**********************************************************
-* Sep 17, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include "cloud_management_widget.h"
 #include "ui_cloud_management_widget.h"
 
-#include <QtCore/QMetaObject>
-#include <QtCore/QSortFilterProxyModel>
-#include <QtWidgets/QMessageBox>
-
-#include <api/app_server_connection.h>
-#include <api/media_server_connection.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource/param.h>
-#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
-#include "client/client_settings.h"
+#include <ui/dialogs/link_to_cloud_dialog.h>
+#include <ui/dialogs/unlink_from_cloud_dialog.h>
 
+class QnCloudManagementWidgetPrivate : public QObject
+{
+    QnCloudManagementWidget *q_ptr;
+    Q_DECLARE_PUBLIC(QnCloudManagementWidget)
+    Q_DECLARE_TR_FUNCTIONS(QnCloudManagementWidget)
 
-QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent /* = NULL*/)
-:
-    QnAbstractPreferencesWidget(parent),
-    QnWorkbenchContextAware(parent),
-    ui(new Ui::CloudManagementWidget),
-    m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory),
-    m_mserverReqHandle(-1),
-    m_boundToCloud(false)
+public:
+    QnCloudManagementWidgetPrivate(QnCloudManagementWidget *parent);
+
+    void at_linkButton_clicked();
+    void at_unlinkButton_clicked();
+    void at_goToCloudButton_clicked();
+
+    void updateUi();
+};
+
+QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
+    : base_type(parent)
+    , ui(new Ui::CloudManagementWidget)
+    , d_ptr(new QnCloudManagementWidgetPrivate(this))
 {
     ui->setupUi(this);
 
-    connect(
-        ui->toggleBindSystemButton, &QPushButton::clicked,
-        this, &QnCloudManagementWidget::onToggleBindSystemClicked);
-    connect(
-        propertyDictionary, &QnResourcePropertyDictionary::asyncSaveDone,
-        this, &QnCloudManagementWidget::onResourcePropertiesSaved);
+    // TODO: #help Set help topic
 
-    connect(
-        qnResPool, &QnResourcePool::resourceChanged,
-        this, &QnCloudManagementWidget::onUserChanged);
-    //setHelpTopic(this, Qn::Administration_CloudManagement_Help);
+    // TODO: #dklychkov Use customization-specific values
+    QString cloudName = lit("Nx Cloud");
+    QString cloudUrl = lit("http://www.networkoptix.com");
 
-    const auto cdbEndpoint = qnSettings->cdbEndpoint();
-    if (!cdbEndpoint.isEmpty())
-    {
-        const auto hostAndPort = cdbEndpoint.split(lit(":"));
-        if (hostAndPort.size() == 2)
-        {
-            m_connectionFactory->setCloudEndpoint(
-                hostAndPort[0].toStdString(),
-                hostAndPort[1].toInt());
-        }
-    }
+    ui->learnMoreLabel->setText(
+            lit("<a href=\"%2\">%1</a>")
+                .arg(tr("Learn more about %1").arg(cloudName))
+                .arg(cloudUrl)
+    );
 
-    onUserChanged(qnResPool->getAdministrator());
+    Q_D(QnCloudManagementWidget);
+
+    connect(ui->linkButton,         &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_linkButton_clicked);
+    connect(ui->unlinkButton,       &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_unlinkButton_clicked);
+    connect(ui->goToCloudButton,    &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked);
+
+    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+        connect(admin, &QnResource::resourceChanged, d, &QnCloudManagementWidgetPrivate::updateUi);
 }
 
-QnCloudManagementWidget::~QnCloudManagementWidget() {
+QnCloudManagementWidget::~QnCloudManagementWidget()
+{
 }
 
-void QnCloudManagementWidget::loadDataToUi() {
-    //QnGlobalSettings *settings = QnGlobalSettings::instance();
-    //TODO #ak
+void QnCloudManagementWidget::loadDataToUi()
+{
+    Q_D(QnCloudManagementWidget);
+    d->updateUi();
 }
 
-void QnCloudManagementWidget::applyChanges() {
-    //TODO #ak
+void QnCloudManagementWidget::applyChanges()
+{
 }
 
-bool QnCloudManagementWidget::hasChanges() const {
-    //TODO #ak
+bool QnCloudManagementWidget::hasChanges() const
+{
     return false;
 }
 
-void QnCloudManagementWidget::updateView(bool boundToCloud)
+
+QnCloudManagementWidgetPrivate::QnCloudManagementWidgetPrivate(QnCloudManagementWidget *parent)
+    : QObject(parent)
+    , q_ptr(parent)
 {
-    m_boundToCloud = boundToCloud;
-    if (m_boundToCloud)
+}
+
+void QnCloudManagementWidgetPrivate::at_linkButton_clicked()
+{
+    Q_Q(QnCloudManagementWidget);
+    QScopedPointer<QnLinkToCloudDialog> dialog(new QnLinkToCloudDialog(q));
+    dialog->exec();
+}
+
+void QnCloudManagementWidgetPrivate::at_unlinkButton_clicked()
+{
+    Q_Q(QnCloudManagementWidget);
+    QScopedPointer<QnUnlinkFromCloudDialog> dialog(new QnUnlinkFromCloudDialog(q));
+    dialog->exec();
+}
+
+void QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked()
+{
+}
+
+void QnCloudManagementWidgetPrivate::updateUi()
+{
+    QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+
+    bool linked = !adminUser->getProperty(Qn::CLOUD_SYSTEM_ID).isEmpty() &&
+                  !adminUser->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY).isEmpty();
+
+    Q_Q(QnCloudManagementWidget);
+
+    if (linked)
     {
-        ui->toggleBindSystemButton->setText(tr("Disconnect system from cloud"));
-        const auto admin = qnResPool->getAdministrator();
-        ui->cloudUserLineEdit->setText(admin->getProperty(Qn::CLOUD_ACCOUNT_NAME));
-        ui->cloudUserLineEdit->setDisabled(true);
+        QString accountLink = lit("<a>%1</a>").arg(adminUser->getProperty(Qn::CLOUD_ACCOUNT_NAME));
+        q->ui->linkedAccountInfoLabel->setText(tr("This system is linked to the cloud account %1").arg(accountLink));
+        q->ui->stackedWidget->setCurrentWidget(q->ui->linkedPage);
     }
     else
     {
-        ui->toggleBindSystemButton->setText(tr("Connect system to cloud"));
-        ui->cloudUserLineEdit->setDisabled(false);
+
+        q->ui->stackedWidget->setCurrentWidget(q->ui->notLinkedPage);
     }
-}
-
-void QnCloudManagementWidget::onToggleBindSystemClicked()
-{
-    if(m_boundToCloud)
-        doUnbindSystem();
-    else
-        doBindSystem();
-}
-
-void QnCloudManagementWidget::doBindSystem()
-{
-    QnMediaServerConnectionPtr serverConnection;
-    for (const QnMediaServerResourcePtr server : qnResPool->getAllServers())
-    {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
-        if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
-            continue;
-
-        serverConnection = server->apiConnection();
-        break;
-    }
-
-    if (!serverConnection)
-    {
-        QMessageBox::warning(
-            this,
-            tr("Network Error"),
-            tr("Failed. None of your servers is connected to the Internet."));
-        return;
-    }
-
-    ui->toggleBindSystemButton->setEnabled(false);
-    //TODO #ak displaying progress
-
-    m_cloudConnection = m_connectionFactory->createConnection(
-        ui->cloudUserLineEdit->text().toStdString(),
-        ui->cloudPasswordLineEdit->text().toStdString());
-
-    nx::cdb::api::SystemRegistrationData sysRegistrationData;
-    sysRegistrationData.name = qnCommon->localSystemName().toStdString();
-    m_cloudConnection->systemManager()->bindSystem(
-        sysRegistrationData,
-        [this, serverConnection](
-            nx::cdb::api::ResultCode result,
-            nx::cdb::api::SystemData systemData)
-        {
-            QMetaObject::invokeMethod(
-                this,
-                "onBindDone",
-                Qt::QueuedConnection,
-                Q_ARG(
-                    QnBindToCloudResponse,
-                    QnBindToCloudResponse(result, std::move(systemData), serverConnection)));
-        });
-}
-
-void QnCloudManagementWidget::doUnbindSystem()
-{
-    m_cloudConnection = m_connectionFactory->createConnection(
-        ui->cloudUserLineEdit->text().toStdString(),
-        ui->cloudPasswordLineEdit->text().toStdString());
-
-    ui->toggleBindSystemButton->setEnabled(false);
-    //TODO #ak displaying progress
-
-    nx::cdb::api::SystemRegistrationData sysRegistrationData;
-    m_cloudConnection->systemManager()->unbindSystem(
-        qnResPool->getAdministrator()->getProperty(Qn::CLOUD_SYSTEM_ID).toStdString(),
-        [this](nx::cdb::api::ResultCode result)
-        {
-            QMetaObject::invokeMethod(
-                this,
-                "onUnbindDone",
-                Qt::QueuedConnection,
-                Q_ARG(
-                    int,
-                    static_cast<int>(result)));
-        });
-}
-
-void QnCloudManagementWidget::onUserChanged(QnResourcePtr resource)
-{
-    const auto user = resource.dynamicCast<QnUserResource>();
-    if (!user || !user->isAdmin())
-        return;
-
-    updateView(
-        !user->getProperty(Qn::CLOUD_SYSTEM_ID).isEmpty() &&
-        !user->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY).isEmpty());
-}
-
-void QnCloudManagementWidget::onBindDone(QnBindToCloudResponse response)
-{
-    if (response.resultCode != nx::cdb::api::ResultCode::ok)
-    {
-        QMessageBox::warning(
-            this,   
-            tr("Failed to connect system to cloud account"),
-            QString::fromStdString(m_connectionFactory->toString(response.resultCode)));
-        ui->toggleBindSystemButton->setEnabled(true);
-        return;
-    }
-
-    const auto admin = qnResPool->getAdministrator();
-    admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, ui->cloudUserLineEdit->text());
-    propertyDictionary->saveParamsAsync(admin->getId());
-
-    m_mserverReqHandle = response.serverConnection->saveCloudSystemCredentials(
-        response.systemData.id.toString(),
-        QString::fromStdString(response.systemData.authKey),
-        this,
-        SLOT(onCloudCredentialsSaved(int, int)));
-}
-
-void QnCloudManagementWidget::onUnbindDone(int intResultCode)
-{
-    const auto resultCode = static_cast<nx::cdb::api::ResultCode>(intResultCode);
-    if (resultCode != nx::cdb::api::ResultCode::ok)
-    {
-        QMessageBox::warning(
-            this,
-            tr("Failed to disconnect system from cloud account"),
-            QString::fromStdString(m_connectionFactory->toString(resultCode)));
-        ui->toggleBindSystemButton->setEnabled(true);
-        return;
-    }
-
-    //TODO #ak removing properties from settings
-    const auto admin = qnResPool->getAdministrator();
-
-    admin->setProperty(Qn::CLOUD_SYSTEM_ID, QVariant());
-    admin->setProperty(Qn::CLOUD_SYSTEM_AUTH_KEY, QVariant());
-    m_mserverReqHandle = propertyDictionary->saveParamsAsync(admin->getId());
-}
-
-void QnCloudManagementWidget::onCloudCredentialsSaved(int status, int handle)
-{
-    cloudOperationCompleted(
-        handle,
-        status == 0,
-        true,
-        status == 0
-            ? tr("Success")
-            : tr("Failed to connect system to cloud account"),
-        status == 0
-            ? tr("System has been connected to the cloud account")
-            : tr("Could not save info to DB"));
-}
-
-void QnCloudManagementWidget::onResourcePropertiesSaved(int handle, ec2::ErrorCode errorCode)
-{
-    cloudOperationCompleted(
-        handle,
-        errorCode == ec2::ErrorCode::ok,
-        false,
-        errorCode == ec2::ErrorCode::ok
-            ? tr("Success")
-            : tr("Failed to remove cloud information from DB"),
-        errorCode == ec2::ErrorCode::ok
-            ? tr("System has been disconnected from the cloud account")
-            : ec2::toString(errorCode));
-}
-
-void QnCloudManagementWidget::cloudOperationCompleted(
-    int requestHandle,
-    bool ok,
-    bool boundToCloud,
-    const QString& messageTitle,
-    const QString& messageText)
-{
-    if (requestHandle != m_mserverReqHandle)
-        return;
-    m_mserverReqHandle = -1;
-
-    ui->toggleBindSystemButton->setEnabled(true);
-    ui->cloudPasswordLineEdit->clear();
-
-    if (!ok)
-    {
-        QMessageBox::warning(
-            this,
-            messageTitle,
-            messageText);
-        return;
-    }
-
-    QMessageBox::information(
-        this,
-        messageTitle,
-        messageText);
-    updateView(boundToCloud);
 }
