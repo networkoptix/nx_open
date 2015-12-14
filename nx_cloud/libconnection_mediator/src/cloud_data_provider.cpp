@@ -1,5 +1,7 @@
 #include "cloud_data_provider.h"
 
+#include <ostream>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
 
