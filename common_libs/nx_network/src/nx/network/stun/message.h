@@ -228,8 +228,15 @@ public:
     explicit Message( Header header_ = Header(),
                       AttributesMap attributes_ = AttributesMap() );
 
-    Message( Message&& message );
-    Message& operator = ( Message&& message );
+#if defined(_MSC_VER) && (_MSC_VER < 1900)
+    // auto generated copy and move
+#else
+    Message( Message&& message ) = default;
+    Message& operator=( Message&& message ) = default;
+
+    Message( const Message& ) = delete;
+    Message& operator=( const Message& ) = delete;
+#endif
 
     void clear();
     void addAttribute( std::unique_ptr<attrs::Attribute>&& attribute );
@@ -256,10 +263,6 @@ public:
 
     void insertIntegrity( const String& userName, const String& key );
     bool verifyIntegrity( const String& userName, const String& key );
-
-private:
-    Message( const Message& );
-    Message& operator=( const Message& );
 };
 
 template< typename T >
