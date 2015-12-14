@@ -110,7 +110,7 @@ TEST_F( StunCustomTest, BindConnect )
     connectClient.connect( address );
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
-        request.newAttribute< stun::cc::attrs::ClientId >( "SomeClient" );
+        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
@@ -126,7 +126,7 @@ TEST_F( StunCustomTest, BindConnect )
     }
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
-        request.newAttribute< stun::cc::attrs::ClientId >( "SomeClient" );
+        request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( "WrongHost" );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;

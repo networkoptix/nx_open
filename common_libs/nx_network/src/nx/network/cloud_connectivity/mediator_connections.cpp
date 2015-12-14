@@ -21,7 +21,7 @@ void MediatorClientConnection::connect(
     stun::Message request(stun::Header(stun::MessageClass::request,
                                        stun::cc::methods::connect));
 
-    request.newAttribute<stun::cc::attrs::ClientId>("SomeClientId"); // TODO
+    request.newAttribute<stun::cc::attrs::PeerId>("SomeClientId"); // TODO
     request.newAttribute<stun::cc::attrs::HostName>(host);
     sendRequest(std::move(request),
                 [=](SystemError::ErrorCode code, stun::Message message)
