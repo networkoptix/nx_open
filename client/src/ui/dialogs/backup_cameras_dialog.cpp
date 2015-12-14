@@ -22,6 +22,23 @@ namespace {
 
     const int dialogMinimumWidth = 800;
 
+    /** Check if backup is not running on the given server. */
+    bool isValidServer(const QnMediaServerResourcePtr &server)
+    {
+        if (!server)
+            return false;
+        return qnServerStorageManager->backupStatus(server).state == Qn::BackupState_None;
+    }
+
+    /** Check if camera is already backing up - or backup is not running now. */
+    bool isValidCamera(const QnVirtualCameraResourcePtr &camera)
+    {
+        if (!camera)
+            return false;
+
+        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled
+            || isValidServer(camera->getParentServer());
+    }
 
     class BackupCamerasDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
@@ -77,11 +94,7 @@ namespace {
         virtual bool validate(const QnResourceList &selectedResources) override
         {
             QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
-            bool valid = boost::algorithm::all_of(cameras, [this](const QnVirtualCameraResourcePtr &camera)
-            {
-                /* Fail if new camera was added to currently backing up server. */
-                return isValidCamera(camera);
-            });
+            bool valid = boost::algorithm::all_of(cameras, isValidCamera);
             m_warningLabel->setVisible(!valid);
             return valid;
         }
@@ -120,20 +133,7 @@ namespace {
         }
 
     private:
-        /** Check if camera is already backing up - or backup is not running now. */
-        bool isValidCamera(const QnVirtualCameraResourcePtr &camera) const
-        {
-            return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled
-                || isValidServer(camera->getParentServer());
-        }
 
-        /** Check if backup is not running on the given server. */
-        bool isValidServer(const QnMediaServerResourcePtr &server) const
-        {
-            if (!server)
-                return false;
-            return qnServerStorageManager->backupStatus(server).state == Qn::BackupState_None;
-        }
 
         bool checkFrame(QWidget* parent)
         {
