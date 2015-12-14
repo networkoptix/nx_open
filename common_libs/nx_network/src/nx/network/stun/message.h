@@ -13,6 +13,12 @@
 #include <vector>
 #include <array>
 
+#ifdef _DEBUG
+	#include <map>
+#else
+	#include <unordered_map>
+#endif
+
 #include <utils/common/cpp14.h>
 
 //!Implementation of STUN protocol (rfc5389)
@@ -220,7 +226,17 @@ namespace attrs
 class NX_NETWORK_API Message
 {
 public:
-    typedef std::map<int, std::unique_ptr<attrs::Attribute> > AttributesMap;
+	#if defined(_MSC_VER) && (_MSC_VER < 1900)
+		typedef std::shared_ptr< attrs::Attribute > AttributePtr;
+	#else
+		typedef std::unique_ptr< attrs::Attribute > AttributePtr;
+	#endif
+
+	#ifdef _DEBUG
+		typedef std::map< int, AttributePtr > AttributesMap;
+	#else
+		typedef std::unordered_map< int, AttributePtr > AttributesMap;
+	#endif
 
     Header header;
     AttributesMap attributes;
@@ -239,7 +255,7 @@ public:
 #endif
 
     void clear();
-    void addAttribute( std::unique_ptr<attrs::Attribute>&& attribute );
+    void addAttribute( AttributePtr&& attribute );
 
     template< typename T >
     const T* getAttribute( int type = 0, size_t index = 0 ) const;
@@ -251,15 +267,15 @@ public:
 
     template< typename T, typename A1 >
     void newAttribute( A1 a1 )
-    { addAttribute( std::make_unique<T>( std::move(a1) ) ); }
+    { addAttribute( AttributePtr( new T( std::move(a1) ) ) ); }
 
     template< typename T, typename A1, typename A2 >
     void newAttribute( A1 a1, A2 a2 )
-    { addAttribute( std::make_unique<T>( std::move(a1), std::move(a2) ) ); }
+    { addAttribute( AttributePtr( new T( std::move(a1), std::move(a2) ) ) ); }
 
     template< typename T, typename A1, typename A2, typename A3 >
     void newAttribute( A1 a1, A2 a2, A3 a3 )
-    { addAttribute( std::make_unique<T>( std::move(a1), std::move(a2), std::move(a3) ) ); }
+    { addAttribute( AttributePtr( new T( std::move(a1), std::move(a2), std::move(a3) ) ) ); }
 
     void insertIntegrity( const String& userName, const String& key );
     bool verifyIntegrity( const String& userName, const String& key );

@@ -186,7 +186,7 @@ Message::Message( Header header_, AttributesMap attributes_ )
 {
 }
 
-void Message::addAttribute( std::unique_ptr<attrs::Attribute>&& attribute )
+void Message::addAttribute( AttributePtr&& attribute )
 {
     attributes[ attribute->getType() ] = std::move( attribute );
 }
