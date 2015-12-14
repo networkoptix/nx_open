@@ -138,7 +138,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     }
 
     foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllIncompatibleResources().filtered<QnMediaServerResource>()) {
-        if (server->getSystemName() == qnCommon->localSystemName() && server->getStatus() == Qn::Incompatible)
+        if (server->getSystemName() == qnCommon->localSystemName() && QnMediaServerResource::isFakeServer(server))
             result.append(server);
     }
     return result;
@@ -248,8 +248,10 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
         return;
 
     QSet<QnUuid> incompatibleTargets;
+    bool clearTargetsWhenFinished = false;
 
     if (m_targets.isEmpty()) {
+        clearTargetsWhenFinished = true;
         setTargets(target.targets, defaultEnableClientUpdates);
         for (const QnUuid &id: target.targets) {
             QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id).dynamicCast<QnMediaServerResource>();
@@ -270,11 +272,13 @@ void QnMediaServerUpdateTool::startUpdate(const QnUpdateTarget &target) {
     connect(m_updateProcess, &QnUpdateProcess::peerStageProgressChanged,        this, &QnMediaServerUpdateTool::setPeerStageProgress);
     connect(m_updateProcess, &QnUpdateProcess::updateFinished,                  this, &QnMediaServerUpdateTool::finishUpdate);
     connect(m_updateProcess, &QnUpdateProcess::targetsChanged,                  this, &QnMediaServerUpdateTool::targetsChanged);
-    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets]{
+    connect(m_updateProcess, &QThread::finished, this, [this, incompatibleTargets, clearTargetsWhenFinished]() {
         m_updateProcess->deleteLater();
-        m_updateProcess = NULL;
+        m_updateProcess = nullptr;
         for (const QnUuid &id: incompatibleTargets)
             qnDesktopClientMessageProcessor->incompatibleServerWatcher()->keepServer(id, false);
+        if (clearTargetsWhenFinished)
+            setTargets(QSet<QnUuid>(), defaultEnableClientUpdates);
     });
 
     m_updateProcess->start();

@@ -1,28 +1,40 @@
 #include "camera_thumbnail_cache.h"
 
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/security_cam_resource.h"
-#include "core/resource/media_server_resource.h"
-
-#include <QtCore/QTimer>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <api/server_rest_connection.h>
+#include <common/common_module.h>
 
 namespace {
 
     const int refreshInterval = 30000;
     const QSize defaultSize(0, 200);
 
+    QString getThumbnailId(const QnUuid &id, const qint64 time)
+    {
+        QString result = id.toString();
+        if (result.startsWith(QLatin1Char('{')))
+            result = result.mid(1, result.size() - 2);
+        result += lit(":");
+        result += QString::number(time);
+        return result;
+    }
+
 } // anonymous namespace
 
-QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent) :
-    QObject(parent),
-    m_thumbnailSize(defaultSize)
+QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
+    : QObject(parent)
+{
+    m_request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+}
+
+QnCameraThumbnailCache::~QnCameraThumbnailCache()
 {
 }
 
-QnCameraThumbnailCache::~QnCameraThumbnailCache() {
-}
-
-void QnCameraThumbnailCache::start() {
+void QnCameraThumbnailCache::start()
+{
     for (const QnResourcePtr &resource: qnResPool->getResources())
         at_resourcePool_resourceAdded(resource);
 
@@ -32,19 +44,22 @@ void QnCameraThumbnailCache::start() {
     m_elapsedTimer.start();
 }
 
-void QnCameraThumbnailCache::stop() {
+void QnCameraThumbnailCache::stop()
+{
     disconnect(qnResPool, 0, this, 0);
 
     m_thumbnailByResourceId.clear();
     m_pixmaps.clear();
 }
 
-QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const {
+QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const
+{
     QMutexLocker lock(&m_mutex);
     return m_pixmaps.value(thumbnailId);
 }
 
-QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId) {
+QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId)
+{
     QMutexLocker lock(&m_mutex);
 
     auto it = m_thumbnailByResourceId.find(resourceId);
@@ -60,21 +75,24 @@ QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId) {
     return thumbnailId;
 }
 
-void QnCameraThumbnailCache::refreshThumbnails(const QList<QnUuid> &resourceIds) {
+void QnCameraThumbnailCache::refreshThumbnails(const QList<QnUuid> &resourceIds)
+{
     QSet<QnUuid> ids;
     {
         QMutexLocker lock(&m_mutex);
         ids = QSet<QnUuid>::fromList(m_thumbnailByResourceId.keys());
     }
 
-    for (const QnUuid &id: resourceIds) {
+    for (const QnUuid &id: resourceIds)
+    {
         if (!ids.contains(id))
             continue;
         refreshThumbnail(id);
     }
 }
 
-void QnCameraThumbnailCache::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnCameraThumbnailCache::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
+{
     if (!resource->hasFlags(Qn::live_cam))
         return;
 
@@ -82,7 +100,8 @@ void QnCameraThumbnailCache::at_resourcePool_resourceAdded(const QnResourcePtr &
     m_thumbnailByResourceId.insert(resource->getId(), ThumbnailData());
 }
 
-void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
+{
     QMutexLocker lock(&m_mutex);
 
     auto it = m_thumbnailByResourceId.find(resource->getId());
@@ -97,37 +116,8 @@ void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr
     emit thumbnailUpdated(resource->getId(), QString());
 }
 
-void QnCameraThumbnailCache::at_thumbnailReceived(int status, const QImage &thumbnail, int handle) {
-    QMutexLocker lock(&m_mutex);
-
-    QnUuid id = m_idByRequestHandle.take(handle);
-    if (id.isNull())
-        return;
-
-    ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
-
-    QString thumbnailId;
-    if (status == 0) {
-        thumbnailId = id.toString();
-        if (thumbnailId.startsWith(QLatin1Char('{')))
-            thumbnailId = thumbnailId.mid(1, thumbnailId.size() - 2);
-        thumbnailId += lit(":");
-        thumbnailId += QString::number(thumbnailData.time);
-        m_pixmaps.remove(thumbnailData.thumbnailId);
-        m_pixmaps.insert(thumbnailId, QPixmap::fromImage(thumbnail));
-        thumbnailData.thumbnailId = thumbnailId;
-    }
-
-    thumbnailData.time = m_elapsedTimer.elapsed();
-    thumbnailData.loading = false;
-
-    if (status == 0) {
-        lock.unlock();
-        emit thumbnailUpdated(id, thumbnailId);
-    }
-}
-
-void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id) {
+void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
+{
     QMutexLocker lock(&m_mutex);
 
     ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
@@ -138,18 +128,43 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id) {
     if (thumbnailData.time > 0 && thumbnailData.time + refreshInterval > m_elapsedTimer.elapsed())
         return;
 
-    QnNetworkResourcePtr camera = qnResPool->getResourceById(id).dynamicCast<QnNetworkResource>();
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return;
 
-    QnMediaServerResourcePtr server = camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)
         return;
 
-    int handle = server->apiConnection()->getThumbnailAsync(
-                camera, -1, -1, m_thumbnailSize,
-                lit("jpg"), QnMediaServerConnection::IFrameAfterTime,
-                this, SLOT(at_thumbnailReceived(int, const QImage&, int)));
+    m_request.camera = camera;
+
+    auto handleReply = [this, id] (bool success, rest::Handle handleId, const QByteArray &imageData)
+    {
+        Q_UNUSED(handleId)
+
+        QString thumbnailId;
+        {
+            QMutexLocker lock(&m_mutex);
+
+            ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
+
+            if (success)
+            {
+                thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
+                m_pixmaps.remove(thumbnailData.thumbnailId);
+                m_pixmaps.insert(thumbnailId, QPixmap::fromImage(QImage::fromData(imageData, "JPG")));
+                thumbnailData.thumbnailId = thumbnailId;
+            }
+
+            thumbnailData.time = m_elapsedTimer.elapsed();
+            thumbnailData.loading = false;
+        }
+
+        if (success)
+            emit thumbnailUpdated(id, thumbnailId);
+    };
+
+    int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, QThread::currentThread());
 
     if (handle == -1) {
         thumbnailData.loading = false;
@@ -158,5 +173,4 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id) {
 
     thumbnailData.time = m_elapsedTimer.elapsed();
     thumbnailData.loading = true;
-    m_idByRequestHandle[handle] = id;
 }

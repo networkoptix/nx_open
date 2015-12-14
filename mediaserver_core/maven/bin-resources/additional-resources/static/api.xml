@@ -169,100 +169,100 @@
                             <attribute>
                                 <name>controlEnabled</name>
                                 <description>Server will manage camera (change resolution, fps, create profiles e.t.c) if parameter if true</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>dewarpingParams</name>
                                 <description>Json string with dewarping parameters</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>groupId</name>
                                 <description>Internal group identifier. It is used for grouping channels for multi-channels cameras together. </description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>groupName</name>
                                 <description>Group name. This name can be changed by user</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>id</name>
                                 <description>Object ID. All ID for all objects in a system is GUIDs</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>login</name>
                                 <description>Login for camera authentication</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>mac</name>
                                 <description>camera MAC address</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>manuallyAdded</name>
                                 <description>True if user added camera manually</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>maxArchiveDays</name>
                                 <description>Maximum archive duration in days for this camera. If value less or equal to zero, it is not used</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>minArchiveDays</name>
                                 <description>Minimum archive duration in days for this camera. If value less or equal to zero, it is not used</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>model</name>
                                 <description>Camera model</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>motionMask</name>
                                 <description>Camera's motion mask. This string defines several rectangles via ':' delimiter. Each rectangle is described by 5 digits: sensitivity, x,y(for left top corner), width, height</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>motionType</name>
                                 <description>If value is 'MT_SoftwareGrid' then server determine motion, otherwise camera built-in motion will be used</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>name</name>
                                 <description>Camera name</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>parentId</name>
                                 <description>Camera's server ID</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>physicalId</name>
                                 <description>Camera unique identifier. This identifier is used in all requests related to a camera. For instance, in RTSP requests</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>password</name>
                                 <description>Password for camera authentication</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>scheduleEnabled</name>
                                 <description>Do record camera archive if true</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>scheduleTasks</name>
                                 <description>List of 'scheduleTask' objects with camera recording schedule.</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>secondaryStreamQuality</name>
                                 <description>Secondary stream quality. Possible values:'SSQualityLow', 'SSQualityMedium', 'SSQualityHigh', 'SSQualityDontUse' </description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>status</name>
                                 <description>Camera status. Possible values are: 'Offline', 'Online', 'Recording'</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>statusFlags</name>
                                 <description>Usually this field is zero. Non zero value is used to mark that a lot of network issues was occurred with this camera</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>typeId</name>
                                 <description>Unique ID with camera's type. Camera's type can describe predefined information such as camera maximum resolution, fps e.t.c.
                                                                         Detailed type information can be obtained via 'getResourceTypes' request.</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>url</name>
                                 <description>Camera plain IP address or full http url if camera was added manually. Also, for multichannel encoders full url is used</description>
-                            </attribute> 
+                            </attribute>
                             <attribute>
                                 <name>vendor</name>
                                 <description>Camera manufacturer</description>
@@ -307,10 +307,67 @@
                     </result>
                 </function>
                 <function>
-                    <name>getCameraBookmarkTags</name>
-                    <description>Reserved for future use</description>
                     <method>GET</method>
+                    <name>bookmarks</name>
+                    <description>Reads bookmarks using specified parameters</description>
+                    <urlPrefix>/ec2</urlPrefix>
                     <params>
+                        <param>
+                            <name>mac/cameraId/physicalId</name>
+                            <optional>false</optional>
+                            <description>
+                                Hardware address (mac) / Identifier of camera (cameraId) / Physical identifier (physicalId).
+                                One of these parameters should be specified to retreive bookmarks
+                            </description>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <optional>true</optional>
+                            <description>
+                                Start time of interval with bookmarks (milliseconds since epoch).
+                                Default value is 0. Should be greater than endTime.
+                            </description>
+                        </param>
+                        <param>
+                            <name>endTime</name>
+                            <optional>true</optional>
+                            <description>
+                                End time of interval with bookmarks (milliseconds since epoch).
+                                Default value is current time. Should be less than startTime.
+                            </description>
+                        </param>
+                        <param>
+                            <name>strategy</name>
+                            <optional>true</optional>
+                            <description>
+                                Strategy of the bookmarks search. Used when request result
+                                is limited by size. Default value is EarliestFirst.
+                            </description>
+                            <values>
+                                <value>
+                                    <name>EarliestFirst</name>
+                                    <desciption>Returns bookmarks by time in direct order. Standard way</desciption>
+                                </value>
+                                <value>
+                                    <name>LatestFirst</name>
+                                    <desciption>Returns bookmarks by time in reverse order. So the latest bookmarks will be returned</desciption>
+                                </value>
+                                <value>
+                                    <name>LongestFirst</name>
+                                    <desciption>Returns bookmarks by length. The longest bookmarks will be returned.</desciption>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>limit</name>
+                            <optional>true</optional>
+                            <description>Maximum number of bookmarks which will be returned.</description>
+                        </param>
+                        <param>
+                            <name>filter</name>
+                            <description>Text-search filter string</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value: 'json'</description>
@@ -330,16 +387,140 @@
                                 </value>
                                 <value>
                                     <name>csv</name>
-                                    <description>CSV data format. In case of hierarchical structure only
-                                        top level data will be provided</description>
+                                    <description>
+                                        CSV data format. In case of hierarchical structure only
+                                        top level data will be provided
+                                    </description>
                                 </value>
                             </values>
                         </param>
                     </params>
-                    <result>
-                        <caption>Return object in requested format</caption>
-                    </result>
                 </function>
+                <function>
+                    <method>GET</method>
+                    <name>bookmarks/add</name>
+                    <description>Adds bokmark to the target server</description>
+                    <urlPrefix>/ec2</urlPrefix>
+                    <params>
+                        <param>
+                            <name>guid</name>
+                            <description>Identifier of bookmark</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>cameraId</name>
+                            <description>Identifier of bookmark owner</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>name</name>
+                            <description>Caption of bookmark</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>description</name>
+                            <description>Details of bookmark</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>timeout</name>
+                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>duration</name>
+                            <description>Length of bookmark (milliseconds)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>tag</name>
+                            <description>Applied tag. Several tag parameters could be used to specify multiple tags</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                </function>
+                <function>
+                    <method>GET</method>
+                    <name>bookmarks/update</name>
+                    <description>Updates bookmark information</description>
+                    <urlPrefix>/ec2</urlPrefix>
+                    <params>
+                        <param>
+                            <name>guid</name>
+                            <description>Identifier of bookmark</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>cameraId</name>
+                            <description>Identifier of bookmark owner</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>name</name>
+                            <description>Caption of bookmark</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>description</name>
+                            <description>Details of bookmark</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>timeout</name>
+                            <description>Time during which recorded period should be preserved (milliseconds)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>startTime</name>
+                            <description>Start time of bookmark (milliseconds since epoch)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>duration</name>
+                            <description>Length of bookmark (milliseconds)</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>tag</name>
+                            <description>Applied tag. Serveral tag parameters could be used to specify multiple tags</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                </function>
+
+                <function>
+                    <method>GET</method>
+                    <name>bookmarks/delete</name>
+                    <description>Removes bookmark with specified identifier</description>
+                    <urlPrefix>/ec2</urlPrefix>
+                    <params>
+                        <param>
+                            <name>guid</name>
+                            <description>Identifier of bookmark</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                </function>
+
+                <function>
+                    <method>GET</method>
+                    <name>bookmarks/tags</name>
+                    <description>Returns currently used tags</description>
+                    <urlPrefix>/ec2</urlPrefix>
+                    <params>
+                        <param>
+                            <name>limit</name>
+                            <description>Maximum number of tags</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                </function>
+
                 <function>
                     <name>getBusinessRules</name>
                     <description>Return business rules</description>
@@ -1467,7 +1648,7 @@
                         </param>
                         <param>
                             <name>filter</name>
-                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle. 
+                            <description>This parameter is used for motion search (periodsType must be 1). Match motion on a video by specified rectangle.
                                 Filter format is: &lt;rect1&gt;;&lt;rect2&gt;;&lt;rectN&gt;
                                 rectangle format is: &lt;x,y,width,height&gt; All values are measured in relative portions of a video frame.
                                 'x' and 'width' in range [0..43], 'y' and 'height' in range [0..31].
@@ -1780,7 +1961,7 @@
                                 <value>
                                     <name>3</name>
                                     <description>Transaction log</description>
-                                </value>                                
+                                </value>
                             </values>
                         </param>
                         <param>
@@ -1852,7 +2033,7 @@
                 </function>
                 <function>
                     <name>createEvent</name>
-                    <description>Using this method it's possible to deliver a generic event to the system from 3rd party systems. 
+                    <description>Using this method it's possible to deliver a generic event to the system from 3rd party systems.
                                  It will be processed and logged according to current event rules.
                     </description>
                     <method>GET</method>
@@ -1945,14 +2126,14 @@
                     <params>
                         <param>
                             <name>pos</name>
-                            <description>By default server opens camera from live position. This parameter defines position in an archive in 
+                            <description>By default server opens camera from live position. This parameter defines position in an archive in
                                                         milliseconds since epoch, microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                                         Position can be passed via standard RTSP attribute as well as via URL parameter</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>resolution</name>
-                            <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or 
+                            <description>Turn on video transcoding to the specified resolution. Resolution string either may contain width and height (for instance 320x240) or
                                                         height only (for instance 240p)</description>
                             <optional>true</optional>
                         </param>
@@ -1995,7 +2176,7 @@
                         </param>
                         <param>
                             <name>stream</name>
-                            <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1. 
+                            <description>Open high quality stream if parameter is 0 or low quality stream if parameter is 1.
                                          By default server auto detect preferred stream index based on destination resolution.</description>
                             <optional>true</optional>
                         </param>
@@ -2016,7 +2197,7 @@
                     <description>
                         Url format for opening camera stream using HTTP protocol. Codec and stream format can be specified in url parameters.
                         Live stream and archive can be downloaded. If required and possible, media stream transcoding is performed on-the-fly.
-                        Stream format can be one of following: webm, mpegts, mpjpeg (motion jpeg)                        
+                        Stream format can be one of following: webm, mpegts, mpjpeg (motion jpeg)
                         Example: http://&lt;server_ip&gt;:&lt;port&gt;/media/12AB42FD5912.webm
                     </description>
                     <method>GET</method>
@@ -2028,7 +2209,7 @@
                         </param>
                         <param>
                             <name>pos</name>
-                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions 
+                            <description>If present and not equal to &lt;now&gt;, specifies archive stream start positions
                                          milliseconds since epoch (1970-01-01 00:00, UTC), microseconds since epoch or text date in ISO fomat (e.g., 2015-07-30T12:00:00).
                                          Otherwise, LIVE stream is provided</description>
                             <optional>true</optional>

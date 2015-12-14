@@ -13,9 +13,4 @@ public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
 
     static MultiServerPeriodDataList loadDataSync(const QnChunksRequestData& request, const QnRestConnectionProcessor* owner);
-private:
-    struct InternalContext;
-    static void waitForDone(InternalContext* ctx);
-    static void loadRemoteDataAsync(MultiServerPeriodDataList& outputData, const QnMediaServerResourcePtr &server, InternalContext* ctx);
-    static void loadLocalData(MultiServerPeriodDataList& outputData, InternalContext* ctx);
 };

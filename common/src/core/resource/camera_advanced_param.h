@@ -47,10 +47,17 @@ struct QnCameraAdvancedParameter {
     QString description;
     QString tag;  
     bool readOnly;
+    QString readCmd; // read parameter command line. Isn't used in UI
+    QString writeCmd; // write parameter command line. Isn't used in UI
+    QString internalRange; // internal device values for range parameters
 
     QnCameraAdvancedParameter();
 
     QStringList getRange() const;
+    QStringList getInternalRange() const;
+    QString fromInternalRange(const QString& value) const;
+    QString toInternalRange(const QString& value) const;
+
     void getRange(double &min, double &max) const;
     void setRange(int min, int max);
     void setRange(double min, double max);
@@ -60,7 +67,7 @@ struct QnCameraAdvancedParameter {
 
 	static bool dataTypeHasValue(DataType value);
 };
-#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)
+#define QnCameraAdvancedParameter_Fields (id)(dataType)(range)(name)(description)(tag)(readOnly)(readCmd)(writeCmd)(internalRange)
 
 struct QnCameraAdvancedParamGroup {
     QString name;

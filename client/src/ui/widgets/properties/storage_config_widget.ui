@@ -14,7 +14,7 @@
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
-      <string>Main Storages</string>
+      <string>Main Storage</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
       <item>
@@ -50,7 +50,7 @@
         <item>
          <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
-           <string>Add External Storage</string>
+           <string>Add External Storage...</string>
           </property>
          </widget>
         </item>
@@ -85,7 +85,7 @@
    <item>
     <widget class="QGroupBox" name="backupStoragesGroupBox">
      <property name="title">
-      <string>Backup Storages</string>
+      <string>Backup Storage</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
       <item>
@@ -127,7 +127,7 @@
         <item>
          <widget class="QPushButton" name="addExtStorageToBackupBtn">
           <property name="text">
-           <string>Add External Storage</string>
+           <string>Add External Storage...</string>
           </property>
          </widget>
         </item>
@@ -262,7 +262,7 @@
         <item>
          <widget class="QLabel" name="whenToBackupLabel">
           <property name="text">
-           <string>Perform backup</string>
+           <string>Perform Backup</string>
           </property>
          </widget>
         </item>

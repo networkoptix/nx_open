@@ -13,6 +13,7 @@ class QnBookmarkTagsControl : public QnProxyLabel
 
 public:
     QnBookmarkTagsControl(const QnCameraBookmarkTags &tags
+        , bool allowClickOnTag
         , QGraphicsItem *parent = nullptr);
 
     virtual ~QnBookmarkTagsControl();

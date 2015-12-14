@@ -336,6 +336,12 @@ public:
         Online,
         Recording,
         NotDefined,
+        /*! Applies only to a server resource. A server is incompatible only when it has system name different
+         * from the current or it has incompatible protocol version.
+         * \note Incompatible server is not the same as fake server which is create in the client by
+         * QnIncompatibleServerWatcher. Fake servers can also have Unauthorized status.
+         * So if you want to check if the server is fake use QnMediaServerResource::isFakeServer().
+         */
         Incompatible
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)

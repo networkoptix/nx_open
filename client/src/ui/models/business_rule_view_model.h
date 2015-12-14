@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULE_VIEW_MODEL_H
-#define BUSINESS_RULE_VIEW_MODEL_H
+#pragma once
 
 #include <QtCore/QVariant>
 
@@ -11,6 +10,8 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/uuid.h>
 
 namespace QnBusiness {
     enum Columns {
@@ -120,8 +121,9 @@ public:
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
+
 signals:
-    void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+    void dataChanged(QnBusiness::Fields fields);
 
 private:
     void updateActionTypesModel();
@@ -164,4 +166,4 @@ private:
     QStandardItemModel *m_actionTypesModel;
 };
 
-#endif // BUSINESS_RULE_VIEW_MODEL_H
+typedef QSharedPointer<QnBusinessRuleViewModel> QnBusinessRuleViewModelPtr;

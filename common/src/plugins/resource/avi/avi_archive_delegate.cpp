@@ -419,9 +419,10 @@ QnConstResourceVideoLayoutPtr QnAviArchiveDelegate::getVideoLayout()
         if (sign && sign->value) {
             QList<QByteArray> tmp = QByteArray(sign->value).split(QnSignHelper::getSignPatternDelim());
             if (tmp.size() > 4) {
-                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong();
+                bool deserialized = false;
+                qint64 timeZoneOffset = tmp[4].trimmed().toLongLong(&deserialized);
                 QnAviResourcePtr aviRes = m_resource.dynamicCast<QnAviResource>();
-                if (timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
+                if (deserialized && timeZoneOffset != Qn::InvalidUtcOffset && timeZoneOffset != -1 && aviRes)
                     aviRes->setTimeZoneOffset(timeZoneOffset);
             }
         }
