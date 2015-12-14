@@ -12,13 +12,10 @@ namespace nx_http
 {
     HttpClient::HttpClient()
     :
-        m_asyncHttpClient( nx_http::AsyncHttpClient::create() ),
         m_done( false ),
         m_terminated( false )
     {
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection );
-        connect( m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection );
+        instanciateHttpClient();
     }
 
     HttpClient::~HttpClient()
@@ -125,24 +122,32 @@ namespace nx_http
         m_userPassword = userPassword;
     }
 
+    void HttpClient::instanciateHttpClient()
+    {
+        m_asyncHttpClient = nx_http::AsyncHttpClient::create();
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection);
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection);
+        connect(m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection);
+    }
+
     template<typename AsyncClientFunc>
         bool HttpClient::doRequest(AsyncClientFunc func)
     {
-        if (m_done)
+        QMutexLocker lk(&m_mutex);
+
+        if (!m_done)
         {
-            m_done = false;
-        }
-        else
-        {
+            lk.unlock();
+
             //have to re-establish connection if previous message has not been read up to the end
             if (m_asyncHttpClient)
             {
                 m_asyncHttpClient->terminate();
                 m_asyncHttpClient.reset();
             }
-            m_asyncHttpClient = nx_http::AsyncHttpClient::create();
-            
-            //TODO #ak setting up attributes
+            instanciateHttpClient();
+
+            //setting up attributes
             for (const auto& keyValue: m_additionalHeaders)
                 m_asyncHttpClient->addAdditionalHeader(keyValue.first, keyValue.second);
             if (m_subsequentReconnectTries)
@@ -158,17 +163,15 @@ namespace nx_http
             if (m_userPassword)
                 m_asyncHttpClient->setUserPassword(m_userPassword.get());
 
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::responseReceived, this, &HttpClient::onResponseReceived, Qt::DirectConnection);
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::someMessageBodyAvailable, this, &HttpClient::onSomeMessageBodyAvailable, Qt::DirectConnection);
-            connect(m_asyncHttpClient.get(), &AsyncHttpClient::done, this, &HttpClient::onDone, Qt::DirectConnection);
+            lk.relock();
         }
 
-        if (!func(m_asyncHttpClient.get()))
-            return false;
+        m_done = false;
+        func(m_asyncHttpClient.get());
 
-        QMutexLocker lk( &m_mutex );
-        while( !m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived) )
-            m_cond.wait( lk.mutex() );
+        m_msgBodyBuffer.clear();
+        while (!m_terminated && (m_asyncHttpClient->state() < AsyncHttpClient::sResponseReceived))
+            m_cond.wait(lk.mutex());
 
         return m_asyncHttpClient->state() != AsyncHttpClient::sFailed;
     }
