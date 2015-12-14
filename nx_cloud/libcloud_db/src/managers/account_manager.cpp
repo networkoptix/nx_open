@@ -109,8 +109,8 @@ bool AccountManager::checkTemporaryPasswordForExpiration(
     std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter)
 {
     if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
-        passwordIter->second.expirationTimestampUtc > 0 &&
-        passwordIter->second.expirationTimestampUtc <= ::time(NULL))
+        (passwordIter->second.expirationTimestampUtc > 0 &&
+         passwordIter->second.expirationTimestampUtc <= ::time(NULL)))
     {
         //TODO #ak remove password from DB
         m_accountPassword.erase(passwordIter);

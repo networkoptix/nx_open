@@ -148,12 +148,12 @@ bool DummySocket::getConnectionStatistics( StreamSocketInfo* /*info*/ )
     return false;
 }
 
-bool DummySocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
+bool DummySocket::setKeepAlive( boost::optional< KeepAliveOptions > /*info*/ )
 {
     return true;
 }
 
-bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ )
 {
     return false;
 }
