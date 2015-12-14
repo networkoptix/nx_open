@@ -32,6 +32,18 @@ public:
     }
 
     template<class OtherResource>
+    void reset(OtherResource *resource) {
+        base_type::reset(resource);
+        initialize(*this);
+    }
+
+    void reset() {
+        if (!base_type::isNull())
+            (*this)->resetWeakPointer();
+        base_type::reset();
+    }
+
+    template<class OtherResource>
     QnSharedResourcePointer(const QWeakPointer<OtherResource> &other): base_type(other) {}
 
     template<class OtherResource>
