@@ -4,7 +4,7 @@ import logging
 import models
 from api.controllers.cloud_api import Account
 
-from api.helpers.exceptions import APIRequestException
+from api.helpers.exceptions import APIRequestException, ErrorCodes
 
 __django__ = logging.getLogger('django')
 
@@ -43,8 +43,9 @@ class AccountManager(db.models.Manager):
         :raise ValueError: email is not set
         """
         now = timezone.now()
-        if not email:
-            raise APIRequestException('Email code is absent')
+        if not email or email == '':
+            raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
+                                      error_data={'email': ['This field is required.']})
         # email = self.normalize_email(email)
         first_name = extra_fields.pop("first_name", True)
         last_name = extra_fields.pop("last_name", True)

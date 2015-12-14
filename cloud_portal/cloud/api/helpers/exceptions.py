@@ -16,13 +16,29 @@ def api_success(data=None, status_code=status.HTTP_200_OK):
             }, status=status_code)
 
 
+class ErrorCodes:
+    no_email = 'noEmail'
+    # Cloud DB errors:
+    cloud_invalid_response = 'cloudInvalidResponse'
+
+    # Portal critical errors (unexpected)
+    portal_critical_error = 'portalError'
+
+    # Validation errors
+    wrong_credentials = 'wrongCredentials'
+    wrong_parameters = 'wrongParameters'
+
+    def __init__(self):
+        pass
+
+
 class APIException(Exception):
     error_text = 'Unexpected error'
-    error_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    error_code = ErrorCodes.portal_critical_error
     error_data = None
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
-    def __init__(self, error_text, error_code=None, error_data=None,
+    def __init__(self, error_text, error_code, error_data=None,
                  status_code=status.HTTP_500_INTERNAL_SERVER_ERROR):
         if error_code is None:
             error_code = status_code
@@ -42,50 +58,50 @@ class APIException(Exception):
 
 class APIInternalException(APIException):
     # 500 error - internal server error
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APIInternalException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APIInternalException, self).__init__(error_text, error_code, error_data=error_data,
                                                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class APIServiceException(APIException):
     # 503 error - service unavailable
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APIServiceException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APIServiceException, self).__init__(error_text, error_code, error_data=error_data,
                                                   status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
 
 
 class APINotFoundException(APIException):
     # 404 error - service unavailable
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APINotFoundException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APINotFoundException, self).__init__(error_text, error_code, error_data=error_data,
                                                    status_code=status.HTTP_404_NOT_FOUND)
 
 
 class APINotAuthorisedException(APIException):
     # 401 error - service unavailable
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APINotAuthorisedException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APINotAuthorisedException, self).__init__(error_text, error_code, error_data=error_data,
                                                         status_code=status.HTTP_401_UNAUTHORIZED)
 
 
 class APIRequestException(APIException):
     # 400 error - bad request
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APIRequestException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APIRequestException, self).__init__(error_text, error_code, error_data=error_data,
                                                   status_code=status.HTTP_400_BAD_REQUEST)
 
 
 class APILogicException(APIException):
     # 200. but some error occurred
-    def __init__(self, error_text, error_data=None, error_code=None):
-        super(APILogicException, self).__init__(error_text, error_data=error_data, error_code=error_code,
+    def __init__(self, error_text, error_code, error_data=None):
+        super(APILogicException, self).__init__(error_text, error_code, error_data=error_data,
                                                 status_code=status.HTTP_200_OK)
 
 
 def validate_response(func):
     def validate_error(response_data):
         if 'resultCode' not in response_data or 'errorText' not in response_data:
-            raise APIInternalException('No valid error message from cloud_db')
+            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response )
 
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
@@ -102,7 +118,7 @@ def validate_response(func):
         try:
             response_data = response.json()
         except ValueError:
-            raise APIInternalException('No JSON data from cloud_db (code:' + str(response.status_code) + ") " + response.text)
+            raise APIInternalException('No JSON data from cloud_db (code:' + str(response.status_code) + ") " + response.text, ErrorCodes.cloud_invalid_response)
 
         errors = {
             status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,
@@ -115,7 +131,7 @@ def validate_response(func):
 
         if response.status_code in errors:
             validate_error(response_data)
-            raise errors[response.status_code](response_data['resultCode'], response_data['errorText'])
+            raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
 
         # Check error_code status - raise APILogicException
         if 'resultCode' in response_data and response_data['resultCode'] != 0:

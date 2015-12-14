@@ -10,7 +10,8 @@ from django.utils import timezone
 from django.db.models import Model
 import api
 from api.controllers.cloud_api import Account
-from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success, \
+    ErrorCodes
 
 __django__ = logging.getLogger('django')
 
@@ -21,7 +22,7 @@ __django__ = logging.getLogger('django')
 def register(request):
     serializer = CreateAccountSerializer(data=request.data)
     if not serializer.is_valid():
-        raise APIRequestException('Wrong form parameters', error_data=serializer.errors)
+        raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
     serializer.save()
     return api_success()
 
@@ -35,7 +36,7 @@ def login(request):
 
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid')
+        raise APINotAuthorisedException('Username or password are invalid', ErrorCodes.wrong_credentials)
 
     django.contrib.auth.login(request, user)
     request.session['password'] = request.data['password']
@@ -72,7 +73,7 @@ def index(request):
         serializer = AccountUpdaterSerializer(request.user, data=request.data)
             
         if not serializer.is_valid():
-            raise APIRequestException('Wrong form parameters', error_data=serializer.errors)
+            raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
         
         Account.update(request.user.email, request.session['password'], request.user.first_name, request.user.last_name)
         # if not success:
@@ -98,12 +99,13 @@ def change_password(request):
 @handle_exceptions
 def activate(request):
     if 'code' not in request.data:
-        raise APIRequestException('Activation code is absent')
+        raise APIRequestException('Activation code is absent', ErrorCodes.wrong_parameters,
+                                      error_data={'code': ['This field is required.']})
     code = request.data['code']
     user_data = Account.activate(code)
 
     if 'email' not in user_data:
-        raise APIInternalException('No email from cloud_db')
+        raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
 
     email = user_data['email']
     try:
@@ -111,7 +113,7 @@ def activate(request):
         user.activated_date = timezone.now()
         user.save(update_fields=['activated_date'])
     except Model.DoesNotExist:
-        raise APIInternalException('No email in portal_db')
+        raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
     return api_success()
 
 
@@ -121,7 +123,8 @@ def activate(request):
 def restore_password(request):
 
     if 'code' not in request.data and 'user_email' not in request.data:
-        raise APIRequestException('Required parameters are absent')
+        raise APIRequestException('Required parameters are absent', ErrorCodes.wrong_parameters,
+                                      error_data={'user_email': ['This field is required.']})
 
     if 'code' in request.data:
         code = request.data['code']
@@ -129,19 +132,18 @@ def restore_password(request):
         try:
             (temp_password, user_email) = base64.b64decode(code).split(":")
         except TypeError:
-            raise APIRequestException('Activation code has wrong structure')
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_parameters,
+                                      error_data={'code': ['Wrong code structure']})
 
         if not user_email or user_email is None or user_email == '':
-            raise APIRequestException('Activation code has wrong structure',
-                                      {'code': code})
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_parameters,
+                                      error_data={'code': ['Wrong code structure']})
 
-        if 'new_password' not in request.data:
-            raise APIRequestException('New password is absent')
+        if 'new_password' not in request.data or request.data['new_password'] == '':
+            raise APIRequestException('New password is absent', ErrorCodes.wrong_parameters,
+                                      error_data={'new_password': ['This field is required.']})
 
         new_password = request.data['new_password']
-
-        if new_password == '':
-            raise APIRequestException('New password is empty')
 
         Account.change_password(user_email, temp_password, new_password)
     else:

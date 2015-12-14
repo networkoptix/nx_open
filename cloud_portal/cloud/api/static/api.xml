@@ -170,5 +170,27 @@
                 </function>
             </functions>
         </group>
+
+        <group>
+            <groupName>Error codes</groupName>
+            <constatnts>
+                <constant>
+                    <name>cloudInvalidResponse</name>
+                    <description>Cloud DB returns unexpected response (no json data or not enough data fields)</description>
+                </constant>
+                <constant>
+                    <name>portalError</name>
+                    <description>Unexpected error in cloud portal</description>
+                </constant>
+                <constant>
+                    <name>wrongCredentials</name>
+                    <description>Credentials wasn't accepted by cloud db. Username or password are incorrect</description>
+                </constant>
+                <constant>
+                    <name>wrongParameters</name>
+                    <description>Parameters validation failed. See error_data for details. error_data in that case is a dictionary 'field_name'=>['Error descriptions']</description>
+                </constant>
+            </constatnts>
+        </group>
     </groups>
 </apidoc>
