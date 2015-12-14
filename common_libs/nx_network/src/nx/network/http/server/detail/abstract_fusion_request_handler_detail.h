@@ -41,10 +41,9 @@ protected:
     void requestCompleted(FusionRequestResult result)
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
-        if (result.resultCode != FusionRequestErrorClass::noError)
-            outputMsgBody = std::make_unique<nx_http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                QJson::serialized(result));
+        outputMsgBody = std::make_unique<nx_http::BufferSource>(
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            QJson::serialized(result));
 
         requestCompleted(
             result.httpStatusCode(),

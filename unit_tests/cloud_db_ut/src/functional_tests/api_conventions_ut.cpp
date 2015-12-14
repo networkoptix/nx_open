@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <utils/common/model_functions.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <cloud_db_client/src/data/account_data.h>
@@ -139,6 +140,59 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
             nx_http::FusionRequestErrorClass::unauthorized,
             requestResult.resultCode);
     }
+}
+
+TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
+{
+    startAndWaitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    auto result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    //changing password
+    std::string account1NewPassword = account1Password + "new";
+    api::AccountUpdateData update;
+    update.passwordHa1 = nx_http::calcHa1(
+        account1.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str()).constData();
+    update.fullName = account1.fullName + "new";
+    update.customization = account1.customization + "new";
+
+    QUrlQuery urlQuery;
+    nx::cdb::api::serializeToUrlQuery(update, &urlQuery);
+
+    nx_http::HttpClient client;
+    QUrl url;
+    url.setHost(endpoint().address.toString());
+    url.setPort(endpoint().port);
+    url.setScheme("http");
+    url.setPath("/account/update");
+    url.setUserName(QString::fromStdString(account1.email));
+    url.setPassword(QString::fromStdString(account1Password));
+    url.setQuery(std::move(urlQuery));
+    ASSERT_TRUE(client.doGet(url));
+    ASSERT_TRUE(client.response() != nullptr);
+    ASSERT_EQ(
+        nx_http::StatusCode::ok,
+        client.response()->statusLine.statusCode);
+
+    nx_http::BufferType msgBody;
+    while (!client.eof())
+        msgBody += client.fetchMessageBodyBuffer();
+
+    ASSERT_FALSE(msgBody.isEmpty());
+    nx_http::FusionRequestResult requestResult =
+        QJson::deserialized<nx_http::FusionRequestResult>(msgBody);
+
+    ASSERT_EQ(
+        nx_http::FusionRequestErrorClass::noError,
+        requestResult.resultCode);
+
+    result = getAccount(account1.email, account1NewPassword, &account1);
+    ASSERT_EQ(result, api::ResultCode::ok);
 }
 
 }   //cdb
