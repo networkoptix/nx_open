@@ -8,7 +8,7 @@
 #include <business/events/network_issue_business_event.h>
 
 #include "network/h264_rtp_parser.h"
-#include "network/rtp_stream_parser.h"
+#include "nx/streaming/rtp_stream_parser.h"
 
 #include "utils/common/log.h"
 #include "utils/common/synctime.h"

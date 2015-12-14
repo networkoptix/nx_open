@@ -6,8 +6,8 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include "rtp_stream_parser.h"
-#include "decoders/audio/aac.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <decoders/audio/aac.h>
 
 
 class QnAacRtpParser: public QnRtpAudioStreamParser

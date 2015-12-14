@@ -2,16 +2,13 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <core/datapacket/video_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
-
-#include "network/ffmpeg_sdp.h"
-#include "network/rtsp_session.h"
-#include "network/rtp_stream_parser.h"
-
-#include "utils/common/util.h"
-
-#include "utils/network/socket.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <network/ffmpeg_sdp.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <utils/common/util.h>
+#include <utils/network/socket.h>
 
 QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
     m_gotLivePacket(false),

@@ -19,7 +19,7 @@ extern "C"
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <core/datapacket/media_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <qmath.h>
 #include <camera/get_image_helper.h>

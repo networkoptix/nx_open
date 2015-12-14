@@ -6,9 +6,9 @@
 #include <utils/common/uuid.h>
 #include <QtCore/QString>
 
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/video_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include "vmax480_stream_fetcher.h"
 #include "network/tcp_connection_priv.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"

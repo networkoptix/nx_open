@@ -11,7 +11,7 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
-#include <core/datapacket/media_context.h>
+#include <nx/streaming/media_context.h>
 
 class FrameTypeExtractor
 {

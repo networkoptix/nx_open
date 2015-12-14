@@ -2,7 +2,7 @@
 #include "ui_sign_dialog.h"
 
 #include "plugins/resource/avi/avi_resource.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"

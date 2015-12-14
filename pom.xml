@@ -30,6 +30,7 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <nxemail.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nxemail.guid>
+        <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
@@ -47,6 +48,7 @@
         <applauncher.guid>{75b8ee80-e089-4de2-b7a1-d1464a9b4351}</applauncher.guid>
         <client.core.guid>{7b7822da-47c1-4758-a07f-c2edcfc63d66}</client.core.guid>
         <client.bin.guid>{6de071a7-831c-43a1-88ae-ee9e12cd4050}</client.bin.guid>
+        <test.client.guid>{c77e79c7-5e40-4447-b606-4b1d3a9d9016}</test.client.guid>
         <client.guid>{6a4121d4-b02f-4e35-b941-ca9a9a2efb69}</client.guid>
         <axclient.guid>{d3f564c6-315b-426b-8ed3-890d91300374}</axclient.guid>
         <traytool.guid>{e2bc6f17-8fc1-4aeb-b614-3fe2c74c41f6}</traytool.guid>
@@ -338,6 +340,7 @@
             <modules>
                 <module>build_variables</module>
                 <module>common</module>
+                <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -405,6 +408,7 @@
                 <module>client</module>
                 <module>client.core</module>
                 <module>client.bin</module>
+                <module>test.client</module>
             </modules>
         </profile>
         <profile>
@@ -422,6 +426,7 @@
                 <module>client.core</module>
                 <module>nxtool</module>
                 <module>client.bin</module>
+                <module>test.client</module>
                 <module>wixsetup</module>
             </modules>
             <properties>

@@ -16,8 +16,8 @@ extern "C"
 }
 
 #include "abstractclientplugin.h"
-#include "../core/datapacket/video_data_packet.h"
-#include "../plugins/videodecoder/stree/resourcecontainer.h"
+#include <nx/streaming/video_data_packet.h>
+#include <plugins/videodecoder/stree/resourcecontainer.h>
 
 
 class QGLContext;

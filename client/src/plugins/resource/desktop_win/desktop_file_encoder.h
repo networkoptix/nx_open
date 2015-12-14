@@ -9,7 +9,7 @@
 #include <QtMultimedia/QAudioInput>
 
 #include <dsp_effects/speex/speex_preprocess.h>
-#include "core/datapacket/audio_data_packet.h"
+#include "nx/streaming/audio_data_packet.h"
 #include "utils/common/long_runnable.h"
 #include "screen_grabber.h"
 #include "buffered_screen_grabber.h"

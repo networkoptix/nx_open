@@ -6,12 +6,12 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/media_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 
-#include "rtp_stream_parser.h"
-#include "rtsp_session.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
 
 QnAacRtpParser::QnAacRtpParser():
     QnRtpAudioStreamParser()

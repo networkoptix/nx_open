@@ -7,7 +7,7 @@
 
 #include <plugins/resource/third_party/third_party_audio_data_packet.h>
 #include <plugins/resource/third_party/third_party_video_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include <network/multicodec_rtp_reader.h>
 #include <plugins/plugin_tools.h>
 #include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>

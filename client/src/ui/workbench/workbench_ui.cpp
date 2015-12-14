@@ -17,7 +17,7 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/layout_resource.h>

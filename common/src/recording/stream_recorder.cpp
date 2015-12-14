@@ -13,13 +13,13 @@
 #include <core/resource/storage_plugin_factory.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <core/datapacket/abstract_data_packet.h>
-#include <core/datapacket/media_data_packet.h>
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <plugins/resource/avi/avi_archive_custom_data.h>
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 #include "transcoding/ffmpeg_audio_transcoder.h"
 #include "transcoding/ffmpeg_video_transcoder.h"

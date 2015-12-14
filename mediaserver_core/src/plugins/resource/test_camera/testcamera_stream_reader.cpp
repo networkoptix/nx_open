@@ -2,8 +2,8 @@
 
 #include "testcamera_stream_reader.h"
 
-#include <core/datapacket/video_data_packet.h>
-#include <core/datapacket/basic_media_context.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/basic_media_context.h>
 #include "testcamera_resource.h"
 #include "utils/common/synctime.h"
 

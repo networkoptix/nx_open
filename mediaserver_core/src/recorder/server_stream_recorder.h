@@ -10,7 +10,7 @@
 #include <recorder/device_file_catalog.h>
 #include <recording/time_period.h>
 #include <motion/motion_estimation.h>
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <recorder/dualstreaming_helper.h>
 
 #include <business/business_fwd.h>

@@ -5,10 +5,10 @@
 
 #include <QtCore/QSharedPointer>
 
-#include "core/datapacket/audio_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/audio_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
-#include <plugins/resource/archive/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 extern "C"
 {

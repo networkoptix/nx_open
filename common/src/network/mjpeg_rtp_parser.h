@@ -6,9 +6,9 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include "core/datapacket/video_data_packet.h"
-#include "rtp_stream_parser.h"
-#include "rtsp_session.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
 //#include "plugins/resource/arecontvision/tools/AVJpegHeader.h"
 
 

@@ -6,7 +6,7 @@
 #include <utils/common/log.h>
 #include <utils/common/byte_array.h>
 #include <utils/common/systemerror.h>
-#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 
 static const int SERVER_TFTP_PORT = 69;
 

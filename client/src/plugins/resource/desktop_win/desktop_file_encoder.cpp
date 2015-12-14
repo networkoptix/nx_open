@@ -25,7 +25,7 @@ extern "C"
 
 #include <utils/common/log.h>
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "win_audio_device_info.h"
 #include "decoders/audio/ffmpeg_audio_decoder.h"
 #include "utils/media/ffmpeg_helper.h"

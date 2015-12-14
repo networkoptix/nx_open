@@ -1,10 +1,10 @@
 #include "resource_display.h"
 #include <cassert>
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>

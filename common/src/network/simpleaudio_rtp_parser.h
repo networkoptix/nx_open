@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "rtp_stream_parser.h"
+#include <nx/streaming/rtp_stream_parser.h>
 
 // used for G711, G726 e.t.c simple audio codecs with one frame per packet
 

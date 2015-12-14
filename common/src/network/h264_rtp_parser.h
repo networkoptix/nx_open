@@ -8,10 +8,10 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include <core/datapacket/video_data_packet.h>
-#include <network/rtp_stream_parser.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/rtp_stream_parser.h>
 #include <utils/media/nalUnits.h>
-#include <network/rtsp_session.h>
+#include <nx/streaming/rtsp_client.h>
 
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {

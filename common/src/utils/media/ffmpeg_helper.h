@@ -13,7 +13,7 @@ extern "C"
 
 #include <QtCore/QIODevice>
 
-#include <core/datapacket/media_context.h>
+#include <nx/streaming/media_context.h>
 
 /** Static.
  * Contains utilities which rely on ffmpeg implementation.

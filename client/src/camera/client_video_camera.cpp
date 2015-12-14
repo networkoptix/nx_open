@@ -2,13 +2,13 @@
 
 #include <utils/common/log.h>
 
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/security_cam_resource.h>
 
-#include <plugins/resource/archive/rtsp_client_archive_delegate.h>
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include "http/custom_headers.h"
 
 #include <recording/time_period.h>

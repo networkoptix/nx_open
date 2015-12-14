@@ -5,7 +5,7 @@
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "licensing/license.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"

@@ -1,3 +1,4 @@
+#include "rtsp_connection.h"
 
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QUrlQuery>
@@ -7,46 +8,48 @@
 #include <QtCore/QDebug>
 #include <QtCore/QBuffer>
 
-#include "libavutil/avutil.h"
-#include "libavcodec/avcodec.h"
+extern "C"
+{
+#include <libavutil/avutil.h>
+#include <libavcodec/avcodec.h>
+};
 
-#include "rtsp_connection.h"
-#include "network/rtp_stream_parser.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
-#include "utils/media/ffmpeg_helper.h"
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/resource_media_layout.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <utils/media/ffmpeg_helper.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <utils/common/string.h>
 
-#include "network/tcp_connection_priv.h"
-#include "utils/network/rtsp/rtsp_types.h"
-#include "plugins/resource/archive/abstract_archive_delegate.h"
-#include "camera/camera_pool.h"
-#include "network/rtsp_session.h"
-#include "recorder/recording_manager.h"
-#include "utils/common/util.h"
-#include "rtsp_data_consumer.h"
-#include "plugins/resource/server_archive/server_archive_delegate.h"
-#include "core/dataprovider/live_stream_provider.h"
-#include "core/resource/resource_fwd.h"
-#include "core/resource/camera_resource.h"
-#include "plugins/resource/server_archive/thumbnails_stream_reader.h"
-#include "rtsp/rtsp_encoder.h"
-#include "rtsp_h264_encoder.h"
-#include "rtsp/rtsp_ffmpeg_encoder.h"
-#include "rtp_universal_encoder.h"
-#include "utils/common/synctime.h"
-#include "network/tcp_listener.h"
-#include "network/authenticate_helper.h"
+#include <network/tcp_connection_priv.h>
+#include <utils/network/rtsp/rtsp_types.h>
+#include <nx/streaming/abstract_archive_delegate.h>
+#include <camera/camera_pool.h>
+#include <nx/streaming/rtsp_client.h>
+#include <recorder/recording_manager.h>
+#include <utils/common/util.h>
+#include <rtsp/rtsp_data_consumer.h>
+#include <plugins/resource/server_archive/server_archive_delegate.h>
+#include <core/dataprovider/live_stream_provider.h>
+#include <core/resource/resource_fwd.h>
+#include <core/resource/camera_resource.h>
+#include <plugins/resource/server_archive/thumbnails_stream_reader.h>
+#include <rtsp/rtsp_encoder.h>
+#include <rtsp/rtsp_h264_encoder.h>
+#include <rtsp/rtsp_ffmpeg_encoder.h>
+#include <rtsp/rtp_universal_encoder.h>
+#include <utils/common/synctime.h>
+#include <network/tcp_listener.h>
+#include <network/authenticate_helper.h>
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
-#include "http/custom_headers.h"
-#include "audit/audit_manager.h"
-#include "media_server/settings.h"
-#include "streaming/streaming_params.h"
-#include "media_server/settings.h"
+#include <http/custom_headers.h>
+#include <audit/audit_manager.h>
+#include <media_server/settings.h>
+#include <streaming/streaming_params.h>
+#include <media_server/settings.h>
 
 class QnTcpListener;
 

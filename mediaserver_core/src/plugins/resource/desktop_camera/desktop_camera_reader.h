@@ -7,7 +7,7 @@
 
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <core/resource/resource_media_layout.h>
-#include <network/nx_rtp_parser.h>
+#include <nx/streaming/nx_rtp_parser.h>
 #include <network/multicodec_rtp_reader.h>
 #include <utils/network/simple_http_client.h>
 

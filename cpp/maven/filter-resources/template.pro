@@ -115,6 +115,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
+                ${root.dir}/common_libs/nx_streaming/src \
                 ${libdir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \

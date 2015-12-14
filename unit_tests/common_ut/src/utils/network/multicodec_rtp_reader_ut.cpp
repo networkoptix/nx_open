@@ -26,7 +26,7 @@
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
 #include <network/multicodec_rtp_reader.h>
-#include <network/rtpsession.h>
+#include <nx/streaming/rtsp_client.h>
 #include <utils/network/http/httpclient.h>
 
 #include "file_socket.h"
@@ -98,19 +98,19 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP2 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    RTPSession rtspSession;
-    rtspSession.setAuth( auth, nx_http::header::AuthScheme::basic );
+    QnRtspClient rtspClient;
+    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
 
-    rtspSession.setTransport( "tcp" );
-    ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
-    rtspSession.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
+    rtspClient.setTransport( "tcp" );
+    ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
+    rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
     quint8 buf[4*1024];
     qint64 totalBytesRead = 0;
     size_t readsCount = 0;
     for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
     {
-        int bytesRead = rtspSession.readBinaryResponce( buf, sizeof(buf) );
+        int bytesRead = rtspClient.readBinaryResponce( buf, sizeof(buf) );
         if( bytesRead <= 0 )
             break;
         totalBytesRead += bytesRead;
@@ -127,12 +127,12 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    RTPSession rtspSession;
-    rtspSession.setAuth( auth, nx_http::header::AuthScheme::basic );
+    QnRtspClient rtspClient;
+    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
 
-    rtspSession.setTransport( "tcp" );
-    ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
-    rtspSession.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
+    rtspClient.setTransport( "tcp" );
+    ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
+    rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
     quint8 buf[64*1024];
     memset( buf, 'x', sizeof(buf) );
@@ -142,7 +142,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
 #ifdef USE_POLL
     struct pollfd pollset[1];
     memset( pollset, 0, sizeof(pollset) );
-    pollset[0].fd = rtspSession.tcpSock()->handle();
+    pollset[0].fd = rtspClient.tcpSock()->handle();
     pollset[0].events |= POLLIN;
 #endif
 
@@ -160,7 +160,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP3 )
         //QThread::msleep( 5 );
 
         int bytesRead = 0;
-        bytesRead = rtspSession.tcpSock()->recv(
+        bytesRead = rtspClient.tcpSock()->recv(
             buf,
             sizeof(buf),
 #ifdef USE_POLL
@@ -233,12 +233,12 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
     QAuthenticator auth;
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
-    RTPSession rtspSession;
-    rtspSession.setAuth( auth, nx_http::header::AuthScheme::basic );
+    QnRtspClient rtspClient;
+    rtspClient.setAuth( auth, nx_http::header::AuthScheme::basic );
 
-    rtspSession.setTransport( "tcp" );
-    ASSERT_TRUE( rtspSession.open( rtspUrl ).errorCode == 0 );
-    rtspSession.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
+    rtspClient.setTransport( "tcp" );
+    ASSERT_TRUE( rtspClient.open( rtspUrl ).errorCode == 0 );
+    rtspClient.play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
 
     quint8 buf[4*1024];
     memset( buf, 'x', sizeof(buf) );
@@ -268,7 +268,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
 
     struct pollfd pollset[1];
     memset( pollset, 0, sizeof(pollset) );
-    pollset[0].fd = rtspSession.tcpSock()->handle();
+    pollset[0].fd = rtspClient.tcpSock()->handle();
     pollset[0].events |= POLLIN;
 
     for( ; static_cast<size_t>(totalBytesRead) < MAX_BYTES_TO_READ; )
@@ -286,7 +286,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
 #ifdef USE_SPLICE
         //std::cout<<"before splice"<<std::endl;
         bytesRead = splice(
-            rtspSession.tcpSock()->handle(),
+            rtspClient.tcpSock()->handle(),
             NULL,
             pipefd[1],
             NULL,
@@ -299,7 +299,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
         bytesRead = read( pipefd[0], buf, bytesRead );
         //std::cout<<"splice returned "<<bytesRead<<", bytesRead2 "<<bytesRead2<<std::endl;
 #else
-        bytesRead = rtspSession.tcpSock()->recv( buf, sizeof(buf), 0 );
+        bytesRead = rtspClient.tcpSock()->recv( buf, sizeof(buf), 0 );
 #endif
 
         if( bytesRead <= 0 )
@@ -310,7 +310,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP5 )
             break;
         }
 
-        //bytesRead = rtspSession.tcpSock()->recv( buf, sizeof(buf), /*MSG_WAITALL*/ MSG_DONTWAIT );
+        //bytesRead = rtspClient.tcpSock()->recv( buf, sizeof(buf), /*MSG_WAITALL*/ MSG_DONTWAIT );
         //std::cout<<"recv returned "<<bytesRead<<std::endl;
         //if( bytesRead <= 0 )
         //    std::cerr<<strerror(errno)<<std::endl;
@@ -421,22 +421,22 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP7 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
 
-    std::vector<std::unique_ptr<RTPSession>> rtspSessions;
-    rtspSessions.resize( SESSION_COUNT );
-    for( auto& rtspSession: rtspSessions )
+    std::vector<std::unique_ptr<QnRtspClient>> RtspClients;
+    RtspClients.resize( SESSION_COUNT );
+    for( auto& rtspClient: RtspClients )
     {
-        rtspSession.reset( new RTPSession() );
-        rtspSession->setAuth( auth, nx_http::header::AuthScheme::basic );
-        rtspSession->setTransport( "tcp" );
-        ASSERT_TRUE( rtspSession->open( rtspUrl ).errorCode == 0 );
-        rtspSession->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
+        rtspClient.reset( new QnRtspClient() );
+        rtspClient->setAuth( auth, nx_http::header::AuthScheme::basic );
+        rtspClient->setTransport( "tcp" );
+        ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
+        rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
     }
 
     std::vector<std::unique_ptr<AsyncReadHandler>> asyncReadHandlers;
     asyncReadHandlers.resize( SESSION_COUNT );
     for( size_t i = 0; i < asyncReadHandlers.size(); ++i )
     {
-        asyncReadHandlers[i].reset( new AsyncReadHandler( rtspSessions[i]->tcpSock() ) );
+        asyncReadHandlers[i].reset( new AsyncReadHandler( RtspClients[i]->tcpSock() ) );
         ASSERT_TRUE( asyncReadHandlers[i]->start() );
     }
 
@@ -469,15 +469,15 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     auth.setUser( "root" );
     auth.setPassword( "ptth" );
 
-    std::vector<std::unique_ptr<RTPSession>> rtspSessions;
-    rtspSessions.resize( SESSION_COUNT );
-    for( auto& rtspSession: rtspSessions )
+    std::vector<std::unique_ptr<QnRtspClient>> RtspClients;
+    RtspClients.resize( SESSION_COUNT );
+    for( auto& rtspClient: RtspClients )
     {
-        rtspSession.reset( new RTPSession() );
-        rtspSession->setAuth( auth, nx_http::header::AuthScheme::basic );
-        rtspSession->setTransport( "tcp" );
-        ASSERT_TRUE( rtspSession->open( rtspUrl ).errorCode == 0 );
-        rtspSession->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
+        rtspClient.reset( new QnRtspClient() );
+        rtspClient->setAuth( auth, nx_http::header::AuthScheme::basic );
+        rtspClient->setTransport( "tcp" );
+        ASSERT_TRUE( rtspClient->open( rtspUrl ).errorCode == 0 );
+        rtspClient->play( AV_NOPTS_VALUE, AV_NOPTS_VALUE, 1.0 );
     }
 
     quint8 buf[64*1024];
@@ -489,7 +489,7 @@ TEST( QnMulticodecRtpReader, DISABLED_streamFetchingOverRTSP8 )
     for( ; totalBytesRead < MAX_BYTES_TO_READ * SESSION_COUNT; )
     {
         int bytesRead = 0;
-        bytesRead = rtspSessions[x % SESSION_COUNT]->tcpSock()->recv(
+        bytesRead = RtspClients[x % SESSION_COUNT]->tcpSock()->recv(
             buf,
             sizeof(buf),
             0 );

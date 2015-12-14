@@ -8,10 +8,10 @@
 #include <utils/common/synctime.h>
 
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 
 #include "decoders/audio/ffmpeg_audio_decoder.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
 #include "video_stream_display.h"

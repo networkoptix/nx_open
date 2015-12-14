@@ -9,8 +9,8 @@
 #include "bitStream.h"
 #include "core/resource/storage_resource.h"
 #include <utils/media/av_codec_helper.h>
-#include <core/datapacket/av_codec_media_context.h>
-#include <core/datapacket/basic_media_context.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/basic_media_context.h>
 
 extern "C"
 {

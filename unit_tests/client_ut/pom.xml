@@ -27,7 +27,7 @@
         <master.project.directory>client</master.project.directory>
         <!--Global libs-->
         <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>       
-        <global.libs>-lcommon -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>

@@ -9,7 +9,7 @@
 #ifdef ENABLE_THIRD_PARTY
 
 #include <plugins/camera_plugin.h>
-#include <plugins/resource/archive/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 
 
 class ThirdPartyArchiveDelegate

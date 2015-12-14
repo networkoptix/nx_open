@@ -2,10 +2,10 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
-#include "rtp_stream_parser.h"
-#include "rtsp_session.h"
-#include "utils/common/synctime.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/common/synctime.h>
 
 #if 0
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};

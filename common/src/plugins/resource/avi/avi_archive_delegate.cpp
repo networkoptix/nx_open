@@ -22,8 +22,8 @@ extern "C"
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_resource.h>
-#include <core/datapacket/video_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include <core/ptz/media_dewarping_params.h>
 
 #include <plugins/resource/avi/avi_resource.h>

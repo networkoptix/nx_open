@@ -4,7 +4,7 @@
 
 #include <cassert>
 
-#include "core/datapacket/audio_data_packet.h"
+#include "nx/streaming/audio_data_packet.h"
 #include "audio_struct.h"
 #include "utils/media/ffmpeg_helper.h"
 

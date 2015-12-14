@@ -7,8 +7,8 @@
 #include <utils/media/externaltimesource.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 
 #include <decoders/video/abstract_video_decoder.h>

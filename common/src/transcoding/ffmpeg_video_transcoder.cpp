@@ -3,7 +3,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"

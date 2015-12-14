@@ -5,18 +5,18 @@
 
 #include <vector>
 
-#include "core/dataprovider/abstract_media_stream_provider.h"
-#include "core/resource/resource_consumer.h"
-#include "core/resource/resource_media_layout.h"
-#include "core/datapacket/media_data_packet.h"
-#include "utils/camera/camera_diagnostics.h"
-#include "utils/common/stoppable.h"
+#include <core/dataprovider/abstract_media_stream_provider.h> 
+#include <core/resource/resource_consumer.h> 
+#include <core/resource/resource_media_layout.h> 
+#include <nx/streaming/media_data_packet.h> 
+#include <utils/camera/camera_diagnostics.h> 
+#include <utils/common/stoppable.h> 
 #include <utils/common/safe_direct_connection.h>
 
-#include "network/rtsp_session.h"
+#include <nx/streaming/rtsp_client.h>
 
 #include <business/business_fwd.h>
-#include "rtp_stream_parser.h"
+#include <nx/streaming/rtp_stream_parser.h>
 
 
 namespace RtpTransport

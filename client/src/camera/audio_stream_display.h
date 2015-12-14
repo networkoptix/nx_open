@@ -3,11 +3,10 @@
 
 #include <utils/thread/mutex.h>
 
-#include "decoders/audio/audio_struct.h"
-#include "openal/qtvsound.h"
-#include "openal/qtvaudiodevice.h"
-#include "core/datapacket/audio_data_packet.h"
-
+#include <decoders/audio/audio_struct.h>
+#include <openal/qtvsound.h>
+#include <openal/qtvaudiodevice.h>
+#include <nx/streaming/audio_data_packet.h>
 
 class QnAbstractAudioDecoder;
 class QnCompressedAudioData;

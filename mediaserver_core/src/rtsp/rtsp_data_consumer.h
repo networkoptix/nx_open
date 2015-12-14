@@ -4,10 +4,10 @@
 #include <QtNetwork/QHostAddress>
 #include <QtCore/QElapsedTimer>
 
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <network/rtp_stream_parser.h>
-#include <core/datapacket/abstract_data_packet.h>
-#include <network/rtsp_session.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/abstract_data_packet.h>
+#include <nx/streaming/rtsp_client.h>
 #include <utils/media/externaltimesource.h>
 #include <rtsp/rtsp_ffmpeg_encoder.h>
 #include <utils/common/adaptive_sleep.h>

@@ -9,7 +9,7 @@
 #include <utils/thread/wait_condition.h>
 
 #include "core/resource/resource_fwd.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "recording/time_period_list.h"
 #include "recording/playbackmask_helper.h"

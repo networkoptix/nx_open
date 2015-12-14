@@ -6,9 +6,9 @@ extern "C"
 #include <libavformat/avformat.h>
 };
 
-#include <core/dataprovider/abstract_media_stream_data_provider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
-#include <plugins/resource/archive/abstract_archive_delegate.h>
+#include <nx/streaming/abstract_archive_delegate.h>
 #include <recorder/device_file_catalog.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 

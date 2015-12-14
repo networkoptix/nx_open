@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <core/datapacket/media_context.h>
-#include <core/datapacket/av_codec_media_context.h>
-#include <core/datapacket/basic_media_context.h>
-#include <core/datapacket/media_context_serializable_data.h>
+#include <nx/streaming/media_context.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/basic_media_context.h>
+#include <nx/streaming/media_context_serializable_data.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 

@@ -1,7 +1,7 @@
 #include "sync_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 

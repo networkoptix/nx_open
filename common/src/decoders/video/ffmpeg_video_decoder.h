@@ -6,7 +6,7 @@
 #include <QtGui/QImage>
 
 #include "abstract_video_decoder.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 #ifdef _USE_DXVA
 #include "dxva/dxva.h"

@@ -2,7 +2,7 @@
 
 #include "ipwebcam_droid_stream_reader.h"
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
 #include "utils/network/http/httptypes.h"

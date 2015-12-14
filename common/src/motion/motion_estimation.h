@@ -7,8 +7,8 @@ static const int MOTION_AGGREGATION_PERIOD = 300 * 1000;
 
 #include <QtCore/QByteArray>
 #include <utils/thread/mutex.h>
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "decoders/video/ffmpeg_video_decoder.h"
 #include "core/resource/motion_window.h"
 

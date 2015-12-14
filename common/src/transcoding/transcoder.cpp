@@ -13,8 +13,8 @@
 #include <transcoding/filters/tiled_image_filter.h>
 #include <transcoding/filters/scale_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
-#include <core/datapacket/media_data_packet.h>
-#include <core/dataprovider/abstract_stream_data_provider.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
 #include <core/resource/camera_resource.h>
 #include <utils/serialization/json.h>
 

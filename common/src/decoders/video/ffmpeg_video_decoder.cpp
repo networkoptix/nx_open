@@ -15,7 +15,7 @@
 
 #include "utils/media/frame_type_extractor.h"
 
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/av_codec_media_context.h>
 
 static const int  LIGHT_CPU_MODE_FRAME_PERIOD = 2;
 static const int MAX_DECODE_THREAD = 4;

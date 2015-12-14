@@ -2,8 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/av_codec_media_context.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 #include "utils/media/audio_processor.h"
 #include "utils/media/ffmpeg_helper.h"
 

@@ -2,8 +2,8 @@
 #define __SYNCPLAY_WRAPPER_H__
 
 #include <utils/media/externaltimesource.h>
-#include <core/dataprovider/abstract_stream_data_provider.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_stream_data_provider.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 class QnAbstractArchiveStreamReader;
 class QnAbstractArchiveDelegate;

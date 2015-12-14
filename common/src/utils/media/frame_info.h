@@ -11,7 +11,7 @@ extern "C"
 {
     #include <libavcodec/avcodec.h>
 }
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/item_dewarping_params.h>
 #include "utils/color_space/image_correction.h"

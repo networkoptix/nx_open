@@ -3,14 +3,12 @@
 * akolesnikov
 ***********************************************************/
 
-// TODO mike: Try to move to mediaserver_core.
-
 #ifndef THIRD_PARTY_VIDEO_DATA_PACKET_H
 #define THIRD_PARTY_VIDEO_DATA_PACKET_H
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 #include <plugins/camera_plugin.h>
 

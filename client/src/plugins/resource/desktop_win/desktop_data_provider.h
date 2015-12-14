@@ -10,7 +10,7 @@
 
 #include <utils/common/long_runnable.h>
 
-#include <core/datapacket/audio_data_packet.h>
+#include <nx/streaming/audio_data_packet.h>
 #include <core/dataprovider/live_stream_provider.h>
 
 #include <ui/screen_recording/qnaudio_device_info.h>

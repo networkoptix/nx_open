@@ -9,7 +9,7 @@
 
 #include "abstract_media_data_filter.h"
 
-#include "../datapacket/media_data_packet.h"
+#include <nx/streaming/media_data_packet.h>
 
 
 //!Converts h.264 stream from avc file format (mpeg4 part 15) to mpeg 4 annex b
