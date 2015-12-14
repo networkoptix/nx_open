@@ -16,7 +16,7 @@
      <property name="title">
       <string>Main Storage</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -46,7 +46,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1">
         <item>
          <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
@@ -74,10 +74,10 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -87,7 +87,7 @@
      <property name="title">
       <string>Backup Storage</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
@@ -123,7 +123,7 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,1">
         <item>
          <widget class="QPushButton" name="addExtStorageToBackupBtn">
           <property name="text">
@@ -151,10 +151,10 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QnStorageRebuildWidget" name="rebuildBackupWidget" native="true"/>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QnStorageRebuildWidget" name="rebuildBackupWidget" native="true"/>
       </item>
      </layout>
     </widget>

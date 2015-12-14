@@ -20,10 +20,21 @@ QnStorageRebuildWidget::~QnStorageRebuildWidget()
 {}
 
 void QnStorageRebuildWidget::loadData( const QnStorageScanData &data ) {
-    ui->statusLabel->setText(tr("Rebuild archive index for storage '%1' is in progress").arg(data.path));
+    if (data.progress >= 0) {
+        ui->progressBar->setValue(data.totalProgress * 100 + 0.5);
+        switch (data.state)
+        {
+        case Qn::RebuildState_PartialScan:
+            ui->progressBar->setFormat(tr("Fast Archive Scan - %p%", "%p is a placeholder for percent value, must be kept."));
+            break;
+        case Qn::RebuildState_FullScan:
+            ui->progressBar->setFormat(tr("Rebuilding Archive Index - %p%", "%p is a placeholder for percent value, must be kept."));
+            break;
+        default:
+            break;
+        }
+    }
 
-    if (data.progress >= 0)
-        ui->progressBar->setValue(data.progress * 100 + 0.5);
 
     ui->stopButton->setEnabled(data.state == Qn::RebuildState_FullScan);
     setVisible(data.state == Qn::RebuildState_PartialScan || data.state == Qn::RebuildState_FullScan);

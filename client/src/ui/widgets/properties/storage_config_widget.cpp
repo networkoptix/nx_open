@@ -554,12 +554,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
         return storage.isWritable && storage.isUsed && storage.isBackup;
     }))
         return error(tr("Select at least one backup storage."));
-/*
-    if (!any_of(qnCameraHistoryPool->getServerFootageCameras(m_server), [](const QnVirtualCameraResourcePtr &camera){
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
-    }))
-        return error(tr("Select at least one camera with archive to backup"));
-*/
+
     if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
         if (!m_backupSchedule.isValid())
             return error(tr("Backup Schedule is invalid."));
@@ -655,11 +650,12 @@ void QnStorageConfigWidget::updateCamerasLabel()
     QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(m_server, true);
     QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
 
-    bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
-    //TODO: #GDM device-dependent-strings
     QString lineTotal = (selectedCameras.size() > 0)
         ? tr("%n of %1 are selected", "", selectedCameras.size()).arg(serverCameras.size())
-        : setWarningStyleHtml(tr("No any cameras selected"));
+        : setWarningStyleHtml( QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("No any devices selected"),
+            tr("No any cameras selected")
+        ));
 
     ui->camerasLabel->setText(lineTotal);
 }
@@ -686,7 +682,8 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
         &&  !hasChanges()
         &&  any_of(m_model->storages(), [isMainPool](const QnStorageModelInfo &info) {
                 return info.isWritable
-                    && info.isBackup != isMainPool;
+                    && info.isBackup != isMainPool
+                    && info.isOnline;
             })
         && !backupIsInProgress
     ;
@@ -694,10 +691,12 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
     if (isMainPool) {
         ui->rebuildMainWidget->loadData(reply);
         ui->rebuildMainButton->setEnabled(canStartRebuild);
+        ui->rebuildMainButton->setVisible(reply.state == Qn::RebuildState_None);
     }
     else {
         ui->rebuildBackupWidget->loadData(reply);
         ui->rebuildBackupButton->setEnabled(canStartRebuild);
+        ui->rebuildBackupButton->setVisible(reply.state == Qn::RebuildState_None);
     }
 }
 

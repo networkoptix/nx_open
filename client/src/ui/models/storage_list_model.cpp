@@ -153,8 +153,22 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
             if (!storageData.isOnline && storageData.isWritable)
                 return tr("%1 (Checking...)").arg(path);
 
-            if (isStorageInRebuild(storageData))
-                return tr("%1 (Indexing...)").arg(path);
+            for (const auto &rebuildStatus: m_rebuildStatus)
+            {
+                if (rebuildStatus.path != storageData.url)
+                    continue;
+
+                int progress = static_cast<int>(rebuildStatus.progress * 100 + 0.5);
+                switch (rebuildStatus.state)
+                {
+                case Qn::RebuildState_PartialScan:
+                    return tr("%1 (Scanning... %2%)").arg(path).arg(progress);
+                case Qn::RebuildState_FullScan:
+                    return tr("%1 (Rebuilding... %2%)").arg(path).arg(progress);
+                default:
+                    break;
+                }
+            }
 
             return path;
         }
@@ -317,6 +331,9 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
         if (isStorageInRebuild(storageData))
             return false;
 
+        if (isStoragePoolInRebuild(storageData))
+            return false;
+
         return (storageData.isOnline || index.column() == ChangeGroupActionColumn);
     };
 
@@ -346,11 +363,19 @@ void QnStorageListModel::setReadOnly( bool readOnly ) {
 }
 
 bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const {
+    using boost::algorithm::any_of;
+
     if (m_readOnly)
         return false;
 
     if (isStorageInRebuild(data))
         return false;
+
+    if (any_of(m_rebuildStatus, [](const QnStorageScanData &status){
+        return status.state == Qn::RebuildState_FullScan;
+    }))
+        return false;
+
 
     if (!data.isOnline)
         return false;
@@ -362,7 +387,7 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
         return true;
 
     /* Check that at least one writable storage left in the main pool. */
-    return std::any_of(m_storages.cbegin(), m_storages.cend(), [data](const QnStorageModelInfo &other) {
+    return any_of(m_storages, [data](const QnStorageModelInfo &other) {
 
         /* Do not count subject to remove. */
         if (other.url == data.url)
@@ -387,27 +412,33 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     if (isStorageInRebuild(data))
         return false;
 
+    if (isStoragePoolInRebuild(data))
+        return false;
+
     return data.isExternal || !data.isWritable;
 }
 
-bool QnStorageListModel::isStorageInRebuild( const QnStorageModelInfo& storage ) const
+
+bool QnStorageListModel::isStoragePoolInRebuild( const QnStorageModelInfo& storage ) const
 {
-    auto mainStatus = m_rebuildStatus[static_cast<int>(QnServerStoragesPool::Main)];
-    auto backupStatus = m_rebuildStatus[static_cast<int>(QnServerStoragesPool::Backup)];
+    QnServerStoragesPool pool = storage.isBackup
+        ? QnServerStoragesPool::Backup
+        : QnServerStoragesPool::Main;
+
+    auto status = m_rebuildStatus[static_cast<int>(pool)];
 
     /* Check if the whole section is in rebuild. */
-    if (mainStatus.state == Qn::RebuildState_FullScan && !storage.isBackup)
-        return true;
+    return (status.state == Qn::RebuildState_FullScan);
+}
 
-    if (backupStatus.state == Qn::RebuildState_FullScan && storage.isBackup)
-        return true;
 
+bool QnStorageListModel::isStorageInRebuild( const QnStorageModelInfo& storage ) const
+{
     /* Check if the current storage is in rebuild */
     for (const auto &rebuildStatus: m_rebuildStatus)
     {
         if (rebuildStatus.path == storage.url)
             return rebuildStatus.state != Qn::RebuildState_None;
     }
-
     return false;
 }
