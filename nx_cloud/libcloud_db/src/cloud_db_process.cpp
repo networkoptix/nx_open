@@ -125,6 +125,7 @@ int CloudDBProcess::executeApplication()
             accountManager,
             &dbManager);
     
+        //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
         authRestrictionList.allow( PingHandler::kHandlerPath, AuthMethod::noAuth );
         authRestrictionList.allow( AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth );

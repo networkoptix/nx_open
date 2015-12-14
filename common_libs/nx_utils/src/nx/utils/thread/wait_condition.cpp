@@ -40,13 +40,6 @@ bool QnWaitCondition::wait( QnMutex* mutex, unsigned long time )
     return res;
 }
 
-bool QnWaitCondition::wait(
-    QnMutexLockerBase* lock,
-    unsigned long time)
-{
-    return wait(lock->mutex(), time);
-}
-
 void QnWaitCondition::wakeAll()
 {
     return m_impl->cond.wakeAll();

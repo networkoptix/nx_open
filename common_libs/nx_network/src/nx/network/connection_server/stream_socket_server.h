@@ -60,7 +60,7 @@ public:
         //waiting connections being cancelled through closeConnection call to finish...
         QnMutexLocker lk(&m_mutex);
         while (m_connectionsBeingClosedCount > 0)
-            m_cond.wait(&lk);
+            m_cond.wait(lk.mutex());
     }
 
     virtual void closeConnection(
