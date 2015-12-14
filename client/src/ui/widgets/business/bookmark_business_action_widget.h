@@ -12,7 +12,7 @@ class QnBookmarkBusinessActionWidget : public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
     typedef QnAbstractBusinessParamsWidget base_type;
-    
+
 public:
     explicit QnBookmarkBusinessActionWidget(QWidget *parent = 0);
     ~QnBookmarkBusinessActionWidget();
@@ -20,7 +20,7 @@ public:
     virtual void updateTabOrder(QWidget *before, QWidget *after) override;
 
 protected slots:
-    virtual void at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) override;
+    virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
 
 private slots:
     void paramsChanged();

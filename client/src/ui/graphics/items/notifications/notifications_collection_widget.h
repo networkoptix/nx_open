@@ -23,6 +23,7 @@ class QnNotificationListWidget;
 class QnNotificationWidget;
 class QnParticleItem;
 class QnToolTipWidget;
+class QnCameraThumbnailManager;
 
 /**
  * An image button widget that displays thumbnail behind the button.
@@ -109,8 +110,8 @@ private:
      * @param resource                      Camera resource - thumbnail provider
      * @param msecSinceEpoch                Timestamp for the thumbnail, -1 means latest available
      */
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
-    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, const QnMediaServerResourcePtr &server, qint64 msecSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourcePtr &camera, qint64 msecSinceEpoch = -1);
+    void loadThumbnailForItem(QnNotificationWidget *item, const QnVirtualCameraResourceList &cameraList, qint64 msecSinceEpoch = -1);
 
     QnNotificationWidget* findItem(QnSystemHealth::MessageType message, const QnResourcePtr &resource);
     QnNotificationWidget* findItem(const QnUuid& businessRuleId, const QnResourcePtr &resource);
@@ -127,6 +128,7 @@ private:
     QMultiHash<QString, QnNotificationWidget*> m_itemsByLoadingSound;
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByBusinessRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
+    QSharedPointer<QnCameraThumbnailManager> m_statusPixmapManager;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

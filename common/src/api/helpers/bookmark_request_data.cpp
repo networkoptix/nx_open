@@ -65,7 +65,10 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
             cameras << camera;
     }
     for (const auto& id: params.allValues(cameraIdKey)) {
-        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(id).dynamicCast<QnVirtualCameraResource>())
+        QnUuid uuid = QnUuid::fromStringSafe(id);
+        if (uuid.isNull())
+            continue;
+        if (QnVirtualCameraResourcePtr camera = qnResPool->getResourceById(uuid).dynamicCast<QnVirtualCameraResource>())
             cameras << camera;
     }
 }
@@ -87,8 +90,8 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
 }
 
 bool QnGetBookmarksRequestData::isValid() const {
-    return !cameras.isEmpty() 
-        && filter.endTimeMs > filter.startTimeMs 
+    return !cameras.isEmpty()
+        && filter.endTimeMs > filter.startTimeMs
         && format != Qn::UnsupportedFormat;
 }
 

@@ -47,8 +47,8 @@ struct QnCameraAdvancedParameter {
     QString description;
     QString tag;  
     bool readOnly;
-    QString readCmd; // read parameter command line. Doesn't used in UI
-    QString writeCmd; // write parameter command line. Doesn't used in UI
+    QString readCmd; // read parameter command line. Isn't used in UI
+    QString writeCmd; // write parameter command line. Isn't used in UI
     QString internalRange; // internal device values for range parameters
 
     QnCameraAdvancedParameter();

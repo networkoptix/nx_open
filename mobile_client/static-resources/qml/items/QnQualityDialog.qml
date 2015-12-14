@@ -49,7 +49,8 @@ QnDialog {
                     color: current ? "#30ffffff" : "#30000000"
                     onClicked: {
                         qualityDialog.hide()
-                        qualityDialog.qualityPicked(modelData)
+                        if (!current)
+                            qualityDialog.qualityPicked(modelData)
                     }
                 }
             }

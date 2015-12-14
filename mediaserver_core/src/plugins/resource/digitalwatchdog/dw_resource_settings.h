@@ -8,14 +8,14 @@
 /*
 * base class either for new and old DW settings
 */
-class DWCommonCameraProxy
+class DWAbstractCameraProxy
 {
 public:
-    DWCommonCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
-    virtual ~DWCommonCameraProxy() {}
+    DWAbstractCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
+    virtual ~DWAbstractCameraProxy() {}
 
     virtual QnCameraAdvancedParamValueList getParamsList() const = 0;
-    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = 0) = 0;
+    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = nullptr) = 0;
     virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &params) = 0;
 protected:
     const QString m_host;
@@ -25,15 +25,15 @@ protected:
 };
 
 
-class QnWin4NetCameraProxy: public DWCommonCameraProxy
+class QnWin4NetCameraProxy: public DWAbstractCameraProxy
 {
 public:
     QnWin4NetCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
 
     virtual QnCameraAdvancedParamValueList getParamsList() const override;
     //virtual bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value) override;
-    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = 0) override;
-    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &params) override {}
+    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = nullptr) override;
+    virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &) override {}
 private:
     QnCameraAdvancedParamValueList fetchParamsFromHttpResponse(const QByteArray& body) const;
     QnCameraAdvancedParamValueList requestParamValues(const QString &request) const;
@@ -41,7 +41,7 @@ private:
     bool setParam(const QnCameraAdvancedParameter &parameter, const QString &value);
 };
 
-class QnPravisCameraProxy: public DWCommonCameraProxy
+class QnPravisCameraProxy: public DWAbstractCameraProxy
 {
 public:
     QnPravisCameraProxy(const QString& host, int port, unsigned int timeout, const QAuthenticator& auth);
@@ -49,7 +49,7 @@ public:
     virtual void setCameraAdvancedParams(const QnCameraAdvancedParams &params) override;
 
     virtual QnCameraAdvancedParamValueList getParamsList() const override;
-    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = 0) override;
+    virtual bool setParams(const QVector<QPair<QnCameraAdvancedParameter, QString>> &parameters, QnCameraAdvancedParamValueList *result = nullptr) override;
 private:
     void addToFlatParams(const QnCameraAdvancedParamGroup& group);
     QString toInnerValue(const QnCameraAdvancedParameter &parameter, const QString &value) const;

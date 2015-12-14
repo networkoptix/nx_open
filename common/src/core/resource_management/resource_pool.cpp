@@ -84,16 +84,16 @@ void QnResourcePool::addResources(const QnResourceList &resources)
 
     for (const QnResourcePtr &resource: resources)
     {
-        bool incompatible = resource->getStatus() == Qn::Incompatible;
+        bool fakeServer = QnMediaServerResource::isFakeServer(resource);
 
         if( insertOrUpdateResource(
                 resource,
-                incompatible ? &m_incompatibleResources : &m_resources ) )
+                fakeServer ? &m_incompatibleResources : &m_resources ) )
         {
             newResources.insert(resource->getId(), resource);
         }
 
-        if (!incompatible)
+        if (!fakeServer)
             m_incompatibleResources.remove(resource->getId());
     }
 

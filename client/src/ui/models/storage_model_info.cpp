@@ -14,6 +14,7 @@ QnStorageModelInfo::QnStorageModelInfo()
     , isWritable(false)
     , isBackup(false)
     , isExternal(false)
+    , isOnline(false)
 {}
 
 QnStorageModelInfo::QnStorageModelInfo( const QnStorageSpaceData &reply )
@@ -26,6 +27,7 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageSpaceData &reply )
     , isWritable(reply.isWritable)
     , isBackup(reply.isBackup)
     , isExternal(reply.isExternal)
+    , isOnline(reply.isOnline)
 {}
 
 QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
@@ -37,5 +39,6 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
     , isWritable(storage->isWritable())
     , isBackup(storage->isBackup())
     , isExternal(storage->isExternal())
+    , isOnline(storage->getStatus() == Qn::Online)
 {}
 

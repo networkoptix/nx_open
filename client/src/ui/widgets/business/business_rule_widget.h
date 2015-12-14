@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULE_WIDGET_H
-#define BUSINESS_RULE_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -12,6 +11,8 @@
 #include <ui/widgets/business/abstract_business_params_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
+#include <utils/common/connective.h>
+
 namespace Ui {
     class BusinessRuleWidget;
 }
@@ -19,24 +20,24 @@ namespace Ui {
 class QStateMachine;
 class QStandardItemModel;
 
-class QnBusinessRuleWidget : public QWidget, public QnWorkbenchContextAware
+class QnBusinessRuleWidget : public Connective<QWidget>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-    
-    typedef QWidget base_type;
+
+    typedef Connective<QWidget> base_type;
 public:
-    explicit QnBusinessRuleWidget(QWidget *parent = 0, QnWorkbenchContext *context = NULL);
+    explicit QnBusinessRuleWidget(QWidget *parent = 0);
     virtual ~QnBusinessRuleWidget();
 
-    QnBusinessRuleViewModel* model() const;
-    void setModel(QnBusinessRuleViewModel* model);
+    QnBusinessRuleViewModelPtr model() const;
+    void setModel(const QnBusinessRuleViewModelPtr &model);
 
 public slots:
     void at_scheduleButton_clicked();
 
 protected:
     /**
-     * @brief initEventParameters   Display widget with current event paramenters.
+     * @brief initEventParameters   Display widget with current event parameters.
      */
     void initEventParameters();
 
@@ -45,7 +46,7 @@ protected:
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
 private slots:
-    void at_model_dataChanged(QnBusinessRuleViewModel* model, QnBusiness::Fields fields);
+    void at_model_dataChanged(QnBusiness::Fields fields);
 
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
@@ -63,7 +64,7 @@ private:
 private:
     QScopedPointer<Ui::BusinessRuleWidget> ui;
 
-    QnBusinessRuleViewModel* m_model;
+    QnBusinessRuleViewModelPtr m_model;
 
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
@@ -75,5 +76,3 @@ private:
 
     bool m_updating;
 };
-
-#endif // BUSINESS_RULE_WIDGET_H

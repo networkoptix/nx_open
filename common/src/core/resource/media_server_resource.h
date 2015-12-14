@@ -60,7 +60,7 @@ public:
     /*
     * New server rest connection
     */
-    rest::QnConnectionPtr serverRestConnection();
+    rest::QnConnectionPtr restConnection();
 
     QnStorageResourceList getStorages() const;
     QnStorageResourcePtr getStorageByUrl(const QString& url) const;
@@ -133,8 +133,8 @@ signals:
     void redundancyChanged(const QnResourcePtr &resource);
     void backupScheduleChanged(const QnResourcePtr &resource);
 private:
-    QnMediaServerConnectionPtr m_restConnection; // deprecated
-    rest::QnConnectionPtr m_serverRestConnection; // new one
+    QnMediaServerConnectionPtr m_apiConnection; // deprecated
+    rest::QnConnectionPtr m_restConnection; // new one
     QString m_apiUrl;
     QList<QHostAddress> m_netAddrList;
     QList<QHostAddress> m_prevNetAddrList;
