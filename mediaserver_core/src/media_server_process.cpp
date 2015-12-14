@@ -2273,8 +2273,8 @@ void MediaServerProcess::run()
         {
             nx::cc::MediatorConnector::SystemCredentials credentials =
             {
-                qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
+                qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8()
             };
 
@@ -2283,7 +2283,7 @@ void MediaServerProcess::run()
             return;
         }
 
-        nx::SocketGlobals::addressPublisher().setSystemCredentials(boost::none);
+        nx::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
     };
 
     loadResourcesFromECS(messageProcessor.data());

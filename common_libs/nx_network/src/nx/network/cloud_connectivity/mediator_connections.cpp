@@ -108,7 +108,7 @@ void MediatorSystemConnection::sendAuthRequest(
     }
     else
     {
-        // can not send anything while credentialy are not known
+        // can not send anything while credentials are not known
         handler(SystemError::notConnected, stun::Message());
     }
 }

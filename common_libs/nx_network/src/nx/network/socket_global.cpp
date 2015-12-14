@@ -9,13 +9,16 @@ SocketGlobals::SocketGlobals()
 
 SocketGlobals::~SocketGlobals()
 {
+    // NOTE: can be move out into QnStoppableAsync::pleaseStop,
+    //       what does not make any sense so far
+
     std::promise< void > promise;
-    BarrierHandler barrier([&](){ promise.set_value(); });
-
-    m_addressResolver.pleaseStop( barrier.fork() );
-    m_addressPublisher.pleaseStop( barrier.fork() );
-    m_mediatorConnector.pleaseStop( barrier.fork() );
-
+    {
+        BarrierHandler barrier([&](){ promise.set_value(); });
+        m_addressResolver.pleaseStop( barrier.fork() );
+        m_addressPublisher.pleaseStop( barrier.fork() );
+        m_mediatorConnector.pleaseStop( barrier.fork() );
+    }
     promise.get_future().wait();
 }
 
