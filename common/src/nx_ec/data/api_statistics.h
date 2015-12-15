@@ -11,6 +11,7 @@
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
 #include "api_layout_data.h"
+#include "api_user_data.h"
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
@@ -83,6 +84,14 @@ namespace ec2 {
 #define ApiBusinessRuleStatistics_Fields (id)(eventType)(eventResourceIds)(eventCondition)(eventState) \
 	(actionType)(actionResourceIds)(actionParams)(aggregationPeriod)(disabled)(schedule)(system)
 
+    struct ApiUserDataStatistics
+        : ApiUserData
+    {
+        ApiUserDataStatistics();
+        ApiUserDataStatistics(ApiUserData&& data);
+    };
+#define ApiUserDataStatistics_Fields (id)(isAdmin)(permissions)(isLdap)(isEnabled)
+
     struct ApiSystemStatistics
     {
         QnUuid systemId;
@@ -93,8 +102,9 @@ namespace ec2 {
         ApiLicenseStatisticsList            licenses;
         ApiMediaServerDataStatisticsList    mediaservers;
         ApiLayoutDataList                   layouts;
+        ApiUserDataStatisticsList           users;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)(users)
 
     struct ApiStatisticsServerInfo
     {
