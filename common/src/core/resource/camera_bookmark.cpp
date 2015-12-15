@@ -2,8 +2,6 @@
 
 #include <QtCore/QMap>
 
-#include <utils/math/defines.h>
-
 #include <utils/common/model_functions.h>
 
 qint64 QnCameraBookmark::endTimeMs() const {
