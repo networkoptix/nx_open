@@ -41,6 +41,7 @@ static const char* IGNORE_VENDORS[][2] =
     {"acti*", "*"},       // ACTi. Current ONVIF implementation quite unstable. Vendor name is not filled by camera!
     {"*", "KCM*"},        // ACTi
     {"*", "DWCA-*"},      // NEW ISD cameras rebrended to DW
+	{"*", "DWEA-*"},      // NEW ISD cameras rebrended to DW
     {"*", "DWCS-*"}       // NEW ISD cameras rebrended to DW
 };
 

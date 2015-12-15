@@ -176,6 +176,8 @@ QList<QnNetworkResourcePtr> QnPlISDResourceSearcher::processPacket(
         int modelPos = responseData.indexOf("DWCA-");
         if (modelPos == -1)
             modelPos = responseData.indexOf("DWCS-");
+		if (modelPos == -1)
+			modelPos = responseData.indexOf("DWEA-");
         if (modelPos == -1)
             return local_result; // not found
         name = extractWord(modelPos, responseData);
