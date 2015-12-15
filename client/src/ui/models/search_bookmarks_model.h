@@ -43,7 +43,7 @@ public:
     /// TODO: #ynikitenkov Refactor to use proxy model
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
 
     QModelIndex parent(const QModelIndex &child) const override;
 

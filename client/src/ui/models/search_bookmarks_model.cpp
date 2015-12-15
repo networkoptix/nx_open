@@ -83,10 +83,10 @@ public:
         , int role);
 
 private:
-    const QString &cameraNameFromId(const QString &id);
+    QString cameraNameFromId(const QString &id);
 
 private:
-    typedef std::map<QString, QString> UniqIdToStringMap;
+    typedef QHash<QString, QString> UniqIdToStringHash;
 
     const ResetOperationFunction m_beginResetModel;
     const ResetOperationFunction m_endResetModel;
@@ -96,7 +96,7 @@ private:
     QnCameraBookmarkList m_bookmarks;
     QnVirtualCameraResourceList m_cameras;
     QnCameraBookmarkSearchFilter m_filter;
-    UniqIdToStringMap m_camerasNames;
+    UniqIdToStringHash m_camerasNames;
 
     int m_sortingColumn;
     Qt::SortOrder m_sortingOrder;
@@ -216,7 +216,7 @@ int QnSearchBookmarksModel::Impl::rowCount(const QModelIndex &parent) const
     return (parent.isValid() ? 0 : m_bookmarks.size());
 }
 
-int QnSearchBookmarksModel::Impl::columnCount(const QModelIndex &parent) const
+int QnSearchBookmarksModel::Impl::columnCount(const QModelIndex & /* parent */) const
 {
     return Column::kColumnsCount;
 }
@@ -251,12 +251,32 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     }
 }
 
-const QString &QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
+QString QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
 {
-    auto it = m_camerasNames.find(id);
-    if (it == m_camerasNames.end())
-        it = m_camerasNames.insert(std::make_pair(id, qnResPool->getResourceByUniqueId(id)->getName())).first;
-    return it->second;
+    const auto it = m_camerasNames.find(id);
+    if (it != m_camerasNames.end())
+        return *it;
+
+    const auto cameraResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(id);
+    if (!cameraResource)
+        return QString();
+
+    connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this
+        , [this, id, cameraResource](const QnResourcePtr & /* resource */)
+    {
+        static const auto kCameraRoleToUpdate = QVector<int>(1, kCamera);
+
+        const auto newName = cameraResource->getName();
+        m_camerasNames[id] = newName;
+
+        const auto topIndex = m_owner->index(0);
+        const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);
+        m_owner->dataChanged(topIndex, bottomIndex, kCameraRoleToUpdate);
+    });
+
+    const auto cameraName = cameraResource->getName();
+    m_camerasNames[id] = cameraName;
+    return cameraName;
 }
 
 ///
