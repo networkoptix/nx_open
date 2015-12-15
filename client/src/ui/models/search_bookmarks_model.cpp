@@ -120,8 +120,8 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_filter()
     , m_camerasNames()
 
-    , m_sortingColumn(kInvalidSortingColumn)
-    , m_sortingOrder(Qt::AscendingOrder)
+    , m_sortingColumn(kStartTime)
+    , m_sortingOrder(Qt::DescendingOrder)
     , m_searchRequestId(QUuid::createUuid())
 {
 }
