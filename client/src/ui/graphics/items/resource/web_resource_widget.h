@@ -12,7 +12,8 @@ public:
     virtual ~QnWebResourceWidget();
 
 protected:
-    virtual Buttons calculateButtonsVisibility() const override;
     virtual QString calculateTitleText() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
+
+    virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
 };
