@@ -116,7 +116,7 @@ void QnRestConnectionProcessor::run()
             }
 
 
-            bool isAdmin = (user->getPermissions() & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission)) > 0;
+            bool isAdmin = user->isAdmin() || ((user->getPermissions() & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission)) > 0);
             if (!isAdmin)
             {
                 sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
