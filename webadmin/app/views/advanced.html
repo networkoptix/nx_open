@@ -1,7 +1,7 @@
 <div class="container">
-    <h1>Advanced settings</h1>
+    <h1>Advanced server settings</h1>
 
-    <div class="alert alert-danger" id="alert-danger-page" role="alert">
+    <div class="alert alert-danger" role="alert">
         <b>Warning!</b> Any changes on this page may cause server failure. Please, use carefully.
     </div>
 
@@ -130,7 +130,9 @@
             </div>
         </div>
 
-        <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+        </div>
     </form>
 
     <h2>Manual update</h2>
@@ -143,4 +145,38 @@
             </div>
         </div>
     </form>
+
+    <h1>Advanced system settings</h1>
+    <div class="alert alert-danger" role="alert">
+        <b>Warning!</b> Any changes on this page may cause system failure. Please, use carefully.
+    </div>
+
+    <form class="form row" role="form" name="systemSettings" novalidate >
+        <div class="form-group" ng-repeat="(setting,value) in systemSettings">
+            <label class="col-sm-4" for="{{setting}}">{{settingsConfig[setting].label}}</label>
+            <div class="col-sm-8">
+                <input ng-if="settingsConfig[setting].type == 'checkbox' " type="checkbox"
+                       style="height: 22px"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"/>
+
+                <input ng-if="settingsConfig[setting].type == 'number' " type="number"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+
+                <input ng-if="settingsConfig[setting].type == 'text'" type="text"
+                       id="{{setting}}"
+                       ng-model="systemSettings[setting]"
+                       class="form-control input-sm"/>
+            </div>
+        </div>
+
+
+        <div class="col-sm-offset-4  col-sm-8">
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+        </div>
+    </form>
+
+
 </div>
