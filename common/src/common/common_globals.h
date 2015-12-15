@@ -3,11 +3,13 @@
 
 #include <cassert>
 
+#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
+#include <cstdint>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
-#include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
 
@@ -336,6 +338,12 @@ public:
         Online,
         Recording,
         NotDefined,
+        /*! Applies only to a server resource. A server is incompatible only when it has system name different
+         * from the current or it has incompatible protocol version.
+         * \note Incompatible server is not the same as fake server which is create in the client by
+         * QnIncompatibleServerWatcher. Fake servers can also have Unauthorized status.
+         * So if you want to check if the server is fake use QnMediaServerResource::isFakeServer().
+         */
         Incompatible
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)

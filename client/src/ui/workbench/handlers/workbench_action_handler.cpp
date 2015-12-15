@@ -119,6 +119,7 @@
 #include <ui/workbench/watchers/workbench_user_layout_count_watcher.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 
 #include <utils/app_server_image_cache.h>
 
@@ -244,7 +245,6 @@ QnWorkbenchActionHandler::QnWorkbenchActionHandler(QObject *parent):
     connect(action(Qn::AdjustVideoAction),                      SIGNAL(triggered()),    this,   SLOT(at_adjustVideoAction_triggered()));
     connect(action(Qn::ExitAction),                             &QAction::triggered,    this,   &QnWorkbenchActionHandler::closeApplication);
     connect(action(Qn::ThumbnailsSearchAction),                 SIGNAL(triggered()),    this,   SLOT(at_thumbnailsSearchAction_triggered()));
-    connect(action(Qn::BookmarksModeAction),                    &QAction::toggled,      this,   &QnWorkbenchActionHandler::at_bookmarksModeAction_triggered);
     connect(action(Qn::SetCurrentLayoutItemSpacing0Action),     SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing0Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing10Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing10Action_triggered()));
     connect(action(Qn::SetCurrentLayoutItemSpacing20Action),    SIGNAL(triggered()),    this,   SLOT(at_setCurrentLayoutItemSpacing20Action_triggered()));
@@ -1143,21 +1143,31 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
 
     const auto parameters = menu()->currentParameters(sender());
+
+    // If time window is specified then set it
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     if (parameters.hasArgument(Qn::BookmarkTagRole))
     {
         const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
 
         const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
-        const bool correctWindow = (timelineWindow.isValid() && !timelineWindow.isNull());
+        const bool correctWindow = timelineWindow.isValid();
 
-        const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
-        const auto start = (correctWindow ? timelineWindow.startTimeMs : nowMs);
-
-        const auto finish = (correctWindow
-            ? timelineWindow.startTimeMs + timelineWindow.durationMs : nowMs);
-
-        m_searchBookmarksDialog->setParameters(filterText, start, finish);
+        if (correctWindow)
+        {
+            const auto endTimeMs = (timelineWindow.isInfinite() ? nowMs : timelineWindow.endTimeMs());
+            m_searchBookmarksDialog->setParameters(timelineWindow.startTimeMs, endTimeMs, filterText);
+            return;
+        }
     }
+
+    // Otherwise set default time window and reset other parameters
+    const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
+    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    const auto start = (firstTimeIsNotKnown ? nowMs : firstBookmarkUtcTimeMs);
+
+    m_searchBookmarksDialog->setParameters(start, nowMs);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
@@ -1390,28 +1400,6 @@ void QnWorkbenchActionHandler::at_thumbnailsSearchAction_triggered() {
 
     resourcePool()->addResource(layout);
     menu()->trigger(Qn::OpenSingleLayoutAction, layout);
-}
-
-void QnWorkbenchActionHandler::at_bookmarksModeAction_triggered() {
-    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
-    const bool checked = bookmarkModeAction->isChecked();
-    const bool enabled = bookmarkModeAction->isEnabled();
-
-    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
-    if (!checked)
-    {
-        const auto currentWidget = navigator()->currentWidget();
-        canSaveBookmarksMode = (!currentWidget
-            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
-    }
-
-    if (enabled && canSaveBookmarksMode)
-        context()->workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
-
-    if (checked)
-        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
-
-    navigator()->setBookmarksModeEnabled(checked);
 }
 
 void QnWorkbenchActionHandler::at_mediaFileSettingsAction_triggered() {
@@ -2353,7 +2341,7 @@ void QnWorkbenchActionHandler::at_versionMismatchMessageAction_triggered() {
             QnWorkbenchVersionMismatchWatcher::versionMismatches(data.version, latestMsVersion, true);
 
         if (updateRequested)
-            component = QString(lit("<font color=\"%1\">%2</font>")).arg(qnGlobals->errorTextColor().name()).arg(component);
+            component = setWarningStyleHtml(component);
 
         messageParts << component;
     }

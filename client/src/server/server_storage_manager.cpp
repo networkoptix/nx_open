@@ -90,8 +90,11 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
         if (const QnClientStorageResourcePtr &storage = resource.dynamicCast<QnClientStorageResource>()) {
             connect(storage, &QnResource::statusChanged, this, checkStoragesStatusInternal);
             //connect(storage, &QnClientStorageResource::freeSpaceChanged,    this, emitStorageChanged); // free space is not used in the client but called quite often
-            connect(storage, &QnClientStorageResource::totalSpaceChanged,   this, emitStorageChanged);
-            connect(storage, &QnClientStorageResource::isWritableChanged,   this, emitStorageChanged);
+            connect(storage, &QnResource::statusChanged,                        this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::totalSpaceChanged,       this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::isWritableChanged,       this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::isUsedForWritingChanged, this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::isBackupChanged,         this, emitStorageChanged);
 
             emit storageAdded(storage);
             checkStoragesStatusInternal(storage);

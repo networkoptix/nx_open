@@ -76,7 +76,9 @@ void QnVistaFocusPtzController::init() {
 
     if(options.contains(lit("PTZ"))) {
         QnResourceData data = qnCommon->dataPool()->data(m_resource);
-        if(data.value<QStringList>(lit("vistaFocusDevices")).contains(config.value<QString>(lit("device_name")), Qt::CaseInsensitive)) {
+        Qn::PtzCapabilities extraCaps = Qn::NoPtzCapabilities;
+        data.value(lit("ptzCapabilities"), &extraCaps);
+        if(extraCaps & Qn::ContinuousFocusCapability) {
             m_capabilities |= Qn::ContinuousFocusCapability;
             m_isMotor = false;
         }

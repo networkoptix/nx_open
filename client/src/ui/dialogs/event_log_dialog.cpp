@@ -27,7 +27,6 @@
 #include <ui/help/help_topics.h>
 #include <ui/dialogs/custom_file_dialog.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/models/business_rule_view_model.h>
 #include <ui/models/event_log_model.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
@@ -269,11 +268,11 @@ void QnEventLogDialog::retranslateUi()
 {
     ui->retranslateUi(this);
 
-    const QString cameraButtonText = (m_filterCameraList.empty() 
+    const QString cameraButtonText = (m_filterCameraList.empty()
         ? QnDeviceDependentStrings::getDefaultNameFromSet(
             tr("<Any Device>"),
             tr("<Any Camera>")
-            )       
+            )
         : lit("<%1>").arg(QnDeviceDependentStrings::getNumericName(m_filterCameraList, false)));
 
     ui->cameraButton->setText(cameraButtonText);
@@ -325,7 +324,7 @@ void QnEventLogDialog::updateHeaderWidth()
             cache << targetText.mid(prevPos, targetText.length() - prevPos);
         }
     }
-    
+
     foreach(const QString& str, cache)
         w = qMax(w, fm.size(0, str).width());
 
@@ -342,28 +341,6 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
     if (m_requests.isEmpty()) {
         requestFinished();
     }
-}
-
-bool QnEventLogDialog::isCameraMatched(QnBusinessRuleViewModel* ruleModel) const
-{
-    if (m_filterCameraList.isEmpty())
-        return true;
-    QnBusiness::EventType eventType = ruleModel->eventType();
-    if (!QnBusiness::requiresCameraResource(eventType))
-        return false;
-    if (ruleModel->eventResources().isEmpty())
-        return true;
-
-    for (int i = 0; i < m_filterCameraList.size(); ++i)
-    {
-        for (int j = 0; j < ruleModel->eventResources().size(); ++j)
-        {
-            if (m_filterCameraList[i]->getId() == ruleModel->eventResources()[j]->getId())
-                return true;
-        }
-    }
-
-    return false;
 }
 
 void QnEventLogDialog::requestFinished()
@@ -567,7 +544,7 @@ void QnEventLogDialog::enableUpdateData()
 
 void QnEventLogDialog::setVisible(bool value)
 {
-    // TODO: #Elric use showEvent instead. 
+    // TODO: #Elric use showEvent instead.
 
     if (value && !isVisible())
         updateData();

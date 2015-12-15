@@ -2471,14 +2471,8 @@ void QnWorkbenchUi::createSliderWidget()
 
     /// TODO: #ynikitenkov move bookmarks-related stuff to new file (BookmarksActionHandler)
     const auto bookmarksViewer = m_sliderItem->timeSlider()->bookmarksViewer();
-    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
-        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
-    {
-        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
-    });
 
-
-    const auto updateBookmarkButtonsAvailability =
+    const auto updateBookmarkActionsAvailability =
         [this, bookmarksViewer]()
     {
         const bool readonly =  qnCommon->isReadOnly()
@@ -2488,15 +2482,27 @@ void QnWorkbenchUi::createSliderWidget()
     };
 
     connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged
-        , this, [updateBookmarkButtonsAvailability]()
+        , this, [updateBookmarkActionsAvailability]()
     {
-        updateBookmarkButtonsAvailability();
+        updateBookmarkActionsAvailability();
     });
 
     connect(qnCommon, &QnCommonModule::readOnlyChanged, this
-        , [updateBookmarkButtonsAvailability](bool /*readonly*/)
+        , [updateBookmarkActionsAvailability](bool /*readonly*/)
     {
-        updateBookmarkButtonsAvailability();
+        updateBookmarkActionsAvailability();
+    });
+
+    connect(context(), &QnWorkbenchContext::userChanged, this
+        , [updateBookmarkActionsAvailability](const QnUserResourcePtr & /*user*/)
+    {
+        updateBookmarkActionsAvailability();
+    });
+
+    connect(bookmarksViewer, &QnBookmarksViewer::editBookmarkClicked, this
+        , [this, getActionParamsFunc](const QnCameraBookmark &bookmark)
+    {
+        menu()->triggerIfPossible(Qn::EditCameraBookmarkAction, getActionParamsFunc(bookmark));
     });
 
     connect(bookmarksViewer, &QnBookmarksViewer::removeBookmarkClicked, this

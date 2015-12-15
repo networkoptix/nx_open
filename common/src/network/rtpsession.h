@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 
 extern "C"
 {

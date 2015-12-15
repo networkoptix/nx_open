@@ -55,6 +55,7 @@ private:
 
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply);
+    void updateCamerasLabel();
 
     void updateColumnWidth();
     int getColWidth(int col);

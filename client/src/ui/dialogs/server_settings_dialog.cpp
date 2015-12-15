@@ -48,7 +48,7 @@ QnServerSettingsDialog::QnServerSettingsDialog(QWidget *parent)
             return;
 
         auto servers = resources.filtered<QnMediaServerResource>([](const QnMediaServerResourcePtr &server){
-            return server->getStatus() != Qn::Incompatible;
+            return !QnMediaServerResource::isFakeServer(server);
         });
 
         if (!servers.isEmpty())

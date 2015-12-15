@@ -206,21 +206,26 @@ void QnCompositeTextOverlay::initTextMode()
         if (actionParams.actionResourceId != cameraId)
             return;
 
-        enum { kDefaultInstantActionTimeoutMs = 5000 };
-
         const auto state = businessAction->getToggleState();
-        const bool isInstantAction = (actionParams.durationMs > 0) || (state == QnBusiness::UndefinedState);
-        const int timeout = (isInstantAction
-            ? (actionParams.durationMs > 0 ? actionParams.durationMs : kDefaultInstantActionTimeoutMs)
-            : QnOverlayTextItemData::kInfinite);
+        // Text Overlay actions with defined duration are for instant events,
+        // otherwise they are for prolonged.
+        const bool isProlongedAction = (actionParams.durationMs <= 0);
 
-        const auto actionId = (isInstantAction ? QnUuid::createUuid() : businessAction->getBusinessRuleId());
+        const bool couldBeInstantEvent = (state == QnBusiness::UndefinedState);
+        if (isProlongedAction && couldBeInstantEvent)
+        {
+            // Do not accept instant events for prolonged actions
+            return;
+        }
 
+        const int timeout = (isProlongedAction ? QnOverlayTextItemData::kInfinite
+            : actionParams.durationMs);
 
-        if (!isInstantAction && (state == QnBusiness::InactiveState))
+        const auto actionId = businessAction->getBusinessRuleId();
+
+        if (isProlongedAction && (state == QnBusiness::InactiveState))
         {
             removeModeData(QnCompositeTextOverlay::kTextOutputMode, actionId);
-
             return;
         }
 
@@ -252,7 +257,7 @@ void QnCompositeTextOverlay::initTextMode()
         }
         else
         {
-            if (text.trimmed().isEmpty()) // Do not add empty text items
+            if (actionParams.text.trimmed().isEmpty()) // Do not add empty text items
                 return;
             static const auto kTextHtml = lit("<html><body>%1</body></html>");
             const auto elided = elideString(actionParams.text, kDescriptionMaxLength);

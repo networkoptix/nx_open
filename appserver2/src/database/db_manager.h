@@ -1,7 +1,7 @@
 #ifndef __DB_MANAGER_H_
 #define __DB_MANAGER_H_
 
-#include <QSqlError>
+#include <QtSql/QSqlError>
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"

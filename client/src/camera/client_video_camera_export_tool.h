@@ -1,24 +1,31 @@
-#ifndef CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H
-#define CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
+
+#include <core/resource/resource_fwd.h>
 
 #include <recording/time_period.h>
 #include <transcoding/filters/filter_helper.h>
 
+#include <utils/common/connective.h>
+
 class QnClientVideoCamera;
 
-class QnClientVideoCameraExportTool : public QObject
+class QnClientVideoCameraExportTool : public Connective<QObject>
 {
     Q_OBJECT
+
+    typedef Connective<QObject> base_type;
 public:
     QnClientVideoCameraExportTool(
-            QnClientVideoCamera *camera,
+            const QnMediaResourcePtr &mediaResource,
             const QnTimePeriod &timePeriod,
             const QString &fileName,
             const QnImageFilterHelper &imageParameters,
             qint64 serverTimeZoneMs,
             QObject *parent = 0);
+    virtual ~QnClientVideoCameraExportTool();
+
 
     /**
      * @brief start                             Start exporting.
@@ -64,12 +71,10 @@ private:
     void finishExport(bool success);
 
 private:
-    QnClientVideoCamera *m_camera;
+    QScopedPointer<QnClientVideoCamera> m_camera;
     QnTimePeriod m_timePeriod;
     QString m_fileName;
     QnImageFilterHelper m_parameters;
     qint64 m_serverTimeZoneMs;
     int m_status;
 };
-
-#endif // CLIENT_VIDEO_CAMERA_EXPORT_TOOL_H

@@ -41,20 +41,20 @@ void QnShowOnAlarmLayoutActionWidget::updateTabOrder(QWidget *before, QWidget *a
     setTabOrder(ui->useSourceCheckBox, after);
 }
 
-void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model || m_updating)
+void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
-        ui->forceOpenCheckBox->setChecked(model->actionParams().forced);
-        ui->useSourceCheckBox->setChecked(model->actionParams().useSource);
+        ui->forceOpenCheckBox->setChecked(model()->actionParams().forced);
+        ui->useSourceCheckBox->setChecked(model()->actionParams().useSource);
         updateUsersButtonText();
     }
 
     if (fields.testFlag(QnBusiness::EventTypeField)) {
-        bool canUseSource = (model->eventType() >= QnBusiness::UserDefinedEvent || requiresCameraResource(model->eventType()));
+        bool canUseSource = (model()->eventType() >= QnBusiness::UserDefinedEvent || requiresCameraResource(model()->eventType()));
         ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 }

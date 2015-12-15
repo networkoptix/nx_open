@@ -53,8 +53,8 @@ void QnCustomBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *after
     setTabOrder(ui->descriptionEdit, after);
 }
 
-void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -65,15 +65,15 @@ void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *
 
     if (fields & QnBusiness::EventParamsField)
     {
-        QString resName = model->eventParams().resourceName;
+        QString resName = model()->eventParams().resourceName;
         if (ui->deviceNameEdit->text() != resName)
             ui->deviceNameEdit->setText(resName);
 
-        QString caption = model->eventParams().caption;
+        QString caption = model()->eventParams().caption;
         if (ui->captionEdit->text() != caption)
             ui->captionEdit->setText(caption);
 
-        QString description = model->eventParams().description;
+        QString description = model()->eventParams().description;
         if (ui->descriptionEdit->text() != description)
             ui->descriptionEdit->setText(description);
     }

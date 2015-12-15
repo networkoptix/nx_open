@@ -414,14 +414,7 @@
                 </os>
             </activation>
             <modules>
-                <module>traytool</module>
-                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
                 <module>client.core</module>
-                <module>nxtool</module>
-                <module>client.bin</module>
-                <module>wixsetup</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -451,6 +444,28 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
+        </profile>
+        <profile>
+            <id>windows-nomobile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>traytool</module>
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>
+                <module>client.core</module>
+                <module>nxtool</module>
+                <module>client.bin</module>
+                <module>wixsetup</module>
+            </modules>
         </profile>
         <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
@@ -484,6 +499,10 @@
                 <file>
                     <missing>customization/${customization}/nxtool.skip</missing>
                 </file>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <module>nxtool</module>
@@ -837,6 +856,7 @@
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
+                <compile.options/>
             </properties>            
             <modules>
                 <module>client.core</module>

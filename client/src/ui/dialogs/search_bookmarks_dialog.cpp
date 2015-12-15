@@ -9,6 +9,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <ui/workbench/workbench.h>
@@ -16,15 +17,18 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_context_aware.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
+#include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
+#include <ui/common/read_only.h>
 #include <ui/models/search_bookmarks_model.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <client/client_settings.h>
-
 #include <utils/common/synctime.h>
+#include <utils/common/scoped_value_rollback.h>
 
 namespace
 {
@@ -89,12 +93,19 @@ public:
         , qint64 utcFinishTimeMs);
 
 private:
+    QnVirtualCameraResourceList availableCameras() const;
+
+    QnVirtualCameraResourcePtr availableCameraByUniqueId(const QString &uniqueId) const;
+
+    void resetToAllAvailableCameras();
+
+    void setCameras(const QnVirtualCameraResourceList &cameras);
+
     void chooseCamera();
 
     void customContextMenuRequested();
 
-    QMenu *createContextMenu(const QnActionParameters &params
-        , const QnTimePeriod &window);
+    QMenu *createContextMenu(const QnActionParameters &params);
 
 private:
     void openInNewLayoutHandler();
@@ -103,6 +114,10 @@ private:
 
     bool fillActionParameters(QnActionParameters &params, QnTimePeriod &window);
 
+    bool currentUserHasAdminPrivileges();
+
+    void applyModelChanges();
+
 private:
     typedef QScopedPointer<Ui::BookmarksLog> UiImpl;
 
@@ -110,10 +125,11 @@ private:
     const UiImpl m_ui;
     QnSearchBookmarksModel * const m_model;
 
-    QnVirtualCameraResourceList m_cameras;
+    bool m_allCamerasChoosen;
 
     QAction * const m_openInNewTabAction;
     QAction * const m_exportBookmarkAction;
+    bool m_updatingNow;
 };
 
 ///
@@ -126,10 +142,11 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     , m_ui(new Ui::BookmarksLog())
     , m_model(new QnSearchBookmarksModel(this))
 
-    , m_cameras()
+    , m_allCamerasChoosen(true)
 
     , m_openInNewTabAction(new QAction(tr("Open in New Tab"), this))
     , m_exportBookmarkAction(new QAction(tr("Export bookmark..."), this))
+    , m_updatingNow(false)
 {
     m_ui->setupUi(m_owner);
     m_ui->gridBookmarks->setModel(m_model);
@@ -138,26 +155,26 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         , [this]()
     {
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
-        m_model->applyFilter();
+        applyModelChanges();
     });
     connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]()
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
         m_model->setFilterText(QString());
-        m_model->applyFilter();
+        applyModelChanges();
     });
 
     connect(m_ui->dateEditFrom, &QDateEdit::userDateChanged, this, [this](const QDate &date)
     {
         m_model->setRange(getTimeOnServerMs(context(), date)
             , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
-        m_model->applyFilter();
+        applyModelChanges();
     });
     connect(m_ui->dateEditTo, &QDateEdit::userDateChanged, this, [this](const QDate &date)
     {
         m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
             , getTimeOnServerMs(context(), date, kMillisecondsInDay));
-        m_model->applyFilter();
+        applyModelChanges();
     });
 
     connect(m_ui->refreshButton, &QPushButton::clicked, this, &Impl::refresh);
@@ -167,7 +184,7 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         , this, &Impl::customContextMenuRequested);
 
     connect(m_ui->gridBookmarks, &QTableView::doubleClicked, this
-        , [this](const QModelIndex &index)
+        , [this](const QModelIndex & /* index */)
     {
         openInNewLayoutHandler();
     });
@@ -178,25 +195,49 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     static const QString kEmptyFilter;
     const auto now = qnSyncTime->currentMSecsSinceEpoch();
     setParameters(kEmptyFilter, getStartOfTheDayMs(now), getEndOfTheDayMs(now));
+
+    const auto camerasWatcher = context()->instance<QnCurrentUserAvailableCamerasWatcher>();
+    connect(camerasWatcher, &QnCurrentUserAvailableCamerasWatcher::userChanged, this, [this]()
+    {
+        resetToAllAvailableCameras();
+        applyModelChanges();
+    });
+
+    connect(camerasWatcher, &QnCurrentUserAvailableCamerasWatcher::availableCamerasChanged, this, [this]()
+    {
+        if (m_allCamerasChoosen)
+            resetToAllAvailableCameras();
+    });
 }
 
 QnSearchBookmarksDialog::Impl::~Impl()
 {
 }
 
+void QnSearchBookmarksDialog::Impl::applyModelChanges()
+{
+    if (!m_updatingNow)
+        m_model->applyFilter();
+}
+
 void QnSearchBookmarksDialog::Impl::setParameters(const QString &filterText
     , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs)
 {
-    m_ui->filterLineEdit->lineEdit()->setText(filterText);
+    {
+        QN_SCOPED_VALUE_ROLLBACK(&m_updatingNow, true);
 
-    m_ui->dateEditFrom->setDate(extractDisplayDate(context(), utcStartTimeMs));
-    m_ui->dateEditTo->setDate(extractDisplayDate(context(), utcFinishTimeMs));
+        resetToAllAvailableCameras();
 
-    m_model->setFilterText(filterText);
-    m_model->setRange(utcStartTimeMs, utcFinishTimeMs);
+        m_ui->filterLineEdit->lineEdit()->setText(filterText);
+        m_ui->dateEditFrom->setDate(extractDisplayDate(context(), utcStartTimeMs));
+        m_ui->dateEditTo->setDate(extractDisplayDate(context(), utcFinishTimeMs));
 
-    m_model->applyFilter();
+        m_model->setFilterText(filterText);
+        m_model->setRange(utcStartTimeMs, utcFinishTimeMs);
+    }
+
+    applyModelChanges();
 }
 
 bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &params, QnTimePeriod &window)
@@ -210,7 +251,7 @@ bool QnSearchBookmarksDialog::Impl::fillActionParameters(QnActionParameters &par
         return false;
 
     const auto &bookmark = bookmarkVariant.value<QnCameraBookmark>();
-    const QnResourcePtr resource = qnResPool->getResourceByUniqueId(bookmark.cameraId);
+    const QnResourcePtr resource = availableCameraByUniqueId(bookmark.cameraId);
 
     if (!resource)
         return false;
@@ -293,32 +334,95 @@ void QnSearchBookmarksDialog::Impl::refresh()
     m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
     m_model->setRange(getTimeOnServerMs(context(), m_ui->dateEditFrom->date())
         , getTimeOnServerMs(context(), m_ui->dateEditTo->date(), kMillisecondsInDay));
-    m_model->setCameras(m_cameras);
 
     m_model->applyFilter();
 }
 
+
+QnVirtualCameraResourceList QnSearchBookmarksDialog::Impl::availableCameras() const
+{
+    const auto camerasWatcher = context()->instance<QnCurrentUserAvailableCamerasWatcher>();
+    return camerasWatcher->availableCameras();
+}
+
+QnVirtualCameraResourcePtr QnSearchBookmarksDialog::Impl::availableCameraByUniqueId(const QString &uniqueId) const
+{
+    const auto cameras = availableCameras();
+
+    const auto it = std::find_if(cameras.begin(), cameras.end()
+        , [this, uniqueId](const QnVirtualCameraResourcePtr &camera)
+    {
+        return (camera->getUniqueId() == uniqueId);
+    });
+
+    return (it == cameras.end() ? QnVirtualCameraResourcePtr() : *it);
+}
+
+void QnSearchBookmarksDialog::Impl::resetToAllAvailableCameras()
+{
+    setCameras(QnVirtualCameraResourceList());
+}
+
+void QnSearchBookmarksDialog::Impl::setCameras(const QnVirtualCameraResourceList &cameras)
+{
+    m_allCamerasChoosen = cameras.empty();
+    const auto &correctCameras = (m_allCamerasChoosen
+        ? availableCameras() : cameras);
+
+    m_model->setCameras(correctCameras);
+
+    const bool isAdmin = currentUserHasAdminPrivileges();
+    setReadOnly(m_ui->cameraButton, !isAdmin);
+
+    if (cameras.empty())
+    {
+        static const auto kAnyDevicesStringsSet = QnCameraDeviceStringSet(
+            tr("<Any Device>"), tr("<Any Camera>"), tr("<Any IO Module>"));
+        static const auto kAnyMyDevicesStringsSet = QnCameraDeviceStringSet(
+            tr("<All My Devices>"), tr("<All My Cameras>"), tr("<All My IO Modules>"));
+
+        const auto &devicesStringsSet = (isAdmin
+            ? kAnyDevicesStringsSet : kAnyMyDevicesStringsSet);
+
+        m_ui->cameraButton->setText(QnDeviceDependentStrings::getNameFromSet(
+            devicesStringsSet, correctCameras));
+        return;
+    }
+
+    const auto devicesStringSet = QnCameraDeviceStringSet(
+        tr("<%n device(s)>", nullptr, cameras.size())
+        , tr("<%n camera(s)>", nullptr, cameras.size())
+        , tr("<%n IO module(s)>", nullptr, cameras.size()));
+
+    const auto caption = QnDeviceDependentStrings::getNameFromSet(
+        devicesStringSet, cameras);
+
+    m_ui->cameraButton->setText(caption);
+}
+
 void QnSearchBookmarksDialog::Impl::chooseCamera()
 {
+    /// Do not allow user without administrator privileges to choose cameras
+    if (!currentUserHasAdminPrivileges())
+        return;
+
     QnResourceSelectionDialog dialog(m_owner);
-    dialog.setSelectedResources(m_cameras);
+    dialog.setSelectedResources(m_allCamerasChoosen
+        ? QnVirtualCameraResourceList() : m_model->cameras());
 
     if (dialog.exec() == QDialog::Accepted)
     {
-        m_cameras = dialog.selectedResources().filtered<QnVirtualCameraResource>();
-        m_model->setCameras(m_cameras);
+        setCameras(dialog.selectedResources().filtered<QnVirtualCameraResource>());
         m_model->applyFilter();
-
-        static const QString kEmptyCamerasCaption = tr("<Any camera>");
-        static const QString kCamerasTemplate = tr("camera(s)");
-        static const QString kCamerasCaptionTemplate = lit("<%1 %2>");
-        m_ui->cameraButton->setText(m_cameras.empty() ? kEmptyCamerasCaption :
-            kCamerasCaptionTemplate.arg(QString::number(m_cameras.size()), kCamerasTemplate));
     }
 }
 
-QMenu *QnSearchBookmarksDialog::Impl::createContextMenu(const QnActionParameters &params
-    , const QnTimePeriod &window)
+bool QnSearchBookmarksDialog::Impl::currentUserHasAdminPrivileges()
+{
+    return accessController()->hasGlobalPermissions(Qn::GlobalAdminPermissions);
+}
+
+QMenu *QnSearchBookmarksDialog::Impl::createContextMenu(const QnActionParameters &params)
 {
     auto result = new QMenu();
 
@@ -340,7 +444,7 @@ void QnSearchBookmarksDialog::Impl::customContextMenuRequested()
     if (!fillActionParameters(params, window))
         return;
 
-    if (auto newMenu = createContextMenu(params, window))
+    if (auto newMenu = createContextMenu(params))
     {
         newMenu->exec(QCursor::pos());
         newMenu->deleteLater();
@@ -359,9 +463,9 @@ QnSearchBookmarksDialog::~QnSearchBookmarksDialog()
 {
 }
 
-void QnSearchBookmarksDialog::setParameters(const QString &filterText
-    , qint64 utcStartTimeMs
-    , qint64 utcFinishTimeMs)
+void QnSearchBookmarksDialog::setParameters(qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs
+    , const QString &filterText)
 {
     m_impl->setParameters(filterText, getStartOfTheDayMs(utcStartTimeMs)
         , getEndOfTheDayMs(utcFinishTimeMs));

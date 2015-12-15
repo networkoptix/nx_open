@@ -62,6 +62,8 @@
 #include <ui/workbench/watchers/workbench_resources_changes_watcher.h>
 #include <ui/workbench/watchers/workbench_server_safemode_watcher.h>
 #include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
+#include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
+#include <ui/workbench/watchers/current_user_available_cameras_watcher.h>
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
@@ -107,8 +109,8 @@ namespace {
         button->setProperty(Qn::ToolButtonCheckedRotationSpeed, action->property(Qn::ToolButtonCheckedRotationSpeed));
 
         if(popup) {
-            /* We want the button to activate the corresponding action so that menu is updated. 
-             * However, menu buttons do not activate their corresponding actions as they do not receive release events. 
+            /* We want the button to activate the corresponding action so that menu is updated.
+             * However, menu buttons do not activate their corresponding actions as they do not receive release events.
              * We work this around by making some hacky connections. */
             button->setPopupMode(QToolButton::InstantPopup);
 
@@ -153,7 +155,7 @@ extern "C" {
 }
 #endif
 
-QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags): 
+QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowFlags flags):
     base_type(parent, flags | Qt::Window | Qt::CustomizeWindowHint
 #ifdef Q_OS_MACX
     | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowMinMaxButtonsHint
@@ -265,7 +267,9 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
+    context->instance<QnWorkbenchBookmarksWatcher>();
     context->instance<QnWorkbenchServerPortWatcher>();
+    context->instance<QnCurrentUserAvailableCamerasWatcher>();
 
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
@@ -398,7 +402,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 #endif
 
     /* VSync workaround must always be enabled to limit fps usage in following cases:
-     * * VSync is not supported by drivers 
+     * * VSync is not supported by drivers
      * * VSync is disabled in drivers
      * * double buffering is disabled in drivers or in our program
      */
@@ -466,7 +470,7 @@ void QnMainWindow::setFullScreen(bool fullScreen) {
 
     /*
      * Animated minimize/maximize process starts event loop,
-     * so we can spoil m_storedGeometry value if enter 
+     * so we can spoil m_storedGeometry value if enter
      * this method while already in animation progress.
      */
     if (m_inFullscreenTransition)
@@ -557,7 +561,7 @@ void QnMainWindow::toggleTitleVisibility() {
 
 bool QnMainWindow::handleMessage(const QString &message) {
     const QStringList files = message.split(QLatin1Char('\n'), QString::SkipEmptyParts);
-    
+
     QnResourceList resources = QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(files));
     if (resources.isEmpty())
         return false;
@@ -701,7 +705,7 @@ bool QnMainWindow::event(QEvent *event) {
     if(event->type() == QnEvent::WinSystemMenu) {
         if(m_mainMenuButton->isVisible())
             m_mainMenuButton->click();
-            
+
         QApplication::sendEvent(m_ui.data(), event);
         result = true;
     }

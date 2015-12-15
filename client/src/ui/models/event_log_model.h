@@ -69,6 +69,7 @@ private:
     static QString motionUrl(Column column, const QnBusinessActionData& action);
     static QString formatUrl(const QString& url);
     static QnResourcePtr getResourceById(const QnUuid& id);
+    static QString getUserNameById(const QnUuid &id);
     static QString getResourceNameString(const QnUuid &id);
     static QString getUserGroupString(QnBusiness::UserGroup value);
 

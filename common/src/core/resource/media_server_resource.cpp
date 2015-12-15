@@ -160,8 +160,8 @@ void QnMediaServerResource::setApiUrl(const QString &apiUrl)
             return;
 
         m_apiUrl = apiUrl;
-        if (m_restConnection)
-            m_restConnection->setUrl(m_apiUrl);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_apiUrl);
     }
     emit apiUrlChanged(::toSharedPointer(this));
 }
@@ -227,20 +227,20 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 
     /* We want the video server connection to be deleted in its associated thread, 
      * no matter where the reference count reached zero. Hence the custom deleter. */
-    if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+    if (!m_apiConnection && !m_apiUrl.isEmpty())
+        m_apiConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
 
-    return m_restConnection;
+    return m_apiConnection;
 }
 
-rest::QnConnectionPtr QnMediaServerResource::serverRestConnection()
+rest::QnConnectionPtr QnMediaServerResource::restConnection()
 {
     QnMutexLocker lock( &m_mutex );
 
-    if (!m_serverRestConnection)
-        m_serverRestConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
+    if (!m_restConnection)
+        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
     
-    return m_serverRestConnection;
+    return m_restConnection;
 }
 
 QnResourcePtr QnMediaServerResourceFactory::createResource(const QnUuid& resourceTypeId, const QnResourceParams& /*params*/)
@@ -354,8 +354,8 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
     if (netAddrListChanged || currentPortChanged ) 
     {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
-        if (m_restConnection)
-            m_restConnection->setUrl(m_apiUrl);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_apiUrl);
         if (currentPortChanged )
             modifiedFields << "portChanged";
     } else {
@@ -544,7 +544,9 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
-            Q_ASSERT_X(newStatus == Qn::Incompatible || m_originalGuid.isNull(), Q_FUNC_INFO, "Incompatible servers should not take any status but incompatible");
+            Q_ASSERT_X(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
+                       Q_FUNC_INFO,
+                       "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
         QnResource::setStatus(newStatus, silenceMode);
