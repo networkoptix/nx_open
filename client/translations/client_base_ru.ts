@@ -2,6 +2,29 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ru" sourcelanguage="en">
 <context>
+    <name>BackupCamerasDialogDelegate</name>
+    <message>
+        <source>Backup newly added devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup newly added cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BookmarkToolTipFrame</name>
     <message>
         <source>Zoom timeline
@@ -142,7 +165,23 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>camera(s)</source>
+        <source>&lt;Any device&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any IO module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n IO module(s)&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1766,11 +1805,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Nothing</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Low</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
@@ -1783,29 +1817,6 @@ to view more bookmarks</source>
     <message>
         <source>High + Low</source>
         <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnBackupCamerasDialogDelegate</name>
-    <message>
-        <source>What to backup:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select devices to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select cameras to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new devices:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2026,10 +2037,12 @@ to view more bookmarks</source>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>на</translation>
     </message>
     <message>
         <source>to</source>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>кому</translation>
     </message>
     <message>
@@ -2047,6 +2060,14 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">Выберите хотя бы одну камеру</translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished">Устройства</translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished">Камеры</translation>
     </message>
 </context>
 <context>
@@ -3156,12 +3177,33 @@ to view more bookmarks</source>
         <translation>Только администраторам</translation>
     </message>
     <message>
-        <source>%1 times</source>
-        <translation>%1 раз</translation>
-    </message>
-    <message>
         <source>All Users</source>
         <translation>Всем пользователям</translation>
+    </message>
+    <message>
+        <source>&lt;User removed&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is description of event. Will be replaced in runtime</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3511,6 +3553,10 @@ to view more bookmarks</source>
     <message>
         <source>Could not export IO module %1.</source>
         <translation>Невозможно экспортировать модуль IO %1.</translation>
+    </message>
+    <message>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4894,6 +4940,10 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Camera</source>
         <translation>Камера</translation>
     </message>
+    <message>
+        <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnRecordingStatusHelper</name>
@@ -5439,6 +5489,14 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
         <translation>Невозможно начать обновление. Сброс к предыдущемы релизу запрещён.</translation>
     </message>
+    <message numerus="yes">
+        <source>Authentication failed for %n servers:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
@@ -5675,18 +5733,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnStorageConfigWidget</name>
     <message>
-        <source>By schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In realtime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On demand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Devices to Backup...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5719,19 +5765,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In Realtime mode all data is backed up on continuously</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Previous footage will not be backed up!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one camera with archive to backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5762,6 +5800,46 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Archive backup is completed.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>By Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Realtime</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup Schedule is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Realtime mode all data is backed up on continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of %1 are selected</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>No any devices selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No any cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
@@ -5789,12 +5867,30 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Use as main storage</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 (Checking...)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Scanning... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Rebuilding... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">Идет восстановление архива для хранилища &apos;%1&apos;</translation>
+        <source>Fast Archive Scan - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding Archive Index - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6751,10 +6847,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>Закладка</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>Вы уверены, что хотите удалить закладку %1?</translation>
-    </message>
-    <message>
         <source>Bookmarks can only be added to an online server.</source>
         <translation>Закладка может быть добавлена только на сервер, находящийся в сети.</translation>
     </message>
@@ -6765,6 +6857,18 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Confirm Deletion</source>
         <translation>Потвердите удаление</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this bookmark?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7012,7 +7116,7 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video to the &apos;.nov&apos; format. Do you want to continue?</source>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7352,6 +7456,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">Ошибка</translation>
+    </message>
+    <message>
+        <source>Error while taking screenshot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

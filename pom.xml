@@ -499,6 +499,10 @@
                 <file>
                     <missing>customization/${customization}/nxtool.skip</missing>
                 </file>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <module>nxtool</module>
