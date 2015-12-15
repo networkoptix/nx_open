@@ -45,10 +45,10 @@ namespace {
 }
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
-    m_monitor(qnPlatform->monitor()) 
+    m_monitor(qnPlatform->monitor())
 {}
 
-int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     QnStorageSpaceReply reply;
 
@@ -69,19 +69,19 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 #endif
 
     /* Enumerate normal storages. */
-    for (const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages().filtered(filterDeprecated)) {      
+    for (const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages().filtered(filterDeprecated)) {
         QnStorageSpaceData data(storage);
-        if (!enoughSpace(data.totalSpace)) 
+        if (!enoughSpace(data.totalSpace))
             data.isWritable = false;
-        reply.storages.push_back(data); 
+        reply.storages.push_back(data);
     }
 
     /* Enumerate backup storages. */
-    for (const QnStorageResourcePtr &storage: qnBackupStorageMan->getStorages().filtered(filterDeprecated)) {      
+    for (const QnStorageResourcePtr &storage: qnBackupStorageMan->getStorages().filtered(filterDeprecated)) {
         QnStorageSpaceData data(storage);
-            if (!enoughSpace(data.totalSpace)) 
+            if (!enoughSpace(data.totalSpace))
                 data.isWritable = false;
-        reply.storages.push_back(data); 
+        reply.storages.push_back(data);
     }
 
 
@@ -122,7 +122,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->isWritable();
-        } 
+        }
 
         reply.storages.push_back(data);
     }
@@ -144,10 +144,10 @@ QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const {
 
 QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const {
     QList<QString> storagePaths;
-    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>()) 
+    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
 
-    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>()) 
+    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
         storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
 
     return storagePaths;

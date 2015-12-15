@@ -385,11 +385,11 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             break;
         case QnUpdateResult::UploadingFailed: {
             QString message = tr("Could not push updates to servers.");
-            if (!result.failedPeers.isEmpty()) {
+            if (!result.failedServers.isEmpty()) {
                 message += lit("\n");
-                message += tr("The problem is caused by %n servers:", "", result.failedPeers.size());
+                message += tr("The problem is caused by %n servers:", "", result.failedServers.size());
                 message += lit("\n");
-                message += serverNamesString(result.failedPeers);
+                message += serverNamesString(result.failedServers);
             }
             QMessageBox::critical(this, tr("Update unsuccessful."), message);
             break;
@@ -398,33 +398,33 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("No free space left on %n servers:", "", result.failedPeers.size()) +
+                                  tr("No free space left on %n servers:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::UploadingFailed_Timeout:
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("%n servers are not responding:", "", result.failedPeers.size()) +
+                                  tr("%n servers are not responding:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::UploadingFailed_Offline:
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("%n servers have gone offline:", "", result.failedPeers.size()) +
+                                  tr("%n servers have gone offline:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::UploadingFailed_AuthenticationFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."),
                                   tr("Could not push updates to servers.") +
                                   lit("\n") +
-                                  tr("Authentication failed for %n servers:", "", result.failedPeers.size()) +
+                                  tr("Authentication failed for %n servers:", "", result.failedServers.size()) +
                                   lit("\n") +
-                                  serverNamesString(result.failedPeers));
+                                  serverNamesString(result.failedServers));
             break;
         case QnUpdateResult::ClientInstallationFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not install an update to the client."));
@@ -704,14 +704,10 @@ void QnServerUpdatesWidget::at_tool_stageProgressChanged(QnFullUpdateStage stage
     ui->updateProgessBar->setFormat(status.arg(value));
 }
 
-QString QnServerUpdatesWidget::serverNamesString(const QSet<QnUuid> &serverIds) {
+QString QnServerUpdatesWidget::serverNamesString(const QnMediaServerResourceList &servers) {
     QString result;
 
-    for (const QnUuid &id: serverIds) {
-        QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
-        if (!server)
-            continue;
-
+    for (const QnMediaServerResourcePtr &server: servers) {
         if (!result.isEmpty())
             result += lit("\n");
 

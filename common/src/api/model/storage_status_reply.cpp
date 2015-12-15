@@ -2,7 +2,7 @@
 
 #include <core/resource/storage_resource.h>
 
-QnStorageSpaceData::QnStorageSpaceData() 
+QnStorageSpaceData::QnStorageSpaceData()
     : url()
     , storageId()
     , totalSpace(QnStorageResource::UnknownSize)
@@ -12,6 +12,7 @@ QnStorageSpaceData::QnStorageSpaceData()
     , isWritable(false)
     , isUsedForWriting(false)
     , isBackup(false)
+    , isOnline(false)
     , storageType()
 {}
 
@@ -25,6 +26,7 @@ QnStorageSpaceData::QnStorageSpaceData( const QnStorageResourcePtr &storage )
     , isWritable(storage->isWritable())
     , isUsedForWriting(storage->isUsedForWriting())
     , isBackup(storage->isBackup())
+    , isOnline(storage->getStatus() == Qn::Online)
     , storageType(storage->getStorageType())
 {}
 

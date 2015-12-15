@@ -176,6 +176,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
         if (!server)
             return;
         server->setModuleInformation(moduleInformation);
+        server->setStatus((compatible && !authorized) ? Qn::Unauthorized : Qn::Incompatible);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")
             .arg(moduleInformation.id.toString())

@@ -7,16 +7,16 @@
     <x>0</x>
     <y>0</y>
     <width>769</width>
-    <height>561</height>
+    <height>570</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="2,2,1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,1,0,0">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
-      <string>Main Storages</string>
+      <string>Main Storage</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -46,11 +46,11 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1">
         <item>
          <widget class="QPushButton" name="addExtStorageToMainBtn">
           <property name="text">
-           <string>Add External Storage</string>
+           <string>Add External Storage...</string>
           </property>
          </widget>
         </item>
@@ -74,10 +74,10 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -85,9 +85,9 @@
    <item>
     <widget class="QGroupBox" name="backupStoragesGroupBox">
      <property name="title">
-      <string>Backup Storages</string>
+      <string>Backup Storage</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
       <item>
        <widget class="QnTableView" name="backupStoragesTable">
         <property name="autoFillBackground">
@@ -123,11 +123,11 @@
        </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="0,0,0,1">
         <item>
          <widget class="QPushButton" name="addExtStorageToBackupBtn">
           <property name="text">
-           <string>Add External Storage</string>
+           <string>Add External Storage...</string>
           </property>
          </widget>
         </item>
@@ -151,10 +151,10 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QnStorageRebuildWidget" name="rebuildBackupWidget" native="true"/>
+        </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QnStorageRebuildWidget" name="rebuildBackupWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -247,6 +247,13 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="camerasLabel">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="backupHSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -262,7 +269,7 @@
         <item>
          <widget class="QLabel" name="whenToBackupLabel">
           <property name="text">
-           <string>Perform backup</string>
+           <string>Perform Backup</string>
           </property>
          </widget>
         </item>
@@ -291,7 +298,7 @@
    <item>
     <widget class="QLabel" name="backupOptionLabel">
      <property name="text">
-      <string>Storage backup is available if there are 2 or more storages in the system.</string>
+      <string>Storage backup is available if there are 2 or more valid storages in the system.</string>
      </property>
     </widget>
    </item>

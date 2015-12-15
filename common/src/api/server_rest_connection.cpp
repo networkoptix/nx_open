@@ -3,6 +3,7 @@
 
 #include <api/app_server_connection.h>
 #include <api/helpers/chunks_request_data.h>
+#include <api/helpers/thumbnail_request_data.h>
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
@@ -42,9 +43,14 @@ ServerConnection::~ServerConnection()
         value->terminate();
 }
 
-Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
+rest::Handle ServerConnection::cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread)
 {
     return executeGet(lit("/ec2/cameraHistory"), request.toParams(), callback, targetThread);
+}
+
+rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread /*= 0*/ )
+{
+    return executeGet(lit("/ec2/cameraThumbnail"), request.toParams(), callback, targetThread);
 }
 
 // --------------------------- private implementation -------------------------------------
@@ -85,11 +91,11 @@ Handle ServerConnection::executeGet(const QString& path, const QnRequestParamLis
 }
 
 template <typename ResultType>
-Handle ServerConnection::executePost(const QString& path, 
+Handle ServerConnection::executePost(const QString& path,
                                            const QnRequestParamList& params,
-                                           const nx_http::StringType& contentType, 
-                                           const nx_http::StringType& messageBody, 
-                                           REST_CALLBACK(ResultType) callback, 
+                                           const nx_http::StringType& contentType,
+                                           const nx_http::StringType& messageBody,
+                                           REST_CALLBACK(ResultType) callback,
                                            QThread* targetThread)
 {
     Request request = prepareRequest(HttpMethod::Post, prepareUrl(path, params), contentType, messageBody);
@@ -117,6 +123,15 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
             result = parseMessageBody<ResultType>(format, msgBody, &success);
         }
         invoke(callback, targetThread, success, id, result);
+    });
+}
+
+Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
+{
+    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    {
+        bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+        invoke(callback, targetThread, success, id, msgBody);
     });
 }
 
@@ -149,7 +164,7 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     QnMediaServerResourcePtr server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return Request();
-    
+
     Request request;
     request.method = method;
     request.url = server->getApiUrl();
@@ -189,7 +204,7 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     QString user = QnAppServerConnectionFactory::url().userName();
     QString password = QnAppServerConnectionFactory::url().password();
     if (user.isEmpty() || password.isEmpty()) {
-        if (QnUserResourcePtr admin = qnResPool->getAdministrator()) 
+        if (QnUserResourcePtr admin = qnResPool->getAdministrator())
         {
             // if auth is not known, use admin hash
             user = admin->getName();
@@ -201,7 +216,7 @@ ServerConnection::Request ServerConnection::prepareRequest(HttpMethod method, co
     request.url.setPassword(password);
     return request;
 }
-    
+
 Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc callback)
 {
     static std::atomic<Handle> requestNum;
@@ -212,7 +227,7 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
     httpClientCaptured->setSendTimeoutMs( TcpConnectTimeoutMs );
     httpClientCaptured->addRequestHeaders(request.headers);
     httpClientCaptured->setAuthType(request.authType);
-    
+
     auto requestCompletionFunc = [requestId, callback, this, httpClientCaptured]
     ( nx_http::AsyncHttpClientPtr httpClient ) mutable
     {
@@ -228,7 +243,7 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
         nx_http::StatusCode::Value statusCode = nx_http::StatusCode::ok;
         nx_http::StringType contentType;
         nx_http::BufferType messageBody;
-        
+
         if( httpClient->failed() ) {
             systemError = SystemError::connectionReset;
         }
@@ -237,11 +252,13 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
             contentType = httpClient->contentType();
             messageBody = httpClient->fetchMessageBodyBuffer();
         }
-        m_runningRequests.erase(itr); // free last reference to the object
+        lock.unlock();
         if (callback)
             callback(requestId, systemError, statusCode, contentType, messageBody);
+        lock.relock();
+        m_runningRequests.remove(requestId); // free last reference to the object
     };
-    
+
     connect(httpClientCaptured.get(), &nx_http::AsyncHttpClient::done, this, requestCompletionFunc, Qt::DirectConnection);
 
     QnMutexLocker lock(&m_mutex);
@@ -262,5 +279,6 @@ Handle ServerConnection::sendRequest(const Request& request, HttpCompletionFunc 
         return Handle();
     }
 }
+
 
 } // namespace rest

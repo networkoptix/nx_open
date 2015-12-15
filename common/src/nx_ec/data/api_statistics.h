@@ -10,6 +10,7 @@
 #include "api_client_info_data.h"
 #include "api_license_data.h"
 #include "api_business_rule_data.h"
+#include "api_layout_data.h"
 
 // NOTE: structs with suffix 'Statistics' are only used to tell fusion which
 //       fields should be serialized for statistics (to cut out private data
@@ -91,8 +92,9 @@ namespace ec2 {
         ApiClientInfoDataList               clients;
         ApiLicenseStatisticsList            licenses;
         ApiMediaServerDataStatisticsList    mediaservers;
+        ApiLayoutDataList                   layouts;
     };
-#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)
+#define ApiSystemStatistics_Fields (systemId)(mediaservers)(cameras)(clients)(licenses)(businessRules)(layouts)
 
     struct ApiStatisticsServerInfo
     {

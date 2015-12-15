@@ -285,7 +285,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         return m_rootNodes[Qn::ServersNode];
 
     if (node->resourceFlags() & Qn::server) {
-        if (node->resourceStatus() == Qn::Incompatible) {
+        if (QnMediaServerResource::isFakeServer(node->resource())) {
             if (m_scope == CamerasScope)
                 return m_rootNodes[Qn::BastardNode];
 
@@ -574,7 +574,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
 
 
     } else if(QnMediaServerResourcePtr server = node->resource().dynamicCast<QnMediaServerResource>()) {
-        if(server->getStatus() == Qn::Incompatible)
+        if (QnMediaServerResource::isFakeServer(server))
             return true;
 
         if(mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) == QByteArray("1")) {
@@ -644,7 +644,7 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     if (server) {
         connect(server,     &QnMediaServerResource::redundancyChanged,  this,   &QnResourcePoolModel::at_server_redundancyChanged);
 
-        if (server->getStatus() == Qn::Incompatible)
+        if (QnMediaServerResource::isFakeServer(server))
             connect(server, &QnMediaServerResource::systemNameChanged,  this,   &QnResourcePoolModel::at_server_systemNameChanged);
     }
 

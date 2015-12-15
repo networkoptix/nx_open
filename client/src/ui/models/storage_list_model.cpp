@@ -7,19 +7,28 @@
 namespace {
     const qreal BYTES_IN_GB = 1000000000.0;
 
-    int storageIndex(const QnStorageModelInfoList &list, const QnStorageModelInfo& storage) {
+    int storageIndex(const QnStorageModelInfoList &list, const QnStorageModelInfo& storage)
+    {
         auto byId = [storage](const QnStorageModelInfo &info)  { return storage.id == info.id;  };
         return qnIndexOf(list, byId);
     }
 
+    int storageIndex(const QnStorageModelInfoList &list, const QString &path)
+    {
+        auto byPath = [path](const QnStorageModelInfo &info)  { return path == info.url;  };
+        return qnIndexOf(list, byPath);
+    }
 }
 
 // ------------------ QnStorageListMode --------------------------
 
 QnStorageListModel::QnStorageListModel(QObject *parent)
     : base_type(parent)
+    , m_storages()
+    , m_rebuildStatus()
     , m_readOnly(false)
     , m_linkBrush(QPalette().link())
+    , m_linkFont()
 {
     m_linkFont.setUnderline(true);
 }
@@ -66,6 +75,22 @@ void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {
     m_storages.removeAt(idx);
     endResetModel();
 }
+
+void QnStorageListModel::updateRebuildInfo( QnServerStoragesPool pool, const QnStorageScanData &rebuildStatus )
+{
+    QnStorageScanData old = m_rebuildStatus[static_cast<int>(pool)];
+    int oldRow = storageIndex(m_storages, old.path);
+
+    m_rebuildStatus[static_cast<int>(pool)] = rebuildStatus;
+    int newRow = storageIndex(m_storages, rebuildStatus.path);
+
+    if (oldRow >= 0)
+        emit dataChanged(index(oldRow, 0), index(oldRow, ColumnCount - 1));
+
+    if (newRow >= 0 && newRow != oldRow)
+        emit dataChanged(index(newRow, 0), index(newRow, ColumnCount - 1));
+}
+
 
 void QnStorageListModel::sortStorages() {
     qSort(m_storages.begin(), m_storages.end(), [](const QnStorageModelInfo &left, const QnStorageModelInfo &right) {
@@ -123,7 +148,30 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case CheckBoxColumn:
         return QString();
     case UrlColumn:
-        return urlPath(storageData.url);
+        {
+            QString path = urlPath(storageData.url);
+            if (!storageData.isOnline && storageData.isWritable)
+                return tr("%1 (Checking...)").arg(path);
+
+            for (const auto &rebuildStatus: m_rebuildStatus)
+            {
+                if (rebuildStatus.path != storageData.url)
+                    continue;
+
+                int progress = static_cast<int>(rebuildStatus.progress * 100 + 0.5);
+                switch (rebuildStatus.state)
+                {
+                case Qn::RebuildState_PartialScan:
+                    return tr("%1 (Scanning... %2%)").arg(path).arg(progress);
+                case Qn::RebuildState_FullScan:
+                    return tr("%1 (Rebuilding... %2%)").arg(path).arg(progress);
+                default:
+                    break;
+                }
+            }
+
+            return path;
+        }
     case TypeColumn:
         return storageData.storageType;
     case TotalSpaceColumn:
@@ -143,6 +191,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
             : QString();
 
     case ChangeGroupActionColumn:
+        /* Calculate predefined column width */
         if (forcedText)
             return tr("Use as backup storage");
 
@@ -151,6 +200,9 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
 
         if (!storageData.isWritable)
             return tr("Inaccessible");
+
+        if (!canMoveStorage(storageData))
+            return QString();
 
         return storageData.isBackup
             ? tr("Use as main storage")
@@ -170,8 +222,10 @@ QVariant QnStorageListModel::fontData(const QModelIndex &index) const {
 
     QnStorageModelInfo storageData = storage(index);
 
-    if (index.column() == RemoveActionColumn ||
-        (index.column() == ChangeGroupActionColumn && storageData.isWritable))
+    if (index.column() == RemoveActionColumn && canRemoveStorage(storageData))
+        return m_linkFont;
+
+    if (index.column() == ChangeGroupActionColumn && canMoveStorage(storageData))
         return m_linkFont;
 
     return QVariant();
@@ -183,8 +237,10 @@ QVariant QnStorageListModel::foregroundData(const QModelIndex &index) const {
 
     QnStorageModelInfo storageData = storage(index);
 
-    if (index.column() == RemoveActionColumn ||
-        (index.column() == ChangeGroupActionColumn && storageData.isWritable))
+    if (index.column() == RemoveActionColumn && canRemoveStorage(storageData))
+        return m_linkBrush;
+
+    if (index.column() == ChangeGroupActionColumn && canMoveStorage(storageData))
         return m_linkBrush;
 
     return QVariant();
@@ -260,12 +316,31 @@ bool QnStorageListModel::setData(const QModelIndex &index, const QVariant &value
 }
 
 Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
-    QnStorageModelInfo storageData = storage(index);
 
-    Qt::ItemFlags flags = Qt::NoItemFlags;
-    flags |= Qt::ItemIsSelectable;
+    auto isEnabled = [this](const QModelIndex &index) {
+        if (m_readOnly)
+            return false;
 
-    if (storageData.isWritable || index.column() == RemoveActionColumn)
+        if (index.column() == RemoveActionColumn)
+            return true;
+
+        QnStorageModelInfo storageData = storage(index);
+        if (!storageData.isWritable)
+            return false;
+
+        if (isStorageInRebuild(storageData))
+            return false;
+
+        if (isStoragePoolInRebuild(storageData))
+            return false;
+
+        return (storageData.isOnline || index.column() == ChangeGroupActionColumn);
+    };
+
+
+    Qt::ItemFlags flags = Qt::ItemIsSelectable;
+
+    if (isEnabled(index))
         flags |= Qt::ItemIsEnabled;
 
     if (index.column() == CheckBoxColumn)
@@ -288,7 +363,21 @@ void QnStorageListModel::setReadOnly( bool readOnly ) {
 }
 
 bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const {
+    using boost::algorithm::any_of;
+
     if (m_readOnly)
+        return false;
+
+    if (isStorageInRebuild(data))
+        return false;
+
+    if (any_of(m_rebuildStatus, [](const QnStorageScanData &status){
+        return status.state == Qn::RebuildState_FullScan;
+    }))
+        return false;
+
+
+    if (!data.isOnline)
         return false;
 
     if (!data.isWritable)
@@ -298,7 +387,7 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
         return true;
 
     /* Check that at least one writable storage left in the main pool. */
-    return std::any_of(m_storages.cbegin(), m_storages.cend(), [data](const QnStorageModelInfo &other) {
+    return any_of(m_storages, [data](const QnStorageModelInfo &other) {
 
         /* Do not count subject to remove. */
         if (other.url == data.url)
@@ -320,5 +409,36 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     if (m_readOnly)
         return false;
 
+    if (isStorageInRebuild(data))
+        return false;
+
+    if (isStoragePoolInRebuild(data))
+        return false;
+
     return data.isExternal || !data.isWritable;
+}
+
+
+bool QnStorageListModel::isStoragePoolInRebuild( const QnStorageModelInfo& storage ) const
+{
+    QnServerStoragesPool pool = storage.isBackup
+        ? QnServerStoragesPool::Backup
+        : QnServerStoragesPool::Main;
+
+    auto status = m_rebuildStatus[static_cast<int>(pool)];
+
+    /* Check if the whole section is in rebuild. */
+    return (status.state == Qn::RebuildState_FullScan);
+}
+
+
+bool QnStorageListModel::isStorageInRebuild( const QnStorageModelInfo& storage ) const
+{
+    /* Check if the current storage is in rebuild */
+    for (const auto &rebuildStatus: m_rebuildStatus)
+    {
+        if (rebuildStatus.path == storage.url)
+            return rebuildStatus.state != Qn::RebuildState_None;
+    }
+    return false;
 }

@@ -13,6 +13,8 @@ class QnBookmarksViewer : public QGraphicsWidget
 {
     Q_OBJECT
     Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
+    Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
+    Q_PROPERTY(bool allowClickOnTag READ allowClickOnTag WRITE setAllowClickOnTag)
 
 public:
     typedef QPair<qreal, qreal> Bounds;
@@ -25,6 +27,14 @@ public:
         , QGraphicsItem *parent);
 
     virtual ~QnBookmarksViewer();
+
+    bool readOnly() const;
+
+    void setReadOnly(bool readonly);
+
+    bool allowClickOnTag() const;
+
+    void setAllowClickOnTag(bool allow);
 
 signals:
     /// @brief Edit action callback
@@ -44,10 +54,6 @@ signals:
     void playBookmark(const QnCameraBookmark &bookmark);
 
 public slots:
-    /// @brief Sets "remove" and "edit" buttons available
-    /// according to specified parameter
-    void setReadOnly(bool readonly);
-
     /// Set timestamp for bookmarks extraction
     void setTargetTimestamp(qint64 timestamp);
 

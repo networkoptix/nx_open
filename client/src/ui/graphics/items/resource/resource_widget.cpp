@@ -90,7 +90,11 @@ namespace {
     }
 
     bool itemBelongsToValidLayout(QnWorkbenchItem *item) {
-        return (item && item->layout() && item->layout()->resource() && item->layout()->resource()->resourcePool());
+        return (item
+            && item->layout()
+            && item->layout()->resource()
+            && item->layout()->resource()->resourcePool()
+            && !item->layout()->resource()->getParentId().isNull());
     }
 
     GraphicsLabel *createGraphicsLabel() {
@@ -234,7 +238,7 @@ void QnResourceWidget::addInfoOverlay() {
     {
         QnHtmlTextItemOptions infoOptions;
         infoOptions.backgroundColor = infoBackgroundColor;
-        infoOptions.borderRadius = 4;
+        infoOptions.borderRadius = 2;
         infoOptions.autosize = true;
 
         enum { kMargin = 2 };
@@ -641,20 +645,19 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
     if (!(m_options & WindowRotationForbidden))
         result |= RotateButton;
 
-    if(itemBelongsToValidLayout(item())) {
-        Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
-        if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
-            result |= CloseButton;
-    }
+    Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
+    if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
+        result |= CloseButton;
 
     return result;
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    m_buttonBar->setVisibleButtons(
-        calculateButtonsVisibility() &
-        ~(item() ? item()->data<int>(Qn::ItemDisabledButtonsRole, 0): 0)
-    );
+    // TODO: #ynikitenkov Change destroying sequence: items should be destroyed before layout
+    if (!item() || !item()->layout())
+        return;
+
+    m_buttonBar->setVisibleButtons(calculateButtonsVisibility() & ~(item()->data<int>(Qn::ItemDisabledButtonsRole, 0)));
 }
 
 QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {
