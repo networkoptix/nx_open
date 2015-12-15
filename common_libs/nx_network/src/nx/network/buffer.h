@@ -12,6 +12,7 @@
 #include <limits>
 
 #include <QtCore/QByteArray>
+#include <boost/functional/hash/hash.hpp>
 
 #ifdef _WIN32
 #undef max
@@ -54,6 +55,18 @@ namespace nx
     String NX_NETWORK_API bufferToString( const Buffer& buffer );
 
     std::string NX_NETWORK_API toStdString(const Buffer& str);
+}
+
+namespace std
+{
+    template<>
+    struct hash< ::nx::Buffer >
+    {
+        size_t operator()( const ::nx::Buffer& buffer ) const
+        {
+            return boost::hash_range( buffer.begin(), buffer.end() );
+        }
+    };
 }
 
 #endif  //NX_BUFFER_H

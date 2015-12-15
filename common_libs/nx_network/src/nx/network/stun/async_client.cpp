@@ -174,17 +174,12 @@ void AsyncClient::openConnectionImpl( QnMutexLockerBase* lock )
 void AsyncClient::closeConnectionImpl( QnMutexLockerBase* lock,
                                        SystemError::ErrorCode code )
 {
-    std::unique_ptr<AbstractStreamSocket> connectingSocket;
-    std::swap(connectingSocket, m_connectingSocket );
+    auto connectingSocket = std::move( m_connectingSocket );
+    auto requestQueue = std::move( m_requestQueue );
+    auto requestsInProgress = std::move( m_requestsInProgress );
 
     if( m_state != State::terminated )
         m_state = State::disconnected;
-
-    std::list< std::pair< Message, RequestHandler > > requestQueue;
-    std::swap( requestQueue, m_requestQueue );
-
-    std::map< Buffer, RequestHandler > requestsInProgress;
-    std::swap( requestsInProgress, m_requestsInProgress );
 
     lock->unlock();
 
