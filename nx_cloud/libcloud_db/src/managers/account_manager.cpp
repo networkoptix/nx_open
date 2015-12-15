@@ -347,7 +347,7 @@ db::DBResult AccountManager::insertAccount(
 }
 
 void AccountManager::accountAdded(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
@@ -426,7 +426,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::accountVerified(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -490,7 +490,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 }
 
 void AccountManager::accountUpdated(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -513,7 +513,7 @@ void AccountManager::accountUpdated(
 }
 
 void AccountManager::passwordResetCodeGenerated(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     api::ResultCode resultCode,
     data::AccountEmail accountEmail,

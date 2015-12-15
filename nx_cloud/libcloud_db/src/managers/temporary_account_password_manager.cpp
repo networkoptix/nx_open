@@ -203,7 +203,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
 }
 
 void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     TemporaryAccountPasswordEx tempPasswordData,
     std::function<void(api::ResultCode)> completionHandler)
