@@ -43,7 +43,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
             alpha + ')';
     }
     function formatFont(font){
-        return font.weight + ' ' + Math.round(font.size) + 'px ' + font.face;
+        return font.weight + ' ' + font.size.toFixed(4) + 'px ' + font.face;
     }
 
     function clearTimeline(){

@@ -65,25 +65,25 @@ function TimelineConfig(){
                 markSize:15/110,
                 transparency:1,
                 fontSize:14,
-                labelPositionFix:5//20
+                labelPositionFix:5
             },
             middle:{
                 markSize:10/110,
                 transparency:0.75,
                 fontSize:13,
-                labelPositionFix:0//18
+                labelPositionFix:0
             },
             small:{
                 markSize:5/110,
                 transparency:0.5,
                 fontSize:11,
-                labelPositionFix:-5//16
+                labelPositionFix:-5
             },
             marks:{
                 markSize:5/110,
                 transparency:0.25,
                 fontSize:0,
-                labelPositionFix:-10
+                labelPositionFix: -10
             },
             events:{
                 markSize:0,

@@ -122,11 +122,9 @@ angular.module('webadminApp')
 
                             if(scope.positionProvider.liveMode || nextPlayedPosition == scope.positionProvider.playedPosition){
                                 scope.lastPlayedPosition = nextPlayedPosition;
-                                scope.scaleManager.tryToSetLiveDate(nextPlayedPosition, scope.positionProvider.liveMode, (new Date()).getTime());
                                 nextPlayedPosition = 0;
-                            }else{
-                                return; // ignore changes until played position wasn't changed
                             }
+                            return; // ignore changes until played position wasn't changed
                         }
 
                         var intervalMs = Math.abs(scope.lastPlayedPosition - scope.positionProvider.playedPosition);
@@ -141,6 +139,10 @@ angular.module('webadminApp')
                                 function () {},
                                 function () {},
                                 function (value) {
+                                    if(nextPlayedPosition){
+                                        console.log("problem with playing position",value,nextPlayedPosition);
+                                        return;
+                                    }
                                     scope.scaleManager.tryToSetLiveDate(value, scope.positionProvider.liveMode, (new Date()).getTime());
                                 });
                         }
@@ -362,8 +364,13 @@ angular.module('webadminApp')
 
                 //Absolute zoom - to target level from 0 to 1
                 function zoomTo(zoomTarget, zoomDate, instant, linear){
+                    var oldZT = zoomTarget;
                     zoomTarget = scope.scaleManager.boundZoom(zoomTarget);
 
+                    var zoom = scope.scaleManager.zoom();
+                    if(zoom == zoomTarget){
+                        return;
+                    }
 
                     function levelsChanged(newLevels,oldLevels){
                         if(newLevels && (!oldLevels || !oldLevels.labels)){
@@ -500,13 +507,15 @@ angular.module('webadminApp')
                 var zoomByWheelTarget = 0;
                 function zoomByWheel(pixels){
 
+                    var zoom = scope.scaleManager.zoom();
+
                     if(window.jscd.touch ) {
-                        zoomByWheelTarget = scope.scaleManager.zoom() - pixels / timelineConfig.maxVerticalScrollForZoomWithTouch;
+                        zoomByWheelTarget = zoom - pixels / timelineConfig.maxVerticalScrollForZoomWithTouch;
                     }else{
                         // We need to smooth zoom here
                         // Collect zoom changing in zoomTarget
                         if(!zoomByWheelTarget) {
-                            zoomByWheelTarget = scope.scaleManager.zoom();
+                            zoomByWheelTarget = zoom;
                         }
                         zoomByWheelTarget -= pixels / timelineConfig.maxVerticalScrollForZoom;
                         zoomByWheelTarget = scope.scaleManager.boundZoom(zoomByWheelTarget);

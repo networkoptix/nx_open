@@ -1090,7 +1090,7 @@ ScaleManager.prototype.coordinateToDate = function(coordinate){
     return Math.round(this.start + coordinate * this.msPerPixel);
 };
 ScaleManager.prototype.dateToCoordinate = function(date){
-    return  Math.round((date - this.start) / this.msPerPixel);
+    return  (date - this.start) / this.msPerPixel;
 };
 
 ScaleManager.prototype.dateToScreenCoordinate = function(date){
