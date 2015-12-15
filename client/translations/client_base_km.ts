@@ -20,7 +20,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Backup Quality:</source>
+        <source>What to backup:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -161,18 +161,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any device&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any IO module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;%n device(s)&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -182,6 +170,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>&lt;%n IO module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any IO Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My IO Modules&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1106,10 +1118,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmark Selection...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Edit Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1474,10 +1482,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1499,6 +1503,14 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmarks Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add a Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1795,17 +1807,17 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Low</source>
+        <source>Low-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>High</source>
+        <source>Hi-Res Streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>High + Low</source>
+        <source>All streams</source>
         <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
@@ -1929,10 +1941,6 @@ to view more bookmarks</source>
         </translation>
     </message>
     <message>
-        <source>Not Applied</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Instant</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2014,6 +2022,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Source and %n more cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>N/A</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2890,15 +2902,23 @@ to view more bookmarks</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Rule will work only for Generic Events that passes all filters. Empty fields don&apos;t affect the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server API</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Actions will only work for Generic Events that pass all filters.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Empty fields do not affect results.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Each filter will pass if any keyword in a field is matched.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5715,10 +5735,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Previous footage will not be backed up!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select at least one backup storage.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5728,10 +5744,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup is created up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5747,15 +5759,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is completed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>By Schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Realtime</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5770,10 +5774,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>In Realtime mode all data is backed up on continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message numerus="yes">
         <source>%n of %1 are selected</source>
         <translation type="unfinished">
@@ -5782,11 +5782,31 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>No any devices selected</source>
+        <source>In Real-Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No any cameras selected</source>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only data from this point forward will be backed up. Existing archives will be ignored.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive has been successfully backup until: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Your archive has been successfully backed up.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
