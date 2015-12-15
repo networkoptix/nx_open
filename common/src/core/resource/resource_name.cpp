@@ -1,6 +1,6 @@
 #include "resource_name.h"
 
-#include <QHostAddress>
+#include <QtNetwork/QHostAddress>
 
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
