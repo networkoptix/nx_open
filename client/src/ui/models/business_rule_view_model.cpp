@@ -964,7 +964,7 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     const int DAY = HOUR * 24;
 
     if (QnBusiness::hasToggleState(m_actionType))
-        return tr("Not Applied");
+        return tr("N/A");
 
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");

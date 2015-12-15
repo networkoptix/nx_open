@@ -101,7 +101,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->setupUi(this);
 
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("In Realtime"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("In Real-Time"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
@@ -622,9 +622,9 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
 
     //TODO: #GDM discuss texts
     QString backedUpTo = realtime
-        ? tr("In Realtime mode all data is backed up on continuously.") + L' ' + setWarningStyleHtml(tr("Previous footage will not be backed up!"))
+        ? tr("In Real-Time mode all data is backed up continuously.") + L' ' + setWarningStyleHtml(tr("Notice: Only data from this point forward will be backed up. Existing archives will be ignored."))
         : reply.backupTimeMs > 0
-        ? tr("Archive backup is created up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        ? tr("Archive has been successfully backup until: %1.").arg(backupPositionToString(reply.backupTimeMs))
         : tr("Backup was never started.");
 
     ui->backupTimeLabel->setText(backedUpTo);
@@ -653,8 +653,8 @@ void QnStorageConfigWidget::updateCamerasLabel()
     QString lineTotal = (selectedCameras.size() > 0)
         ? tr("%n of %1 are selected", "", selectedCameras.size()).arg(serverCameras.size())
         : setWarningStyleHtml( QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("No any devices selected"),
-            tr("No any cameras selected")
+            tr("No devices selected"),
+            tr("No cameras selected")
         ));
 
     ui->camerasLabel->setText(lineTotal);
@@ -742,6 +742,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
     if (!m_backupCancelled)
         QMessageBox::information(this,
             tr("Finished"),
-            tr("Archive backup is completed."));
+            tr("Your archive has been successfully backed up."));
     m_backupCancelled = false;
 }

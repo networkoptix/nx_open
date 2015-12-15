@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QCheckBox" name="fixedDurationCheckBox">
      <property name="text">
-      <string>Fixed duration:</string>
+      <string>Display text for:</string>
      </property>
     </widget>
    </item>
@@ -65,7 +65,7 @@
    <item row="1" column="0">
     <widget class="QCheckBox" name="customTextCheckBox">
      <property name="text">
-      <string>Custom Text:</string>
+      <string>Use custom text:</string>
      </property>
     </widget>
    </item>
