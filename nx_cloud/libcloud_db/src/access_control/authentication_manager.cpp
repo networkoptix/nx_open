@@ -21,6 +21,7 @@
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
 #include "managers/account_manager.h"
+#include "managers/temporary_account_password_manager.h"
 #include "managers/system_manager.h"
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
@@ -36,6 +37,7 @@ using namespace nx_http;
 AuthenticationManager::AuthenticationManager(
     AccountManager* const accountManager,
     SystemManager* const systemManager,
+    TemporaryAccountPasswordManager* const temporaryAccountPasswordManager,
     const QnAuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
@@ -45,6 +47,7 @@ AuthenticationManager::AuthenticationManager(
 {
     m_authDataProviders.push_back(accountManager);
     m_authDataProviders.push_back(systemManager);
+    m_authDataProviders.push_back(temporaryAccountPasswordManager);
 }
 
 bool AuthenticationManager::authenticate(

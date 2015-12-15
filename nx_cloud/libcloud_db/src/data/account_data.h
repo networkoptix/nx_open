@@ -84,7 +84,7 @@ public:
 class TemporaryAccountPassword
 {
 public:
-    QnUuid accountID;
+    std::string accountEmail;
     std::string password;
     std::string passwordHa1;
     std::string realm;
@@ -96,7 +96,7 @@ public:
     TemporaryAccountPassword();
 };
 
-#define TemporaryAccountPassword_Fields (accountID)(passwordHa1)(realm) \
+#define TemporaryAccountPassword_Fields (accountEmail)(passwordHa1)(realm) \
     (expirationTimestampUtc)(maxUseCount)(useCount)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

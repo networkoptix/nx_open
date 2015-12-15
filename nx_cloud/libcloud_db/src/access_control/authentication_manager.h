@@ -21,6 +21,7 @@ namespace cdb {
 
 class AccountManager;
 class SystemManager;
+class TemporaryAccountPasswordManager;
 class StreeManager;
 class AbstractAuthenticationDataProvider;
 
@@ -38,6 +39,7 @@ public:
     AuthenticationManager(
         AccountManager* const accountManager,
         SystemManager* const systemManager,
+        TemporaryAccountPasswordManager* const temporaryAccountPasswordManager,
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 

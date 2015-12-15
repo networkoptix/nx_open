@@ -26,6 +26,7 @@
 namespace nx {
 namespace cdb {
 
+class TemporaryAccountPasswordManager;
 class EMailManager;
 namespace conf
 {
@@ -45,6 +46,7 @@ public:
     */
     AccountManager(
         const conf::Settings& settings,
+        TemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::DBManager* const dbManager,
         EMailManager* const emailManager ) throw( std::runtime_error );
     virtual ~AccountManager();
@@ -85,6 +87,7 @@ public:
     
 private:
     const conf::Settings& m_settings;
+    TemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::DBManager* const m_dbManager;
     EMailManager* const m_emailManager;
     //!map<email, account>
@@ -96,7 +99,6 @@ private:
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(QSqlDatabase* connection, int* const dummyResult);
-    nx::db::DBResult fetchTemporaryPasswords(QSqlDatabase* connection, int* const dummyResult);
 
     //add_account DB operations
     nx::db::DBResult insertAccount(
@@ -132,25 +134,13 @@ private:
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );
 
-    nx::db::DBResult generatePasswordResetCode(
-        QSqlDatabase* const tran,
-        const data::AccountEmail& accountEmail,
-        data::TemporaryAccountPassword* const confirmationCode);
     void passwordResetCodeGenerated(
         ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
-        nx::db::DBResult resultCode,
+        api::ResultCode resultCode,
         data::AccountEmail accountEmail,
-        data::TemporaryAccountPassword resultData,
+        data::AccountConfirmationCode confirmationCode,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
-
-    nx::db::DBResult insertTempPassword(
-        QSqlDatabase* const connection,
-        data::TemporaryAccountPassword tempPasswordData);
-
-    bool checkTemporaryPasswordForExpiration(
-        QnMutexLockerBase* const lk,
-        std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter);
 };
 
 }   //cdb

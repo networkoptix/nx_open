@@ -42,6 +42,7 @@
 #include "http_handlers/share_system_handler.h"
 #include "http_handlers/update_system_sharing_handler.h"
 #include "managers/account_manager.h"
+#include "managers/temporary_account_password_manager.h"
 #include "managers/auth_provider.h"
 #include "managers/email_manager.h"
 #include "managers/system_manager.h"
@@ -116,8 +117,13 @@ int CloudDBProcess::executeApplication()
         StreeManager streeManager(settings.auth());
 
         //creating data managers
+        TemporaryAccountPasswordManager tempPasswordManager(
+            settings,
+            &dbManager);
+
         AccountManager accountManager(
             settings,
+            &tempPasswordManager,
             &dbManager,
             &emailManager);
     
@@ -134,6 +140,7 @@ int CloudDBProcess::executeApplication()
         AuthenticationManager authenticationManager( 
             &accountManager,
             &systemManager,
+            &tempPasswordManager,
             authRestrictionList,
             streeManager);
 
