@@ -45,6 +45,7 @@ SystemManager::~SystemManager()
 void SystemManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
+    const stree::AbstractResourceReader& /*authSearchInputData*/,
     stree::AbstractResourceWriter* const authProperties,
     std::function<void(bool)> completionHandler)
 {

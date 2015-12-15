@@ -61,6 +61,7 @@ private:
     bool authenticateInDataManagers(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
+        const stree::AbstractResourceReader& authSearchInputData,
         stree::AbstractResourceWriter* const authProperties);
     void addWWWAuthenticateHeader(
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );

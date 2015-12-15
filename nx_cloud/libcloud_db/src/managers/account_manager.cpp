@@ -60,6 +60,7 @@ AccountManager::~AccountManager()
 void AccountManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
+    const stree::AbstractResourceReader& authSearchInputData,
     stree::AbstractResourceWriter* const authProperties,
     std::function<void(bool)> completionHandler)
 {
@@ -93,11 +94,14 @@ void AccountManager::authenticateByName(
         if (!checkTemporaryPasswordForExpiration(&lk, curIt))
             continue;
 
-        if (validateHa1Func(curIt->second.passwordHa1.c_str()))
+        //currently, checking password permissions here, but should move it to authorization phase
+        if (validateHa1Func(curIt->second.passwordHa1.c_str()) &&
+            curIt->second.accessRights.authorize(authSearchInputData))
         {
             authProperties->put(
                 cdb::attr::authAccountEmail,
                 username);
+
             result = true;
 
             ++curIt->second.useCount;
@@ -284,18 +288,19 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
     return db::DBResult::ok;
 }
 
-class TemporaryAccountPasswordWithEmail
+class TemporaryAccountPasswordEx
 :
     public data::TemporaryAccountPassword
 {
 public:
     std::string email;
+    std::string accessRightsStr;
 };
 
-#define TemporaryAccountPasswordWithEmail_Fields TemporaryAccountPassword_Fields (email)
+#define TemporaryAccountPasswordEx_Fields TemporaryAccountPassword_Fields (email)(accessRightsStr)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (TemporaryAccountPasswordWithEmail),
+    (TemporaryAccountPasswordEx),
     (sql_record),
     _Fields)
 
@@ -312,7 +317,7 @@ db::DBResult AccountManager::fetchTemporaryPasswords(QSqlDatabase* connection, i
             ap.expiration_timestamp_utc as expirationTimestampUtc,              \
             ap.max_use_count as maxUseCount,                                    \
             ap.use_count as useCount,                                           \
-            ap.access_rights as accessRights                                    \
+            ap.access_rights as accessRightsStr                                 \
          FROM account_password ap LEFT JOIN account a ON ap.account_id=a.id");
     if (!readPasswordsQuery.exec())
     {
@@ -321,10 +326,15 @@ db::DBResult AccountManager::fetchTemporaryPasswords(QSqlDatabase* connection, i
         return db::DBResult::ioError;
     }
 
-    std::vector<TemporaryAccountPasswordWithEmail> tmpPasswords;
+    std::vector<TemporaryAccountPasswordEx> tmpPasswords;
     QnSql::fetch_many(readPasswordsQuery, &tmpPasswords);
     for (auto& tmpPassword: tmpPasswords)
-        m_accountPassword.emplace(std::move(tmpPassword.email), std::move(tmpPassword));
+    {
+        tmpPassword.accessRights.parse(tmpPassword.accessRightsStr);
+        m_accountPassword.emplace(
+            std::move(tmpPassword.email),
+            std::move(tmpPassword));
+    }
 
     return db::DBResult::ok;
 }
@@ -584,7 +594,7 @@ nx::db::DBResult AccountManager::generatePasswordResetCode(
         ::time(NULL) +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
     tempPasswordData->maxUseCount = 1;
-    //tempPassword.accessRights = TODO #ak updateAccount only;
+    tempPasswordData->accessRights.requestsAllowed.push_back(kAccountUpdatePath);
 
     nx::db::DBResult result = insertTempPassword(
         connection,
@@ -645,6 +655,9 @@ nx::db::DBResult AccountManager::insertTempPassword(
     insertTempPassword.bindValue(
         ":id",
         QnSql::serialized_field(QnUuid::createUuid()));
+    insertTempPassword.bindValue(
+        ":accessRights",
+        QnSql::serialized_field(tempPasswordData.accessRights.toString()));
     if (!insertTempPassword.exec())
     {
         NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2").

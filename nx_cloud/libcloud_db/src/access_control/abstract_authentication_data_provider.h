@@ -23,11 +23,13 @@ public:
     //!Finds entity with \a username and validates its password using \a validateHa1Func
     /*!
         In case of success, \a completionHandler is called with \a true
+        \param authProperties Some attributes can be added here as a authentication output
         \param completionHandler Can be invoked within this method
     */
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
+        const stree::AbstractResourceReader& authSearchInputData,
         stree::AbstractResourceWriter* const authProperties,
         std::function<void(bool)> completionHandler) = 0;
 };

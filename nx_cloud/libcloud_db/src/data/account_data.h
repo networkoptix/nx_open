@@ -70,6 +70,17 @@ public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };
 
+class AccessRestrictions
+{
+public:
+    std::vector<std::string> requestsAllowed;
+
+    std::string toString() const;
+    bool parse(const std::string& str);
+
+    bool authorize(const stree::AbstractResourceReader& requestAttributes) const;
+};
+
 class TemporaryAccountPassword
 {
 public:
@@ -80,13 +91,13 @@ public:
     std::uint32_t expirationTimestampUtc;
     int maxUseCount;
     int useCount;
-    std::string accessRights;
+    AccessRestrictions accessRights;
 
     TemporaryAccountPassword();
 };
 
 #define TemporaryAccountPassword_Fields (accountID)(passwordHa1)(realm) \
-    (expirationTimestampUtc)(maxUseCount)(useCount)(accessRights)
+    (expirationTimestampUtc)(maxUseCount)(useCount)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountPassword),

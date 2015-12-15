@@ -354,7 +354,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 }
 
 //checks that password reset code is valid for changing password only
-TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
+TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 {
     startAndWaitUntilStarted();
 
@@ -386,35 +386,65 @@ TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
         QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
     const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
 
-    //verifying that only /account/update is allowed with this temporary password
-    result = getAccount(account1.email, tmpPassword, &account1);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    api::SystemData system2;
-    result = bindRandomSystem(
-        account1.email,
-        tmpPassword,
-        &system2);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    std::vector<api::SystemData> systems;
-    result = getSystems(account1.email, tmpPassword, &systems);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    std::vector<api::SystemSharing> sharings;
-    result = getSystemSharings(account1.email, tmpPassword, &sharings);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
+    for (int i = 0; i < 2; ++i)
     {
-        //sharing system to account2 with "editor" permission
-        const auto result = shareSystem(
+        if (i == 1)
+            restart();
+
+        //verifying that only /account/update is allowed with this temporary password
+        api::AccountData accountData;
+        result = getAccount(account1.email, tmpPassword, &accountData);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        api::SystemData system2;
+        result = bindRandomSystem(
             account1.email,
             tmpPassword,
-            system1.id,
-            account2.email,
-            api::SystemAccessRole::editor);
+            &system2);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        std::vector<api::SystemData> systems;
+        result = getSystems(account1.email, tmpPassword, &systems);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        std::vector<api::SystemSharing> sharings;
+        result = getSystemSharings(account1.email, tmpPassword, &sharings);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        {
+            //sharing system to account2 with "editor" permission
+            const auto result = shareSystem(
+                account1.email,
+                tmpPassword,
+                system1.id,
+                account2.email,
+                api::SystemAccessRole::editor);
+            ASSERT_EQ(api::ResultCode::notAuthorized, result);
+        }
     }
+
+    //setting new password
+    std::string account1NewPassword = "new_password";
+
+    api::AccountUpdateData update;
+    update.passwordHa1 = nx_http::calcHa1(
+        account1.email.c_str(),
+        moduleInfo().realm.c_str(),
+        account1NewPassword.c_str()).constData();
+    result = updateAccount(account1.email, tmpPassword, update);
+    ASSERT_EQ(api::ResultCode::ok, result);  //tmpPassword is still active
+
+    api::AccountData accountData;
+    result = getAccount(account1.email, account1NewPassword, &accountData);
+    ASSERT_EQ(api::ResultCode::ok, result); //new password has been set
+
+    result = updateAccount(account1.email, tmpPassword, update);
+    ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
+
+    restart();
+
+    result = updateAccount(account1.email, tmpPassword, update);
+    ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 }
 
 }   //cdb

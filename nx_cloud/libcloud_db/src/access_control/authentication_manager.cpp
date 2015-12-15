@@ -92,9 +92,13 @@ bool AuthenticationManager::authenticate(
         inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
+    const auto authSearchInputData = stree::MultiSourceResourceReader(
+        socketResources,
+        httpRequestResources,
+        inputRes);
     m_stree.search(
         StreeOperation::authentication,
-        stree::MultiSourceResourceReader(socketResources, httpRequestResources, inputRes),
+        authSearchInputData,
         &authTraversalResult);
     if (auto authenticated = authTraversalResult.get(attr::authenticated))
     {
@@ -145,6 +149,7 @@ bool AuthenticationManager::authenticate(
     if (!authenticateInDataManagers(
             userID,
             std::move(validateHa1Func),
+            authSearchInputData,
             authProperties))
     {
         return (authResult = false);
@@ -168,6 +173,7 @@ bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
 bool AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
+    const stree::AbstractResourceReader& authSearchInputData,
     stree::AbstractResourceWriter* const authProperties)
 {
     //TODO #ak AuthenticationManager has to become async sometimes...
@@ -179,6 +185,7 @@ bool AuthenticationManager::authenticateInDataManagers(
         authDataProvider->authenticateByName(
             username,
             validateHa1Func,
+            authSearchInputData,
             authProperties,
             [&authPromise](bool authResult) { authPromise.set_value(authResult); });
         authFuture.wait();
