@@ -238,7 +238,7 @@ void QnResourceWidget::addInfoOverlay() {
     {
         QnHtmlTextItemOptions infoOptions;
         infoOptions.backgroundColor = infoBackgroundColor;
-        infoOptions.borderRadius = 4;
+        infoOptions.borderRadius = 2;
         infoOptions.autosize = true;
 
         enum { kMargin = 2 };
@@ -653,7 +653,8 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    if (!item())
+    // TODO: #ynikitenkov Change destroying sequence: items should be destroyed before layout
+    if (!item() || !item()->layout())
         return;
 
     m_buttonBar->setVisibleButtons(calculateButtonsVisibility() & ~(item()->data<int>(Qn::ItemDisabledButtonsRole, 0)));

@@ -329,8 +329,7 @@ namespace
         if (tags.empty())
             return insertionIndex;
 
-        const auto tagsControl = new QnBookmarkTagsControl(
-            tags, m_viewer->allowClickOnTag(), this);
+        const auto tagsControl = new QnBookmarkTagsControl(tags, this);
 
         QObject::connect(tagsControl, &QnBookmarkTagsControl::tagClicked
             , this, [this](const QString &tag)
@@ -533,10 +532,6 @@ public:
 
     void setReadOnly(bool readonly);
 
-    bool allowClickOnTag() const;
-
-    void setAllowClickOnTag(bool allow);
-
     void setTargetTimestamp(qint64 timestamp);
 
     void updateOnWindowChange();
@@ -580,7 +575,6 @@ private:
 
     QnCameraBookmarkList m_bookmarks;
     bool m_readonly;
-    bool m_allowClickOnTag;
 
     typedef QScopedPointer<QTimer> QTimerPtr;
     QTimerPtr m_updateDelayedTimer;
@@ -608,7 +602,6 @@ QnBookmarksViewer::Impl::Impl(const GetBookmarksFunc &getBookmarksFunc
 
     , m_bookmarks()
     , m_readonly(false)
-    , m_allowClickOnTag(false)
 
     , m_updateDelayedTimer()
     , m_forceUpdateTimer()
@@ -663,16 +656,6 @@ bool QnBookmarksViewer::Impl::readOnly() const
 void QnBookmarksViewer::Impl::setReadOnly(bool readonly)
 {
     m_readonly = readonly;
-}
-
-bool QnBookmarksViewer::Impl::allowClickOnTag() const
-{
-    return m_allowClickOnTag;
-}
-
-void QnBookmarksViewer::Impl::setAllowClickOnTag(bool allow)
-{
-    m_allowClickOnTag = allow;
 }
 
 void QnBookmarksViewer::Impl::updateTimestampInternal(qint64 timestamp)
@@ -862,16 +845,6 @@ bool QnBookmarksViewer::readOnly() const
 void QnBookmarksViewer::setReadOnly(bool readonly)
 {
     m_impl->setReadOnly(readonly);
-}
-
-bool QnBookmarksViewer::allowClickOnTag() const
-{
-    return m_impl->allowClickOnTag();
-}
-
-void QnBookmarksViewer::setAllowClickOnTag(bool allow)
-{
-    m_impl->setAllowClickOnTag(allow);
 }
 
 void QnBookmarksViewer::setTargetTimestamp(qint64 timestamp)

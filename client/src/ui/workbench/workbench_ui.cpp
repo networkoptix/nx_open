@@ -2479,10 +2479,6 @@ void QnWorkbenchUi::createSliderWidget()
             || !accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
 
         bookmarksViewer->setReadOnly(readonly);
-
-
-        const bool userIsAdmin = accessController()->hasGlobalPermissions(Qn::GlobalAdminPermissions);
-        bookmarksViewer->setAllowClickOnTag(userIsAdmin);
     };
 
     connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged

@@ -891,6 +891,12 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Audit Trail..."));
 
+    factory(Qn::OpenBookmarksSearchAction).
+        flags(Qn::Main | Qn::GlobalHotkey).
+        text(tr("Bookmarks Search...")).
+        shortcut(tr("Ctrl+B")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main).
         separator();
@@ -902,13 +908,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Alarm/Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(tr("Ctrl+E")).
-        autoRepeat(false);
-
-    factory(Qn::OpenBookmarksSearchAction).
-        flags(Qn::GlobalHotkey).
-        text(tr("Bookmarks...")).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalAdminPermissions).
-        shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
     factory(Qn::CameraListAction).

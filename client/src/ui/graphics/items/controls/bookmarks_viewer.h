@@ -14,7 +14,6 @@ class QnBookmarksViewer : public QGraphicsWidget
     Q_OBJECT
     Q_PROPERTY(QnBookmarkColors colors READ colors WRITE setColors)
     Q_PROPERTY(bool readOnly READ readOnly WRITE setReadOnly)
-    Q_PROPERTY(bool allowClickOnTag READ allowClickOnTag WRITE setAllowClickOnTag)
 
 public:
     typedef QPair<qreal, qreal> Bounds;
@@ -31,10 +30,6 @@ public:
     bool readOnly() const;
 
     void setReadOnly(bool readonly);
-
-    bool allowClickOnTag() const;
-
-    void setAllowClickOnTag(bool allow);
 
 signals:
     /// @brief Edit action callback

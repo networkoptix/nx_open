@@ -17,6 +17,12 @@
 namespace {
     //TODO: #GDM move timeout constant to more common module
     const int testLdapTimeoutMSec = 30 * 1000; //ec2::RESPONSE_WAIT_TIMEOUT_MS;
+
+    /** Special value, used when the user has pressed "Test" button. */
+    const int kTestPrepareHandle = 0;
+
+    /** Special value, used when we are no waiting for the test results anymore. */
+    const int kTestInvalidHandle = -1;
 }
 
 class QnLdapSettingsDialogPrivate: public QObject {
@@ -44,7 +50,7 @@ public:
 QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *parent)
     : QObject(parent)
     , q_ptr(parent)
-    , testHandle(-1)
+    , testHandle(kTestInvalidHandle)
     , timeoutTimer(new QTimer(parent))
 {
     connect(QnGlobalSettings::instance(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapSettingsDialogPrivate::updateFromSettings);
@@ -52,6 +58,9 @@ QnLdapSettingsDialogPrivate::QnLdapSettingsDialogPrivate(QnLdapSettingsDialog *p
 }
 
 void QnLdapSettingsDialogPrivate::testSettings() {
+    /* Make sure stopTesting() will work well. */
+    testHandle = kTestPrepareHandle;
+
     QnLdapSettings settings = this->settings();
 
     if (!settings.isValid()) {
@@ -99,13 +108,16 @@ void QnLdapSettingsDialogPrivate::showTestResult(const QString &text) {
 }
 
 void QnLdapSettingsDialogPrivate::stopTesting(const QString &text) {
-    if (testHandle < 0)
+    /* Check if we have already processed results (e.g. by timeout) */
+    if (testHandle == kTestInvalidHandle)
         return;
 
     Q_Q(QnLdapSettingsDialog);
 
     timeoutTimer->stop();
-    testHandle = -1;
+
+    /* We are not waiting the results anymore. */
+    testHandle = kTestInvalidHandle;
 
     q->ui->buttonBox->button(QDialogButtonBox::Ok)->show();
     testButton->setEnabled(true);
@@ -124,7 +136,7 @@ QnLdapSettings QnLdapSettingsDialogPrivate::settings() const {
             url.setPort(QnLdapSettings::defaultPort(url.scheme() == lit("ldaps")));
         result.uri = url;
     }
-    
+
     result.adminDn = q->ui->adminDnLineEdit->text().trimmed();
     result.adminPassword = q->ui->passwordLineEdit->text().trimmed();
     result.searchBase = q->ui->searchBaseLineEdit->text().trimmed();
@@ -193,7 +205,7 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
     auto updateTestButton = [this] {
         Q_D(QnLdapSettingsDialog);
         /* Check if testing in progress. */
-        if (d->testHandle >= 0)
+        if (d->testHandle >= kTestPrepareHandle)
             return;
         QnLdapSettings settings = d->settings();
         d->testButton->setEnabled(settings.isValid());
@@ -259,7 +271,7 @@ void QnLdapSettingsDialog::accept() {
 void QnLdapSettingsDialog::reject() {
     Q_D(QnLdapSettingsDialog);
 
-    if (d->testHandle != -1)
+    if (d->testHandle != kTestInvalidHandle)
         d->stopTesting();
     else
         base_type::reject();

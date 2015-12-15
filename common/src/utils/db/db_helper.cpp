@@ -3,10 +3,10 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
 
-#include <QSqlQuery>
-#include <QSqlRecord>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 #include <QFile>
-#include <QSqlError>
+#include <QtSql/QSqlError>
 #include "qcoreapplication.h"
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction 

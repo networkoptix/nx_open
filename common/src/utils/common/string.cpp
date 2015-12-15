@@ -416,5 +416,9 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const QString boldValue = (isBold ? lit("bold") : lit("normal"));
     const QString italicValue (isItalic ? lit("italic") : lit("normal"));
 
-    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, text);
+    static const auto kNewLineSymbol = L'\n';
+    static const auto kNewLineTag = lit("<br>");
+
+    const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
