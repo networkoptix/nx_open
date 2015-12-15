@@ -21,6 +21,7 @@
 
 #include <utils/db/db_manager.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/thread_safe_counter.h>
 
 #include "access_control/auth_types.h"
 #include "access_control/abstract_authentication_data_provider.h"
@@ -147,12 +148,14 @@ private:
     Cache<QnUuid, data::SystemData> m_cache;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
+    ThreadSafeCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult insertSystemToDB(
         QSqlDatabase* const connection,
         const data::SystemRegistrationDataWithAccount& newSystem,
         data::SystemData* const systemData);
     void systemAdded(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
         data::SystemData systemData,
@@ -162,6 +165,7 @@ private:
         QSqlDatabase* const connection,
         const data::SystemSharing& systemSharing);
     void systemSharingAdded(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemSharing sytemSharing,
         std::function<void(api::ResultCode)> completionHandler);
@@ -170,6 +174,7 @@ private:
         QSqlDatabase* const connection,
         const data::SystemID& systemID);
     void systemDeleted(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemID systemID,
         std::function<void(api::ResultCode)> completionHandler);
@@ -178,6 +183,7 @@ private:
         QSqlDatabase* const connection,
         const data::SystemSharing& sharing);
     void sharingUpdated(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);

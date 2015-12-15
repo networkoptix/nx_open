@@ -39,6 +39,7 @@ SystemManager::SystemManager(
 
 SystemManager::~SystemManager()
 {
+    m_startedAsyncCallsCounter.wait();
 }
 
 void SystemManager::authenticateByName(
@@ -94,7 +95,9 @@ void SystemManager::bindSystemToAccount(
     m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccount, data::SystemData>(
         std::bind(&SystemManager::insertSystemToDB, this, _1, _2, _3),
         std::move(registrationDataWithAccount),
-        std::bind(&SystemManager::systemAdded, this, _1, _2, _3, std::move(completionHandler)));
+        std::bind(&SystemManager::systemAdded,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, _3, std::move(completionHandler)));
 }
 
 void SystemManager::unbindSystem(
@@ -106,7 +109,9 @@ void SystemManager::unbindSystem(
     m_dbManager->executeUpdate<data::SystemID>(
         std::bind(&SystemManager::deleteSystemFromDB, this, _1, _2),
         std::move(systemID),
-        std::bind(&SystemManager::systemDeleted, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::systemDeleted,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 namespace {
@@ -182,7 +187,9 @@ void SystemManager::shareSystem(
     m_dbManager->executeUpdate<data::SystemSharing>(
         std::bind(&SystemManager::insertSystemSharingToDB, this, _1, _2),
         std::move(sharingData),
-        std::bind(&SystemManager::systemSharingAdded, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::systemSharingAdded,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 void SystemManager::getCloudUsersOfSystem(
@@ -252,7 +259,9 @@ void SystemManager::updateSharing(
     m_dbManager->executeUpdate<data::SystemSharing>(
         std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
         std::move(sharing),
-        std::bind(&SystemManager::sharingUpdated, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::sharingUpdated,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
@@ -326,6 +335,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 }
 
 void SystemManager::systemAdded(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
@@ -384,6 +394,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 }
 
 void SystemManager::systemSharingAdded(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -431,6 +442,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -486,6 +498,7 @@ nx::db::DBResult SystemManager::updateSharingInDB(
 }
 
 void SystemManager::sharingUpdated(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)

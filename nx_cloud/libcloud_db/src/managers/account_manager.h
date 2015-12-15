@@ -13,6 +13,7 @@
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/thread_safe_counter.h>
 #include <utils/db/db_manager.h>
 
 #include "access_control/auth_types.h"
@@ -90,6 +91,7 @@ private:
     mutable QnMutex m_mutex;
     //map<email, temporary password>
     std::multimap<std::string, data::TemporaryAccountPassword> m_accountPassword;
+    ThreadSafeCounter m_startedAsyncCallsCounter;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(QSqlDatabase* connection, int* const dummyResult);
@@ -101,6 +103,7 @@ private:
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const resultData );
     void accountAdded(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
         nx::db::DBResult resultCode,
         data::AccountData accountData,
@@ -113,6 +116,7 @@ private:
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
     void accountVerified(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
@@ -122,6 +126,7 @@ private:
         QSqlDatabase* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     void accountUpdated(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );
@@ -131,6 +136,7 @@ private:
         const data::AccountEmail& accountEmail,
         data::TemporaryAccountPassword* const confirmationCode);
     void passwordResetCodeGenerated(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
         nx::db::DBResult resultCode,
         data::AccountEmail accountEmail,

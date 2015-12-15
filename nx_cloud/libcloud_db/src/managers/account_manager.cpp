@@ -52,6 +52,9 @@ AccountManager::AccountManager(
 
 AccountManager::~AccountManager()
 {
+    //assuming no public methods of this class can be called anymore,
+    //  but we have to wait for all scheduled async calls to finish
+    m_startedAsyncCallsCounter.wait();
 }
 
 void AccountManager::authenticateByName(
@@ -104,22 +107,6 @@ void AccountManager::authenticateByName(
     }
 }
 
-bool AccountManager::checkTemporaryPasswordForExpiration(
-    QnMutexLockerBase* const /*lk*/,
-    std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter)
-{
-    if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
-        (passwordIter->second.expirationTimestampUtc > 0 &&
-         passwordIter->second.expirationTimestampUtc <= ::time(NULL)))
-    {
-        //TODO #ak remove password from DB
-        m_accountPassword.erase(passwordIter);
-        return false;
-    }
-
-    return true;
-}
-
 void AccountManager::addAccount(
     const AuthorizationInfo& authzInfo,
     data::AccountData accountData,
@@ -144,8 +131,10 @@ void AccountManager::addAccount(
     m_dbManager->executeUpdate<data::AccountData, data::AccountConfirmationCode>(
         std::bind(&AccountManager::insertAccount, this, _1, _2, _3),
         std::move(accountData),
-        std::bind(&AccountManager::accountAdded, this, requestSourceSecured, 
-                  _1, _2, _3, std::move(completionHandler)) );
+        std::bind(&AccountManager::accountAdded, this, 
+                    m_startedAsyncCallsCounter.getScopedIncrement(),
+                    requestSourceSecured,
+                    _1, _2, _3, std::move(completionHandler)) );
 }
 
 void AccountManager::activate(
@@ -158,7 +147,8 @@ void AccountManager::activate(
         std::bind(&AccountManager::verifyAccount, this, _1, _2, _3),
         std::move(emailVerificationCode),
         std::bind(&AccountManager::accountVerified, this,
-                  _1, _2, _3, std::move(completionHandler)));
+                    m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, _3, std::move(completionHandler)));
 }
 
 void AccountManager::getAccount(
@@ -202,7 +192,9 @@ void AccountManager::updateAccount(
     m_dbManager->executeUpdate<data::AccountUpdateDataWithEmail>(
         std::bind(&AccountManager::updateAccountInDB, this, _1, _2),
         std::move(updateDataWithEmail),
-        std::bind(&AccountManager::accountUpdated, this, _1, _2, std::move(completionHandler)));
+        std::bind(&AccountManager::accountUpdated, this,
+                    m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 void AccountManager::resetPassword(
@@ -218,8 +210,9 @@ void AccountManager::resetPassword(
     m_dbManager->executeUpdate<data::AccountEmail, data::TemporaryAccountPassword>(
         std::bind(&AccountManager::generatePasswordResetCode, this, _1, _2, _3),
         std::move(accountEmail),
-        std::bind(&AccountManager::passwordResetCodeGenerated, this, 
-                  requestSourceSecured, _1, _2, _3, std::move(completionHandler)));
+        std::bind(&AccountManager::passwordResetCodeGenerated, this,
+                    m_startedAsyncCallsCounter.getScopedIncrement(),
+                    requestSourceSecured, _1, _2, _3, std::move(completionHandler)));
 }
 
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
@@ -246,7 +239,6 @@ db::DBResult AccountManager::fillCache()
     const auto result = future.get();
     if (result != db::DBResult::ok)
         return result;
-
 
     //reading temporary passwords
     cacheFilledPromise = std::promise<db::DBResult>();
@@ -398,6 +390,7 @@ db::DBResult AccountManager::insertAccount(
 }
 
 void AccountManager::accountAdded(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
@@ -476,6 +469,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::accountVerified(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -539,6 +533,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 }
 
 void AccountManager::accountUpdated(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -601,6 +596,7 @@ nx::db::DBResult AccountManager::generatePasswordResetCode(
 }
 
 void AccountManager::passwordResetCodeGenerated(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
     bool requestSourceSecured,
     nx::db::DBResult resultCode,
     data::AccountEmail accountEmail,
@@ -657,6 +653,22 @@ nx::db::DBResult AccountManager::insertTempPassword(
     }
 
     return db::DBResult::ok;
+}
+
+bool AccountManager::checkTemporaryPasswordForExpiration(
+    QnMutexLockerBase* const /*lk*/,
+    std::multimap<std::string, data::TemporaryAccountPassword>::iterator passwordIter)
+{
+    if (passwordIter->second.useCount >= passwordIter->second.maxUseCount ||
+        (passwordIter->second.expirationTimestampUtc > 0 &&
+            passwordIter->second.expirationTimestampUtc <= ::time(NULL)))
+    {
+        //TODO #ak remove password from DB
+        m_accountPassword.erase(passwordIter);
+        return false;
+    }
+
+    return true;
 }
 
 }   //cdb
