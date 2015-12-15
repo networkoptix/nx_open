@@ -75,10 +75,13 @@ public:
     qint64 getLastBackupTime(QnServer::StoragePool pool, const QnUuid& camera, 
                              QnServer::ChunksCatalog catalog) const;
 
+    void setBookmarkCountController(std::function<void(size_t)> handler);
+
 protected:
     virtual bool afterInstallUpdate(const QString& updateName) override;
 
     bool addOrUpdateBookmark(const QnCameraBookmark &bookmark);
+    void updateBookmarkCount();
 private:
     bool createDatabase();
     bool cleanupEvents();
@@ -96,6 +99,7 @@ private:
     qint64 m_auditCleanuptime;
     qint64 m_eventKeepPeriod;
     QnDbTransaction m_tran;
+    std::function<void(size_t)> m_updateBookmarkCount;
 };
 
 #define qnServerDb QnServerDb::instance()

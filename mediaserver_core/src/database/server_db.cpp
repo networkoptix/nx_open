@@ -868,7 +868,11 @@ bool QnServerDb::getBookmarks(const QString& cameraUniqueId, const QnCameraBookm
 }
 
 bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
-    return addOrUpdateBookmark(bookmark);
+    auto result = addOrUpdateBookmark(bookmark);
+    if (result)
+        updateBookmarkCount();
+
+    return result;
 }
 
 bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark) {
@@ -983,57 +987,101 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
     return tran.commit();
 }
 
+void QnServerDb::updateBookmarkCount()
+{
+    QWriteLocker lock(&m_mutex);
+    if (!m_updateBookmarkCount)
+        return;
+
+    QSqlQuery query(m_sdb);
+    query.setForwardOnly(true);
+    query.prepare(lit("SELECT count(guid) FROM bookmarks"));
+    if (!execSQLQuery(&query, Q_FUNC_INFO))
+        return;
+
+    if (!query.next()) {
+        Q_ASSERT_X(false, Q_FUNC_INFO, "Query has failed!");
+        return;
+    }
+
+    const auto value = query.value(0).toString();
+    m_updateBookmarkCount(value.toInt());
+}
+
 bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId) {
-    QnDbTransactionLocker tran(getTransaction());
-
+    bool result;
     {
-        QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid IN (SELECT guid from bookmarks WHERE unique_id = :id)");
-        delQuery.bindValue(":id", cameraUniqueId);
-        if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+        QnDbTransactionLocker tran(getTransaction());
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmark_tags "
+                             "WHERE bookmark_guid IN (SELECT guid from bookmarks "
+                                                     "WHERE unique_id = :id)");
+            delQuery.bindValue(":id", cameraUniqueId);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        {
+            QSqlQuery delQuery(m_sdb);
+            delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id");
+            delQuery.bindValue(":id", cameraUniqueId);
+            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        if (!execSQLQuery("DELETE FROM fts_bookmarks "
+                          "WHERE docid NOT IN (SELECT rowid FROM bookmarks)",
+                          m_sdb, Q_FUNC_INFO))
             return false;
+
+        result = tran.commit();
     }
 
-    {
-        QSqlQuery delQuery(m_sdb);
-        delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id");
-        delQuery.bindValue(":id", cameraUniqueId);
-        if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
-            return false;
-    }
+    if (result)
+        updateBookmarkCount();
 
-    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
-        return false;
-
-    return tran.commit();
+    return result;
 }
 
 bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
     if (!containsBookmark(bookmarkId))
         return false;
 
-    QnDbTransactionLocker tran(getTransaction());
-
+    bool result;
     {
-        QSqlQuery cleanTagQuery(m_sdb);
-        cleanTagQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid = ?");
-        cleanTagQuery.addBindValue(bookmarkId.toRfc4122());
-        if (!execSQLQuery(&cleanTagQuery, Q_FUNC_INFO))
+        QnDbTransactionLocker tran(getTransaction());
+
+        {
+            QSqlQuery cleanTagQuery(m_sdb);
+            cleanTagQuery.prepare("DELETE FROM bookmark_tags "
+                                  "WHERE bookmark_guid = ?");
+            cleanTagQuery.addBindValue(bookmarkId.toRfc4122());
+            if (!execSQLQuery(&cleanTagQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        {
+            QSqlQuery cleanQuery(m_sdb);
+            cleanQuery.prepare("DELETE FROM bookmarks WHERE guid = ?");
+            cleanQuery.addBindValue(bookmarkId.toRfc4122());
+            if (!execSQLQuery(&cleanQuery, Q_FUNC_INFO))
+                return false;
+        }
+
+        if (!execSQLQuery("DELETE FROM fts_bookmarks "
+                          "WHERE docid NOT IN (SELECT rowid FROM bookmarks)",
+                          m_sdb, Q_FUNC_INFO))
             return false;
+
+        result = tran.commit();
     }
 
-    {
-        QSqlQuery cleanQuery(m_sdb);
-        cleanQuery.prepare("DELETE FROM bookmarks WHERE guid = ?");
-        cleanQuery.addBindValue(bookmarkId.toRfc4122());
-        if (!execSQLQuery(&cleanQuery, Q_FUNC_INFO))
-            return false;
-    }
+    if (result)
+        updateBookmarkCount();
 
-    if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
-        return false;
-
-    return tran.commit();
+    return result;
 }
 
 bool QnServerDb::setLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId, 
@@ -1074,36 +1122,60 @@ qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& c
     return result;
 }
 
+void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
+{
+    {
+        QWriteLocker lock(&m_mutex);
+        Q_ASSERT_X( !m_updateBookmarkCount, Q_FUNC_INFO, "controller is already set!" );
+        m_updateBookmarkCount = std::move(handler);
+    }
+    updateBookmarkCount();
+}
+
 bool QnServerDb::deleteBookmarksToTime(const QMap<QString, qint64>& dataToDelete) 
 {
-    QnDbTransactionLocker tran(getTransaction());
-
-    for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
+    bool result;
     {
-        const QString& cameraUniqueId = itr.key();
-        qint64 timestampMs = itr.value();
+        QnDbTransactionLocker tran(getTransaction());
 
+        for (auto itr = dataToDelete.begin(); itr != dataToDelete.end(); ++itr)
         {
-            QSqlQuery delQuery(m_sdb);
-            delQuery.prepare("DELETE FROM bookmark_tags WHERE bookmark_guid IN (SELECT guid from bookmarks WHERE unique_id = :id AND start_time < :timestamp)");
-            delQuery.bindValue(":id", cameraUniqueId);
-            delQuery.bindValue(":timestamp", timestampMs);
-            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+            const QString& cameraUniqueId = itr.key();
+            qint64 timestampMs = itr.value();
+
+            {
+                QSqlQuery delQuery(m_sdb);
+                delQuery.prepare("DELETE FROM bookmark_tags "
+                                 "WHERE bookmark_guid IN (SELECT guid from bookmarks "
+                                                         "WHERE unique_id = :id "
+                                                           "AND start_time < :timestamp)");
+                delQuery.bindValue(":id", cameraUniqueId);
+                delQuery.bindValue(":timestamp", timestampMs);
+                if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                    return false;
+            }
+
+            {
+                QSqlQuery delQuery(m_sdb);
+                delQuery.prepare("DELETE FROM bookmarks "
+                                 "WHERE unique_id = :id AND start_time < :timestamp");
+                delQuery.bindValue(":id", cameraUniqueId);
+                delQuery.bindValue(":timestamp", timestampMs);
+                if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
+                    return false;
+            }
+
+            if (!execSQLQuery("DELETE FROM fts_bookmarks "
+                              "WHERE docid NOT IN (SELECT rowid FROM bookmarks)",
+                              m_sdb, Q_FUNC_INFO))
                 return false;
+
         }
-
-        {
-            QSqlQuery delQuery(m_sdb);
-            delQuery.prepare("DELETE FROM bookmarks WHERE unique_id = :id AND start_time < :timestamp");
-            delQuery.bindValue(":id", cameraUniqueId);
-            delQuery.bindValue(":timestamp", timestampMs);
-            if (!execSQLQuery(&delQuery, Q_FUNC_INFO))
-                return false;
-        }
-
-        if (!execSQLQuery("DELETE FROM fts_bookmarks WHERE docid NOT IN (SELECT rowid FROM bookmarks)", m_sdb, Q_FUNC_INFO))
-            return false;
-
+        result = tran.commit();
     }
-    return tran.commit();
+
+    if (result)
+        updateBookmarkCount();
+
+    return result;
 }
