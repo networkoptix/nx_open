@@ -15,6 +15,7 @@ public:
     template<class Deleter>
     QnSharedResourcePointer(Resource *ptr, Deleter d): base_type(ptr, d) { initialize(*this); }
 
+    // copy 
     QnSharedResourcePointer(const QSharedPointer<Resource> &other): base_type(other) {}
 
     QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<Resource> &other) {
@@ -29,6 +30,37 @@ public:
     QnSharedResourcePointer<Resource> &operator=(const QSharedPointer<OtherResource> &other) {
         base_type::operator=(other);
         return *this;
+    }
+
+    // move 
+    QnSharedResourcePointer(QSharedPointer<Resource> &&other): base_type(std::move(other)) {
+        other.reset();
+    }
+
+    QnSharedResourcePointer<Resource> &operator=(QSharedPointer<Resource> &&other) {
+        base_type::operator=(std::move(other));
+        other.reset();
+        return *this;
+    }
+
+    template<class OtherResource>
+    QnSharedResourcePointer(QSharedPointer<OtherResource> &&other): base_type(std::move(other)) {
+        other.reset();
+    }
+
+    template<class OtherResource>
+    QnSharedResourcePointer<Resource> &operator=(QSharedPointer<OtherResource> &&other) {
+        base_type::operator=(std::move(other));
+        other.reset();
+        return *this;
+    }
+
+    using base_type::reset;
+
+    template<class OtherResource>
+    void reset(OtherResource *resource) {
+        base_type::reset(resource);
+        initialize(*this);
     }
 
     template<class OtherResource>
