@@ -2817,22 +2817,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2847,11 +2832,6 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Schedule...</source>
         <translation type="unfinished">Esquema...</translation>
     </message>
@@ -2862,13 +2842,33 @@
     </message>
     <message>
         <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
+        <source>Unchecking the storage will cause nothing but writing stop.
+It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Unchecking the storage will cause nothing but writing stop.
-It won&apos;t deny oldest footage removing from the drive.</source>
+        <source>Main Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">Incluir Storage Externo...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Perform Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

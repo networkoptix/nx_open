@@ -3,6 +3,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <mobile_client/mobile_client_roles.h>
+#include <common/common_module.h>
 #include <watchers/available_cameras_watcher.h>
 
 QnAvailableCameraListModel::QnAvailableCameraListModel(QObject *parent) :
@@ -101,8 +102,10 @@ void QnAvailableCameraListModel::at_watcher_cameraRemoved(const QnResourcePtr &r
 }
 
 void QnAvailableCameraListModel::at_resourcePool_resourceChanged(const QnResourcePtr &resource) {
+    QnAvailableCamerasWatcher *watcher = qnCommon->instance<QnAvailableCamerasWatcher>();
+
     int row = m_resources.indexOf(resource);
-    bool accept = filterAcceptsResource(resource) && QnAvailableCamerasWatcher::instance()->isCameraAvailable(resource->getId());
+    bool accept = filterAcceptsResource(resource) && watcher->isCameraAvailable(resource->getId());
 
     if (row == -1) {
         if (accept)
@@ -118,7 +121,7 @@ void QnAvailableCameraListModel::at_resourcePool_resourceChanged(const QnResourc
 }
 
 void QnAvailableCameraListModel::resetResourcesInternal() {
-    QnAvailableCamerasWatcher *watcher = QnAvailableCamerasWatcher::instance();
+    QnAvailableCamerasWatcher *watcher = qnCommon->instance<QnAvailableCamerasWatcher>();
 
     disconnect(watcher, nullptr, this, nullptr);
     disconnect(qnResPool, nullptr, this, nullptr);

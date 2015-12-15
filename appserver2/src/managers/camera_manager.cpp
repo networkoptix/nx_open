@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include "core/resource/camera_resource.h"
 #include "database/db_manager.h"

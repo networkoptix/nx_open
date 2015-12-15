@@ -16,26 +16,26 @@
     <properties>
         <guid>${mobile_client.guid}</guid>
         <product.title>${mobile_client.name}</product.title>
+        <product.display.title>${client.display.name}</product.display.title>
+        <template>app</template>
         <!--Global libs-->
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <qt.libs>core qml quick concurrent network sql multimedia xml</qt.libs>
-        <global.libs>-lappserver2 -lcommon -lclient.core -lssl -lcrypto</global.libs>
+        <global.libs>-lappserver2 -lcommon -lclient.core</global.libs>
         <!--Specific os libs used-->
-        <linux.oslibs>${ffmpeg.libs} -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs.release/>
+        <windows.oslibs.debug/>
+        <linux.oslibs>${ffmpeg.libs} -lssl -lcrypto -lFestival -lestools -leststring -lestbase -lmp3lame -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lquazip</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
         <ios.oslibs>-lturbojpeg</ios.oslibs>
         <!--Global defines-->
         <global.defines>CL_FORCE_LOGO</global.defines>
         <!--Specific os defines-->
-        <android.defines/>
-        <ios.defines/>
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
         <linux.defines/>
-
-        <project.version.code>${buildNumber}</project.version.code>
-        <project.version.name>${release.version}</project.version.name>
-        <provisioning_profile>${root.dir}/customization/default/ios-client/testing.mobileprovision</provisioning_profile>
-        <provisioning_profile_id/>
-    </properties>
+        <mac.defines/>
+    </properties>   
 
 
     <dependencies>

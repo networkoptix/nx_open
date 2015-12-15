@@ -32,6 +32,8 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList &cameras);
 
+    const QnVirtualCameraResourceList &cameras() const;
+
     /// QAbstractItemModel overrides
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -41,7 +43,7 @@ public:
     /// TODO: #ynikitenkov Refactor to use proxy model
     void sort(int column, Qt::SortOrder order = Qt::AscendingOrder) override;
 
-    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const override;
+    QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
 
     QModelIndex parent(const QModelIndex &child) const override;
 
@@ -51,7 +53,6 @@ public:
         int role = Qt::DisplayRole) const override;
 
 private:
-    typedef QAbstractItemModel Base;
     class Impl;
 
     Impl * const m_impl;

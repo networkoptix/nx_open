@@ -1,7 +1,7 @@
 #ifndef __QN_DB_HELPER_H__
 #define __QN_DB_HELPER_H__
 
-#include <QSqlDatabase>
+#include <QtSql/QSqlDatabase>
 #include <QReadWriteLock>
 
 class QSqlDatabase;
