@@ -259,7 +259,18 @@ QString QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
 
     const auto cameraResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(id);
     if (!cameraResource)
-        return QString();
+        return tr("<Removed camera>");
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this
+        , [this](const QnResourcePtr &resource)
+    {
+        const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!cameraResource)
+            return;
+
+        m_camerasNames.remove(cameraResource->getUniqueId());
+        disconnect(cameraResource.data(), nullptr, this, nullptr);
+    });
 
     connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this
         , [this, id, cameraResource](const QnResourcePtr & /* resource */)
