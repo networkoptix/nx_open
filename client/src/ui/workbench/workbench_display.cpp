@@ -58,6 +58,7 @@
 #include <ui/graphics/items/resource/server_resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/resource/videowall_screen_widget.h>
+#include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/decodedpicturetoopengluploadercontextpool.h>
 #include <ui/graphics/items/grid/curtain_item.h>
@@ -897,18 +898,24 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     }
 
     QnResourceWidget *widget;
-    if (resource->hasFlags(Qn::server)) {
+    if (resource->hasFlags(Qn::server))
+    {
         widget = new QnServerResourceWidget(context(), item);
     }
-    else
-    if (resource->hasFlags(Qn::videowall)) {
+    else if (resource->hasFlags(Qn::videowall))
+    {
         widget = new QnVideowallScreenWidget(context(), item);
     }
-    else
-    if (resource->hasFlags(Qn::media)) {
+    else if (resource->hasFlags(Qn::media))
+    {
         widget = new QnMediaResourceWidget(context(), item);
     }
-    else {
+    else if (resource->hasFlags(Qn::url))
+    {
+        widget = new QnWebResourceWidget(context(), item);
+    }
+    else
+    {
         // TODO: #Elric unsupported for now
         qnDeleteLater(item);
         return false;

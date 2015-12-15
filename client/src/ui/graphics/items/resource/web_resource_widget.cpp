@@ -7,21 +7,19 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 {
 
     QGraphicsWebView *webView = new QGraphicsWebView(this);
-    webView->setUrl(QUrl(lit("www.yandex.ru")));
+    webView->setUrl(QUrl(lit("http://bash.im")));
     addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
-    setInfoVisible(true, false);
+
+    updateTitleText();
+    updateInfoText();
+    updateDetailsText();
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()
 {
 
-}
-
-QnResourceWidget::Buttons QnWebResourceWidget::calculateButtonsVisibility() const
-{
-    return 0;
 }
 
 QString QnWebResourceWidget::calculateTitleText() const
@@ -32,4 +30,16 @@ QString QnWebResourceWidget::calculateTitleText() const
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
     return Qn::EmptyOverlay;
+}
+
+Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )
+{
+    Q_UNUSED(painter)
+    Q_UNUSED(channel)
+    Q_UNUSED(channelRect)
+
+    if (!paintRect.isValid())
+        return Qn::NothingRendered;
+
+    return Qn::NewFrameRendered;
 }
