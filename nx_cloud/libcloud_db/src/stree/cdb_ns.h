@@ -38,6 +38,8 @@ enum Value
     authSystemID,
     //!Operation data contains accountID equal to the one been authenticated
     authSelfAccountAccessRequested,
+    //!Operation data contains systemID equal to the one been authenticated
+    authSelfSystemAccessRequested,
     resultCode,
 
     entity,

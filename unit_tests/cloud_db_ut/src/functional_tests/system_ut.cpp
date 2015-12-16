@@ -557,5 +557,79 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
     }
 }
 
+TEST_F(CdbFunctionalTest, system_unbind)
+{
+    startAndWaitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
+    for (int i = 0; i < 3; ++i)
+    {
+        //adding system1 to account1
+        api::SystemData system1;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            bindRandomSystem(account1.email, account1Password, &system1));
+
+        //checking account1 system list
+        {
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+            ASSERT_EQ(systems.size(), 1);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        }
+
+        //sharing system1 with account2 as viewer
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            shareSystem(
+                account1.email,
+                account1Password,
+                system1.id,
+                account2.email,
+                api::SystemAccessRole::editorWithSharing));
+
+        switch (i)
+        {
+            case 0:
+                //unbinding with owner credentials
+                ASSERT_EQ(
+                    api::ResultCode::ok,
+                    unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+                break;
+            case 1:
+                //unbinding with owner credentials
+                ASSERT_EQ(
+                    api::ResultCode::ok,
+                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                break;
+            case 2:
+                //unbinding with owner credentials
+                ASSERT_EQ(
+                    api::ResultCode::forbidden,
+                    unbindSystem(account2.email, account2Password, system1.id.toStdString()));
+                continue;
+        }
+
+        //checking account1 system list
+        {
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+            ASSERT_TRUE(systems.empty());
+        }
+    }
+}
+
 }   //cdb
 }   //nx

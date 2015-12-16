@@ -229,6 +229,9 @@ api::ResultCode CdbFunctionalTest::addActivatedAccount(
     if (resCode != api::ResultCode::ok)
         return resCode;
 
+    if (activationCode.code.empty())
+        return api::ResultCode::unknownError;
+
     std::string email;
     resCode = activateAccount(activationCode, &email);
     if (resCode != api::ResultCode::ok)
@@ -306,6 +309,26 @@ api::ResultCode CdbFunctionalTest::bindRandomSystem(
                 &nx::cdb::api::SystemManager::bindSystem,
                 connection->systemManager(),
                 std::move(sysRegData),
+                std::placeholders::_1));
+
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::unbindSystem(
+    const std::string& login,
+    const std::string& password,
+    const std::string& systemID)
+{
+    auto connection = connectionFactory()->createConnection(login, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+
+    std::tie(resCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::cdb::api::SystemManager::unbindSystem,
+                connection->systemManager(),
+                systemID,
                 std::placeholders::_1));
 
     return resCode;

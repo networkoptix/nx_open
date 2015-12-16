@@ -71,6 +71,10 @@ protected:
         const std::string& email,
         const std::string& password,
         api::SystemData* const systemData);
+    api::ResultCode unbindSystem(
+        const std::string& login,
+        const std::string& password,
+        const std::string& systemID);
     api::ResultCode getSystems(
         const std::string& email,
         const std::string& password,

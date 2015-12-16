@@ -141,6 +141,9 @@
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
+                        <condition resName="auth.selfSystemAccessRequested">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
                     </sequence>
                     <sequence value="/auth/get_authentication">
                         <set resName="authorized" resValue="false"/>
