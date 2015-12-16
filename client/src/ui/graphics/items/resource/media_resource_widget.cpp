@@ -1050,22 +1050,28 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     return result;
 }
 
-QString QnMediaResourceWidget::calculatePositionText() const {
+QString QnMediaResourceWidget::calculatePositionText() const
+{
     /* Do not show time for regular media files. */
     if (!m_resource->toResourcePtr()->flags().testFlag(Qn::utc))
         return QString();
 
-    qint64 datetimeUsec = getDisplayTimeUsec();
-    QString timeString = m_display->camDisplay()->isRealTimeSource()
-        ? tr("LIVE")
-        : (datetimeUsec == DATETIME_NOW || datetimeUsec == AV_NOPTS_VALUE)
-        ? QString()
-        : QDateTime::fromMSecsSinceEpoch(datetimeUsec/1000).toString(lit("yyyy-MM-dd hh:mm:ss"));
+    static const auto extractTime = [](qint64 dateTimeUsec)
+    {
+        if (!dateTimeUsec || (dateTimeUsec == DATETIME_NOW) || (dateTimeUsec == AV_NOPTS_VALUE))
+            return QString();
 
-    enum {
-        kPositionTextPixelSize = 14
+        enum { kMicroInMiniSeconds = 1000 };
+        static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
+
+        const auto dateTimeMs = dateTimeUsec / kMicroInMiniSeconds;
+        return QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
     };
 
+    const QString timeString = (m_display->camDisplay()->isRealTimeSource()
+        ? tr("LIVE") : extractTime(getDisplayTimeUsec()));
+
+    enum { kPositionTextPixelSize = 14 };
     return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);
 }
 
