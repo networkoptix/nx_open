@@ -33,6 +33,7 @@
 #include "http_handlers/get_account_handler.h"
 #include "http_handlers/update_account_handler.h"
 #include "http_handlers/reset_password_handler.h"
+#include "http_handlers/reactivate_account_handler.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
@@ -133,9 +134,10 @@ int CloudDBProcess::executeApplication()
     
         //TODO #ak move following to stree xml
         QnAuthMethodRestrictionList authRestrictionList;
-        authRestrictionList.allow( PingHandler::kHandlerPath, AuthMethod::noAuth );
-        authRestrictionList.allow( AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth );
-        authRestrictionList.allow( ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth );
+        authRestrictionList.allow(PingHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(AddAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
+        authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
 
         AuthenticationManager authenticationManager( 
             &accountManager,
@@ -292,6 +294,12 @@ void CloudDBProcess::registerApiHandlers(
         ResetPasswordHttpHandler::kHandlerPath,
         [accountManager, &authorizationManager]() -> std::unique_ptr<ResetPasswordHttpHandler> {
             return std::make_unique<ResetPasswordHttpHandler>( accountManager, authorizationManager );
+        } );
+
+    msgDispatcher->registerRequestProcessor<ReactivateAccountHttpHandler>(
+        ReactivateAccountHttpHandler::kHandlerPath,
+        [accountManager, &authorizationManager]() -> std::unique_ptr<ReactivateAccountHttpHandler> {
+            return std::make_unique<ReactivateAccountHttpHandler>( accountManager, authorizationManager );
         } );
 
     //systems

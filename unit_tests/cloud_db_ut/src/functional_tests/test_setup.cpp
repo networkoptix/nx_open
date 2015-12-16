@@ -187,7 +187,6 @@ api::ResultCode CdbFunctionalTest::activateAccount(
     //activating account
     auto connection = connectionFactory()->createConnection("", "");
 
-    //adding account
     api::ResultCode result = api::ResultCode::ok;
     nx::cdb::api::AccountEmail response;
     std::tie(result, response) = makeSyncCall<api::ResultCode, nx::cdb::api::AccountEmail>(
@@ -197,6 +196,24 @@ api::ResultCode CdbFunctionalTest::activateAccount(
             activationCode,
             std::placeholders::_1));
     *accountEmail = response.email;
+    return result;
+}
+
+api::ResultCode CdbFunctionalTest::reactivateAccount(
+    const std::string& email,
+    api::AccountConfirmationCode* const activationCode)
+{
+    auto connection = connectionFactory()->createConnection("", "");
+
+    api::ResultCode result = api::ResultCode::ok;
+    api::AccountEmail accountEmail;
+    accountEmail.email = email;
+    std::tie(result, *activationCode) = makeSyncCall<api::ResultCode, nx::cdb::api::AccountConfirmationCode>(
+        std::bind(
+            &nx::cdb::api::AccountManager::reactivateAccount,
+            connection->accountManager(),
+            std::move(accountEmail),
+            std::placeholders::_1));
     return result;
 }
 

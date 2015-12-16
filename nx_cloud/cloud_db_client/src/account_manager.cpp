@@ -73,6 +73,19 @@ void AccountManager::resetPassword(
         std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));
 }
 
+void AccountManager::reactivateAccount(
+    api::AccountEmail accountEmail,
+    std::function<void(
+        api::ResultCode,
+        api::AccountConfirmationCode)> completionHandler)
+{
+    executeRequest(
+        kAccountReactivatePath,
+        std::move(accountEmail),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));
+}
+
 }   //cl
 }   //cdb
 }   //nx

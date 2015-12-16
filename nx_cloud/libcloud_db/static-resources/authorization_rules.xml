@@ -37,7 +37,7 @@
                     <set resName="resultCode" resValue="accountNotActivated"/>
                     <condition resName="request.path">
                         <set value="/account/activate" resName="authorized" resValue="true"/>
-                        <set value="/account/get" resName="authorized" resValue="true"/>
+                        <!-- <set value="/account/get" resName="authorized" resValue="true"/> -->
                     </condition>
                 </sequence>
                 <sequence value="3">

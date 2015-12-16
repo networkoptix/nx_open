@@ -52,6 +52,9 @@ protected:
     api::ResultCode activateAccount(
         const api::AccountConfirmationCode& activationCode,
         std::string* const accountEmail);
+    api::ResultCode reactivateAccount(
+        const std::string& email,
+        api::AccountConfirmationCode* const activationCode);
     api::ResultCode getAccount(
         const std::string& email,
         const std::string& password,

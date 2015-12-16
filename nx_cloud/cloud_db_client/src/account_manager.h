@@ -53,6 +53,11 @@ public:
         std::function<void(
             api::ResultCode,
             api::AccountConfirmationCode)> completionHandler) override;
+    virtual void reactivateAccount(
+        api::AccountEmail accountEmail,
+        std::function<void(
+            api::ResultCode,
+            api::AccountConfirmationCode)> completionHandler) override;
 };
 
 }   //cl

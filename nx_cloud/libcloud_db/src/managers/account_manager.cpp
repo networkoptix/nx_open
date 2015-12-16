@@ -233,6 +233,35 @@ void AccountManager::resetPassword(
                     std::move(confirmationCode), std::move(completionHandler)));
 }
 
+void AccountManager::reactivateAccount(
+    const AuthorizationInfo& authzInfo,
+    data::AccountEmail accountEmail,
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+{
+    const auto existingAccount = m_cache.find(accountEmail.email);
+    if (!existingAccount)
+    {
+        NX_LOG(lm("/account/reactivate. Unknown account %1").
+            arg(accountEmail.email), cl_logDEBUG1);
+        return completionHandler(
+            api::ResultCode::notFound,
+            data::AccountConfirmationCode());
+    }
+
+    //fetching request source
+    bool requestSourceSecured = false;
+    authzInfo.get(attr::secureSource, &requestSourceSecured);
+
+    using namespace std::placeholders;
+    m_dbManager->executeUpdate<std::string, data::AccountConfirmationCode>(
+        std::bind(&AccountManager::issueAccountActivationCode, this, _1, _2, _3),
+        std::move(accountEmail.email),
+        std::bind(&AccountManager::accountReactivated, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            requestSourceSecured,
+            _1, _2, _3, std::move(completionHandler)));
+}
+
 boost::optional<data::AccountData> AccountManager::findAccountByUserName(
     const std::string& userName ) const
 {
@@ -289,7 +318,7 @@ db::DBResult AccountManager::fetchAccounts( QSqlDatabase* connection, int* const
 db::DBResult AccountManager::insertAccount(
     QSqlDatabase* const connection,
     const data::AccountData& accountData,
-    data::AccountConfirmationCode* const resultData )
+    data::AccountConfirmationCode* const resultData)
 {
     //TODO #ak should return specific error if email address already used for account
 
@@ -309,15 +338,41 @@ db::DBResult AccountManager::insertAccount(
         return db::DBResult::ioError;
     }
 
+    return issueAccountActivationCode(
+        connection,
+        accountData.email,
+        resultData);
+}
+
+db::DBResult AccountManager::issueAccountActivationCode(
+    QSqlDatabase* const connection,
+    const std::string& accountEmail,
+    data::AccountConfirmationCode* const resultData)
+{
+    //removing already-existing activation codes
+    QSqlQuery deleteActivationCodesQuery(*connection);
+    deleteActivationCodesQuery.prepare(
+        "DELETE FROM email_verification "
+        "WHERE account_id=(SELECT id FROM account WHERE email=?)");
+    deleteActivationCodesQuery.bindValue(
+        0,
+        QnSql::serialized_field(accountEmail));
+    if (!deleteActivationCodesQuery.exec())
+    {
+        NX_LOG(lit("Could not delete account activation codes from DB. %1").
+            arg(connection->lastError().text()), cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
     //inserting email verification code
     const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
     QSqlQuery insertEmailVerificationQuery( *connection );
     insertEmailVerificationQuery.prepare( 
         "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
-                               "VALUES ( ?, ?, ? )" );
+                               "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )" );
     insertEmailVerificationQuery.bindValue(
         0,
-        QnSql::serialized_field(accountData.id));
+        QnSql::serialized_field(accountEmail));
     insertEmailVerificationQuery.bindValue(
         1,
         emailVerificationCode);
@@ -336,7 +391,7 @@ db::DBResult AccountManager::insertAccount(
 
     //sending confirmation email
     ActivateAccountNotification notification;
-    notification.user_email = QString::fromStdString(accountData.email);
+    notification.user_email = QString::fromStdString(accountEmail);
     notification.type = CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME;
     notification.message.code = QString::fromStdString(resultData->code);
     m_emailManager->sendAsync(
@@ -366,8 +421,26 @@ void AccountManager::accountAdded(
     //adding activation code only in response to portal
     completionHandler(
         resultCode == db::DBResult::ok
-        ? api::ResultCode::ok
-        : api::ResultCode::dbError,
+            ? api::ResultCode::ok
+            : api::ResultCode::dbError,
+        requestSourceSecured
+            ? std::move(resultData)
+            : data::AccountConfirmationCode());
+}
+
+void AccountManager::accountReactivated(
+    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    bool requestSourceSecured,
+    nx::db::DBResult resultCode,
+    std::string /*email*/,
+    data::AccountConfirmationCode resultData,
+    std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler)
+{
+    //adding activation code only in response to portal
+    completionHandler(
+        resultCode == db::DBResult::ok
+            ? api::ResultCode::ok
+            : api::ResultCode::dbError,
         requestSourceSecured
             ? std::move(resultData)
             : data::AccountConfirmationCode());

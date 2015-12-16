@@ -39,17 +39,47 @@ TEST_F(CdbFunctionalTest, account_activation)
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_TRUE(!activationCode.code.empty());
 
-    //only get_account is allowed for not activated account
+    //only /account/activate and /account/reactivate are allowed for not activated account
 
     //adding system1 to account1
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
     ASSERT_EQ(api::ResultCode::accountNotActivated, result);
 
+    api::AccountData account1Tmp;
+    result = getAccount(account1.email, account1Password, &account1Tmp);
+    ASSERT_EQ(api::ResultCode::accountNotActivated, result);
+
+    std::string email;
+    result = activateAccount(activationCode, &email);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(account1.email, email);
+
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
-    ASSERT_EQ(api::AccountStatus::awaitingActivation, account1.statusCode);
+    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+}
+
+TEST_F(CdbFunctionalTest, account_reactivation)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    api::AccountData account1;
+    std::string account1Password;
+    api::AccountConfirmationCode activationCode;
+    result = addAccount(&account1, &account1Password, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_TRUE(!activationCode.code.empty());
+
+    //reactivating account (e.g. we lost activation code)
+    result = reactivateAccount(account1.email, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_TRUE(!activationCode.code.empty());
 
     std::string email;
     result = activateAccount(activationCode, &email);
@@ -210,6 +240,13 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_TRUE(!activationCode.code.empty());
 
+    std::string activatedAccountEmail;
+    result = activateAccount(activationCode, &activatedAccountEmail);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        QUrl::fromPercentEncoding(account1.email.c_str()).toStdString(),
+        activatedAccountEmail);
+
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::notAuthorized);  //test%40yandex.ru MUST be unknown email
 
@@ -217,7 +254,7 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
-    ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
+    ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
 

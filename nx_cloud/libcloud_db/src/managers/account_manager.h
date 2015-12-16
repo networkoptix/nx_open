@@ -81,6 +81,10 @@ public:
         const AuthorizationInfo& authzInfo,
         data::AccountEmail accountEmail,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
+    void reactivateAccount(
+        const AuthorizationInfo& authzInfo,
+        data::AccountEmail accountEmail,
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
     boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const;
@@ -105,6 +109,10 @@ private:
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const resultData );
+    nx::db::DBResult issueAccountActivationCode(
+        QSqlDatabase* const connection,
+        const std::string& accountEmail,
+        data::AccountConfirmationCode* const resultData);
     void accountAdded(
         ThreadSafeCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
@@ -112,6 +120,13 @@ private:
         data::AccountData accountData,
         data::AccountConfirmationCode resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
+    void accountReactivated(
+        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+        bool requestSourceSecured,
+        nx::db::DBResult resultCode,
+        std::string email,
+        data::AccountConfirmationCode resultData,
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
     //verify_account DB operations
     nx::db::DBResult verifyAccount(

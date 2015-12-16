@@ -14,6 +14,7 @@ const char* kAccountActivatePath = "/account/activate";
 const char* kAccountGetPath = "/account/get";
 const char* kAccountUpdatePath = "/account/update";
 const char* kAccountPasswordResetPath = "/account/reset_password";
+const char* kAccountReactivatePath = "/account/reactivate";
 
 const char* kSystemBindPath = "/system/bind";
 const char* kSystemUnbindPath = "/system/unbind";
