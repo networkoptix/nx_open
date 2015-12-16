@@ -54,8 +54,10 @@ private:
     void at_eventsGrid_clicked(const QModelIndex& index);
 
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
-    void updateBackupUi(const QnBackupStatusData& reply);
-    void updateCamerasLabel();
+    void updateBackupUi(const QnBackupStatusData& reply
+        , int selectedCamerasCount);
+    void updateCamerasLabel(int selectedCamerasCount);
+    int getSelectedCamerasCount() const;
 
     void updateColumnWidth();
     int getColWidth(int col);
@@ -67,7 +69,9 @@ private:
     void cancelBackup();
 
     /** Check if backup can be started right now - and show additional info if not. */
-    bool canStartBackup(const QnBackupStatusData& data, QString *info);
+    bool canStartBackup(const QnBackupStatusData& data
+        , int selectedCamerasCount
+        , QString *info);
 
     QString backupPositionToString(qint64 backupTimeMs);
 
