@@ -1227,7 +1227,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     if(!m_pausedOverride) {
 
         //TODO: #GDM #refactor logic in 3.0
-        auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget)
+        auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget) -> qint64
         {
             if (mediaWidget->display()->camDisplay()->isRealTimeSource())
                 return DATETIME_NOW;
@@ -1244,7 +1244,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             return timeUSec;
         };
 
-        auto usecToMsec = [endTimeMSec, this](qint64 timeUSec) {
+        auto usecToMsec = [endTimeMSec, this](qint64 timeUSec) -> qint64
+        {
             return timeUSec == DATETIME_NOW
                 ? endTimeMSec
                 : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
