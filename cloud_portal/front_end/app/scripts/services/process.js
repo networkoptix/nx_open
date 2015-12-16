@@ -3,8 +3,14 @@
 
 angular.module('cloudApp')
     .factory('process', function ($q) {
+
+        function formatError(error,errorCodes){
+            return (errorCodes && errorCodes[error.resultCode]) || Config.errorCodes[error.resultCode] || Config.errorCodes.unknownError;
+        }
+
         return {
-            init:function(caller){
+            formatError:formatError,
+            init:function(caller, errorCodes){
                 var deferred = $q.defer();
 
                 return {
@@ -25,7 +31,7 @@ angular.module('cloudApp')
                             console.error("process error",error);
                             self.error = true;
                             self.errorData = error;
-                            self.errorMessage = error.data.errorText;
+                            self.errorMessage = formatError(error.data, errorCodes);
                             self.processing = false;
 
                             deferred.reject(error);
