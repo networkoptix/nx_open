@@ -1138,6 +1138,16 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
     systemAdministrationDialog()->setCurrentPage(QnSystemAdministrationDialog::UserManagement);
 }
 
+qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
+{
+    enum { kOneWeekOffsetMs = 1000 * 60 * 60 * 24 * 7 } ;
+    const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
+    const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
+    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    return (firstTimeIsNotKnown ? nowMs - kOneWeekOffsetMs : firstBookmarkUtcTimeMs);
+}
+
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
     QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
@@ -1146,28 +1156,18 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 
     // If time window is specified then set it
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
-    if (parameters.hasArgument(Qn::BookmarkTagRole))
-    {
-        const QString filterText = parameters.argument(Qn::BookmarkTagRole).toString();
 
-        const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
-        const bool correctWindow = timelineWindow.isValid();
+    const auto filterText = (parameters.hasArgument(Qn::BookmarkTagRole)
+        ? parameters.argument(Qn::BookmarkTagRole).toString() : QString());
 
-        if (correctWindow)
-        {
-            const auto endTimeMs = (timelineWindow.isInfinite() ? nowMs : timelineWindow.endTimeMs());
-            m_searchBookmarksDialog->setParameters(timelineWindow.startTimeMs, endTimeMs, filterText);
-            return;
-        }
-    }
+    const auto timelineWindow = parameters.argument<QnTimePeriod>(Qn::ItemSliderWindowRole);
+    const auto endTimeMs = (timelineWindow.isValid()
+        ? (timelineWindow.isInfinite() ? nowMs : timelineWindow.endTimeMs()) : nowMs);
 
-    // Otherwise set default time window and reset other parameters
-    const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
-    const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
-    const auto start = (firstTimeIsNotKnown ? nowMs : firstBookmarkUtcTimeMs);
+    const auto startTimeMs(timelineWindow.isValid()
+        ? timelineWindow.startTimeMs : getFirstBookmarkTimeMs());
 
-    m_searchBookmarksDialog->setParameters(start, nowMs);
+    m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {

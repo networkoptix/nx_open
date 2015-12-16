@@ -2528,13 +2528,8 @@ void QnWorkbenchUi::createSliderWidget()
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
         , [this, bookmarksViewer](const QString &tag)
     {
-        const auto windowStart = m_sliderItem->timeSlider()->windowStart();
-        const auto window = QnTimePeriod(windowStart
-            , m_sliderItem->timeSlider()->windowEnd() - windowStart);
-
         QnActionParameters params;
         params.setArgument(Qn::BookmarkTagRole, tag);
-        params.setArgument(Qn::ItemSliderWindowRole, window);
         menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
     });
 
