@@ -4,9 +4,6 @@ import django
 from notifications.config import notifications_config
 from django.conf import settings
 
-import logging
-__django__ = logging.getLogger('django')
-
 
 def send(user_email, msg_type, message):
 

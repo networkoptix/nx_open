@@ -5,19 +5,14 @@ import logging
 import json
 import traceback
 
-__django__ = logging.getLogger('django')
+logger = logging.getLogger(__name__)
 
 
-def api_success(data=None, status_code=status.HTTP_200_OK):
-    if data is not None:
-        return Response(data, status=status_code)
-    return Response({
-                'resultCode': 0
-            }, status=status_code)
 
 
 class ErrorCodes:
-    no_email = 'noEmail'
+    ok = 'ok'
+
     # Cloud DB errors:
     cloud_invalid_response = 'cloudInvalidResponse'
 
@@ -25,16 +20,46 @@ class ErrorCodes:
     portal_critical_error = 'portalError'
 
     # Validation errors
-    wrong_credentials = 'wrongCredentials'
+    not_authorized = 'notAuthorized'
     wrong_parameters = 'wrongParameters'
+
+
+    # CLOUD DB specific errors
+    forbidden = 'forbidden'
+    account_not_activated = 'accountNotActivated'
+    account_blocked = 'accountBlocked'
+    not_found = 'notFound'  # Account not found, activation code not found and so on
+    account_exists = 'alreadyExists'
+    db_error = 'dbError'
+    network_error = 'networkError'
+    not_implemented = 'notImplemented'
+    unknown_realm = 'unknownRealm'
+    bad_username = 'badUsername'
+    bad_request = 'badRequest'
+    invalid_nonce = 'invalidNonce'
+    service_unavailable = 'serviceUnavailable'
+    unknown_error = 'unknownError'
+
+    response_serialization_error = 'responseSerializationError'
+    deserialization_error = 'deserializationError'
+    not_acceptable = 'notAcceptable'
 
     def __init__(self):
         pass
 
 
+
+def api_success(data=None, status_code=status.HTTP_200_OK):
+    if data is not None:
+        return Response(data, status=status_code)
+    return Response({
+                'resultCode': ErrorCodes.ok
+            }, status=status_code)
+
+
 class APIException(Exception):
     error_text = 'Unexpected error'
-    error_code = ErrorCodes.portal_critical_error
+    error_code = ErrorCodes.unknown_error
     error_data = None
     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -106,9 +131,9 @@ def validate_response(func):
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
 
-        __django__.debug(response.status_code)
-        __django__.debug(response.text)
-        __django__.debug('------------------------------------------------------------')
+        logger.debug(response.status_code)
+        logger.debug(response.text)
+        logger.debug('------------------------------------------------------------')
 
         if response.status_code == status.HTTP_204_NO_CONTENT:  # No content
             return None
@@ -134,7 +159,7 @@ def validate_response(func):
             raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
 
         # Check error_code status - raise APILogicException
-        if 'resultCode' in response_data and response_data['resultCode'] != 0:
+        if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok:
             validate_error(response_data)
             raise APILogicException(response_data['errorText'], response_data['resultCode'])
 
@@ -159,7 +184,7 @@ def handle_exceptions(func):
                 return Response(data, status=status.HTTP_200_OK)
             return data
         except APIException as error:
-            __django__.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.
+            logger.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.
                              format(error.status_code,
                                     error.error_text,
                                     error.error_code,
@@ -168,7 +193,7 @@ def handle_exceptions(func):
             return error.response()
         except:
             detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()
-            __django__.error(detailed_error)
+            logger.error(detailed_error)
 
             if not settings.DEBUG:
                 detailed_error = 'Unexpected error somewhere inside'

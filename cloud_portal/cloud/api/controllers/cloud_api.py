@@ -1,11 +1,8 @@
 import requests
-import logging
 from requests.auth import HTTPDigestAuth
 from hashlib import md5
 from cloud import settings
 from api.helpers.exceptions import validate_response
-
-__django__ = logging.getLogger('django')
 
 
 class System(object):

@@ -9,7 +9,6 @@ angular.module('cloudApp')
             account:function(){
                 var defer = $q.defer();
                 if(!accountCache){
-
                     console.log("account request");
                     $http.get(apiBase + '/account').then(function(response){
                         accountCache = response.data;
@@ -17,7 +16,6 @@ angular.module('cloudApp')
                         defer.resolve(accountCache);
                     },function(error){
                         console.error(error);
-
                         accountCache = null;
                         defer.resolve(null);
                         return null

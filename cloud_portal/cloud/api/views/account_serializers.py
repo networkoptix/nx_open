@@ -1,9 +1,6 @@
 from api.models import Account
 from rest_framework import serializers
-import logging
 import django
-
-__django__ = logging.getLogger('django')
 
 
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer

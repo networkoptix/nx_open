@@ -1,0 +1,7 @@
+django
+djangorestframework
+pygments
+django-cors-headers
+MySQL-python
+pystache
+jsonfield

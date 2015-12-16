@@ -5,15 +5,12 @@ from account_serializers import AccountSerializer, CreateAccountSerializer, Acco
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
 import base64
-import logging
 from django.utils import timezone
 from django.db.models import Model
 import api
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success, \
     ErrorCodes
-
-__django__ = logging.getLogger('django')
 
 
 @api_view(['POST'])
@@ -36,7 +33,7 @@ def login(request):
 
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid', ErrorCodes.wrong_credentials)
+        raise APINotAuthorisedException('Username or password are invalid', ErrorCodes.not_authorized)
 
     django.contrib.auth.login(request, user)
     request.session['password'] = request.data['password']
@@ -58,8 +55,6 @@ def logout(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def index(request):
-
-    __django__.debug("index")
 
     """
     List all snippets, or create a new snippet.

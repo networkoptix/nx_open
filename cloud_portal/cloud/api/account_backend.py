@@ -1,22 +1,14 @@
 from django.utils import timezone
 from django import db
-import logging
 import models
 from api.controllers.cloud_api import Account
-
 from api.helpers.exceptions import APIRequestException, ErrorCodes
-
-__django__ = logging.getLogger('django')
 
 
 class AccountBackend(object):
     @staticmethod
     def authenticate(username=None, password=None):
-
-        __django__.debug("authentificate " + username)
-
         checkuser = Account.get(username, password)
-        __django__.debug(checkuser)
 
         if checkuser:
             return models.Account.objects.get(email=username)
