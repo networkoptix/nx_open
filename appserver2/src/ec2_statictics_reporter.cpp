@@ -117,6 +117,9 @@ namespace ec2
         if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
             return res;
 
+        dbManager_queryOrReturn(ApiUserDataList, users);
+        for (auto& u : users) outData->users.push_back(std::move(u));
+
         #undef dbManager_queryOrReturn
 
         outData->systemId = getOrCreateSystemId();

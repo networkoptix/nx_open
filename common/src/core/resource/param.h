@@ -55,6 +55,7 @@ namespace Qn
     static const QString NETWORK_INTERFACES = lit("networkInterfaces");
     static const QString FULL_VERSION = lit("fullVersion");
     static const QString SYSTEM_RUNTIME = lit("systemRuntime");
+    static const QString BOOKMARK_COUNT = lit("bookmarkCount");
 
     // Storage
     static const QString SPACE = lit("space");
