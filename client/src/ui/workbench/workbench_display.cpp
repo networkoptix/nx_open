@@ -703,7 +703,6 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             }
         }
 
-        // Update visible layouts
         if (oldWidget)
             oldWidget->setOption(QnResourceWidget::FullScreenMode, false);
         if (newWidget)
