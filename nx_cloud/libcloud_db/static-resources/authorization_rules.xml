@@ -34,10 +34,16 @@
                 <sequence value="1">
                     <!-- account not activated -->
                     <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountNotActivated"/>
                     <condition resName="request.path">
                         <set value="/account/activate" resName="authorized" resValue="true"/>
                         <set value="/account/get" resName="authorized" resValue="true"/>
                     </condition>
+                </sequence>
+                <sequence value="3">
+                    <!-- account blocked -->
+                    <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountBlocked"/>
                 </sequence>
             </condition>
 

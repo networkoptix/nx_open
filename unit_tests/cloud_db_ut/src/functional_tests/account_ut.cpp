@@ -44,7 +44,7 @@ TEST_F(CdbFunctionalTest, account_activation)
     //adding system1 to account1
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
-    ASSERT_EQ(api::ResultCode::forbidden, result);
+    ASSERT_EQ(api::ResultCode::accountNotActivated, result);
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
@@ -185,7 +185,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
             nx_http::FusionRequestResult(),
             &success);
     ASSERT_TRUE(success);
-    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.resultCode);
+    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.errorClass);
 }
 
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)

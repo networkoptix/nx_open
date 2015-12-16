@@ -30,32 +30,45 @@ enum class FusionRequestErrorClass
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorClass)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorClass), (lexical))
 
+enum class FusionRequestErrorDetail
+{
+    noError = 0,
+    responseSerializationError,
+    deserializationError,
+    notAcceptable
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FusionRequestErrorDetail)
+//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorDetail), (lexical))
+
+//not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
+void NX_NETWORK_API serialize(const FusionRequestErrorDetail&, QString*);
+
 class NX_NETWORK_API FusionRequestResult
 {
 public:
-    enum ErrorDetail
-    {
-        ecNoDetail = 0,
-        ecResponseSerializationError,
-        ecDeserializationError,
-        ecNotAcceptable
-    };
-
-    FusionRequestErrorClass resultCode;
+    FusionRequestErrorClass errorClass;
+    QString resultCode;
     int errorDetail;
     QString errorText;
 
     FusionRequestResult();
     FusionRequestResult(
         FusionRequestErrorClass _errorClass,
+        QString _resultCode,
         int _errorDetail,
+        QString _errorText);
+    FusionRequestResult(
+        FusionRequestErrorClass _errorClass,
+        QString _resultCode,
+        FusionRequestErrorDetail _errorDetail,
         QString _errorText);
 
     nx_http::StatusCode::Value httpStatusCode() const;
 };
 
 
-#define FusionRequestResult_Fields (resultCode)(errorDetail)(errorText)
+#define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)
 
 //not using QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES here since it does not support declspec
 bool NX_NETWORK_API deserialize(QnJsonContext*, const QJsonValue&, class FusionRequestResult*);

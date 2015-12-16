@@ -13,10 +13,13 @@
 #include <utils/common/app_info.h>
 #include <utils/common/guard.h>
 #include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
 #include <nx/network/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+
+#include <cloud_db_client/src/data/types.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -61,9 +64,11 @@ bool AuthenticationManager::authenticate(
     auto guard = makeScopedGuard([&msgBody, &authResult](){
         if (authResult)
             return;
-        nx_http::FusionRequestResult result;
-        result.resultCode = nx_http::FusionRequestErrorClass::unauthorized;
-        result.errorText = "unauthorized";
+        nx_http::FusionRequestResult result(
+            nx_http::FusionRequestErrorClass::unauthorized,
+            QnLexical::serialized(api::ResultCode::notAuthorized),
+            static_cast<int>(api::ResultCode::notAuthorized),
+            "unauthorized");
         *msgBody = std::make_unique<nx_http::BufferSource>(
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
             QJson::serialized(result));

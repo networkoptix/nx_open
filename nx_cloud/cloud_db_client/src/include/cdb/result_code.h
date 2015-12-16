@@ -19,8 +19,12 @@ enum class ResultCode
     ok = 0,
     //!Provided credentials are invalid
     notAuthorized = CDB_API_ERROR_CODE_BASE,
+
     //!Requested operation is not allowed with credentials provided
     forbidden,
+    accountNotActivated,
+    accountBlocked,
+
     notFound,
     alreadyExists,
     dbError,

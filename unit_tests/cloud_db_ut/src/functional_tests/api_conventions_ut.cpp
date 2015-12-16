@@ -10,6 +10,7 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <cloud_db_client/src/data/account_data.h>
+#include <cloud_db_client/src/data/types.h>
 
 #include "test_setup.h"
 #include "version.h"
@@ -43,9 +44,12 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
 
         ASSERT_TRUE(httpClient.response() != nullptr);
         ASSERT_EQ(nx_http::StatusCode::badRequest, httpClient.response()->statusLine.statusCode);
-        ASSERT_EQ(nx_http::FusionRequestErrorClass::badRequest, requestResult.resultCode);
+        ASSERT_EQ(nx_http::FusionRequestErrorClass::badRequest, requestResult.errorClass);
         ASSERT_EQ(
-            (int)nx_http::FusionRequestResult::ecDeserializationError,
+            QnLexical::serialized(nx_http::FusionRequestErrorDetail::deserializationError),
+            requestResult.resultCode);
+        ASSERT_EQ(
+            (int)nx_http::FusionRequestErrorDetail::deserializationError,
             requestResult.errorDetail);
     }
 
@@ -64,9 +68,12 @@ TEST_F(CdbFunctionalTest, api_conventions_general)
 
         ASSERT_TRUE(httpClient.response() != nullptr);
         ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
-        ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.resultCode);
+        ASSERT_EQ(nx_http::FusionRequestErrorClass::unauthorized, requestResult.errorClass);
         ASSERT_EQ(
-            (int)api::ResultCode::forbidden,
+            QnLexical::serialized(api::ResultCode::accountNotActivated),
+            requestResult.resultCode);
+        ASSERT_EQ(
+            (int)api::ResultCode::accountNotActivated,
             requestResult.errorDetail);
     }
 }
@@ -138,6 +145,9 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInUnauthorizedResponse)
 
         ASSERT_EQ(
             nx_http::FusionRequestErrorClass::unauthorized,
+            requestResult.errorClass);
+        ASSERT_EQ(
+            QnLexical::serialized(api::ResultCode::notAuthorized),
             requestResult.resultCode);
     }
 }
@@ -189,6 +199,9 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
 
     ASSERT_EQ(
         nx_http::FusionRequestErrorClass::noError,
+        requestResult.errorClass);
+    ASSERT_EQ(
+        QnLexical::serialized(nx_http::FusionRequestErrorDetail::noError),
         requestResult.resultCode);
 
     result = getAccount(account1.email, account1NewPassword, &account1);

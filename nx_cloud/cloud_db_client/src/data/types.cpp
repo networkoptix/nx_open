@@ -22,6 +22,8 @@ nx_http::StatusCode::Value resultCodeToHttpStatusCode(ResultCode resultCode)
         case ResultCode::notAuthorized:
             return nx_http::StatusCode::unauthorized;
         case ResultCode::forbidden:
+        case ResultCode::accountNotActivated:
+        case ResultCode::accountBlocked:
             return nx_http::StatusCode::forbidden;
         case ResultCode::notFound:
             return nx_http::StatusCode::notFound;
@@ -83,6 +85,8 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
     {
         case ResultCode::notAuthorized:
         case ResultCode::forbidden:
+        case ResultCode::accountNotActivated:
+        case ResultCode::accountBlocked:
         case ResultCode::badUsername:
         case ResultCode::badRequest:
         case ResultCode::invalidNonce:
@@ -110,13 +114,14 @@ nx_http::FusionRequestResult resultCodeToFusionRequestResult(ResultCode resultCo
 
     return nx_http::FusionRequestResult(
         requestResultCode,
+        QnLexical::serialized(resultCode),
         static_cast<int>(resultCode),
         QnLexical::serialized(resultCode));
 }
 
 ResultCode fusionRequestResultToResultCode(nx_http::FusionRequestResult result)
 {
-    if (result.resultCode == nx_http::FusionRequestErrorClass::noError)
+    if (result.errorClass == nx_http::FusionRequestErrorClass::noError)
         return ResultCode::ok;
 
     return static_cast<ResultCode>(result.errorDetail);
@@ -127,6 +132,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::notAuthorized, "notAuthorized")
     (ResultCode::forbidden, "forbidden")
+    (ResultCode::accountNotActivated, "accountNotActivated")
+    (ResultCode::accountBlocked, "accountBlocked")
     (ResultCode::notFound, "notFound")
     (ResultCode::alreadyExists, "alreadyExists")
     (ResultCode::dbError, "dbError")
