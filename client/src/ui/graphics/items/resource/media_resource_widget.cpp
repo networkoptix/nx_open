@@ -74,6 +74,13 @@
 
 namespace
 {
+    bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
+    {
+        return ((dateTimeUsec == DATETIME_NOW)
+            || (dateTimeUsec == AV_NOPTS_VALUE)
+            || (dateTimeUsec == kNoTimeValue));
+    }
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -1058,13 +1065,13 @@ QString QnMediaResourceWidget::calculatePositionText() const
 
     static const auto extractTime = [](qint64 dateTimeUsec)
     {
-        if (!dateTimeUsec || (dateTimeUsec == DATETIME_NOW) || (dateTimeUsec == AV_NOPTS_VALUE))
+        if (isSpecialDateTimeValueUsec(dateTimeUsec))
             return QString();
 
-        enum { kMicroInMiniSeconds = 1000 };
+        enum { kMicroInMilliSeconds = 1000 };
         static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
 
-        const auto dateTimeMs = dateTimeUsec / kMicroInMiniSeconds;
+        const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
         return QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
     };
 
@@ -1579,7 +1586,7 @@ qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const
 qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
 {
     qint64 result = getUtcCurrentTimeUsec();
-    if (result != DATETIME_NOW && result != AV_NOPTS_VALUE)
+    if (!isSpecialDateTimeValueUsec(result))
         result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource) * 1000ll;
     return result;
 }
