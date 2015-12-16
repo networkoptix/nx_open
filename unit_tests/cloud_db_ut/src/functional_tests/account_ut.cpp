@@ -168,7 +168,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
+        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) {
             donePromise.set_value();
         },
         Qt::DirectConnection);
