@@ -20,7 +20,7 @@
         <global.libs></global.libs>
         <!--Specific os libs used-->
         <qt.libs>core network multimedia concurrent xml sql</qt.libs>
-        <ffmpeg.libs>-lcommon -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
+        <ffmpeg.libs>-lcommon -lnx_streaming -lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
         <windows.oslibs>DbgHelp.lib -lIphlpapi -lwinmm -lws2_32 -lssleay32 -llibeay32</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>  

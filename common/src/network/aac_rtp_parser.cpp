@@ -6,11 +6,12 @@
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
 
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/media_data_packet.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 
-#include "rtp_stream_parser.h"
-#include "rtpsession.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
 
 QnAacRtpParser::QnAacRtpParser():
     QnRtpAudioStreamParser()
@@ -35,6 +36,7 @@ QnAacRtpParser::QnAacRtpParser():
 
 QnAacRtpParser::~QnAacRtpParser()
 {
+    // Do nothing.
 }
 
 void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
@@ -77,15 +79,15 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
     m_auHeaderExists = m_sizeLength || m_indexLength || m_indexDeltaLength || m_CTSDeltaLength || m_DTSDeltaLength || m_randomAccessIndication || m_streamStateIndication;
     m_aacHelper.readConfig(m_config);
     
-    m_context = QnMediaContextPtr(new QnMediaContext(CODEC_ID_AAC));
-    m_context->ctx()->channels = m_aacHelper.m_channels;
-    m_context->ctx()->sample_rate = m_aacHelper.m_sample_rate;
-    m_context->ctx()->sample_fmt = AV_SAMPLE_FMT_S16;
-    m_context->ctx()->time_base.num = 1;
-    m_context->ctx()->time_base.den = m_aacHelper.m_sample_rate;
-    m_context->ctx()->extradata = (uint8_t*) av_malloc(m_config.size());
-    memcpy(m_context->ctx()->extradata, m_config.data(), m_config.size());
-    m_context->ctx()->extradata_size = m_config.size();
+    const auto context = new QnAvCodecMediaContext(CODEC_ID_AAC);
+    m_context = QnConstMediaContextPtr(context);
+    const auto av = context->getAvCodecContext();
+    av->channels = m_aacHelper.m_channels;
+    av->sample_rate = m_aacHelper.m_sample_rate;
+    av->sample_fmt = AV_SAMPLE_FMT_S16;
+    av->time_base.num = 1;
+    av->time_base.den = m_aacHelper.m_sample_rate;
+    context->setExtradata((const quint8*) m_config.data(), m_config.size());
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
@@ -93,7 +95,7 @@ void QnAacRtpParser::setSDPInfo(QList<QByteArray> lines)
 
 }
 
-bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
+bool QnAacRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;

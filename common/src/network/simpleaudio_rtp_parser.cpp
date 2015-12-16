@@ -2,12 +2,12 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "rtp_stream_parser.h"
-#include "rtpsession.h"
-#include "utils/common/synctime.h"
-#include "core/datapacket/media_data_packet.h"
-#include "core/datapacket/audio_data_packet.h"
-
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/common/synctime.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/av_codec_media_context.h>
 
 QnSimpleAudioRtpParser::QnSimpleAudioRtpParser():
     QnRtpAudioStreamParser(),
@@ -55,20 +55,22 @@ void QnSimpleAudioRtpParser::setSDPInfo(QList<QByteArray> lines)
         }   
     }
     
-    m_context = QnMediaContextPtr(new QnMediaContext(m_codecId));
-    m_context->ctx()->channels = m_channels;
-    m_context->ctx()->sample_rate = m_frequency;
-    m_context->ctx()->sample_fmt = m_sampleFormat;
-    m_context->ctx()->time_base.num = 1;
-    m_context->ctx()->bits_per_coded_sample = m_bits_per_coded_sample;
-    m_context->ctx()->time_base.den = m_frequency;
+    const auto context = new QnAvCodecMediaContext(m_codecId);
+    m_context = QnConstMediaContextPtr(context);
+    const auto av = context->getAvCodecContext();
+    av->channels = m_channels;
+    av->sample_rate = m_frequency;
+    av->sample_fmt = m_sampleFormat;
+    av->time_base.num = 1;
+    av->bits_per_coded_sample = m_bits_per_coded_sample;
+    av->time_base.den = m_frequency;
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_context;
     m_audioLayout->setAudioTrackInfo(track);
 }
 
-bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const RtspStatistic& statistics, bool& gotData)
+bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int bufferSize, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     const quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -94,7 +96,7 @@ bool QnSimpleAudioRtpParser::processData(quint8* rtpBufferBase, int bufferOffset
 
 
     QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
-    audioData->compressionType = m_context->ctx()->codec_id;
+    audioData->compressionType = !m_context? CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
     if (m_timeHelper) {
         audioData->timestamp = m_timeHelper->getUsecTime(ntohl(rtpHeader->timestamp), statistics, m_frequency);

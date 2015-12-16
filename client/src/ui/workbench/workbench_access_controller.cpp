@@ -18,7 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_criterion.h>
 
-#include <plugins/resource/archive/abstract_archive_resource.h>
+#include <nx/streaming/abstract_archive_resource.h>
 
 #include <utils/common/checked_cast.h>
 

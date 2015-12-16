@@ -5,7 +5,7 @@
 #include <utils/common/sleep.h>
 #include <utils/common/log.h>
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 #include <core/resource/camera_resource.h>
 
 

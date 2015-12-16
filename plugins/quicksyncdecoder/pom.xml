@@ -26,7 +26,7 @@
 		<!--Global libs-->
 		<qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale</ffmpeg.libs>
-		<global.libs>-lcommon -lprotobuf</global.libs>
+		<global.libs>-lcommon -lnx_streaming -lprotobuf</global.libs>
 		<!--Specific os libs used-->
 		<windows.oslibs>DbgHelp.lib -lDxErr -ld3d9 -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lssleay32 -llibeay32 -lglu32 -lDxva2 -llibmfxmd</windows.oslibs>
 		<windows.oslibs.release></windows.oslibs.release>

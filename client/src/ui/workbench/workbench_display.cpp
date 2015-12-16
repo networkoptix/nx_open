@@ -86,8 +86,8 @@
 #include "workbench_access_controller.h"
 #include "workbench.h"
 
-#include "core/dataprovider/abstract_streamdataprovider.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "nx/streaming/abstract_stream_data_provider.h"
+#include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include <ui/workbench/handlers/workbench_action_handler.h> // TODO: remove
 #include <ui/workbench/handlers/workbench_notifications_handler.h>

@@ -49,7 +49,7 @@
 
 #include <nx_ec/dummy_handler.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 

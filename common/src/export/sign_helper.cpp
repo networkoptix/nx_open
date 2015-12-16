@@ -5,7 +5,7 @@
 #include <QtCore/QProcess>
 #include <QtCore/QTemporaryFile>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "licensing/license.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
@@ -83,18 +83,40 @@ QnSignHelper::QnSignHelper():
 
 void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size)
 {
-    if (srcCodec == 0 || srcCodec->codec_id != CODEC_ID_H264) {
-        ctx.addData((const char*) data, size);
+    if (!srcCodec)
+        doUpdateDigestNoCodec(ctx, data, size);
+    else
+        doUpdateDigest(srcCodec->codec_id, srcCodec->extradata, srcCodec->extradata_size, ctx, data, size);
+}
+
+void QnSignHelper::updateDigest(const QnConstMediaContextPtr& context, QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    if (!context)
+        doUpdateDigestNoCodec(ctx, data, size);
+    else
+        doUpdateDigest(context->getCodecId(), context->getExtradata(), context->getExtradataSize(), ctx, data, size);
+}
+
+void QnSignHelper::doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    ctx.addData((const char*) data, size);
+}
+
+void QnSignHelper::doUpdateDigest(CodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size)
+{
+    if (codecId != CODEC_ID_H264)
+    {
+        doUpdateDigestNoCodec(ctx, data, size);
         return;
     }
 
     // skip nal prefixes (sometimes it is 00 00 01 code, sometimes unitLen)
     const quint8* dataEnd = data + size;
 
-    if (srcCodec->extradata_size >= 7 && srcCodec->extradata[0] == 1)
+    if (extradataSize >= 7 && extradata[0] == 1)
     {
         // prefix is unit len
-        int reqUnitSize = (srcCodec->extradata[4] & 0x03) + 1;
+        int reqUnitSize = (extradata[4] & 0x03) + 1;
 
         const quint8* curNal = data;
         while (curNal < dataEnd - reqUnitSize)
@@ -109,10 +131,11 @@ void QnSignHelper::updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &c
             curNal += curSize;
         }
     }
-    else {
+    else
+    {
         // prefix is 00 00 01 code
         const quint8* curNal = NALUnit::findNextNAL(data, dataEnd);
-        while(curNal < dataEnd)
+        while (curNal < dataEnd)
         {
             const quint8* nextNal = NALUnit::findNALWithStartCode(curNal, dataEnd, true);
             ctx.addData((const char*) curNal, nextNal - curNal);
@@ -596,7 +619,7 @@ int QnSignHelper::removeH264SeiMessage(quint8* buffer, int size)
     return size;
 }
 
-QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
+QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame)
 {
     QnWritableCompressedVideoDataPtr generatedFrame;
     QByteArray srcCodecExtraData((const char*) srcCodec->extradata, srcCodec->extradata_size);
@@ -673,7 +696,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSgnatureFrame(AVCodecContext* srcCo
     generatedFrame->channelNumber = 0; 
 error_label:
     delete [] videoBuf;
-    QnFfmpegHelper::deleteCodecContext(videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(videoCodecCtx);
     av_free(frame);
 
     return generatedFrame;

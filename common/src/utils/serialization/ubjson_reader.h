@@ -3,7 +3,8 @@
 
 #include <cassert>
 
-#include <algorithm> /* For std::min. */
+#include <algorithm> //< For std::min.
+#include <array>
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
@@ -67,6 +68,10 @@ public:
 
     bool readInt8(qint8 *target) {
         return readNumberInternal(QnUbjson::Int8Marker, target);
+    }
+
+    bool readUInt16(quint16 *target) {
+        return readNumberInternal(QnUbjson::UInt16Marker, target);
     }
 
     bool readInt16(qint16 *target) {
@@ -190,6 +195,8 @@ public:
             return m_stream.skipBytes(sizeof(quint8));
         case QnUbjson::Int8Marker:
             return m_stream.skipBytes(sizeof(qint8));
+        case QnUbjson::UInt16Marker:
+            return m_stream.skipBytes(sizeof(quint16));
         case QnUbjson::Int16Marker:
             return m_stream.skipBytes(sizeof(qint16));
         case QnUbjson::Int32Marker:
@@ -418,10 +425,11 @@ private:
 
         switch (m_stream.readMarker()) {
         case QnUbjson::UInt8Marker: return readTypedSizeFromStream<quint8>(target);
-        case QnUbjson::Int8Marker:  return readTypedSizeFromStream<qint8>(target);
+        case QnUbjson::Int8Marker: return readTypedSizeFromStream<qint8>(target);
+        case QnUbjson::UInt16Marker: return readTypedSizeFromStream<quint16>(target);
         case QnUbjson::Int16Marker: return readTypedSizeFromStream<qint16>(target);
         case QnUbjson::Int32Marker: return readTypedSizeFromStream<qint32>(target);
-        default:                    return false;
+        default: return false;
         }
     }
 

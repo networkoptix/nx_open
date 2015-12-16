@@ -15,8 +15,7 @@
 
 #include <database/server_db.h>
 
-#include "camera/camera_pool.h"
-#include "decoders/video/ffmpeg.h"
+#include <camera/camera_pool.h>
 
 #include <recorder/recording_manager.h>
 #include <recorder/storage_manager.h>

@@ -142,7 +142,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
         if (bufferSize == packetSize)
         {
             bool gotData;
-            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, RtspStatistic(), gotData);
+            m_parsers[streamIndex].processData(m_recvBuffer, 0, packetSize, QnRtspStatistic(), gotData);
             result = m_parsers[streamIndex].nextData();
             if (result)
                 result->channelNumber = streamIndex;
@@ -168,7 +168,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
     if (result) {
         result->flags |= QnAbstractMediaData::MediaFlags_LIVE;
         result->opaque = 0;
-        if (result->dataType == QnAbstractMediaData::AUDIO && result->context && result->context->ctx() && !m_audioLayout)
+        if (result->dataType == QnAbstractMediaData::AUDIO && result->context && !m_audioLayout)
         {
             QnMutexLocker lock( &m_audioLayoutMutex );
             m_audioLayout.reset( new QnResourceCustomAudioLayout() );
