@@ -1225,16 +1225,33 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         m_dayTimeWidget->setEnabledWindow(startTimeMSec, endTimeMSec);
 
     if(!m_pausedOverride) {
-        qint64 timeUSec = m_currentMediaWidget->display()->camDisplay()->isRealTimeSource() ? DATETIME_NOW : m_currentMediaWidget->display()->camera()->getCurrentTime();
-        if ((quint64)timeUSec == AV_NOPTS_VALUE)
-            timeUSec = -1;
 
-        if(isSearch && timeUSec < 0) {
-            timeUSec = m_currentMediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
-            if (timeUSec != DATETIME_NOW && timeUSec >= 0)
-                timeUSec *= 1000;
-        }
-        qint64 timeMSec = timeUSec == DATETIME_NOW ? endTimeMSec : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
+        //TODO: #GDM #refactor logic in 3.0
+        auto usecTimeForWidget = [isSearch](QnMediaResourceWidget *mediaWidget)
+        {
+            if (mediaWidget->display()->camDisplay()->isRealTimeSource())
+                return DATETIME_NOW;
+
+            qint64 timeUSec =  mediaWidget->display()->camera()->getCurrentTime();
+            if ((quint64)timeUSec == AV_NOPTS_VALUE)
+                timeUSec = -1;
+
+            if(isSearch && timeUSec < 0) {
+                timeUSec = mediaWidget->item()->data<qint64>(Qn::ItemTimeRole, -1);
+                if (timeUSec != DATETIME_NOW && timeUSec >= 0)
+                    timeUSec *= 1000;
+            }
+            return timeUSec;
+        };
+
+        auto usecToMsec = [endTimeMSec, this](qint64 timeUSec) {
+            return timeUSec == DATETIME_NOW
+                ? endTimeMSec
+                : (timeUSec < 0 ? m_timeSlider->value() : timeUSec / 1000);
+        };
+
+        qint64 timeUSec = usecTimeForWidget(m_currentMediaWidget);
+        qint64 timeMSec = usecToMsec(timeUSec);
 
         m_timeSlider->setValue(timeMSec, keepInWindow);
 
@@ -1244,10 +1261,17 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
         bool sync = (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods));
         if(isSearch || !sync) {
             QVector<qint64> indicators;
-            foreach(QnResourceWidget *widget, display()->widgets())
-                if(QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
-                    if (mediaWidget != m_currentMediaWidget && mediaWidget->resource()->toResource()->hasFlags(Qn::sync))
-                        indicators.push_back(mediaWidget->display()->camera()->getCurrentTime() / 1000);
+            for (QnResourceWidget *widget: display()->widgets())
+            {
+                if (!widget->resource()->hasFlags(Qn::sync))
+                    continue;
+                QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
+                if (!mediaWidget || mediaWidget == m_currentMediaWidget)
+                    continue;
+
+                qint64 timeUSec = usecTimeForWidget(mediaWidget);
+                indicators.push_back(usecToMsec(timeUSec));
+            }
             m_timeSlider->setIndicators(indicators);
         } else {
             m_timeSlider->setIndicators(QVector<qint64>());
