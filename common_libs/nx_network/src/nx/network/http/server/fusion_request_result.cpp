@@ -69,7 +69,7 @@ nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
         case FusionRequestErrorClass::noError:
             return nx_http::StatusCode::ok;
         case FusionRequestErrorClass::badRequest:
-            switch (errorDetail)
+            switch (static_cast<FusionRequestErrorDetail>(errorDetail))
             {
                 case FusionRequestErrorDetail::notAcceptable:
                     return nx_http::StatusCode::notAcceptable;
