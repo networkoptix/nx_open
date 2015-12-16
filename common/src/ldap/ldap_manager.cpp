@@ -8,8 +8,47 @@
 #include <QtCore/QCryptographicHash>
 #include <stdio.h>
 
-class QnLdapFilter
-{
+#ifdef Q_OS_WIN
+#include <Windows.h>
+#include <winldap.h>
+
+#define QSTOCW(s) (const PWCHAR)(s.utf16())
+
+#define FROM_WCHAR_ARRAY QString::fromWCharArray
+#define DIGEST_MD5 L"DIGEST-MD5"
+#define EMPTY_STR L""
+#define LDAP_RESULT ULONG
+#else
+
+#define LDAP_DEPRECATED 1
+#include <ldap.h>
+#define QSTOCW(s) s.toUtf8().constData()
+#define LdapGetLastError() errno
+#define FROM_WCHAR_ARRAY QString::fromUtf8
+#define DIGEST_MD5 "DIGEST-MD5"
+#define EMPTY_STR ""
+#define PWSTR char*
+#define PWCHAR char*
+#define LDAP_RESULT int
+#endif
+
+#define LdapErrorStr(rc) FROM_WCHAR_ARRAY(ldap_err2string(rc))
+
+#include <QtCore/QMap>
+#include <QtCore/QBuffer>
+#include <QCryptographicHash>
+
+#include "network/authutil.h"
+
+static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert) {
+    Q_UNUSED(Connection)
+
+    CertFreeCertificateContext(*ppServerCert);
+
+    return TRUE;
+}
+
+class QnLdapFilter {
 public:
     QnLdapFilter()
     {
@@ -110,38 +149,6 @@ namespace {
     static const QString MAIL(lit("mail"));
 }
 
-#ifdef Q_OS_WIN
-#include <Windows.h>
-#include <winldap.h>
-
-#define QSTOCW(s) (const PWCHAR)(s.utf16())
-
-#define FROM_WCHAR_ARRAY QString::fromWCharArray
-#define DIGEST_MD5 L"DIGEST-MD5"
-#define EMPTY_STR L""
-#define LDAP_RESULT ULONG
-#else
-
-#define LDAP_DEPRECATED 1
-#include <ldap.h>
-#define QSTOCW(s) s.toUtf8().constData()
-#define LdapGetLastError() errno
-#define FROM_WCHAR_ARRAY QString::fromUtf8
-#define DIGEST_MD5 "DIGEST-MD5"
-#define EMPTY_STR ""
-#define PWSTR char*
-#define PWCHAR char*
-#define LDAP_RESULT int
-#endif
-
-#define LdapErrorStr(rc) FROM_WCHAR_ARRAY(ldap_err2string(rc))
-
-#include <QtCore/QMap>
-#include <QtCore/QBuffer>
-#include <QCryptographicHash>
-
-#include "network/authutil.h"
-
 namespace {
     QString GetFirstValue(LDAP *ld, LDAPMessage *e, const QString& name) {
         QString result;
@@ -241,6 +248,11 @@ bool LdapSession::connect()
     }
 
 #ifdef Q_OS_WIN
+    // If Windows Vista or later
+    if ((LOBYTE(LOWORD(GetVersion()))) >= 6) {
+        ldap_set_option(m_ld, LDAP_OPT_SERVER_CERTIFICATE, &VerifyServerCertificate);
+    }
+
     rc = ldap_connect(m_ld, NULL); // Need to connect before SASL bind!
     if (rc != 0)
     {
