@@ -128,7 +128,7 @@ LOGGING = {
         },
     },
     'loggers': {
-        'django': {
+        'api.helpers.exceptions': {
             'level': 'DEBUG',
             'propagate': True,
             'handlers': ['console', 'mail_admins']

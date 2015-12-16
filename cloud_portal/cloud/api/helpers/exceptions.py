@@ -8,8 +8,6 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-
-
 class ErrorCodes:
     ok = 'ok'
 
