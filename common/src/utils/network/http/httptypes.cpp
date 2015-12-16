@@ -1398,7 +1398,7 @@ namespace nx_http
 
         StringType KeepAlive::toString() const
         {
-            StringType result = "timeout="+StringType::number(timeout.count());
+            StringType result = "timeout="+StringType::number((unsigned int)timeout.count());
             if (max)
                 result += ", max="+StringType::number(*max);
             return result;
