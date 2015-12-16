@@ -87,7 +87,7 @@ namespace {
 
             layout->addWidget(m_backupNewCamerasCheckBox);
             layout->addStretch();
-            layout->addWidget(new QLabel(tr("Backup Quality:"), placeholder));
+            layout->addWidget(new QLabel(tr("What to backup:"), placeholder));
             layout->addWidget(m_qualityComboBox);
         }
 
@@ -180,11 +180,11 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/)
 QString QnBackupCamerasDialog::qualitiesToString(Qn::CameraBackupQualities qualities) {
     switch (qualities) {
     case Qn::CameraBackup_LowQuality:
-        return tr("Low", "Cameras Backup");
+        return tr("Low-Res Streams", "Cameras Backup");
     case Qn::CameraBackup_HighQuality:
-        return tr("High", "Cameras Backup");
+        return tr("Hi-Res Streams", "Cameras Backup");
     case Qn::CameraBackup_Both:
-        return tr("High + Low", "Cameras Backup");
+        return tr("All streams", "Cameras Backup");
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;

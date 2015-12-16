@@ -180,7 +180,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields) {
         ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
-    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField)) {
+    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField)) {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }

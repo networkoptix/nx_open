@@ -71,7 +71,7 @@ namespace {
 
     const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #gdm #customization
+    const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
     const float noAspectRatio = -1.0;
 
@@ -101,6 +101,10 @@ namespace {
         auto label = new GraphicsLabel();
         label->setAcceptedMouseButtons(0);
         label->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        QFont f = label->font();
+        f.setBold(true);
+        label->setFont(f);
         return label;
     }
 
@@ -168,8 +172,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20);
+    font.setStyleName(lit("Arial"));
+    font.setPixelSize(15);
     setFont(font);
+
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     createButtons();
