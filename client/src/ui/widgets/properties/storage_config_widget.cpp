@@ -541,7 +541,8 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
 
     using boost::algorithm::any_of;
 
-    auto error = [info](const QString &error) -> bool {
+    auto error = [info](const QString &error) -> bool
+    {
         if (info)
             *info = error;
         return false;
@@ -550,22 +551,36 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
+    const auto isCorrectStorage = [](const QnStorageModelInfo &storage)
+    {
         return storage.isWritable && storage.isUsed && storage.isBackup;
-    }))
+    };
+
+    if (!any_of(m_model->storages(), isCorrectStorage))
         return error(tr("Select at least one backup storage."));
 
-    if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
-        if (!m_backupSchedule.isValid())
-            return error(tr("Backup Schedule is invalid."));
+    if ((m_backupSchedule.backupType == Qn::Backup_Schedule)
+        && !m_backupSchedule.isValid())
+    {
+        return error(tr("Backup Schedule is invalid."));
     }
 
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
 
-    if (qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Main).state != Qn::RebuildState_None
-     || qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Backup).state != Qn::RebuildState_None)
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return false;
+
+    const auto rebuildStatusState = [this](QnServerStoragesPool type)
+    {
+        return qnServerStorageManager->rebuildStatus(m_server, type).state;
+    };
+
+    if ((rebuildStatusState(QnServerStoragesPool::Main) != Qn::RebuildState_None)
+        || (rebuildStatusState(QnServerStoragesPool::Backup) != Qn::RebuildState_None))
+    {
         return error(tr("Couldn't start backup while rebuilding archive index is being processed."));
+    }
 
     return true;
 }
