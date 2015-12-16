@@ -104,9 +104,9 @@ class APINotFoundException(APIException):
 
 class APINotAuthorisedException(APIException):
     # 401 error - service unavailable
-    def __init__(self, error_text, error_code, error_data=None):
+    def __init__(self, error_text, error_code=ErrorCodes.not_authorized, error_data=None):
         super(APINotAuthorisedException, self).__init__(error_text,
-                                                        error_code=ErrorCodes.not_authorized,
+                                                        error_code,
                                                         error_data=error_data,
                                                         status_code=status.HTTP_401_UNAUTHORIZED)
 
