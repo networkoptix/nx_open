@@ -429,7 +429,7 @@ void AccountManager::accountAdded(
 }
 
 void AccountManager::accountReactivated(
-    ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::db::DBResult resultCode,
     std::string /*email*/,
