@@ -77,7 +77,11 @@ angular.module('cloudApp')
                     new_password:newPassword
                 });
             },
-
+            reactivate:function(user_email){
+                return $http.post(apiBase + '/account/activate',{
+                    user_email:user_email
+                });
+            },
             activate:function(code){
                 return $http.post(apiBase + '/account/activate',{
                     code:code

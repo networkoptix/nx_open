@@ -27,13 +27,24 @@ angular.module('cloudApp', [
         })
 
 
+
+        .when('/activate/', {
+            templateUrl: 'views/activate_restore.html',
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: function ($route) { $route.current.params.reactivating = true; }
+            }
+        })
         .when('/activate/:activateCode', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
         .when('/restore_password/', {
             templateUrl: 'views/activate_restore.html',
-            controller: 'ActivateRestoreCtrl'
+            controller: 'ActivateRestoreCtrl',
+            resolve: {
+                test: function ($route) { $route.current.params.restoring = true; }
+            }
         })
         .when('/restore_password/:restoreCode', {
             templateUrl: 'views/activate_restore.html',

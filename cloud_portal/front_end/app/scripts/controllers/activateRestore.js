@@ -1,14 +1,17 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams,  process) {
 
         $scope.data = {
-            newPassword: '123',
-            email: 'a@b.c',
+            newPassword: '',
+            email: '',
             restoreCode: $routeParams.restoreCode,
             activateCode: $routeParams.activateCode
         };
+
+        $scope.reactivating = $routeParams.reactivating;
+        $scope.restoring = $routeParams.restoring;
 
         $scope.change = process.init(function(){
             console.log("change password", $scope.data.restoreCode, $scope.data.newPassword, $scope);
@@ -22,7 +25,6 @@ angular.module('cloudApp')
         };
 
         $scope.restore = process.init(function(){
-            console.log("restore password", $scope.data.email, $scope);
             return cloudApi.restorePasswordRequest($scope.data.email);
         });
 
@@ -30,7 +32,13 @@ angular.module('cloudApp')
             return cloudApi.activate($scope.data.activateCode);
         });
 
+
+        $scope.reactivate = process.init(function(){
+            return cloudApi.reactivate($scope.data.email);
+        });
+
         if($scope.data.activateCode){
             $scope.activate.run();
         }
+
     });

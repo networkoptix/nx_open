@@ -72,6 +72,15 @@ class Account(object):
 
     @staticmethod
     @validate_response
+    def reactivate(email):
+        params = {
+            'email': email
+        }
+        request = settings.CLOUD_CONNECT['url'] + '/account/reactivate'
+        return requests.post(request, json=params)
+
+    @staticmethod
+    @validate_response
     def update(email, password, first_name, last_name):
 
         params = {

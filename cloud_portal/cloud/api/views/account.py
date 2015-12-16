@@ -93,22 +93,29 @@ def change_password(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def activate(request):
-    if 'code' not in request.data:
-        raise APIRequestException('Activation code is absent', ErrorCodes.wrong_parameters,
-                                      error_data={'code': ['This field is required.']})
-    code = request.data['code']
-    user_data = Account.activate(code)
+    if 'user_email' not in request.data and 'code' not in request.data:
+        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
+                                      error_data={'code': ['This field is required.'],'user_email':['This field is required.']})
 
-    if 'email' not in user_data:
-        raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
+    if  'code' in request.data:
+        code = request.data['code']
+        user_data = Account.activate(code)
 
-    email = user_data['email']
-    try:
-        user = api.models.Account.objects.get(email=email)
-        user.activated_date = timezone.now()
-        user.save(update_fields=['activated_date'])
-    except Model.DoesNotExist:
-        raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
+        if 'email' not in user_data:
+            raise APIInternalException('No email from cloud_db', ErrorCodes.cloud_invalid_response)
+
+        email = user_data['email']
+        try:
+            user = api.models.Account.objects.get(email=email)
+            user.activated_date = timezone.now()
+            user.save(update_fields=['activated_date'])
+        except Model.DoesNotExist:
+            raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
+        return api_success()
+
+    if 'user_email' in request.data:
+        Account.reactivate(request.data['user_email'])
+
     return api_success()
 
 
