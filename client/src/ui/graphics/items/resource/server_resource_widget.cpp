@@ -523,6 +523,8 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     updateButtonsVisibility();
     updateTitleText();
     //updateInfoOpacity();
+    updateInfoText();
+    updateDetailsText();
     at_statistics_received();
 }
 

@@ -703,6 +703,12 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             }
         }
 
+        // Update visible layouts
+        if (oldWidget)
+            oldWidget->setOption(QnResourceWidget::FullScreenMode, false);
+        if (newWidget)
+            newWidget->setOption(QnResourceWidget::FullScreenMode, true);
+
         /* Hide / show other items when zoomed. */
         if(newWidget)
             opacityAnimator(newWidget)->animateTo(1.0);

@@ -836,7 +836,8 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 /** Time value for 'now'. */
 #define DATETIME_NOW        INT64_MAX
 
-// TODO: #rvasilenko Change to other constant (-1?) - 0 is 1/1/1970
+// TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
+// Note: -1 is used for invalid time
 // Now it is returning when no archive data and archive is played backward
 enum { kNoTimeValue = 0 };
 

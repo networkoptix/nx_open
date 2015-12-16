@@ -757,8 +757,11 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
+    {
+        widget->setOption(QnResourceWidget::ActivityPresence, false);
         if(!(widget->options() & QnResourceWidget::DisplayInfo))
             widget->setOverlayVisible(false);
+    }
 }
 
 void QnWorkbenchUi::at_activityStarted() {
@@ -767,8 +770,11 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
+    {
+        widget->setOption(QnResourceWidget::ActivityPresence, true);
         if(widget->isInfoVisible()) // TODO: #Elric wrong place?
             widget->setOverlayVisible(true);
+    }
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
