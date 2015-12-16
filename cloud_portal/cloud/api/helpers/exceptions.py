@@ -1,6 +1,8 @@
 from rest_framework.response import Response
+from rest_framework.request import Request
 from rest_framework import status
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 import logging
 import json
 import traceback
@@ -103,7 +105,9 @@ class APINotFoundException(APIException):
 class APINotAuthorisedException(APIException):
     # 401 error - service unavailable
     def __init__(self, error_text, error_code, error_data=None):
-        super(APINotAuthorisedException, self).__init__(error_text, error_code, error_data=error_data,
+        super(APINotAuthorisedException, self).__init__(error_text,
+                                                        error_code=ErrorCodes.not_authorized,
+                                                        error_data=error_data,
                                                         status_code=status.HTTP_401_UNAUTHORIZED)
 
 
@@ -182,12 +186,33 @@ def handle_exceptions(func):
                 return Response(data, status=status.HTTP_200_OK)
             return data
         except APIException as error:
-            logger.error('APIException. \nStatus: {0}\nMessage: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.
-                             format(error.status_code,
-                                    error.error_text,
-                                    error.error_code,
-                                    json.dumps(error.error_data, indent=4, separators=(',', ': ')),
-                                    traceback.format_exc()))
+
+            request = args[0]
+            page_url = 'unknown'
+            user_name = 'not authorized'
+            request_data = ''
+
+            if isinstance(request, Request):
+                page_url = request.build_absolute_uri()
+                request_data = request.data
+                if not isinstance(request.user, AnonymousUser):
+                    user_name = request.user.email
+
+            if error.status_code != ErrorCodes.not_authorized:
+                error_formatted = '\n{8}\nStatus: {0}\nPortal URL: {5}\nUser: {6}\nRequest: {7}\n' \
+                                  'Message: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.\
+                                  format(error.status_code,
+                                         error.error_text,
+                                         error.error_code,
+                                         json.dumps(error.error_data, indent=4, separators=(',', ': ')),
+                                         traceback.format_exc(),
+                                         page_url,
+                                         user_name,
+                                         request_data,
+                                         error.__class__.__name__)
+            print(error_formatted)
+            logger.error(error_formatted)
+
             return error.response()
         except:
             detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()

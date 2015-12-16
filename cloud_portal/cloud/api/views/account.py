@@ -33,7 +33,7 @@ def login(request):
 
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
     if user is None:
-        raise APINotAuthorisedException('Username or password are invalid', ErrorCodes.not_authorized)
+        raise APINotAuthorisedException('Username or password are invalid')
 
     django.contrib.auth.login(request, user)
     request.session['password'] = request.data['password']
