@@ -14,7 +14,7 @@
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
-      <string>Main Storage</string>
+      <string>Main Storage Locations</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
       <item>
@@ -85,7 +85,7 @@
    <item>
     <widget class="QGroupBox" name="backupStoragesGroupBox">
      <property name="title">
-      <string>Backup Storage</string>
+      <string>Backup Storage Locations</string>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="1,0">
       <item>
@@ -269,7 +269,7 @@
         <item>
          <widget class="QLabel" name="whenToBackupLabel">
           <property name="text">
-           <string>Perform Backup</string>
+           <string>Execute Backup</string>
           </property>
          </widget>
         </item>
@@ -279,7 +279,7 @@
         <item>
          <widget class="QPushButton" name="pushButtonSchedule">
           <property name="text">
-           <string>Schedule...</string>
+           <string>Set Schedule...</string>
           </property>
          </widget>
         </item>

@@ -47,6 +47,8 @@ protected:
     virtual bool eventFilter(QObject *o, QEvent *e) override;
     virtual void keyPressEvent(QKeyEvent *event) override;
 
+    virtual void showEvent(QShowEvent *event) override;
+
 public Q_SLOTS:
     virtual void accept() override;
     virtual void reject() override;

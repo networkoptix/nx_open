@@ -3,11 +3,13 @@
 
 #include <cassert>
 
+#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
+#include <cstdint>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
-#include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
 

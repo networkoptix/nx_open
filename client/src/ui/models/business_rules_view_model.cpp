@@ -208,11 +208,14 @@ void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rul
         return;
 
     QnBusinessRuleViewModelPtr ruleModel = ruleModelById(rule->id());
-    if (!ruleModel) {
+    if (!ruleModel)
+    {
         ruleModel = QnBusinessRuleViewModelPtr(new QnBusinessRuleViewModel(this));
+        ruleModel->loadFromRule(rule);
         addRuleModelInternal(ruleModel);
     }
-    ruleModel->loadFromRule(rule);
+    else
+        ruleModel->loadFromRule(rule);
 }
 
 void QnBusinessRulesViewModel::deleteRule(const QnBusinessRuleViewModelPtr &ruleModel) {
