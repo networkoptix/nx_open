@@ -40,6 +40,7 @@
 
 #include "network/authutil.h"
 
+#ifdef Q_OS_WIN
 static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *ppServerCert) {
     Q_UNUSED(Connection)
 
@@ -47,6 +48,7 @@ static BOOLEAN _cdecl VerifyServerCertificate(PLDAP Connection, PCCERT_CONTEXT *
 
     return TRUE;
 }
+#endif
 
 class QnLdapFilter {
 public:
