@@ -137,9 +137,13 @@ void QnUnlinkFromCloudDialogPrivate::at_unbindFinished(api::ResultCode result)
 
                 disconnect(propertyDictionary, nullptr, this, nullptr);
 
-                if (errorCode == ec2::ErrorCode::ok)
+                if (errorCode != ec2::ErrorCode::ok)
+                {
+                    openFailurePage(tr("Can not remove settings from the database."));
                     return;
+                }
 
-                openFailurePage(tr("Can not remove settings from the database."));
+                Q_Q(QnUnlinkFromCloudDialog);
+                q->close();
             });
 }
