@@ -573,7 +573,13 @@ TEST_F(CdbFunctionalTest, system_unbind)
         api::ResultCode::ok,
         addActivatedAccount(&account2, &account2Password));
 
-    for (int i = 0; i < 3; ++i)
+    //adding system2 to account1
+    api::SystemData system0;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system0));
+
+    for (int i = 0; i < 4; ++i)
     {
         //adding system1 to account1
         api::SystemData system1;
@@ -619,6 +625,12 @@ TEST_F(CdbFunctionalTest, system_unbind)
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
                     unbindSystem(account2.email, account2Password, system1.id.toStdString()));
+                continue;
+            case 3:
+                //unbinding with other system credentials
+                ASSERT_EQ(
+                    api::ResultCode::forbidden,
+                    unbindSystem(system0.id.toStdString(), system0.authKey, system1.id.toStdString()));
                 continue;
         }
 
