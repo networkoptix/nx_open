@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', function ($scope, cloudApi, process, $location,$sessionStorage) {
+    .controller('AccountCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams) {
 
         cloudApi.account().then(function(account){
             $scope.account = account;
@@ -9,6 +9,9 @@ angular.module('cloudApp')
                 $location.path('/');
             }
         });
+
+        $scope.accountMode = $routeParams.accountMode;
+        $scope.passwordMode =  $routeParams.passwordMode;
 
         $scope.session = $sessionStorage;
         $scope.password = '';
@@ -19,6 +22,8 @@ angular.module('cloudApp')
         });
         $scope.changePassword = process.init(function() {
             return cloudApi.changePassword($scope.newPassword,$scope.password);
+        },{
+            notAuthorized: Config.errorCodes.oldPasswordMistmatch
         });
         $scope.changePassword.promise.then(function(){
             $scope.session.password = $scope.newPassword;

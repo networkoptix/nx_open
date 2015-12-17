@@ -50,7 +50,7 @@ def api_success(data=None, status_code=status.HTTP_200_OK):
     if data is not None:
         return Response(data, status=status_code)
     return Response({
-                'resultCode': ErrorCodes.ok
+                'resultCode': ErrorCodes.ok.value
             }, status=status_code)
 
 
@@ -133,10 +133,6 @@ def validate_response(func):
 
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
-
-        logger.debug(response.status_code)
-        logger.debug(response.text)
-        logger.debug('------------------------------------------------------------')
 
         if response.status_code == status.HTTP_204_NO_CONTENT:  # No content
             return None

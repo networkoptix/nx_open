@@ -1,12 +1,12 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdaterSerializer
+from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 import django
 import base64
 from django.utils import timezone
-from django.db.models import Model
+from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success, \
@@ -65,12 +65,14 @@ def index(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = AccountUpdaterSerializer(request.user, data=request.data)
+        serializer = AccountUpdateSerializer(request.user, data=request.data)
             
         if not serializer.is_valid():
-            raise APIRequestException('Wrong form parameters', ErrorCodes.wrong_parameters, error_data=serializer.errors)
-        
-        Account.update(request.user.email, request.session['password'], request.user.first_name, request.user.last_name)
+            raise APIRequestException('Wrong form parameters',
+                                      ErrorCodes.wrong_parameters,
+                                      error_data=serializer.errors)
+
+        Account.update(request.user.email, request.session['password'], request.data['first_name'], request.data['last_name'])
         # if not success:
         #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
@@ -97,7 +99,7 @@ def activate(request):
         raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
                                       error_data={'code': ['This field is required.'],'user_email':['This field is required.']})
 
-    if  'code' in request.data:
+    if 'code' in request.data:
         code = request.data['code']
         user_data = Account.activate(code)
 
@@ -109,7 +111,7 @@ def activate(request):
             user = api.models.Account.objects.get(email=email)
             user.activated_date = timezone.now()
             user.save(update_fields=['activated_date'])
-        except Model.DoesNotExist:
+        except ObjectDoesNotExist:
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
         return api_success()
 

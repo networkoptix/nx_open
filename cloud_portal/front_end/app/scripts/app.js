@@ -17,9 +17,19 @@ angular.module('cloudApp', [
             templateUrl: 'views/register.html',
             controller: 'LoginCtrl'
         })
+        .when('/account/password', {
+            templateUrl: 'views/account.html',
+            controller: 'AccountCtrl',
+            resolve: {
+                test: function ($route) { $route.current.params.passwordMode = true; }
+            }
+        })
         .when('/account', {
             templateUrl: 'views/account.html',
-            controller: 'AccountCtrl'
+            controller: 'AccountCtrl',
+            resolve: {
+                test: function ($route) { $route.current.params.accountMode = true; }
+            }
         })
         .when('/systems', {
             templateUrl: 'views/systems.html',

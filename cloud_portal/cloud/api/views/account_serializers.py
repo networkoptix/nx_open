@@ -26,7 +26,7 @@ class AccountSerializer(serializers.ModelSerializer):  # ModelSerializer
         fields = ('email', 'first_name', 'last_name', 'subscribe')
 
 
-class AccountUpdaterSerializer(serializers.ModelSerializer):  # ModelSerializer
+class AccountUpdateSerializer(serializers.ModelSerializer):  # ModelSerializer
     class Meta:
         model = Account
         fields = ('first_name', 'last_name', 'subscribe')

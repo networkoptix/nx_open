@@ -10,5 +10,5 @@ notifications_config = {
 }
 
 notifications_module_config = {
-    'portal_url':'http://cloud-demo.hdw.mx/static/index.html#'
+    'portal_url': 'http://cloud-demo.hdw.mx/static/index.html#'
 }

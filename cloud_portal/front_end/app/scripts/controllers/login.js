@@ -34,6 +34,13 @@ angular.module('cloudApp')
         };
 
         $scope.register = process.init(function() {
-            return cloudApi.register($scope.account.email,$scope.account.password,$scope.account.firstName,$scope.account.lastName,$scope.account.subscribe);
+            return cloudApi.register(
+                $scope.account.email,
+                $scope.account.password,
+                $scope.account.firstName,
+                $scope.account.lastName,
+                $scope.account.subscribe);
+        },{
+            alreadyExists: Config.errorCodes.emailAlreadyExists
         });
     });

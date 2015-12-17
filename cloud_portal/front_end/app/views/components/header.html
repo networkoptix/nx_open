@@ -14,13 +14,14 @@
             </li>
 
             <li role="presentation" class="active pull-right" ng-if="!account"><a href="#/register">Sign up</a></li>
-            <li role="presentation" class="pull-right" ng-if="!account"><a href="#/login" ng-click="login();$event.preventDefault();">Sign in</a></li>
+            <li role="presentation" class="pull-right" ng-if="!account"><a href="#/login" ng-click="login();$event.preventDefault();">Login</a></li>
 
             <li role="presentation" class="dropdown pull-right" ng-if="account">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{account.email}} <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="#/account/">Account Settings</a></li>
-                    <li><a href="" ng-click="logout()">Sign out</a></li>
+                    <li><a href="#/account/password/">Change Password</a></li>
+                    <li><a href="" ng-click="logout()">Logout</a></li>
                 </ul>
             </li>
         </ul>

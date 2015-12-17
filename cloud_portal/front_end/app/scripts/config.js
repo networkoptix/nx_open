@@ -22,7 +22,8 @@ var Config = {
 
         // Internal error code for interface
         accountAlreadyActivated: 'Your account was already activated',
-        emailNotFound: 'Email isn\'t registered in portal'
-
+        emailNotFound: 'Email isn\'t registered in portal',
+        emailAlreadyExists: 'Email is already registered in portal',
+        oldPasswordMistmatch: 'Current password doesn\'t match'
     }
 };
