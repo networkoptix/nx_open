@@ -4,7 +4,6 @@
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
 
-/*
 class QAbstractVideoSurface;
 
 namespace nx
@@ -18,11 +17,11 @@ namespace nx
 			Q_OBJECT
 
 		public:
-			enum class State {
-				Disconnected,
-				Connecting,
-				Connected,
-				Suspended
+			enum class State
+			{
+				Stopped,
+				Playing,
+				Paused
 			};
 
 			enum class MediaStatus
@@ -47,25 +46,26 @@ namespace nx
 
 			Q_PROPERTY(qint64 position READ position WRITE setPosition NOTIFY positionChanged)
 
-			Q_PROPERTY(Player::State playbackState READ playbackState NOTIFY playbackStateChanged)
-			Q_PROPERTY(QMediaPlayer::MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
+			Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
+			Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
 
+			// todo: rename it 
 			Q_PROPERTY(bool reconnectOnPlay READ reconnectOnPlay WRITE setReconnectOnPlay NOTIFY reconnectOnPlayChanged)
 
 		public:
 			Player(QObject *parent = nullptr);
 			~Player();
 
-			QMediaPlayer::State playbackState() const;
+			State playbackState() const;
 
-			QMediaPlayer::MediaStatus mediaStatus() const;
+			MediaStatus mediaStatus() const;
 
 			QUrl source() const;
 
 			QAbstractVideoSurface *videoSurface() const;
 
 			qint64 position() const;
-			void setPosition(qint64 value) const;
+			void setPosition(qint64 value);
 
 			bool reconnectOnPlay() const;
 			void setReconnectOnPlay(bool reconnectOnPlay);
@@ -85,12 +85,12 @@ namespace nx
 			void positionChanged();
 			void playbackFinished();
 			void mediaStatusChanged();
+			void reconnectOnPlayChanged();
 
 		private:
 			QScopedPointer<PlayerPrivate> d_ptr;
-			Q_DECLARE_PRIVATE(PlayerPrivate)
+			Q_DECLARE_PRIVATE(Player);
 		};
 
 	}
-	*/
 }

@@ -16,7 +16,7 @@ namespace nx
 		class VideoDecoderRegistry
 		{
 		public:
-			VideoDecoderRegistry* instance();
+			static VideoDecoderRegistry* instance();
 			/*
 			* \returns optimal video decoder (in case of any) compatible with such frame. Returns null pointer if no compatible decoder found.
 			*/

@@ -9,7 +9,7 @@ namespace media
 
 bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
 {
-	VideoDecoderRegistry::addPlugin<FfmpegDecoder>();
+	VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
 	return true;
 }
 
