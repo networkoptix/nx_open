@@ -14,10 +14,11 @@ angular.module('cloudApp')
         $scope.password = '';
 
         $scope.login = process.init(function() {
+            $scope.session.email = $scope.email;
             return cloudApi.login($scope.email, $scope.password);
         });
         $scope.login.promise.then(function(){
-                if($scope.password) { // TODO: This is dirty security hole, but I need this to make "Open in client" work
+            if($scope.password) { // TODO: This is dirty security hole, but I need this to make "Open in client" work
                 $scope.session.password = $scope.password;
             }
             $location.path('/systems');

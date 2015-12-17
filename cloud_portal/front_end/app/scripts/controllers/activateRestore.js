@@ -1,11 +1,14 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams,  process) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams,  process, $sessionStorage) {
+
+
+        $scope.session = $sessionStorage;
 
         $scope.data = {
             newPassword: '',
-            email: '',
+            email: $sessionStorage.email,
             restoreCode: $routeParams.restoreCode,
             activateCode: $routeParams.activateCode
         };
@@ -35,7 +38,7 @@ angular.module('cloudApp')
 
         $scope.reactivate = process.init(function(){
             return cloudApi.reactivate($scope.data.email);
-        });
+        },{'forbidden':'Your account was already activated'});
 
         if($scope.data.activateCode){
             $scope.activate.run();

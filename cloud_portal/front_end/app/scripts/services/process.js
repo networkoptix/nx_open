@@ -24,15 +24,33 @@ angular.module('cloudApp')
                         this.processing = true;
                         var self = this;
                         return caller().then(function(data){
-                            self.success = true;
+
                             self.processing = false;
-                            deferred.resolve(data);
+
+                            console.log("process success", data);
+
+                            if(data.data.resultCode && data.data.resultCode != Config.errorCodes.ok){
+
+                                console.log("process error", data);
+
+                                self.error = true;
+                                self.errorData = data;
+                                self.errorMessage = formatError(data.data, errorCodes);
+
+                                deferred.reject(data);
+
+                            }else {
+                                self.success = true;
+
+                                deferred.resolve(data);
+                            }
                         },function(error){
+
+                            self.processing = false;
                             console.error("process error",error);
                             self.error = true;
                             self.errorData = error;
                             self.errorMessage = formatError(error.data, errorCodes);
-                            self.processing = false;
 
                             deferred.reject(error);
                         },function(progress){

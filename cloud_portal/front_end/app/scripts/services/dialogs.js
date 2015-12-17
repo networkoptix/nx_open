@@ -46,13 +46,15 @@ angular.module('cloudApp')
             $modalInstance.dismiss('close');
         };
 
-
         $scope.ok = function(){
             $modalInstance.close('ok');
         };
 
-
         $scope.cancel = function(){
             $modalInstance.dismiss('cancel');
         };
+
+        $scope.$on('$routeChangeStart', function(){
+            $modalInstance.close();
+        });
     });
