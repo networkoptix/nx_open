@@ -134,14 +134,14 @@ def restore_password(request):
         try:
             (temp_password, user_email) = base64.b64decode(code).split(":")
         except TypeError:
-            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_parameters,
-                                      error_data={'code': ['Wrong code structure']})
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
+        except ValueError:
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
+        if not user_email or not temp_password:
+            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
 
-        if not user_email or user_email is None or user_email == '':
-            raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_parameters,
-                                      error_data={'code': ['Wrong code structure']})
 
-        if 'new_password' not in request.data or request.data['new_password'] == '':
+        if 'new_password' not in request.data or not request.data['new_password']:
             raise APIRequestException('New password is absent', ErrorCodes.wrong_parameters,
                                       error_data={'new_password': ['This field is required.']})
 

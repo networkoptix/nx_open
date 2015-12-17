@@ -17,28 +17,34 @@ angular.module('cloudApp')
         $scope.restoring = $routeParams.restoring;
 
         $scope.change = process.init(function(){
-            console.log("change password", $scope.data.restoreCode, $scope.data.newPassword, $scope);
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
+        },{
+            notFound: Config.errorCodes.wrongCode
         });
 
         $scope.directChange = function(){
-            $scope.$apply();
-            console.log("change password", $scope.data.restoreCode, $scope.data.newPassword, $scope);
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
         };
 
         $scope.restore = process.init(function(){
             return cloudApi.restorePasswordRequest($scope.data.email);
+        },{
+            notFound: Config.errorCodes.emailNotFound
         });
 
         $scope.activate = process.init(function(){
             return cloudApi.activate($scope.data.activateCode);
+        },{
+            notFound: Config.errorCodes.wrongCode
         });
 
 
         $scope.reactivate = process.init(function(){
             return cloudApi.reactivate($scope.data.email);
-        },{'forbidden':'Your account was already activated'});
+        },{
+            forbidden: Config.errorCodes.accountAlreadyActivated,
+            notFound: Config.errorCodes.emailNotFound
+        });
 
         if($scope.data.activateCode){
             $scope.activate.run();

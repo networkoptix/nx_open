@@ -23,6 +23,7 @@ class ErrorCodes(Enum):
     # Validation errors
     not_authorized = 'notAuthorized'
     wrong_parameters = 'wrongParameters'
+    wrong_code = 'wrongCode'
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
@@ -70,8 +71,12 @@ class APIException(Exception):
         super(Exception, self).__init__(error_text)
 
     def response(self):
+        result_code = self.error_code
+        if isinstance(self.error_code, ErrorCodes):
+            result_code = self.error_code.value
+
         return Response({
-                'resultCode': self.error_code,
+                'resultCode': result_code,
                 'errorText': self.error_text,
                 'errorData': self.error_data
             }, status=self.status_code)
@@ -194,7 +199,7 @@ def handle_exceptions(func):
                 if not isinstance(request.user, AnonymousUser):
                     user_name = request.user.email
 
-            if error.status_code != ErrorCodes.not_authorized:
+            if error.error_code != ErrorCodes.not_authorized:
                 error_formatted = '\n{8}\nStatus: {0}\nPortal URL: {5}\nUser: {6}\nRequest: {7}\n' \
                                   'Message: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.\
                                   format(error.status_code,
@@ -206,9 +211,7 @@ def handle_exceptions(func):
                                          user_name,
                                          request_data,
                                          error.__class__.__name__)
-            print(error_formatted)
-            logger.error(error_formatted)
-
+                logger.error(error_formatted)
             return error.response()
         except:
             detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()
