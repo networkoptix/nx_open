@@ -19,21 +19,45 @@ namespace methods
     enum Value
     {
         /** Pings mediaserver endpoints and reports verified onese
-         *  Request: \class attrs::SystemId, \class attrs::ServerId,
-         *           \class attrs::Authorization, \class attrs::PublicEndpointList
-         *  Response: \class attrs::PublicEndpointList (vrified) */
+         *  Request: SystemId, ServerId, PublicEndpointList
+         *  Response: PublicEndpointList (vrified) */
         ping = stun::MethodType::userMethod,
 
         /** Registers mediaserver for external connections.
-         *  Request: \class attrs::SystemId, \class attrs::ServerId,
-         *           \class attrs::Authorization, \class attrs::PublicEndpointList */
+         *  Request: SystemId, ServerId, PublicEndpointList */
         bind,
 
         // TODO: specify bahavior
         listen,
+
+        /** Initiate connection to some mediaserver
+         *  Request: \class PeerId, \class HostName, \class ConnectionId
+         *  Response: \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
+         *            \class UdtHpEndpointList (opt)
+         */
         connect
     };
-};
+}
+
+namespace indications
+{
+    enum Value
+    {
+        /** Indicates requested connection
+         *  Attrs: \class PeerId, \class ConnectionId,
+         *         \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
+         *         \class UdtHpEndpointList (opt)
+         */
+        connectionRequested,
+
+        /** Indicates update information about on-going connection establishment
+         *  Attrs: \class ConnectionId,
+         *         \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
+         *         \class UdtHpEndpointList (opt)
+         */
+        connectionUpdate
+    };
+}
 
 namespace error
 {
@@ -50,13 +74,17 @@ namespace attrs
     {
         systemId = stun::attrs::userDefined,
         serverId,
-        clientId,
+        peerId,
+        connectionId,
 
         hostName = stun::attrs::userDefined + 0x200,
         publicEndpointList,
-        authorization,
+        tcpHpEndpointList,
+        udtHpEndpointList,
     };
 
+
+    /** Base class for string attributes */
     struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
     {
         StringAttribute( int userType, const String& value = String() );
@@ -74,10 +102,16 @@ namespace attrs
         ServerId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API ClientId : StringAttribute
+    struct NX_NETWORK_API PeerId : StringAttribute
     {
-        static const int TYPE = clientId;
-        ClientId( const String& value ) : StringAttribute( TYPE, value ) {}
+        static const int TYPE = peerId;
+        PeerId( const String& value ) : StringAttribute( TYPE, value ) {}
+    };
+
+    struct NX_NETWORK_API ConnectionId : StringAttribute
+    {
+        static const int TYPE = connectionId;
+        ConnectionId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API HostName : StringAttribute
@@ -86,11 +120,33 @@ namespace attrs
         HostName( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
-    struct NX_NETWORK_API PublicEndpointList : StringAttribute
+
+    /** Base class for endpoint attributes */
+    struct NX_NETWORK_API EndpointList : StringAttribute
+    {
+        EndpointList( int type, const std::list< SocketAddress >& endpoints );
+        std::list< SocketAddress > get() const;
+    };
+
+    struct NX_NETWORK_API PublicEndpointList : EndpointList
     {
         static const int TYPE = publicEndpointList;
-        PublicEndpointList( const std::list< SocketAddress >& endpoints );
-        std::list< SocketAddress > get() const;
+        PublicEndpointList( const std::list< SocketAddress >& endpoints )
+            : EndpointList( TYPE, endpoints ) {}
+    };
+
+    struct NX_NETWORK_API TcpHpEndpointList : EndpointList
+    {
+        static const int TYPE = tcpHpEndpointList;
+        TcpHpEndpointList( const std::list< SocketAddress >& endpoints )
+            : EndpointList( TYPE, endpoints ) {}
+    };
+
+    struct NX_NETWORK_API UdtHpEndpointList : EndpointList
+    {
+        static const int TYPE = udtHpEndpointList;
+        UdtHpEndpointList( const std::list< SocketAddress >& endpoints )
+            : EndpointList( TYPE, endpoints ) {}
     };
 }
 

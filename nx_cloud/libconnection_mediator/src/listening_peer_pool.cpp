@@ -87,7 +87,7 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
 void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                                  stun::Message message )
 {
-    const auto userNameAttr = message.getAttribute< stun::cc::attrs::ClientId >();
+    const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
     if( !userNameAttr )
         return errorResponse( connection, message.header, stun::error::badRequest,
             "Attribute ClientId is required" );

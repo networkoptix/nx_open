@@ -26,7 +26,7 @@ struct Notification
 
 struct ActivateAccountData
 {
-    QString code;
+    std::string code;
 };
 
 #define ActivateAccountData_Fields (code)

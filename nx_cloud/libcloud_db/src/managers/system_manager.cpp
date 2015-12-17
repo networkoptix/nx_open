@@ -7,13 +7,16 @@
 
 #include <QtSql/QSqlQuery>
 
+#include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
+#include <utils/common/guard.h>
 #include <utils/common/sync_call.h>
 #include <utils/serialization/lexical.h>
 #include <utils/serialization/sql.h>
 #include <utils/serialization/sql_functions.h>
 
 #include "account_manager.h"
+#include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
 #include "stree/cdb_ns.h"
 
@@ -31,6 +34,46 @@ SystemManager::SystemManager(
     //pre-filling cache
     if (fillCache() != db::DBResult::ok)
         throw std::runtime_error("Failed to pre-load systems cache");
+}
+
+
+SystemManager::~SystemManager()
+{
+    m_startedAsyncCallsCounter.wait();
+}
+
+void SystemManager::authenticateByName(
+    const nx_http::StringType& username,
+    std::function<bool(const nx::Buffer&)> validateHa1Func,
+    const stree::AbstractResourceReader& /*authSearchInputData*/,
+    stree::AbstractResourceWriter* const authProperties,
+    std::function<void(bool)> completionHandler)
+{
+    bool result = false;
+    auto scopedGuard = makeScopedGuard(
+        [/*std::move*/ completionHandler, &result]() {
+        completionHandler(result);
+    });
+
+    QnMutexLocker lk(&m_mutex);
+
+    auto systemData = m_cache.find(QnUuid::fromStringSafe(username));
+    if (!systemData)
+        return;
+
+    if (!validateHa1Func(nx_http::calcHa1(
+            username,
+            AuthenticationManager::realm(),
+            nx::String(systemData->authKey.c_str()))))
+    {
+        return;
+    }
+
+    authProperties->put(
+        cdb::attr::authSystemID,
+        QVariant::fromValue(QnUuid(systemData->id)));
+
+    result = true;
 }
 
 void SystemManager::bindSystemToAccount(
@@ -53,7 +96,9 @@ void SystemManager::bindSystemToAccount(
     m_dbManager->executeUpdate<data::SystemRegistrationDataWithAccount, data::SystemData>(
         std::bind(&SystemManager::insertSystemToDB, this, _1, _2, _3),
         std::move(registrationDataWithAccount),
-        std::bind(&SystemManager::systemAdded, this, _1, _2, _3, std::move(completionHandler)));
+        std::bind(&SystemManager::systemAdded,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, _3, std::move(completionHandler)));
 }
 
 void SystemManager::unbindSystem(
@@ -65,7 +110,9 @@ void SystemManager::unbindSystem(
     m_dbManager->executeUpdate<data::SystemID>(
         std::bind(&SystemManager::deleteSystemFromDB, this, _1, _2),
         std::move(systemID),
-        std::bind(&SystemManager::systemDeleted, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::systemDeleted,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 namespace {
@@ -141,7 +188,9 @@ void SystemManager::shareSystem(
     m_dbManager->executeUpdate<data::SystemSharing>(
         std::bind(&SystemManager::insertSystemSharingToDB, this, _1, _2),
         std::move(sharingData),
-        std::bind(&SystemManager::systemSharingAdded, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::systemSharingAdded,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 void SystemManager::getCloudUsersOfSystem(
@@ -211,7 +260,9 @@ void SystemManager::updateSharing(
     m_dbManager->executeUpdate<data::SystemSharing>(
         std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
         std::move(sharing),
-        std::bind(&SystemManager::sharingUpdated, this, _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::sharingUpdated,
+                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
+                    _1, _2, std::move(completionHandler)));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
@@ -285,6 +336,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 }
 
 void SystemManager::systemAdded(
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
@@ -343,6 +395,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 }
 
 void SystemManager::systemSharingAdded(
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -390,6 +443,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -445,6 +499,7 @@ nx::db::DBResult SystemManager::updateSharingInDB(
 }
 
 void SystemManager::sharingUpdated(
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)

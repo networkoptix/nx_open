@@ -27,7 +27,7 @@ namespace cdb {
 TEST_F(CdbFunctionalTest, account_activation)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -39,20 +39,21 @@ TEST_F(CdbFunctionalTest, account_activation)
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_TRUE(!activationCode.code.empty());
 
-    //only get_account is allowed for not activated account
+    //only /account/activate and /account/reactivate are allowed for not activated account
 
     //adding system1 to account1
     api::SystemData system1;
     result = bindRandomSystem(account1.email, account1Password, &system1);
-    ASSERT_EQ(api::ResultCode::forbidden, result);
+    ASSERT_EQ(api::ResultCode::accountNotActivated, result);
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
-    ASSERT_EQ(api::AccountStatus::awaitingActivation, account1.statusCode);
+    api::AccountData account1Tmp;
+    result = getAccount(account1.email, account1Password, &account1Tmp);
+    ASSERT_EQ(api::ResultCode::accountNotActivated, result);
 
-    result = activateAccount(activationCode);
+    std::string email;
+    result = activateAccount(activationCode, &email);
     ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(account1.email, email);
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
@@ -60,10 +61,64 @@ TEST_F(CdbFunctionalTest, account_activation)
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
+TEST_F(CdbFunctionalTest, account_reactivation)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+
+    api::AccountData account1;
+    std::string account1Password;
+    api::AccountConfirmationCode activationCode;
+    result = addAccount(&account1, &account1Password, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
+    ASSERT_TRUE(!activationCode.code.empty());
+
+    //reactivating account (e.g. we lost activation code)
+    result = reactivateAccount(account1.email, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_TRUE(!activationCode.code.empty());
+
+    std::string email;
+    result = activateAccount(activationCode, &email);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(account1.email, email);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+}
+
+//reactivation of already activated account must fail
+TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+    api::AccountData account1;
+    std::string account1Password;
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+
+    //reactivating account (e.g. we lost activation code)
+    api::AccountConfirmationCode activationCode;
+    result = reactivateAccount(account1.email, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::forbidden);
+}
+
 TEST_F(CdbFunctionalTest, account_general)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -142,7 +197,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
 TEST_F(CdbFunctionalTest, account_badRegistration)
 {
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -166,7 +221,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
     auto doneFuture = donePromise.get_future();
     QObject::connect(
         client.get(), &nx_http::AsyncHttpClient::done,
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
+        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr /*client*/) {
             donePromise.set_value();
         },
         Qt::DirectConnection);
@@ -183,13 +238,13 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
             nx_http::FusionRequestResult(),
             &success);
     ASSERT_TRUE(success);
-    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.resultCode);
+    ASSERT_NE(nx_http::FusionRequestErrorClass::noError, requestResult.errorClass);
 }
 
 TEST_F(CdbFunctionalTest, account_requestQueryDecode)
 {
     //waiting for cloud_db initialization
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::ResultCode result = api::ResultCode::ok;
 
@@ -208,6 +263,13 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
     ASSERT_TRUE(!activationCode.code.empty());
 
+    std::string activatedAccountEmail;
+    result = activateAccount(activationCode, &activatedAccountEmail);
+    ASSERT_EQ(result, api::ResultCode::ok);
+    ASSERT_EQ(
+        QUrl::fromPercentEncoding(account1.email.c_str()).toStdString(),
+        activatedAccountEmail);
+
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::notAuthorized);  //test%40yandex.ru MUST be unknown email
 
@@ -215,13 +277,13 @@ TEST_F(CdbFunctionalTest, account_requestQueryDecode)
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
     ASSERT_EQ(account1.customization, QN_CUSTOMIZATION_NAME);
-    ASSERT_EQ(account1.statusCode, api::AccountStatus::awaitingActivation);
+    ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
 
 TEST_F(CdbFunctionalTest, account_update)
 {
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     api::AccountData account1;
     std::string account1Password;
@@ -255,7 +317,61 @@ TEST_F(CdbFunctionalTest, account_update)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_general)
 {
-    waitUntilStarted();
+    startAndWaitUntilStarted();
+
+    for (int i = 0; i < 2; ++i)
+    {
+        //adding account
+        api::AccountData account1;
+        std::string account1Password;
+        api::ResultCode result = addActivatedAccount(&account1, &account1Password);
+        ASSERT_EQ(api::ResultCode::ok, result);
+
+        //resetting passsword
+        std::string confirmationCode;
+        result = resetAccountPassword(account1.email, &confirmationCode);
+        ASSERT_EQ(api::ResultCode::ok, result);
+
+        //old password is still active
+        result = getAccount(account1.email, account1Password, &account1);
+        ASSERT_EQ(api::ResultCode::ok, result);
+
+        if (i == 1)
+            restart();  //checking that code is valid after cloud_db restart
+
+        //confirmation code has format base64(tmp_password:email)
+        const auto tmpPasswordAndEmail = QByteArray::fromBase64(
+            QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
+        const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
+
+        //setting new password
+        std::string account1NewPassword = "new_password";
+
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx_http::calcHa1(
+            account1.email.c_str(),
+            moduleInfo().realm.c_str(),
+            account1NewPassword.c_str()).constData();
+        result = updateAccount(account1.email, tmpPassword, update);
+        ASSERT_EQ(api::ResultCode::ok, result);
+
+        result = getAccount(account1.email, account1NewPassword, &account1);
+        ASSERT_EQ(api::ResultCode::ok, result);
+
+        //temporary password must have already been removed
+        result = updateAccount(account1.email, tmpPassword, update);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+    }
+}
+
+TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
+{
+    const std::chrono::seconds expirationPeriod(5);
+
+    addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");
+    addArg(QByteArray::number((unsigned int)expirationPeriod.count()).constData());
+
+    startAndWaitUntilStarted();
 
     //adding account
     api::AccountData account1;
@@ -268,9 +384,8 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
     result = resetAccountPassword(account1.email, &confirmationCode);
     ASSERT_EQ(api::ResultCode::ok, result);
 
-    //old password is still active
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
+    //waiting for temporary password to expire
+    std::this_thread::sleep_for(expirationPeriod + std::chrono::seconds(1));
 
     //confirmation code has format base64(tmp_password:email)
     const auto tmpPasswordAndEmail = QByteArray::fromBase64(
@@ -280,26 +395,28 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
     //setting new password
     std::string account1NewPassword = "new_password";
 
-    api::AccountUpdateData update;
-    update.passwordHa1 = nx_http::calcHa1(
-        account1.email.c_str(),
-        moduleInfo().realm.c_str(),
-        account1NewPassword.c_str()).constData();
-    result = updateAccount(account1.email, tmpPassword, update);
-    ASSERT_EQ(api::ResultCode::ok, result);
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
 
-    result = getAccount(account1.email, account1NewPassword, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result);
+        api::AccountUpdateData update;
+        update.passwordHa1 = nx_http::calcHa1(
+            account1.email.c_str(),
+            moduleInfo().realm.c_str(),
+            account1NewPassword.c_str()).constData();
+        result = updateAccount(account1.email, tmpPassword, update);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword has expired
 
-    //temporary password must have already been removed
-    result = updateAccount(account1.email, tmpPassword, update);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
+        result = getAccount(account1.email, account1Password, &account1);
+        ASSERT_EQ(api::ResultCode::ok, result); //old password is still active
+    }
 }
 
 //checks that password reset code is valid for changing password only
-TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
+TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
 {
-    waitUntilStarted();
+    startAndWaitUntilStarted();
 
     //adding account
     api::AccountData account1;
@@ -329,62 +446,42 @@ TEST_F(CdbFunctionalTest, DISABLED_account_resetPassword_authorization)
         QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
     const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
 
-    //verifying that only /account/update is allowed with this temporary password
-    result = getAccount(account1.email, tmpPassword, &account1);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    api::SystemData system2;
-    result = bindRandomSystem(
-        account1.email,
-        tmpPassword,
-        &system2);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    std::vector<api::SystemData> systems;
-    result = getSystems(account1.email, tmpPassword, &systems);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
-    std::vector<api::SystemSharing> sharings;
-    result = getSystemSharings(account1.email, tmpPassword, &sharings);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);
-
+    for (int i = 0; i < 2; ++i)
     {
-        //sharing system to account2 with "editor" permission
-        const auto result = shareSystem(
+        if (i == 1)
+            restart();
+
+        //verifying that only /account/update is allowed with this temporary password
+        api::AccountData accountData;
+        result = getAccount(account1.email, tmpPassword, &accountData);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        api::SystemData system2;
+        result = bindRandomSystem(
             account1.email,
             tmpPassword,
-            system1.id,
-            account2.email,
-            api::SystemAccessRole::editor);
+            &system2);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        std::vector<api::SystemData> systems;
+        result = getSystems(account1.email, tmpPassword, &systems);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        std::vector<api::SystemSharing> sharings;
+        result = getSystemSharings(account1.email, tmpPassword, &sharings);
+        ASSERT_EQ(api::ResultCode::notAuthorized, result);
+
+        {
+            //sharing system to account2 with "editor" permission
+            const auto result = shareSystem(
+                account1.email,
+                tmpPassword,
+                system1.id,
+                account2.email,
+                api::SystemAccessRole::editor);
+            ASSERT_EQ(api::ResultCode::notAuthorized, result);
+        }
     }
-}
-
-TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
-{
-    const std::chrono::seconds expiraionPeriod(10);
-    //TODO #ak setting expiration period
-
-    waitUntilStarted();
-
-    //adding account
-    api::AccountData account1;
-    std::string account1Password;
-    api::ResultCode result = addActivatedAccount(&account1, &account1Password);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //resetting passsword
-    std::string confirmationCode;
-    result = resetAccountPassword(account1.email, &confirmationCode);
-    ASSERT_EQ(api::ResultCode::ok, result);
-
-    //waiting for temporary password to expire
-    std::this_thread::sleep_for(expiraionPeriod + std::chrono::seconds(1));
-
-    //confirmation code has format base64(tmp_password:email)
-    const auto tmpPasswordAndEmail = QByteArray::fromBase64(
-        QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
-    const std::string tmpPassword = tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).constData();
 
     //setting new password
     std::string account1NewPassword = "new_password";
@@ -395,44 +492,19 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
         moduleInfo().realm.c_str(),
         account1NewPassword.c_str()).constData();
     result = updateAccount(account1.email, tmpPassword, update);
-    ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword has expired
+    ASSERT_EQ(api::ResultCode::ok, result);  //tmpPassword is still active
 
-    result = getAccount(account1.email, account1Password, &account1);
-    ASSERT_EQ(api::ResultCode::ok, result); //old password is still active
-}
+    api::AccountData accountData;
+    result = getAccount(account1.email, account1NewPassword, &accountData);
+    ASSERT_EQ(api::ResultCode::ok, result); //new password has been set
 
-TEST_F(CdbFunctionalTest, usingPostMethod)
-{
-    const QByteArray testData =
-        "{\"fullName\": \"a k\", \"passwordHa1\": \"5f6291102209098cf5432a415e26d002\", "
-        "\"email\": \"andreyk07@gmail.com\", \"customization\": \"default\"}";
+    result = updateAccount(account1.email, tmpPassword, update);
+    ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 
-    bool success = false;
-    auto accountData = QJson::deserialized<data::AccountData>(
-        testData, data::AccountData(), &success);
-    ASSERT_TRUE(success);
+    restart();
 
-    waitUntilStarted();
-
-    auto client = nx_http::AsyncHttpClient::create();
-    QUrl url;
-    url.setHost(endpoint().address.toString());
-    url.setPort(endpoint().port);
-    url.setScheme("http");
-    url.setPath("/account/register");
-    std::promise<void> donePromise;
-    auto doneFuture = donePromise.get_future();
-    QObject::connect(
-        client.get(), &nx_http::AsyncHttpClient::done, 
-        client.get(), [&donePromise](nx_http::AsyncHttpClientPtr client) {
-            donePromise.set_value();
-        },
-        Qt::DirectConnection);
-    client->doPost(url, "application/json", testData);
-
-    doneFuture.wait();
-    ASSERT_TRUE(client->response() != nullptr);
-    ASSERT_EQ(nx_http::StatusCode::ok, client->response()->statusLine.statusCode);
+    result = updateAccount(account1.email, tmpPassword, update);
+    ASSERT_EQ(api::ResultCode::notAuthorized, result);  //tmpPassword is removed
 }
 
 }   //cdb

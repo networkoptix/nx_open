@@ -47,17 +47,21 @@ EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_
 
 EMailManager::~EMailManager()
 {
-    decltype(m_ongoingRequests) ongoingRequests;
-    {
-        QnMutexLocker lk(&m_mutex);
-        ongoingRequests = std::move(m_ongoingRequests);
-    }
+    //NOTE if we just terminate all ongoing calls then user of this class can dead-lock
+    m_startedAsyncCallsCounter.wait();
 
-    for (auto httpRequest: ongoingRequests)
-        httpRequest->terminate();
+    //decltype(m_ongoingRequests) ongoingRequests;
+    //{
+    //    QnMutexLocker lk(&m_mutex);
+    //    ongoingRequests = std::move(m_ongoingRequests);
+    //}
+
+    //for (auto httpRequest: ongoingRequests)
+    //    httpRequest->terminate();
 }
 
 void EMailManager::onSendNotificationRequestDone(
+    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
     nx_http::AsyncHttpClientPtr client,
     std::function<void(bool)> completionHandler)
 {
@@ -71,7 +75,6 @@ void EMailManager::onSendNotificationRequestDone(
         m_ongoingRequests.erase(client);
     }
 }
-
 
 }   //cdb
 }   //nx

@@ -37,9 +37,9 @@ namespace stree
         template<typename T> bool get( int resID, T* const value ) const
         {
             QVariant untypedValue;
-            if( !get( resID, &untypedValue ) )
+            if (!get(resID, &untypedValue))
                 return false;
-            if( !untypedValue.canConvert<T>() )
+            if (!untypedValue.canConvert<T>())
                 return false;
             *value = untypedValue.value<T>();
             return true;
@@ -69,6 +69,11 @@ namespace stree
             if (untypedValue.canConvert<QString>())
             {
                 *value = untypedValue.toString().toStdString();
+                return true;
+            }
+            if (untypedValue.canConvert<QnUuid>())
+            {
+                *value = untypedValue.value<QnUuid>().toStdString();
                 return true;
             }
             return false;

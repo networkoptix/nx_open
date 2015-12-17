@@ -3,11 +3,10 @@
 
 #include <utils/common/guard.h>
 #include <nx/utils/thread/mutex.h>
-
 #include <nx/network/dns_resolver.h>
-#include <nx/network/stun/async_client.h>
 
 #include "cdb_endpoint_fetcher.h"
+#include "mediator_connections.h"
 
 // Forward
 namespace nx { class SocketGlobals; }
@@ -58,6 +57,7 @@ struct NX_NETWORK_API AddressEntry
 
 //!Contains peer names, their known addresses and some attributes
 class NX_NETWORK_API AddressResolver
+        : public QnStoppableAsync
 {
     AddressResolver();
     friend class ::nx::SocketGlobals;
@@ -104,6 +104,8 @@ public:
     */
     void cancel( void* requestId, std::function< void() > handler = nullptr );
     bool isRequestIdKnown( void* requestId ) const;
+
+    void pleaseStop( std::function<void()> handler ) override;
 
 private:
     struct HostAddressInfo
@@ -158,7 +160,6 @@ private:
 
     void dnsResolve( HaInfoIterator info );
     void mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
-    void mediatorStunResolve( HaInfoIterator info, QnMutexLockerBase* lk );
 
     std::vector< Guard > grabHandlers( SystemError::ErrorCode lastErrorCode,
                                        HaInfoIterator info );
@@ -170,7 +171,7 @@ private:
     std::multimap< void*, RequestInfo > m_requests;
 
     DnsResolver m_dnsResolver;
-    stun::AsyncClient* m_stunClient;
+    std::shared_ptr<MediatorClientConnection> m_mediatorConnection;
 };
 
 } // namespace cc

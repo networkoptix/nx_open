@@ -186,21 +186,7 @@ Message::Message( Header header_, AttributesMap attributes_ )
 {
 }
 
-Message::Message( Message&& message )
-    : header( std::move(message.header) )
-    , attributes( std::move(message.attributes) )
-{
-}
-
-Message& Message::operator = ( Message&& message )
-{
-    if( this == &message ) return *this;
-    attributes = std::move(message.attributes);
-    header = message.header;
-    return *this;
-}
-
-void Message::addAttribute( std::unique_ptr<attrs::Attribute>&& attribute )
+void Message::addAttribute( AttributePtr&& attribute )
 {
     attributes[ attribute->getType() ] = std::move( attribute );
 }

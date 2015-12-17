@@ -19,6 +19,7 @@
 #include "access_control/authorization_manager.h"
 #include "access_control/auth_types.h"
 #include "managers/managers_types.h"
+#include "stree/cdb_ns.h"
 #include "stree/http_request_attr_reader.h"
 #include "stree/socket_attr_reader.h"
 
@@ -62,7 +63,7 @@ protected:
         //performing authorization
         //  authorization is performed here since it can depend on input data which 
         //  needs to be deserialized depending on request type
-        if( !m_authorizationManager.authorize(
+        if (!m_authorizationManager.authorize(
                 authenticationData,
                 stree::MultiSourceResourceReader(
                     socketResources,
@@ -70,15 +71,20 @@ protected:
                     dataToAuthorize),
                 this->m_entityType,
                 this->m_actionType,
-                authzInfo ) )   //using same object since we can move it
+                authzInfo))   //using same object since we can move it
         {
+            api::ResultCode resultCode = api::ResultCode::forbidden;
+            if (auto resultCodeStr = authzInfo->get<QString>(attr::resultCode))
+                resultCode = QnLexical::deserialized<api::ResultCode>(*resultCodeStr);
+
             nx_http::FusionRequestResult result(
                 nx_http::FusionRequestErrorClass::unauthorized,
-                static_cast<int>(api::ResultCode::forbidden),
+                QnLexical::serialized(resultCode),
+                static_cast<int>(resultCode),
                 QString());
             this->response()->headers.emplace(
                 Qn::API_RESULT_CODE_HEADER_NAME,
-                QnLexical::serialized(api::ResultCode::forbidden).toLatin1());
+                QnLexical::serialized(resultCode).toLatin1());
             this->requestCompleted(std::move(result));
             return false;
         }

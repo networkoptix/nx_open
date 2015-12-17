@@ -20,12 +20,12 @@ static String endpointsToString( const std::list< SocketAddress >& endpoints )
     return list.join( lit(",") ).toUtf8();
 }
 
-PublicEndpointList::PublicEndpointList( const std::list< SocketAddress >& endpoints )
-    : StringAttribute( TYPE, endpointsToString( endpoints ) )
+EndpointList::EndpointList( int type, const std::list< SocketAddress >& endpoints )
+    : StringAttribute( type, endpointsToString( endpoints ) )
 {
 }
 
-std::list< SocketAddress > PublicEndpointList::get() const
+std::list< SocketAddress > EndpointList::get() const
 {
     const auto value = getString();
     if( value.isEmpty() )

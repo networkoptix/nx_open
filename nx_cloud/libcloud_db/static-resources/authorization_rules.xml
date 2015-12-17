@@ -21,6 +21,10 @@
                     <set resName="user.ha1" resValue="111111111111111"/>
                 </sequence> -->
             </condition>
+
+            <condition resName="request.path">
+                <set value="/account/reset_password" resName="authenticated" resValue="true"/>
+            </condition>
         </sequence>
 
         <sequence value="authorization">
@@ -30,10 +34,16 @@
                 <sequence value="1">
                     <!-- account not activated -->
                     <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountNotActivated"/>
                     <condition resName="request.path">
                         <set value="/account/activate" resName="authorized" resValue="true"/>
-                        <set value="/account/get" resName="authorized" resValue="true"/>
+                        <!-- <set value="/account/get" resName="authorized" resValue="true"/> -->
                     </condition>
+                </sequence>
+                <sequence value="3">
+                    <!-- account blocked -->
+                    <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountBlocked"/>
                 </sequence>
             </condition>
 
@@ -129,6 +139,9 @@
                     <sequence value="/system/unbind">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                        <condition resName="auth.selfSystemAccessRequested">
                             <set value="owner" resName="authorized" resValue="true"/>
                         </condition>
                     </sequence>

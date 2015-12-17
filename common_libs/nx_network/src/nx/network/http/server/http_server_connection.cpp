@@ -44,27 +44,29 @@ namespace nx_http
         //    which will be forwarded to the request handler.
         //    Should this data be template parameter?
         stree::ResourceContainer authInfo;
-        if( m_authenticationManager )
+        if (m_authenticationManager)
         {
             boost::optional<header::WWWAuthenticate> wwwAuthenticate;
-            if( !m_authenticationManager->authenticate(
+            std::unique_ptr<AbstractMsgBodySource> msgBody;
+            if (!m_authenticationManager->authenticate(
                     *this,
                     *request.request,
                     &wwwAuthenticate,
-                    &authInfo ) )
+                    &authInfo,
+                    &msgBody))
             {
-                nx_http::Message response( nx_http::MessageType::response );
+                nx_http::Message response(nx_http::MessageType::response);
                 response.response->statusLine.statusCode = nx_http::StatusCode::unauthorized;
-                if( wwwAuthenticate )
+                if (wwwAuthenticate)
                 {
                     response.response->headers.emplace(
                         header::WWWAuthenticate::NAME,
-                        wwwAuthenticate.get().serialized() );
+                        wwwAuthenticate.get().serialized());
                 }
                 return prepareAndSendResponse(
                     request.request->requestLine.version,
-                    std::move( response ),
-                    nullptr );
+                    std::move(response),
+                    std::move(msgBody));
             }
         }
 

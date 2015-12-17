@@ -6,9 +6,8 @@
 #include <QtCore/QQueue>
 #include <QtCore/QVariant>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/semaphore.h>
 
-#include "semaphore.h"
 
 static const qint32 MAX_THREAD_QUEUE_SIZE = 256;
 
