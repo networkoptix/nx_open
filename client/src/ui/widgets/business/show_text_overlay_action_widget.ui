@@ -7,21 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>587</width>
-    <height>124</height>
+    <height>147</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="fixedDurationCheckBox">
-     <property name="text">
-      <string>Display text for:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
+   <item row="2" column="2">
     <widget class="QWidget" name="durationWidget" native="true">
      <property name="enabled">
       <bool>false</bool>
@@ -62,14 +55,14 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QCheckBox" name="customTextCheckBox">
+   <item row="2" column="0">
+    <widget class="QCheckBox" name="fixedDurationCheckBox">
      <property name="text">
-      <string>Use custom text:</string>
+      <string>Display text for:</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="3" column="2">
     <widget class="QPlainTextEdit" name="customTextEdit">
      <property name="enabled">
       <bool>false</bool>
@@ -87,6 +80,40 @@
       </size>
      </property>
     </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QCheckBox" name="customTextCheckBox">
+     <property name="text">
+      <string>Use custom text:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="useSourceCheckBox">
+       <property name="text">
+        <string>Also show on source camera</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

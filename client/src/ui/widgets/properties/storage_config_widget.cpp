@@ -381,7 +381,8 @@ void QnStorageConfigWidget::updateRebuildInfo() {
 }
 
 void QnStorageConfigWidget::updateBackupInfo() {
-    updateBackupUi(qnServerStorageManager->backupStatus(m_server));
+    updateBackupUi(qnServerStorageManager->backupStatus(m_server)
+        , getSelectedCamerasCount());
 }
 
 void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const {
@@ -537,11 +538,14 @@ void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
     emit hasChangesChanged();
 }
 
-bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QString *info) {
+bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
+    , int selectedCamerasCount
+    , QString *info) {
 
     using boost::algorithm::any_of;
 
-    auto error = [info](const QString &error) -> bool {
+    auto error = [info](const QString &error) -> bool
+    {
         if (info)
             *info = error;
         return false;
@@ -550,22 +554,44 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data, QStri
     if (data.state != Qn::BackupState_None)
         return error(tr("Backup is already in progress."));
 
-    if (!any_of(m_model->storages(), [](const QnStorageModelInfo &storage){
+    const auto isCorrectStorage = [](const QnStorageModelInfo &storage)
+    {
         return storage.isWritable && storage.isUsed && storage.isBackup;
-    }))
+    };
+
+    if (!any_of(m_model->storages(), isCorrectStorage))
         return error(tr("Select at least one backup storage."));
 
-    if (m_backupSchedule.backupType == Qn::Backup_Schedule) {
-        if (!m_backupSchedule.isValid())
-            return error(tr("Backup Schedule is invalid."));
+    if ((m_backupSchedule.backupType == Qn::Backup_Schedule)
+        && !m_backupSchedule.isValid())
+    {
+        return error(tr("Backup Schedule is invalid."));
     }
 
     if (hasChanges())
         return error(tr("Apply changes before starting backup."));
 
-    if (qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Main).state != Qn::RebuildState_None
-     || qnServerStorageManager->rebuildStatus(m_server, QnServerStoragesPool::Backup).state != Qn::RebuildState_None)
+    if (m_backupSchedule.backupType == Qn::Backup_RealTime)
+        return false;
+
+    if (!selectedCamerasCount)
+    {
+        const auto text = QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Select at least one device to start backup.")
+            , tr("Select at least one camera to start backup."));
+        return error(text);
+    }
+
+    const auto rebuildStatusState = [this](QnServerStoragesPool type)
+    {
+        return qnServerStorageManager->rebuildStatus(m_server, type).state;
+    };
+
+    if ((rebuildStatusState(QnServerStoragesPool::Main) != Qn::RebuildState_None)
+        || (rebuildStatusState(QnServerStoragesPool::Backup) != Qn::RebuildState_None))
+    {
         return error(tr("Couldn't start backup while rebuilding archive index is being processed."));
+    }
 
     return true;
 }
@@ -603,8 +629,23 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     ui->backupOptionLabel->setVisible(backupIsPossible);
 }
 
+int QnStorageConfigWidget::getSelectedCamerasCount() const
+{
+    if (!m_server)
+        return 0;
 
-void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
+    const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr &camera)
+    {
+        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+    };
+
+    QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(m_server, true);
+    QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
+    return selectedCameras.size();
+}
+
+void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
+    , int selectedCamerasCount)
 {
     QString status;
 
@@ -615,7 +656,8 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
         ui->progressBarBackup->setValue(0);
 
     QString backupInfo;
-    bool canStartBackup = this->canStartBackup(reply, &backupInfo);
+    bool canStartBackup = this->canStartBackup(
+        reply, selectedCamerasCount, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
 
     bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
@@ -634,30 +676,30 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply)
     ui->stackedWidgetBackupInfo->setCurrentWidget(backupInProgress ? ui->backupProgressPage : ui->backupPreparePage);
     ui->comboBoxBackupType->setEnabled(!backupInProgress);
 
-    updateCamerasLabel();
+    updateCamerasLabel(selectedCamerasCount);
 }
 
-
-void QnStorageConfigWidget::updateCamerasLabel()
+void QnStorageConfigWidget::updateCamerasLabel(int selectedCamerasCount)
 {
     if (!m_server)
         return;
 
-    auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr &camera) {
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
+    const auto getNumberedCaption = [this, selectedCamerasCount]() -> QString
+    {
+        const auto overallCamerasCount = qnResPool->getAllCameras(m_server, true).size();
+        return tr("%n of %1 are selected", "", selectedCamerasCount).arg(overallCamerasCount);
     };
 
-    QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(m_server, true);
-    QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
+    const auto getSimpleCaption = []()
+    {
+        return setWarningStyleHtml(QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("No devices selected"), tr("No cameras selected")));
+    };
 
-    QString lineTotal = (selectedCameras.size() > 0)
-        ? tr("%n of %1 are selected", "", selectedCameras.size()).arg(serverCameras.size())
-        : setWarningStyleHtml( QnDeviceDependentStrings::getDefaultNameFromSet(
-            tr("No devices selected"),
-            tr("No cameras selected")
-        ));
+    const QString caption = (selectedCamerasCount > 0
+        ? getNumberedCaption() : getSimpleCaption());
 
-    ui->camerasLabel->setText(lineTotal);
+    ui->camerasLabel->setText(caption);
 }
 
 
@@ -712,7 +754,7 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
     if (server != m_server)
         return;
 
-    updateBackupUi(status);
+    updateBackupUi(status, getSelectedCamerasCount());
     updateRebuildInfo();
 }
 
