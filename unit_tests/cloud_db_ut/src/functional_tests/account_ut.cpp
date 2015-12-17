@@ -92,6 +92,29 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
+//reactivation of already activated account must fail
+TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    api::ResultCode result = api::ResultCode::ok;
+    api::AccountData account1;
+    std::string account1Password;
+    result = addActivatedAccount(&account1, &account1Password);
+    ASSERT_EQ(result, api::ResultCode::ok);
+
+    result = getAccount(account1.email, account1Password, &account1);
+    ASSERT_EQ(api::ResultCode::ok, result);
+    ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
+    ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+
+    //reactivating account (e.g. we lost activation code)
+    api::AccountConfirmationCode activationCode;
+    result = reactivateAccount(account1.email, &activationCode);
+    ASSERT_EQ(result, api::ResultCode::forbidden);
+}
+
 TEST_F(CdbFunctionalTest, account_general)
 {
     //waiting for cloud_db initialization

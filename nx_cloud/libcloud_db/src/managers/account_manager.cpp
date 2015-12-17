@@ -248,6 +248,15 @@ void AccountManager::reactivateAccount(
             data::AccountConfirmationCode());
     }
 
+    if (existingAccount->statusCode == api::AccountStatus::activated)
+    {
+        NX_LOG(lm("/account/reactivate. Not reactivating of already activated account %1").
+            arg(accountEmail.email), cl_logDEBUG1);
+        return completionHandler(
+            api::ResultCode::forbidden,
+            data::AccountConfirmationCode());
+    }
+
     //fetching request source
     bool requestSourceSecured = false;
     authzInfo.get(attr::secureSource, &requestSourceSecured);
@@ -552,7 +561,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         updateAccountQuery.bindValue(
             ":customization",
             QnSql::serialized_field(accountData.customization.get()));
-    if( !updateAccountQuery.exec() )
+    if (!updateAccountQuery.exec())
     {
         NX_LOG(lit("Could not update account in DB. %1").
             arg(connection->lastError().text()), cl_logDEBUG1);
