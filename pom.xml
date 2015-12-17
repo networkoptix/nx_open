@@ -98,13 +98,11 @@
         <mobile>false</mobile>
         <newmobile></newmobile>
         <ffmpeg.libs></ffmpeg.libs>
-        <!-- compile.option1. See profile no-webkit -->
-        <webkit>true</webkit>
         <!-- compile.option2. See profile angle  -->
         <angle>false</angle>
 
         <root.dir>${basedir}</root.dir>
-        <compile.option1>-webkit</compile.option1>
+        <compile.option1></compile.option1>
         <compile.option2/>
         <compile.option3/>
         <compile.options>${compile.option1}${compile.option2}${compile.option3}</compile.options>
@@ -117,7 +115,7 @@
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.2.1-SNAPSHOT</qt.version>
+        <qt.version>5.6.0-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
@@ -151,8 +149,8 @@
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>
         <qtlib11>PrintSupport</qtlib11>
-        <qtlib12>WebKit</qtlib12>
-        <qtlib13>WebKitWidgets</qtlib13>
+        <qtlib12></qtlib12>
+        <qtlib13></qtlib13>
         <qtlib14>MultimediaWidgets</qtlib14>
         <qtlib15>Quick</qtlib15>
         <qtlib16>Qml</qtlib16>
@@ -814,18 +812,6 @@
                 <finalName>${deb.customization.company.name}-${final.artifact.name}-${release.version}.${buildNumber}-${build.suffix}</finalName>
                 <updateFeedUrl>${prodUpdateFeedUrl}</updateFeedUrl>
                 <skip.sign>false</skip.sign>
-            </properties>
-        </profile>
-        <profile>
-            <id>no-webkit</id>
-            <activation>
-                <property>
-                    <name>webkit</name>
-                    <value>false</value>
-                </property>
-            </activation>
-            <properties>
-                <compile.option1/>
             </properties>
         </profile>
         <profile>
