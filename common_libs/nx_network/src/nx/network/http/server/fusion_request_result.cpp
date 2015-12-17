@@ -21,7 +21,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorClass,
 
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorDetail,
-    (FusionRequestErrorDetail::noError, "noError")
+    (FusionRequestErrorDetail::ok, "ok")
     (FusionRequestErrorDetail::responseSerializationError, "responseSerializationError")
     (FusionRequestErrorDetail::deserializationError, "deserializationError")
     (FusionRequestErrorDetail::notAcceptable, "notAcceptable")
@@ -31,8 +31,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorDetail,
 FusionRequestResult::FusionRequestResult()
 :
     errorClass(FusionRequestErrorClass::noError),
-    resultCode(QnLexical::serialized(FusionRequestErrorDetail::noError)),
-    errorDetail(static_cast<int>(FusionRequestErrorDetail::noError))
+    resultCode(QnLexical::serialized(FusionRequestErrorDetail::ok)),
+    errorDetail(static_cast<int>(FusionRequestErrorDetail::ok))
 {
 }
 

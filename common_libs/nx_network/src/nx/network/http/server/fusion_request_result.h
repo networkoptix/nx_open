@@ -32,7 +32,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((FusionRequestErrorClass), (lexical))
 
 enum class FusionRequestErrorDetail
 {
-    noError = 0,
+    ok = 0,
     responseSerializationError,
     deserializationError,
     notAcceptable

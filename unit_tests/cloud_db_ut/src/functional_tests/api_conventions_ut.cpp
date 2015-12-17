@@ -201,7 +201,7 @@ TEST_F(CdbFunctionalTest, api_conventions_jsonInOkResponse)
         nx_http::FusionRequestErrorClass::noError,
         requestResult.errorClass);
     ASSERT_EQ(
-        QnLexical::serialized(nx_http::FusionRequestErrorDetail::noError),
+        QnLexical::serialized(nx_http::FusionRequestErrorDetail::ok),
         requestResult.resultCode);
 
     result = getAccount(account1.email, account1NewPassword, &account1);
