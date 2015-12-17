@@ -437,7 +437,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 }
 
 void AccountManager::accountAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
@@ -464,7 +464,7 @@ void AccountManager::accountAdded(
 }
 
 void AccountManager::accountReactivated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::db::DBResult resultCode,
     std::string /*email*/,
@@ -534,7 +534,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::accountVerified(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -608,7 +608,7 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 }
 
 void AccountManager::accountUpdated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool activateAccountIfNotActive,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
@@ -634,7 +634,7 @@ void AccountManager::accountUpdated(
 }
 
 void AccountManager::passwordResetCodeGenerated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     api::ResultCode resultCode,
     data::AccountEmail accountEmail,

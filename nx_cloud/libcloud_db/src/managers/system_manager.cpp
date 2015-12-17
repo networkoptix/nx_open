@@ -336,7 +336,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 }
 
 void SystemManager::systemAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
@@ -395,7 +395,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 }
 
 void SystemManager::systemSharingAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -443,7 +443,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -499,7 +499,7 @@ nx::db::DBResult SystemManager::updateSharingInDB(
 }
 
 void SystemManager::sharingUpdated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)

@@ -208,7 +208,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
 }
 
 void TemporaryAccountPasswordManager::tempPasswordAddedToDb(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     TemporaryAccountPasswordEx tempPasswordData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -250,7 +250,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
 }
 
 void TemporaryAccountPasswordManager::tempPasswordDeleted(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     QnUuid /*tempPasswordID*/,
     std::function<void(api::ResultCode)> completionHandler)
