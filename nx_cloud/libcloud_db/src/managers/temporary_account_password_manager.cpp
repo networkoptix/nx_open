@@ -46,7 +46,7 @@ void TemporaryAccountPasswordManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& authSearchInputData,
-    stree::AbstractResourceWriter* const authProperties,
+    stree::ResourceContainer* const authProperties,
     std::function<void(bool)> completionHandler)
 {
     bool result = false;
@@ -74,6 +74,10 @@ void TemporaryAccountPasswordManager::authenticateByName(
             authProperties->put(
                 cdb::attr::authAccountEmail,
                 username);
+            if (curIt->second.isEmailCode)
+                authProperties->put(
+                    cdb::attr::authenticatedByEmailCode,
+                    true);
 
             result = true;
 
@@ -155,6 +159,7 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
             ap.expiration_timestamp_utc as expirationTimestampUtc,              \
             ap.max_use_count as maxUseCount,                                    \
             ap.use_count as useCount,                                           \
+            ap.is_email_code as isEmailCode,                                    \
             ap.access_rights as accessRightsStr                                 \
          FROM account_password ap LEFT JOIN account a ON ap.account_id=a.id");
     if (!readPasswordsQuery.exec())
@@ -185,9 +190,9 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
     QSqlQuery insertTempPassword(*connection);
     insertTempPassword.prepare(
         "INSERT INTO account_password (id, account_id, password_ha1, realm, "
-            "expiration_timestamp_utc, max_use_count, use_count, access_rights) "
+            "expiration_timestamp_utc, max_use_count, use_count, is_email_code, access_rights) "
         "VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :passwordHa1, :realm, "
-            ":expirationTimestampUtc, :maxUseCount, :useCount, :accessRights)");
+            ":expirationTimestampUtc, :maxUseCount, :useCount, :isEmailCode, :accessRights)");
     QnSql::bind(tempPasswordData, &insertTempPassword);
     insertTempPassword.bindValue(
         ":accessRights",

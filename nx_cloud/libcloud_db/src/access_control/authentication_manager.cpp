@@ -38,26 +38,22 @@ namespace cdb {
 using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
-    AccountManager* const accountManager,
-    SystemManager* const systemManager,
-    TemporaryAccountPasswordManager* const temporaryAccountPasswordManager,
+    std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
     const QnAuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
-    m_dist(0, std::numeric_limits<size_t>::max())
+    m_dist(0, std::numeric_limits<size_t>::max()),
+    m_authDataProviders(std::move(authDataProviders))
 {
-    m_authDataProviders.push_back(accountManager);
-    m_authDataProviders.push_back(systemManager);
-    m_authDataProviders.push_back(temporaryAccountPasswordManager);
 }
 
 bool AuthenticationManager::authenticate(
     const nx_http::HttpServerConnection& connection,
     const nx_http::Request& request,
     boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-    stree::AbstractResourceWriter* authProperties,
+    stree::ResourceContainer* authProperties,
     std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody)
 {
     bool authResult = false;
@@ -182,7 +178,7 @@ bool AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& authSearchInputData,
-    stree::AbstractResourceWriter* const authProperties)
+    stree::ResourceContainer* const authProperties)
 {
     //TODO #ak AuthenticationManager has to become async sometimes...
 

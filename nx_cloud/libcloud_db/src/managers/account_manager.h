@@ -55,7 +55,7 @@ public:
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
-        stree::AbstractResourceWriter* const authProperties,
+        stree::ResourceContainer* const authProperties,
         std::function<void(bool)> completionHandler) override;
 
     //!Adds account in "not activated" state and sends verification email to the email address provided
@@ -141,10 +141,12 @@ private:
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
 
     nx::db::DBResult updateAccountInDB(
+        bool activateAccountIfNotActive,
         QSqlDatabase* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     void accountUpdated(
         ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+        bool authenticatedByEmailCode,
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
         std::function<void(api::ResultCode)> completionHandler );

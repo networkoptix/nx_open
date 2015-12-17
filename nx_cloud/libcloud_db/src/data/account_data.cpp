@@ -121,7 +121,8 @@ TemporaryAccountPassword::TemporaryAccountPassword()
 :
     expirationTimestampUtc(0),
     maxUseCount(0),
-    useCount(0)
+    useCount(0),
+    isEmailCode(false)
 {
 }
 

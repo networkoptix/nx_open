@@ -37,9 +37,7 @@ class AuthenticationManager
 {
 public:
     AuthenticationManager(
-        AccountManager* const accountManager,
-        SystemManager* const systemManager,
-        TemporaryAccountPasswordManager* const temporaryAccountPasswordManager,
+        std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
         const QnAuthMethodRestrictionList& authRestrictionList,
         const StreeManager& stree);
 
@@ -47,7 +45,7 @@ public:
         const nx_http::HttpServerConnection& connection,
         const nx_http::Request& request,
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate,
-        stree::AbstractResourceWriter* authProperties,
+        stree::ResourceContainer* authProperties,
         std::unique_ptr<nx_http::AbstractMsgBodySource>* const msgBody) override;
         
     static nx::String realm(); 
@@ -64,7 +62,7 @@ private:
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
-        stree::AbstractResourceWriter* const authProperties);
+        stree::ResourceContainer* const authProperties);
     void addWWWAuthenticateHeader(
         boost::optional<nx_http::header::WWWAuthenticate>* const wwwAuthenticate );
     nx::Buffer generateNonce();

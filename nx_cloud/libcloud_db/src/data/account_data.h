@@ -91,13 +91,15 @@ public:
     std::uint32_t expirationTimestampUtc;
     int maxUseCount;
     int useCount;
+    //!this password has been sent to user's email address
+    bool isEmailCode;
     AccessRestrictions accessRights;
 
     TemporaryAccountPassword();
 };
 
 #define TemporaryAccountPassword_Fields (accountEmail)(passwordHa1)(realm) \
-    (expirationTimestampUtc)(maxUseCount)(useCount)
+    (expirationTimestampUtc)(maxUseCount)(useCount)(isEmailCode)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (TemporaryAccountPassword),

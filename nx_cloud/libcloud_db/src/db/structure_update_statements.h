@@ -127,6 +127,13 @@ CREATE TABLE account_password (                                     \
 );                                                                  \
 ";
 
+//#CLOUD-143
+static const char kAddIsEmailCodeToTemporaryAccountPassword[] =
+"                                                                   \
+ALTER TABLE account_password ADD COLUMN is_email_code INTEGER;      \
+UPDATE account_password set is_email_code = 1;                      \
+";
+
 
 }   //db
 }   //cdb
