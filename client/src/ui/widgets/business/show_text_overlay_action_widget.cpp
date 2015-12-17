@@ -25,10 +25,10 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
     connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
-
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {
         // Prolonged type of event has changed. In case of instant
@@ -42,7 +42,8 @@ QnShowTextOverlayActionWidget::~QnShowTextOverlayActionWidget()
 {}
 
 void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->fixedDurationCheckBox);
+    setTabOrder(before, ui->useSourceCheckBox);
+    setTabOrder(ui->useSourceCheckBox, ui->fixedDurationCheckBox);
     setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
     setTabOrder(ui->durationSpinBox, ui->customTextCheckBox);
     setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
@@ -55,11 +56,16 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField)) {
+    if (fields.testFlag(QnBusiness::EventTypeField))
+    {
         bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
+
+        const bool canUseSource = ((model()->eventType() >= QnBusiness::UserDefinedEvent)
+            || (requiresCameraResource(model()->eventType())));
+        ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
@@ -71,8 +77,12 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
         ui->customTextCheckBox->setChecked(!params.text.isEmpty());
         ui->customTextEdit->setPlainText(params.text);
+
+        ui->useSourceCheckBox->setChecked(params.useSource);
     }
 }
+
+
 
 void QnShowTextOverlayActionWidget::paramsChanged() {
     if (!model() || m_updating)
@@ -84,6 +94,6 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
     params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
-
+    params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);
 }

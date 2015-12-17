@@ -460,7 +460,7 @@ void QnSearchBookmarksDialog::Impl::customContextMenuRequested()
 ///
 
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(QWidget *parent)
-    : QnButtonBoxDialog(parent)
+    : QnWorkbenchStateDependentButtonBoxDialog(parent)
     , m_impl(new Impl(this))
 {
 }
