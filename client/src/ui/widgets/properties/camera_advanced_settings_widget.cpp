@@ -3,6 +3,9 @@
 
 #include <QtNetwork/QNetworkReply>
 
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineProfile>
+
 #include <api/app_server_connection.h>
 
 #include <api/network_proxy_factory.h>
@@ -125,7 +128,12 @@ void QnCameraAdvancedSettingsWidget::reloadData() {
 }
 
 void QnCameraAdvancedSettingsWidget::initWebView() {
-    m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(ui->webView);
+
+    //this User-Agent is required for vista camera to use html/js page, not java applet
+    QWebEngineProfile* profile = new QWebEngineProfile(this);
+    profile->setHttpUserAgent(lit("Mozilla/5.0 (Windows; U; Windows NT based; en-US) AppleWebKit/534.34 (KHTML, like Gecko)  QtWeb Internet Browser/3.8.5 http://www.QtWeb.net"));
+
+    m_cameraAdvancedSettingsWebPage = new CameraAdvancedSettingsWebPage(profile, ui->webView);
     ui->webView->setPage(m_cameraAdvancedSettingsWebPage);
 
     QStyle* style = QStyleFactory().create(lit("fusion"));

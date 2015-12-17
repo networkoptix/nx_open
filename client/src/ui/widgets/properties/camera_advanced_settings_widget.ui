@@ -52,7 +52,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWebView" name="webView" native="true">
+        <widget class="QWebEngineView" name="webView" native="true">
          <property name="url" stdset="0">
           <url>
            <string>about:blank</string>

@@ -26,7 +26,7 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webenginewidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
         <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
@@ -81,22 +81,4 @@
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>           
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>webkit-win</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>    
-                <property>
-                    <name>webkit</name>
-                    <value>!false</value>
-                </property>                  
-            </activation>
-            <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-            </properties>
-        </profile>  
-    </profiles>
 </project>

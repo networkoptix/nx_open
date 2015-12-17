@@ -6,21 +6,20 @@
 #ifndef CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 #define CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H
 
-#include <QWebPage>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineProfile>
+
 #include "core/resource/resource_fwd.h"
 
 class QnCustomCookieJar;
 
 class CameraAdvancedSettingsWebPage
 :
-    public QWebPage
+    public QWebEnginePage
 {
 public:
-    CameraAdvancedSettingsWebPage( QObject* parent = 0 );
+    CameraAdvancedSettingsWebPage(QWebEngineProfile *profile, QObject* parent = 0 );
     void setCamera(QnResourcePtr camRes);
-protected:
-    //!Implementation of QWebPage::userAgentForUrl
-    virtual QString	userAgentForUrl( const QUrl& url ) const override;
 private:
     QnCustomCookieJar* m_cookieJar;
 };

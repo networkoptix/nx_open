@@ -1,15 +1,15 @@
 #include "web_resource_widget.h"
 
-#include <QtWebKitWidgets/QGraphicsWebView>
+//#include <QtWebKitWidgets/QGraphicsWebView>
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
 {
 
-    QGraphicsWebView *webView = new QGraphicsWebView(this);
+  /*  QGraphicsWebView *webView = new QGraphicsWebView(this);
     webView->setUrl(QUrl(lit("http://bash.im")));
     addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
-
+*/
     setOption(QnResourceWidget::WindowRotationForbidden, true);
 
     updateTitleText();

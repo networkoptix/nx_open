@@ -1,7 +1,20 @@
 #include "icon_pixmap_accessor.h"
 
 #include <QtGui/QIcon>
+
+#if QT_VERSION == 0x050201
 #include <QtGui/5.2.1/QtGui/private/qicon_p.h>
+#elif QT_VERSION == 0x050401
+#include <QtGui/5.4.1/QtGui/private/qicon_p.h>
+#elif QT_VERSION == 0x050500
+#include <QtGui/5.5.0/QtGui/private/qicon_p.h>
+#elif QT_VERSION == 0x050501
+#include <QtGui/5.5.1/QtGui/private/qicon_p.h>
+#elif QT_VERSION == 0x050600
+#include <QtGui/5.6.0/QtGui/private/qicon_p.h>
+#else
+#error "Include proper header here!"
+#endif
 
 class QIconThemeEngine {
 public:
