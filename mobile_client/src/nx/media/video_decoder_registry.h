@@ -16,15 +16,16 @@ namespace nx
 		class VideoDecoderRegistry
 		{
 		public:
+			VideoDecoderRegistry* instance();
 			/*
 			* \returns optimal video decoder (in case of any) compatible with such frame. Returns null pointer if no compatible decoder found.
 			*/
 			typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
-			static VideoDecoderPtr createCompatibleDecoder(const QnConstCompressedVideoDataPtr& frame);
+			VideoDecoderPtr createCompatibleDecoder(const QnConstCompressedVideoDataPtr& frame);
 
 			/** Register video decoder plugin */
 			template <class Decoder>
-			static void addPlugin() { m_plugins.push_back(instantiate<Decoder>); }
+			void addPlugin() { m_plugins.push_back(instantiate<Decoder>); }
 
 		private:
 			template <class Decoder>
@@ -34,7 +35,7 @@ namespace nx
 			};
 		private:
 			typedef std::function<AbstractVideoDecoder* (const QnConstCompressedVideoDataPtr& context)> InstanceFunc;
-			static QVector<InstanceFunc> m_plugins;
+			QVector<InstanceFunc> m_plugins;
 		};
 
 	}
