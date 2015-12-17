@@ -33,13 +33,13 @@ void AccountManager::registerNewAccount(
 
 void AccountManager::activateAccount(
     api::AccountConfirmationCode activationCode,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::function<void(api::ResultCode, api::AccountEmail)> completionHandler)
 {
     executeRequest(
         kAccountActivatePath,
         std::move(activationCode),
         completionHandler,
-        completionHandler);
+        std::bind(completionHandler, std::placeholders::_1, api::AccountEmail()));
 }
 
 void AccountManager::getAccount(
@@ -68,6 +68,19 @@ void AccountManager::resetPassword(
 {
     executeRequest(
         kAccountPasswordResetPath,
+        std::move(accountEmail),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));
+}
+
+void AccountManager::reactivateAccount(
+    api::AccountEmail accountEmail,
+    std::function<void(
+        api::ResultCode,
+        api::AccountConfirmationCode)> completionHandler)
+{
+    executeRequest(
+        kAccountReactivatePath,
         std::move(accountEmail),
         completionHandler,
         std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode()));

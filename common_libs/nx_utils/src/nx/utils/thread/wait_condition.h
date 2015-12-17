@@ -22,7 +22,7 @@ public:
 	QnWaitCondition();
     ~QnWaitCondition();
     
-    bool wait( QnMutex* mutex, unsigned long time = ULONG_MAX );
+    bool wait(QnMutex* mutex, unsigned long time = ULONG_MAX);
     void wakeAll();
     void wakeOne();
 

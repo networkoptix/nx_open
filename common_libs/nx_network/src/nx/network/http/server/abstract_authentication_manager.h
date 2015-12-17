@@ -8,9 +8,14 @@
 
 #include "http_server_connection.h"
 
+#include <memory>
+
 #include <boost/optional.hpp>
 
 #include <plugins/videodecoder/stree/resourcecontainer.h>
+
+#include "../abstract_msg_body_source.h"
+
 
 namespace nx_http
 {
@@ -27,7 +32,8 @@ namespace nx_http
             const HttpServerConnection& connection,
             const nx_http::Request& request,
             boost::optional<header::WWWAuthenticate>* const wwwAuthenticate,
-            stree::AbstractResourceWriter* authProperties ) = 0;
+            stree::AbstractResourceWriter* authProperties,
+            std::unique_ptr<AbstractMsgBodySource>* const msgBody) = 0;
     };
 }
 

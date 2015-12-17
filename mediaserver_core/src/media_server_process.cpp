@@ -2271,19 +2271,19 @@ void MediaServerProcess::run()
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::cc::MediatorAddressPublisher::Authorization auth =
+            nx::cc::MediatorConnector::SystemCredentials credentials =
             {
-                qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
+                qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8()
             };
 
-            nx::SocketGlobals::addressPublisher()
-                    .updateAuthorization(std::move(auth));
+            nx::SocketGlobals::mediatorConnector()
+                    .setSystemCredentials(std::move(credentials));
             return;
         }
 
-        nx::SocketGlobals::addressPublisher().updateAuthorization(boost::none);
+        nx::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
     };
 
     loadResourcesFromECS(messageProcessor.data());

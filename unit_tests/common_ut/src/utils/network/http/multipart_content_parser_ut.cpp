@@ -196,7 +196,7 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
             std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
                 decodedFramesProcessor ) );
 
-        for( size_t pos = 0; pos < testData.size(); pos += dataStep )
+        for( int pos = 0; pos < testData.size(); pos += dataStep )
             parser.processData( QnByteArrayConstRef(
                 testData,
                 pos,
@@ -265,7 +265,7 @@ TEST( HttpMultipartContentParser, unSizedData )
                 std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
                     decodedFramesProcessor ) );
 
-            for( int pos = 0; pos < testData.size(); pos += dataStep )
+            for( size_t pos = 0; pos < (size_t)testData.size(); pos += dataStep )
                 parser.processData( QnByteArrayConstRef(
                     testData,
                     pos,

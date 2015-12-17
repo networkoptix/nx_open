@@ -66,6 +66,57 @@ bool AccountEmail::getAsVariant(int resID, QVariant* const value) const
 }
 
 
+std::string AccessRestrictions::toString() const
+{
+    std::string result;
+    for (const auto& str: requestsAllowed)
+    {
+        if (!result.empty())
+            result += ",";
+        result += str;
+    }
+
+    return result;
+}
+
+bool AccessRestrictions::parse(const std::string& str)
+{
+    if (str.empty())
+        return true;
+    //TODO #ak use boost.spirit (could not compile it for some reason) or something...
+
+    for (std::string::size_type
+        pos = 0;
+        (pos != std::string::npos) && (pos < str.size()); )
+    {
+        auto newPos = str.find(',', pos);
+        if (newPos == std::string::npos)
+            newPos = str.size();
+        if (newPos != pos)
+            requestsAllowed.push_back(str.substr(pos, newPos-pos));
+        pos = newPos + 1;
+    }
+
+    return true;
+}
+
+bool AccessRestrictions::authorize(const stree::AbstractResourceReader& requestAttributes) const
+{
+    if (requestsAllowed.empty())
+        return true;    //no restrictions
+
+    if (auto requestPath = requestAttributes.get(attr::requestPath))
+    {
+        return std::find(
+            requestsAllowed.begin(),
+            requestsAllowed.end(),
+            requestPath->toString().toStdString()) != requestsAllowed.end();
+    }
+
+    return true;
+}
+
+
 TemporaryAccountPassword::TemporaryAccountPassword()
 :
     expirationTimestampUtc(0),

@@ -72,8 +72,6 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver()
-:
-    m_stunClient(nullptr)
 {
 }
 
@@ -200,6 +198,19 @@ bool AddressResolver::isRequestIdKnown( void* requestId ) const
     return m_requests.count( requestId );
 }
 
+void AddressResolver::pleaseStop( std::function<void()> handler )
+{
+    // TODO: make DnsResolver QnStoppableAsync
+    m_dnsResolver.pleaseStop();
+
+    QnMutexLocker lk( &m_mutex );
+    if( m_mediatorConnection )
+    {
+        lk.unlock();
+        m_mediatorConnection->pleaseStop( std::move(handler) );
+    }
+}
+
 AddressResolver::HostAddressInfo::HostAddressInfo()
     : m_dnsState( State::unresolved )
     , m_mediatorState( State::unresolved )
@@ -312,63 +323,28 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
 void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )
 {
     info->second.mediatorProgress();
-    if( !m_stunClient )
-    {
-        lk->unlock();
-        auto client = SocketGlobals::mediatorConnector().client();
-        lk->relock();
-        m_stunClient = client;
-    }
+    if( !m_mediatorConnection )
+        m_mediatorConnection = SocketGlobals::mediatorConnector().clientConnection();
 
-    if( m_stunClient )
-        return mediatorStunResolve( info, lk );
-
-    NX_LOGX( lit( "Mediator address is not resolved yet" ), cl_logDEBUG1 );
-    info->second.setMediatorEntries();
-
-    const auto guards = grabHandlers( SystemError::dnsServerFailure, info );
     lk->unlock();
-}
-
-void AddressResolver::mediatorStunResolve( HaInfoIterator info, QnMutexLockerBase* lk )
-{
-    stun::Message request( stun::Header( stun::MessageClass::request,
-                                         stun::cc::methods::connect ) );
-    request.newAttribute< stun::cc::attrs::ClientId >( "SomeClientId" ); // TODO
-    request.newAttribute< stun::cc::attrs::HostName >( info->first.toString().toUtf8() );
-
-    auto functor = [ = ]( SystemError::ErrorCode code, stun::Message message )
+    m_mediatorConnection->connect( info->first.toString().toUtf8(),
+                                   [this, info](std::list<SocketAddress> addresses)
     {
+        std::vector< AddressEntry > entries;
         std::vector< Guard > guards;
 
         QnMutexLocker lk( &m_mutex );
-        std::vector< AddressEntry > entries;
-        if( const auto error = stun::AsyncClient::hasError( code, message ) )
+        for( const auto& it : addresses )
         {
-            // count failure as unresolvable, better luck next time
-            NX_LOGX( *error, cl_logDEBUG1 );
-            code = SystemError::dnsServerFailure;
-        }
-        else
-        if( auto eps = message.getAttribute< stun::cc::attrs::PublicEndpointList >() )
-        {
-            for( const auto& it : eps->get() )
-            {
-                AddressEntry entry( AddressType::regular, it.address );
-                entry.attributes.push_back( AddressAttribute(
-                    AddressAttributeType::nxApiPort, it.port ) );
-                entries.push_back( std::move( entry ) );
-            }
+            AddressEntry entry( AddressType::regular, it.address );
+            entry.attributes.push_back( AddressAttribute(
+                AddressAttributeType::nxApiPort, it.port ) );
+            entries.push_back( std::move( entry ) );
         }
 
-        info->second.setMediatorEntries( entries );
-        guards = grabHandlers( code, info );
-    };
-
-    lk->unlock();
-    m_stunClient->sendRequest(
-        std::move(request),
-        std::move(functor));
+        info->second.setMediatorEntries( std::move(entries) );
+        guards = grabHandlers( SystemError::noError, info );
+    });
 }
 
 std::vector< Guard > AddressResolver::grabHandlers(

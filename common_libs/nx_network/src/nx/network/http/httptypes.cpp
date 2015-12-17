@@ -908,6 +908,23 @@ namespace nx_http
             right.basic = nullptr;
         }
 
+        Authorization::Authorization(const Authorization& right)
+        :
+            authScheme( right.authScheme )
+        {
+            switch (authScheme)
+            {
+                case AuthScheme::basic:
+                    basic = new BasicCredentials(*right.basic);
+                    break;
+                case AuthScheme::digest:
+                    digest = new DigestCredentials(*right.digest);
+                    break;
+                default:
+                    break;
+            }
+        }
+        
         Authorization::~Authorization()
         {
             clear();
@@ -1017,6 +1034,12 @@ namespace nx_http
         DigestAuthorization::DigestAuthorization( DigestAuthorization&& right )
         :
             Authorization( std::move(right) )
+        {
+        }
+
+        DigestAuthorization::DigestAuthorization(const DigestAuthorization& right)
+        :
+            Authorization(right)
         {
         }
 

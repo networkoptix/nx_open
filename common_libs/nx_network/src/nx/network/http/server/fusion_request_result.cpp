@@ -20,34 +20,58 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorClass,
     )
 
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(FusionRequestErrorDetail,
+    (FusionRequestErrorDetail::ok, "ok")
+    (FusionRequestErrorDetail::responseSerializationError, "responseSerializationError")
+    (FusionRequestErrorDetail::deserializationError, "deserializationError")
+    (FusionRequestErrorDetail::notAcceptable, "notAcceptable")
+    )
+
+
 FusionRequestResult::FusionRequestResult()
 :
-    resultCode(FusionRequestErrorClass::noError),
-    errorDetail(ecNoDetail)
+    errorClass(FusionRequestErrorClass::noError),
+    resultCode(QnLexical::serialized(FusionRequestErrorDetail::ok)),
+    errorDetail(static_cast<int>(FusionRequestErrorDetail::ok))
 {
 }
 
 FusionRequestResult::FusionRequestResult(
     FusionRequestErrorClass _errorClass,
+    QString _resultCode,
     int _errorDetail,
     QString _errorText)
 :
-    resultCode(_errorClass),
+    errorClass(_errorClass),
+    resultCode(_resultCode),
     errorDetail(_errorDetail),
+    errorText(std::move(_errorText))
+{
+}
+
+FusionRequestResult::FusionRequestResult(
+    FusionRequestErrorClass _errorClass,
+    QString _resultCode,
+    FusionRequestErrorDetail _errorDetail,
+    QString _errorText)
+:
+    errorClass(_errorClass),
+    resultCode(_resultCode),
+    errorDetail(static_cast<int>(_errorDetail)),
     errorText(std::move(_errorText))
 {
 }
 
 nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
 {
-    switch (resultCode)
+    switch (errorClass)
     {
         case FusionRequestErrorClass::noError:
             return nx_http::StatusCode::ok;
         case FusionRequestErrorClass::badRequest:
-            switch (errorDetail)
+            switch (static_cast<FusionRequestErrorDetail>(errorDetail))
             {
-                case ecNotAcceptable:
+                case FusionRequestErrorDetail::notAcceptable:
                     return nx_http::StatusCode::notAcceptable;
                 default:
                     return nx_http::StatusCode::badRequest;

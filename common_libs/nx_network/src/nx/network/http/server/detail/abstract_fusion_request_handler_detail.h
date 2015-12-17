@@ -13,6 +13,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <utils/serialization/json.h>
+#include <utils/serialization/lexical.h>
 
 #include "../fusion_request_result.h"
 
@@ -41,10 +42,9 @@ protected:
     void requestCompleted(FusionRequestResult result)
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
-        if (result.resultCode != FusionRequestErrorClass::noError)
-            outputMsgBody = std::make_unique<nx_http::BufferSource>(
-                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-                QJson::serialized(result));
+        outputMsgBody = std::make_unique<nx_http::BufferSource>(
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+            QJson::serialized(result));
 
         requestCompleted(
             result.httpStatusCode(),
@@ -97,7 +97,8 @@ protected:
         {
             FusionRequestResult result(
                 FusionRequestErrorClass::badRequest,
-                FusionRequestResult::ecNotAcceptable,
+                QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
+                FusionRequestErrorDetail::notAcceptable,
                 lit("Input format %1 not supported. Input data attributes can be specified in url or by %2 POST message body").
                     arg(Qn::serializationFormatToHttpContentType(*inputDataFormat)).
                     arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
@@ -109,7 +110,8 @@ protected:
         {
             FusionRequestResult result(
                 FusionRequestErrorClass::badRequest,
-                FusionRequestResult::ecNotAcceptable,
+                QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
+                FusionRequestErrorDetail::notAcceptable,
                 lit("Output format %1 not supported. Only %2 is supported").
                     arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat)).
                     arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
@@ -196,7 +198,7 @@ public:
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
 
-        if (result.resultCode == FusionRequestErrorClass::noError)
+        if (result.errorClass == FusionRequestErrorClass::noError)
         {
             //serializing outputData
             nx::Buffer serializedData;
@@ -208,12 +210,13 @@ public:
             }
             else
             {
-                result.resultCode = FusionRequestErrorClass::internalError;
-                result.errorDetail = FusionRequestResult::ecResponseSerializationError;
+                result.errorClass = FusionRequestErrorClass::internalError;
+                result.resultCode = QnLexical::serialized(FusionRequestErrorDetail::responseSerializationError);
+                result.errorDetail = static_cast<int>(FusionRequestErrorDetail::responseSerializationError);
             }
         }
 
-        if (result.resultCode != FusionRequestErrorClass::noError)
+        if (result.errorClass != FusionRequestErrorClass::noError)
             outputMsgBody = std::make_unique<nx_http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
                 QJson::serialized(result));
@@ -273,7 +276,8 @@ private:
         {
             FusionRequestResult result(
                 FusionRequestErrorClass::badRequest,
-                FusionRequestResult::ecDeserializationError,
+                QnLexical::serialized(FusionRequestErrorDetail::deserializationError),
+                FusionRequestErrorDetail::deserializationError,
                 lit("Error deserializing input of type %1").
                     arg(Qn::serializationFormatToHttpContentType(inputDataFormat)));
             this->requestCompleted(std::move(result));

@@ -173,7 +173,7 @@ MAKE_FIELD_NAME_STR_CONST(AccountEmail, email)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountEmail* const data)
 {
-    if (!urlQuery.hasQueryItem(AccountUpdateData_passwordHa1_field))
+    if (!urlQuery.hasQueryItem(AccountEmail_email_field))
         return false;
     data->email = urlQuery.queryItemValue(AccountEmail_email_field).toStdString();
     return true;

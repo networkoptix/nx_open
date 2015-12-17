@@ -3,10 +3,13 @@
 
 #include <QtCore/qglobal.h>
 
+
 class QnSemaphorePrivate;
 
-// TODO: #AK or #VASILENKO add doxydocs: what is fixed here?
-class QnSemaphore {
+/*!
+    \note Need own semaphore to add it to deadlock detection logic someday...
+*/
+class NX_UTILS_API QnSemaphore {
 public:
     explicit QnSemaphore(int n = 0);
     ~QnSemaphore();

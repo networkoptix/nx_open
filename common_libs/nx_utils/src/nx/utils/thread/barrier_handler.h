@@ -2,6 +2,7 @@
 #define NX_UTILS_BARRIER_HANDLER_H
 
 #include <functional>
+#include <memory>
 
 #include "mutex.h"
 

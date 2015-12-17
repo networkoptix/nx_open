@@ -7,7 +7,7 @@
 #include <QtCore/QSharedPointer>
 
 #include <nx/utils/singleton.h>
-#include "semaphore.h"
+#include <nx/utils/thread/semaphore.h>
 #include "utils/common/stoppable.h"
 #include <utils/common/safe_direct_connection.h>
 

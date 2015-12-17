@@ -1611,10 +1611,13 @@ void SSLServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode,
 void SSLServerSocket::connectionAccepted(SystemError::ErrorCode errorCode, AbstractStreamSocket* newSocket)
 {
     if( newSocket )
+    {
         if( m_allowNonSecureConnect )
             newSocket = new QnMixedSSLSocket(newSocket);
         else
             newSocket = new QnSSLSocket(newSocket, true);
+    }
+
     auto handler = std::move(m_acceptHandler);
     handler(errorCode, newSocket);
 }

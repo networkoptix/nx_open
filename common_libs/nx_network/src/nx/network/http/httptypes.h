@@ -9,6 +9,7 @@
 #include <cstring>
 #include <functional>
 #include <map>
+#include <string>
 #include <vector>
 
 #include <boost/optional.hpp>
@@ -443,6 +444,7 @@ namespace nx_http
             Authorization();
             Authorization( const AuthScheme::Value& authSchemeVal );
             Authorization( Authorization&& right );
+            Authorization(const Authorization&);
             ~Authorization();
 
             Authorization& operator=( Authorization&& right );
@@ -455,7 +457,6 @@ namespace nx_http
             StringType userid() const;
 
         private:
-            Authorization( const Authorization& );
             const Authorization& operator=( const Authorization& );
         };
 
@@ -474,7 +475,8 @@ namespace nx_http
         {
         public:
             DigestAuthorization();
-            DigestAuthorization( DigestAuthorization&& right );
+            DigestAuthorization(DigestAuthorization&& right);
+            DigestAuthorization(const DigestAuthorization& right);
 
             void addParam( const BufferType& name, const BufferType& value );
         };
