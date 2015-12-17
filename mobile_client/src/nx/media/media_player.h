@@ -40,6 +40,10 @@ namespace nx
 			Q_ENUMS(State)
 			Q_ENUMS(MediaStatus)
 
+			/*
+			* Source url to open.
+			* In order to support multiserver archive, media player supports non standard URL scheme 'camera'. Example to open: "camera://<camera_id>"
+			*/
 			Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 			
 			Q_PROPERTY(QAbstractVideoSurface * videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
