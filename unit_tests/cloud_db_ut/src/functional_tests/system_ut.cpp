@@ -591,9 +591,11 @@ TEST_F(CdbFunctionalTest, system_unbind)
         {
             std::vector<api::SystemData> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_EQ(systems.size(), 1);
+            ASSERT_EQ(systems.size(), 2);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
         }
 
         //sharing system1 with account2 as viewer
@@ -615,7 +617,7 @@ TEST_F(CdbFunctionalTest, system_unbind)
                     unbindSystem(account1.email, account1Password, system1.id.toStdString()));
                 break;
             case 1:
-                //unbinding with owner credentials
+                //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
                     unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
@@ -625,12 +627,20 @@ TEST_F(CdbFunctionalTest, system_unbind)
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
                     unbindSystem(account2.email, account2Password, system1.id.toStdString()));
+                //unbinding with system credentials
+                ASSERT_EQ(
+                    api::ResultCode::ok,
+                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
                 continue;
             case 3:
                 //unbinding with other system credentials
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
                     unbindSystem(system0.id.toStdString(), system0.authKey, system1.id.toStdString()));
+                //unbinding with system credentials
+                ASSERT_EQ(
+                    api::ResultCode::ok,
+                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
                 continue;
         }
 
@@ -638,7 +648,9 @@ TEST_F(CdbFunctionalTest, system_unbind)
         {
             std::vector<api::SystemData> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-            ASSERT_TRUE(systems.empty());
+            ASSERT_EQ(systems.size(), 1);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
+            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         }
     }
 }
