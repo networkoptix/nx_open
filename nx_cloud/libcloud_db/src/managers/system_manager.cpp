@@ -51,9 +51,9 @@ void SystemManager::authenticateByName(
 {
     bool result = false;
     auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ completionHandler, &result]() {
-        completionHandler(result);
-    });
+        [&completionHandler, &result]() {
+            completionHandler(result);
+        });
 
     QnMutexLocker lk(&m_mutex);
 

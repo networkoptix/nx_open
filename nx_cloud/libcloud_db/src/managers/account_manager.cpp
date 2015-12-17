@@ -90,7 +90,7 @@ void AccountManager::authenticateByName(
         std::move(validateHa1Func),
         authSearchInputData,
         authProperties,
-        [username, authProperties, completionHandler, this](bool authResult) mutable {
+        [username, authProperties, /*std::move*/ completionHandler, this](bool authResult) mutable {
             if (authResult)
             {
                 bool authenticatedByEmailCode = false;
