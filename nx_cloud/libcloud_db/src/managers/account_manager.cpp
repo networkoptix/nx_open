@@ -5,6 +5,7 @@
 
 #include "account_manager.h"
 
+#include <chrono>
 #include <functional>
 #include <iostream>
 
@@ -33,10 +34,9 @@
 namespace nx {
 namespace cdb {
 
-static const QString CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME = lit("activate_account");
-static const QString CONFIRMATION_URL_PARAM = lit("confirmationUrl");
-static const QString CONFIRMATION_CODE_PARAM = lit("confirmationCode");
-static const int UNCONFIRMED_ACCOUNT_EXPIRATION_SEC = 3*24*60*60;
+static const QString kConfirmaionEmailTemplateFileName = lit("activate_account");
+static const QString kPasswordResetEmailTemplateFileName = lit("restore_password");
+static const std::chrono::seconds kUnconfirmedAccountExpirationSec(3*24*60*60);
 
 AccountManager::AccountManager(
     const conf::Settings& settings,
@@ -160,7 +160,7 @@ void AccountManager::updateAccount(
     std::function<void(api::ResultCode)> completionHandler)
 {
     std::string accountEmail;
-    if (!authzInfo.get( attr::authAccountEmail, &accountEmail))
+    if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
     {
         completionHandler(api::ResultCode::forbidden);
         return;
@@ -387,7 +387,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
         emailVerificationCode);
     insertEmailVerificationQuery.bindValue(
         2,
-        QDateTime::currentDateTimeUtc().addSecs(UNCONFIRMED_ACCOUNT_EXPIRATION_SEC));
+        QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
     if( !insertEmailVerificationQuery.exec() )
     {
         NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
@@ -401,8 +401,8 @@ db::DBResult AccountManager::issueAccountActivationCode(
     //sending confirmation email
     ActivateAccountNotification notification;
     notification.user_email = QString::fromStdString(accountEmail);
-    notification.type = CONFIRMAION_EMAIL_TEMPLATE_FILE_NAME;
-    notification.message.code = QString::fromStdString(resultData->code);
+    notification.type = kConfirmaionEmailTemplateFileName;
+    notification.message.code = resultData->code;
     m_emailManager->sendAsync(
         std::move(notification),
         std::function<void(bool)>());
@@ -610,6 +610,15 @@ void AccountManager::passwordResetCodeGenerated(
             resultCode,
             data::AccountConfirmationCode());
     }
+
+    //sending password reset link
+    ActivateAccountNotification notification;
+    notification.user_email = QString::fromStdString(accountEmail.email);
+    notification.type = kPasswordResetEmailTemplateFileName;
+    notification.message.code = confirmationCode.code;
+    m_emailManager->sendAsync(
+        std::move(notification),
+        std::function<void(bool)>());
 
     return completionHandler(
         api::ResultCode::ok,
