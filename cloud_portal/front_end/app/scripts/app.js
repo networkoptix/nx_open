@@ -26,8 +26,6 @@ angular.module('cloudApp', [
             controller: 'SystemsCtrl'
         })
 
-
-
         .when('/activate/', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
@@ -50,7 +48,6 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
-
 
         .when('/debug', {
             templateUrl: 'views/debug.html',

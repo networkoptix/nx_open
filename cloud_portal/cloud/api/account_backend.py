@@ -35,7 +35,7 @@ class AccountManager(db.models.Manager):
         :raise ValueError: email is not set
         """
         now = timezone.now()
-        if not email or email == '':
+        if not email:
             raise APIRequestException('Email code is absent', ErrorCodes.wrong_parameters,
                                       error_data={'email': ['This field is required.']})
         # email = self.normalize_email(email)

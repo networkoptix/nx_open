@@ -5,3 +5,4 @@ django-cors-headers
 MySQL-python
 pystache
 jsonfield
+enum34

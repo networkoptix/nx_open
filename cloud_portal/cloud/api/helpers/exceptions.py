@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework import status
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from enum import Enum
 import logging
 import json
 import traceback
@@ -10,7 +11,7 @@ import traceback
 logger = logging.getLogger(__name__)
 
 
-class ErrorCodes:
+class ErrorCodes(Enum):
     ok = 'ok'
 
     # Cloud DB errors:
@@ -22,7 +23,6 @@ class ErrorCodes:
     # Validation errors
     not_authorized = 'notAuthorized'
     wrong_parameters = 'wrongParameters'
-
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
@@ -43,10 +43,6 @@ class ErrorCodes:
     response_serialization_error = 'responseSerializationError'
     deserialization_error = 'deserializationError'
     not_acceptable = 'notAcceptable'
-
-    def __init__(self):
-        pass
-
 
 
 def api_success(data=None, status_code=status.HTTP_200_OK):
