@@ -203,7 +203,7 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
 
 std::chrono::milliseconds QnDirectModuleFinder::maxPingTimeout() const
 {
-    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
+    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
 }
 
 std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
@@ -215,7 +215,5 @@ std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
 
 std::chrono::milliseconds QnDirectModuleFinder::discoveryCheckInterval() const
 {
-    return std::max<milliseconds>(
-        aliveCheckInterval(),
-        kDiscoveryCheckInterval);
+    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
 }

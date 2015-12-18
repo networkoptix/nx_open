@@ -157,7 +157,7 @@ QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 }
 
 std::chrono::milliseconds QnModuleFinder::pingTimeout() const {
-    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
+    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
 }
 
 void QnModuleFinder::start() {
