@@ -18,7 +18,9 @@ SocketGlobals::~SocketGlobals()
         m_addressResolver.pleaseStop( barrier.fork() );
         m_addressPublisher.pleaseStop( barrier.fork() );
         m_mediatorConnector.pleaseStop( barrier.fork() );
+        m_cloudTunnelPool.pleaseStop( barrier.fork() );
     }
+
     promise.get_future().wait();
 }
 

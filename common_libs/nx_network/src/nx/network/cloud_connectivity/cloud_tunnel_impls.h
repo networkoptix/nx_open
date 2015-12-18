@@ -11,6 +11,7 @@ class UdtCloudTunnelImpl
 {
 public:
     void open(const SocketAddress& address,
+              std::shared_ptr<StreamSocketOptions> options,
               std::function<void(SystemError::ErrorCode)> handler) override
     {
         QnMutexLocker(&m_mutex);
@@ -20,7 +21,8 @@ public:
         // TODO: initiates UDP hole punching and create m_tunnelSocket
     }
 
-    void connect(SocketHandler handler) override
+    void connect(std::shared_ptr<StreamSocketOptions> options,
+                 SocketHandler handler) override
     {
         QnMutexLocker(&m_mutex);
         if (m_tunnelSocket)

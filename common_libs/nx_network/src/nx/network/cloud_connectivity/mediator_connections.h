@@ -35,6 +35,14 @@ public:
     void bind(std::list<SocketAddress> addresses,
               std::function<void(bool)> handler);
 
+    // TODO: propper implementation
+    typedef int ConnectionRequest;
+    void monitorConnectionRequest(std::function<void(ConnectionRequest)> handler);
+
+    // TODO: propper implementation
+    typedef int ConnectionUpdate;
+    void monitorConnectionUpdate(std::function<void(ConnectionUpdate)> handler);
+
 private:
     void sendAuthRequest(stun::Message request,
                          stun::AsyncClient::RequestHandler handler);

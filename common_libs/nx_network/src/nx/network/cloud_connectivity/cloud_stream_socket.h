@@ -1,12 +1,9 @@
 #ifndef NX_CC_CLOUD_STREAM_SOCKET_H
 #define NX_CC_CLOUD_STREAM_SOCKET_H
 
-#include <memory>
-
-#include "../abstract_socket.h"
-#include "cc_common.h"
-#include "cloud_tunnel.h"
-#include "address_resolver.h"
+#include <nx/utils/async_operation_guard.h>
+#include <nx/network/abstract_socket.h>
+#include <nx/network/socket_global.h>
 
 namespace nx {
 namespace cc {
@@ -22,29 +19,31 @@ class CloudStreamSocket
     public AbstractStreamSocket
 {
 public:
-    //TODO #ak add all socket functions
+    // TODO: #ak add all socket functions
+    //       all configuration options should be stored in m_socketOptions
+
+    // NOTE: all operarations shell be implemented sync or async in respect to
+    //       m_socketOptions->nonBlockMode
 
     //!Implementation of AbstractStreamSocket::connect
     virtual bool connect(
         const SocketAddress& remoteAddress,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS) override;
 
 protected:
     //!Implementation of AbstractStreamSocket::connectAsyncImpl
     virtual void connectAsyncImpl(
-        const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )>&& handler ) override;
+        const SocketAddress& address,
+        std::function<void(SystemError::ErrorCode)>&& handler) override;
 
 private:
-    std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
-    std::function<void( SystemError::ErrorCode )> m_connectHandler;
+    void startAsyncConnect(const SocketAddress& originalAddress,
+                           std::vector<AddressEntry> dnsEntries);
 
-    void applyCachedAttributes();
-    bool instanciateSocket( const AddressEntry& dnsEntry );
-    void onResolveDone( std::vector<AddressEntry> dnsEntries );
-    bool startAsyncConnect(
-        std::vector<AddressEntry>&& dnsEntries,
-        int port );
+    std::shared_ptr<StreamSocketOptions> m_socketOptions;
+    std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    std::function<void(SystemError::ErrorCode)> m_connectHandler;
+    nx::utils::AsyncOperationGuard m_asyncGuard;
 };
 
 } // namespace cc

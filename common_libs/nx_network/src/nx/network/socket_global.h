@@ -8,6 +8,7 @@
 #include "cloud_connectivity/address_resolver.h"
 #include "cloud_connectivity/mediator_address_publisher.h"
 #include "cloud_connectivity/mediator_connector.h"
+#include "cloud_connectivity/cloud_tunnel.h"
 
 namespace nx {
 
@@ -29,6 +30,10 @@ public:
     inline static
     cc::MediatorConnector& mediatorConnector()
     { return s_instance->m_mediatorConnector; }
+
+    inline static
+    cc::CloudTunnelPool& cloudTunnelPool()
+    { return s_instance->m_cloudTunnelPool; }
 
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
@@ -62,6 +67,7 @@ private:
     cc::AddressResolver m_addressResolver;
     cc::MediatorAddressPublisher m_addressPublisher;
     cc::MediatorConnector m_mediatorConnector;
+    cc::CloudTunnelPool m_cloudTunnelPool;
 };
 
 } // namespace nx

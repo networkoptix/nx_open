@@ -161,6 +161,23 @@ protected:
     virtual void dispatchImpl( std::function<void()>&& handler ) = 0;
 };
 
+//!Socket configuration options ready to apply to any \class AbstractSocket
+struct NX_NETWORK_API SocketOptions
+{
+    boost::optional< bool> reuseAddrFlag;
+    boost::optional< unsigned int > sendBufferSize, recvBufferSize;
+    boost::optional< unsigned int > sendTimeout, recvTimeout;
+
+    inline void apply( AbstractSocket* socket )
+    {
+        if( reuseAddrFlag )     socket->setReuseAddrFlag( *reuseAddrFlag );
+        if( sendBufferSize )    socket->setSendBufferSize( *sendBufferSize );
+        if( recvBufferSize )    socket->setRecvBufferSize( *recvBufferSize );
+        if( sendTimeout )       socket->setSendTimeout( *sendTimeout );
+        if( recvTimeout )       socket->setRecvTimeout( *recvTimeout );
+    }
+};
+
 //!Interface for writing to/reading from socket
 class NX_NETWORK_API AbstractCommunicatingSocket
 :
@@ -386,6 +403,21 @@ public:
         \note due to some OS limitations some values might be = 0 (meaning system defaults)
     */
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
+};
+
+//!Socket configuration options ready to apply to any \class AbstractStreamSocket
+struct NX_NETWORK_API StreamSocketOptions : SocketOptions
+{
+    boost::optional< bool > noDelay;
+    boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
+
+    inline void apply( AbstractStreamSocket* socket )
+    {
+        SocketOptions::apply( socket );
+
+        if( noDelay )           socket->setNoDelay( *noDelay );
+        if( keepAliveOptions )  socket->setKeepAlive( *keepAliveOptions );
+    }
 };
 
 //!Stream socket with encryption

@@ -14,9 +14,9 @@ namespace cc {
 
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis )
+    unsigned int timeoutMillis)
 {
-    //TODO #ak use timeoutMillis
+    //TODO #ak use timeoutMillis in wait condition
 
     //issuing async call and waiting for completion
     std::promise<SystemError::ErrorCode> completionPromise;
@@ -33,110 +33,81 @@ bool CloudStreamSocket::connect(
 }
 
 void CloudStreamSocket::connectAsyncImpl(
-    const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )>&& handler )
+    const SocketAddress& address,
+    std::function<void(SystemError::ErrorCode)>&& handler)
 {
-    //TODO #ak use socket write timeout
     m_connectHandler = std::move(handler);
 
-    const auto remotePort = addr.port;
+    auto sharedGuard = m_asyncGuard.sharedGuard();
     nx::SocketGlobals::addressResolver().resolveAsync(
-        addr.address,
-        [this, remotePort](
-            SystemError::ErrorCode osErrorCode,
-            std::vector<AddressEntry> dnsEntries)
+        address.address,
+        [this, address, sharedGuard](SystemError::ErrorCode code,
+                                     std::vector<AddressEntry> entries)
         {
-            if (osErrorCode != SystemError::noError)
+            if (auto lk = sharedGuard->lock())
             {
-                auto connectHandlerBak = std::move(m_connectHandler);
-                connectHandlerBak(osErrorCode);
-                return;
+                if (entries.empty() && code == SystemError::noError)
+                    code = SystemError::hostUnreach;
+
+                if (code != SystemError::noError)
+                {
+                    auto connectHandlerBak = std::move(m_connectHandler);
+                    lk.unlock();
+                    connectHandlerBak(code);
+                    return;
+                }
+
+                startAsyncConnect(std::move(address), std::move(entries));
             }
-
-            if (!startAsyncConnect(std::move(dnsEntries), remotePort))
-            {
-                auto connectHandlerBak = std::move( m_connectHandler );
-                connectHandlerBak( SystemError::getLastOSErrorCode() );
-            }
-        },
-        true,
-        this);   //TODO #ak resolve cancellation
+        });
 }
 
-void CloudStreamSocket::applyCachedAttributes()
+void CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
+                                          std::vector<AddressEntry> dnsEntries)
 {
-    //TODO #ak applying cached attributes to socket m_socketDelegate
-}
-
-void CloudStreamSocket::onResolveDone( std::vector<AddressEntry> dnsEntries )
-{
-    //TODO #ak which port shell we actually use???
-    int port = 0;
-    if( !startAsyncConnect( std::move( dnsEntries ), port ) )
-    {
-        auto connectHandlerBak = std::move( m_connectHandler );
-        connectHandlerBak( SystemError::getLastOSErrorCode() );
-    }
-}
-
-bool CloudStreamSocket::startAsyncConnect(
-    std::vector<AddressEntry>&& dnsEntries,
-    int port )
-{
-    if( dnsEntries.empty() )
-    {
-        SystemError::setLastErrorCode( SystemError::hostUnreach );
-        return false;
-    }
-
     std::shared_ptr<CloudTunnel> cloudTunnel;
     for (const auto dnsEntry : dnsEntries)
     {
         if (dnsEntry.type == AddressType::regular)
         {
-            /*
+            auto port = originalAddress.port;
+            /* TODO: #mux fix this code
+             *
             const auto enforcedPort = dnsEntry.attributes.find(
                         AddressAttributeType::nxApiPort);
             if (enforcedPort != dnsEntry.attributes.end())
                 port = enforcedPort->second.value;
             */
 
-            m_socketDelegate.reset( new TCPSocket(true) );
-            applyCachedAttributes();
-            m_socketDelegate->connectAsync(
+            m_socketDelegate.reset(new TCPSocket(true));
+            m_socketOptions->apply(m_socketDelegate.get());
+            return m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
-                m_connectHandler );
-
-            return true;
+                std::move(m_connectHandler));
         }
-        else
-        {
-            //if (!cloudTunnel)
-                //cloudTunnel = CloudTonelPool::getTunnel(address.host);
 
-            cloudTunnel->addAddress(dnsEntry);
-        }
+        if (!cloudTunnel)
+            cloudTunnel = SocketGlobals::cloudTunnelPool().getTunnel(
+                originalAddress.address.toString().toUtf8());
+
+        cloudTunnel->addAddress(dnsEntry);
     }
 
-    unsigned int sockSendTimeout = 0;
-    if( !getSendTimeout( &sockSendTimeout ) )
-        return false;
-
-    cloudTunnel->connect(sockSendTimeout, [this](
+    auto sharedGuard = m_asyncGuard.sharedGuard();
+    cloudTunnel->connect( m_socketOptions,
+                          [this, sharedGuard](
         SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> cloudConnection)
+        std::unique_ptr<AbstractStreamSocket> socket)
     {
-        if( errorCode == SystemError::noError )
+        if (auto lk = sharedGuard->lock())
         {
-            applyCachedAttributes();
+            m_socketDelegate = std::move(socket);
+            const auto handler = std::move(m_connectHandler);
+
+            lk.unlock();
+            handler(errorCode);
         }
-
-        auto userHandler = std::move(m_connectHandler);
-        //this object can be freed in handler, so using local variable for handler
-        userHandler( errorCode);
     });
-
-    return true;
 }
 
 } // namespace cc

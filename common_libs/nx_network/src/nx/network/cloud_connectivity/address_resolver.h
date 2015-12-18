@@ -40,6 +40,7 @@ struct NX_NETWORK_API AddressAttribute
 
     AddressAttribute( AddressAttributeType type_, quint64 value_ );
     bool operator ==( const AddressAttribute& rhs ) const;
+    bool operator <( const AddressAttribute& rhs ) const;
     QString toString() const;
 };
 
@@ -52,6 +53,7 @@ struct NX_NETWORK_API AddressEntry
     AddressEntry( AddressType type_ = AddressType::unknown,
                   HostAddress host_ = HostAddress() );
     bool operator ==( const AddressEntry& rhs ) const;
+    bool operator <( const AddressEntry& rhs ) const;
     QString toString() const;
 };
 
@@ -93,7 +95,7 @@ public:
         \a natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync( const HostAddress& hostName, ResolveHandler handler,
-                       bool natTraversal, void* requestId = nullptr );
+                       bool natTraversal = true, void* requestId = nullptr );
 
     std::vector< AddressEntry > resolveSync( const HostAddress& hostName, bool natTraversal );
 
