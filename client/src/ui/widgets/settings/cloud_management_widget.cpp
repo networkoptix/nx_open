@@ -113,6 +113,7 @@ void QnCloudManagementWidgetPrivate::at_unlinkButton_clicked()
 
 void QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked()
 {
+    QDesktopServices::openUrl(QUrl(QnAppInfo::cloudPortalUrl()));
 }
 
 void QnCloudManagementWidgetPrivate::updateUi()
