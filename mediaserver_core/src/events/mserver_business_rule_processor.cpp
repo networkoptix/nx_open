@@ -28,7 +28,7 @@
 #include "camera/get_image_helper.h"
 #include "core/resource_management/resource_properties.h"
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <utils/email/email.h>
 #include <nxemail/email_manager_impl.h>
 #include "nx_ec/data/api_email_data.h"
@@ -157,7 +157,7 @@ struct QnEmailAttachmentData {
     QString imagePath;
 };
 
-QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor(): 
+QnMServerBusinessRuleProcessor::QnMServerBusinessRuleProcessor():
     QnBusinessRuleProcessor(),
     m_emailManager(new EmailManagerImpl())
 {
@@ -214,7 +214,7 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             break;
         }
     }
-    
+
     if (result)
         qnServerDb->saveActionToDB(action);
 
@@ -229,7 +229,7 @@ bool QnMServerBusinessRuleProcessor::executePanicAction(const QnPanicBusinessAct
         return false;
     if (mediaServer->getPanicMode() == Qn::PM_User)
         return true; // ignore panic business action if panic mode turn on by user
-    
+
     Qn::PanicMode val = Qn::PM_None;
     if (action->getToggleState() == QnBusiness::ActiveState)
         val =  Qn::PM_BusinessEvents;
@@ -263,9 +263,9 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
         if (action->getToggleState() == QnBusiness::ActiveState)
             rez = qnRecordingManager->startForcedRecording(
                 camera,
-                action->getStreamQuality(), action->getFps(), 
+                action->getStreamQuality(), action->getFps(),
                 0, /* Record-before setup is forbidden */
-                action->getRecordAfter(), 
+                action->getRecordAfter(),
                 action->getRecordDuration());
         else
             rez = qnRecordingManager->stopForcedRecording(camera);
@@ -273,7 +273,7 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action) 
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
 {
     Q_ASSERT(action);
     auto camera = qnResPool->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
@@ -287,7 +287,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
     qint64 endTimeMs = startTimeMs;
 
-    if (fixedDurationMs <= 0) 
+    if (fixedDurationMs <= 0)
     {
         // bookmark as an prolonged action
         if (action->getToggleState() == QnBusiness::ActiveState) {
@@ -507,9 +507,9 @@ void QnMServerBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggreg
     m_aggregatedEmails.erase( aggregatedActionIter );
 }
 
-QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action, 
-                                                                 const QnBusinessAggregationInfo &aggregationInfo, 
-                                                                 QnEmailAttachmentList& attachments, 
+QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
+                                                                 const QnBusinessAggregationInfo &aggregationInfo,
+                                                                 QnEmailAttachmentList& attachments,
                                                                  bool useIp)
 {
     QnBusinessEventParameters params = action->getRuntimeParams();
@@ -520,7 +520,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
     contextMap[tpProductName] = QnAppInfo::productNameLong();
     contextMap[tpEvent] = QnBusinessStringsHelper::eventName(eventType);
     contextMap[tpSource] = getFullResourceName(QnBusinessStringsHelper::eventSource(params), useIp);
-    if (eventType == QnBusiness::CameraMotionEvent) 
+    if (eventType == QnBusiness::CameraMotionEvent)
     {
         auto camRes = qnResPool->getResourceById<QnVirtualCameraResource>( action->getRuntimeParams().eventResourceId);
         qnCameraHistoryPool->updateCameraHistorySync(camRes);
@@ -536,10 +536,10 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
         }
 
     }
-    else if (eventType == QnBusiness::UserDefinedEvent) 
+    else if (eventType == QnBusiness::UserDefinedEvent)
     {
         auto metadata = action->getRuntimeParams().metadata;
-        if (!metadata.cameraRefs.empty()) 
+        if (!metadata.cameraRefs.empty())
         {
             QVariantList cameras;
             int screenshotNum = 1;
@@ -565,7 +565,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDescriptionMap(const QnAbstrac
                     cameras << camera;
                 }
             }
-            if (!cameras.isEmpty()) 
+            if (!cameras.isEmpty())
             {
                 contextMap[tpHasCameras] = lit("1");
                 contextMap[tpCameras] = cameras;
@@ -592,7 +592,7 @@ QString QnMServerBusinessRuleProcessor::formatEmailList(const QStringList &value
 
 QVariantList QnMServerBusinessRuleProcessor::aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
                                                                 const QnBusinessAggregationInfo& aggregationInfo,
-                                                                bool useIp) 
+                                                                bool useIp)
 {
     QVariantList result;
     if (aggregationInfo.isEmpty()) {
@@ -658,7 +658,7 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
             break;
         }
     case StorageFailureEvent:
-    case ServerFailureEvent: 
+    case ServerFailureEvent:
     case LicenseIssueEvent:
     case BackupFinishedEvent:
         {
@@ -703,4 +703,4 @@ QVariantHash QnMServerBusinessRuleProcessor::eventDetailsMap(
         break;
     }
     return detailsMap;
-} 
+}
