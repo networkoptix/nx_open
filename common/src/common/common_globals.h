@@ -153,7 +153,6 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
     enum RebuildState {
-        RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
         RebuildState_PartialScan = 3
