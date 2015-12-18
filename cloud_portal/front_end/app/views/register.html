@@ -13,38 +13,44 @@
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" ng-model="account.firstName" id="firstName" name="firstName" placeholder="First name">
+                <input type="text" class="form-control" ng-model="account.firstName" id="firstName"
+                       name="firstName" placeholder="First name">
             </div>
         </div>
         <div class="form-group">
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" name="lastName" placeholder="Last name">
+                <input type="text" class="form-control" ng-model="account.lastName" id="lastName"
+                       name="lastName" placeholder="Last name">
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" validate-field>
             <label for="email"  class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-9">
-                <input type="email" class="form-control" ng-model="account.email" id="email"  name="email" placeholder="Email">
+                <input type="email" class="form-control" ng-model="account.email" id="email"
+                       name="email" placeholder="Email" required>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" validate-field>
             <label for="password"  class="col-sm-3 control-label">Password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control" ng-model="account.password" id="password"   name="password" placeholder="Password">
+                <input type="password" class="form-control" ng-model="account.password" id="password"
+                       name="password" placeholder="Password" required>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" >
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="subscribe" name="account.subscribe" id="subscribe" disabled> Subscribe to email newsletters</label>
+                    <label ><input type="checkbox" ng-model="subscribe" name="account.subscribe" id="subscribe"
+                                   disabled> Subscribe to email newsletters</label>
                 </div>
             </div>
         </div>
-        <div class="form-group">
+        <div class="form-group" validate-field>
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="agree" name="account.agree" id="agree" disabled> I agree with <a href="#/eula" onclick="eula()">Terms and Conditions</a></label>
+                    <label ><input type="checkbox" ng-model="agree" name="account.agree" id="agree"
+                                   disabled> I agree with <a href="#/eula" onclick="eula()">Terms and Conditions</a></label>
                 </div>
             </div>
         </div>

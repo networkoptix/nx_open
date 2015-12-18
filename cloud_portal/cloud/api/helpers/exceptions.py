@@ -195,7 +195,7 @@ def handle_exceptions(func):
                 if not isinstance(request.user, AnonymousUser):
                     user_name = request.user.email
 
-            if error.error_code != ErrorCodes.not_authorized:
+            if error.error_code != ErrorCodes.not_authorized and error.error_code != ErrorCodes.not_authorized.value:
                 error_formatted = '\n{8}\nStatus: {0}\nPortal URL: {5}\nUser: {6}\nRequest: {7}\n' \
                                   'Message: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.\
                                   format(error.status_code,

@@ -53,17 +53,19 @@
                    error-prefix="'Couldn\'t change your password:'"></process-alert>
 
     <form name="passwordForm" class="form-horizontal">
-        <div class="form-group" >
+        <div class="form-group" validate-field>
             <label for="password"  class="col-sm-3 control-label">Current password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control" ng-model="password" id="password" placeholder="Password">
+                <input type="password" class="form-control" ng-model="password"
+                       id="password" placeholder="Password" required>
             </div>
         </div>
 
-        <div class="form-group" >
+        <div class="form-group" validate-field>
             <label for="newPassword"  class="col-sm-3 control-label">New password</label>
             <div class="col-sm-9">
-                <input type="password" class="form-control" ng-model="newPassword" id="newPassword" placeholder="New Password">
+                <input type="password" class="form-control" ng-model="newPassword"
+                       id="newPassword" placeholder="New Password" required="">
             </div>
         </div>
 
