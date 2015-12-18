@@ -458,7 +458,7 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     // merge chunks
     {
         QnMutexLocker lk(&m_mutexStorages);
-        bool stillHaveThisStorage = hasStorageInternal(storage);
+        bool stillHaveThisStorage = hasStorageUnsafe(storage);
         if (!stillHaveThisStorage)
             return;
         fileCatalog->addChunks(newChunks);
@@ -626,7 +626,7 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
 
             {
                 QnMutexLocker lk(&m_mutexStorages);
-                bool stillHaveThisStorage = hasStorageInternal(storage);
+                bool stillHaveThisStorage = hasStorageUnsafe(storage);
                 if (!m_rebuildCancelled && stillHaveThisStorage)
                     replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
             }
@@ -698,7 +698,7 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     }
 }
 
-bool QnStorageManager::hasStorageInternal(const QnStorageResourcePtr &storage) const
+bool QnStorageManager::hasStorageUnsafe(const QnStorageResourcePtr &storage) const
 {
     for (auto itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
@@ -711,7 +711,7 @@ bool QnStorageManager::hasStorageInternal(const QnStorageResourcePtr &storage) c
 bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
 {
     QnMutexLocker lock(&m_mutexStorages);
-    return hasStorageInternal(storage);
+    return hasStorageUnsafe(storage);
 }
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)

@@ -55,7 +55,7 @@ public:
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
     void removeStorage(const QnStorageResourcePtr &storage);
-    bool hasStorageInternal(const QnStorageResourcePtr &storage) const;
+    bool hasStorageUnsafe(const QnStorageResourcePtr &storage) const;
     bool hasStorage(const QnStorageResourcePtr &storage) const;
 
     /*
