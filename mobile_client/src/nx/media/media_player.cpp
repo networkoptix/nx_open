@@ -22,15 +22,14 @@ namespace nx
 namespace media
 {
 
-
-class PlayerPrivate : public QObject 
+class PlayerPrivate: public QObject
 {
 	Q_DECLARE_PUBLIC(Player)
 	Player *q_ptr;
 
 public:
 	std::unique_ptr<QnArchiveStreamReader> archiveReader;
-
+protected:
 	
 	// -------------------- depracated ----------------------
 
@@ -271,6 +270,7 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
 void Player::play()
 {
 	Q_D(Player);
+	d->archiveReader->open();
 }
 
 void Player::pause() 
@@ -291,7 +291,9 @@ void Player::setSource(const QUrl &url)
 		return;
 	
 	d->archiveReader.reset();
-	QnUuid id(url.path());
+	d->setState(State::Stopped);
+
+	QnUuid id(url.path().mid(1));
 	QnResourcePtr camera = qnResPool->getResourceById(id);
 	if (!camera)
 		return;

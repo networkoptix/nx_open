@@ -30,7 +30,7 @@ namespace nx
 			* \param frame		compressed video data. If frame is null pointer then function must flush internal decoder buffer.
 			* If no more frames in buffer left, function must returns true as result and null shared pointer in the 'result' parameter.
 			* \param result		decoded video data. If decoder still fills internal buffer then result can be empty but function return true.
-			* \!returns true if frame is decoded without errors or frame is null.
+			* \!returns true if frame is decoded without errors. For nullptr input data returns true while flushing internal buffer (result isn't null)
 			*/
 			virtual bool decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result = nullptr) = 0;
 		};
