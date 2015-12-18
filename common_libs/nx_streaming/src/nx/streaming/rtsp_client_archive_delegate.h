@@ -3,18 +3,19 @@
 
 #include <atomic>
 
-#include <recording/time_period.h>
-#include <utils/common/uuid.h>
-#include <nx/streaming/rtsp_client.h>
-#include <nx/streaming/nx_rtp_parser.h>
-#include <nx/streaming/archive_stream_reader.h>
-#include <core/resource/resource_media_layout.h>
 #include <nx/streaming/abstract_archive_delegate.h>
+
+#include <utils/common/uuid.h>
+#include "utils/thread/mutex.h"
+#include "recording/time_period.h"
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
 class QnArchiveStreamReader;
 class QnCustomResourceVideoLayout;
+class QnRtspClient;
+class QnRtspIoDevice;
+class QnNxRtpParser;
 
 class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
@@ -79,7 +80,7 @@ private:
     void parseAudioSDP(const QList<QByteArray>& audioSDP);
 private:
     QnMutex m_mutex;
-    QnRtspClient m_rtspSession;
+    std::unique_ptr<QnRtspClient> m_rtspSession;
     QnRtspIoDevice* m_rtpData;
     quint8* m_rtpDataBuffer;
     bool m_tcpMode;
@@ -112,7 +113,7 @@ private:
     int m_frameCnt;
     QnCustomResourceVideoLayoutPtr m_customVideoLayout;
     
-    QMap<int, QnNxRtpParserPtr> m_parsers;
+	QMap<int, QSharedPointer<QnNxRtpParser>> m_parsers;
     
     struct {
         QString username;

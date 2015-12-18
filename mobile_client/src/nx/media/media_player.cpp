@@ -9,6 +9,10 @@
 #include <ui/texture_size_helper.h>
 #include <utils/mjpeg/mjpeg_session.h>
 
+#include "nx/streaming/archive_stream_reader.h"
+#include "nx/streaming/rtsp_client_archive_delegate.h"
+#include "core/resource_management/resource_pool.h"
+
 namespace {
     const qint64 invalidTimestamp = -1;
 }
@@ -25,6 +29,11 @@ class PlayerPrivate : public QObject
 	Player *q_ptr;
 
 public:
+	std::unique_ptr<QnArchiveStreamReader> archiveReader;
+
+	
+	// -------------------- depracated ----------------------
+
 	QnMjpegSession *session;
 	Player::State state;
 	Player::MediaStatus mediaStatus;
@@ -280,18 +289,15 @@ void Player::setSource(const QUrl &url)
 
 	if (url == d->session->url())
 		return;
+	
+	d->archiveReader.reset();
+	QnUuid id(url.path());
+	QnResourcePtr camera = qnResPool->getResourceById(id);
+	if (!camera)
+		return;
 
-	d->waitingForFrame = true;
-	d->session->setUrl(url);
-	d->session->stop();
-
-	if (d->position != 0) {
-		d->position = 0;
-		d->timestamp = invalidTimestamp;
-		emit positionChanged();
-	}
-
-	d->session->start();
+	d->archiveReader.reset(new QnArchiveStreamReader(camera));
+	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface *videoSurface)

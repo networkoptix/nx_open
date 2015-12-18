@@ -14,15 +14,11 @@ extern "C"
 #include <api/session_manager.h>
 #include <api/network_proxy_factory.h>
 
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/basic_media_context.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
-
-#include <nx/streaming/archive_stream_reader.h>
-
+#include <core/resource/resource_media_layout.h>
 #include <utils/common/util.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
@@ -33,12 +29,19 @@ extern "C"
 #include "http/custom_headers.h"
 #include "common/common_module.h"
 
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/streaming/nx_rtp_parser.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/basic_media_context.h>
+
 static const int MAX_RTP_BUFFER_SIZE = 65535;
 
 static const int REOPEN_TIMEOUT = 1000;
 
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader):
     QnAbstractArchiveDelegate(),
+	m_rtspSession(new QnRtspClient),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -104,7 +107,7 @@ void QnRtspClientArchiveDelegate::setCamera(const QnVirtualCameraResourcePtr &ca
 
     m_camera = camera;
     m_server = camera->getParentServer();
-    setupRtspSession(camera, m_server, &m_rtspSession, m_playNowModeAllowed);
+    setupRtspSession(camera, m_server, m_rtspSession.get(), m_playNowModeAllowed);
 }
 
 void QnRtspClientArchiveDelegate::setFixedServer(const QnMediaServerResourcePtr &server){
@@ -122,7 +125,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         return QnMediaServerResourcePtr();
     if (m_fixedServer)
         return QnMediaServerResourcePtr();
-    return qnCameraHistoryPool->getNextMediaServerAndPeriodOnTime(camera, time, m_rtspSession.getScale() >= 0, &m_serverTimePeriod);
+    return qnCameraHistoryPool->getNextMediaServerAndPeriodOnTime(camera, time, m_rtspSession->getScale() >= 0, &m_serverTimePeriod);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(const QnVirtualCameraResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
@@ -250,10 +253,10 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         }
     }
 
-    setupRtspSession(m_camera, m_server, &m_rtspSession, m_playNowModeAllowed);
+    setupRtspSession(m_camera, m_server, m_rtspSession.get(), m_playNowModeAllowed);
     m_rtpData = 0;
 
-    const bool isOpened = m_rtspSession.open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
+    const bool isOpened = m_rtspSession->open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
         m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
@@ -264,25 +267,25 @@ bool QnRtspClientArchiveDelegate::openInternal() {
         if (m_forcedEndTime)
             endTime = m_forcedEndTime;
 
-        m_rtspSession.play(m_position, endTime, m_rtspSession.getScale());
-        QnRtspClient::TrackMap trackInfo =  m_rtspSession.getTrackInfo();
+        m_rtspSession->play(m_position, endTime, m_rtspSession->getScale());
+        QnRtspClient::TrackMap trackInfo =  m_rtspSession->getTrackInfo();
         if (!trackInfo.isEmpty())
             m_rtpData = trackInfo[0]->ioDevice;
         if (!m_rtpData)
-            m_rtspSession.stop();
+            m_rtspSession->stop();
     }
     else {
-        m_rtspSession.stop();
+        m_rtspSession->stop();
     }
-    m_opened = m_rtspSession.isOpened();
-    m_sendedCSec = m_rtspSession.lastSendedCSeq();
+    m_opened = m_rtspSession->isOpened();
+    m_sendedCSec = m_rtspSession->lastSendedCSeq();
 
     if (m_opened) {
 
-        QList<QByteArray> audioSDP = m_rtspSession.getSdpByType(QnRtspClient::TT_AUDIO);
+        QList<QByteArray> audioSDP = m_rtspSession->getSdpByType(QnRtspClient::TT_AUDIO);
         parseAudioSDP(audioSDP);
 
-        QString vLayout = m_rtspSession.getVideoLayout();
+        QString vLayout = m_rtspSession->getVideoLayout();
         if (!vLayout.isEmpty()) {
             auto newValue = QnCustomResourceVideoLayout::fromString(vLayout);
             bool isChanged =  getVideoLayout()->toString() != newValue->toString();
@@ -326,7 +329,7 @@ void QnRtspClientArchiveDelegate::close()
 {
     QnMutexLocker lock( &m_mutex );
     //m_waitBOF = false;
-    m_rtspSession.stop();
+    m_rtspSession->stop();
     m_lastPacketFlags = -1;
     m_opened = false;
     m_audioLayout.reset();
@@ -338,7 +341,7 @@ qint64 QnRtspClientArchiveDelegate::startTime() const
 {
     qint64 result = m_globalMinArchiveTime;
     if (result == qint64(AV_NOPTS_VALUE))
-        result = m_rtspSession.startTime();
+        result = m_rtspSession->startTime();
 
     if (result == DATETIME_NOW || result <= qnSyncTime->currentMSecsSinceEpoch()*1000)
         return result;
@@ -349,8 +352,8 @@ qint64 QnRtspClientArchiveDelegate::startTime() const
 qint64 QnRtspClientArchiveDelegate::endTime() const
 {
     /*
-    if (m_rtspSession.endTime() > qnSyncTime->currentUSecsSinceEpoch())
-        return m_rtspSession.endTime();
+    if (m_rtspSession->endTime() > qnSyncTime->currentUSecsSinceEpoch())
+        return m_rtspSession->endTime();
     else
     */
     return DATETIME_NOW; // LIVE or archive future point as right edge for server video
@@ -388,8 +391,8 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
     qint64 timeMs = AV_NOPTS_VALUE;
     if (result && result->timestamp >= 0)
         timeMs = result->timestamp/1000; // do not switch server if AV_NOPTS_VALUE and any other invalid packet timings
-    bool outOfRange = (quint64)timeMs != AV_NOPTS_VALUE && ((m_rtspSession.getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
-                      (m_rtspSession.getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
+    bool outOfRange = (quint64)timeMs != AV_NOPTS_VALUE && ((m_rtspSession->getScale() >= 0 && timeMs >= m_serverTimePeriod.endTimeMs()) ||
+                      (m_rtspSession->getScale() <  0 && timeMs < m_serverTimePeriod.startTimeMs));
     if (result == 0 || outOfRange || result->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         if ((quint64)m_lastSeekTime == AV_NOPTS_VALUE)
@@ -402,7 +405,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextData()
 
             m_server = newServer;
             m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
-            if (m_rtspSession.getScale() > 0)
+            if (m_rtspSession->getScale() > 0)
                 m_position = m_serverTimePeriod.startTimeMs*1000;
             else
                 m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
@@ -432,7 +435,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
     while(!result)
     {
         if (!m_rtpData || (!m_opened && !m_closing)) {
-            //m_rtspSession.stop(); // reconnect
+            //m_rtspSession->stop(); // reconnect
             reopen();
             return result;
         }
@@ -440,7 +443,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         int rtpChannelNum = 0;
         int blockSize  = m_rtpData->read((char*)m_rtpDataBuffer, MAX_RTP_BUFFER_SIZE);
         if (blockSize <= 0 && !m_closing) {
-            //m_rtspSession.stop(); // reconnect
+            //m_rtspSession->stop(); // reconnect
             reopen();
             return result; 
         }
@@ -482,7 +485,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
         else {
             rtpChannelNum = m_rtpData->getMediaSocket()->getLocalAddress().port;
         }
-        const QString format = m_rtspSession.getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
+        const QString format = m_rtspSession->getTrackFormatByRtpChannelNum(rtpChannelNum).toLower();
         qint64 parserPosition = qint64(AV_NOPTS_VALUE);
         if (format.isEmpty()) {
             //qWarning() << Q_FUNC_INFO << __LINE__ << "RTP track" << rtpChannelNum << "not found";
@@ -544,7 +547,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
             bool isLowQuality = m_quality == MEDIA_Quality_Low;
             if (isLowPacket != isLowQuality) 
             {
-                m_rtspSession.setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
+                m_rtspSession->setAdditionAttribute("x-media-quality", isLowPacket ? "low" : "high");
                 m_qualityFastSwitch = true; // We already have got new quality. So, it is "fast" switch
                 m_quality = isLowPacket ? MEDIA_Quality_Low : MEDIA_Quality_High;
                 emit qualityChanged(m_quality);
@@ -559,7 +562,7 @@ QnAbstractMediaDataPtr QnRtspClientArchiveDelegate::getNextDataInternal()
 
 void QnRtspClientArchiveDelegate::setAdditionalAttribute(const QByteArray& name, const QByteArray& value)
 {
-    m_rtspSession.setAdditionAttribute(name, value);
+    m_rtspSession->setAdditionAttribute(name, value);
 }
 
 qint64 QnRtspClientArchiveDelegate::seek(qint64 startTime, qint64 endTime)
@@ -588,7 +591,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
     }
 
     if (!findIFrame)
-        m_rtspSession.setAdditionAttribute("x-no-find-iframe", "1");
+        m_rtspSession->setAdditionAttribute("x-no-find-iframe", "1");
 
     if (!m_opened && m_camera) {
         if (!openInternal() && m_isMultiserverAllowed)
@@ -601,7 +604,7 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
                 {
                     m_server = nextServer;
                     m_lastSeekTime = m_serverTimePeriod.startTimeMs*1000;
-                    if (m_rtspSession.getScale() > 0)
+                    if (m_rtspSession->getScale() > 0)
                         m_position = m_serverTimePeriod.startTimeMs*1000;
                     else
                         m_position = (m_serverTimePeriod.endTimeMs()-1)*1000;
@@ -621,10 +624,10 @@ qint64 QnRtspClientArchiveDelegate::seek(qint64 time, bool findIFrame)
             endTime = m_forcedEndTime;
         else if (m_singleShotMode)
             endTime = time;
-        m_rtspSession.sendPlay(time, endTime, m_rtspSession.getScale());
-        m_rtspSession.removeAdditionAttribute("x-no-find-iframe");
+        m_rtspSession->sendPlay(time, endTime, m_rtspSession->getScale());
+        m_rtspSession->removeAdditionAttribute("x-no-find-iframe");
     }
-    m_sendedCSec = m_rtspSession.lastSendedCSeq();
+    m_sendedCSec = m_rtspSession->lastSendedCSeq();
     return time;
 }
 
@@ -636,9 +639,9 @@ void QnRtspClientArchiveDelegate::setSingleshotMode(bool value)
     m_singleShotMode = value;
     /*
     if (value)
-        m_rtspSession.sendPause();
+        m_rtspSession->sendPause();
     else
-        m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+        m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
     */
 }
 
@@ -675,7 +678,7 @@ void QnRtspClientArchiveDelegate::processMetadata(const quint8* data, int dataSi
     const quint8* payload = data + RtpHeader::RTP_HEADER_SIZE;
     QByteArray ba((const char*)payload, data + dataSize - payload);
     if (ba.startsWith("clock="))
-        m_rtspSession.parseRangeHeader(QLatin1String(ba));
+        m_rtspSession->parseRangeHeader(QLatin1String(ba));
     else if (ba.startsWith("drop-report"))
         emit dataDropped(m_reader);
 }
@@ -709,14 +712,14 @@ void QnRtspClientArchiveDelegate::onReverseMode(qint64 displayTime, bool value)
     close();
 
     if (!m_opened && m_camera) {
-        m_rtspSession.setScale(qAbs(m_rtspSession.getScale()) * sign);
+        m_rtspSession->setScale(qAbs(m_rtspSession->getScale()) * sign);
         m_position = displayTime;
         openInternal();
     }
     else {
-        m_rtspSession.sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession.getScale()) * sign);
+        m_rtspSession->sendPlay(displayTime, AV_NOPTS_VALUE, qAbs(m_rtspSession->getScale()) * sign);
     }
-    m_sendedCSec = m_rtspSession.lastSendedCSeq();
+    m_sendedCSec = m_rtspSession->lastSendedCSeq();
     //m_waitBOF = true;
 
     if (fromLive) 
@@ -747,13 +750,13 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
         value = "low";
 
     QByteArray paramName = "x-media-quality";
-    m_rtspSession.setAdditionAttribute(paramName, value);
+    m_rtspSession->setAdditionAttribute(paramName, value);
 
-    if (!m_rtspSession.isOpened())
+    if (!m_rtspSession->isOpened())
         return false;
 
     if (!fastSwitch) {
-        m_rtspSession.sendSetParameter(paramName, value);
+        m_rtspSession->sendSetParameter(paramName, value);
         return false; // switch quality without seek (it is take more time)
     }
     else 
@@ -762,15 +765,15 @@ bool QnRtspClientArchiveDelegate::setQuality(MediaQuality quality, bool fastSwit
 
 void QnRtspClientArchiveDelegate::setSendMotion(bool value)
 {
-    m_rtspSession.setAdditionAttribute("x-send-motion", value ? "1" : "0");
-    m_rtspSession.sendSetParameter("x-send-motion", value ? "1" : "0");
+    m_rtspSession->setAdditionAttribute("x-send-motion", value ? "1" : "0");
+    m_rtspSession->sendSetParameter("x-send-motion", value ? "1" : "0");
 }
 
 void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
 {
     if (region.isEmpty())
     {
-        m_rtspSession.removeAdditionAttribute("x-motion-region");
+        m_rtspSession->removeAdditionAttribute("x-motion-region");
     }
     else 
     {
@@ -780,9 +783,9 @@ void QnRtspClientArchiveDelegate::setMotionRegion(const QRegion& region)
         stream << region;
         buffer.close();
         QByteArray s = buffer.data().toBase64();
-        m_rtspSession.setAdditionAttribute("x-motion-region", s);
+        m_rtspSession->setAdditionAttribute("x-motion-region", s);
     }
-    //m_rtspSession.sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession.getScale());
+    //m_rtspSession->sendPlay(AV_NOPTS_VALUE, AV_NOPTS_VALUE, m_rtspSession->getScale());
 }
 
 void QnRtspClientArchiveDelegate::beforeSeek(qint64 time)
@@ -859,5 +862,5 @@ void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
 {
     m_playNowModeAllowed = value;
     if (!value)
-        m_rtspSession.setUsePredefinedTracks(0);
+        m_rtspSession->setUsePredefinedTracks(0);
 }

@@ -25,18 +25,25 @@ namespace nx
 
 			/** Register video decoder plugin */
 			template <class Decoder>
-			void addPlugin() { m_plugins.push_back(instantiate<Decoder>); }
-
+			void addPlugin() { m_plugins << Metadata<Decoder>(); }
 		private:
-			template <class Decoder>
-			static AbstractVideoDecoder* instantiate(const QnConstCompressedVideoDataPtr& frame)
+			struct MetadataBase
 			{
-				return Decoder::isCompatible(frame) ? new Decoder() : nullptr;
+				std::function<AbstractVideoDecoder* ()> instance;
+				std::function<bool(const QnConstCompressedVideoDataPtr& frame)> isCompatible;
 			};
-		private:
-			typedef std::function<AbstractVideoDecoder* (const QnConstCompressedVideoDataPtr& context)> InstanceFunc;
-			QVector<InstanceFunc> m_plugins;
-		};
 
+			template <class Decoder>
+			struct Metadata : public MetadataBase
+			{
+				Metadata()
+				{
+					instance = []() { return new Decoder(); };
+					isCompatible = &Decoder::isCompatible;
+				}
+			};
+
+			QVector<MetadataBase> m_plugins;
+		};
 	}
 }
