@@ -635,7 +635,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
     return result;
 }
 
-void QnStorageManager::addStorage(const QnStorageResourcePtr &storage, bool markOffline)
+void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = qnStorageDbPool->getStorageIndex(storage);
@@ -648,8 +648,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage, bool mark
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
-        if (markOffline)
-            storage->setStatus(Qn::Offline); // we will check status after
+        storage->setStatus(Qn::Offline); // we will check status after
         m_storageRoots.insert(storageIndex, storage);
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
@@ -740,7 +739,7 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
 
     if (checkIfMyStorage(storage)) {
         if (!hasStorage(storage))
-            addStorage(storage, false);
+            addStorage(storage);
     }
     else {
         if (hasStorage(storage))

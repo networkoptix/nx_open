@@ -61,7 +61,7 @@ public:
     * Remove storage if storage is absent in specified list
     */
     void removeAbsentStorages(const QnStorageResourceList &newStorages);
-    void addStorage(const QnStorageResourcePtr &storage, bool markOffline=true);
+    void addStorage(const QnStorageResourcePtr &storage);
 
     QString getFileName(const qint64& fileDate, qint16 timeZone, const QnNetworkResourcePtr &netResource, const QString& prefix, const QnStorageResourcePtr& storage);
     bool fileStarted(const qint64& startDateMs, int timeZone, const QString& fileName, QnAbstractMediaStreamDataProvider* provider);
