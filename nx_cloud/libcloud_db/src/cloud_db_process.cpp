@@ -114,7 +114,8 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
     
-        EMailManager emailManager(settings);
+        std::unique_ptr<AbstractEmailManager> emailManager(
+            EMailManagerFactory::create(settings));
         StreeManager streeManager(settings.auth());
 
         //creating data managers
@@ -126,7 +127,7 @@ int CloudDBProcess::executeApplication()
             settings,
             &tempPasswordManager,
             &dbManager,
-            &emailManager);
+            emailManager.get());
     
         SystemManager systemManager(
             accountManager,
