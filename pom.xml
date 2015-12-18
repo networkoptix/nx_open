@@ -424,7 +424,7 @@
                 <buildenv.script>get_buildenv.bat</buildenv.script>
                 <platform>windows</platform>
                 <box>windows</box>
-                <compiler>msvc2012u3</compiler>
+                <compiler>msvc2015</compiler>
                 <arch>x64</arch>
                 <force_x86>false</force_x86>
                 <bespin.version>1.2-windows-SNAPSHOT</bespin.version>
