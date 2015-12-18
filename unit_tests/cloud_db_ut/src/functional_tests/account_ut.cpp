@@ -28,14 +28,14 @@ namespace cdb {
 
 TEST_F(CdbFunctionalTest, account_activation)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -75,14 +75,14 @@ TEST_F(CdbFunctionalTest, account_activation)
 
 TEST_F(CdbFunctionalTest, account_reactivation)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -117,14 +117,14 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 //reactivation of already activated account must fail
 TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -149,14 +149,14 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
 TEST_F(CdbFunctionalTest, account_general)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(3);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -239,14 +239,14 @@ TEST_F(CdbFunctionalTest, account_general)
 
 TEST_F(CdbFunctionalTest, account_badRegistration)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -375,14 +375,14 @@ TEST_F(CdbFunctionalTest, account_update)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_general)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(4);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -434,14 +434,14 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 {
-    MockEmailManager* mockedEmailManager = new MockEmailManager();
+    MockEmailManager mockedEmailManager;
     EXPECT_CALL(
-        *mockedEmailManager,
+        mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
 
     EMailManagerFactory::setFactory(
-        [mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(mockedEmailManager);
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
         });
 
     const std::chrono::seconds expirationPeriod(5);
