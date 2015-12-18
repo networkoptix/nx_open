@@ -45,7 +45,7 @@ QnObject {
         property int prevPlayerPosition: 0
         property bool updateTimeline: false
         property bool dirty: true
-        property alias mediaPlayer: playerLoader.item
+        property var mediaPlayer: nxPlayer
         property bool resetUrlOnConnect: false
 
         /* Qt MediaPlayer fails to play video if media source is frequently changed at first video load.
@@ -82,127 +82,55 @@ QnObject {
         }
     }
 
-    Loader {
-        id: playerLoader
-        sourceComponent: resourceHelper.protocol != QnMediaResourceHelper.Mjpeg ? qtPlayer : mjpegPlayer
-    }
+    QnPlayer {
+		id: nxPlayer
 
-    Component {
-        id: qtPlayer
+        source: "camera://media/" + player.resourceId
 
-        MediaPlayer {
-            source: resourceHelper.mediaUrl
+        readonly property bool hasTimestamp: true
+        readonly property bool loading: playbackState == QnPlayer.PlayingState && mediaStatus != QnPlayer.BufferedMedia
+        readonly property bool playing: playbackState == QnPlayer.PlayingState && mediaStatus == QnPlayer.BufferedMedia
 
-            autoPlay: !d.paused
+		readonly property real timestamp: position
+		property real finalTimestamp: {
+            var chunksEnd = resourceHelper.finalTimestamp
+            if (chunksEnd != -1)
+                chunksEnd = chunkProvider.closestChunkEndMs(chunksEnd - 1, false)
+            return chunksEnd
+        }
 
-            onPositionChanged: {
-                failureTimer.updateTimer()
+        reconnectOnPlay: atLive
 
-                if (d.position < 0)
-                    return
+        onTimestampChanged: {
+            if (d.position < 0)
+                return
 
-                if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
-                    /* A workaround for Android issue 11590
-                       Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
-                       To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
-                     */
-                    d.position += 300
-                } else {
-                    d.position += d.mediaPlayer.position - d.prevPlayerPosition
-                }
-                d.prevPlayerPosition = d.mediaPlayer.position
-
-                if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
-                    return
-                }
-
-                if (d.updateTimeline) {
-                    timelineCorrectionRequest(d.position)
-                    d.updateTimeline = false
-                }
+            if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
+                seek(d.chunkEnd + 1)
+                return
             }
 
-            onPlaybackStateChanged: {
-                // A workaround for inconsistent playbackState changes of Qt MediaPlayer
-                if (playbackState == MediaPlayer.PlayingState && d.paused)
-                    pause()
-            }
-
-            readonly property bool hasTimestamp: false
-
-            readonly property bool loading: {
-                if (playbackState == MediaPlayer.PlayingState)
-                    return position == 0
-
-                return status == MediaPlayer.Loading ||
-                       status == MediaPlayer.Buffering ||
-                       status == MediaPlayer.Stalled ||
-                       status == MediaPlayer.Loaded ||
-                       status == MediaPlayer.Buffered
-            }
-
-            readonly property bool playing: playbackState === MediaPlayer.PlayingState && position > 0
-
-            function getFinalTimestamp(startPos) {
-                if (startPos <= 0)
-                    return -1
-
-                return chunkProvider.closestChunkEndMs(startPos, true)
+            if (mediaPlayer.timestamp >= 0) {
+                d.position = mediaPlayer.timestamp
+                timelineCorrectionRequest(d.position)
             }
         }
-    }
 
-    Component {
-        id: mjpegPlayer
+        onPlaybackFinished: {
+            if (d.position == -1)
+                return
 
-        QnMjpegPlayer {
-            source: resourceHelper.mediaUrl
+            if (!d.paused)
+                player.play(d.chunkEnd + 1)
+        }
 
-            readonly property bool hasTimestamp: true
-            readonly property bool loading: playbackState == QnMjpegPlayer.PlayingState && mediaStatus != QnMjpegPlayer.BufferedMedia
-            readonly property bool playing: playbackState == QnMjpegPlayer.PlayingState && mediaStatus == QnMjpegPlayer.BufferedMedia
+        onPositionChanged: failureTimer.updateTimer()
 
-            finalTimestamp: {
-                var chunksEnd = resourceHelper.finalTimestamp
-                if (chunksEnd != -1)
-                    chunksEnd = chunkProvider.closestChunkEndMs(chunksEnd - 1, false)
-                return chunksEnd
-            }
+        function getFinalTimestamp(startPos) {
+            if (startPos <= 0)
+                return -1
 
-            reconnectOnPlay: atLive
-
-            onTimestampChanged: {
-                if (d.position < 0)
-                    return
-
-                if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
-                    return
-                }
-
-                if (mediaPlayer.timestamp >= 0) {
-                    d.position = mediaPlayer.timestamp
-                    timelineCorrectionRequest(d.position)
-                }
-            }
-
-            onPlaybackFinished: {
-                if (d.position == -1)
-                    return
-
-                if (!d.paused)
-                    player.play(d.chunkEnd + 1)
-            }
-
-            onPositionChanged: failureTimer.updateTimer()
-
-            function getFinalTimestamp(startPos) {
-                if (startPos <= 0)
-                    return -1
-
-                return Qt.binding(function() { return finalTimestamp })
-            }
+            return Qt.binding(function() { return finalTimestamp })
         }
     }
 
