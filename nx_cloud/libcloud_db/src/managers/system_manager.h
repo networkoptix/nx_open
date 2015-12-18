@@ -189,6 +189,15 @@ private:
         data::SystemSharing sharing,
         std::function<void(api::ResultCode)> completionHandler);
 
+    nx::db::DBResult activateSystem(
+        QSqlDatabase* const connection,
+        const QnUuid& systemID);
+    void systemActivated(
+        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::db::DBResult dbResult,
+        QnUuid systemID,
+        std::function<void(api::ResultCode)> completionHandler);
+
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
     nx::db::DBResult fetchSystemToAccountBinder(QSqlDatabase* connection, int* const /*dummy*/);

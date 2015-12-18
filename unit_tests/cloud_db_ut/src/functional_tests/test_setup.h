@@ -104,6 +104,12 @@ protected:
         const std::string& systemID,
         std::vector<api::SystemSharing>* const sharings);
 
+    //calls on system's regard
+    api::ResultCode getCdbNonce(
+        const std::string& systemID,
+        const std::string& authKey,
+        api::NonceData* const nonceData);
+
     api::SystemAccessRole accountAccessRoleForSystem(
         const std::vector<api::SystemSharing>& sharings,
         const std::string& accountEmail,

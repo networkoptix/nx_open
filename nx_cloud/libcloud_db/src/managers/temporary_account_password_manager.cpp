@@ -51,7 +51,7 @@ void TemporaryAccountPasswordManager::authenticateByName(
 {
     bool result = false;
     auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ completionHandler, &result]() {
+        [/*std::move*/ &completionHandler, &result]() {
         completionHandler(result);
     });
 

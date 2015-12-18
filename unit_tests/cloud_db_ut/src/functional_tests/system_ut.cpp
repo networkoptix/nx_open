@@ -655,5 +655,59 @@ TEST_F(CdbFunctionalTest, system_unbind)
     }
 }
 
+TEST_F(CdbFunctionalTest, system_activation)
+{
+    startAndWaitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system1 to account1
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    //checking account1 system list
+    {
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+        ASSERT_EQ(systems.size(), 1);
+        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
+    }
+
+    api::NonceData nonceData;
+    auto resultCode = getCdbNonce(system1.id.toStdString(), system1.authKey, &nonceData);
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
+    system1.status = api::SystemStatus::ssActivated;
+
+    //checking account1 system list
+    {
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+        ASSERT_EQ(systems.size(), 1);
+        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+    }
+
+    restart();
+
+    //checking account1 system list
+    {
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+        ASSERT_EQ(systems.size(), 1);
+        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+    }
+}
+
 }   //cdb
 }   //nx
