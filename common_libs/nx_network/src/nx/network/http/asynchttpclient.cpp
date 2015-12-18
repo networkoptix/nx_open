@@ -970,10 +970,10 @@ namespace nx_http
         nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
         httpClient->setAdditionalHeaders(extraHeaders);
         httpClient->setAuthType(authType);
-        return downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+        downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
     }
 
-    bool downloadFileAsyncEx(
+    void downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         nx_http::AsyncHttpClientPtr httpClientCaptured)

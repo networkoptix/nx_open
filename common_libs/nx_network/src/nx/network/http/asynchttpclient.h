@@ -373,7 +373,7 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
 
-    bool downloadFileAsyncEx(
+    void downloadFileAsyncEx(
         const QUrl& url,
         std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
         nx_http::AsyncHttpClientPtr httpClientCaptured);

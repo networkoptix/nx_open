@@ -2,6 +2,7 @@
 #define QN_COMMON_GLOBALS_H
 
 #include <cassert>
+#include <limits>
 
 #define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
 #include <cstdint>
@@ -818,7 +819,7 @@ public:
     /**
      * Invalid value for a timezone UTC offset.
      */
-    static const qint64 InvalidUtcOffset = INT64_MAX;
+    static const qint64 InvalidUtcOffset = std::numeric_limits<qint64>::max();
 #define InvalidUtcOffset InvalidUtcOffset
 
     /**
