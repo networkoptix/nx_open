@@ -12,7 +12,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/network_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/videowall_resource.h>
 
@@ -226,8 +226,8 @@ void QnVideowallItemWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
         qreal xspace = m_layout->cellSpacing().width() * 0.5;
         qreal yspace = m_layout->cellSpacing().height() * 0.5;
-       
-        qreal cellAspectRatio = m_layout->hasCellAspectRatio() 
+
+        qreal cellAspectRatio = m_layout->hasCellAspectRatio()
             ? m_layout->cellAspectRatio()
             : qnGlobals->defaultLayoutCellAspectRatio();
 
@@ -474,7 +474,7 @@ void QnVideowallItemWidget::updateStatusOverlay(Qn::ResourceStatusOverlay overla
 
     if(overlay == Qn::EmptyOverlay)
         opacityAnimator(m_statusOverlayWidget)->animateTo(0.0);
-    else 
+    else
         opacityAnimator(m_statusOverlayWidget)->animateTo(1.0);
 }
 
@@ -524,8 +524,9 @@ bool QnVideowallItemWidget::paintItem(QPainter *painter, const QRectF &paintRect
         return true;
     }
 
-    if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
-        m_widget->m_thumbnailManager->selectResource(resource);
+    if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        m_widget->m_thumbnailManager->selectResource(camera);
         return false;
     }
 

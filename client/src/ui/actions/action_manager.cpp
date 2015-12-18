@@ -22,6 +22,8 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench.h>
+
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/style/globals.h>
@@ -392,6 +394,8 @@ QnActionManager::QnActionManager(QObject *parent):
     m_actionById[Qn::NoAction] = m_root;
     m_idByAction[m_root] = Qn::NoAction;
 
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, &QnActionManager::hideAllMenus);
+
     QnMenuFactory factory(this, m_root);
 
     using namespace QnResourceCriterionExpressions;
@@ -666,6 +670,10 @@ QnActionManager::QnActionManager(QObject *parent):
             autoRepeat(false).
             condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
+        factory().
+            flags(Qn::Main).
+            separator();
+
         factory(Qn::NewUserAction).
             flags(Qn::Main | Qn::Tree).
             requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditUsersPermission).
@@ -883,6 +891,13 @@ QnActionManager::QnActionManager(QObject *parent):
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         text(tr("Audit Trail..."));
 
+    factory(Qn::OpenBookmarksSearchAction).
+        flags(Qn::Main | Qn::GlobalHotkey).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewArchivePermission).
+        text(tr("Bookmarks Search...")).
+        shortcut(tr("Ctrl+B")).
+        autoRepeat(false);
+
     factory().
         flags(Qn::Main).
         separator();
@@ -894,12 +909,6 @@ QnActionManager::QnActionManager(QObject *parent):
         text(tr("Alarm/Event Rules...")).
         icon(qnSkin->icon("events/settings.png")).
         shortcut(tr("Ctrl+E")).
-        autoRepeat(false);
-
-    factory(Qn::OpenBookmarksSearchAction).
-        flags(Qn::GlobalHotkey).
-        text(tr("Bookmarks...")).
-        shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
     factory(Qn::CameraListAction).
@@ -1653,7 +1662,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Bookmark Selection...")).
+        text(tr("Add a Bookmark...")).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnAddBookmarkActionCondition(this),
@@ -1972,17 +1981,11 @@ QMenu* QnActionManager::integrateMenu(QMenu *menu, const QnActionParameters &par
 
 
 QMenu *QnActionManager::newMenu(Qn::ActionScope scope, QWidget *parent, const QnActionParameters &parameters, CreationOptions options) {
-    /* This method call means that we are opening brand new context menu.
-       Following check will assure that only the latest context menu will be displayed.
-       In the standalone application it is guarantied by the qt GUI engine. */
-    if (qnRuntime->isActiveXMode()) {
-        for (auto menuObject: m_parametersByMenu.keys()) {
-            if (!menuObject)
-                continue;
-            if (QMenu* menu = qobject_cast<QMenu*>(menuObject))
-                menu->hide();
-        }
-    }
+    /*
+     * This method is called when we are opening a brand new context menu.
+     * Following check will assure that only the latest context menu will be displayed.
+     */
+    hideAllMenus();
 
     return newMenu(Qn::NoAction, scope, parent, parameters, options);
 }
@@ -2186,4 +2189,13 @@ bool QnActionManager::eventFilter(QObject *watched, QEvent *event) {
 
     m_lastClickedMenu = watched;
     return false;
+}
+
+void QnActionManager::hideAllMenus() {
+    for (auto menuObject: m_parametersByMenu.keys()) {
+        if (!menuObject)
+            continue;
+        if (QMenu* menu = qobject_cast<QMenu*>(menuObject))
+            menu->hide();
+    }
 }

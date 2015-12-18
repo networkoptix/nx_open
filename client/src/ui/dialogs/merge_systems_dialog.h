@@ -48,8 +48,7 @@ private:
 
     QnMediaServerResourcePtr m_discoverer;
     QUrl m_url;
-    QString m_user;
-    QString m_password;
+    QString m_adminPassword;
 };
 
 #endif // MERGE_SYSTEMS_DIALOG_H

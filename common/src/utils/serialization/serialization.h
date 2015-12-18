@@ -89,7 +89,7 @@ public:
         serializeInternal(ctx, value.constData(), target);
     }
 #endif
-    
+
     void serialize(context_type *ctx, const void *value, data_type *target) const {
         assert(ctx && value && target);
 
@@ -104,7 +104,7 @@ public:
         return deserializeInternal(ctx, value, target->data());
     }
 #endif
-    
+
     bool deserialize(context_type *ctx, const data_type &value, void *target) const {
         assert(ctx && target);
 
@@ -148,7 +148,7 @@ public:
         serializeInternal(value.constData(), target);
     }
 #endif
-    
+
     void serialize(const void *value, data_type *target) const {
         assert(value && target);
 
@@ -163,7 +163,7 @@ public:
         return deserializeInternal(value, target->data());
     }
 #endif
-    
+
     bool deserialize(const data_type &value, void *target) const {
         assert(target);
 
@@ -208,8 +208,8 @@ public:
     }
 
     template<class T>
-    void registerSerializer() { 
-        registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type()); 
+    void registerSerializer() {
+        registerSerializer(new typename QnSerialization::default_serializer<Serializer, T>::type());
     }
 
 private:
@@ -241,10 +241,10 @@ namespace QnSerializationDetail {
     template<class T, class D>
     bool deserialize_internal(const D &value, T *target) {
         /* That's the place where ADL kicks in.
-         * 
+         *
          * Note that we wrap a serialized type into a wrapper so that
-         * ADL would find only overloads with it as the first parameter. 
-         * Otherwise other overloads could also be discovered. 
+         * ADL would find only overloads with it as the first parameter.
+         * Otherwise other overloads could also be discovered.
          *
          * Also note that disable_user_conversions is also looked up via ADL, and thus
          * conversion wrapping for the data type can actually be disabled by
@@ -262,9 +262,9 @@ namespace QnSerializationDetail {
     template<class Context, class T, class D>
     bool deserialize_direct(Context *ctx, const D &value, T *target) {
         /* That's the place where ADL kicks in.
-         * 
+         *
          * Note that we wrap a serialized type into a wrapper so that
-         * ADL would find only overloads with it as the first parameter. 
+         * ADL would find only overloads with it as the first parameter.
          * Otherwise other overloads could also be discovered. */
         return deserialize(ctx, disable_user_conversions(value), target);
     }
@@ -273,7 +273,7 @@ namespace QnSerializationDetail {
     // TODO: #Elric qMetaTypeId uses atomics for custom types. Maybe introduce local cache?
 
     template<class T>
-    struct is_metatype_defined: 
+    struct is_metatype_defined:
         std::integral_constant<bool, QMetaTypeId2<T>::Defined>
     {};
 
@@ -325,10 +325,10 @@ namespace QnSerialization {
         return QnSerializationDetail::deserialize_internal(value, target);
     }
 
-    
+
     /* Public interface for (de)serializers that use context. */
 
-    // TODO: use template for context, with static_assert, so that the 
+    // TODO: use template for context, with static_assert, so that the
     // actual type is passed down the call tree.
 
     template<class Context, class T, class D>

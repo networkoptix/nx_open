@@ -146,8 +146,11 @@ namespace QnXmlTag {
     const QString paramName 		= lit("name");
     const QString paramDescription	= lit("description");
     const QString paramRange		= lit("range");
+    const QString paramInternalRange= lit("internalRange");
     const QString paramTag			= lit("tag");
     const QString paramReadOnly		= lit("readOnly");
+    const QString paramReadCmd	    = lit("readCmd");
+    const QString paramWriteCmd	    = lit("writeCmd");
 }
 
 bool QnCameraAdvacedParamsXmlParser::readXml(QIODevice *xmlSource, QnCameraAdvancedParams &result) {
@@ -223,7 +226,10 @@ bool QnCameraAdvacedParamsXmlParser::parseElementXml(const QDomElement &elementX
 	param.name          = elementXml.attribute(QnXmlTag::paramName);
 	param.description   = elementXml.attribute(QnXmlTag::paramDescription);
 	param.range         = elementXml.attribute(QnXmlTag::paramRange);
+    param.internalRange = elementXml.attribute(QnXmlTag::paramInternalRange);
 	param.tag           = elementXml.attribute(QnXmlTag::paramTag);
 	param.readOnly      = parseBooleanXmlValue(elementXml.attribute(QnXmlTag::paramReadOnly));
+    param.readCmd       = elementXml.attribute(QnXmlTag::paramReadCmd);
+    param.writeCmd      = elementXml.attribute(QnXmlTag::paramWriteCmd);
 	return true;
 }

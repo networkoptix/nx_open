@@ -26,7 +26,7 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
     return result;
 }
 
-qint64 parseDateTime( const QString& dateTime )
+qint64 parseDateTime( const QString& dateTimeStr )
 {
     static const qint64 MIN_PER_HOUR = 60;
     static const qint64 SEC_PER_MIN = 60;
@@ -36,13 +36,13 @@ qint64 parseDateTime( const QString& dateTime )
     static const qint64 MS_PER_SEC = 1000;
     static const qint64 USEC_PER_MS = 1000;
 
-    if( dateTime.toLower().trimmed() == lit( "now" ) )
+    if( dateTimeStr.toLower().trimmed() == lit( "now" ) )
     {
         return DATETIME_NOW;
     }
-    else if( dateTime.contains( L'T' ) || (dateTime.contains( L'-' ) && !dateTime.startsWith( L'-' )) )
+    else if( dateTimeStr.contains( L'T' ) || (dateTimeStr.contains( L'-' ) && !dateTimeStr.startsWith( L'-' )) )
     {
-        const QStringList dateTimeParts = dateTime.split( L'.' );
+        const QStringList dateTimeParts = dateTimeStr.split( L'.' );
         QDateTime tmpDateTime = QDateTime::fromString( dateTimeParts[0], Qt::ISODate );
         if( dateTimeParts.size() > 1 )
             tmpDateTime = tmpDateTime.addMSecs( dateTimeParts[1].toInt() / 1000 );
@@ -50,13 +50,24 @@ qint64 parseDateTime( const QString& dateTime )
     }
     else
     {
-        auto somethingSinceEpoch = dateTime.toLongLong();
+        auto somethingSinceEpoch = dateTimeStr.toLongLong();
         //detecting millis or usec?
-        if( somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS) )
+        if( somethingSinceEpoch > 0 && somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS) )
             return somethingSinceEpoch * USEC_PER_MS;   //dateTime is in millis
         else
             return somethingSinceEpoch;
     }
+}
+
+qint64 parseDateTimeMsec( const QString& dateTimeStr )
+{
+    static const qint64 kUsecPerMs = 1000;
+
+    qint64 usecSinceEpoch = parseDateTime(dateTimeStr);
+    if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
+        return usecSinceEpoch;  //special values are returned "as is"
+
+    return usecSinceEpoch / kUsecPerMs;
 }
 
 QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern) {
@@ -405,5 +416,9 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const QString boldValue = (isBold ? lit("bold") : lit("normal"));
     const QString italicValue (isItalic ? lit("italic") : lit("normal"));
 
-    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, text);
+    static const auto kNewLineSymbol = L'\n';
+    static const auto kNewLineTag = lit("<br>");
+
+    const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }

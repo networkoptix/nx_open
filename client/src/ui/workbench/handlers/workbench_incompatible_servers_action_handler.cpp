@@ -36,32 +36,38 @@ QnWorkbenchIncompatibleServersActionHandler::QnWorkbenchIncompatibleServersActio
 
 QnWorkbenchIncompatibleServersActionHandler::~QnWorkbenchIncompatibleServersActionHandler() {}
 
-void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered() {
-    if (m_connectTool) {
+void QnWorkbenchIncompatibleServersActionHandler::at_connectToCurrentSystemAction_triggered()
+{
+    if (m_connectTool)
+    {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Please wait. Requested servers will be added to your system."));
         return;
     }
 
     QSet<QnUuid> targets;
-    foreach (const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        if (resource->hasFlags(Qn::remote_server) && (resource->getStatus() == Qn::Incompatible || resource->getStatus() == Qn::Unauthorized))
+    for (const QnResourcePtr &resource: menu()->currentParameters(sender()).resources())
+    {
+        if (QnMediaServerResource::isFakeServer(resource))
             targets.insert(resource->getId());
     }
 
     connectToCurrentSystem(targets);
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const QSet<QnUuid> &targets, const QString &initialUser, const QString &initialPassword) {
+void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
+        const QSet<QnUuid> &targets,
+        const QString &initialPassword)
+{
     if (m_connectTool)
         return;
 
     if (targets.isEmpty())
         return;
 
-    QString user = initialUser.isEmpty() ? lit("admin") : initialUser;
     QString password = initialPassword;
 
-    forever {
+    forever
+    {
         QInputDialog dialog(mainWindow());
         dialog.setWindowTitle(tr("Enter Password..."));
         dialog.setLabelText(tr("Administrator Password"));
@@ -80,7 +86,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
             break;
     }
 
-    if (!validateStartLicenses(targets, user, password))
+    if (!validateStartLicenses(targets, password))
         return;
 
     m_connectTool = new QnConnectToCurrentSystemTool(this);
@@ -97,11 +103,13 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(const Q
     connect(m_connectTool,      &QnConnectToCurrentSystemTool::stateChanged,    progressDialog,        &QnProgressDialog::setLabelText);
     connect(progressDialog,     &QnProgressDialog::canceled,                    m_connectTool,         &QnConnectToCurrentSystemTool::cancel);
 
-    m_connectTool->start(targets, user, password);
+    m_connectTool->start(targets, password);
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered() {
-    if (m_mergeDialog) {
+void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggered()
+{
+    if (m_mergeDialog)
+    {
         m_mergeDialog->raise();
         return;
     }
@@ -111,21 +119,22 @@ void QnWorkbenchIncompatibleServersActionHandler::at_mergeSystemsAction_triggere
     delete m_mergeDialog;
 }
 
-void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode) {
+void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int errorCode)
+{
     m_connectTool->deleteLater();
     m_connectTool->QObject::disconnect(this);
 
-    switch (errorCode) {
+    switch (errorCode)
+    {
     case QnConnectToCurrentSystemTool::NoError:
         QMessageBox::information(mainWindow(), tr("Information"), tr("Rejoice! Selected servers have been successfully connected to your system!"));
         break;
     case QnConnectToCurrentSystemTool::AuthentificationFailed: {
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Authentication failed.") + L'\n' + tr("Please, check the password you have entered."));
         QSet<QnUuid> targets = m_connectTool->targets();
-        QString user = m_connectTool->user();
-        QString password = m_connectTool->password();
+        QString password = m_connectTool->adminPassword();
         delete m_connectTool;
-        connectToCurrentSystem(targets, user, password);
+        connectToCurrentSystem(targets, password);
         break;
     }
     case QnConnectToCurrentSystemTool::ConfigurationFailed:
@@ -139,7 +148,10 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     }
 }
 
-bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(const QSet<QnUuid> &targets, const QString &user, const QString &password) {
+bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
+        const QSet<QnUuid> &targets,
+        const QString &adminPassword)
+{
 
     QnLicenseListHelper helper(qnLicensePool->getLicenses());
     if (helper.totalLicenseByType(Qn::LC_Start) == 0)
@@ -147,7 +159,8 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(const QS
 
     QnMediaServerResourceList aliveServers;
 
-    foreach (const QnUuid &id, targets) {
+    for (const QnUuid &id: targets)
+    {
         QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
         if (server)
             aliveServers << server;
@@ -157,9 +170,12 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(const QS
     if (aliveServers.isEmpty())
         return true;
 
-    bool serversWithStartLicenses = std::any_of(aliveServers.cbegin(), aliveServers.cend(), [this, &user, &password](const QnMediaServerResourcePtr &server) {
-        return serverHasStartLicenses(server, user, password);
-    });
+    bool serversWithStartLicenses = std::any_of(aliveServers.cbegin(), aliveServers.cend(),
+            [this, &adminPassword](const QnMediaServerResourcePtr &server)
+            {
+                return serverHasStartLicenses(server, adminPassword);
+            }
+    );
 
     /* Check if all OK */
     if (!serversWithStartLicenses)
@@ -175,10 +191,13 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(const QS
     return messageBox.exec() != QnMessageBox::Cancel;
 }
 
-bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(const QnMediaServerResourcePtr &server, const QString &user, const QString &password) {
+bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
+        const QnMediaServerResourcePtr &server,
+        const QString &adminPassword)
+{
     QAuthenticator auth;
-    auth.setUser(user);
-    auth.setPassword(password);
+    auth.setUser(lit("admin"));
+    auth.setPassword(adminPassword);
 
     /* Check if there is a valid starter license in the remote system. */
     QnLicenseList remoteLicensesList = remoteLicenses(server->getUrl(), auth);

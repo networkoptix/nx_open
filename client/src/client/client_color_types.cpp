@@ -220,6 +220,15 @@ QnFailoverPriorityColors::QnFailoverPriorityColors() {
     high    = QColor(0xff5500);
 }
 
+
+QnGraphicsMessageBoxColors::QnGraphicsMessageBoxColors()
+{
+    text    = QColor(0xff, 0xff, 0xff, 0x99);
+    frame   = QColor(0x00, 0x7e, 0xd4, 0xff);
+    window  = QColor(0x00, 0x4b, 0x80, 0xcc);
+}
+
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     QN_CLIENT_COLOR_TYPES,
     (json)(eq),

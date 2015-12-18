@@ -22,6 +22,7 @@ struct QnMultiserverRequestData {
 
     bool isLocal;
     Qn::SerializationFormat format;
+    bool extraFormatting;
 
 protected:
     /* Avoid creating invalid instances when making local requests. */

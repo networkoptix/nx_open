@@ -1,7 +1,7 @@
 #include "active_camera_thumbnail_loader.h"
 #include "private/active_camera_thumbnail_loader_p.h"
 
-#include <QtQml>
+#include <QtQml/QtQml>
 
 #include <utils/common/id.h>
 #include <core/resource/camera_resource.h>

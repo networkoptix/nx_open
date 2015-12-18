@@ -79,9 +79,11 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
     } else {
         m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
-        provider->loadAsync();
     }
+    connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
+        m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+    });
+    provider->loadAsync();
 }
 
 QString QnNotificationToolTipWidget::text() const {
@@ -143,13 +145,6 @@ void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton butt
         emit thumbnailClicked();
     }
 }
-
-void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
-    if (!m_thumbnailLabel)
-        return;
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
-}
-
 
 // -------------------------------------------------------------------------- //
 // QnNotificationWidget

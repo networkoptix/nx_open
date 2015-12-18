@@ -127,8 +127,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_discoverer.clear();
     m_url.clear();
-    m_user.clear();
-    m_password.clear();
+    m_adminPassword.clear();
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -147,9 +146,8 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_user = lit("admin");
-    m_password = password;
-    m_mergeTool->pingSystem(m_url, m_user, m_password);
+    m_adminPassword = password;
+    m_mergeTool->pingSystem(m_url, m_adminPassword);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -162,7 +160,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_adminPassword, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
