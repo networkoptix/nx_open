@@ -989,23 +989,27 @@ bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
 
 void QnServerDb::updateBookmarkCount()
 {
-    QWriteLocker lock(&m_mutex);
-    if (!m_updateBookmarkCount)
-        return;
+    std::function<void()> finalHandler;
+    {
+        QWriteLocker lock(&m_mutex);
+        if (!m_updateBookmarkCount)
+            return;
 
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare(lit("SELECT count(guid) FROM bookmarks"));
-    if (!execSQLQuery(&query, Q_FUNC_INFO))
-        return;
+        QSqlQuery query(m_sdb);
+        query.setForwardOnly(true);
+        query.prepare(lit("SELECT count(guid) FROM bookmarks"));
+        if (!execSQLQuery(&query, Q_FUNC_INFO))
+            return;
 
-    if (!query.next()) {
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Query has failed!");
-        return;
+        if (!query.next()) {
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Query has failed!");
+            return;
+        }
+
+        const auto value = query.value(0).toString();
+        finalHandler = std::bind(m_updateBookmarkCount, value.toInt());
     }
-
-    const auto value = query.value(0).toString();
-    m_updateBookmarkCount(value.toInt());
+    finalHandler();
 }
 
 bool QnServerDb::deleteAllBookmarksForCamera(const QString& cameraUniqueId) {
