@@ -12,6 +12,7 @@ namespace nx
 	namespace media
 	{
 		class AbstractVideoDecoder;
+		typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
 
 		class VideoDecoderRegistry
 		{
@@ -20,7 +21,6 @@ namespace nx
 			/*
 			* \returns optimal video decoder (in case of any) compatible with such frame. Returns null pointer if no compatible decoder found.
 			*/
-			typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
 			VideoDecoderPtr createCompatibleDecoder(const QnConstCompressedVideoDataPtr& frame);
 
 			/** Register video decoder plugin */

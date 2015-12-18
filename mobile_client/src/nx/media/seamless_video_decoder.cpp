@@ -9,6 +9,10 @@ namespace
 	/** This data is used to compare current and previous frame so as to reset video decoder if need */
 	struct FrameBasicInfo
 	{
+		bool operator== (const FrameBasicInfo& other) const {
+			return other.size == size && codec == codec;
+		}
+
 		FrameBasicInfo(): 
 			codec(CODEC_ID_NONE)
 		{
@@ -37,7 +41,7 @@ class SeamlessVideoDecoderPrivate : public QObject
 	Q_DECLARE_PUBLIC(SeamlessVideoDecoder)
 	SeamlessVideoDecoder *q_ptr;
 public:
-	std::deque<QSharedPointer<QVideoFrame>> queue; //< temporary optional buffer for decoded data
+	std::deque<QSharedPointer<QVideoFrame>> queue; //< temporary  buffer for decoded data
 	VideoDecoderPtr videoDecoder;
 	FrameBasicInfo prevFrameInfo;
 };
@@ -48,7 +52,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QS
 	result->clear();
 
 	FrameBasicInfo frameInfo(frame);
-	if (frameInfo != d->prevFrameInfo)
+	if (!(frameInfo == d->prevFrameInfo))
 	{
 		QSharedPointer<QVideoFrame> decodedFrame;
 		while (d->videoDecoder && d->videoDecoder->decode(QnConstCompressedVideoDataPtr(), &decodedFrame))
