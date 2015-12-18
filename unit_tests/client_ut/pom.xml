@@ -26,7 +26,7 @@
         <!--Specify the project to test-->      
         <master.project.directory>client</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webenginewidgets</qt.libs>       
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webenginecore webenginewidgets</qt.libs>       
         <global.libs>-lcommon -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->

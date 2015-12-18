@@ -21,7 +21,16 @@
      </property>
      <widget class="QWidget" name="noSettingsPage">
       <layout class="QVBoxLayout" name="verticalLayout_4">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -38,7 +47,16 @@
      </widget>
      <widget class="QWidget" name="manualPage">
       <layout class="QVBoxLayout" name="verticalLayout" stretch="0">
-       <property name="margin">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
         <number>0</number>
        </property>
        <item>
@@ -47,19 +65,19 @@
       </layout>
      </widget>
      <widget class="QWidget" name="webPage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <property name="margin">
+      <layout class="QVBoxLayout" name="webPageLayout">
+       <property name="leftMargin">
         <number>0</number>
        </property>
-       <item>
-        <widget class="QWebEngineView" name="webView" native="true">
-         <property name="url" stdset="0">
-          <url>
-           <string>about:blank</string>
-          </url>
-         </property>
-        </widget>
-       </item>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
       </layout>
      </widget>
     </widget>
@@ -67,11 +85,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>QWebView</class>
-   <extends>QWidget</extends>
-   <header>QtWebKitWidgets/QWebView</header>
-  </customwidget>
   <customwidget>
    <class>QnCameraAdvancedParamsWidget</class>
    <extends>QWidget</extends>

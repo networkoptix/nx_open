@@ -11,17 +11,15 @@
 
 #include "core/resource/resource_fwd.h"
 
-class QnCustomCookieJar;
-
 class CameraAdvancedSettingsWebPage
 :
     public QWebEnginePage
 {
 public:
     CameraAdvancedSettingsWebPage(QWebEngineProfile *profile, QObject* parent = 0 );
-    void setCamera(QnResourcePtr camRes);
+    void setCamera(const QnResourcePtr &camera);
 private:
-    QnCustomCookieJar* m_cookieJar;
+    QNetworkCookieJar* m_cookieJar;
 };
 
 #endif  //CAMERA_ADVANCED_SETTINGS_WEB_PAGE_H

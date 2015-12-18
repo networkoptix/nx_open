@@ -26,7 +26,7 @@
         <assembly-skip>true</assembly-skip>
         <rename-skip>true</rename-skip>
         <template>lib</template>
-        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webenginewidgets</qt.libs>
+        <qt.libs>core gui network opengl xml xmlpatterns sql multimedia concurrent webenginecore webenginewidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Global libs-->
         <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
