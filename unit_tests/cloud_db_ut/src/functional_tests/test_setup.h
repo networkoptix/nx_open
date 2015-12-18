@@ -109,6 +109,10 @@ protected:
         const std::string& systemID,
         const std::string& authKey,
         api::NonceData* const nonceData);
+    //calls on system's regard
+    api::ResultCode ping(
+        const std::string& systemID,
+        const std::string& authKey);
 
     api::SystemAccessRole accountAccessRoleForSystem(
         const std::vector<api::SystemSharing>& sharings,

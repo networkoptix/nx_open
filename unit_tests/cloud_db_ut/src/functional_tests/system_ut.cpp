@@ -665,47 +665,69 @@ TEST_F(CdbFunctionalTest, system_activation)
         api::ResultCode::ok,
         addActivatedAccount(&account1, &account1Password));
 
-    //adding system1 to account1
-    api::SystemData system1;
-    ASSERT_EQ(
-        api::ResultCode::ok,
-        bindRandomSystem(account1.email, account1Password, &system1));
-
-    //checking account1 system list
+    for (int i = 0; i < 1; ++i)
     {
-        std::vector<api::SystemData> systems;
-        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-        ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
-    }
+        //adding system1 to account1
+        api::SystemData system1;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            bindRandomSystem(account1.email, account1Password, &system1));
 
-    api::NonceData nonceData;
-    auto resultCode = getCdbNonce(system1.id.toStdString(), system1.authKey, &nonceData);
-    ASSERT_EQ(api::ResultCode::ok, resultCode);
-    system1.status = api::SystemStatus::ssActivated;
+        //checking account1 system list
+        {
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+            ASSERT_EQ(systems.size(), 1);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(api::SystemStatus::ssNotActivated, systems[0].status);
+        }
 
-    //checking account1 system list
-    {
-        std::vector<api::SystemData> systems;
-        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
-    }
+        if (i == 0)
+        {
+            api::NonceData nonceData;
+            auto resultCode = getCdbNonce(
+                system1.id.toStdString(),
+                system1.authKey,
+                &nonceData);
+            ASSERT_EQ(api::ResultCode::ok, resultCode);
+        }
+        //else if (i == 1)
+        //{
+        //    //activating with ping
+        //    api::NonceData nonceData;
+        //    auto resultCode = ping(
+        //        system1.id.toStdString(),
+        //        system1.authKey);
+        //    ASSERT_EQ(api::ResultCode::ok, resultCode);
+        //}
+        system1.status = api::SystemStatus::ssActivated;
 
-    restart();
+        //checking account1 system list
+        {
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+            ASSERT_EQ(systems.size(), 1);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+        }
 
-    //checking account1 system list
-    {
-        std::vector<api::SystemData> systems;
-        ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
-        ASSERT_EQ(systems.size(), 1);
-        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
-        ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
-        ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+        restart();
+
+        //checking account1 system list
+        {
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
+            ASSERT_EQ(systems.size(), 1);
+            ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+            ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(api::SystemStatus::ssActivated, systems[0].status);
+        }
+
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            unbindSystem(account1.email, account1Password, system1.id.toStdString()));
     }
 }
 
