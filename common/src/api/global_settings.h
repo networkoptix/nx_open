@@ -62,6 +62,9 @@ public:
     std::chrono::seconds aliveUpdateInterval() const;
     void setAliveUpdateInterval(std::chrono::seconds newInterval) const;
 
+    std::chrono::seconds serverDiscoveryPingTimeout() const;
+    void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -111,6 +114,7 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
+    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
 
     QList<QnAbstractResourcePropertyAdaptor*> m_allAdaptors;
 

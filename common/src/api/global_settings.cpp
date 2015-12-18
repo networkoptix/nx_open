@@ -60,6 +60,8 @@ namespace {
     const int kEc2KeepAliveProbeCountDefault = 3;
     const QString kEc2AliveUpdateInterval(lit("ec2AliveUpdateIntervalSec"));
     const int kEc2AliveUpdateIntervalDefault = 60;
+    const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
+    const int kServerDiscoveryPingTimeoutDefault = 15;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent): 
@@ -109,6 +111,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         kEc2AliveUpdateIntervalDefault,
         this);
     ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
+    m_serverDiscoveryPingTimeout = new QnLexicalResourcePropertyAdaptor<int>(
+        kServerDiscoveryPingTimeout,
+        kServerDiscoveryPingTimeoutDefault,
+        this);
+    ec2Adaptors << m_serverDiscoveryPingTimeout;
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -339,6 +346,16 @@ std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const
 void QnGlobalSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) const
 {
     m_ec2AliveUpdateIntervalAdaptor->setValue(newInterval.count());
+}
+
+std::chrono::seconds QnGlobalSettings::serverDiscoveryPingTimeout() const
+{
+    return std::chrono::seconds(m_serverDiscoveryPingTimeout->value());
+}
+
+void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const
+{
+    m_serverDiscoveryPingTimeout->setValue(newInterval.count());
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
