@@ -456,7 +456,13 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     if (sdb)
         sdb->flushRecords();
     // merge chunks
-    fileCatalog->addChunks(newChunks);
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        bool stillHaveThisStorage = hasStorageUnsafe(storage);
+        if (!stillHaveThisStorage)
+            return;
+        fileCatalog->addChunks(newChunks);
+    }
 }
 
 void QnStorageManager::initDone()
@@ -618,8 +624,12 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
-            if (!m_rebuildCancelled)
-                replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+            {
+                QnMutexLocker lk(&m_mutexStorages);
+                bool stillHaveThisStorage = hasStorageUnsafe(storage);
+                if (!m_rebuildCancelled && stillHaveThisStorage)
+                    replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
@@ -635,7 +645,7 @@ QString QnStorageManager::toCanonicalPath(const QString& path)
     return result;
 }
 
-void QnStorageManager::addStorage(const QnStorageResourcePtr &storage, bool markOffline)
+void QnStorageManager::addStorage(const QnStorageResourcePtr &storage)
 {
     {
         int storageIndex = qnStorageDbPool->getStorageIndex(storage);
@@ -648,8 +658,7 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr &storage, bool mark
         //QnStorageResourcePtr oldStorage = removeStorage(storage); // remove existing storage record if exists
         //if (oldStorage)
         //    storage->addWritedSpace(oldStorage->getWritedSpace());
-        if (markOffline)
-            storage->setStatus(Qn::Offline); // we will check status after
+        storage->setStatus(Qn::Offline); // we will check status after
         m_storageRoots.insert(storageIndex, storage);
         connect(storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
                 this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)), Qt::DirectConnection);
@@ -689,15 +698,20 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     }
 }
 
-bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
+bool QnStorageManager::hasStorageUnsafe(const QnStorageResourcePtr &storage) const
 {
-    QnMutexLocker lock( &m_mutexStorages );
     for (auto itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         if (itr.value()->getId() == storage->getId())
             return true;
     }
     return false;
+}
+
+bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
+{
+    QnMutexLocker lock(&m_mutexStorages);
+    return hasStorageUnsafe(storage);
 }
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
@@ -740,7 +754,7 @@ void QnStorageManager::at_storageChanged(const QnResourcePtr &resource)
 
     if (checkIfMyStorage(storage)) {
         if (!hasStorage(storage))
-            addStorage(storage, false);
+            addStorage(storage);
     }
     else {
         if (hasStorage(storage))

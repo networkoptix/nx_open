@@ -2012,7 +2012,10 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-
+        qnServerDb->setBookmarkCountController([server](size_t count){
+            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+            propertyDictionary->saveParams(server->getId());
+        });
 
         propertyDictionary->saveParams(server->getId());
 
