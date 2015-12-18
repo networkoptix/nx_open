@@ -1,47 +1,63 @@
 -----------------------------------------------2.5.0.xxxx-----------------------------------------
 NEW FEATURES
+    New mobile clients - MOBILE-10
     Bookmarks - VMS-256
     Redundant storage - VMS-939
-    New mobile clients - MOBILE-10
+    Alarm layout - VMS-1171
+    Generic Text Overlay - VMS-1170
+    PTZ as an action - VMS-260
 	
 NEW DEVICE SUPPORT
+    Axis F44 Main Unit - VMS-1199
     Axis Q6000E panoramic camera - VMS-686
+    ACTi V23 4 Channel Encoder (With I/O Support) - VMS-1157
+    Messoa IP Cameras (With I/O Support)
+    Hikvision DS-6704HFI 4 Channel Video Server
 
 IMPROVEMENTS
-    Support of Wiper/Light/Aux commands on PTZ Bosch and Redvision cameras - VISTA-60
+?    Alarm inputs are not discovered from OnCam 360 camera's - VISTA-75
     Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
-    Improved auto discovery - it's faster now - VMS-466
+    Better support of ISD Panzilla cameras - VMS-1465, VMS-936, VMS-1351
+    Vista VK2-1080XVRDPTPMF camera is mapped for advanced PTZ - VISTA-76
+    Arecont RTSP camera support - VMS-1166
+    Digital I/O support for Arecont cameras - VMS-1343
     Added "Connect" button to the "Connection Test" dialog - VMS-263
+    Improved "Info" displaying on items - VMS-1282
+    Calendar widget can be pinned now - VMS-925
     Added layout backgrounds support to the Video Wall mode - VMS-741
     Transcoding is enabled by default for video export from multisensor cameras - VMS-265
-    "Timeline mode" is renamed to "Time Mode". Now it affects timeline and timestamps in Event Logs and Audit Trail - VMS-602
-    Added tracking of the instant erasing of archive more then one hour length for any camera to the Audit Trail - VMS-1004
-    Added notification if maximum number of cameras is exceeded on the Server - VMS-751
-    Simplified "Camera recording" action settings. Now just "pre recording" and "post recording" can be configured - VMS-881
-    Improved "Server Settings" and "System Administration" dialogs - VMS-1244, VMS-1180
-    Calendar can be pinned now - VMS-925
-    "Search" tab little improvement - Search text-input area is focused automatically - VMS-269
-    Long camera names are not shown on the small items any more - VMS-991
-    Improved sorting of device list in Web Client. Now it's similar to Desktop Client - VISTA-61
-    Added an ability to download API documentation to Web Admin Interface - VISTA-62
-    Added easy API export to containers like mkv, avi and such - VMS-763
+    Added warning before export if export causes video downscaling - VMS-1362
+    "Timeline mode" is renamed to "Time Mode". Now it affects timeline and timestamps in Event Logs, Audit Trail and Bookmark Log - VMS-602
+    Added a possibility to sort Alarm/Event Rules by any column - VMS-1548
+    Improved "Server Settings" and "System Administration" dialogs. Now changes can be applied without closing dialog - VMS-1244, VMS-1180
+    Storage Analytics improvements. Storage space occupied by deleted/moved out cameras is displayed separately. - VMS-1569
+    Improved time synchronization mechanism between Servers - VMS-1394, VMS-1149
+    Improved error messages for some cases of push updates failure - VMS-1536
+    Server SSL can be disabled
+    Server on Nx1 may crash on generic event. Fixed.
+    General Server improvements based on anonymous usage statistics - VMS-1529, VMS-1491, VMS-1239
 
 BUG FIXES
-    Digital input/output didn't work for ACTi V23. Fixed. - VMS-1157
-    Digital input/output doesn't work for Messoa camera. Fixed. - VMS-1187
-    AV20175DN sensors order was incorrect. Fixed. VMS-1192
-    Axis F44 was displayed as signle-channel resource. Fixed. - VMS-1199
-    Changes were not applied in the Client till relogin if Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
-    System time could be changed if Server marked as Time Server started later then other Servers. Fixed. - VMS-1149
-    Chunks on the timeline weren't loaded if system time was changed back for some reasons. Fixed. - VMS-1142
+    Digital I/O could not be programmed for Honeywell cameras. Fixed. - VMS-1479
+    Digital I/O could not be programmed for Sony cameras with latest firmware. Fixed. - VMS-1348
+    AV20175DN firmware update re-ordered sensors. Fixed. - VMS-1192
+    DWC-MF10M36TIR camera streams MJPEG instead of h264 by default. Fixed. - VMS-1453
+    MJPEG-stream instead of h264 is being requested from D-link 7110 - VMS-1365
+    Focus buttons VK2-Encoder were not functional. Fixed. VISTA-77
+    Triggered Event Rule with target I/O Module might turn off all active output ports on device. Fixed. - VMS-1458
+    Changes were not applied in the Client till re-login if Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
     Middle-click on the item with any default rotation always led to rotation to 0 degree. Fixed. - VMS-490
-    If some filters were disabled in Audit Trail, total activity was not refreshed. Fixed. - VISTA-8
+    Chunks on the timeline weren't loaded if system time was changed back for some reasons. Fixed. - VMS-1142
     Chunks on the timeline were displayed with local Server Time for cameras added as HTTP-links. Fixed. - VMS-821
     Chunks weren't disappear from timeline after Server's stop. Fixed. - VMS-929
+    Client didn't update itself during "Update from local file". Fixed. - VMS-1121
+    Merge Systems failed if System name contained ":" character. Fixed. - VMS-1360
+    Rebuilding archive index failed if storage login contained '\' character. Fixed.
+    Proxying local via remote server failed. Fixed.
     Flag "Send usage statistics" was enabled automatically after upgrade. Fixed. - VMS-1227
-    Watching LIVE video wasn't logged in Audit Trail. Fixed. - VMS-555
+    Watching LIVE video via Android Client wasn't logged in Audit Trail. Fixed. - VMS-555
     Export with Paxton Plugin has led to the crash. Fixed. - VISTA-72
-
+	
 
 -----------------------------------------------2.4.1.xxxx-----------------------------------------
 NEW FEATURES
