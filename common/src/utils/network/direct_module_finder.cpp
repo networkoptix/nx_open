@@ -208,8 +208,9 @@ std::chrono::milliseconds QnDirectModuleFinder::maxPingTimeout() const
 
 std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
 {
-    return maxPingTimeout() > seconds(4)
-        ? (maxPingTimeout() / 2) - seconds(1)
+    const auto maxPingTimeoutLocal = maxPingTimeout();
+    return maxPingTimeoutLocal > seconds(4)
+        ? (maxPingTimeoutLocal / 2) - seconds(1)
         : seconds(1);
 }
 
