@@ -6,7 +6,6 @@
 #include "sql.h"
 #include "sql_macros.h"
 #include "enum.h"
-#include "recording/time_period.h"
 
 // TODO: #Elric enumz!
 // TODO: #Elric #EC2 static assert for enum size.

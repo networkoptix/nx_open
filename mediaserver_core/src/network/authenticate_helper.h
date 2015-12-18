@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator> 
 #include <QtCore/QMap>
 #include <QElapsedTimer>
 #include <QCache>
@@ -25,7 +25,7 @@ struct QnLdapDigestAuthContext;
 class QnAuthHelper: public QObject
 {
     Q_OBJECT
-    
+
 public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
@@ -37,7 +37,7 @@ public:
 
     //!Authenticates request on server side
     Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
-    
+
     Qn::AuthResult authenticate(const QString& login, const QByteArray& digest) const;
 
     QnAuthMethodRestrictionList* restrictionList();
@@ -67,7 +67,7 @@ private:
         QString path;
 
         TempAuthenticationKeyCtx() {}
-        TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right ) 
+        TempAuthenticationKeyCtx( TempAuthenticationKeyCtx&& right )
         :
             timeGuard( std::move( right.timeGuard ) ),
             path( std::move( right.path ) )
@@ -107,7 +107,7 @@ private:
         bool isProxy );
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce);
-    Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
+    Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter,
                       std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
     Qn::AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);

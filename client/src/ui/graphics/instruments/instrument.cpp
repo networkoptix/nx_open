@@ -6,7 +6,7 @@
 #include <QtGui/QWheelEvent>
 #include <QtGui/QTabletEvent>
 #include <QtGui/QKeyEvent>
-#include <QInputMethodEvent>
+#include <QtGui/QInputMethodEvent>
 #include <QtGui/QFocusEvent>
 #include <QtGui/QPaintEvent>
 #include <QtGui/QMoveEvent>
@@ -17,7 +17,7 @@
 #include <QtGui/QDragEnterEvent>
 #include <QtGui/QDragMoveEvent>
 #include <QtGui/QDragLeaveEvent>
-#include <QShowEvent>
+#include <QtGui/QShowEvent>
 #include <QtGui/QHideEvent>
 #include <QtGui/QActionEvent>
 #include <QtWidgets/QGraphicsView>
@@ -26,8 +26,8 @@
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
-#include <QGraphicsSceneHelpEvent>
-#include <QGraphicsSceneHoverEvent>
+#include <QtWidgets/QGraphicsSceneHelpEvent>
+#include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <ui/animation/animation_event.h>
 #include <ui/animation/animation_timer.h>
 #include <utils/common/warnings.h>

@@ -10,10 +10,6 @@
 #include <QtGui/QVector4D>
 #include <QtGui/QMatrix4x4>
 
-// TODO: #Elric #5.3 remove
-quint32 qFloatDistance(float a, float b);
-quint64 qFloatDistance(double a, double b);
-
 // -------------------------------------------------------------------------- //
 // qFuzzyIsNull
 // -------------------------------------------------------------------------- //

@@ -1,6 +1,20 @@
 #include "elided_label.h"
 
+
+#if QT_VERSION == 0x050201
 #include <QtWidgets/5.2.1/QtWidgets/private/qlabel_p.h>
+#elif QT_VERSION == 0x050401
+#include <QtWidgets/5.4.1/QtWidgets/private/qlabel_p.h>
+#elif QT_VERSION == 0x050500
+#include <QtWidgets/5.5.0/QtWidgets/private/qlabel_p.h>
+#elif QT_VERSION == 0x050501
+#include <QtWidgets/5.5.1/QtWidgets/private/qlabel_p.h>
+#elif QT_VERSION == 0x050600
+#include <QtWidgets/5.6.0/QtWidgets/private/qlabel_p.h>
+#else
+#error "Include proper header here!"
+#endif
+
 #include <QtWidgets/QStyleOption>
 
 QnElidedLabel::QnElidedLabel(QWidget *parent) :

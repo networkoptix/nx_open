@@ -26,12 +26,13 @@
         <product.display.title>${client.display.name}</product.display.title>
         <template>app</template>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webenginecore webenginewidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase -lDxErr</!-->
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>
@@ -81,22 +82,4 @@
             <systemPath>${root.dir}/client/pom.xml</systemPath>
         </dependency>           
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>webkit-win</id>
-            <activation>
-                <os>
-                    <family>Windows</family>
-                </os>    
-                <property>
-                    <name>webkit</name>
-                    <value>!false</value>
-                </property>                  
-            </activation>
-            <properties>
-                <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>
-            </properties>
-        </profile>  
-    </profiles>
 </project>

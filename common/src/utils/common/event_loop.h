@@ -10,6 +10,8 @@
 #include <QtCore/5.5.0/QtCore/private/qthread_p.h>
 #elif QT_VERSION == 0x050501
 #include <QtCore/5.5.1/QtCore/private/qthread_p.h>
+#elif QT_VERSION == 0x050600
+#include <QtCore/5.6.0/QtCore/private/qthread_p.h>
 #else
 #error "Include proper header here!"
 #endif

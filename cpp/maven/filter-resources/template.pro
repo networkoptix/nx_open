@@ -109,7 +109,8 @@ LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib
 }
 LIBS += ${global.libs}
 
-INCLUDEPATH +=  ${qt.dir}/include \
+INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
+                ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
                 ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \
@@ -118,7 +119,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${libdir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
-                ${qt.dir}/include/QtCore/$$QT_VERSION/ \
+                ${qt.dir}/include/QtCore/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
 
 DEPENDPATH *= $${INCLUDEPATH}

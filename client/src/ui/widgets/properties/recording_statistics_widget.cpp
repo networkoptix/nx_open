@@ -5,7 +5,7 @@
 #include <QtGui/QClipboard>
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
-#include <QShowEvent>
+#include <QtGui/QShowEvent>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
