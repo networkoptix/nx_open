@@ -652,6 +652,8 @@ TEST_F(CdbFunctionalTest, system_unbind)
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         }
+
+        restart();
     }
 }
 
