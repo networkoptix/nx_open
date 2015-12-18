@@ -3,6 +3,7 @@
 #include <business/actions/abstract_business_action.h>
 
 #include <camera/resource_display.h>
+#include <camera/cam_display.h>
 
 #include <client/client_message_processor.h>
 
@@ -185,9 +186,11 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
-    if (auto camDisplay = display()->display(item)) {
-        camDisplay->setCurrentTimeUSec(DATETIME_NOW);
-        camDisplay->start();
+    if (auto resourceDisplay = display()->display(item)) {
+        if (resourceDisplay->camDisplay())
+            resourceDisplay->camDisplay()->setSpeed(1.0);
+        resourceDisplay->setCurrentTimeUSec(DATETIME_NOW);
+        resourceDisplay->start();
     }
 
 }

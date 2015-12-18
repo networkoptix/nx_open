@@ -120,8 +120,8 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_filter()
     , m_camerasNames()
 
-    , m_sortingColumn(kInvalidSortingColumn)
-    , m_sortingOrder(Qt::AscendingOrder)
+    , m_sortingColumn(kStartTime)
+    , m_sortingOrder(Qt::DescendingOrder)
     , m_searchRequestId(QUuid::createUuid())
 {
 }
@@ -259,7 +259,18 @@ QString QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
 
     const auto cameraResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(id);
     if (!cameraResource)
-        return QString();
+        return tr("<Removed camera>");
+
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this
+        , [this](const QnResourcePtr &resource)
+    {
+        const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
+        if (!cameraResource)
+            return;
+
+        m_camerasNames.remove(cameraResource->getUniqueId());
+        disconnect(cameraResource.data(), nullptr, this, nullptr);
+    });
 
     connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this
         , [this, id, cameraResource](const QnResourcePtr & /* resource */)

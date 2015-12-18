@@ -60,7 +60,7 @@ QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    switch(action->actionType()) 
+    switch(action->actionType())
     {
         case QnBusiness::SendMailAction:
         {
@@ -99,7 +99,7 @@ bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr&
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    if (routeToServer) 
+    if (routeToServer)
     {
         // todo: it is better to use action.clone here
         ec2::ApiBusinessActionData actionData;
@@ -137,9 +137,12 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
     QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
 
-    switch (action->actionType()) {
+    switch (action->actionType())
+    {
+    case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
-        if (action->getParams().useSource) {
+        if (action->getParams().useSource)
+        {
             if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId))
                 resources << sourceCamera;
             resources << qnResPool->getResources<QnNetworkResource>(action->getRuntimeParams().metadata.cameraRefs);
@@ -148,14 +151,16 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     default:
         break;
     }
-    
-    if (resources.isEmpty()) {
+
+    if (resources.isEmpty())
+    {
         if (QnBusiness::requiresCameraResource(action->actionType()))
             return; //camera does not exist anymore
         else
             executeAction(action, QnResourcePtr());
     }
-    else {
+    else
+    {
         for(const QnResourcePtr& res: resources)
             executeAction(action, res);
     }
@@ -378,13 +383,13 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
 
     if (!QnBusiness::hasToggleState(bEvent->getEventType()))
         return true;
-    
+
     // for continue event put information to m_eventsInProgress
     QnUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnUuid();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
     if (bEvent->getToggleState() == QnBusiness::ActiveState)
         runtimeRule.resources[resId] = bEvent;
-    else 
+    else
         runtimeRule.resources.remove(resId);
 
     return true;
@@ -393,7 +398,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
 QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstractBusinessEventPtr& bEvent)
 {
     QnAbstractBusinessActionList result;
-    for(const QnBusinessEventRulePtr& rule: m_rules)    
+    for(const QnBusinessEventRulePtr& rule: m_rules)
     {
         if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;

@@ -893,6 +893,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewArchivePermission).
         text(tr("Bookmarks Search...")).
         shortcut(tr("Ctrl+B")).
         autoRepeat(false);
@@ -1661,7 +1662,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Bookmark Selection...")).
+        text(tr("Add a Bookmark...")).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnAddBookmarkActionCondition(this),

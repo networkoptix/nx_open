@@ -271,11 +271,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
@@ -293,6 +288,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">Alle Server sind offline. Protokolle sind nicht verfügbar.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2483,17 +2483,17 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2844,11 +2844,6 @@
     </message>
     <message>
         <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">Planen...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2860,27 +2855,32 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <location/>
-        <source>Main Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Add External Storage...</source>
         <translation type="unfinished">Externen Speicher hinzufügen...</translation>
     </message>
     <message>
         <location/>
-        <source>Backup Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Perform Backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -71,7 +71,7 @@ namespace {
 
     const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #gdm #customization
+    const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
     const float noAspectRatio = -1.0;
 
@@ -101,6 +101,10 @@ namespace {
         auto label = new GraphicsLabel();
         label->setAcceptedMouseButtons(0);
         label->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        QFont f = label->font();
+        f.setBold(true);
+        label->setFont(f);
         return label;
     }
 
@@ -168,8 +172,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20);
+    font.setStyleName(lit("Arial"));
+    font.setPixelSize(15);
     setFont(font);
+
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     createButtons();
@@ -779,7 +785,8 @@ void QnResourceWidget::updateHud(bool animate) {
 
     /*
         Logic must be the following:
-        * there are two options: 'mouse in the widget' and 'info button checked'
+        * if widget is in full screen mode and there is no activity - hide all following overlays
+        * otherwise, there are two options: 'mouse in the widget' and 'info button checked'
         * camera name should be visible if any option is active
         * position item should be visible if any option is active
         * control buttons should be visible if mouse cursor is in the widget
@@ -787,7 +794,12 @@ void QnResourceWidget::updateHud(bool animate) {
     */
 
     /* Motion mask widget should not have overlays at all */
-    bool overlaysCanBeVisible = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
+        && !options().testFlag(ActivityPresence));
+
+    bool overlaysCanBeVisible = (!isInactiveInFullScreen
+        && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
 
     bool detailsVisible = m_options.testFlag(DisplayInfo);
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
@@ -943,11 +955,16 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
-void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
+void QnResourceWidget::optionsChangedNotify(Options changedFlags)
+{
+    const bool updateHudWoAnimation =
+        (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
+        || (changedFlags.testFlag(InfoOverlaysForbidden));
+
+    if (updateHudWoAnimation)
         updateHud(false);
-    else if (changedFlags.testFlag(InfoOverlaysForbidden))
-        updateHud(false);
+    else if (changedFlags.testFlag(FullScreenMode) || changedFlags.testFlag(ActivityPresence))
+        updateHud(true);
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {

@@ -54,13 +54,13 @@ void QnCameraThumbnailCache::stop()
 
 QPixmap QnCameraThumbnailCache::getThumbnail(const QString &thumbnailId) const
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     return m_pixmaps.value(thumbnailId);
 }
 
 QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto it = m_thumbnailByResourceId.find(resourceId);
     if (it == m_thumbnailByResourceId.end())
@@ -79,7 +79,7 @@ void QnCameraThumbnailCache::refreshThumbnails(const QList<QnUuid> &resourceIds)
 {
     QSet<QnUuid> ids;
     {
-        QMutexLocker lock(&m_mutex);
+        QnMutexLocker lock(&m_mutex);
         ids = QSet<QnUuid>::fromList(m_thumbnailByResourceId.keys());
     }
 
@@ -96,13 +96,13 @@ void QnCameraThumbnailCache::at_resourcePool_resourceAdded(const QnResourcePtr &
     if (!resource->hasFlags(Qn::live_cam))
         return;
 
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_thumbnailByResourceId.insert(resource->getId(), ThumbnailData());
 }
 
 void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     auto it = m_thumbnailByResourceId.find(resource->getId());
     if (it == m_thumbnailByResourceId.end())
@@ -118,7 +118,7 @@ void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr
 
 void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
 
@@ -144,7 +144,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 
         QString thumbnailId;
         {
-            QMutexLocker lock(&m_mutex);
+            QnMutexLocker lock(&m_mutex);
 
             ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
 

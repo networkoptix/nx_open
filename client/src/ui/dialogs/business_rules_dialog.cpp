@@ -181,9 +181,12 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
         m_rulesViewModel->forceColumnMinWidth(column, QnBusinessRuleItemDelegate::optimalWidth(column, this->fontMetrics()));
     }
 
+    const int kSortColumn = QnBusiness::EventColumn;
+
     SortRulesProxyModel* sortModel = new SortRulesProxyModel(this);
     sortModel->setDynamicSortFilter(false);
     sortModel->setSourceModel(m_rulesViewModel);
+    sortModel->sort(kSortColumn);
     connect(ui->filterLineEdit, &QLineEdit::textChanged, sortModel, &SortRulesProxyModel::setText);
 
     ui->tableView->setModel(sortModel);
@@ -206,6 +209,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->tableView->selectionModel(), &QItemSelectionModel::currentRowChanged, this, &QnBusinessRulesDialog::at_tableView_currentRowChanged);
 
     ui->tableView->clearSelection();
+    ui->tableView->horizontalHeader()->setSortIndicator(kSortColumn, Qt::AscendingOrder);
 
     // TODO: #Elric replace with a single connect call
     QnSingleEventSignalizer *resizeSignalizer = new QnSingleEventSignalizer(this);
@@ -287,6 +291,15 @@ void QnBusinessRulesDialog::keyPressEvent(QKeyEvent *event) {
     }
     base_type::keyPressEvent(event);
 }
+
+
+void QnBusinessRulesDialog::showEvent( QShowEvent *event )
+{
+    base_type::showEvent(event);
+    if (SortRulesProxyModel* sortModel = dynamic_cast<SortRulesProxyModel*>(ui->tableView->model()))
+        sortModel->sort(ui->tableView->horizontalHeader()->sortIndicatorSection(), ui->tableView->horizontalHeader()->sortIndicatorOrder());
+}
+
 
 void QnBusinessRulesDialog::at_beforeModelChanged() {
     m_currentDetailsWidget->setModel(QnBusinessRuleViewModelPtr());
