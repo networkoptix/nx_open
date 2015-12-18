@@ -9,7 +9,7 @@
 #include "access_control/abstract_authentication_data_provider.h"
 
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/thread_safe_counter.h>
+#include <utils/common/counter.h>
 #include <plugins/videodecoder/stree/resourcecontainer.h>
 #include <utils/db/db_manager.h>
 
@@ -65,7 +65,7 @@ public:
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
         const stree::AbstractResourceReader& authSearchInputData,
-        stree::AbstractResourceWriter* const authProperties,
+        stree::ResourceContainer* const authProperties,
         std::function<void(bool)> completionHandler) override;
 
     void createTemporaryPassword(
@@ -76,7 +76,7 @@ public:
 private:
     const conf::Settings& m_settings;
     nx::db::DBManager* const m_dbManager;
-    ThreadSafeCounter m_startedAsyncCallsCounter;
+    QnCounter m_startedAsyncCallsCounter;
     //!map<account email, password data>
     std::multimap<std::string, TemporaryAccountPasswordEx> m_accountPassword;
     mutable QnMutex m_mutex;
@@ -94,7 +94,7 @@ private:
         QSqlDatabase* const connection,
         TemporaryAccountPasswordEx tempPasswordData);
     void tempPasswordAddedToDb(
-        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+        QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
         TemporaryAccountPasswordEx tempPasswordData,
         std::function<void(api::ResultCode)> completionHandler);
@@ -103,7 +103,7 @@ private:
         QSqlDatabase* const connection,
         QnUuid tempPasswordID);
     void tempPasswordDeleted(
-        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+        QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult resultCode,
         QnUuid tempPasswordID,
         std::function<void(api::ResultCode)> completionHandler);

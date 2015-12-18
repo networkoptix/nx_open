@@ -20,7 +20,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/thread_safe_counter.h>
+#include <utils/common/counter.h>
 
 #include "settings.h"
 
@@ -93,10 +93,10 @@ private:
     mutable QnMutex m_mutex;
     SocketAddress m_notificationModuleEndpoint;
     std::set<nx_http::AsyncHttpClientPtr> m_ongoingRequests;
-    ThreadSafeCounter m_startedAsyncCallsCounter;
+    QnCounter m_startedAsyncCallsCounter;
 
     void onSendNotificationRequestDone(
-        ThreadSafeCounter::ScopedIncrement asyncCallLocker,
+        QnCounter::ScopedIncrement asyncCallLocker,
         nx_http::AsyncHttpClientPtr client,
         std::function<void(bool)> completionHandler);
 };

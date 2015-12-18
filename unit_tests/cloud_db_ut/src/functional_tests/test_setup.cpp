@@ -447,6 +447,40 @@ api::ResultCode CdbFunctionalTest::getSystemSharings(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::getCdbNonce(
+    const std::string& systemID,
+    const std::string& authKey,
+    api::NonceData* const nonceData)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *nonceData) =
+        makeSyncCall<api::ResultCode, api::NonceData>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getCdbNonce,
+                connection->authProvider(),
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::ping(
+    const std::string& systemID,
+    const std::string& authKey)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    nx::cdb::api::ModuleInfo cloudModuleInfo;
+    std::tie(resCode, cloudModuleInfo) =
+        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::ModuleInfo>(
+            std::bind(
+                &nx::cdb::api::Connection::ping,
+                connection.get(),
+                std::placeholders::_1));
+    return resCode;
+}
+
 api::ResultCode CdbFunctionalTest::getSystemSharings(
     const std::string& email,
     const std::string& password,

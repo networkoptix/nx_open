@@ -63,29 +63,52 @@ AccountManager::~AccountManager()
 void AccountManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& /*authSearchInputData*/,
-    stree::AbstractResourceWriter* const authProperties,
+    const stree::AbstractResourceReader& authSearchInputData,
+    stree::ResourceContainer* const authProperties,
     std::function<void(bool)> completionHandler)
 {
-    bool result = false;
-    auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ completionHandler, &result](){
-            completionHandler(result);
-        });
-
-    QnMutexLocker lk(&m_mutex);
-
-    auto account = m_cache.find(toStdString(username));
-    if (!account)
-        return;
-    if (validateHa1Func(account->passwordHa1.c_str()))
     {
-        authProperties->put(
-            cdb::attr::authAccountEmail,
-            username);
-        result = true;
-        return;
+        QnMutexLocker lk(&m_mutex);
+
+        auto account = m_cache.find(toStdString(username));
+        if (account && validateHa1Func(account->passwordHa1.c_str()))
+        {
+            authProperties->put(
+                cdb::attr::authAccountEmail,
+                username);
+            completionHandler(true);
+            return;
+        }
     }
+
+    //NOTE currently, all authenticateByName are sync. 
+    //  Changing it to async requires some HTTP authentication refactoring
+
+    //authenticating by temporary password
+    m_tempPasswordManager->authenticateByName(
+        username,
+        std::move(validateHa1Func),
+        authSearchInputData,
+        authProperties,
+        [username, authProperties, /*std::move*/ completionHandler, this](bool authResult) mutable {
+            if (authResult)
+            {
+                bool authenticatedByEmailCode = false;
+                authProperties->get(
+                    attr::authenticatedByEmailCode,
+                    &authenticatedByEmailCode);
+                if (authenticatedByEmailCode)
+                {
+                    //activating account
+                    m_cache.atomicUpdate(
+                        std::string(username.constData(), username.size()),
+                        [](api::AccountData& account) {
+                            account.statusCode = api::AccountStatus::activated;
+                        });
+                }
+            }
+            completionHandler(authResult);
+        });
 }
 
 void AccountManager::addAccount(
@@ -165,17 +188,19 @@ void AccountManager::updateAccount(
         completionHandler(api::ResultCode::forbidden);
         return;
     }
+    bool authenticatedByEmailCode = false;
+    authzInfo.get(attr::authenticatedByEmailCode, &authenticatedByEmailCode);
 
     data::AccountUpdateDataWithEmail updateDataWithEmail(std::move(accountData));
     updateDataWithEmail.email = accountEmail;
 
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::AccountUpdateDataWithEmail>(
-        std::bind(&AccountManager::updateAccountInDB, this, _1, _2),
+        std::bind(&AccountManager::updateAccountInDB, this, authenticatedByEmailCode, _1, _2),
         std::move(updateDataWithEmail),
         std::bind(&AccountManager::accountUpdated, this,
                     m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
+                    authenticatedByEmailCode, _1, _2, std::move(completionHandler)));
 }
 
 void AccountManager::resetPassword(
@@ -215,6 +240,7 @@ void AccountManager::resetPassword(
         ::time(NULL) +
         m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
     tempPasswordData.maxUseCount = 1;
+    tempPasswordData.isEmailCode = true;
     tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
 
     //preparing confirmation code
@@ -411,7 +437,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 }
 
 void AccountManager::accountAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     db::DBResult resultCode,
     data::AccountData accountData,
@@ -438,7 +464,7 @@ void AccountManager::accountAdded(
 }
 
 void AccountManager::accountReactivated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::db::DBResult resultCode,
     std::string /*email*/,
@@ -508,7 +534,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::accountVerified(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
     const std::string accountEmail,
@@ -530,6 +556,7 @@ void AccountManager::accountVerified(
 }
 
 nx::db::DBResult AccountManager::updateAccountInDB(
+    bool activateAccountIfNotActive,
     QSqlDatabase* const connection,
     const data::AccountUpdateDataWithEmail& accountData)
 {
@@ -545,7 +572,9 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         accountUpdateFieldsSql << lit("full_name=:fullName");
     if (accountData.customization)
         accountUpdateFieldsSql << lit("customization=:customization");
-    updateAccountQuery.prepare( 
+    if (activateAccountIfNotActive)
+        accountUpdateFieldsSql << lit("status_code=:status_code");
+    updateAccountQuery.prepare(
         lit("UPDATE account SET %1 WHERE email=:email").
             arg(accountUpdateFieldsSql.join(lit(","))));
     //TODO #ak use fusion here (at the moment it is missing boost::optional support)
@@ -561,6 +590,13 @@ nx::db::DBResult AccountManager::updateAccountInDB(
         updateAccountQuery.bindValue(
             ":customization",
             QnSql::serialized_field(accountData.customization.get()));
+    if (activateAccountIfNotActive)
+        updateAccountQuery.bindValue(
+            ":status_code",
+            QnSql::serialized_field(2));
+    updateAccountQuery.bindValue(
+        ":email",
+        QnSql::serialized_field(accountData.email));
     if (!updateAccountQuery.exec())
     {
         NX_LOG(lit("Could not update account in DB. %1").
@@ -572,7 +608,8 @@ nx::db::DBResult AccountManager::updateAccountInDB(
 }
 
 void AccountManager::accountUpdated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    bool activateAccountIfNotActive,
     nx::db::DBResult resultCode,
     data::AccountUpdateDataWithEmail accountData,
     std::function<void(api::ResultCode)> completionHandler)
@@ -581,13 +618,15 @@ void AccountManager::accountUpdated(
     {
         m_cache.atomicUpdate(
             accountData.email,
-            [&accountData](api::AccountData& account) {
+            [&accountData, activateAccountIfNotActive](api::AccountData& account) {
                 if (accountData.passwordHa1)
                     account.passwordHa1 = accountData.passwordHa1.get();
                 if (accountData.fullName)
                     account.fullName = accountData.fullName.get();
                 if (accountData.customization)
                     account.customization = accountData.customization.get();
+                if (activateAccountIfNotActive)
+                    account.statusCode = api::AccountStatus::activated;
             });
     }
     
@@ -595,7 +634,7 @@ void AccountManager::accountUpdated(
 }
 
 void AccountManager::passwordResetCodeGenerated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     api::ResultCode resultCode,
     data::AccountEmail accountEmail,

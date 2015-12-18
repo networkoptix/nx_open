@@ -4,13 +4,13 @@ namespace nx {
 namespace utils {
 
 AsyncOperationGuard::AsyncOperationGuard()
-    : m_guard(new SharedGuard)
+    : m_sharedGuard(new SharedGuard)
 {
 }
 
 AsyncOperationGuard::~AsyncOperationGuard()
 {
-    m_guard->terminate();
+    m_sharedGuard->terminate();
 }
 
 AsyncOperationGuard::SharedGuard::SharedGuard()
@@ -19,13 +19,13 @@ AsyncOperationGuard::SharedGuard::SharedGuard()
 }
 
 AsyncOperationGuard::SharedGuard::Lock::Lock(SharedGuard* guard)
-    : m_guard(guard)
+    : m_sharedGuard(guard)
     , m_locked(guard->begin())
 {
 }
 
 AsyncOperationGuard::SharedGuard::Lock::Lock(Lock&& rhs)
-    : m_guard(rhs.m_guard)
+    : m_sharedGuard(rhs.m_sharedGuard)
     , m_locked(rhs.m_locked)
 {
     rhs.m_locked = false;
@@ -37,7 +37,7 @@ void AsyncOperationGuard::SharedGuard::Lock::unlock()
         return;
 
     m_locked = true;
-    m_guard->end();
+    m_sharedGuard->end();
 }
 
 AsyncOperationGuard::SharedGuard::Lock::operator bool() const
@@ -81,7 +81,12 @@ void AsyncOperationGuard::SharedGuard::end()
 const std::shared_ptr<AsyncOperationGuard::SharedGuard>&
     AsyncOperationGuard::sharedGuard()
 {
-    return m_guard;
+    return m_sharedGuard;
+}
+
+AsyncOperationGuard::SharedGuard* AsyncOperationGuard::operator->() const
+{
+    return m_sharedGuard.get();
 }
 
 } // namespace utils

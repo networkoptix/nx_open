@@ -32,7 +32,7 @@ namespace nx_http
             const HttpServerConnection& connection,
             const nx_http::Request& request,
             boost::optional<header::WWWAuthenticate>* const wwwAuthenticate,
-            stree::AbstractResourceWriter* authProperties,
+            stree::ResourceContainer* authProperties,
             std::unique_ptr<AbstractMsgBodySource>* const msgBody) = 0;
     };
 }

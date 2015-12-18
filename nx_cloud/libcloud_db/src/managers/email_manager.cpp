@@ -61,7 +61,7 @@ EMailManager::~EMailManager()
 }
 
 void EMailManager::onSendNotificationRequestDone(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx_http::AsyncHttpClientPtr client,
     std::function<void(bool)> completionHandler)
 {
