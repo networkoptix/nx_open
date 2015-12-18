@@ -33,6 +33,13 @@ angular.module('cloudApp')
             subscribe:true
         };
 
+        $scope.setRegisterForm = function(scope){
+            $scope.registerForm = scope;
+        };
+        $scope.hideAlreadyExists = function(){
+            $scope.registerForm.registerForm.email.$setValidity('alreadyExists',true);
+        };
+
         $scope.register = process.init(function() {
             return cloudApi.register(
                 $scope.account.email,
@@ -41,6 +48,9 @@ angular.module('cloudApp')
                 $scope.account.lastName,
                 $scope.account.subscribe);
         },{
-            alreadyExists: Config.errorCodes.emailAlreadyExists
+            alreadyExists: function(error){
+                $scope.registerForm.registerForm.email.$setValidity('alreadyExists',false);
+                return false;
+            }
         });
     });

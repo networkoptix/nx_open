@@ -1,11 +1,13 @@
 <div>
-    <div class="alert alert-success" ng-if="successMessage && process.success" ng-bind-html="successMessage">
-    </div>
+    <div class="alert alert-success" ng-if="successMessage && process.success"
+         ng-bind-html="successMessage"></div>
 
-    <div class="alert alert-danger" ng-if="process.error" ng-bind-html="errorMessage || errorPrefix + ' ' + process.errorMessage">
-    </div>
+    <div class="alert alert-danger" ng-if="process.error && process.errorMessage"
+         ng-bind-html="errorPrefix + ' ' + process.errorMessage"></div>
 
-    <div class="alert alert-info" ng-if="introMessage && !process.running && !process.success && !process.error" ng-bind-html="introMessage"></div>
+    <div class="alert alert-info" ng-if="introMessage && !process.running && !process.success && !process.error"
+         ng-bind-html="introMessage"></div>
 
-    <div class="alert alert-warning" ng-if="processMessage && process.running" ng-bind-html="processMessage"></div>
+    <div class="alert alert-warning" ng-if="processMessage && process.running"
+         ng-bind-html="processMessage"></div>
 </div>

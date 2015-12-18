@@ -7,7 +7,6 @@ angular.module('cloudApp')
             templateUrl: 'views/components/process-alert.html',
             scope:{
                 process:'=',
-                errorMessage:'=',
                 errorPrefix:'=',
                 successMessage:'=',
                 processMessage:'=',

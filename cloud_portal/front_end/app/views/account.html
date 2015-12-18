@@ -60,7 +60,7 @@
                        id="password" placeholder="Password" required>
             </div>
             <div class="col-sm-5">
-                <span class="help-block" ng-if="passwordForm.password.$error.required">Current password is required.</span>
+                <span class="help-block" ng-if="passwordForm.password.$dirty && passwordForm.password.$error.required">Current password is required.</span>
             </div>
         </div>
 
@@ -71,7 +71,7 @@
                        id="newPassword" placeholder="New Password" required="">
             </div>
             <div class="col-sm-5">
-                <span class="help-block" ng-if="passwordForm.newPassword.$error.required">New password is required.</span>
+                <span class="help-block" ng-if="passwordForm.newPassword.$dirty && passwordForm.newPassword.$error.required">New password is required.</span>
             </div>
         </div>
 
