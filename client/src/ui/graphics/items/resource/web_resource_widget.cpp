@@ -1,5 +1,6 @@
 #include "web_resource_widget.h"
 
+#include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QGraphicsWebView>
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
@@ -7,7 +8,18 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 {
 
     QGraphicsWebView *webView = new QGraphicsWebView(this);
-    webView->setUrl(QUrl(lit("http://bash.im")));
+    webView->setUrl(QUrl(lit("http://google.ru")));
+    webView->setRenderHints(0);
+    webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true); 
+    webView->settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true); 
+
+    connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
+        this, [](QNetworkReply* reply, const QList<QSslError> &){ reply->ignoreSslErrors();} );
+//     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
+//         this, &::at_authenticationRequired, Qt::DirectConnection );
+//     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
+//         this, &::at_proxyAuthenticationRequired, Qt::DirectConnection);
+
     addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
@@ -15,6 +27,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateTitleText();
     updateInfoText();
     updateDetailsText();
+    updateButtonsVisibility();
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()
