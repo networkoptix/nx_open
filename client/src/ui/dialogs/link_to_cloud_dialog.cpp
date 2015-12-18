@@ -9,6 +9,7 @@
 #include <core/resource/user_resource.h>
 #include <cdb/connection.h>
 #include <common/common_module.h>
+#include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
 #include <client/client_settings.h>
 
@@ -16,6 +17,8 @@ using namespace nx::cdb;
 
 namespace
 {
+    QString kCreateAccountPath = lit("/static/index.html#/register");
+
     rest::QnConnectionPtr getPublicServerConnection()
     {
         for (const QnMediaServerResourcePtr server: qnResPool->getAllServers())
@@ -73,8 +76,8 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
     connect(ui->buttonBox,          &QDialogButtonBox::accepted,        this,   &QnLinkToCloudDialog::accept);
     connect(ui->buttonBox,          &QDialogButtonBox::rejected,        this,   &QnLinkToCloudDialog::reject);
 
-    QString createAccountUrl = lit("http://www.networkoptix.com"); // TODO: #dklychkov take a proper URL from settings.
-    QString createAccountText = tr("Create account");
+    const QString createAccountUrl = QnAppInfo::cloudPortalUrl() + kCreateAccountPath;
+    const QString createAccountText = tr("Create account");
     ui->createAccountLabel->setText(lit("<a href=\"%2\">%1</a>").arg(createAccountText, createAccountUrl));
 }
 

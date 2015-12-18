@@ -6,8 +6,15 @@
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
 
+#include <utils/common/app_info.h>
+
 #include <ui/dialogs/link_to_cloud_dialog.h>
 #include <ui/dialogs/unlink_from_cloud_dialog.h>
+
+namespace
+{
+    const QString kAboutUrlPath = lit("/static/index.html#/about/cloud");
+}
 
 class QnCloudManagementWidgetPrivate : public QObject
 {
@@ -34,14 +41,10 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
 
     // TODO: #help Set help topic
 
-    // TODO: #dklychkov Use customization-specific values
-    QString cloudName = lit("Nx Cloud");
-    QString cloudUrl = lit("http://www.networkoptix.com");
-
     ui->learnMoreLabel->setText(
             lit("<a href=\"%2\">%1</a>")
-                .arg(tr("Learn more about %1").arg(cloudName))
-                .arg(cloudUrl)
+                .arg(tr("Learn more about %1").arg(QnAppInfo::cloudName()))
+                .arg(QnAppInfo::cloudPortalUrl() + kAboutUrlPath)
     );
 
     Q_D(QnCloudManagementWidget);
@@ -109,8 +112,13 @@ void QnCloudManagementWidgetPrivate::updateUi()
 
     if (linked)
     {
-        QString accountLink = lit("<a>%1</a>").arg(adminUser->getProperty(Qn::CLOUD_ACCOUNT_NAME));
-        q->ui->linkedAccountInfoLabel->setText(tr("This system is linked to the cloud account %1").arg(accountLink));
+        const QColor nxColor(lit("#2fa2db")); // TODO: #dklychkov make customizeable
+
+        QString accountLabel = lit("<span style=\"color:%2;\">%1</span>")
+                               .arg(adminUser->getProperty(Qn::CLOUD_ACCOUNT_NAME))
+                               .arg(nxColor.name());
+
+        q->ui->linkedAccountInfoLabel->setText(tr("This system is linked to the cloud account %1").arg(accountLabel));
         q->ui->stackedWidget->setCurrentWidget(q->ui->linkedPage);
     }
     else
