@@ -50,7 +50,7 @@ private:
 
     void resetQualities();
 
-    void resetCamerasToBackup();
+    void restoreCamerasToBackup();
 
     /** Load initial storages data from resource pool. */
     void loadStoragesFromResources();
@@ -59,12 +59,14 @@ private:
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
 
-    void setCamerasToBackup(const QnVirtualCameraResourceList &cameras
+    void applyCamerasToBackup(const QnVirtualCameraResourceList &cameras
         , Qn::CameraBackupQualities quality);
 
+    void updateCamerasForBackup(const QnVirtualCameraResourceList &cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply
-        , int selectedCamerasCount);
+        , int overallSelectedCameras
+        , int currentServerSelectedCameras);
     void updateSelectedCamerasCaption(int selectedCamerasCount);
 
     void updateColumnWidth();
@@ -118,6 +120,7 @@ private:
 
     Qn::CameraBackupQualities m_quality;
     QnVirtualCameraResourceList m_camerasToBackup;
+    QnVirtualCameraResourceList m_currentServerCamerasToBackup;
 
 private:
     void setupGrid(QTableView* tableView, bool isMainPool);

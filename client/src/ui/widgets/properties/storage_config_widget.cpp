@@ -19,7 +19,6 @@
 #include <core/resource_management/resource_changes_listener.h>
 
 #include <server/server_storage_manager.h>
-
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 #include <ui/common/ui_resource_name.h>
@@ -91,15 +90,14 @@ namespace
         return comboBox->findData(static_cast<int>(quality));
     }
 
-    QnVirtualCameraResourceList getCurrentSelectedCameras(
-        const QnResourcePtr &serverResource = QnResourcePtr())
+    QnVirtualCameraResourceList getCurrentSelectedCameras()
     {
         const auto isSelectedForBackup = [](const QnVirtualCameraResourcePtr &camera)
         {
             return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
         };
 
-        QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(serverResource, true);
+        QnVirtualCameraResourceList serverCameras = qnResPool->getAllCameras(QnResourcePtr(), true);
         QnVirtualCameraResourceList selectedCameras = serverCameras.filtered(isSelectedForBackup);
         return selectedCameras;
     }
@@ -128,6 +126,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , m_updating(false)
     , m_quality(qnGlobalSettings->backupQualities())
     , m_camerasToBackup()
+    , m_currentServerCamerasToBackup()
 {
     ui->setupUi(this);
 
@@ -162,9 +161,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
         if (dialog->exec() != QDialog::Accepted)
             return;
 
-        m_camerasToBackup = dialog->selectedResources().filtered<QnVirtualCameraResource>();
-        updateBackupInfo();
-        emit hasChangesChanged();
+        updateCamerasForBackup(dialog->selectedResources().filtered<QnVirtualCameraResource>());
     };
     connect(ui->backupResourcesButton, &QPushButton::clicked, this, chooseCamerasToBackup);
 
@@ -220,11 +217,9 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 QnStorageConfigWidget::~QnStorageConfigWidget()
 {}
 
-void QnStorageConfigWidget::resetCamerasToBackup()
+void QnStorageConfigWidget::restoreCamerasToBackup()
 {
-    m_camerasToBackup = getCurrentSelectedCameras();
-
-    updateBackupInfo();
+    updateCamerasForBackup(getCurrentSelectedCameras());
 }
 
 void QnStorageConfigWidget::resetQualities()
@@ -266,8 +261,7 @@ void QnStorageConfigWidget::initQualitiesCombo()
 
     resetQualities();
 
-    connect(ui->qualityComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this
-        , [this](int index)
+    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this, [this](int index)
     {
         m_quality = extractQuality(ui->qualityComboBox);
         emit hasChangesChanged();
@@ -289,7 +283,7 @@ void QnStorageConfigWidget::hideEvent( QHideEvent *event ) {
     base_type::hideEvent(event);
 
     resetQualities();
-    resetCamerasToBackup();
+    restoreCamerasToBackup();
 
     m_updateStatusTimer->stop();
 }
@@ -305,7 +299,7 @@ bool QnStorageConfigWidget::hasChanges() const {
         return true;
 
     // Check if cameras on !all! servers are different with selected
-    if (getCurrentSelectedCameras(QnResourcePtr()).toSet() != m_camerasToBackup.toSet())
+    if (getCurrentSelectedCameras().toSet() != m_camerasToBackup.toSet())
         return true;
 
     return (m_server->getBackupSchedule() != m_backupSchedule);
@@ -462,7 +456,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
         disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
 
     m_server = server;
-    resetCamerasToBackup();
+    restoreCamerasToBackup();
 
     if (m_server)
         connect(m_server, &QnMediaServerResource::backupScheduleChanged, this, [this]() {
@@ -481,7 +475,7 @@ void QnStorageConfigWidget::updateRebuildInfo() {
 
 void QnStorageConfigWidget::updateBackupInfo() {
     updateBackupUi(qnServerStorageManager->backupStatus(m_server)
-        , m_camerasToBackup.size());
+        , m_camerasToBackup.size(), m_currentServerCamerasToBackup.size());
 }
 
 void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const {
@@ -540,7 +534,7 @@ void QnStorageConfigWidget::applyChanges()
     QnStorageResourceList storagesToUpdate;
     ec2::ApiIdDataList storagesToRemove;
 
-    setCamerasToBackup(m_camerasToBackup, m_quality);
+    applyCamerasToBackup(m_camerasToBackup, m_quality);
     applyStoragesChanges(storagesToUpdate, m_model->storages());
 
     QSet<QnUuid> newIdList;
@@ -640,8 +634,8 @@ void QnStorageConfigWidget::at_openBackupSchedule_clicked() {
 
 bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
     , int selectedCamerasCount
-    , QString *info) {
-
+    , QString *info)
+{
     using boost::algorithm::any_of;
 
     auto error = [info](const QString &error) -> bool
@@ -730,7 +724,8 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
-    , int selectedCamerasCount)
+    , int overallSelectedCameras
+    , int currentServerSelectedCameras)
 {
     QString status;
 
@@ -742,7 +737,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
 
     QString backupInfo;
     bool canStartBackup = this->canStartBackup(
-        reply, selectedCamerasCount, &backupInfo);
+        reply, currentServerSelectedCameras, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
 
     bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
@@ -761,7 +756,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
     ui->stackedWidgetBackupInfo->setCurrentWidget(backupInProgress ? ui->backupProgressPage : ui->backupPreparePage);
     ui->comboBoxBackupType->setEnabled(!backupInProgress);
 
-    updateSelectedCamerasCaption(selectedCamerasCount);
+    updateSelectedCamerasCaption(overallSelectedCameras);
 }
 
 void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCount)
@@ -799,7 +794,25 @@ void QnStorageConfigWidget::updateSelectedCamerasCaption(int selectedCamerasCoun
     ui->backupResourcesButton->setText(caption);
 }
 
-void QnStorageConfigWidget::setCamerasToBackup(const QnVirtualCameraResourceList &cameras
+void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResourceList &cameras)
+{
+    if (m_camerasToBackup.toSet() == cameras.toSet())
+        return;
+
+    m_camerasToBackup = cameras;
+
+    const auto isCurrentServerFilter = [this](const QnVirtualCameraResourcePtr &resource)
+    {
+        return (resource->getParentServer() == m_server);
+    };
+
+    m_currentServerCamerasToBackup = m_camerasToBackup.filtered(isCurrentServerFilter);
+
+    updateBackupInfo();
+    emit hasChangesChanged();
+}
+
+void QnStorageConfigWidget::applyCamerasToBackup(const QnVirtualCameraResourceList &cameras
     , Qn::CameraBackupQualities quality)
 {
     qnGlobalSettings->setBackupQualities(quality);
@@ -878,7 +891,7 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
     if (server != m_server)
         return;
 
-    updateBackupUi(status, m_camerasToBackup.size());
+    updateBackupUi(status, m_camerasToBackup.size(), m_currentServerCamerasToBackup.size());
     updateRebuildInfo();
 }
 
