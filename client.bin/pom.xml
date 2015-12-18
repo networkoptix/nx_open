@@ -29,9 +29,10 @@
         <qt.libs>core gui network opengl xml sql multimedia concurrent webenginecore webenginewidgets</qt.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!-- ATTENTION!!! -lestbase should be the LATEST in the list!!! Required for Linux -->
-        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <!-- Disabled msvs 2015 libs> -lFestival -lestools -leststring -lestbase -lDxErr</!-->
+        <global.libs>-lcommon -lappserver2 -lclient.core -lclient -lquazip</global.libs>
         <!--Specific os libs used-->
-        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>
         <linux.oslibs>-lmp3lame -lssl -lcrypto -lz -lopenal -lX11 -lXfixes -lGL -lGLU -ltermcap -lsigar -lfaac -lXss</linux.oslibs>

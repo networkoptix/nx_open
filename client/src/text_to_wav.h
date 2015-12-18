@@ -1,5 +1,6 @@
-#ifndef TEXT_TO_WAV_H
-#define TEXT_TO_WAV_H
+#pragma once
+
+#ifdef ENABLE_TEXT_TO_SPEECH
 
 #include <QtCore/QIODevice>
 #include <utils/thread/mutex.h>
@@ -20,7 +21,7 @@
 */
 class TextToWaveServer
 :
-    public QnLongRunnable, 
+    public QnLongRunnable,
     public Singleton<TextToWaveServer>
 {
     Q_OBJECT
@@ -79,4 +80,4 @@ private:
     QSharedPointer<SynthetiseSpeechTask> addTaskToQueue( const QString& text, QIODevice* const dest );
 };
 
-#endif  //TEXT_TO_WAV_H
+#endif //ENABLE_TEXT_TO_SPEECH
