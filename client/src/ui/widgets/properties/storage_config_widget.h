@@ -38,7 +38,7 @@ public:
     virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
-    virtual void retranslateUi() override;
+
 protected:
 
     virtual void setReadOnlyInternal(bool readOnly) override;
@@ -46,6 +46,12 @@ protected:
     virtual void hideEvent(QHideEvent *event) override;
 
 private:
+    void initQualitiesCombo();
+
+    void resetQualities();
+
+    void resetCamerasToBackup();
+
     /** Load initial storages data from resource pool. */
     void loadStoragesFromResources();
 
@@ -53,11 +59,13 @@ private:
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
 
+    void setCamerasToBackup(const QnVirtualCameraResourceList &cameras
+        , Qn::CameraBackupQualities quality);
+
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply
         , int selectedCamerasCount);
-    void updateCamerasLabel(int selectedCamerasCount);
-    int getSelectedCamerasCount() const;
+    void updateSelectedCamerasCaption(int selectedCamerasCount);
 
     void updateColumnWidth();
     int getColWidth(int col);
@@ -107,6 +115,10 @@ private:
 
     bool m_backupCancelled;
     bool m_updating;
+
+    Qn::CameraBackupQualities m_quality;
+    QnVirtualCameraResourceList m_camerasToBackup;
+
 private:
     void setupGrid(QTableView* tableView, bool isMainPool);
     void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;
