@@ -716,8 +716,6 @@ bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
 
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 {
-    cancelRebuildCatalogAsync();
-
     int storageIndex = -1;
     {
         QnMutexLocker lock( &m_mutexStorages );
