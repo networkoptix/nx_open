@@ -12,30 +12,45 @@
     <form name="registerForm" class="form-horizontal" ng-if="!register.success">
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
-            <div class="col-sm-9">
+            <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName"
                        name="firstName" placeholder="First name">
+            </div>
+            <div class="col-sm-5">
+
             </div>
         </div>
         <div class="form-group">
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
-            <div class="col-sm-9">
+            <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.lastName" id="lastName"
                        name="lastName" placeholder="Last name">
+            </div>
+            <div class="col-sm-5">
+
             </div>
         </div>
         <div class="form-group" validate-field>
             <label for="email"  class="col-sm-3 control-label">Email address</label>
-            <div class="col-sm-9">
+            <div class="col-sm-4">
                 <input type="email" class="form-control" ng-model="account.email" id="email"
                        name="email" placeholder="Email" required>
+            </div>
+            <div class="col-sm-5">
+                <span class="help-block" ng-if="registerForm.email.$error.required">Email is required.</span>
+
+                <span class="help-block" ng-if="registerForm.email.$error.email">Not a valid email</span>
+
             </div>
         </div>
         <div class="form-group" validate-field>
             <label for="password"  class="col-sm-3 control-label">Password</label>
-            <div class="col-sm-9">
+            <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="account.password" id="password"
                        name="password" placeholder="Password" required>
+            </div>
+            <div class="col-sm-5">
+                <span class="help-block" ng-if="registerForm.password.$error.required">Password is required.</span>
             </div>
         </div>
         <div class="form-group" >
