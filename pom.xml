@@ -149,13 +149,13 @@
         <qtlib9>Gui</qtlib9>
         <qtlib10>X11Extras</qtlib10>
         <qtlib11>PrintSupport</qtlib11>
-        <qtlib12></qtlib12>
-        <qtlib13></qtlib13>
-        <qtlib14>MultimediaWidgets</qtlib14>
-        <qtlib15>Quick</qtlib15>
+        <qtlib12>WebChannel</qtlib12>
+        <qtlib13>WebEngineCore</qtlib13>
+        <qtlib14>WebEngine</qtlib14>
+        <qtlib15>WebEngineWidgets</qtlib15>
         <qtlib16>Qml</qtlib16>
-        <qtlib17>Positioning</qtlib17>
-        <qtlib18>Sensors</qtlib18>
+        <qtlib17>Quick</qtlib17>
+        <qtlib18>MultimediaWidgets</qtlib18>
         <!--qtlib19 is for desktop only-->
         <qtlib19></qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
