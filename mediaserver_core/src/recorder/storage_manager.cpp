@@ -456,7 +456,13 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
     if (sdb)
         sdb->flushRecords();
     // merge chunks
-    fileCatalog->addChunks(newChunks);
+    {
+        QnMutexLocker lk(&m_mutexStorages);
+        bool stillHaveThisStorage = hasStorageInternal(storage);
+        if (!stillHaveThisStorage)
+            return;
+        fileCatalog->addChunks(newChunks);
+    }
 }
 
 void QnStorageManager::initDone()
@@ -618,8 +624,12 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
-            if (!m_rebuildCancelled)
-                replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+            {
+                QnMutexLocker lk(&m_mutexStorages);
+                bool stillHaveThisStorage = hasStorageInternal(storage);
+                if (!m_rebuildCancelled && stillHaveThisStorage)
+                    replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
+            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
@@ -688,9 +698,8 @@ void QnStorageManager::onDelResource(const QnResourcePtr &resource)
     }
 }
 
-bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
+bool QnStorageManager::hasStorageInternal(const QnStorageResourcePtr &storage) const
 {
-    QnMutexLocker lock( &m_mutexStorages );
     for (auto itr = m_storageRoots.begin(); itr != m_storageRoots.end(); ++itr)
     {
         if (itr.value()->getId() == storage->getId())
@@ -699,8 +708,16 @@ bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
     return false;
 }
 
+bool QnStorageManager::hasStorage(const QnStorageResourcePtr &storage) const
+{
+    QnMutexLocker lock(&m_mutexStorages);
+    return hasStorageInternal(storage);
+}
+
 void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
 {
+    cancelRebuildCatalogAsync();
+
     int storageIndex = -1;
     {
         QnMutexLocker lock( &m_mutexStorages );
