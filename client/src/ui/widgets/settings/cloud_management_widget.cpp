@@ -54,7 +54,21 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent)
     connect(ui->goToCloudButton,    &QPushButton::clicked,  d,  &QnCloudManagementWidgetPrivate::at_goToCloudButton_clicked);
 
     if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+    {
         connect(admin, &QnResource::resourceChanged, d, &QnCloudManagementWidgetPrivate::updateUi);
+        connect(admin, &QnResource::propertyChanged, d, [this](const QnResourcePtr &resource, const QString &key)
+        {
+            Q_UNUSED(resource)
+
+            if (key == Qn::CLOUD_ACCOUNT_NAME ||
+                key == Qn::CLOUD_SYSTEM_ID ||
+                key == Qn::CLOUD_SYSTEM_AUTH_KEY)
+            {
+                Q_D(QnCloudManagementWidget);
+                d->updateUi();
+            }
+        });
+    }
 }
 
 QnCloudManagementWidget::~QnCloudManagementWidget()
