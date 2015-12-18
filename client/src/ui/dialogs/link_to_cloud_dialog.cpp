@@ -176,6 +176,7 @@ void QnLinkToCloudDialogPrivate::bindSystem()
 void QnLinkToCloudDialogPrivate::openSuccessPage()
 {
     Q_Q(QnLinkToCloudDialog);
+    q->ui->successLabel->setText(tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()));
     q->ui->stackedWidget->setCurrentWidget(q->ui->successPage);
     updateButtonBox();
 }
