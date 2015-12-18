@@ -360,7 +360,7 @@ void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInt
 
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 {
-    return aliveUpdateInterval() * 3;   //3 is here to keep same values as before by default
+    return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
