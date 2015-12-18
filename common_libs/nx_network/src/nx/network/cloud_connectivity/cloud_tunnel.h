@@ -14,6 +14,7 @@
 #include <utils/common/stoppable.h>
 
 #include "cc_common.h"
+#include "address_resolver.h"
 #include "../abstract_socket.h"
 
 #include <QMutex>
@@ -21,57 +22,39 @@
 namespace nx {
 namespace cc {
 
-class AbstractTunnelConnector
-{
-public:
-    virtual ~AbstractTunnelConnector() {}
+typedef std::function<void(SystemError::ErrorCode,
+                           std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
 
-    /*!
-        \param handler void( ErrorDescription, std::unique_ptr<AbstractStreamSocket> )
-    */
-    template<class Handler> bool connectAsync( Handler /*handler*/ ) { return false; }
-    virtual HostAddress remoteHost() const = 0;
-
-private:
-    AbstractTunnelConnector( const AbstractTunnelConnector& );
-    AbstractTunnelConnector& operator=( const AbstractTunnelConnector& );
-};
-
-//!Implements client-side logic of setting up tunnel via mediator (with help of hole punching, probably)
-class CloudTunnelConnector
-:
-    public AbstractTunnelConnector
-{
-};
-
-//!Implements server-side logic of setting up tunnel via mediator (with help of hole punching, probably)
-class CloudTunnelAcceptor
-:
-    public AbstractTunnelConnector
-{
-};
-
-//!Implements established tunnel logic
-class CloudTunnelProcessor
-{
-public:
-    /*!
-        \param handler of type (ErrorDescription result, std::unique_ptr<AbstractStreamSocket> socket)
-    */
-    template<class Handler>
-    bool createConnection( Handler&& /*handler*/ )
-    {
-        //TODO #ak
-        return false;
-    }
-};
-
-//TODO #ak there can be tunnels of different types:
+//TODO #ak there can be AbstractCloudTunnelImpl of different types:
 //    - direct or backward tcp connection (no hole punching used)
 //    - udt tunnel (no matter hole punching is used or not)
 //    - tcp with hole punching
 //Last type of tunnel does not allow us to have multiple connections per tunnel (really?)
 
+/** Implements one of cloud connection logics, multiplie certain implementations
+ *  will be used by \class CloudTonel to use several connection methods simultiously */
+class AbstractCloudTunnelImpl
+:
+    public QnStoppableAsync
+{
+public:
+    /** Initiates connection using \a address
+     *  \a handler with noError indicates that tunnel is successfuly opened
+     *  \a handler with error indicates that tunnel was not opend or got closed */
+    virtual void open(const SocketAddress& address,
+                      std::function<void(SystemError::ErrorCode)> handler) = 0;
+
+    /** Creates new connection to peer or returns current in case if real
+     *  tunneling is notsupported by used method */
+    virtual void connect(SocketHandler handler) = 0;
+
+    /** Accepts new connection from peer (like socket)
+     *  \note not all of the AbstractCloudTunnelImpl can really accept connections */
+    virtual void accept(SocketHandler handler) = 0;
+
+    /** Indicates if this tonnel is opened */
+    virtual bool isOpen() = 0;
+};
 
 //!Tunnel between two peers. Tunnel can be established by backward TCP connection or by hole punching UDT connection
 /*!
@@ -94,29 +77,22 @@ class CloudTunnel
     public QnStoppableAsync
 {
 public:
-    //!Initializer
-    /*!
-        \note MUST call \a CloudTunnel::start after creating this object
-    */
-    CloudTunnel( std::unique_ptr<AbstractTunnelConnector> connector )
-    :
-        m_connector( std::move(connector) )
+    //! Implementation of QnStoppableAsync::pleaseStop
+    virtual void pleaseStop(std::function<void()> handler) override
     {
+        // TODO: call pleaseStop on all internal AbstractCloudTunnelImpls
     }
 
-    //!Implementation of QnStoppableAsync::pleaseStop
-    virtual void pleaseStop( std::function<void()> completionHandler ) override;
-
-    /*!
-        MUST call this method after creating object. This method is required because we do not use exceptions
-    */
-    bool start()
+    /** Saves \a address and initiates and creates certain new CloudTunnelImpl
+     *  if this tunnel has not any connected CloudTunnelImpls
+     *  \note address can also be used later to create another CloudTunnelImpl
+     *        in case if current gets broken */
+    void addAddress(const AddressEntry& address)
     {
-        return m_connector->connectAsync(
-            [this]( ErrorDescription result, std::unique_ptr<AbstractStreamSocket> socket ) {
-                tunnelEstablished( result, std::move(socket) );
-            } );
+        // TODO: create certain AbstractCloudTunnelImpl and open is if there are
+        //       on other already connected tunnels
     }
+
     //!Establish new connection
     /*!
         \param timeoutMillis
@@ -124,56 +100,31 @@ public:
         \note This method is re-enterable. So, it can be called in different threads simultaneously
         \note Request interleaving is allowed
     */
-    template<class Handler>
-    bool connect( unsigned int /*timeoutMillis*/, Handler&& completionHandler )
+    void connect(unsigned int timeoutMillis, SocketHandler handler)
     {
-        m_connectCompletionHandler = std::forward<Handler>( completionHandler );
-        //TODO
-        return false;
+        // TODO: if there some opened AbstractCloudTunnelImpl delegate connect
+        //       to it, otherwise try to open all underlaing AbstractCloudTunnelImpls
+        //       and delegate connect to the first successfuly opend
     }
+
     //!Accept new incoming connection
     /*!
         \param handler. void(const ErrorDescription&, std::unique_ptr<AbstractStreamSocket>)
         //TODO #ak who listenes tunnel?
     */
-    template<class Handler>
-    bool acceptAsync( Handler&& completionHandler )
+    void accept(SocketHandler handler)
     {
-        m_acceptCompletionHandler = std::forward<Handler>( completionHandler );
-        //TODO
-        return false;
+        // TODO: accepts connections from all AbstractCloudTunnelImpls
     }
-    //!Set handler to be called on detecting underlying connection closure
-    /*!
-        \param handler. void(const std::unique_ptr<CloudTunnel>&)
-    */
-    template<class Handler>
-    void setConnectionClosedHandler( Handler&& handler )
-    {
-        //TODO need multiple handlers?
-        m_connectionClosedHandler = std::forward<Handler>( handler );
-        //TODO
-    }
-
-    HostAddress remotePeerAddress() const;
 
 private:
-    class ConnectionRequest
-    {
-    public:
-        std::function<void(ErrorDescription, std::unique_ptr<AbstractStreamSocket>)> completionHandler;
-    };
+    std::map<AddressEntry, std::unique_ptr<AbstractCloudTunnelImpl>> m_impls;
+};
 
-    std::unique_ptr<AbstractTunnelConnector> m_connector;
-    std::unique_ptr<AbstractStreamSocket> m_tunnelSocket;
-    std::function<void(ErrorDescription, std::unique_ptr<AbstractStreamSocket>)> m_connectCompletionHandler;
-    std::function<void(const ErrorDescription&, std::unique_ptr<AbstractStreamSocket>)> m_acceptCompletionHandler;
-    std::function<void(const std::unique_ptr<CloudTunnel>&)> m_connectionClosedHandler;
-    std::list<ConnectionRequest> m_pendingConnectionRequests;
-    std::unique_ptr<CloudTunnelProcessor> m_tunnelProcessor;
-
-    void tunnelEstablished( ErrorDescription result, std::unique_ptr<AbstractStreamSocket> socket );
-    void processPendingConnectionRequests();
+/** Listens for stun indications and creates new CloudTunnels in CloudTunnelPool.
+ *  this class is supposed to be instantiated in CloudServerSocket */
+class CloudTunnelAcceptor
+{
 };
 
 //!Stores cloud tunnels
@@ -185,13 +136,17 @@ public:
     //!Get tunnel to \a targetHost
     /*!
         Always returns not null tunnel.
-        If tunnel does not exist, allocates new tunnel object, initiates cloud connection and returns tunnel object
+        If tunnel does not exist, allocates new tunnel object and returns tunnel object
     */
-    std::shared_ptr<CloudTunnel> getTunnelToHost( const SocketAddress& targetEndpoint );
+    std::shared_ptr<CloudTunnel> getTunnel(const String& peerId);
+
+    //! Monitors for all tunnels added
+    void monitorTunnels(std::function<void(std::shared_ptr<CloudTunnel>)> handler);
 
 private:
     QMutex m_mutex;
-    std::map< SocketAddress, std::shared_ptr<CloudTunnel> > m_Pool;
+    std::function<void(std::shared_ptr<CloudTunnel>)> m_monitor;
+    std::map<String, std::shared_ptr<CloudTunnel>> m_pool;
 };
 
 } // namespace cc

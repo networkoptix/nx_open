@@ -1,5 +1,5 @@
-#ifndef NX_CC_HYBRID_STREAM_SOCKET_H
-#define NX_CC_HYBRID_STREAM_SOCKET_H
+#ifndef NX_CC_CLOUD_STREAM_SOCKET_H
+#define NX_CC_CLOUD_STREAM_SOCKET_H
 
 #include <memory>
 
@@ -45,13 +45,9 @@ private:
     bool startAsyncConnect(
         std::vector<AddressEntry>&& dnsEntries,
         int port );
-    void cloudConnectDone(
-        std::shared_ptr<CloudTunnel> tunnel,
-        ErrorDescription errorCode,
-        std::unique_ptr<AbstractStreamSocket> cloudConnection );
 };
 
 } // namespace cc
 } // namespace nx
 
-#endif  //NX_CC_HYBRID_STREAM_SOCKET_H
+#endif  //NX_CC_CLOUD_STREAM_SOCKET_H

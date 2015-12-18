@@ -3,64 +3,38 @@
 namespace nx {
 namespace cc {
 
-void CloudTunnel::tunnelEstablished(
-    ErrorDescription /*result*/,
-    std::unique_ptr<AbstractStreamSocket> socket )
+std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnel(const String& peerId)
 {
-    //TODO
-    m_tunnelSocket = std::move(socket);
-
-    //TODO listening tunnel socket
-    //TODO if someone waiting for cloud connection,
-        //if type of tunnel allows us to have multiple connections than creating new connection (if we can)...
-        //if type of tunnel does not allow us to have more than one connection, than giving socket to someone and initiating new connection with same(?) acceptor
-
-    processPendingConnectionRequests();
-}
-
-void CloudTunnel::processPendingConnectionRequests()
-{
-    if( m_pendingConnectionRequests.empty() )
-        return;
-
-    auto connectionDoneHandler = [this](
-        ErrorDescription result,
-        std::unique_ptr<AbstractStreamSocket> socket )
+    std::shared_ptr<CloudTunnel> tunnel;
+    std::function<void(std::shared_ptr<CloudTunnel>)> monitor;
     {
-        assert( !m_pendingConnectionRequests.empty() );
-        auto handler = std::move(m_pendingConnectionRequests.front().completionHandler);
-        handler( result, std::move(socket) );
-        //if someone is waiting for another connection,
-        processPendingConnectionRequests();
-    };
+        QMutexLocker lock(&m_mutex);
+        auto it = m_pool.find(peerId);
+        if(it == m_pool.end())
+            it = m_pool.emplace(peerId, std::make_shared<CloudTunnel>()).first;
 
-    if( !m_tunnelProcessor->createConnection( connectionDoneHandler ) )
-    {
-        const SystemError::ErrorCode sysErrorCode = SystemError::getLastOSErrorCode();
-        //reporting to every who is waiting for connection that there will be no connection
-        for( ConnectionRequest& connectionRequest: m_pendingConnectionRequests )
-        {
-            auto handler = std::move(connectionRequest.completionHandler);
-            handler(
-                ErrorDescription( ResultCode::ioError, sysErrorCode ),
-                std::unique_ptr<AbstractStreamSocket>() );
-        }
-        return;
+        tunnel = it->second;
+        monitor = m_monitor;
     }
+
+    if (monitor)
+        monitor(tunnel);
+
+    return tunnel;
 }
 
-std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnelToHost(
-    const SocketAddress& targetEndpoint )
+void CloudTunnelPool::monitorTunnels(
+        std::function<void(std::shared_ptr<CloudTunnel>)> handler)
 {
-    QMutexLocker lock( &m_mutex );
-    auto it = m_Pool.find( targetEndpoint );
-    if( it != m_Pool.end() )
-        return it->second;
+    std::map<String, std::shared_ptr<CloudTunnel>> currentTunnels;
+    {
+        QMutexLocker lock(&m_mutex);
+        m_monitor = handler;
+        currentTunnels = m_pool;
+    }
 
-    //TODO #ak creating tunnel
-
-    it = m_Pool.emplace( targetEndpoint, std::shared_ptr<CloudTunnel>() ).first;
-    return it->second;
+    for (const auto& tunnel : currentTunnels)
+        handler(tunnel.second);
 }
 
 } // namespace cc

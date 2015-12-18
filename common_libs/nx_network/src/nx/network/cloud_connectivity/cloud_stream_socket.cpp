@@ -1,4 +1,4 @@
-#include "hybrid_stream_socket.h"
+#include "cloud_stream_socket.h"
 
 #include <future>
 
@@ -89,68 +89,54 @@ bool CloudStreamSocket::startAsyncConnect(
         return false;
     }
 
-    //TODO #ak try every resolved address? Also, should prefer regular address to a cloud one
-    AddressEntry& dnsEntry = dnsEntries[0];
-    switch( dnsEntry.type )
+    std::shared_ptr<CloudTunnel> cloudTunnel;
+    for (const auto dnsEntry : dnsEntries)
     {
-        case AddressType::regular:
-            //using tcp connection
+        if (dnsEntry.type == AddressType::regular)
+        {
+            /*
+            const auto enforcedPort = dnsEntry.attributes.find(
+                        AddressAttributeType::nxApiPort);
+            if (enforcedPort != dnsEntry.attributes.end())
+                port = enforcedPort->second.value;
+            */
+
             m_socketDelegate.reset( new TCPSocket(true) );
             applyCachedAttributes();
             m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
                 m_connectHandler );
+
             return true;
-
-        case AddressType::cloud:
-        case AddressType::unknown:  //if peer is unknown, trying to establish cloud connect
+        }
+        else
         {
-            unsigned int sockSendTimeout = 0;
-            if( !getSendTimeout( &sockSendTimeout ) )
-                return false;
+            //if (!cloudTunnel)
+                //cloudTunnel = CloudTonelPool::getTunnel(address.host);
 
-            //establishing cloud connect
-            auto tunnel = CloudTunnelPool::instance()->getTunnelToHost(
-                SocketAddress( std::move( dnsEntry.host ), port ) );
-            return tunnel->connect(
-                sockSendTimeout,
-                [this, tunnel](
-                    ErrorDescription errorCode,
-                    std::unique_ptr<AbstractStreamSocket> cloudConnection )
-                {
-                    cloudConnectDone(
-                        std::move( tunnel ),
-                        errorCode,
-                        std::move( cloudConnection ) );
-                } );
+            cloudTunnel->addAddress(dnsEntry);
+        }
+    }
+
+    unsigned int sockSendTimeout = 0;
+    if( !getSendTimeout( &sockSendTimeout ) )
+        return false;
+
+    cloudTunnel->connect(sockSendTimeout, [this](
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractStreamSocket> cloudConnection)
+    {
+        if( errorCode == SystemError::noError )
+        {
+            applyCachedAttributes();
         }
 
-        default:
-            assert( false );
-            SystemError::setLastErrorCode( SystemError::hostUnreach );
-            return false;
-    }
-}
+        auto userHandler = std::move(m_connectHandler);
+        //this object can be freed in handler, so using local variable for handler
+        userHandler( errorCode);
+    });
 
-void CloudStreamSocket::cloudConnectDone(
-    std::shared_ptr<CloudTunnel> /*tunnel*/,
-    ErrorDescription errorCode,
-    std::unique_ptr<AbstractStreamSocket> cloudConnection )
-{
-    if( errorCode.resultCode == ResultCode::ok )
-    {
-        assert( errorCode.sysErrorCode == SystemError::noError );
-        m_socketDelegate = std::move(cloudConnection);
-        applyCachedAttributes();
-    }
-    else
-    {
-        assert( !cloudConnection );
-        if( errorCode.sysErrorCode == SystemError::noError )    //e.g., cloud connect is forbidden for target host
-            errorCode.sysErrorCode = SystemError::hostUnreach;
-    }
-    auto userHandler = std::move(m_connectHandler);
-    userHandler( errorCode.sysErrorCode );  //this object can be freed in handler, so using local variable for handler
+    return true;
 }
 
 } // namespace cc
