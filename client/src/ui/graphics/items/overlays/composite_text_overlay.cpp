@@ -26,7 +26,7 @@ namespace
     enum
     {
         kCaptionMaxLength = 64
-        , kDescriptionMaxLength = 96
+        , kDescriptionMaxLength = 160
         , kMaxItemWidth = 250
     };
 
