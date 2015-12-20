@@ -12,9 +12,11 @@
 #include "nx/streaming/archive_stream_reader.h"
 #include "nx/streaming/rtsp_client_archive_delegate.h"
 #include "core/resource_management/resource_pool.h"
+#include "player_data_consumer.h"
 
 namespace {
     const qint64 invalidTimestamp = -1;
+	const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
 }
 
 namespace nx
@@ -28,8 +30,16 @@ class PlayerPrivate: public QObject
 	Player *q_ptr;
 
 public:
-	std::unique_ptr<QnArchiveStreamReader> archiveReader;
+	std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
+	std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
+	QElapsedTimer ptsTimer;                               //< main AV timer for playback
+	boost::optional<qint64> lastVideoPts;                 //< last video frame PTS
+	bool hasAudio;
+	QSharedPointer<QVideoFrame> videoFrameToRender;       //< decoded video which is awaiting to be rendered
 protected:
+	void at_gotVideoFrame();
+	void presentNextFrame();
+	qint64 getNextTimeToRender(qint64 pts);
 	
 	// -------------------- depracated ----------------------
 
@@ -56,6 +66,7 @@ protected:
 	void updateMediaStatus();
 	void processFrame();
 	void at_session_frameEnqueued();
+	
 };
 
 
@@ -71,6 +82,7 @@ PlayerPrivate::PlayerPrivate(Player *parent)
 	, timestamp(0)
 	, reconnectOnPlay(false)
 	, maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
+	, hasAudio(false)
 {
 }
 
@@ -169,6 +181,81 @@ void PlayerPrivate::processFrame() {
 	}
 }
 
+void PlayerPrivate::at_gotVideoFrame()
+{
+	if (videoFrameToRender)
+		return; //< we already have fame to render. Ignore next frame (will be processed later)
+
+	if (state != Player::State::Playing)
+		return;
+	
+	videoFrameToRender = dataConsumer->dequeueVideoFrame();
+	if (!videoFrameToRender)
+		return;
+
+	qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender->startTime());
+	
+	if (nextTimeToRender > ptsTimer.elapsed())
+		executeDelayed([this]() { presentNextFrame(); }, nextTimeToRender - ptsTimer.elapsed());
+	else
+		presentNextFrame();
+}
+
+void PlayerPrivate::presentNextFrame()
+{
+	Q_Q(Player);
+
+	if (!videoFrameToRender)
+		return;
+
+	/* update video surface's pixel format if need */
+	if (videoSurface)
+	{
+		if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
+			videoSurface->stop();
+
+		if (!videoSurface->isActive()) {
+			QVideoSurfaceFormat format(videoFrameToRender->size(), videoFrameToRender->pixelFormat(), videoFrameToRender->handleType());
+			videoSurface->start(format);
+		}
+	}
+
+	if (videoSurface && videoSurface->isActive())
+		videoSurface->present(*videoFrameToRender);
+	
+	lastVideoPts = videoFrameToRender->startTime();
+	emit q->positionChanged();
+
+	videoFrameToRender.clear();
+	at_gotVideoFrame(); //< calculate next time to render
+}
+
+qint64 PlayerPrivate::getNextTimeToRender(qint64 pts)
+{
+	Q_Q(Player);
+
+	if (hasAudio)
+	{
+		// todo: not implemented yet
+		return pts;
+	}
+	else 
+	{
+		/* Calculate time to present next frame */
+
+		//< Reset timer If no previous frame or pts discontinue
+		if (!lastVideoPts.is_initialized() || !qBetween(qint64(lastVideoPts), pts, qint64(lastVideoPts) + kMaxFrameDuration))
+		{
+			lastVideoPts = pts;
+			ptsTimer.restart();
+			return pts;
+		}
+
+		const qint64 ptsDistance = pts - qint64(lastVideoPts);
+		return ptsTimer.elapsed() + ptsDistance;
+	}
+}
+
 void PlayerPrivate::at_session_frameEnqueued() {
 	if (state != Player::State::Playing)
 		return;
@@ -183,6 +270,11 @@ Player::Player(QObject *parent)
 	, d_ptr(new PlayerPrivate(this))
 {
 	Q_D(Player);
+
+	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
+	
+
+	// remove this:
 
 	QThread *networkThread;
 	networkThread = new QThread();
@@ -270,6 +362,10 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
 void Player::play()
 {
 	Q_D(Player);
+
+	d->dataConsumer->start();
+	d->archiveReader->start();
+
 	d->archiveReader->open();
 }
 
@@ -291,6 +387,7 @@ void Player::setSource(const QUrl &url)
 		return;
 	
 	d->archiveReader.reset();
+	d->dataConsumer.reset();
 	d->setState(State::Stopped);
 
 	QnUuid id(url.path().mid(1));
@@ -299,7 +396,9 @@ void Player::setSource(const QUrl &url)
 		return;
 
 	d->archiveReader.reset(new QnArchiveStreamReader(camera));
+	d->dataConsumer.reset(new PlayerDataConsumer());
 	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
+	d->archiveReader->addDataProcessor(d->dataConsumer.get());
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface *videoSurface)

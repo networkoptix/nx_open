@@ -15,9 +15,13 @@ namespace nx
 		* if video parameters have changed.
 		*/
 		class SeamlessVideoDecoderPrivate;
-		class SeamlessVideoDecoder
+		class SeamlessVideoDecoder: public QObject
 		{
+			Q_OBJECT
 		public:
+
+			SeamlessVideoDecoder();
+			virtual ~SeamlessVideoDecoder();
 
 			/*
 			* Decode a video frame. This is a sync function and it could take a lot of CPU. This isn't thread safe call.

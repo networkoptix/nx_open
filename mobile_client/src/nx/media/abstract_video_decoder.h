@@ -12,9 +12,12 @@ namespace nx
 		/*
 		* Interface for video decoder implementation.
 		*/
-		class AbstractVideoDecoder
+		class AbstractVideoDecoder: public QObject
 		{
+			Q_OBJECT
 		public:
+
+			virtual ~AbstractVideoDecoder() {}
 
 			/*
 			* \param context	codec context.

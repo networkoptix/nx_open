@@ -8,7 +8,7 @@ namespace media
 
 VideoDecoderRegistry* VideoDecoderRegistry::instance()
 {
-	VideoDecoderRegistry instance;
+	static VideoDecoderRegistry instance;
 	return &instance;
 }
 

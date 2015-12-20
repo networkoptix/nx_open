@@ -27,6 +27,9 @@
 #include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
 
+#include <nx/media/video_decoder_registry.h>
+#include <nx/media/ffmpeg_decoder.h>
+
 #include "version.h"
 
 int runUi(QGuiApplication *application) {
@@ -129,10 +132,17 @@ void initLog() {
     QnLog::initLog(lit("INFO"));
 }
 
+void initDecoders()
+{
+	using namespace nx::media;
+	VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
+}
+
 int main(int argc, char *argv[]) {
     QGuiApplication application(argc, argv);
 
     initLog();
+	initDecoders();
 
     QnMobileClientModule mobile_client;
     Q_UNUSED(mobile_client)

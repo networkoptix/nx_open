@@ -10,7 +10,7 @@ namespace
 	struct FrameBasicInfo
 	{
 		bool operator== (const FrameBasicInfo& other) const {
-			return other.size == size && codec == codec;
+			return other.size == size && other.codec == codec;
 		}
 
 		FrameBasicInfo(): 
@@ -23,6 +23,7 @@ namespace
 			codec(CODEC_ID_NONE)
 		{
 			// todo: implement me
+			codec = frame->compressionType;
 		}
 
 		QSize size;
@@ -41,15 +42,39 @@ class SeamlessVideoDecoderPrivate : public QObject
 	Q_DECLARE_PUBLIC(SeamlessVideoDecoder)
 	SeamlessVideoDecoder *q_ptr;
 public:
+	SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent);
+public:
 	std::deque<QSharedPointer<QVideoFrame>> queue; //< temporary  buffer for decoded data
 	VideoDecoderPtr videoDecoder;
 	FrameBasicInfo prevFrameInfo;
 };
 
+SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent)
+	: QObject(parent)
+	, q_ptr(parent)
+{
+
+}
+
+// ----------------------------------- SeamlessVideoDecoder -----------------------------------
+
+SeamlessVideoDecoder::SeamlessVideoDecoder()
+	: QObject()
+	, d_ptr(new SeamlessVideoDecoderPrivate(this))
+{
+	Q_D(SeamlessVideoDecoder);
+}
+
+SeamlessVideoDecoder::~SeamlessVideoDecoder()
+{
+	Q_D(SeamlessVideoDecoder);
+}
+
 bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
 {
 	Q_D(SeamlessVideoDecoder);
-	result->clear();
+	if (result)
+		result->clear();
 
 	FrameBasicInfo frameInfo(frame);
 	if (!(frameInfo == d->prevFrameInfo))

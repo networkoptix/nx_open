@@ -13,12 +13,18 @@ namespace nx
 		/*
 		* This class implements ffmpeg video decoder
 		*/
+		class FfmpegDecoderPrivate;
 		class FfmpegDecoder : public AbstractVideoDecoder
 		{
 		public:
-			static bool isCompatible(const QnConstCompressedVideoDataPtr& frame);
+			FfmpegDecoder();
+			virtual ~FfmpegDecoder();
 
+			static bool isCompatible(const QnConstCompressedVideoDataPtr& frame);
 			virtual bool decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result = nullptr) override;
+		private:
+			QScopedPointer<FfmpegDecoderPrivate> d_ptr;
+			Q_DECLARE_PRIVATE(FfmpegDecoder);
 		};
 	}
 }
