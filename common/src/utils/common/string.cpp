@@ -16,8 +16,11 @@ namespace
         return text.trimmed().replace(kNewLineSymbol, kNewLineTag);
     }
 
-    int elideTextNode(QDomText &textNode, int maxLength)
+    int elideTextNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
     {
+        auto textNode = node.toText();
         if (textNode.isNull())
             return 0;
 
@@ -31,10 +34,12 @@ namespace
         return maxLength;
     }
 
-    int elideDomNode(QDomNode &node, int maxLength)
+    int elideDomNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
     {
         // if specified node is text - elide it
-        if (auto len = elideTextNode(node.toText(), maxLength))
+        if (auto len = elideTextNode(node, maxLength, tail))
             return len;
 
         int currentCount = 0;
@@ -51,7 +56,7 @@ namespace
             // Tries to elide text node
             if (currentCount < maxLength)
             {
-                if (auto length = elideTextNode(child.toText(), maxLength - currentCount))
+                if (auto length = elideTextNode(child, maxLength - currentCount, tail))
                 {
                     currentCount += length;
                     continue;
@@ -74,7 +79,7 @@ namespace
                 continue;
             }
 
-            currentCount += elideDomNode(child, maxLength - currentCount);
+            currentCount += elideDomNode(child, maxLength - currentCount, tail);
         }
 
         // Removes all elements that are not fit
@@ -504,6 +509,7 @@ QString elideHtml(const QString &html, int maxLength, const QString &tail)
 {
     QDomDocument dom;
     dom.setContent(replaceNewLineToBrTag(html));
-    elideDomNode(dom.documentElement(), maxLength);
+    auto root = dom.documentElement();
+    elideDomNode(root, maxLength, tail);
     return dom.toString();
 }
