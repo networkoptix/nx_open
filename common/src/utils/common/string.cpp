@@ -1,9 +1,90 @@
 #include "string.h"
 
+#include <QtXml/QDomDocument>
+
 #include <cmath>
 
 #include "util.h"
 
+namespace
+{
+    QString replaceNewLineToBrTag(const QString &text)
+    {
+        static const auto kNewLineSymbol = L'\n';
+        static const auto kNewLineTag = lit("<br>");
+
+        return text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    }
+
+    int elideTextNode(QDomText &textNode, int maxLength)
+    {
+        if (textNode.isNull())
+            return 0;
+
+        const auto text = textNode.nodeValue();
+        const auto textSize = text.size();
+        if (textSize <= maxLength)
+            return textSize;
+
+        const auto elided = elideString(text, maxLength);
+        textNode.setNodeValue(elided);
+        return maxLength;
+    }
+
+    int elideDomNode(QDomNode &node, int maxLength)
+    {
+        // if specified node is text - elide it
+        if (auto len = elideTextNode(node.toText(), maxLength))
+            return len;
+
+        int currentCount = 0;
+        QList<QDomNode> forRemove;
+        for (auto child = node.firstChild(); !child.isNull(); child = child.nextSibling())
+        {
+            if (currentCount >= maxLength)
+            {
+                // Removes all elements that are not fit to length
+                forRemove.append(child);
+                continue;
+            }
+
+            // Tries to elide text node
+            if (currentCount < maxLength)
+            {
+                if (auto length = elideTextNode(child.toText(), maxLength - currentCount))
+                {
+                    currentCount += length;
+                    continue;
+                }
+            }
+
+            // if it is not text node, try to parse whole element
+            const auto elem = child.toElement();
+            if (elem.isNull())
+            {
+                // If it is not element (comment or some specific data) - skip it
+                continue;
+            }
+
+            const int textSize = elem.text().size();
+            if ((currentCount + textSize) <= maxLength)
+            {
+                // Text length of element (and all its child elements) is less then maximum
+                currentCount += textSize;
+                continue;
+            }
+
+            currentCount += elideDomNode(child, maxLength - currentCount);
+        }
+
+        // Removes all elements that are not fit
+        for(auto child: forRemove)
+            node.removeChild(child);
+
+        return currentCount;
+    };
+
+}
 
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement) {
     if(!symbols)
@@ -402,9 +483,8 @@ QString htmlBold(const QString &source) {
 
 QString elideString(const QString &source, int maxLength, const QString &tail) {
     const auto tailLength = tail.length();
-    return source.length() <= maxLength
-        ? source
-        : source.left(maxLength - tailLength) + tail;
+    return (source.length() <= maxLength ? source
+        : source.left(maxLength > tailLength ? maxLength - tailLength : 0) + tail);
 }
 
 QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBold /*= false */, bool isItalic /*= false*/ ) {
@@ -416,9 +496,14 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const QString boldValue = (isBold ? lit("bold") : lit("normal"));
     const QString italicValue (isItalic ? lit("italic") : lit("normal"));
 
-    static const auto kNewLineSymbol = L'\n';
-    static const auto kNewLineTag = lit("<br>");
-
-    const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    const auto newFormattedText = replaceNewLineToBrTag(text);
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
+}
+
+QString elideHtml(const QString &html, int maxLength, const QString &tail)
+{
+    QDomDocument dom;
+    dom.setContent(replaceNewLineToBrTag(html));
+    elideDomNode(dom.documentElement(), maxLength);
+    return dom.toString();
 }

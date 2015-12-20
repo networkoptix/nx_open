@@ -20,14 +20,15 @@
 
 namespace
 {
+    const auto kHtmlPageTemplate = lit("<html><head><style>* {text-ident: 0; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; color: white;}</style></head><body>%1</body></html>");
+    const auto kComplexHtml = lit("%1%2");
+
     enum
     {
         kCaptionMaxLength = 64
         , kDescriptionMaxLength = 96
         , kMaxItemWidth = 250
     };
-
-
 
     enum { kBookmarksFilterPrecisionMs = 5 * 60 * 1000 };
 
@@ -239,29 +240,33 @@ void QnCompositeTextOverlay::initTextMode()
         };
 
         QString text;
+
         if (actionParams.text.isEmpty())
         {
             const auto runtimeParams = businessAction->getRuntimeParams();
-            const auto caption = elideString(
-                QnBusinessStringsHelper::eventAtResource(runtimeParams, true), kCaptionMaxLength);
 
-            const auto desciption = elideString(
-                QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n")), kDescriptionMaxLength);
+            const auto caption = QnBusinessStringsHelper::eventAtResource(runtimeParams, true);
+            const auto htmlCaption = htmlFormattedParagraph(caption, kCaptionPixelFontSize, true);
 
-            if (caption.trimmed().isEmpty() && desciption.trimmed().isEmpty())  // Do not add empty text items
+            const auto desc = QnBusinessStringsHelper::eventDetails(runtimeParams, lit("\n"));
+            const auto htmlDesc = htmlFormattedParagraph(desc, kDescriptionPixelFontSize);
+
+            if (caption.trimmed().isEmpty() && desc.trimmed().isEmpty())  // Do not add empty text items
                 return;
 
-            static const auto kComplexHtml = lit("%1%2");
-            text = kComplexHtml.arg(htmlFormattedParagraph(caption, kCaptionPixelFontSize, true)
-                , htmlFormattedParagraph(desciption, kDescriptionPixelFontSize));
+            text = kComplexHtml.arg(elideHtml(htmlCaption, kCaptionMaxLength)
+                , elideHtml(htmlDesc, kDescriptionMaxLength));
+
+            text = kHtmlPageTemplate.arg(text);
         }
         else
         {
             if (actionParams.text.trimmed().isEmpty()) // Do not add empty text items
                 return;
-            static const auto kTextHtml = lit("<html><body>%1</body></html>");
-            const auto elided = elideString(actionParams.text, kDescriptionMaxLength);
-            text = kTextHtml.arg(htmlFormattedParagraph(elided, 13));
+
+            const auto elided = elideHtml(htmlFormattedParagraph(
+                actionParams.text, kDescriptionPixelFontSize), kDescriptionMaxLength);
+            text = kHtmlPageTemplate.arg(elided);
         }
 
         const QnHtmlTextItemOptions options(m_colors.textOverlayItemColor, true
@@ -424,8 +429,6 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
     static QnHtmlTextItemOptions options = QnHtmlTextItemOptions(
         colors.background, false, kBorderRadius, kPadding, kPadding, kMaxItemWidth);
 
-    static const auto kBookTemplate = lit("<html><body>%1%2</body></html>");
-
     InternalDataHash data;
 
     const auto timestamp = m_counter.elapsed();
@@ -440,10 +443,12 @@ QnCompositeTextOverlay::InternalDataHash QnCompositeTextOverlay::makeTextItemDat
         if (bookmark.name.trimmed().isEmpty() && bookmark.description.trimmed().isEmpty())
             continue;
 
-        const auto bookmarkHtml = kBookTemplate.arg(
-            htmlFormattedParagraph(elideString(bookmark.name, kCaptionMaxLength), kCaptionPixelSize, true)
-            , htmlFormattedParagraph(elideString(bookmark.description, kDescriptionMaxLength), kDescriptionPixeSize));
+        const auto captionHtml = elideHtml(htmlFormattedParagraph(
+            bookmark.name, kCaptionPixelSize, true), kCaptionMaxLength);
+        const auto descHtml = elideHtml(htmlFormattedParagraph(
+            bookmark.description, kDescriptionPixeSize), kDescriptionMaxLength);
 
+        const auto bookmarkHtml = kHtmlPageTemplate.arg(kComplexHtml.arg(captionHtml, descHtml));
         const auto itemData = QnOverlayTextItemData(bookmark.guid, bookmarkHtml, options);
         data.insert(itemData.id, InternalData(timestamp, itemData));
     }
