@@ -161,6 +161,11 @@ protected:
     virtual void dispatchImpl( std::function<void()>&& handler ) = 0;
 };
 
+#define SocketOptions_setOrFalse(setter, param) \
+    if( param )                                 \
+        if( !socket->setter( *param ) )         \
+            return false;
+
 //!Socket configuration options ready to apply to any \class AbstractSocket
 struct NX_NETWORK_API SocketOptions
 {
@@ -168,13 +173,14 @@ struct NX_NETWORK_API SocketOptions
     boost::optional< unsigned int > sendBufferSize, recvBufferSize;
     boost::optional< unsigned int > sendTimeout, recvTimeout;
 
-    inline void apply( AbstractSocket* socket )
+    inline bool apply( AbstractSocket* socket )
     {
-        if( reuseAddrFlag )     socket->setReuseAddrFlag( *reuseAddrFlag );
-        if( sendBufferSize )    socket->setSendBufferSize( *sendBufferSize );
-        if( recvBufferSize )    socket->setRecvBufferSize( *recvBufferSize );
-        if( sendTimeout )       socket->setSendTimeout( *sendTimeout );
-        if( recvTimeout )       socket->setRecvTimeout( *recvTimeout );
+        SocketOptions_setOrFalse(setReuseAddrFlag,  reuseAddrFlag);
+        SocketOptions_setOrFalse(setSendBufferSize, sendBufferSize);
+        SocketOptions_setOrFalse(setRecvBufferSize, recvBufferSize);
+        SocketOptions_setOrFalse(setSendTimeout,    sendTimeout);
+        SocketOptions_setOrFalse(setRecvTimeout,    recvTimeout);
+        return true;
     }
 };
 
@@ -411,12 +417,14 @@ struct NX_NETWORK_API StreamSocketOptions : SocketOptions
     boost::optional< bool > noDelay;
     boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
 
-    inline void apply( AbstractStreamSocket* socket )
+    inline bool apply( AbstractStreamSocket* socket )
     {
-        SocketOptions::apply( socket );
+        if( !SocketOptions::apply( socket ) )
+            return false;
 
-        if( noDelay )           socket->setNoDelay( *noDelay );
-        if( keepAliveOptions )  socket->setKeepAlive( *keepAliveOptions );
+        SocketOptions_setOrFalse(setNoDelay,    noDelay);
+        SocketOptions_setOrFalse(setKeepAlive,  keepAliveOptions);
+        return true;
     }
 };
 

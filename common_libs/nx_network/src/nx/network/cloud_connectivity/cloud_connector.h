@@ -42,7 +42,7 @@ public:
         const HostAddress& targetHost,
         Handler&& completionHandler )
     {
-        auto tunnel = CloudTunnelPool::instance()->getTunnelToHost( targetHost );
+        auto tunnel = TunnelPool::instance()->getTunnelToHost( targetHost );
         assert( tunnel );
         return tunnel->connect( std::forward<Handler>(completionHandler) );
     }

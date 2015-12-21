@@ -32,7 +32,7 @@ public:
     { return s_instance->m_mediatorConnector; }
 
     inline static
-    cc::CloudTunnelPool& cloudTunnelPool()
+    cc::TunnelPool& tunnelPool()
     { return s_instance->m_cloudTunnelPool; }
 
 	static void init();	/** Should be called before any socket use */
@@ -67,7 +67,7 @@ private:
     cc::AddressResolver m_addressResolver;
     cc::MediatorAddressPublisher m_addressPublisher;
     cc::MediatorConnector m_mediatorConnector;
-    cc::CloudTunnelPool m_cloudTunnelPool;
+    cc::TunnelPool m_cloudTunnelPool;
 };
 
 } // namespace nx

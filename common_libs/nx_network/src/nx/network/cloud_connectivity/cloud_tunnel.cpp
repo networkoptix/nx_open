@@ -1,50 +1,83 @@
 #include "cloud_tunnel.h"
 
 #include <nx/network/socket_global.h>
+#include <nx/network/cloud_connectivity/cloud_tunnel_udt.h>
 
 namespace nx {
 namespace cc {
 
-void CloudTunnel::addAddress(const AddressEntry& address)
+Tunnel::Tunnel(String peerId, std::vector<CloudConnectType> types)
 {
-    // we already know this address
-    if (m_impls.count(address))
-        return;
-
-    switch(address.type)
+    for (const auto type : types)
     {
-        // TODO: create certain AbstractCloudTunnelImpl
-    };
+        std::unique_ptr<AbstractTunnelConnector> connector;
+        switch(type)
+        {
+            case CloudConnectType::udtHp:
+                connector = std::make_unique<UdtTunnelConnector>(peerId);
+
+            default:
+                // Probably just log the ERROR
+                Q_ASSERT_X(false, Q_FUNC_INFO, "Unsupported CloudConnectType value!");
+        };
+
+        if (connector)
+            m_connectors.emplace(connector->getPriority(), std::move(connector));
+    }
+
+    m_connectorsItreator = m_connectors.begin();
 }
 
-void CloudTunnel::connect(std::shared_ptr<StreamSocketOptions> options,
-                          SocketHandler handler)
+void Tunnel::connect(std::shared_ptr<StreamSocketOptions> options,
+                     SocketHandler handler)
 {
-    // TODO: if there some opened AbstractCloudTunnelImpl delegate connect
-    //       to it, otherwise try to open all underlaing AbstractCloudTunnelImpls
-    //       and delegate connect to the first successfuly opend
+    QnMutexLocker lk(&m_mutex);
 
-    static_cast<void>(options);
-    static_cast<void>(handler);
+    // try to use existed connection if avaliable
+    if (m_connection)
+    {
+        // TODO: m_connection.connect(options, [handler](...){...});
+        return;
+    }
+
+    if (m_connectorsItreator == m_connectors.end())
+    {
+        lk.unlock();
+        handler(SystemError::notConnected, std::unique_ptr<AbstractStreamSocket>());
+        return;
+    }
+
+    auto currentPriority = m_connectorsItreator->first;
+    do
+    {
+        // TODO: m_connectorsItreator->second->connect(options, [handler](...){...});
+
+        if (++m_connectorsItreator == m_connectors.end())
+            return;
+    }
+    while (currentPriority == m_connectorsItreator->first);
 }
 
-void CloudTunnel::accept(SocketHandler handler)
+void Tunnel::accept(SocketHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
     Q_ASSERT_X(!handler, Q_FUNC_INFO, "simultaneous accept on the same tunnel");
     m_acceptHandler = std::move(handler);
 }
 
-void CloudTunnel::pleaseStop(std::function<void()> handler)
+void Tunnel::pleaseStop(std::function<void()> handler)
 {
     BarrierHandler barrier(std::move(handler));
 
     QnMutexLocker lock(&m_mutex);
-    for (const auto& impl : m_impls)
-        impl.second->pleaseStop(barrier.fork());
+    for (const auto& connector : m_connectors)
+        connector.second->pleaseStop(barrier.fork());
+
+    if (m_connection)
+        m_connection->pleaseStop(barrier.fork());
 }
 
-CloudTunnelPool::CloudTunnelPool()
+TunnelPool::TunnelPool()
     : m_mediatorConnection(SocketGlobals::mediatorConnector().systemConnection())
 {
     m_mediatorConnection->monitorConnectionRequest(
@@ -53,21 +86,25 @@ CloudTunnelPool::CloudTunnelPool()
         QnMutexLocker lock(&m_mutex);
         switch(request)
         {
-            // TODO: create certain AbstractCloudTunnelImpl and add it to
+            // TODO: create certain AbstractAbstractTunnelConnection and add it to
             //       m_pool
         };
     });
 }
 
-std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnel(const String& peerId)
+std::shared_ptr<Tunnel> TunnelPool::get(
+        const String& peerId, std::vector<CloudConnectType> connectTypes)
 {
-    std::shared_ptr<CloudTunnel> tunnel;
-    std::function<void(std::shared_ptr<CloudTunnel>)> monitor;
+    std::shared_ptr<Tunnel> tunnel;
+    std::function<void(std::shared_ptr<Tunnel>)> monitor;
     {
         QnMutexLocker lock(&m_mutex);
         auto it = m_pool.find(peerId);
         if(it == m_pool.end())
-            it = m_pool.emplace(peerId, std::make_shared<CloudTunnel>()).first;
+        {
+            auto tunnel = std::make_shared<Tunnel>(peerId, std::move(connectTypes));
+            it = m_pool.emplace(peerId, std::move(tunnel)).first;
+        }
 
         tunnel = it->second;
         monitor = m_monitor;
@@ -79,10 +116,10 @@ std::shared_ptr<CloudTunnel> CloudTunnelPool::getTunnel(const String& peerId)
     return tunnel;
 }
 
-void CloudTunnelPool::monitorTunnels(
-        std::function<void(std::shared_ptr<CloudTunnel>)> handler)
+void TunnelPool::setNewHandler(
+        std::function<void(std::shared_ptr<Tunnel>)> handler)
 {
-    std::map<String, std::shared_ptr<CloudTunnel>> currentTunnels;
+    std::map<String, std::shared_ptr<Tunnel>> currentTunnels;
     {
         QnMutexLocker lock(&m_mutex);
         m_monitor = handler;
@@ -93,7 +130,7 @@ void CloudTunnelPool::monitorTunnels(
         handler(tunnel.second);
 }
 
-void CloudTunnelPool::pleaseStop(std::function<void()> handler)
+void TunnelPool::pleaseStop(std::function<void()> handler)
 {
     BarrierHandler barrier(std::move(handler));
 

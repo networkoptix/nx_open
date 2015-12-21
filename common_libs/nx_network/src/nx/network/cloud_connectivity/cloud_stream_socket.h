@@ -37,7 +37,7 @@ protected:
         std::function<void(SystemError::ErrorCode)>&& handler) override;
 
 private:
-    void startAsyncConnect(const SocketAddress& originalAddress,
+    bool startAsyncConnect(const SocketAddress& originalAddress,
                            std::vector<AddressEntry> dnsEntries);
 
     std::shared_ptr<StreamSocketOptions> m_socketOptions;

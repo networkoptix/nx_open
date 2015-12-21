@@ -46,52 +46,65 @@ void CloudStreamSocket::connectAsyncImpl(
         {
             if (auto lk = sharedGuard->lock())
             {
-                if (entries.empty() && code == SystemError::noError)
-                    code = SystemError::hostUnreach;
+                if (code == SystemError::noError)
+                    if (startAsyncConnect(std::move(address), std::move(entries)))
+                        return;
+                    else
+                        code = SystemError::hostUnreach;
 
-                if (code != SystemError::noError)
-                {
-                    auto connectHandlerBak = std::move(m_connectHandler);
-                    lk.unlock();
-                    connectHandlerBak(code);
-                    return;
-                }
-
-                startAsyncConnect(std::move(address), std::move(entries));
+                auto connectHandlerBak = std::move(m_connectHandler);
+                lk.unlock();
+                connectHandlerBak(code);
+                return;
             }
         });
 }
 
-void CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
+bool CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
                                           std::vector<AddressEntry> dnsEntries)
 {
-    std::shared_ptr<CloudTunnel> cloudTunnel;
-    for (const auto dnsEntry : dnsEntries)
+    std::vector<CloudConnectType> cloudConnectTypes;
+    for (const auto entry : dnsEntries)
     {
-        if (dnsEntry.type == AddressType::regular)
+        switch( entry.type )
         {
-            auto port = originalAddress.port;
-            /* TODO: #mux fix this code
-             *
-            const auto enforcedPort = dnsEntry.attributes.find(
-                        AddressAttributeType::nxApiPort);
-            if (enforcedPort != dnsEntry.attributes.end())
-                port = enforcedPort->second.value;
-            */
+            case AddressType::regular:
+            {
+                SocketAddress target(entry.host, originalAddress.port);
+                for(const auto& attr : entry.attributes)
+                    if(attr.type == AddressAttributeType::nxApiPort)
+                        target.port = static_cast<quint16>(attr.value);
 
-            m_socketDelegate.reset(new TCPSocket(true));
-            m_socketOptions->apply(m_socketDelegate.get());
-            return m_socketDelegate->connectAsync(
-                SocketAddress(std::move(dnsEntry.host), port),
-                std::move(m_connectHandler));
-        }
+                m_socketDelegate.reset(new TCPSocket(true));
+                if (!m_socketOptions->apply(m_socketDelegate.get()))
+                    return false;
 
-        if (!cloudTunnel)
-            cloudTunnel = SocketGlobals::cloudTunnelPool().getTunnel(
-                originalAddress.address.toString().toUtf8());
+                m_socketDelegate->connectAsync(
+                    std::move(target), std::move(m_connectHandler));
 
-        cloudTunnel->addAddress(dnsEntry);
+                return true;
+            }
+            case AddressType::cloud:
+            {
+                auto ccType = CloudConnectType::unknown;
+                for(const auto& attr : entry.attributes)
+                    if(attr.type == AddressAttributeType::cloudConnect)
+                        ccType = static_cast<CloudConnectType>(attr.value);
+
+                cloudConnectTypes.push_back(ccType);
+                break;
+            }
+            default:
+                Q_ASSERT_X(false, Q_FUNC_INFO, "Unexpected AddressType value!");
+
+        };
     }
+
+    if (cloudConnectTypes.empty())
+        return false;
+
+    auto cloudTunnel = SocketGlobals::tunnelPool().get(
+        originalAddress.address.toString().toUtf8(), std::move(cloudConnectTypes));
 
     auto sharedGuard = m_asyncGuard.sharedGuard();
     cloudTunnel->connect( m_socketOptions,
@@ -108,6 +121,8 @@ void CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
             handler(errorCode);
         }
     });
+
+    return true;
 }
 
 } // namespace cc

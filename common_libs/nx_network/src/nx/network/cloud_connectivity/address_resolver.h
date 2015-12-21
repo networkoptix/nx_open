@@ -29,8 +29,18 @@ QString toString( const AddressType& type );
 
 enum class AddressAttributeType
 {
+    unknown,
     peerFoundPassively, //!< NX peer reported its address and name by itself
     nxApiPort,          //!< NX peer (mediaserver) port
+    cloudConnect,       //!< NX cloud connect required
+};
+
+enum class CloudConnectType
+{
+    unknown,
+    udtHp,      // UDT over UDP hole punching
+    tcpHp,      // TCP hole punching
+    proxy,      // Proxy server address
 };
 
 struct NX_NETWORK_API AddressAttribute
