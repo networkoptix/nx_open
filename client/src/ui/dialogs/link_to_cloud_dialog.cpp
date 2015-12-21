@@ -29,7 +29,7 @@ namespace
             if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
                 continue;
 
-            return server->serverRestConnection();
+            return server->restConnection();
         }
         return rest::QnConnectionPtr();
     }
