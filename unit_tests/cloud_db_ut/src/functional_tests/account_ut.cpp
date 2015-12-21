@@ -35,7 +35,7 @@ TEST_F(CdbFunctionalTest, account_activation)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -82,7 +82,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -124,7 +124,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -156,7 +156,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -246,7 +246,7 @@ TEST_F(CdbFunctionalTest, account_badRegistration)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -382,7 +382,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -441,7 +441,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     const std::chrono::seconds expirationPeriod(5);

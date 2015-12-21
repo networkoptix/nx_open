@@ -50,7 +50,7 @@ CdbFunctionalTest::CdbFunctionalTest()
 
     EMailManagerFactory::setFactory(
         [](const conf::Settings& /*settings*/){
-            return new EmailManagerStub(nullptr);
+            return std::make_unique<EmailManagerStub>(nullptr);
         });
 }
 
