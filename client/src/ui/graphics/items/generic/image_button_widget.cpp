@@ -136,7 +136,7 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
 
 QIcon QnImageButtonWidget::icon() const
 {
-    return m_innerIcon;
+    return m_icon;
 }
 
 void QnImageButtonWidget::setIcon(const QIcon &icon)
@@ -156,7 +156,7 @@ void QnImageButtonWidget::setIcon(const QIcon &icon)
 
     m_actionIconOverridden = true;
 
-    m_innerIcon = icon;
+    m_icon = icon;
     emit iconChanged();
 }
 
