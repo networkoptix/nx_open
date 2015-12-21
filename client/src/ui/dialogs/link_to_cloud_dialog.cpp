@@ -44,9 +44,12 @@ namespace
 
 class QnLinkToCloudDialogPrivate : public QObject
 {
-public:
     QnLinkToCloudDialog *q_ptr;
 
+    Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
+    Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
+
+public:
     QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent);
 
     void lockUi(bool lock);
@@ -65,9 +68,6 @@ public:
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
-
-    Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
-    Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
 };
 
 QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
