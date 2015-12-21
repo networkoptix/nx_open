@@ -114,7 +114,8 @@ int CloudDBProcess::executeApplication()
             return 2;
         }
     
-        EMailManager emailManager(settings);
+        std::unique_ptr<AbstractEmailManager> emailManager(
+            EMailManagerFactory::create(settings));
         StreeManager streeManager(settings.auth());
 
         //creating data managers
@@ -126,7 +127,7 @@ int CloudDBProcess::executeApplication()
             settings,
             &tempPasswordManager,
             &dbManager,
-            &emailManager);
+            emailManager.get());
     
         SystemManager systemManager(
             accountManager,
@@ -139,10 +140,11 @@ int CloudDBProcess::executeApplication()
         authRestrictionList.allow(ActivateAccountHandler::kHandlerPath, AuthMethod::noAuth);
         authRestrictionList.allow(ReactivateAccountHttpHandler::kHandlerPath, AuthMethod::noAuth);
 
+        std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
+        authDataProviders.push_back(&accountManager);
+        authDataProviders.push_back(&systemManager);
         AuthenticationManager authenticationManager( 
-            &accountManager,
-            &systemManager,
-            &tempPasswordManager,
+            std::move(authDataProviders),
             authRestrictionList,
             streeManager);
 
@@ -430,6 +432,7 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddCustomizationToSystem);
     dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
     dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
+    dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
     return dbStructureUpdater.updateStructSync();
 }
 

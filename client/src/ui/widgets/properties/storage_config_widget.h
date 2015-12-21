@@ -38,7 +38,7 @@ public:
     virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
-    virtual void retranslateUi() override;
+
 protected:
 
     virtual void setReadOnlyInternal(bool readOnly) override;
@@ -46,6 +46,12 @@ protected:
     virtual void hideEvent(QHideEvent *event) override;
 
 private:
+    void initQualitiesCombo();
+
+    void resetQualities();
+
+    void restoreCamerasToBackup();
+
     /** Load initial storages data from resource pool. */
     void loadStoragesFromResources();
 
@@ -53,8 +59,15 @@ private:
     void updateBackupInfo();
     void at_eventsGrid_clicked(const QModelIndex& index);
 
+    void applyCamerasToBackup(const QnVirtualCameraResourceList &cameras
+        , Qn::CameraBackupQualities quality);
+
+    void updateCamerasForBackup(const QnVirtualCameraResourceList &cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
-    void updateBackupUi(const QnBackupStatusData& reply);
+    void updateBackupUi(const QnBackupStatusData& reply
+        , int overallSelectedCameras
+        , int currentServerSelectedCameras);
+    void updateSelectedCamerasCaption(int selectedCamerasCount);
 
     void updateColumnWidth();
     int getColWidth(int col);
@@ -66,7 +79,9 @@ private:
     void cancelBackup();
 
     /** Check if backup can be started right now - and show additional info if not. */
-    bool canStartBackup(const QnBackupStatusData& data, QString *info);
+    bool canStartBackup(const QnBackupStatusData& data
+        , int selectedCamerasCount
+        , QString *info);
 
     QString backupPositionToString(qint64 backupTimeMs);
 
@@ -102,6 +117,11 @@ private:
 
     bool m_backupCancelled;
     bool m_updating;
+
+    Qn::CameraBackupQualities m_quality;
+    QnVirtualCameraResourceList m_camerasToBackup;
+    QnVirtualCameraResourceList m_currentServerCamerasToBackup;
+
 private:
     void setupGrid(QTableView* tableView, bool isMainPool);
     void applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const;

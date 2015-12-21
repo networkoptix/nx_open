@@ -967,10 +967,17 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders,
         AsyncHttpClient::AuthType authType )
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-        httpClientCaptured->setAdditionalHeaders(extraHeaders);
-        httpClientCaptured->setAuthType(authType);
+        nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+        httpClient->setAdditionalHeaders(extraHeaders);
+        httpClient->setAuthType(authType);
+        downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+    }
 
+    void downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured)
+    {
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
         ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {

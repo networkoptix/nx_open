@@ -286,7 +286,7 @@
     </message>
     <message>
         <location/>
-        <source>Bookmarks list</source>
+        <source>Bookmark Log</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2471,17 +2471,17 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2817,22 +2817,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2843,16 +2828,6 @@
     <message>
         <location/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2868,7 +2843,32 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     </message>
     <message>
         <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
+        <source>Add External Storage...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

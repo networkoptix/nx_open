@@ -14,7 +14,7 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src/ \
     ${root.dir}/client.core/src/
 
-!ios {
+unix: !ios {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
 

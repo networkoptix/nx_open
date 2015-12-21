@@ -16,7 +16,7 @@
 * Client MUST NOT make requests in callbacks as it will cause a deadlock.
 */
 
-namespace rest 
+namespace rest
 {
     class ServerConnection: public QObject
     {
@@ -39,6 +39,8 @@ namespace rest
         */
         Handle cameraHistoryAsync(const QnChunksRequestData &request, Result<ec2::ApiCameraHistoryDataList>::type callback, QThread* targetThread = 0);
 
+        Handle cameraThumbnailAsync(const QnThumbnailRequestData &request, Result<QByteArray>::type callback, QThread* targetThread = 0);
+
         /**
          * Save the credentials returned by cloud to the database.
          */
@@ -56,14 +58,14 @@ namespace rest
         void cancelRequest(const Handle& requestId);
 
     private:
-        enum class HttpMethod 
+        enum class HttpMethod
         {
             Unknown,
             Get,
             Post
         };
 
-        struct Request 
+        struct Request
         {
             Request(): method(HttpMethod::Unknown), authType(nx_http::AsyncHttpClient::authBasicAndDigest) {}
             bool isValid() const { return method != HttpMethod::Unknown && url.isValid(); }
@@ -77,8 +79,8 @@ namespace rest
         };
 
         template <typename ResultType> Handle executeGet(
-            const QString& path, 
-            const QnRequestParamList& params, 
+            const QString& path,
+            const QnRequestParamList& params,
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 
@@ -90,8 +92,9 @@ namespace rest
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 
-        template <typename ResultType> 
+        template <typename ResultType>
         Handle executeRequest(const Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
+        Handle executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);
         Handle executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread);
 
         QUrl prepareUrl(const QString& path, const QnRequestParamList& params) const;

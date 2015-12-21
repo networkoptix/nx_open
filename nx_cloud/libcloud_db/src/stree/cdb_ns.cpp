@@ -30,6 +30,7 @@ CdbAttrNameSet::CdbAttrNameSet()
     registerResource(attr::authSystemID, "auth.systemID", QVariant::String);
     registerResource(attr::authSelfAccountAccessRequested, "auth.selfAccountAccessRequested", QVariant::Bool);
     registerResource(attr::authSelfSystemAccessRequested, "auth.selfSystemAccessRequested", QVariant::Bool);
+    registerResource(attr::authenticatedByEmailCode, "authenticatedByEmailCode", QVariant::Bool);
     registerResource(attr::resultCode, "resultCode", QVariant::String);
 
     registerResource(attr::entity, "entity", QVariant::String);

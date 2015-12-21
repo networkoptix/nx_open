@@ -52,14 +52,16 @@ public:
             ~Lock();
 
         private:
-            AsyncOperationGuard::SharedGuard* m_guard;
+            SharedGuard* m_sharedGuard;
             bool m_locked;
         };
 
         Lock lock();
 
-    private:
+        /** Causes all further created lock be invalid */
         void terminate();
+
+    private:
         bool begin();
         void end();
 
@@ -69,8 +71,11 @@ public:
 
     const std::shared_ptr<SharedGuard>& sharedGuard();
 
+    /** Forward all of the sharedGuard public methods */
+    SharedGuard* operator->() const;
+
 private:
-    std::shared_ptr<AsyncOperationGuard::SharedGuard> m_guard;
+    std::shared_ptr<AsyncOperationGuard::SharedGuard> m_sharedGuard;
 };
 
 } // namespace utils

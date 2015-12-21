@@ -73,12 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
-    {
+    	{
             "keys": [
                 "ArecontVision|??05", "ArecontVision|?155"
             ],
             "isRTSPSupported": false
-    },
+    	},
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -209,6 +209,12 @@
                 "DW|DWC-PV2M4TIR","DW|DWC-PB2M4TIR", "DWC|DWC-PV2M4T", "DW|DWC-PV2M4T"
             ],
         "dw-http-ptz": true
+        },
+        {
+            "keys": [
+                "DW|DWC-BVI2IR"
+            ],
+            "dw-pravis-chipset": true
         },
         {
             "keys": [

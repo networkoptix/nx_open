@@ -48,6 +48,14 @@ QnReadOnlyEventEater::QnReadOnlyEventEater(QObject *parent): QnMultiEventEater(p
 
     addEventType(QEvent::KeyPress);
     addEventType(QEvent::KeyRelease);
+
+    addEventType(QEvent::HoverEnter);
+    addEventType(QEvent::HoverLeave);
+    addEventType(QEvent::HoverMove);
+
+    addEventType(QEvent::Enter);
+    addEventType(QEvent::Leave);
+    addEventType(QEvent::FocusIn);
 }
 
 bool QnReadOnlyEventEater::activate(QObject *, QEvent *event) {

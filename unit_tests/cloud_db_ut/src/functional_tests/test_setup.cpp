@@ -19,7 +19,10 @@
 #include <utils/common/sync_call.h>
 #include <nx/network/http/auth_tools.h>
 
+#include <libcloud_db/src/managers/email_manager.h>
+
 #include "version.h"
+#include "email_manager_mocked.h"
 
 
 namespace nx {
@@ -31,7 +34,6 @@ CdbFunctionalTest::CdbFunctionalTest()
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
     m_port = (std::rand() % 10000) + 50000;
-    //m_port = 54526;
     m_tmpDir = QDir::homePath() + "/cdb_ut.data";
     QDir(m_tmpDir).removeRecursively();
 
@@ -43,9 +45,13 @@ CdbFunctionalTest::CdbFunctionalTest()
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
     *b = strdup("-db/driverName"); *b = strdup("QSQLITE");
     *b = strdup("-db/name"); *b = strdup(lit("%1/%2").arg(m_tmpDir).arg(lit("cdb_ut.sqlite")).toLatin1().constData());
-    *b = strdup("--notification/enabled=false");
 
     m_connectionFactory->setCloudEndpoint("127.0.0.1", m_port);
+
+    EMailManagerFactory::setFactory(
+        [](const conf::Settings& /*settings*/){
+            return new EmailManagerStub(nullptr);
+        });
 }
 
 CdbFunctionalTest::~CdbFunctionalTest()
@@ -444,6 +450,40 @@ api::ResultCode CdbFunctionalTest::getSystemSharings(
                 std::placeholders::_1));
 
     *sharings = std::move(data.sharing);
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::getCdbNonce(
+    const std::string& systemID,
+    const std::string& authKey,
+    api::NonceData* const nonceData)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    std::tie(resCode, *nonceData) =
+        makeSyncCall<api::ResultCode, api::NonceData>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getCdbNonce,
+                connection->authProvider(),
+                std::placeholders::_1));
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::ping(
+    const std::string& systemID,
+    const std::string& authKey)
+{
+    auto connection = connectionFactory()->createConnection(systemID, authKey);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    nx::cdb::api::ModuleInfo cloudModuleInfo;
+    std::tie(resCode, cloudModuleInfo) =
+        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::ModuleInfo>(
+            std::bind(
+                &nx::cdb::api::Connection::ping,
+                connection.get(),
+                std::placeholders::_1));
     return resCode;
 }
 

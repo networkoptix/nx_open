@@ -16,7 +16,7 @@ public:
     {
     }
 
-    bool isValid() const { return authenticateHeader.is_initialized(); }
+    bool isValid() const { return static_cast<bool>(authenticateHeader); }
 
     void clear()
     {

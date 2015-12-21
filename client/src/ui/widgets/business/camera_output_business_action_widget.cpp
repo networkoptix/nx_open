@@ -36,14 +36,14 @@ void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget
     setTabOrder(ui->autoResetSpinBox, after);
 }
 
-void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields & QnBusiness::ActionTypeField) {
-        bool instant = (model->actionType() == QnBusiness::CameraOutputOnceAction);
+        bool instant = (model()->actionType() == QnBusiness::CameraOutputOnceAction);
         if (instant) {
             ui->autoResetCheckBox->setEnabled(false);
             ui->autoResetCheckBox->setChecked(true);
@@ -56,7 +56,7 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
         QnIOPortDataList outputPorts;
         bool inited = false;
 
-        QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
+        QnVirtualCameraResourceList cameras = model()->actionResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             QnIOPortDataList cameraOutputs = camera->getRelayOutputList();
             if (!inited) {
@@ -88,13 +88,13 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusinessRuleView
     }
 
     if (fields & QnBusiness::ActionParamsField) {
-        QnBusinessActionParameters params = model->actionParams();
+        QnBusinessActionParameters params = model()->actionParams();
 
         QString text = params.relayOutputId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
 
-        bool instant = (model->actionType() == QnBusiness::CameraOutputOnceAction);
+        bool instant = (model()->actionType() == QnBusiness::CameraOutputOnceAction);
         if (!instant) {
             int autoReset = params.relayAutoResetTimeout / 1000;
             ui->autoResetCheckBox->setChecked(autoReset > 0);

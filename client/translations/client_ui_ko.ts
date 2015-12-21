@@ -266,11 +266,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -288,6 +283,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2471,17 +2471,17 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2817,22 +2817,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2847,22 +2832,7 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">일정...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2870,6 +2840,36 @@
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished">선택하지 않은 장치에 다른 문제가 발생하지 않으나, 녹화는 멈춤, 예전 데이터 삭제시 거부 하지 않게 됩니다.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">외부 장치 추가...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storages in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULES_VIEW_MODEL_H
-#define BUSINESS_RULES_VIEW_MODEL_H
+#pragma once
 
 #include <QtCore/QAbstractItemModel>
 #include <QtGui/QStandardItemModel>
@@ -12,13 +11,14 @@
 #include <ui/models/business_rule_view_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <utils/common/id.h>
+#include <utils/common/uuid.h>
+#include <utils/common/connective.h>
 
-class QnBusinessRulesViewModel : public QAbstractItemModel, public QnWorkbenchContextAware
+class QnBusinessRulesViewModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
 
-    typedef QAbstractItemModel base_type;
+    typedef Connective<QAbstractItemModel> base_type;
 public:
     explicit QnBusinessRulesViewModel(QObject *parent = 0);
     virtual ~QnBusinessRulesViewModel();
@@ -41,13 +41,14 @@ public:
     /** Add existing rule to the model. */
     void addOrUpdateRule(const QnBusinessEventRulePtr &rule);
 
-    void deleteRule(QnBusinessRuleViewModel* ruleModel);
-    void deleteRule(const QnUuid &id);
+    void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
 
     void forceColumnMinWidth(QnBusiness::Columns column, int width);
 
-    QnBusinessRuleViewModel* ruleModelById(const QnUuid &id);
-    QnBusinessRuleViewModel *rule(const QModelIndex &index) const;
+    QnBusinessRuleViewModelPtr rule(const QModelIndex &index) const;
+
+protected:
+    QnBusinessRuleViewModelPtr ruleModelById(const QnUuid &id) const;
 
 private:
     bool isIndexValid(const QModelIndex &index) const;
@@ -55,19 +56,15 @@ private:
     QString columnTitle(QnBusiness::Columns column) const;
     QSize columnSizeHint(QnBusiness::Columns column) const;
 
-    void addRuleModelInternal(QnBusinessRuleViewModel* ruleModel);
+    void addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel);
 
 private slots:
-    void at_rule_dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+    void at_rule_dataChanged(const QnUuid &id, QnBusiness::Fields fields);
     void at_soundModel_listChanged();
     void at_soundModel_itemChanged(const QString &filename);
 
 private:
-    QList<QnBusinessRuleViewModel *> m_rules;
+    QList<QnBusinessRuleViewModelPtr> m_rules;
     QMap<QnBusiness::Columns, QnBusiness::Fields> m_fieldsByColumn;
     QMap<QnBusiness::Columns, int> m_forcedWidthByColumn;
 };
-
-
-
-#endif // BUSINESS_RULES_VIEW_MODEL_H

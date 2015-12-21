@@ -40,6 +40,8 @@ enum Value
     authSelfAccountAccessRequested,
     //!Operation data contains systemID equal to the one been authenticated
     authSelfSystemAccessRequested,
+    //!request has been authenticated by code sent to account email
+    authenticatedByEmailCode,
     resultCode,
 
     entity,

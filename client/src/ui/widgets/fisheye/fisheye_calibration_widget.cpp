@@ -28,7 +28,7 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
     ui->setupUi(this);
 
     ui->loadingWidget->setText(tr("Loading preview, please wait..."));
-    
+
     m_updateTimer = new QTimer(this);
     m_updateTimer->setInterval(refreshInterval);
     connect(m_updateTimer,      &QTimer::timeout,                       this,               &QnFisheyeCalibrationWidget::updateImage);
@@ -42,7 +42,7 @@ QnFisheyeCalibrationWidget::QnFisheyeCalibrationWidget(QWidget *parent) :
 
     connect(ui->xCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_xCenterSlider_valueChanged);
     connect(ui->stretchSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_stretchSlider_valueChanged);
-    
+
     connect(ui->yCenterSlider,  &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_yCenterSlider_valueChanged);
     connect(ui->radiusSlider,   &QSlider::valueChanged,                 this,               &QnFisheyeCalibrationWidget::at_radiusSlider_valueChanged);
     connect(m_calibrator,       &QnFisheyeCalibrator::centerChanged,    this,               &QnFisheyeCalibrationWidget::at_calibrator_centerChanged);
@@ -70,15 +70,15 @@ void QnFisheyeCalibrationWidget::init() {
     updatePage();
 }
 
-QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const 
+QnImageProvider* QnFisheyeCalibrationWidget::imageProvider() const
 {
     return m_imageProvider;
 }
 
-
+//TODO: #GDM change to QnCameraThumbnailManager
 void QnFisheyeCalibrationWidget::setImageProvider(QnImageProvider *provider) {
     // TODO: #GDM #Common ownership is not clear. Does this object claim ownership of provider?
-    // If not, then it should not rely on destruction order => need to store provider in 
+    // If not, then it should not rely on destruction order => need to store provider in
     // QPointer and check that it's alive before usage.
     m_inLoading = false;
     if (m_imageProvider) {

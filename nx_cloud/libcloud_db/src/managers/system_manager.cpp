@@ -36,7 +36,6 @@ SystemManager::SystemManager(
         throw std::runtime_error("Failed to pre-load systems cache");
 }
 
-
 SystemManager::~SystemManager()
 {
     m_startedAsyncCallsCounter.wait();
@@ -46,14 +45,14 @@ void SystemManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
     const stree::AbstractResourceReader& /*authSearchInputData*/,
-    stree::AbstractResourceWriter* const authProperties,
+    stree::ResourceContainer* const authProperties,
     std::function<void(bool)> completionHandler)
 {
     bool result = false;
     auto scopedGuard = makeScopedGuard(
-        [/*std::move*/ completionHandler, &result]() {
-        completionHandler(result);
-    });
+        [&completionHandler, &result]() {
+            completionHandler(result);
+        });
 
     QnMutexLocker lk(&m_mutex);
 
@@ -69,9 +68,24 @@ void SystemManager::authenticateByName(
         return;
     }
 
+    auto systemID = QnUuid(systemData->id);
+
     authProperties->put(
         cdb::attr::authSystemID,
-        QVariant::fromValue(QnUuid(systemData->id)));
+        QVariant::fromValue(systemID));
+
+    m_cache.atomicUpdate(
+        systemID,
+        [](data::SystemData& system){ system.status = api::SystemStatus::ssActivated; });
+
+    using namespace std::placeholders;
+
+    m_dbManager->executeUpdate<QnUuid>(
+        std::bind(&SystemManager::activateSystem, this, _1, _2),
+        std::move(systemID),
+        std::bind(&SystemManager::systemActivated, this,
+            m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, [](api::ResultCode){}));
 
     result = true;
 }
@@ -336,7 +350,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
 }
 
 void SystemManager::systemAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount systemRegistrationData,
     data::SystemData systemData,
@@ -395,7 +409,7 @@ nx::db::DBResult SystemManager::insertSystemSharingToDB(
 }
 
 void SystemManager::systemSharingAdded(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing systemSharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -443,7 +457,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemID systemID,
     std::function<void(api::ResultCode)> completionHandler)
@@ -499,7 +513,7 @@ nx::db::DBResult SystemManager::updateSharingInDB(
 }
 
 void SystemManager::sharingUpdated(
-    ThreadSafeCounter::ScopedIncrement /*asyncCallLocker*/,
+    QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::DBResult dbResult,
     data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
@@ -515,6 +529,50 @@ void SystemManager::sharingUpdated(
             //inserting modified version
             accountSystemPairIndex.emplace(sharing);
         }
+    }
+
+    completionHandler(
+        dbResult == nx::db::DBResult::ok
+        ? api::ResultCode::ok
+        : api::ResultCode::dbError);
+}
+
+nx::db::DBResult SystemManager::activateSystem(
+    QSqlDatabase* const connection,
+    const QnUuid& systemID)
+{
+    QSqlQuery updateSystemStatusQuery(*connection);
+    updateSystemStatusQuery.prepare(
+        "UPDATE system "
+        "SET status_code=:statusCode "
+        "WHERE id=:id");
+    updateSystemStatusQuery.bindValue(
+        ":statusCode",
+        QnSql::serialized_field(static_cast<int>(api::SystemStatus::ssActivated)));
+    updateSystemStatusQuery.bindValue(
+        ":id",
+        QnSql::serialized_field(systemID));
+    if (!updateSystemStatusQuery.exec())
+    {
+        NX_LOG(lit("Failed to read system list from DB. %1").
+            arg(connection->lastError().text()), cl_logWARNING);
+        return db::DBResult::ioError;
+    }
+
+    return db::DBResult::ok;
+}
+
+void SystemManager::systemActivated(
+    QnCounter::ScopedIncrement asyncCallLocker,
+    nx::db::DBResult dbResult,
+    QnUuid systemID,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    if (dbResult == nx::db::DBResult::ok)
+    {
+        m_cache.atomicUpdate(
+            systemID,
+            [](data::SystemData& system) { system.status = api::SystemStatus::ssActivated; });
     }
 
     completionHandler(

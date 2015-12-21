@@ -31,6 +31,7 @@
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
+#include <ui/utils/bookmark_merge_helper.h>
 
 #include <ui/help/help_topics.h>
 
@@ -45,7 +46,7 @@
 namespace {
 
     QTime msecsToTime(qint64 msecs) {
-        return QTime(0, 0, 0, 0).addMSecs(msecs); 
+        return QTime(0, 0, 0, 0).addMSecs(msecs);
     }
 
     inline qreal adjust(qreal value, qreal target, qreal delta) {
@@ -66,9 +67,9 @@ namespace {
 
     qreal speed(qreal progress, qreal center, qreal starting, qreal relative) {
         /* Speed of tickmark height animation depends on tickmark height.
-         * 
+         *
          * The goal is for animation of different tickmark groups to start and
-         * end at the same moment, even if the height changes in these groups are 
+         * end at the same moment, even if the height changes in these groups are
          * different. */
         if(progress > center) {
             return progress * relative;
@@ -86,12 +87,12 @@ namespace {
     /** Minimal distance between tickmarks from the same group for this group to be used as toplevel one. */
     const qreal topLevelTickmarkStep = 0.75;
 
-    /** Minimal distance between tickmarks from the same group for this group to be visible. 
+    /** Minimal distance between tickmarks from the same group for this group to be visible.
      * Note that because of the fact that tickmarks do not disappear instantly, in some cases
      * step may become smaller that this value. */
     const qreal minTickmarkLineStepPixels = 5.0;
 
-    /** Critical distance between tickmarks from the same group. 
+    /** Critical distance between tickmarks from the same group.
      * Tickmarks that are closer to each other will never be displayed. */
     const qreal criticalTickmarkLineStepPixels = 2.0;
 
@@ -104,19 +105,19 @@ namespace {
     /** Critical distance between tickmarks from the same group.
      * Text labels will never be displayed for tickmarks that are closer to each other. */
     const qreal criticalTickmarkTextStepPixels = 25.0;
-    
+
     /** Minimal opacity for a tickmark that is visible. */
     const qreal minTickmarkLineOpacity = 0.05;
 
     /** Minimal opacity for a tickmark text label that is visible. */
     const qreal minTickmarkTextOpacity = 0.5;
-    
+
     /** Ratio between the sizes of consequent tickmark groups. */
     const qreal tickmarkStepScale = 2.0 / 3.0;
 
     /** Minimal height of a tickmark text. */
     const int minTickmarkTextHeightPixels = 9;
-    
+
     /** Maximal tickmark height, relative to the height of the tickmark bar. */
     const qreal maxTickmarkHeight = 1.0;
 
@@ -150,7 +151,7 @@ namespace {
     const qreal minDateSpanPixels = 160;
 
 
-    
+
     /* Lines bar. */
 
     const qreal lineCommentTopMargin = -0.20;
@@ -171,7 +172,7 @@ namespace {
     /** Minimal relative change of msecs-per-pixel value of a time slider for animation parameters to be recalculated.
      * This value was introduced so that the parameters are not recalculated constantly when changes are small. */
     const qreal msecsPerPixelChangeThreshold = 1.0e-4;
-    
+
     /** Lower limit on time slider scale. */
     const qreal minMSecsPerPixel = 2.0;
 
@@ -195,9 +196,6 @@ namespace {
     const int bookmarkFontPixelSize = 11;
     const int bookmarkTextPadding = 6;
     const int minBookmarkTextCharsVisible = 6;
-    const int bookmarkMergeDistance = 100;
-    const int minBookmarksToMerge = 5;
-    const int mergeBookmarksInterval = 2000;
 
 
     bool checkLine(int line) {
@@ -250,7 +248,7 @@ namespace {
             erodedTarget = target;
         } else {
             erodedTarget = QnGeometry::eroded(target, targetMargins);
-        } 
+        }
 
         if(!erodedTarget.isValid()) {
             erodedTarget = QRectF();
@@ -280,14 +278,14 @@ namespace {
 // QnTimeSliderChunkPainter
 // -------------------------------------------------------------------------- //
 // TODO: #Elric
-// An even better solution that will remove all blinking 
+// An even better solution that will remove all blinking
 // (we still have it with recorded chunks trapped between two motion chunks)
 // would be to draw it pixel-by-pixel, counting the motion/recording percentage
 // in each pixel. This approach can be made to work just as fast as the current one.
 class QnTimeSliderChunkPainter {
 public:
-    QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter): 
-        m_slider(slider), 
+    QnTimeSliderChunkPainter(QnTimeSlider *slider, QPainter *painter):
+        m_slider(slider),
         m_painter(painter),
         m_centralPosition(0),
         m_centralCoordinate(0),
@@ -387,7 +385,7 @@ private:
             mc = sum * lineBarMinNoticeableFraction + mc * (1.0 - lineBarMinNoticeableFraction);
             nc = nc * (1.0 - lineBarMinNoticeableFraction);
         } else if (!qFuzzyIsNull(rc) && rc < sum * lineBarMinNoticeableFraction) {
-            /* Make sure recording content is noticeable even if there isn't much of it. 
+            /* Make sure recording content is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum because mc == 0. */
             rc = sum * lineBarMinNoticeableFraction;// + rc * (1.0 - lineBarMinNoticeableFraction);
             nc = sum * (1.0 - lineBarMinNoticeableFraction);
@@ -399,12 +397,12 @@ private:
 private:
     QnTimeSlider *m_slider;
     QPainter *m_painter;
-    
+
     qint64 m_centralPosition;
     qreal m_centralCoordinate;
     qint64 m_minChunkLength;
     QRectF m_rect;
-    
+
     qint64 m_position;
     qint64 m_pendingLength;
     qint64 m_pendingPosition;
@@ -424,7 +422,7 @@ public:
     QnTimeSliderStepStorage() {
         QnTimeSlider::createSteps(&m_absolute, &m_relative);
     }
-    
+
     const QVector<QnTimeStep> &absolute() const {
         return m_absolute;
     }
@@ -465,7 +463,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-    m_mergeBookmarksPendingOperation(new QnPendingOperation([this](){ mergeBookmarks(); }, mergeBookmarksInterval, this)),
+    m_bookmarkMergeHelper(new QnBookmarkMergeHelper()),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
@@ -480,7 +478,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
 
     , m_currentRulerRectMousePos()
     , m_lastLineBarValue()
-    , m_bookmarksViewer(new QnBookmarksViewer( 
+    , m_bookmarksViewer(new QnBookmarksViewer(
         std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
         , [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
         {
@@ -565,7 +563,7 @@ void QnTimeSlider::createSteps(QVector<QnTimeStep> *absoluteSteps, QVector<QnTim
     //: Translate this into 'none' or 'forced' if you want to switch off automatic detection of
     //: Do not translate this string unless you know what you're doing.
     QString ampmUsage = tr("auto", "AM/PM usage based on user's system locale.");
-    
+
     bool ampm;
     if(ampmUsage == lit("forced")) {
         ampm = true;
@@ -718,7 +716,7 @@ bool QnTimeSlider::isLineVisible(int line) const {
 void QnTimeSlider::setLineStretch(int line, qreal stretch) {
     if(!checkLine(line))
         return;
-    
+
     if(qFuzzyCompare(m_lineData[line].stretch, stretch))
         return;
 
@@ -756,7 +754,7 @@ QString QnTimeSlider::lineComment(int line) {
 QnTimePeriodList QnTimeSlider::timePeriods(int line, Qn::TimePeriodContent type) const {
     if(!checkLinePeriod(line, type))
         return QnTimePeriodList();
-    
+
     return m_lineData[line].timeStorage.periods(type);
 }
 
@@ -773,7 +771,8 @@ QnCameraBookmarkList QnTimeSlider::bookmarks() const {
 
 void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
     m_bookmarks = bookmarks;
-    mergeBookmarks();
+    m_bookmarkMergeHelper->setBookmarks(bookmarks);
+    update();
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -861,7 +860,7 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             setAnimationStart(start);
             setAnimationEnd(end);
         }
-        else 
+        else
         {
             qint64 oldWindowSize = m_windowEnd - m_windowStart;
 
@@ -871,13 +870,11 @@ void QnTimeSlider::setWindow(qint64 start, qint64 end, bool animate) {
             sliderChange(SliderMappingChange);
             emit windowChanged(m_windowStart, m_windowEnd);
 
-            if (oldWindowSize != m_windowEnd - m_windowStart)
-                m_mergeBookmarksPendingOperation->requestOperation();
-
             updateToolTipVisibility();
             updateMSecsPerPixel();
             updateThumbnailsPeriod();
 
+            m_bookmarksViewer->updateOnWindowChange();
             updateBookmarksViewerTimestamp();
         }
     }
@@ -1010,7 +1007,7 @@ QPointF QnTimeSlider::positionFromValue(qint64 logicalValue, bool bound) const {
     d->ensureMapper();
 
     return QPointF(
-        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound), 
+        d->pixelPosMin + GraphicsStyle::sliderPositionFromValue(m_windowStart, m_windowEnd, logicalValue, d->pixelPosMax - d->pixelPosMin, d->upsideDown, bound),
         0.0
     );
 }
@@ -1134,7 +1131,7 @@ bool QnTimeSlider::scaleWindow(qreal factor, qint64 anchor) {
 
     setWindow(start, end);
 
-    /* If after two adjustments desired window end still lies outside the 
+    /* If after two adjustments desired window end still lies outside the
      * slider range, then we've reached the max scale. */
     return end <= maximum();
 }
@@ -1144,7 +1141,7 @@ QnTimeSlider::Marker QnTimeSlider::markerFromPosition(const QPointF &pos, qreal 
         QPointF selectionStart = positionFromValue(m_selectionStart);
         if(qAbs(selectionStart.x() - pos.x()) < maxDistance)
             return SelectionStartMarker;
-        
+
         QPointF selectionEnd = positionFromValue(m_selectionEnd);
         if(qAbs(selectionEnd.x() - pos.x()) < maxDistance)
             return SelectionEndMarker;
@@ -1227,9 +1224,9 @@ void QnTimeSlider::addThumbnail(const QnThumbnail &thumbnail) {
     if(m_thumbnailsUpdateTimer->isActive())
         return;
 
-    if(m_thumbnailData.contains(thumbnail.time())) 
+    if(m_thumbnailData.contains(thumbnail.time()))
         return; /* There is no real point in overwriting existing thumbnails. Besides, it would result in flicker. */
- 
+
     m_thumbnailData[thumbnail.time()] = ThumbnailData(thumbnail);
 }
 
@@ -1237,75 +1234,8 @@ void QnTimeSlider::clearThumbnails() {
     m_thumbnailData.clear();
 }
 
-void QnTimeSlider::mergeBookmarks() {
-    qint64 windowLength = m_windowEnd - m_windowStart;
-    qint64 mergeDistance = windowLength * bookmarkMergeDistance / rect().width();
-
-    m_mergedBookmarks.clear();
-
-    int firstBookmarkIndex = -1;
-    int lastBookmarkIndex = -1;
-
-    auto mergePendingBookmarks = [this](int firstBookmarkIndex, int lastBookmarkIndex) {
-        BookmarkCluster mergedCluster;
-
-        mergedCluster.startTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
-        mergedCluster.firstBookmarkIndex = firstBookmarkIndex;
-        mergedCluster.lastBookmarkIndex = lastBookmarkIndex;
-
-        mergedCluster.endTimeMs = 0;
-        for (int i = firstBookmarkIndex; i <= lastBookmarkIndex; ++i)
-            mergedCluster.endTimeMs = std::max(mergedCluster.endTimeMs, m_bookmarks[i].endTimeMs());
-
-        return mergedCluster;
-    };
-
-    for (int i = 0; i < m_bookmarks.size(); ++i) {
-        const QnCameraBookmark &bookmark = m_bookmarks[i];
-
-        if (firstBookmarkIndex >= 0 && bookmark.startTimeMs - m_bookmarks[firstBookmarkIndex].startTimeMs >= mergeDistance) {
-            if (lastBookmarkIndex - firstBookmarkIndex + 1 >= minBookmarksToMerge) {
-                m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
-            } else {
-                qint64 firstStartTimeMs = m_bookmarks[firstBookmarkIndex].startTimeMs;
-                do {
-                    m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
-                    ++firstBookmarkIndex;
-                } while (firstBookmarkIndex <= lastBookmarkIndex && bookmark.startTimeMs - firstStartTimeMs >= mergeDistance);
-            }
-            firstBookmarkIndex = lastBookmarkIndex = -1;
-        }
-
-        if (firstBookmarkIndex == -1)
-            firstBookmarkIndex = lastBookmarkIndex = i;
-        else
-            ++lastBookmarkIndex;
-    }
-
-    if (firstBookmarkIndex < 0)
-        return;
-
-    if (lastBookmarkIndex - firstBookmarkIndex + 1 >= minBookmarksToMerge) {
-        m_mergedBookmarks.append(mergePendingBookmarks(firstBookmarkIndex, lastBookmarkIndex));
-    } else {
-        while (firstBookmarkIndex <= lastBookmarkIndex) {
-            m_mergedBookmarks.append(BookmarkCluster(m_bookmarks[firstBookmarkIndex], firstBookmarkIndex));
-            ++firstBookmarkIndex;
-        }
-    }
-}
-
 QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
-    QnCameraBookmarkList result;
-
-    for (const BookmarkCluster &cluster: m_mergedBookmarks) {
-        if (cluster.startTimeMs <= position && position < cluster.endTimeMs) {
-            for (int i = cluster.firstBookmarkIndex; i <= cluster.lastBookmarkIndex; ++i)
-                result.append(m_bookmarks[i]);
-        }
-    }
-
-    return result;
+    return m_bookmarkMergeHelper->bookmarksAtPosition(position, m_msecsPerPixel);
 }
 
 void QnTimeSlider::freezeThumbnails() {
@@ -1415,7 +1345,7 @@ int QnTimeSlider::helpTopicAt(const QPointF &pos) const {
 void QnTimeSlider::updatePixmapCache() {
     m_pixmapCache->setFont(font());
     m_pixmapCache->setColor(palette().color(QPalette::WindowText));
-    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16); 
+    m_noThumbnailsPixmap = m_pixmapCache->textPixmap(tr("NO THUMBNAILS AVAILABLE"), 16);
 
     updateLineCommentPixmaps();
     updateTickmarkTextSteps();
@@ -1555,7 +1485,7 @@ void QnTimeSlider::updateStepAnimationTargets() {
         } else  {
             targetHeight = minTickmarkHeight + (maxTickmarkHeight - minTickmarkHeight) * pow(tickmarkStepScale, maxStepIndex - i);
         }
-        
+
         if(!qFuzzyCompare(data.targetHeight, targetHeight)) {
             data.targetHeight = targetHeight;
 
@@ -1618,7 +1548,7 @@ void QnTimeSlider::animateThumbnails(int deltaMSecs) {
     bool oldShown = false;
     for(QList<ThumbnailData>::iterator pos = m_oldThumbnailData.begin(); pos != m_oldThumbnailData.end(); pos++)
         oldShown |= animateThumbnail(dt, *pos);
-    
+
     if(!oldShown) {
         m_oldThumbnailData.clear();
 
@@ -1651,7 +1581,7 @@ void QnTimeSlider::updateAggregationValue() {
 
     /* Aggregate to 1/16-pixels. */
     qreal aggregationMSecs = qMax(m_msecsPerPixel / 16.0, 1.0);
-    
+
     /* Calculate only once presuming current value is the same on all lines. */
     qreal oldAggregationMSecs = m_lineData[0].timeStorage.aggregationMSecs();
     if(oldAggregationMSecs / 2.0 < aggregationMSecs && aggregationMSecs < oldAggregationMSecs * 2.0)
@@ -1665,7 +1595,7 @@ void QnTimeSlider::updateTotalLineStretch() {
     qreal totalLineStretch = 0.0;
     for(int line = 0; line < m_lineCount; line++)
         totalLineStretch += effectiveLineStretch(line);
-    
+
     if(qFuzzyCompare(m_totalLineStretch, totalLineStretch))
         return;
     m_totalLineStretch = totalLineStretch;
@@ -1708,7 +1638,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
         updateThumbnailsStepSizeLater(); /* Re-start the timer. */
         return;
     }
-    
+
     /* Calculate new bounding size. */
     int boundingHeigth = qRound(thumbnailsHeight());
     if(boundingHeigth < thumbnailHeightForDrawing)
@@ -1745,7 +1675,7 @@ void QnTimeSlider::updateThumbnailsStepSize(bool instant, bool forced) {
     if(m_oldThumbnailData.isEmpty())
         freezeThumbnails();
 
-    /* If animation is running, we want to wait until it's finished. 
+    /* If animation is running, we want to wait until it's finished.
      * We also don't want to update thumbnails too often. */
     qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
     if((!instant || isAnimatingWindow() || currentTime - m_lastThumbnailsUpdateTime < 1000) && !forced) {
@@ -1972,9 +1902,9 @@ void QnTimeSlider::drawSelection(QPainter *painter) {
 }
 
 void QnTimeSlider::drawMarker(QPainter *painter, qint64 pos, const QColor &color) {
-    if(pos < m_windowStart || pos > m_windowEnd) 
+    if(pos < m_windowStart || pos > m_windowEnd)
         return;
-    
+
     //QnScopedPainterAntialiasingRollback antialiasingRollback(painter, false);
     QnScopedPainterPenRollback penRollback(painter, QPen(color, 0));
 
@@ -1989,7 +1919,7 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     qint64 maximumValue = this->windowEnd();
 
     /* The code here may look complicated, but it takes care of not rendering
-     * different motion periods several times over the same location. 
+     * different motion periods several times over the same location.
      * It makes transparent time slider look better. */
 
     /* Note that constness of period lists is important here as requesting
@@ -2016,20 +1946,20 @@ void QnTimeSlider::drawPeriodsBar(QPainter *painter, const QnTimePeriodList &rec
     while(value != maximumValue) {
         qint64 nextValue[Qn::TimePeriodContentCount] = {maximumValue, maximumValue};
         for(int i = 0; i < Qn::TimePeriodContentCount; i++) {
-            if(pos[i] == end[i]) 
+            if(pos[i] == end[i])
                 continue;
-            
+
             if(!inside[i]) {
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs);
                 continue;
             }
-            
+
             if(!pos[i]->isInfinite())
                 nextValue[i] = qMin(maximumValue, pos[i]->startTimeMs + pos[i]->durationMs);
         }
 
         qint64 bestValue = qMin(nextValue[Qn::RecordingContent], nextValue[Qn::MotionContent]);
-        
+
         Qn::TimePeriodContent content;
         if (inside[Qn::MotionContent]) {
             content = Qn::MotionContent;
@@ -2122,7 +2052,7 @@ void QnTimeSlider::drawTickmarks(QPainter *painter, const QRectF &rect) {
 
         /* Calculate line ends. */
         if(pos - m_localOffset >= m_windowStart && pos - m_localOffset <= m_windowEnd) {
-            m_tickmarkLines[index] << 
+            m_tickmarkLines[index] <<
                 QPointF(x, rect.top() + 1.0 /* To prevent antialiased lines being drawn outside provided rect. */) <<
                 QPointF(x, rect.top() + lineHeight);
         }
@@ -2215,7 +2145,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
     qreal thumbnailWidth = rect.height() * aspectRatio;
 
     if(!m_oldThumbnailData.isEmpty() || m_thumbnailsUpdateTimer->isActive()) {
-        QRectF boundingRect = rect; 
+        QRectF boundingRect = rect;
         for (int i = 0; i < m_oldThumbnailData.size(); i++) {
             const ThumbnailData &data = m_oldThumbnailData[i];
             if(data.thumbnail.isEmpty())
@@ -2236,7 +2166,7 @@ void QnTimeSlider::drawThumbnails(QPainter *painter, const QRectF &rect) {
         qint64 startTime = qFloor(m_windowStart, step);
         qint64 endTime = qCeil(m_windowEnd, step);
 
-        QRectF boundingRect = rect; 
+        QRectF boundingRect = rect;
         for (qint64 time = startTime; time <= endTime; time += step) {
             QMap<qint64, ThumbnailData>::iterator pos = m_thumbnailData.find(time);
             if(pos == m_thumbnailData.end())
@@ -2291,25 +2221,26 @@ void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
     if (!m_bookmarksVisible)
         return;
 
-    if (m_mergedBookmarks.isEmpty())
+    QnTimelineBookmarkItemList bookmarks = m_bookmarkMergeHelper->bookmarks(m_msecsPerPixel);
+    if (bookmarks.isEmpty())
         return;
-    
+
     QFontMetricsF fontMetrics(m_pixmapCache->font());
-    
+
     qreal pos = quickPositionFromValue(sliderPosition());
 
     QBrush pastBrush(m_colors.pastBookmarkBound);
     QBrush futureBrush(m_colors.futureBookmarkBound);
 
-    for (int i = 0; i < m_mergedBookmarks.size(); ++i) {
-        const BookmarkCluster &bookmarkCluster = m_mergedBookmarks[i];
+    for (int i = 0; i < bookmarks.size(); ++i) {
+        const QnTimelineBookmarkItem &bookmarkItem = bookmarks[i];
 
-        if (bookmarkCluster.startTimeMs >= m_windowEnd || bookmarkCluster.endTimeMs <= m_windowStart)
+        if (bookmarkItem.startTimeMs() >= m_windowEnd || bookmarkItem.endTimeMs() <= m_windowStart)
             continue;
 
         QRectF bookmarkRect = rect;
-        bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkCluster.startTimeMs, m_windowStart)));
-        bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkCluster.endTimeMs, m_windowEnd)));
+        bookmarkRect.setLeft(quickPositionFromValue(qMax(bookmarkItem.startTimeMs(), m_windowStart)));
+        bookmarkRect.setRight(quickPositionFromValue(qMin(bookmarkItem.endTimeMs(), m_windowEnd)));
 
         QBrush leftBoundBrush;
         QBrush rightBoundBrush;
@@ -2329,14 +2260,14 @@ void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
         painter->fillRect(bookmarkRect.left(), bookmarkRect.top(), 1, bookmarkRect.height(), leftBoundBrush);
         painter->fillRect(bookmarkRect.right() - 1, bookmarkRect.top(), 1, bookmarkRect.height(), rightBoundBrush);
 
-        if (bookmarkCluster.firstBookmarkIndex != bookmarkCluster.lastBookmarkIndex)
+        if (bookmarkItem.isCluster())
             continue;
 
-        const QnCameraBookmark &bookmark = m_bookmarks[bookmarkCluster.firstBookmarkIndex];
+        const QnCameraBookmark &bookmark = bookmarkItem.bookmark();
 
         QRectF textRect = bookmarkRect;
-        if (i < m_mergedBookmarks.size() - 1)
-            textRect.setRight(qMin(bookmarkRect.right(), quickPositionFromValue(m_mergedBookmarks[i + 1].startTimeMs)));
+        if (i < bookmarks.size() - 1)
+            textRect.setRight(qMin(bookmarkRect.right(), quickPositionFromValue(bookmarks[i + 1].startTimeMs())));
         textRect.adjust(bookmarkTextPadding, 0, -bookmarkTextPadding, 0);
 
         QString text = fontMetrics.elidedText(bookmark.name, Qt::ElideRight, textRect.width());
@@ -2483,12 +2414,12 @@ void QnTimeSlider::wheelEvent(QGraphicsSceneWheelEvent *event) {
         return; /* Do nothing if animated unzoom is in progress. */
     }
 
-    /* delta() returns the distance that the wheel is rotated 
+    /* delta() returns the distance that the wheel is rotated
      * in eighths (1/8s) of a degree. */
     qreal degrees = event->delta() / 8.0;
 
     m_zoomAnchor = valueFromPosition(event->pos());
-    
+
     /* Snap zoom anchor to window sides. */
     if(m_options & SnapZoomToSides) {
         qreal windowRange = m_windowEnd - m_windowStart;
@@ -2517,7 +2448,7 @@ void QnTimeSlider::resizeEvent(QGraphicsSceneResizeEvent *event) {
 
 void QnTimeSlider::kineticMove(const QVariant &degrees) {
     qreal factor = std::pow(2.0, -degrees.toReal() / degreesFor2x);
-    
+
     if(!scaleWindow(factor, m_zoomAnchor))
         kineticProcessor()->reset();
 }
@@ -2563,7 +2494,7 @@ void QnTimeSlider::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event) {
 
 void QnTimeSlider::hoverEnterEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverEnterEvent(event);
-    
+
     unsetCursor();
 }
 
@@ -2616,26 +2547,13 @@ void QnTimeSlider::updateBookmarksViewerTimestamp()
     if (lineBarRect.contains(m_currentRulerRectMousePos))
     {
         const auto timestamp = valueFromPosition(m_currentRulerRectMousePos);
-        const auto emptyBookmarks = bookmarksAtPosition(timestamp).empty();
-        if (emptyBookmarks)
-            m_bookmarksViewer->resetBookmarks();
-        else
-            m_bookmarksViewer->setTargetTimestamp(timestamp);
-    }
-    else
-    {
-        m_bookmarksViewer->updateOnWindowChange();
+        m_bookmarksViewer->setTargetTimestamp(timestamp);
     }
 }
 
 void QnTimeSlider::processBoomarksHover(QGraphicsSceneHoverEvent *event)
-{  
-    const auto pos = event->pos();
+{
     m_currentRulerRectMousePos = event->pos();
-
-    if (pos != m_currentRulerRectMousePos)
-        return;
-
     updateBookmarksViewerTimestamp();
 }
 
@@ -2644,7 +2562,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
         m_dragMarker = markerFromPosition(event->pos(), hoverEffectDistance);
     } else if(event->button() == Qt::RightButton) {
         if(m_options & SelectionEditable) {
-            m_dragMarker = CreateSelectionMarker; 
+            m_dragMarker = CreateSelectionMarker;
         } else {
             m_dragMarker = NoMarker;
         }
@@ -2666,7 +2584,7 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent *event) {
     event->accept();
 }
 
-void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event) 
+void QnTimeSlider::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     dragProcessor()->mouseMoveEvent(this, event);
     event->accept();
@@ -2734,7 +2652,7 @@ void QnTimeSlider::dragMove(DragInfo *info) {
 
     if(m_dragMarker == NoMarker || m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker)
         setSliderPosition(valueFromPosition(mousePos));
-    
+
     if(m_dragMarker == SelectionStartMarker || m_dragMarker == SelectionEndMarker) {
         qint64 selectionStart = m_selectionStart;
         qint64 selectionEnd = m_selectionEnd;
@@ -2768,20 +2686,4 @@ void QnTimeSlider::finishDrag(DragInfo *) {
     }
 
     setSliderDown(false);
-}
-
-QnTimeSlider::BookmarkCluster::BookmarkCluster()
-    : startTimeMs(-1)
-    , endTimeMs(-1)
-    , firstBookmarkIndex(-1)
-    , lastBookmarkIndex(-1)
-{
-}
-
-QnTimeSlider::BookmarkCluster::BookmarkCluster(const QnCameraBookmark &bookmark, int index)
-    : startTimeMs(bookmark.startTimeMs)
-    , endTimeMs(bookmark.endTimeMs())
-    , firstBookmarkIndex(index)
-    , lastBookmarkIndex(index)
-{
 }

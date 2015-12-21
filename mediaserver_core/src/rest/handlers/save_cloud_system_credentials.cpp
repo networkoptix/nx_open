@@ -40,7 +40,7 @@ int QnSaveCloudSystemCredentialsHandler::executeGet(
         return CODE_OK;
     }
 
-    //trying to connect to the cloud
+    //trying to connect to the cloud to activate system
     std::unique_ptr<
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)
@@ -49,12 +49,13 @@ int QnSaveCloudSystemCredentialsHandler::executeGet(
         cloudSystemID.toStdString(),
         cloudAuthKey.toStdString());
     nx::cdb::api::ResultCode cdbResultCode = nx::cdb::api::ResultCode::ok;
-    nx::cdb::api::ModuleInfo cloudModuleInfo;
-    std::tie(cdbResultCode, cloudModuleInfo) = makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::ModuleInfo>(
-        std::bind(
-            &nx::cdb::api::Connection::ping,
-            cloudConnection.get(),
-            std::placeholders::_1));
+    nx::cdb::api::NonceData nonceData;
+    std::tie(cdbResultCode, nonceData) =
+        makeSyncCall<nx::cdb::api::ResultCode, nx::cdb::api::NonceData>(
+            std::bind(
+                &nx::cdb::api::AuthProvider::getCdbNonce,
+                cloudConnection->authProvider(),
+                std::placeholders::_1));
 
     if (cdbResultCode != nx::cdb::api::ResultCode::ok)
     {

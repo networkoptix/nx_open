@@ -2,11 +2,11 @@
 
 #include <utils/common/id.h>
 #include <core/resource/resource_fwd.h>
-#include <utils/common/singleton.h>
 #include <utils/common/connective.h>
 
 class QnAvailableCamerasWatcherPrivate;
-class QnAvailableCamerasWatcher : public Connective<QObject>, public Singleton<QnAvailableCamerasWatcher> {
+class QnAvailableCamerasWatcher : public Connective<QObject>
+{
     Q_OBJECT
 
     typedef Connective<QObject> base_type;

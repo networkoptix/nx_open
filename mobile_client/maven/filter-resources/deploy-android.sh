@@ -27,6 +27,10 @@ else
 fi
 TARGET_APK=revamped-${installer.name}-${project.version.name}.${project.version.code}-$APK_SUFFIX.apk
 
+rm -rf $BUILD_TARGET
+
+set -e
+
 make install --makefile=Makefile.${build.configuration} INSTALL_ROOT=$BUILD_TARGET
 ${libdir}/bin/androiddeployqt $BUILD_TYPE $SIGN --input android-deployment.json --output $BUILD_TARGET $*
 
