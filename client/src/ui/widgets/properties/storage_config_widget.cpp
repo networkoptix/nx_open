@@ -709,18 +709,29 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     using boost::algorithm::any_of;
 
-    bool backupIsActive = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
+    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
         return info.isBackup;
     });
 
     /* Notify about backup possibility if there are less than two valid storages in the system. */
-    bool backupIsPossible = !isReadOnly()
-        && !backupIsActive
-        && boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info) { return info.isWritable; }) <= 1;
 
-    ui->backupStoragesGroupBox->setVisible(backupIsActive);
-    ui->backupControls->setVisible(backupIsActive);
-    ui->backupOptionLabel->setVisible(backupIsPossible);
+    const auto writableDevices = boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info)
+    {
+        return info.isWritable;
+    });
+
+
+    ui->backupStoragesGroupBox->setVisible(backupStoragesExist);
+    ui->backupControls->setVisible(backupStoragesExist);
+
+    // Show warning when:
+    // 1. Not read only
+    // 2. No storages where isBackup == true
+    // 3. Writable storages count is less than 2
+    const bool lessThanTwoStorages = (writableDevices < 2);
+    const bool showWarning = (!isReadOnly() &&
+        !backupStoragesExist && lessThanTwoStorages);
+    ui->backupOptionLabel->setVisible(showWarning);
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
