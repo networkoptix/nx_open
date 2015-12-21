@@ -214,6 +214,8 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         if (m_allCamerasChoosen)
             resetToAllAvailableCameras();
     });
+
+    m_ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Search bookmarks by name, tag or description"));
 }
 
 QnSearchBookmarksDialog::Impl::~Impl()
