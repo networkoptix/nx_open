@@ -38,7 +38,7 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
     connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked, this, [this]()
     {
         const bool isFixedDuration = ui->fixedDurationCheckBox->isChecked();
-        ui->ruleWarning->setVisible(isFixedDuration);
+        ui->ruleWarning->setVisible(!isFixedDuration);
         paramsChanged();
     });
 
@@ -93,7 +93,7 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
         const bool isFixedFuration = (params.durationMs > 0);
         ui->fixedDurationCheckBox->setChecked(isFixedFuration);
-        ui->ruleWarning->setVisible(isFixedFuration);
+        ui->ruleWarning->setVisible(!isFixedFuration);
         if (ui->fixedDurationCheckBox->isChecked())
             ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
 
