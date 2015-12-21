@@ -728,9 +728,9 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     // 1. Not read only
     // 2. No storages where isBackup == true
     // 3. Writable storages count is less than 2
-    const bool lessThanTwoStorages = (writableDevices > 1);
+    const bool lessThanTwoStorages = (writableDevices < 2);
     const bool showWarning = (!isReadOnly() &&
-        !backupStoragesExist && !lessThanTwoStorages);
+        !backupStoragesExist && lessThanTwoStorages);
     ui->backupOptionLabel->setVisible(showWarning);
 }
 
