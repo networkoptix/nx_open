@@ -1,27 +1,21 @@
 #pragma once
 
-#include <QtWidgets/QDialog>
-
-namespace Ui
-{
-    class QnUnlinkFromCloudDialog;
-}
+#include <ui/dialogs/message_box.h>
 
 class QnUnlinkFromCloudDialogPrivate;
 
-class QnUnlinkFromCloudDialog : public QDialog
+class QnUnlinkFromCloudDialog : public QnMessageBox
 {
     Q_OBJECT
-    typedef QDialog base_type;
+    typedef QnMessageBox base_type;
 
 public:
     explicit QnUnlinkFromCloudDialog(QWidget *parent = 0);
     ~QnUnlinkFromCloudDialog();
 
-    void accept() override;
+    void done(int result) override;
 
 private:
-    QScopedPointer<Ui::QnUnlinkFromCloudDialog> ui;
     QScopedPointer<QnUnlinkFromCloudDialogPrivate> d_ptr;
     Q_DECLARE_PRIVATE(QnUnlinkFromCloudDialog)
 };
