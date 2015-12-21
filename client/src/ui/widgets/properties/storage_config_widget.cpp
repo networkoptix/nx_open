@@ -714,13 +714,19 @@ void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     });
 
     /* Notify about backup possibility if there are less than two valid storages in the system. */
-    bool backupIsPossible = !isReadOnly()
-        && !backupIsActive
-        && boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info) { return info.isWritable; }) <= 1;
+
+    const auto writableDevices = boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info)
+    {
+        return info.isWritable;
+    });
+
+    const bool moreThanOneStorageDevices = (writableDevices > 1);
+    const bool backupIsPossible = (!isReadOnly() &&
+        !backupIsActive && moreThanOneStorageDevices);
 
     ui->backupStoragesGroupBox->setVisible(backupIsActive);
     ui->backupControls->setVisible(backupIsActive);
-    ui->backupOptionLabel->setVisible(backupIsPossible);
+    ui->backupOptionLabel->setVisible(!moreThanOneStorageDevices);
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
