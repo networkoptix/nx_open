@@ -358,6 +358,11 @@ private:
     void addInfoOverlay();
     void addMainOverlay();
 
+    void setupIconButton(QGraphicsLinearLayout *layout
+        , QnImageButtonWidget *button);
+
+    void insertIconButtonCopy(QGraphicsLinearLayout *layout);
+
     Q_SLOT void updateCheckedButtons();
 
     Q_SLOT void at_infoButton_toggled(bool toggled);
