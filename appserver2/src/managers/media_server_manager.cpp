@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>

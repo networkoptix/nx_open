@@ -42,7 +42,7 @@ AccountManager::AccountManager(
     const conf::Settings& settings,
     TemporaryAccountPasswordManager* const tempPasswordManager,
     nx::db::DBManager* const dbManager,
-    EMailManager* const emailManager ) throw( std::runtime_error )
+    AbstractEmailManager* const emailManager) throw(std::runtime_error)
 :
     m_settings(settings),
     m_tempPasswordManager(tempPasswordManager),

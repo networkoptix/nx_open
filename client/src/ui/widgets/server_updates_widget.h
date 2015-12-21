@@ -52,7 +52,7 @@ private:
     void checkForUpdatesInternet(bool autoSwitch = false, bool autoStart = false);
     void checkForUpdatesLocal();
 
-    QString serverNamesString(const QSet<QnUuid> &serverIds);
+    QString serverNamesString(const QnMediaServerResourceList &servers);
 
 private:
     enum UpdateSource {

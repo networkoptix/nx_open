@@ -146,7 +146,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
         notify = m_historyValidCameras.contains(cameraId);
         m_historyValidCameras.remove(cameraId);
         if (m_asyncRunningRequests.contains(cameraId)) {
-            server->serverRestConnection()->cancelRequest(m_asyncRunningRequests[cameraId]);
+            server->restConnection()->cancelRequest(m_asyncRunningRequests[cameraId]);
             m_asyncRunningRequests.remove(cameraId);
             notify = true;
         }
@@ -177,7 +177,8 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
     
     QnMutexLocker lock(&m_mutex);
     using namespace std::placeholders;
-    auto handle = server->serverRestConnection()->cameraHistoryAsync(request, [this, callback] (bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods) {
+    auto handle = server->restConnection()->cameraHistoryAsync(request, [this, callback] (bool success, rest::Handle id, const ec2::ApiCameraHistoryDataList &periods)
+    {
         at_cameraPrepared(success, id, periods, callback);
     });
     bool started = handle > 0;

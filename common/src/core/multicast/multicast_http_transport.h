@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QElapsedTimer>
-#include <QUdpSocket>
+#include <QtNetwork/QUdpSocket>
 #include <QTimer>
 #include "multicast_http_fwd.h"
 #include <memory>

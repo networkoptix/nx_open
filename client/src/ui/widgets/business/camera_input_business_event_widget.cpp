@@ -25,8 +25,8 @@ void QnCameraInputBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *
     setTabOrder(ui->relayComboBox, after);
 }
 
-void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -35,7 +35,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
         QnIOPortDataList inputPorts;
         bool inited = false;
 
-        QnVirtualCameraResourceList cameras = model->eventResources().filtered<QnVirtualCameraResource>();
+        QnVirtualCameraResourceList cameras = model()->eventResources().filtered<QnVirtualCameraResource>();
         foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
             QnIOPortDataList cameraInputs = camera->getInputPortList();
             if (!inited) {
@@ -67,7 +67,7 @@ void QnCameraInputBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewMo
     }
 
     if (fields & QnBusiness::EventParamsField) {
-        QString text = model->eventParams().inputPortId;
+        QString text = model()->eventParams().inputPortId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
     }

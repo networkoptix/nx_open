@@ -4,7 +4,7 @@
 #include <exception>
 #include <list>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 #include <set>
 
 #include <QtConcurrent/QtConcurrentMap>

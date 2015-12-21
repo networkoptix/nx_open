@@ -120,23 +120,25 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
     return result.take();
 }
 
-bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const {
-    const QString paramsTemplateFileName(lit(":/camera_advanced_params/dw.xml"));
-    QFile paramsTemplateFile(paramsTemplateFileName);
-#ifdef _DEBUG
-    QnCameraAdvacedParamsXmlParser::validateXml(&paramsTemplateFile);
-#endif
-    bool result = QnCameraAdvacedParamsXmlParser::readXml(&paramsTemplateFile, params);
-#ifdef _DEBUG
-    if (!result)
-        qWarning() << "Error while parsing xml" << paramsTemplateFileName;
-#endif
-    return result;
+bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const 
+{
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.value<bool>(lit("dw-pravis-chipset")))
+        return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw-pravis.xml"));
+    else
+        return loadXmlParametersInternal(params, lit(":/camera_advanced_params/dw.xml"));
 }
 
-void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) {
+void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params) 
+{
     base_type::initAdvancedParametersProviders(params);
-    m_cameraProxy.reset(new DWCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+
+    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    if (resourceData.value<bool>(lit("dw-pravis-chipset")))
+        m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+    else
+        m_cameraProxy.reset(new QnWin4NetCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
+    m_cameraProxy->setCameraAdvancedParams(params);
 }
 
 QSet<QString> QnDigitalWatchdogResource::calculateSupportedAdvancedParameters() const {
@@ -189,7 +191,11 @@ bool QnDigitalWatchdogResource::setAdvancedParameterUnderLock(const QnCameraAdva
         return true;
     if (!m_cameraProxy)
         return false;
-    return m_cameraProxy->setParam(parameter, value);
+
+    QVector<QPair<QnCameraAdvancedParameter, QString>> params;
+    params << QPair<QnCameraAdvancedParameter, QString>(parameter, value);
+
+    return m_cameraProxy->setParams(params);
 }
 
 bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result)
@@ -211,7 +217,7 @@ bool QnDigitalWatchdogResource::setAdvancedParametersUnderLock(const QnCameraAdv
     }
     if (!success)
         return false;
-    return m_cameraProxy->setParams(moreParamsToProcess, result);
+    return m_cameraProxy->setParams(moreParamsToProcess, &result);
 }
 
 #endif //ENABLE_ONVIF

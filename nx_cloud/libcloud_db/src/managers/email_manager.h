@@ -28,58 +28,39 @@
 namespace nx {
 namespace cdb {
 
-//!Responsible for sending emails
-class EMailManager
+class AbstractEmailManager
 {
 public:
-    EMailManager( const conf::Settings& settings ) throw(std::runtime_error);
-    virtual ~EMailManager();
+    virtual ~AbstractEmailManager() {}
 
     template<class NotificationType>
     void sendAsync(
         NotificationType notification,
         std::function<void(bool)> completionHandler)
     {
-        auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
-
-        if (!m_settings.notification().enabled)
-        {
-            if (completionHandler)
-            {
-                nx::SocketGlobals::aioService().post(
-                    [asyncOperationLocker, completionHandler]() {
-                        completionHandler(false);
-                    });
-            }
-            return;
-        }
-
-        QUrl url;
-        url.setScheme("http");
-        url.setHost(m_notificationModuleEndpoint.address.toString());
-        url.setPort(m_notificationModuleEndpoint.port);
-        url.setPath("/notifications/send");
-
-        auto httpClient = nx_http::AsyncHttpClient::create();
-        QObject::connect(
-            httpClient.get(), &nx_http::AsyncHttpClient::done,
-            httpClient.get(),
-            [this, asyncOperationLocker, completionHandler](nx_http::AsyncHttpClientPtr client) {
-                onSendNotificationRequestDone(
-                    std::move(asyncOperationLocker),
-                    std::move(client),
-                    std::move(completionHandler));
-            },
-            Qt::DirectConnection);
-        {
-            QnMutexLocker lk(&m_mutex);
-            m_ongoingRequests.insert(httpClient);
-        }
-        httpClient->doPost(
-            url,
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-            QJson::serialized(std::move(notification)));
+        sendAsync(
+            QJson::serialized(notification),
+            std::move(completionHandler));
     }
+
+    virtual void sendAsync(
+        QByteArray serializedNotification,
+        std::function<void(bool)> completionHandler) = 0;
+};
+
+//!Responsible for sending emails
+class EMailManager
+:
+    public AbstractEmailManager
+{
+public:
+    EMailManager(const conf::Settings& settings) throw(std::runtime_error);
+    virtual ~EMailManager();
+
+protected:
+    virtual void sendAsync(
+        QByteArray serializedNotification,
+        std::function<void(bool)> completionHandler) override;
 
 private:
     struct SendEmailTask
@@ -99,6 +80,18 @@ private:
         QnCounter::ScopedIncrement asyncCallLocker,
         nx_http::AsyncHttpClientPtr client,
         std::function<void(bool)> completionHandler);
+};
+
+/*!
+    \note Access to internal factory func is not synchronized
+*/
+class EMailManagerFactory
+{
+public:
+    static AbstractEmailManager* create(const conf::Settings& settings);
+    static void setFactory(
+        std::function<AbstractEmailManager*(
+            const conf::Settings& settings)> factoryFunc);
 };
 
 }   //cdb

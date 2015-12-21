@@ -8,12 +8,12 @@
 
 // TODO: #MSAPI rename module to rest_result
 // Add format field (Qn::SerializationFormat) that will be set in QnJsonRestHandler (to be renamed).
-// 
-// And it also might make sense to get rid of "error" in reply. Looks like it 
+//
+// And it also might make sense to get rid of "error" in reply. Looks like it
 // was a bad idea in the first place. This way we'll send a reply if there was
-// no error, and some HTTP error code otherwise. And maybe a text/plain 
+// no error, and some HTTP error code otherwise. And maybe a text/plain
 // description of the error.
-// 
+//
 
 struct QnRestResult {
 public:
@@ -31,10 +31,7 @@ public:
     QnRestResult();
     void setError(Error errorValue, const QString &errorStringValue = QString());
 };
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnRestResult::Error)
-
 #define QnRestResult_Fields (error)(errorString)
-
 
 struct QnJsonRestResult: public QnRestResult {
 public:
@@ -78,8 +75,11 @@ public:
 
 #define QnUbjsonRestResult_Fields QnRestResult_Fields (reply)
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(QnRestResult::Error)
+QN_FUSION_DECLARE_FUNCTIONS(QnRestResult::Error, (lexical)(numeric))
+QN_FUSION_DECLARE_FUNCTIONS(QnRestResult, (ubjson)(xml)(json)(csv_record))
+
 #define QN_REST_RESULT_TYPES \
-    (QnRestResult) \
     (QnJsonRestResult) \
     (QnUbjsonRestResult)
 

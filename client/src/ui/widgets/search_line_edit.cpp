@@ -2,6 +2,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QMimeData>
+#include <QtCore/QTimer>
 
 #include <QtGui/QFocusEvent>
 #include <QtGui/QDrag>
@@ -15,67 +16,14 @@
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOptionFrameV2>
 
-#include <ui/style/skin.h>
 #include <ui/common/palette.h>
-
-namespace {
-    /** Search icon on the left hand side */
-    class QnSearchButton : public QAbstractButton {
-    public:
-        QnSearchButton(QWidget *parent = 0): 
-            QAbstractButton(parent)
-        {
-            setObjectName(QLatin1String("QnSearchButton"));
-#ifndef QT_NO_CURSOR
-            setCursor(Qt::ArrowCursor);
-#endif //QT_NO_CURSOR
-            setFocusPolicy(Qt::NoFocus);
-        }
-
-        void paintEvent(QPaintEvent *event) {
-            Q_UNUSED(event);
-
-            int size = height(); //assuming height and width are equal
-            QPainterPath &path = m_pathCacheBySize[size];
-            if (path.isEmpty()) {
-                int radius = (size / 5) * 2;
-                QRect circle(size / 3 - 1, size / 4, radius, radius);
-                path.addEllipse(circle);
-
-                path.arcMoveTo(circle, 300);
-                QPointF c = path.currentPosition();
-                int diff = size / 7;
-                path.lineTo(qMin(width() - 2, (int)c.x() + diff), c.y() + diff);
-            }
-
-            QPainter painter(this);
-            painter.setRenderHint(QPainter::Antialiasing, true);
-            painter.setPen(QPen(Qt::darkGray, 2));  //TODO: #GDM #Bookmarks should we customize this?
-            painter.drawPath(path);                 //TODO: #GDM #Bookmarks should we cache pixmap?
-            painter.end();
-        }
-
-    private:
-        QMap<int, QPainterPath> m_pathCacheBySize;
-    };
-
-    QToolButton *createCloseButton(QnSearchLineEdit *parent)
-    {
-        QToolButton *result = new QToolButton(parent);
-        result->setIcon(qnSkin->icon(lit("titlebar/close_tab.png")));
-        result->setToolTip(QObject::tr("Close"));
-        QObject::connect(result, &QAbstractButton::clicked, parent, &QnSearchLineEdit::escKeyPressed);
-
-        return result;
-    }
-}
+#include <utils/common/delayed.h>
 
 QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     : QWidget(parent)
     , m_lineEdit(new QLineEdit(this))
-    , m_closeButton(createCloseButton(this))
-    , m_searchButton(new QnSearchButton(this))
-    , m_closeButtonVisible(true)
+    , m_textChangedSignalFilterMs(0)
+    , m_filterTimer()
 {
     setFocusPolicy(m_lineEdit->focusPolicy());
     setAttribute(Qt::WA_InputMethodEnabled);
@@ -95,44 +43,29 @@ QnSearchLineEdit::QnSearchLineEdit(QWidget *parent)
     clearPalette.setBrush(QPalette::Base, QBrush(Qt::transparent));
     m_lineEdit->setPalette(clearPalette);
     m_lineEdit->setPlaceholderText(tr("Search"));
-    connect(m_lineEdit, &QLineEdit::textChanged, this, &QnSearchLineEdit::textChanged);
     connect(m_lineEdit, &QLineEdit::returnPressed, this, &QnSearchLineEdit::enterKeyPressed);
+
+    connect(m_lineEdit, &QLineEdit::textChanged, this
+        , [this](const QString &text)
+    {
+        const auto emitTextChanged = [this, text]()
+        {
+            emit textChanged(text);
+            m_filterTimer.reset();
+        };
+
+        if (m_textChangedSignalFilterMs <= 0)
+        {
+            emitTextChanged();
+            return;
+        }
+
+        m_filterTimer.reset(executeDelayedParented(
+            emitTextChanged, m_textChangedSignalFilterMs, this));
+    });
 
     QSizePolicy policy = sizePolicy();
     setSizePolicy(QSizePolicy::Preferred, policy.verticalPolicy());
-}
-
-void QnSearchLineEdit::resizeEvent(QResizeEvent *event) {
-    updateGeometries();
-    QWidget::resizeEvent(event);
-}
-
-void QnSearchLineEdit::updateGeometries() {
-
-    QStyleOptionFrameV2 panel;
-    initStyleOption(&panel);
-    QRect rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
-
-    const int height = rect.height();
-    const int width = rect.width();
-    const int buttonSize = height;
-    int editWidth = rect.width();
-    
-    const int closeButtonSize = height * 3 / 4;
-    // left edge
-    m_searchButton->setGeometry(rect.x(), rect.y(), buttonSize, buttonSize);
-    editWidth -= buttonSize;
-
-    // right edge
-    if (m_closeButtonVisible) {
-        m_closeButton->setGeometry(
-                    width - (buttonSize + closeButtonSize) / 2,
-                    rect.y() + (buttonSize - closeButtonSize) / 2 + 1,
-                    closeButtonSize, closeButtonSize);
-        editWidth -= closeButtonSize;
-    }
-
-    m_lineEdit->setGeometry(m_searchButton->x() + buttonSize, 0, editWidth, height);
 }
 
 void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
@@ -151,24 +84,27 @@ void QnSearchLineEdit::initStyleOption(QStyleOptionFrameV2 *option) const
     option->features = QStyleOptionFrameV2::None;
 }
 
-QSize QnSearchLineEdit::sizeHint() const {
+QSize QnSearchLineEdit::sizeHint() const
+{
     m_lineEdit->setFrame(true);
     QSize size = m_lineEdit->sizeHint();
     m_lineEdit->setFrame(false);
     return size;
 }
 
-void QnSearchLineEdit::focusInEvent(QFocusEvent *event) 
+void QnSearchLineEdit::focusInEvent(QFocusEvent *event)
 {
     m_lineEdit->event(event);
     m_lineEdit->selectAll();
     QWidget::focusInEvent(event);
 }
 
-void QnSearchLineEdit::focusOutEvent(QFocusEvent *event) {
+void QnSearchLineEdit::focusOutEvent(QFocusEvent *event)
+{
     m_lineEdit->event(event);
 
-    if (m_lineEdit->completer()) {
+    if (m_lineEdit->completer())
+    {
         connect(m_lineEdit->completer(), SIGNAL(activated(QString)),
             m_lineEdit, SLOT(setText(QString)));
         connect(m_lineEdit->completer(), SIGNAL(highlighted(QString)),
@@ -181,18 +117,13 @@ void QnSearchLineEdit::keyPressEvent(QKeyEvent *event)
 {
     m_lineEdit->event(event);
     if ((event->key() == Qt::Key_Enter) || (event->key() == Qt::Key_Return))
-    {
         event->accept();
-    }
 }
 
 void QnSearchLineEdit::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::EnabledChange)
-    {
-        m_closeButton->setVisible(m_closeButtonVisible && isEnabled()); /// To update close button state when hiding/showing
         emit enabledChanged();
-    }
 }
 
 bool QnSearchLineEdit::event(QEvent *event)
@@ -203,7 +134,7 @@ bool QnSearchLineEdit::event(QEvent *event)
         const bool result = m_lineEdit->event(event);
         if (keyEvent->key() == Qt::Key_Escape)
         {
-            escKeyPressed();
+            emit escKeyPressed();
             keyEvent->accept();
         }
         return result;
@@ -212,7 +143,8 @@ bool QnSearchLineEdit::event(QEvent *event)
     return QWidget::event(event);
 }
 
-void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
+void QnSearchLineEdit::paintEvent(QPaintEvent *event)
+{
     Q_UNUSED(event)
     QPainter p(this);
     QStyleOptionFrameV2 panel;
@@ -220,22 +152,22 @@ void QnSearchLineEdit::paintEvent(QPaintEvent *event) {
     style()->drawPrimitive(QStyle::PE_PanelLineEdit, &panel, &p, this);
 }
 
-QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const {
+QVariant QnSearchLineEdit::inputMethodQuery(Qt::InputMethodQuery property) const
+{
     return m_lineEdit->inputMethodQuery(property);
 }
 
-bool QnSearchLineEdit::isCloseButtonVisible() const {
-    return m_closeButtonVisible;
+int QnSearchLineEdit::textChangedSignalFilterMs() const
+{
+    return m_textChangedSignalFilterMs;
 }
 
-void QnSearchLineEdit::setCloseButtonVisible(bool visible) {
-    if (m_closeButtonVisible == visible)
-        return;
-
-    m_closeButtonVisible = visible;
-    m_closeButton->setVisible(visible && isEnabled());
+void QnSearchLineEdit::setTextChangedSignalFilterMs(int filterMs)
+{
+    m_textChangedSignalFilterMs = filterMs;
 }
 
-void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e) {
+void QnSearchLineEdit::inputMethodEvent(QInputMethodEvent *e)
+{
     m_lineEdit->event(e);
 }

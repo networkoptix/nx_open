@@ -325,7 +325,7 @@ protected:
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
-
+    bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
