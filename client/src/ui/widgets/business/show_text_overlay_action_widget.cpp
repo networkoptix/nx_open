@@ -31,12 +31,18 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
     connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
-    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
 
-    connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, [this]()
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked, this, [this]()
+    {
+        const bool isFixedDuration = ui->fixedDurationCheckBox->isChecked();
+        ui->ruleWarning->setVisible(isFixedDuration);
+        paramsChanged();
+    });
+
+    connect(ui->customTextCheckBox,     &QCheckBox::clicked, this, [this]()
     {
         ui->customTextEdit->setPlainText(ui->customTextCheckBox->isChecked()
             ? model()->actionParams().text : getPlaceholderText());
@@ -85,9 +91,12 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
         const auto params = model()->actionParams();
 
-        ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
+        const bool isFixedFuration = (params.durationMs > 0);
+        ui->fixedDurationCheckBox->setChecked(isFixedFuration);
+        ui->ruleWarning->setVisible(isFixedFuration);
         if (ui->fixedDurationCheckBox->isChecked())
             ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
+
 
         const bool useCustomText = !params.text.isEmpty();
         ui->customTextCheckBox->setChecked(useCustomText);
