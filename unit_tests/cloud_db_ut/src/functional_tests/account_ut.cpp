@@ -28,7 +28,7 @@ namespace cdb {
 
 TEST_F(CdbFunctionalTest, account_activation)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
@@ -75,7 +75,7 @@ TEST_F(CdbFunctionalTest, account_activation)
 
 TEST_F(CdbFunctionalTest, account_reactivation)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
@@ -117,7 +117,7 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 //reactivation of already activated account must fail
 TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
@@ -149,7 +149,7 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
 TEST_F(CdbFunctionalTest, account_general)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(3);
@@ -239,7 +239,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
 TEST_F(CdbFunctionalTest, account_badRegistration)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
@@ -375,7 +375,7 @@ TEST_F(CdbFunctionalTest, account_update)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_general)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(4);
@@ -434,7 +434,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
