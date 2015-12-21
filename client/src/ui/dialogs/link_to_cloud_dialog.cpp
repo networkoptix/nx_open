@@ -88,8 +88,6 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
 
     connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
-    connect(ui->buttonBox,          &QDialogButtonBox::accepted,        this,   &QnLinkToCloudDialog::accept);
-    connect(ui->buttonBox,          &QDialogButtonBox::rejected,        this,   &QnLinkToCloudDialog::reject);
 
     const QString createAccountUrl = QnAppInfo::cloudPortalUrl() + kCreateAccountPath;
     const QString createAccountText = tr("Create account");

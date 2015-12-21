@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QtWidgets/QDialog>
+#include <ui/dialogs/button_box_dialog.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 namespace Ui
 {
@@ -9,11 +10,11 @@ namespace Ui
 
 class QnLinkToCloudDialogPrivate;
 
-class QnLinkToCloudDialog : public QDialog
+class QnLinkToCloudDialog : public QnWorkbenchStateDependentButtonBoxDialog
 {
     Q_OBJECT
 
-    typedef QDialog base_type;
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 
 public:
     explicit QnLinkToCloudDialog(QWidget *parent = 0);
