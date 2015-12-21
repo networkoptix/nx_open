@@ -87,6 +87,13 @@ namespace
         return QSize(resolution.left(pos).toInt(), resolution.mid(pos + 1).toInt());
     }
 
+    bool transcodingSupportedForServer(const QnMediaServerResourcePtr &server)
+    {
+        // TODO: #dklychkov Reimplement when we have proper API for this.
+        const auto flags = server->getServerFlags();
+        return !(flags & (Qn::SF_ArmServer | Qn::SF_Edge));
+    }
+
 } // anonymous namespace
 
 QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
@@ -95,6 +102,7 @@ QnMediaResourceHelper::QnMediaResourceHelper(QObject *parent)
     , m_finalTimestamp(-1)
     , m_nativeStreamIndex(1)
     , m_transcodingSupported(true)
+    , m_useTranscoding(true)
     , m_transcodingProtocol(transcodingProtocol)
     , m_nativeProtocol(nativeStreamProtocol)
     , m_maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
@@ -214,8 +222,8 @@ void QnMediaResourceHelper::updateUrl()
         return;
     }
 
-    if ((m_transcodingSupported && m_resolution <= 0 && m_screenSize.isEmpty()) ||
-        (!m_transcodingSupported && m_nativeResolutions.isEmpty()))
+    if ((m_useTranscoding && m_resolution <= 0 && m_screenSize.isEmpty()) ||
+        (!m_useTranscoding && m_nativeResolutions.isEmpty()))
     {
         setUrl(QUrl());
         return;
@@ -225,7 +233,7 @@ void QnMediaResourceHelper::updateUrl()
 
     QUrlQuery query;
 
-    Protocol protocol = m_transcodingSupported ? m_transcodingProtocol : m_nativeProtocol;
+    Protocol protocol = m_useTranscoding ? m_transcodingProtocol : m_nativeProtocol;
     QnUserResourcePtr user = qnCommon->instance<QnUserWatcher>()->user();
 
     url.setScheme(protocolScheme(protocol));
@@ -244,7 +252,7 @@ void QnMediaResourceHelper::updateUrl()
     }
     else
     {
-        if (m_transcodingSupported)
+        if (m_useTranscoding)
         {
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), currentResolutionString());
@@ -329,12 +337,12 @@ void QnMediaResourceHelper::setPosition(qint64 position)
 
     emit positionChanged();
     updateFinalTimestamp();
-    updateUrl();
+    updateCurrentStream();
 }
 
 QStringList QnMediaResourceHelper::resolutions() const
 {
-    if (!m_transcodingSupported)
+    if (!m_useTranscoding)
         return m_nativeResolutions.values();
 
     QStringList result;
@@ -346,7 +354,7 @@ QStringList QnMediaResourceHelper::resolutions() const
 
 QString QnMediaResourceHelper::resolution() const
 {
-    if (m_transcodingSupported)
+    if (m_useTranscoding)
     {
         return m_resolution > 0 ? lit("%1p").arg(m_resolution) : QString();
     }
@@ -358,7 +366,7 @@ QString QnMediaResourceHelper::resolution() const
 
 void QnMediaResourceHelper::setResolution(const QString &resolution)
 {
-    if (m_transcodingSupported)
+    if (m_useTranscoding)
     {
         int resolutionHeight = resolution.leftRef(resolution.length() - 1).toInt();
 
@@ -410,7 +418,7 @@ void QnMediaResourceHelper::setScreenSize(const QSize &size)
 
 int QnMediaResourceHelper::optimalResolution() const
 {
-    if (!m_transcodingSupported)
+    if (!m_useTranscoding)
         return 0;
 
     if (m_screenSize.isEmpty())
@@ -483,7 +491,7 @@ void QnMediaResourceHelper::setFinalTimestamp(qint64 finalTimestamp)
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
 {
-    if (m_transcodingSupported)
+    if (m_useTranscoding)
         return m_transcodingProtocol;
     else
         return m_nativeProtocol;
@@ -519,7 +527,7 @@ qreal QnMediaResourceHelper::sensorAspectRatio() const
         }
         else
         {
-            if (m_transcodingSupported)
+            if (m_useTranscoding)
                 resolution = m_nativeResolutions.first();
             else
                 resolution = m_nativeResolutions[m_nativeStreamIndex];
@@ -567,7 +575,6 @@ void QnMediaResourceHelper::updateMediaStreams()
     CameraMediaStreams supportedStreams = QJson::deserialized<CameraMediaStreams>(m_camera->getProperty(Qn::CAMERA_MEDIA_STREAM_LIST_PARAM_NAME).toLatin1());
 
     m_nativeResolutions.clear();
-    bool transcodingSupported = false;
     bool nativeSupported = false;
     bool mjpegSupported = false;
 
@@ -575,9 +582,6 @@ void QnMediaResourceHelper::updateMediaStreams()
 
     for (const CameraMediaStreamInfo &info: supportedStreams.streams)
     {
-        if (info.transcodingRequired)
-            transcodingSupported = true;
-
         if (info.transcodingRequired || info.resolution == CameraMediaStreamInfo::anyResolution)
             continue;
 
@@ -593,6 +597,7 @@ void QnMediaResourceHelper::updateMediaStreams()
         {
             if (nativeStreamIndex(info.resolution) != -1)
                 continue;
+
             m_nativeResolutions.insert(info.encoderIndex, info.resolution);
         }
     }
@@ -623,29 +628,32 @@ void QnMediaResourceHelper::updateMediaStreams()
     else
         m_nativeProtocol = nativeStreamProtocol;
 
-    if (m_transcodingSupported != transcodingSupported)
-    {
-        m_transcodingSupported = transcodingSupported;
+    updateCurrentStream();
+}
 
-        if (m_transcodingSupported)
+void QnMediaResourceHelper::updateCurrentStream()
+{
+    if (!m_camera)
+        return;
+
+    QnTimePeriod period;
+    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(m_camera, m_position, &period);
+    if (!server)
+        return;
+
+    bool useTranscoding = m_transcodingSupported && transcodingSupportedForServer(server);
+
+    if (m_useTranscoding != useTranscoding)
+    {
+        m_useTranscoding = useTranscoding;
+
+        if (m_useTranscoding)
             updateStardardResolutions();
 
         emit resolutionsChanged();
-        emit aspectRatioChanged();
         emit resolutionChanged();
         emit protocolChanged();
-    }
-    else if (!m_transcodingSupported)
-    {
-        emit resolutionsChanged();
-        emit resolutionChanged();
         emit aspectRatioChanged();
-    }
-    else
-    {
-        updateStardardResolutions();
-        emit resolutionsChanged();
-        emit resolutionChanged();
     }
 
     updateUrl();
