@@ -8,10 +8,17 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <cdb/connection.h>
+
 #include <common/common_module.h>
+#include <client/client_settings.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/delayed.h>
-#include <client/client_settings.h>
+
+#include <ui/style/warning_style.h>
+#include <ui/dialogs/message_box.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 using namespace nx::cdb;
 
@@ -38,15 +45,16 @@ namespace
 class QnLinkToCloudDialogPrivate : public QObject
 {
 public:
-    class QnLinkToCloudDialog *q_ptr;
+    QnLinkToCloudDialog *q_ptr;
 
     QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent);
 
-    void updateButtonBox();
+    void lockUi(bool lock);
     void bindSystem();
 
-    void openSuccessPage();
-    void openFailurePage(const QString &message);
+    void showSuccess();
+    void showFailure(const QString &message = QString());
+    void showCredentialsFailure();
 
 private:
     void at_bindFinished(api::ResultCode result, const api::SystemData &systemData, const rest::QnConnectionPtr &connection);
@@ -56,6 +64,7 @@ public:
         nx::cdb::api::ConnectionFactory,
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
+    bool linkedSuccessfully;
 
     Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
     Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
@@ -70,15 +79,24 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
 
     Q_D(QnLinkToCloudDialog);
 
-    connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,  &QnLinkToCloudDialogPrivate::updateButtonBox);
-    connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,  &QnLinkToCloudDialogPrivate::updateButtonBox);
-    connect(ui->stackedWidget,      &QStackedWidget::currentChanged,    d,  &QnLinkToCloudDialogPrivate::updateButtonBox);
+    auto *okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    auto updateOkButton = [this, okButton]()
+    {
+        okButton->setEnabled(!ui->accountLineEdit->text().isEmpty() &&
+                             !ui->passwordLineEdit->text().isEmpty());
+    };
+
+    connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
+    connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
     connect(ui->buttonBox,          &QDialogButtonBox::accepted,        this,   &QnLinkToCloudDialog::accept);
     connect(ui->buttonBox,          &QDialogButtonBox::rejected,        this,   &QnLinkToCloudDialog::reject);
 
     const QString createAccountUrl = QnAppInfo::cloudPortalUrl() + kCreateAccountPath;
     const QString createAccountText = tr("Create account");
     ui->createAccountLabel->setText(lit("<a href=\"%2\">%1</a>").arg(createAccountText, createAccountUrl));
+    setWarningStyle(ui->invalidCredentialsLabel);
+    ui->invalidCredentialsLabel->hide();
+    updateOkButton();
 }
 
 QnLinkToCloudDialog::~QnLinkToCloudDialog()
@@ -87,9 +105,10 @@ QnLinkToCloudDialog::~QnLinkToCloudDialog()
 
 void QnLinkToCloudDialog::accept()
 {
-    if (ui->stackedWidget->currentWidget() == ui->credentialsPage)
+    Q_D(QnLinkToCloudDialog);
+
+    if (!d->linkedSuccessfully)
     {
-        Q_D(QnLinkToCloudDialog);
         d->bindSystem();
         return;
     }
@@ -101,6 +120,7 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *pare
     : QObject(parent)
     , q_ptr(parent)
     , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
+    , linkedSuccessfully(false)
 {
     const auto cdbEndpoint = qnSettings->cdbEndpoint();
     if (!cdbEndpoint.isEmpty())
@@ -115,38 +135,33 @@ QnLinkToCloudDialogPrivate::QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *pare
     }
 }
 
-void QnLinkToCloudDialogPrivate::updateButtonBox()
+void QnLinkToCloudDialogPrivate::lockUi(bool lock)
 {
     Q_Q(QnLinkToCloudDialog);
-    QDialogButtonBox::StandardButtons buttons = QDialogButtonBox::Ok;
-    bool okEnabled = true;
 
-    if (q->ui->stackedWidget->currentWidget() == q->ui->credentialsPage)
-    {
-        buttons |= QDialogButtonBox::Cancel;
-        okEnabled = !q->ui->accountLineEdit->text().isEmpty() &&
-                    !q->ui->passwordLineEdit->text().isEmpty();
-        q->ui->createAccountLabel->show();
-    }
-    else
-    {
-        q->ui->createAccountLabel->hide();
-    }
+    const bool enabled = !lock;
 
-    q->ui->buttonBox->setStandardButtons(buttons);
-    q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(okEnabled);
+    q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(enabled);
+    q->ui->createAccountLabel->setEnabled(enabled);
+    q->ui->credentialsWidget->setEnabled(enabled);
+
+    if (enabled)
+        q->ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
 }
 
 void QnLinkToCloudDialogPrivate::bindSystem()
 {
+    Q_Q(QnLinkToCloudDialog);
+
+    lockUi(true);
+    q->ui->invalidCredentialsLabel->hide();
+
     auto serverConnection = getPublicServerConnection();
     if (!serverConnection)
     {
-        openFailurePage(tr("None of your servers is connected to the Internet."));
+        showFailure(tr("None of your servers is connected to the Internet."));
         return;
     }
-
-    Q_Q(QnLinkToCloudDialog);
 
     q->ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 
@@ -173,20 +188,47 @@ void QnLinkToCloudDialogPrivate::bindSystem()
     });
 }
 
-void QnLinkToCloudDialogPrivate::openSuccessPage()
+void QnLinkToCloudDialogPrivate::showSuccess()
 {
     Q_Q(QnLinkToCloudDialog);
-    q->ui->successLabel->setText(tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()));
-    q->ui->stackedWidget->setCurrentWidget(q->ui->successPage);
-    updateButtonBox();
+    QnMessageBox messageBox(QMessageBox::NoIcon,
+                            helpTopic(q),
+                            q->windowTitle(),
+                            tr("The system is successfully linked to %1").arg(q->ui->accountLineEdit->text()),
+                            QMessageBox::Ok,
+                            q->parentWidget());
+
+    messageBox.exec();
+    linkedSuccessfully = true;
+    q->accept();
 }
 
-void QnLinkToCloudDialogPrivate::openFailurePage(const QString &message)
+void QnLinkToCloudDialogPrivate::showFailure(const QString &message)
 {
     Q_Q(QnLinkToCloudDialog);
-    q->ui->errorMessageLabel->setText(message);
-    q->ui->stackedWidget->setCurrentWidget(q->ui->failurePage);
-    updateButtonBox();
+
+    QnMessageBox messageBox(QMessageBox::NoIcon,
+                            helpTopic(q),
+                            tr("Error"),
+                            tr("Could not link the system to the cloud"),
+                            QMessageBox::Ok,
+                            q);
+
+    if (!message.isEmpty())
+        messageBox.setInformativeText(message);
+
+    messageBox.exec();
+
+    lockUi(false);
+}
+
+void QnLinkToCloudDialogPrivate::showCredentialsFailure()
+{
+    Q_Q(QnLinkToCloudDialog);
+
+    q->ui->invalidCredentialsLabel->show();
+
+    lockUi(false);
 }
 
 void QnLinkToCloudDialogPrivate::at_bindFinished(
@@ -202,16 +244,23 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         {
         case api::ResultCode::badUsername:
         case api::ResultCode::notAuthorized:
-            openFailurePage(tr("Invalid login or password."));
+            showCredentialsFailure();
             break;
         default:
-            openFailurePage(tr("Can not connect the system to the cloud account."));
+            showFailure(QString()); // TODO: #dklychkov More detailed diagnostics
             break;
         }
         return;
     }
 
     const auto &admin = qnResPool->getAdministrator();
+
+    if (!admin)
+    {
+        q->reject();
+        return;
+    }
+
     admin->setProperty(Qn::CLOUD_ACCOUNT_NAME, q->ui->accountLineEdit->text());
     propertyDictionary->saveParamsAsync(admin->getId());
 
@@ -220,9 +269,9 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         Q_UNUSED(handleId)
 
         if (success)
-            openSuccessPage();
+            showSuccess();
         else
-            openFailurePage(tr("Can not save information to database"));
+            showFailure(tr("Can not save information to database"));
     };
 
     connection->saveCloudSystemCredentials(systemData.id.toString(), QString::fromStdString(systemData.authKey),

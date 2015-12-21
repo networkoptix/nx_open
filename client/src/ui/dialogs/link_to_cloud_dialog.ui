@@ -7,95 +7,65 @@
     <x>0</x>
     <y>0</y>
     <width>360</width>
-    <height>165</height>
+    <height>152</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Link to Cloud</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
    <item>
-    <widget class="QStackedWidget" name="stackedWidget">
-     <property name="currentIndex">
-      <number>0</number>
-     </property>
-     <widget class="QWidget" name="credentialsPage">
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="accountLabel">
-         <property name="text">
-          <string>Cloud account</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="accountLineEdit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="passwordLabel">
-         <property name="text">
-          <string>Password</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="passwordLineEdit">
-         <property name="echoMode">
-          <enum>QLineEdit::Password</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="successPage">
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <item alignment="Qt::AlignTop">
-        <widget class="QLabel" name="successLabel">
-         <property name="text">
-          <string notr="true">The system is successfully linked to account@mail.com</string>
-         </property>
-         <property name="textFormat">
-          <enum>Qt::PlainText</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="failurePage">
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QLabel" name="errorLabel">
-         <property name="text">
-          <string>Error</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="errorMessageLabel">
-         <property name="text">
-          <string notr="true">Something went wrong</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
+    <widget class="QWidget" name="credentialsWidget" native="true">
+     <layout class="QFormLayout" name="formLayout_2">
+      <property name="labelAlignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <item row="2" column="0">
+       <widget class="QLabel" name="passwordLabel">
+        <property name="text">
+         <string>Password (PIN)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="passwordLineEdit">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLabel" name="invalidCredentialsLabel">
+        <property name="text">
+         <string>Account or password is invalid</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="accountLineEdit"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="accountLabel">
+        <property name="text">
+         <string>Cloud account</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -123,6 +93,10 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>accountLineEdit</tabstop>
+  <tabstop>passwordLineEdit</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
