@@ -14,6 +14,9 @@
 #include <nx/network/socket_global.h>
 
 #include "mediator_mocks.h"
+#include "functional_tests/test_setup.h"
+#include "local_cloud_data_provider.h"
+
 
 namespace nx {
 namespace hpm {
@@ -81,6 +84,20 @@ TEST_F( ConnectTest, BindConnect )
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
     }
+}
+
+TEST_F(MediatorFunctionalTest, resolve)
+{
+    LocalCloudDataProvider cloudDataProvider;
+    registerCloudDataProvider(&cloudDataProvider);
+
+    startAndWaitUntilStarted();
+
+    const auto client = clientConnection();
+
+    //TODO
+
+    client->pleaseStopSync();
 }
 
 } // namespace test

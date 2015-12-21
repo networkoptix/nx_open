@@ -9,7 +9,7 @@
 namespace nx {
 namespace hpm {
 
-MediaserverApiBase::MediaserverApiBase( CloudDataProviderBase* cloudData,
+MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
                                     stun::MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
@@ -90,7 +90,7 @@ void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
 
 // impl
 
-MediaserverApi::MediaserverApi( CloudDataProviderBase* cloudData,
+MediaserverApi::MediaserverApi( AbstractCloudDataProvider* cloudData,
                                 stun::MessageDispatcher* dispatcher )
     : MediaserverApiBase( cloudData, dispatcher )
 {

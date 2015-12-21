@@ -18,7 +18,6 @@ namespace cc {
 class NX_NETWORK_API MediatorConnector
     : public QnStoppableAsync
 {
-    MediatorConnector();
     friend class ::nx::SocketGlobals;
 
 public:
@@ -45,6 +44,9 @@ public:
     boost::optional<SystemCredentials> getSystemCredentials();
 
     void pleaseStop( std::function<void()> handler ) override;
+
+protected:
+    MediatorConnector();
 
 private:
     void fetchEndpoint();

@@ -66,10 +66,10 @@ int MediatorProcess::executeApplication()
     }
 
     TimerManager timerManager;
-    std::shared_ptr< CloudDataProvider > cloudDataProvider;
+    std::unique_ptr<AbstractCloudDataProvider> cloudDataProvider;
     if (settings.cloudDB().runWithCloud)
     {
-        cloudDataProvider = std::make_unique< CloudDataProvider >(
+        cloudDataProvider = AbstractCloudDataProviderFactory::create(
             settings.cloudDB().address.toStdString(),
             settings.cloudDB().user.toStdString(),
             settings.cloudDB().password.toStdString(),

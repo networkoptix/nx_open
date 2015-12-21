@@ -5,7 +5,7 @@
 namespace nx {
 namespace hpm {
 
-RequestProcessor::RequestProcessor( CloudDataProviderBase* cloudData )
+RequestProcessor::RequestProcessor( AbstractCloudDataProvider* cloudData )
     : m_cloudData( cloudData )
 {
 }

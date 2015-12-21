@@ -13,7 +13,7 @@ namespace hpm {
 namespace test {
 
 class CloudDataProviderMock
-        : public CloudDataProviderBase
+        : public AbstractCloudDataProvider
 {
 public:
     MOCK_CONST_METHOD1( getSystem, boost::optional< System >( const String& ) );
@@ -39,7 +39,7 @@ public:
     MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
                                     std::function< void( SocketAddress, bool ) > ) );
 
-    MediaserverApiMock( CloudDataProviderBase* cloudData,
+    MediaserverApiMock( AbstractCloudDataProvider* cloudData,
                         stun::MessageDispatcher* dispatcher )
         : MediaserverApiBase( cloudData, dispatcher ) {}
 

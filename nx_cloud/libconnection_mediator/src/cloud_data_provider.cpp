@@ -4,16 +4,46 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
+#include <utils/common/cpp14.h>
+
 
 namespace nx {
 namespace hpm {
 
-CloudDataProviderBase::~CloudDataProviderBase()
+AbstractCloudDataProvider::~AbstractCloudDataProvider()
 {
 }
 
 
-CloudDataProviderBase::System::System( String authKey_, bool mediatorEnabled_ )
+static AbstractCloudDataProviderFactory::FactoryFunc cloudDataProviderFactoryFunc;
+
+std::unique_ptr<AbstractCloudDataProvider> AbstractCloudDataProviderFactory::create(
+    const std::string& address,
+    const std::string& user,
+    const std::string& password,
+    TimerDuration updateInterval)
+{
+    if (cloudDataProviderFactoryFunc)
+        return cloudDataProviderFactoryFunc(
+            address,
+            user,
+            password,
+            updateInterval);
+    else
+        return std::make_unique<CloudDataProvider>(
+            address,
+            user,
+            password,
+            updateInterval);
+}
+
+void AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
+{
+    cloudDataProviderFactoryFunc = std::move(factoryFunc);
+}
+
+
+AbstractCloudDataProvider::System::System( String authKey_, bool mediatorEnabled_ )
     : authKey( authKey_ )
     , mediatorEnabled( mediatorEnabled_ )
 
@@ -21,7 +51,7 @@ CloudDataProviderBase::System::System( String authKey_, bool mediatorEnabled_ )
 }
 
 std::ostream& operator<<( std::ostream& os,
-                          const boost::optional< CloudDataProviderBase::System >& system )
+                          const boost::optional< AbstractCloudDataProvider::System >& system )
 {
     if( !system )
         return os << "boost::none";
@@ -82,7 +112,7 @@ CloudDataProvider::~CloudDataProvider()
     lk.unlock();
 }
 
-boost::optional< CloudDataProviderBase::System >
+boost::optional< AbstractCloudDataProvider::System >
     CloudDataProvider::getSystem( const String& systemId ) const
 {
     QnMutexLocker lk( &m_mutex );
@@ -93,7 +123,7 @@ boost::optional< CloudDataProviderBase::System >
     return it->second;
 }
 
-static QString traceSystems( const std::map< String, CloudDataProviderBase::System >& systems )
+static QString traceSystems( const std::map< String, AbstractCloudDataProvider::System >& systems )
 {
     QStringList list;
     for( const auto sys : systems )
