@@ -16,6 +16,9 @@ namespace
         return text.trimmed().replace(kNewLineSymbol, kNewLineTag);
     }
 
+
+    // @brief Tries to elide node text
+    // @return Resulting text length
     int elideTextNode(QDomNode &node
         , int maxLength
         , const QString &tail)
@@ -34,6 +37,8 @@ namespace
         return maxLength;
     }
 
+    // @brief Tries to elide node (element) text.
+    // @return Resulting text length
     int elideDomNode(QDomNode &node
         , int maxLength
         , const QString &tail)
@@ -42,11 +47,11 @@ namespace
         if (auto len = elideTextNode(node, maxLength, tail))
             return len;
 
-        int currentCount = 0;
+        int currentLength = 0;
         QList<QDomNode> forRemove;
         for (auto child = node.firstChild(); !child.isNull(); child = child.nextSibling())
         {
-            if (currentCount >= maxLength)
+            if (currentLength >= maxLength)
             {
                 // Removes all elements that are not fit to length
                 forRemove.append(child);
@@ -54,11 +59,11 @@ namespace
             }
 
             // Tries to elide text node
-            if (currentCount < maxLength)
+            if (currentLength < maxLength)
             {
-                if (auto length = elideTextNode(child, maxLength - currentCount, tail))
+                if (auto length = elideTextNode(child, maxLength - currentLength, tail))
                 {
-                    currentCount += length;
+                    currentLength += length;
                     continue;
                 }
             }
@@ -71,22 +76,22 @@ namespace
                 continue;
             }
 
-            const int textSize = elem.text().size();
-            if ((currentCount + textSize) <= maxLength)
+            const int textLength = elem.text().size();
+            if ((currentLength + textLength) <= maxLength)
             {
                 // Text length of element (and all its child elements) is less then maximum
-                currentCount += textSize;
+                currentLength += textLength;
                 continue;
             }
 
-            currentCount += elideDomNode(child, maxLength - currentCount, tail);
+            currentLength += elideDomNode(child, maxLength - currentLength, tail);
         }
 
         // Removes all elements that are not fit
         for(auto child: forRemove)
             node.removeChild(child);
 
-        return currentCount;
+        return currentLength;
     };
 
 }
@@ -486,10 +491,14 @@ QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
 }
 
-QString elideString(const QString &source, int maxLength, const QString &tail) {
+QString elideString(const QString &source, int maxLength, const QString &tail)
+{
+    if (source.length() <= maxLength)
+        return source;
+
     const auto tailLength = tail.length();
-    return (source.length() <= maxLength ? source
-        : source.left(maxLength > tailLength ? maxLength - tailLength : 0) + tail);
+    const auto elidedText = source.left(maxLength > tailLength ? maxLength - tailLength : 0);
+    return (elidedText + tail);
 }
 
 QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBold /*= false */, bool isItalic /*= false*/ ) {
