@@ -3,6 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <QCoreApplication>
@@ -12,10 +13,12 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket_global.h>
 
+
 int main( int argc, char **argv )
 {
 	nx::SocketGlobals::InitGuard sgGuard;
-    ::testing::InitGoogleTest(&argc, argv);
+
+    ::testing::InitGoogleMock(&argc, argv);
 
     const int result = RUN_ALL_TESTS();
     return result;

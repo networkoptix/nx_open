@@ -49,21 +49,24 @@ class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<Graphi
 
 public:
     enum Option {
-        DisplayActivity             = 0x0001,   /**< Whether the paused overlay icon should be displayed. */
-        DisplaySelection            = 0x0002,   /**< Whether selected / not selected state should be displayed. */
-        DisplayMotion               = 0x0004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
+        DisplayActivity             = 0x00001,   /**< Whether the paused overlay icon should be displayed. */
+        DisplaySelection            = 0x00002,   /**< Whether selected / not selected state should be displayed. */
+        DisplayMotion               = 0x00004,   /**< Whether motion is to be displayed. */                              // TODO: #Elric this flag also handles smart search, separate!
         //DisplayButtons              = 0x0008,   /**< Whether item buttons are to be displayed. */ supressed by InfoOverlaysForbidden
-        DisplayMotionSensitivity    = 0x0010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
-        DisplayCrosshair            = 0x0020,   /**< Whether PTZ crosshair is to be displayed. */
-        DisplayInfo                 = 0x0040,   /**< Whether info panel is to be displayed. */
-        DisplayDewarped             = 0x0080,   /**< Whether the video is to be dewarped. */
+        DisplayMotionSensitivity    = 0x00010,   /**< Whether a grid with motion region sensitivity is to be displayed. */
+        DisplayCrosshair            = 0x00020,   /**< Whether PTZ crosshair is to be displayed. */
+        DisplayInfo                 = 0x00040,   /**< Whether info panel is to be displayed. */
+        DisplayDewarped             = 0x00080,   /**< Whether the video is to be dewarped. */
 
-        ControlPtz                  = 0x0100,   /**< Whether PTZ state can be controlled with mouse. */
-        ControlZoomWindow           = 0x0200,   /**< Whether zoom windows can be created by dragging the mouse. */
+        ControlPtz                  = 0x00100,   /**< Whether PTZ state can be controlled with mouse. */
+        ControlZoomWindow           = 0x00200,   /**< Whether zoom windows can be created by dragging the mouse. */
 
-        WindowRotationForbidden     = 0x1000,
-        SyncPlayForbidden           = 0x2000,   /**< Whether SyncPlay is forbidden for this widget. */
-        InfoOverlaysForbidden       = 0x4000
+        WindowRotationForbidden     = 0x01000,
+        SyncPlayForbidden           = 0x02000,   /**< Whether SyncPlay is forbidden for this widget. */
+        InfoOverlaysForbidden       = 0x04000,
+
+        FullScreenMode              = 0x08000,
+        ActivityPresence            = 0x10000
     };
     Q_DECLARE_FLAGS(Options, Option)
 

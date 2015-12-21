@@ -24,7 +24,7 @@ void QnOptionalBool::setValue( bool value ) {
 }
 
 bool QnOptionalBool::isDefined() const {
-    return static_cast< bool >( m_value );
+    return static_cast<bool>(m_value);
 }
 
 void QnOptionalBool::undefine() {

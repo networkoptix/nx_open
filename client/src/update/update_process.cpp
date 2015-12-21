@@ -96,8 +96,12 @@ void QnUpdateProcess::run() {
     QnUpdateResult result(m_updateResult);
     result.targetVersion = m_target.version;
     result.clientInstallerRequired = m_clientRequiresInstaller;
-    result.failedPeers = m_failedPeerIds;
     result.protocolChanged = m_protocolChanged;
+
+    for (const QnUuid &id: m_failedPeerIds) {
+        if (QnMediaServerResourcePtr server = qnResPool->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
+            result.failedServers.append(server);
+    }
 
     emit updateFinished(result);
 }

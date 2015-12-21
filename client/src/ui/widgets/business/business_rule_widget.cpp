@@ -37,11 +37,11 @@
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
 
-QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent, QnWorkbenchContext *context) :
+QnBusinessRuleWidget::QnBusinessRuleWidget(QWidget *parent) :
     base_type(parent),
-    QnWorkbenchContextAware(parent, context),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::BusinessRuleWidget),
-    m_model(NULL),
+    m_model(),
     m_eventParameters(NULL),
     m_actionParameters(NULL),
     m_updating(false)
@@ -87,13 +87,13 @@ void QnBusinessRuleWidget::retranslateUi() {
 }
 
 
-QnBusinessRuleViewModel* QnBusinessRuleWidget::model() const {
+QnBusinessRuleViewModelPtr QnBusinessRuleWidget::model() const {
     return m_model;
 }
 
-void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
+void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model) {
     if (m_model)
-        disconnect(m_model, 0, this, 0);
+        disconnect(m_model, nullptr, this, nullptr);
 
     m_model = model;
 
@@ -112,13 +112,12 @@ void QnBusinessRuleWidget::setModel(QnBusinessRuleViewModel *model) {
         ui->actionTypeComboBox->setModel(m_model->actionTypesModel());
     }
 
-    connect(m_model, SIGNAL(dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)),
-            this, SLOT(at_model_dataChanged(QnBusinessRuleViewModel*, QnBusiness::Fields)));
-    at_model_dataChanged(m_model, QnBusiness::AllFieldsMask);
+    connect(m_model, &QnBusinessRuleViewModel::dataChanged, this, &QnBusinessRuleWidget::at_model_dataChanged);
+    at_model_dataChanged(QnBusiness::AllFieldsMask);
 }
 
-void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model,  QnBusiness::Fields fields) {
-    if (!model || m_model != model || m_updating)
+void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!m_model || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -181,17 +180,17 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, 
         ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
-    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField)) {
+    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField)) {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }
 
     if (fields & QnBusiness::AggregationField) {
-        ui->aggregationWidget->setValue(model->aggregationPeriod());
+        ui->aggregationWidget->setValue(m_model->aggregationPeriod());
     }
 
     if (fields & QnBusiness::CommentsField) {
-        QString text = model->comments();
+        QString text = m_model->comments();
         if (ui->commentsLineEdit->text() != text)
             ui->commentsLineEdit->setText(text);
     }
@@ -201,7 +200,7 @@ void QnBusinessRuleWidget::initEventParameters() {
     if (m_eventParameters) {
         ui->eventParamsLayout->removeWidget(m_eventParameters);
         m_eventParameters->setVisible(false);
-        m_eventParameters->setModel(NULL);
+        m_eventParameters->setModel(QnBusinessRuleViewModelPtr());
     }
 
     if (!m_model)
@@ -227,7 +226,7 @@ void QnBusinessRuleWidget::initActionParameters() {
     if (m_actionParameters) {
         ui->actionParamsLayout->removeWidget(m_actionParameters);
         m_actionParameters->setVisible(false);
-        m_actionParameters->setModel(NULL);
+        m_actionParameters->setModel(QnBusinessRuleViewModelPtr());
     }
 
     if (!m_model)
@@ -240,13 +239,29 @@ void QnBusinessRuleWidget::initActionParameters() {
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
-    if (m_actionParameters) {
+    const auto getTabBeforeTarget = [this]() -> QWidget *
+    {
+        if (const bool aggregationIsVisible = !QnBusiness::hasToggleState(m_model->actionType()))
+            return ui->aggregationWidget->lastTabItem();
+
+        const bool resourceIsVisible = QnBusiness::requiresCameraResource(m_model->actionType())
+            || QnBusiness::requiresUserResource(m_model->actionType());
+        if (resourceIsVisible)
+            return ui->actionResourcesHolder;
+
+        return ui->actionTypeComboBox;
+    };
+
+    if (m_actionParameters)
+    {
         ui->actionParamsLayout->addWidget(m_actionParameters);
-        m_actionParameters->updateTabOrder(ui->aggregationWidget,  ui->commentsLineEdit);
+        m_actionParameters->updateTabOrder(getTabBeforeTarget(),  ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
-    } else {
-        setTabOrder(ui->aggregationWidget, ui->commentsLineEdit);
+    }
+    else
+    {
+        setTabOrder(getTabBeforeTarget(), ui->commentsLineEdit);
     }
 }
 

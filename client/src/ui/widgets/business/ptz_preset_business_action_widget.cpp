@@ -30,31 +30,31 @@ QnExecPtzPresetBusinessActionWidget::~QnExecPtzPresetBusinessActionWidget()
 {
 }
 
-void QnExecPtzPresetBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) 
+void QnExecPtzPresetBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after)
 {
     setTabOrder(before, ui->presetComboBox);
     setTabOrder(ui->presetComboBox, after);
 }
 
-void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields & QnBusiness::ActionResourcesField) 
+    if (fields & QnBusiness::ActionResourcesField)
     {
         ui->presetComboBox->clear();
         m_presets.clear();
         m_ptzController.reset();
-        QnVirtualCameraResourceList cameras = model->actionResources().filtered<QnVirtualCameraResource>();
+        QnVirtualCameraResourceList cameras = model()->actionResources().filtered<QnVirtualCameraResource>();
         if (cameras.size() != 1)
             return; // single camera only allowed
         setupPtzController(cameras[0]);
     }
 
     if (fields & (QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField))
-        updateComboboxItems(model->actionParams().presetId);
+        updateComboboxItems(model()->actionParams().presetId);
 }
 
 void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCameraResourcePtr& camera)
@@ -70,7 +70,7 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
         serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
         m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
     } else {
-        m_ptzController = fisheyeController; 
+        m_ptzController = fisheyeController;
     }
 
     connect(m_ptzController.data(), &QnAbstractPtzController::changed, this, [this](Qn::PtzDataFields fields) {
@@ -90,7 +90,7 @@ void QnExecPtzPresetBusinessActionWidget::updateComboboxItems(const QString& pre
         ui->presetComboBox->setCurrentIndex(ui->presetComboBox->findData(presetId));
 };
 
-void QnExecPtzPresetBusinessActionWidget::paramsChanged() 
+void QnExecPtzPresetBusinessActionWidget::paramsChanged()
 {
     if (!model() || m_updating)
         return;

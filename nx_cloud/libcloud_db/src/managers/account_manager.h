@@ -27,7 +27,7 @@ namespace nx {
 namespace cdb {
 
 class TemporaryAccountPasswordManager;
-class EMailManager;
+class AbstractEmailManager;
 namespace conf
 {
     class Settings;
@@ -48,7 +48,7 @@ public:
         const conf::Settings& settings,
         TemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::DBManager* const dbManager,
-        EMailManager* const emailManager ) throw( std::runtime_error );
+        AbstractEmailManager* const emailManager) throw(std::runtime_error);
     virtual ~AccountManager();
 
     virtual void authenticateByName(
@@ -93,7 +93,7 @@ private:
     const conf::Settings& m_settings;
     TemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::DBManager* const m_dbManager;
-    EMailManager* const m_emailManager;
+    AbstractEmailManager* const m_emailManager;
     //!map<email, account>
     Cache<std::string, data::AccountData> m_cache;
     mutable QnMutex m_mutex;
@@ -108,7 +108,7 @@ private:
     nx::db::DBResult insertAccount(
         QSqlDatabase* const tran,
         const data::AccountData& accountData,
-        data::AccountConfirmationCode* const resultData );
+        data::AccountConfirmationCode* const resultData);
     nx::db::DBResult issueAccountActivationCode(
         QSqlDatabase* const connection,
         const std::string& accountEmail,
@@ -119,7 +119,7 @@ private:
         nx::db::DBResult resultCode,
         data::AccountData accountData,
         data::AccountConfirmationCode resultData,
-        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler );
+        std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
     void accountReactivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
@@ -138,7 +138,7 @@ private:
         nx::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         const std::string accountEmail,
-        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler );
+        std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
 
     nx::db::DBResult updateAccountInDB(
         bool activateAccountIfNotActive,
@@ -149,7 +149,7 @@ private:
         bool authenticatedByEmailCode,
         nx::db::DBResult resultCode,
         data::AccountUpdateDataWithEmail accountData,
-        std::function<void(api::ResultCode)> completionHandler );
+        std::function<void(api::ResultCode)> completionHandler);
 
     void passwordResetCodeGenerated(
         QnCounter::ScopedIncrement asyncCallLocker,

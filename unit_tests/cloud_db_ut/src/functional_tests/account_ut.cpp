@@ -6,6 +6,7 @@
 #include <chrono>
 #include <functional>
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 #include <QtCore/QDir>
@@ -17,6 +18,7 @@
 #include <nx/network/http/server/fusion_request_result.h>
 #include <utils/common/model_functions.h>
 
+#include "email_manager_mocked.h"
 #include "test_setup.h"
 #include "version.h"
 
@@ -26,6 +28,16 @@ namespace cdb {
 
 TEST_F(CdbFunctionalTest, account_activation)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(1);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
 
@@ -63,6 +75,16 @@ TEST_F(CdbFunctionalTest, account_activation)
 
 TEST_F(CdbFunctionalTest, account_reactivation)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(2);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
 
@@ -95,6 +117,16 @@ TEST_F(CdbFunctionalTest, account_reactivation)
 //reactivation of already activated account must fail
 TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(1);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
 
@@ -117,6 +149,16 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
 TEST_F(CdbFunctionalTest, account_general)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(3);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
 
@@ -197,6 +239,16 @@ TEST_F(CdbFunctionalTest, account_general)
 
 TEST_F(CdbFunctionalTest, account_badRegistration)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(1);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     startAndWaitUntilStarted();
 
     api::ResultCode result = api::ResultCode::ok;
@@ -323,6 +375,16 @@ TEST_F(CdbFunctionalTest, account_update)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_general)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(4);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     startAndWaitUntilStarted();
 
     for (int i = 0; i < 2; ++i)
@@ -372,6 +434,16 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 {
+    MockEmailManager mockedEmailManager;
+    EXPECT_CALL(
+        mockedEmailManager,
+        sendAsyncMocked(QByteArray())).Times(2);
+
+    EMailManagerFactory::setFactory(
+        [&mockedEmailManager](const conf::Settings& /*settings*/) {
+            return new EmailManagerStub(&mockedEmailManager);
+        });
+
     const std::chrono::seconds expirationPeriod(5);
 
     addArg("-accountManager/passwordResetCodeExpirationTimeoutSec");

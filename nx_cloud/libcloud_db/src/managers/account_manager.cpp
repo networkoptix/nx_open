@@ -42,7 +42,7 @@ AccountManager::AccountManager(
     const conf::Settings& settings,
     TemporaryAccountPasswordManager* const tempPasswordManager,
     nx::db::DBManager* const dbManager,
-    EMailManager* const emailManager ) throw( std::runtime_error )
+    AbstractEmailManager* const emailManager) throw(std::runtime_error)
 :
     m_settings(settings),
     m_tempPasswordManager(tempPasswordManager),
@@ -90,7 +90,7 @@ void AccountManager::authenticateByName(
         std::move(validateHa1Func),
         authSearchInputData,
         authProperties,
-        [username, authProperties, completionHandler, this](bool authResult) mutable {
+        [username, authProperties, /*std::move*/ completionHandler, this](bool authResult) mutable {
             if (authResult)
             {
                 bool authenticatedByEmailCode = false;

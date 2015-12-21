@@ -54,9 +54,21 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
         - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
         - date in ISO format (YYYY-MM-DDTHH:mm:ss)
         - special value "now". In this case \a DATETIME_NOW is returned
+        - negative value. In this case value returned "as is"
     \return usec since epoch
 */
-qint64 parseDateTime( const QString& dateTime );
+qint64 parseDateTime( const QString& dateTimeStr );
+
+
+/*!
+    \param dateTime Can be one of following:\n
+        - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
+        - date in ISO format (YYYY-MM-DDTHH:mm:ss)
+        - special value "now". In this case \a DATETIME_NOW is returned
+        - negative value. In this case value returned "as is"
+    \return msec since epoch
+*/
+qint64 parseDateTimeMsec( const QString& dateTimeStr );
 
 /**
  * \param size                          File size to format. Can be negative.

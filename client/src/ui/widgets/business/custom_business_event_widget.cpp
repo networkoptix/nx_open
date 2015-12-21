@@ -23,7 +23,11 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     connect(ui->captionEdit,     &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
-    const QString description = tr("Rule will work only for Generic Events that passes all filters. Empty fields don't affect the result. Each filter passes if any of keyword is matched.");
+    const QString description = lit("%1<br>%2<br>%3").arg(
+        tr("Actions will only work for Generic Events that pass all filters.")
+        , tr("Empty fields do not affect results.")
+        , tr("Each filter will pass if any keyword in a field is matched."));
+
     const QString linkText = tr("Server API");
     const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
     const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);
@@ -53,8 +57,8 @@ void QnCustomBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *after
     setTabOrder(ui->descriptionEdit, after);
 }
 
-void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *model, QnBusiness::Fields fields) {
-    if (!model)
+void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+    if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
@@ -65,15 +69,15 @@ void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusinessRuleViewModel *
 
     if (fields & QnBusiness::EventParamsField)
     {
-        QString resName = model->eventParams().resourceName;
+        QString resName = model()->eventParams().resourceName;
         if (ui->deviceNameEdit->text() != resName)
             ui->deviceNameEdit->setText(resName);
 
-        QString caption = model->eventParams().caption;
+        QString caption = model()->eventParams().caption;
         if (ui->captionEdit->text() != caption)
             ui->captionEdit->setText(caption);
 
-        QString description = model->eventParams().description;
+        QString description = model()->eventParams().description;
         if (ui->descriptionEdit->text() != description)
             ui->descriptionEdit->setText(description);
     }

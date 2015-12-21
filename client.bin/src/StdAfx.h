@@ -63,7 +63,7 @@ extern "C" {
 #   include <QtMultimedia/QAudioOutput>
 #endif
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QCloseEvent>
@@ -113,7 +113,7 @@ extern "C" {
 #include <QtCore/QPair>
 #include <QtCore/QParallelAnimationGroup>
 #include <QtGui/QPixmap>
-#include <QPixmapCache>
+#include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QPropertyAnimation>
@@ -133,7 +133,7 @@ extern "C" {
 #include <QtCore/QStringListModel>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QStyleOption>
-#include <QStyleOptionGraphicsItem>
+#include <QtWidgets/QStyleOptionGraphicsItem>
 #include <QtWidgets/QTabWidget>
 #include <QtCore/QTextStream>
 #include <QtCore/QThread>

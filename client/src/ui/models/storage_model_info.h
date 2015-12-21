@@ -6,7 +6,7 @@
 
 struct QnStorageSpaceData;
 
-struct QnStorageModelInfo 
+struct QnStorageModelInfo
 {
     QnUuid id;
     bool isUsed;
@@ -17,6 +17,7 @@ struct QnStorageModelInfo
     bool isWritable;
     bool isBackup;
     bool isExternal;
+    bool isOnline;
 
     QnStorageModelInfo();
     explicit QnStorageModelInfo(const QnStorageSpaceData &reply);

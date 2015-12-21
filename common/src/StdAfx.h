@@ -77,7 +77,7 @@ extern "C" {
 //#include <QtMultimedia/QAudioOutput>
 //#endif
 
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QtCore/QBuffer>
 #include <QtGui/QCloseEvent>
 #include <QtGui/QColor>
@@ -109,7 +109,7 @@ extern "C" {
 #include <QtCore/QPair>
 #include <QtCore/QParallelAnimationGroup>
 #include <QtGui/QPixmap>
-#include <QPixmapCache>
+#include <QtGui/QPixmapCache>
 #include <QtCore/QPoint>
 #include <QtCore/QPointF>
 #include <QtCore/QPropertyAnimation>

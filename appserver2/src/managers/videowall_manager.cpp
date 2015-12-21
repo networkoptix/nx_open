@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <QtConcurrent>
+#include <QtConcurrent/QtConcurrent>
 
 #include "fixed_url_client_query_processor.h"
 #include "database/db_manager.h"

@@ -22,7 +22,7 @@ namespace ec2 {
 
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES( \
             (ApiCameraDataStatistics)(ApiStorageDataStatistics)(ApiMediaServerDataStatistics) \
-            (ApiLicenseStatistics)(ApiBusinessRuleStatistics) \
+            (ApiLicenseStatistics)(ApiBusinessRuleStatistics)(ApiUserDataStatistics) \
 			(ApiSystemStatistics)(ApiStatisticsServerInfo), \
             (ubjson)(xml)(json)(sql_record)(csv_record), _Fields, (optional, true))
 
@@ -94,5 +94,11 @@ namespace ec2 {
     ApiBusinessRuleStatistics::ApiBusinessRuleStatistics(ApiBusinessRuleData&& data)
         : ApiBusinessRuleData(std::move(data))
 	{}
+
+    ApiUserDataStatistics::ApiUserDataStatistics() {}
+
+    ApiUserDataStatistics::ApiUserDataStatistics(ApiUserData&& data)
+        : ApiUserData(std::move(data))
+    {}
 
 } // namespace ec2

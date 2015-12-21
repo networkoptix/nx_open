@@ -1,5 +1,6 @@
 #pragma once
 
+#include <core/resource/resource_fwd.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 #include <nx/utils/uuid.h>
@@ -60,7 +61,7 @@ struct QnUpdateResult {
     QnSoftwareVersion targetVersion;
     bool clientInstallerRequired;
     bool protocolChanged;
-    QSet<QnUuid> failedPeers;
+    QnMediaServerResourceList failedServers;
 };
 Q_DECLARE_METATYPE(QnUpdateResult);
 

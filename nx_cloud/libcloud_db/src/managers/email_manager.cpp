@@ -60,6 +60,51 @@ EMailManager::~EMailManager()
     //    httpRequest->terminate();
 }
 
+void EMailManager::sendAsync(
+    QByteArray serializedNotification,
+    std::function<void(bool)> completionHandler)
+{
+    auto asyncOperationLocker = m_startedAsyncCallsCounter.getScopedIncrement();
+
+    if (!m_settings.notification().enabled)
+    {
+        if (completionHandler)
+        {
+            nx::SocketGlobals::aioService().post(
+                [asyncOperationLocker, completionHandler]() {
+                completionHandler(false);
+            });
+        }
+        return;
+    }
+
+    QUrl url;
+    url.setScheme("http");
+    url.setHost(m_notificationModuleEndpoint.address.toString());
+    url.setPort(m_notificationModuleEndpoint.port);
+    url.setPath("/notifications/send");
+
+    auto httpClient = nx_http::AsyncHttpClient::create();
+    QObject::connect(
+        httpClient.get(), &nx_http::AsyncHttpClient::done,
+        httpClient.get(),
+        [this, asyncOperationLocker, completionHandler](nx_http::AsyncHttpClientPtr client) {
+        onSendNotificationRequestDone(
+            std::move(asyncOperationLocker),
+            std::move(client),
+            std::move(completionHandler));
+    },
+        Qt::DirectConnection);
+    {
+        QnMutexLocker lk(&m_mutex);
+        m_ongoingRequests.insert(httpClient);
+    }
+    httpClient->doPost(
+        url,
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        std::move(serializedNotification));
+}
+
 void EMailManager::onSendNotificationRequestDone(
     QnCounter::ScopedIncrement /*asyncCallLocker*/,
     nx_http::AsyncHttpClientPtr client,
@@ -74,6 +119,24 @@ void EMailManager::onSendNotificationRequestDone(
         QnMutexLocker lk(&m_mutex);
         m_ongoingRequests.erase(client);
     }
+}
+
+
+static std::function<AbstractEmailManager*(
+    const conf::Settings& settings)> kEMailManagerFactoryFunc;
+
+AbstractEmailManager* EMailManagerFactory::create(const conf::Settings& settings)
+{
+    return kEMailManagerFactoryFunc
+        ? kEMailManagerFactoryFunc(settings)
+        : new EMailManager(settings);
+}
+
+void EMailManagerFactory::setFactory(
+    std::function<AbstractEmailManager*(
+        const conf::Settings& settings)> factoryFunc)
+{
+    kEMailManagerFactoryFunc = std::move(factoryFunc);
 }
 
 }   //cdb

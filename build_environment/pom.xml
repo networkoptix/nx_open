@@ -303,13 +303,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>${bespin.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -343,13 +336,6 @@
                 </property>
             </activation>
             <dependencies>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>1.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
                 <dependency>
                     <groupId>com.google</groupId>
                     <artifactId>gtest</artifactId>
@@ -396,6 +382,13 @@
                     <version>${ffmpeg.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>${bespin.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>

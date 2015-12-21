@@ -88,6 +88,11 @@ int QnAggregationWidget::value() const {
     return  ui->valueSpinBox->value() * ui->periodComboBox->itemData(ui->periodComboBox->currentIndex()).toInt();
 }
 
+QWidget *QnAggregationWidget::lastTabItem()
+{
+    return ui->periodComboBox;
+}
+
 void QnAggregationWidget::setShort(bool value) {
     ui->longLabel->setVisible(!value);
 }

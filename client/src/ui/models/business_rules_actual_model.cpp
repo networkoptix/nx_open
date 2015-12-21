@@ -20,7 +20,7 @@ void QnBusinessRulesActualModel::reset() {
 }
 
 void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {
-    QnBusinessRuleViewModel* ruleModel = rule(index);
+    QnBusinessRuleViewModelPtr ruleModel = rule(index);
 
     if (m_savingRules.values().contains(ruleModel))
         return;
@@ -39,15 +39,12 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex &index) {
 void QnBusinessRulesActualModel::at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule) {
     if (!m_savingRules.contains(handle))
         return;
-    QnBusinessRuleViewModel* model = m_savingRules[handle];
+    QnBusinessRuleViewModelPtr model = m_savingRules[handle];
     m_savingRules.remove(handle);
 
     const bool success = errorCode == ec2::ErrorCode::ok;
-    if(success) {
-        if (model->id().isNull())
-            deleteRule(model);
+    if(success)
         addOrUpdateRule(rule);
-    }
     emit afterModelChanged(RuleSaved, success);
 }
 
@@ -57,7 +54,7 @@ void QnBusinessRulesActualModel::at_message_ruleChanged(const QnBusinessEventRul
 }
 
 void QnBusinessRulesActualModel::at_message_ruleDeleted(const QnUuid &id) {
-    deleteRule(id);  //TODO: #GDM #Business ask user
+    deleteRule(ruleModelById(id));  //TODO: #GDM #Business ask user
     emit businessRuleDeleted(id);
 }
 
