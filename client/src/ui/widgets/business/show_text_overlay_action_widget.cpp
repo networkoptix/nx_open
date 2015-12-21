@@ -12,7 +12,14 @@ namespace {
     enum {
         msecPerSecond = 1000
     };
+}
 
+QString QnShowTextOverlayActionWidget::getPlaceholderText()
+{
+    static const auto kPlaceholderText = tr("Html tags could be used within custom text:\n<h4>Headers (h1-h6)</h4>Also different <font color=\"red\">colors</font> and <font size=\"18\">sizes</font> could be applied. Text could be <s>stricken</s>, <u>underlined</u>, <b>bold</b> or <i>italic</i>"
+        , "Do not translate tags (text between '<' and '>' symbols. Do not remove '\n' sequence");
+
+    return kPlaceholderText;
 }
 
 QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
@@ -24,11 +31,24 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
     connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
-    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
-    connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
+
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked, this, [this]()
+    {
+        const bool isFixedDuration = ui->fixedDurationCheckBox->isChecked();
+        ui->ruleWarning->setVisible(!isFixedDuration);
+        paramsChanged();
+    });
+
+    connect(ui->customTextCheckBox,     &QCheckBox::clicked, this, [this]()
+    {
+        ui->customTextEdit->setPlainText(ui->customTextCheckBox->isChecked()
+            ? model()->actionParams().text : getPlaceholderText());
+        paramsChanged();
+    });
+
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {
         // Prolonged type of event has changed. In case of instant
@@ -71,12 +91,16 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
         const auto params = model()->actionParams();
 
-        ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
+        const bool isFixedFuration = (params.durationMs > 0);
+        ui->fixedDurationCheckBox->setChecked(isFixedFuration);
+        ui->ruleWarning->setVisible(!isFixedFuration);
         if (ui->fixedDurationCheckBox->isChecked())
             ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
 
-        ui->customTextCheckBox->setChecked(!params.text.isEmpty());
-        ui->customTextEdit->setPlainText(params.text);
+
+        const bool useCustomText = !params.text.isEmpty();
+        ui->customTextCheckBox->setChecked(useCustomText);
+        ui->customTextEdit->setPlainText(useCustomText ? params.text : getPlaceholderText());
 
         ui->useSourceCheckBox->setChecked(params.useSource);
     }
