@@ -1,13 +1,14 @@
 #pragma once
 
 #include <ui/dialogs/message_box.h>
+#include <ui/dialogs/workbench_state_dependent_dialog.h>
 
 class QnUnlinkFromCloudDialogPrivate;
 
-class QnUnlinkFromCloudDialog : public QnMessageBox
+class QnUnlinkFromCloudDialog : public QnWorkbenchStateDependentDialog<QnMessageBox>
 {
     Q_OBJECT
-    typedef QnMessageBox base_type;
+    typedef QnWorkbenchStateDependentDialog<QnMessageBox> base_type;
 
 public:
     explicit QnUnlinkFromCloudDialog(QWidget *parent = 0);

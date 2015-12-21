@@ -37,16 +37,14 @@ private:
 };
 
 QnUnlinkFromCloudDialog::QnUnlinkFromCloudDialog(QWidget *parent)
-    : base_type(QMessageBox::NoIcon,
-                -1,
-                tr("Unlink from cloud"),
-                tr("You are going to disconnect this system from the cloud account."),
-                QMessageBox::Ok | QMessageBox::Cancel,
-                parent
-            )
+    : base_type(parent)
     , d_ptr(new QnUnlinkFromCloudDialogPrivate(this))
 {
+    setWindowTitle(tr("Unlink from cloud"));
+    setText(tr("You are going to disconnect this system from the cloud account."));
+    setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     setDefaultButton(QMessageBox::Ok);
+    //TODO: #dklychkov set help topic
 }
 
 QnUnlinkFromCloudDialog::~QnUnlinkFromCloudDialog()
