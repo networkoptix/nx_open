@@ -2235,7 +2235,7 @@ void MediaServerProcess::run()
         for (const auto& value: storagesToRemove)
             idList.push_back(value->getId());
         if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+            qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
         qnResPool->removeResources(storagesToRemove);
     }
 

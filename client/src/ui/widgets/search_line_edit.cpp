@@ -92,6 +92,16 @@ QSize QnSearchLineEdit::sizeHint() const
     return size;
 }
 
+void QnSearchLineEdit::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+
+    QStyleOptionFrameV2 panel;
+    initStyleOption(&panel);
+    const auto rect = style()->subElementRect(QStyle::SE_LineEditContents, &panel, this);
+    m_lineEdit->setGeometry(rect);
+}
+
 void QnSearchLineEdit::focusInEvent(QFocusEvent *event)
 {
     m_lineEdit->event(event);

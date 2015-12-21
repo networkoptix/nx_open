@@ -27,5 +27,8 @@ private slots:
     void paramsChanged();
 
 private:
+    static QString getPlaceholderText();
+
+private:
     QScopedPointer<Ui::ShowTextOverlayActionWidget> ui;
 };
