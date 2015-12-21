@@ -224,6 +224,7 @@ QnResourceWidget::~QnResourceWidget() {
 void QnResourceWidget::addInfoOverlay() {
     {
         auto titleLayout = createGraphicsLayout(Qt::Horizontal);
+        titleLayout->setSpacing(2.0);
         titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
         titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
@@ -239,6 +240,8 @@ void QnResourceWidget::addInfoOverlay() {
 
         addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
         setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
+
+        insertIconButtonCopy(titleLayout);
     }
 
     {
@@ -274,6 +277,36 @@ void QnResourceWidget::addInfoOverlay() {
     }
 }
 
+void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
+    , QnImageButtonWidget *button)
+{
+    enum { kItemButtonIndex = 0};
+    layout->insertItem(kItemButtonIndex, button);
+    connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this
+        , [this, layout, button]()
+    {
+        if(m_iconButton->isVisible())
+            layout->insertItem(kItemButtonIndex, button);
+        else
+            layout->removeItem(button);
+    });
+
+    connect(m_iconButton, &QnImageButtonWidget::iconChanged, this, [this, button]()
+    {
+        if (button != m_iconButton)
+            button->setIcon(m_iconButton->icon());
+    });
+
+}
+
+void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
+{
+    auto iconButtonCopy = new QnImageButtonWidget(this);
+    iconButtonCopy->setPreferredSize(24.0, 24.0);
+
+    setupIconButton(layout, iconButtonCopy);
+}
+
 void QnResourceWidget::addMainOverlay() {
     auto headerLayout = createGraphicsLayout(Qt::Horizontal);
     headerLayout->setSpacing(2.0);
@@ -282,13 +315,7 @@ void QnResourceWidget::addMainOverlay() {
     headerLayout->addItem(m_overlayWidgets.mainExtrasLabel);
     headerLayout->addItem(m_buttonBar);
 
-    connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this, [this, headerLayout](){
-        if(m_iconButton->isVisible()) {
-            headerLayout->insertItem(0, m_iconButton);
-        } else {
-            headerLayout->removeItem(m_iconButton);
-        }
-    });
+    setupIconButton(headerLayout, m_iconButton);
 
     auto headerWidget = createGraphicsWidget(headerLayout);
 
