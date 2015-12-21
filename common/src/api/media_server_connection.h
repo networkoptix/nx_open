@@ -221,16 +221,6 @@ public:
     int getBookmarksAsync(const QnGetBookmarksRequestData &request, QObject *target, const char *slot);
     int getBookmarkTagsAsync(const QnGetBookmarkTagsRequestData &request, QObject *target, const char *slot);
 
-    //!Report system cloud credentials to mediaserver
-    /*!
-        \param slot (int status, int handle)
-    */
-    int saveCloudSystemCredentials(
-        const QString& cloudSystemID,
-        const QString& cloudAuthKey,
-        QObject *target,
-        const char *slot);
-
 protected:
     virtual QnAbstractReplyProcessor *newReplyProcessor(int object) override;
     virtual bool isReady() const override;

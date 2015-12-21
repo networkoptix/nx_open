@@ -156,6 +156,14 @@ QString QnAppInfo::updateGeneratorUrl() {
     return QStringLiteral("${update.generator.url}");
 }
 
+QString QnAppInfo::cloudPortalUrl() {
+    return QStringLiteral("${cloud.portalUrl}");
+}
+
+QString QnAppInfo::cloudName() {
+    return QStringLiteral("${cloud.name}");
+}
+
 int QnAppInfo::freeLicenseCount() {
     return ${freeLicenseCount};
 }

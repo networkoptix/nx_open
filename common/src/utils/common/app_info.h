@@ -48,6 +48,8 @@ struct QnAppInfo {
     static QString mirrorListUrl();
     static QString helpUrl();
     static QString updateGeneratorUrl();
+    static QString cloudPortalUrl();
+    static QString cloudName();
 
     static int     freeLicenseCount();
     static QString freeLicenseKey();

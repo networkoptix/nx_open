@@ -2,7 +2,7 @@
 
 #include <network/router.h>
 #include <http/custom_headers.h>
-#include <utils/network/http/asynchttpclient.h>
+#include <nx/network/http/asynchttpclient.h>
 #include <utils/common/systemerror.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h>
@@ -38,10 +38,8 @@ void runMultiserverDownloadRequest(QUrl &url
 
     context->executeGuarded([url, requestCompletionFunc, headers, context]()
     {
-        if (nx_http::downloadFileAsync(url, requestCompletionFunc, headers,
-            nx_http::AsyncHttpClient::authDigestWithPasswordHash))
-        {
-            context->incRequestsCount();
-        }
+        nx_http::downloadFileAsync(
+                    url, requestCompletionFunc, headers, nx_http::AsyncHttpClient::authDigestWithPasswordHash);
+        context->incRequestsCount();
     });
 }
