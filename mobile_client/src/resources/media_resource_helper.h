@@ -1,5 +1,4 @@
-#ifndef MEDIA_RESOURCE_HELPER_H
-#define MEDIA_RESOURCE_HELPER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -7,7 +6,8 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/connective.h>
 
-class QnMediaResourceHelper : public Connective<QObject> {
+class QnMediaResourceHelper : public Connective<QObject>
+{
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
@@ -30,7 +30,8 @@ class QnMediaResourceHelper : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    enum Protocol {
+    enum Protocol
+    {
         Webm,
         Rtsp,
         Hls,
@@ -116,5 +117,3 @@ private:
     int m_maxTextureSize;
     int m_maxNativeResolution;
 };
-
-#endif // MEDIA_RESOURCE_HELPER_H
