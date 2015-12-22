@@ -130,6 +130,8 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 {
     ui->setupUi(this);
 
+    ui->spacerLabel->setText(lit("\n"));    /// Creates two-line spacer for wraning text.
+
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("In Real-Time"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
