@@ -19,8 +19,10 @@ namespace nx
 		class PlayerDataConsumer : public QnAbstractDataConsumer
 		{
 			Q_OBJECT
+			typedef QnAbstractDataConsumer base_type;
 		public:
 			PlayerDataConsumer();
+			virtual ~PlayerDataConsumer();
 
 			QSharedPointer<QVideoFrame> dequeueVideoFrame();
 		signals:
@@ -33,6 +35,7 @@ namespace nx
 			bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
 			void enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFrame);
+			virtual void pleaseStop() override;
 		private:
 			std::unique_ptr<SeamlessVideoDecoder> m_decoder;
 			

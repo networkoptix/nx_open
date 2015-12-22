@@ -88,8 +88,11 @@ QnObject {
         source: "camera://media/" + player.resourceId
 
         readonly property bool hasTimestamp: true
-        readonly property bool loading: playbackState == QnPlayer.PlayingState && mediaStatus != QnPlayer.BufferedMedia
-        readonly property bool playing: playbackState == QnPlayer.PlayingState && mediaStatus == QnPlayer.BufferedMedia
+        readonly property bool loading: playbackState == QnPlayer.Playing && mediaStatus != QnPlayer.Loaded
+        readonly property bool playing: playbackState == QnPlayer.Playing && mediaStatus == QnPlayer.Loaded
+
+		onPlaybackStateChanged: console.log("----------- Playback state: " + playbackState)
+		onMediaStatusChanged: console.log("----------- MediaStatus: " + mediaStatus)
 
 		readonly property real timestamp: position
 		property real finalTimestamp: {

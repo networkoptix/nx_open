@@ -19,6 +19,17 @@ PlayerDataConsumer::PlayerDataConsumer():
 	
 }
 
+PlayerDataConsumer::~PlayerDataConsumer()
+{
+	stop();
+}
+
+void PlayerDataConsumer::pleaseStop()
+{
+	base_type::pleaseStop();
+	m_queueWaitCond.wakeAll();
+}
+
 bool PlayerDataConsumer::canAcceptData() const
 {
 	// todo: implement me
@@ -56,8 +67,10 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
 void PlayerDataConsumer::enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFrame)
 {
 	QnMutexLocker lock(&m_queueMutex);
-	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize)
+	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
 		m_queueWaitCond.wait(&m_queueMutex);
+	if (needToStop())
+		return;
 	m_decodedVideo.push_back(std::move(decodedFrame));
 	lock.unlock();
 	emit gotVideoFrame();

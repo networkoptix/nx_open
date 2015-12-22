@@ -17,14 +17,14 @@ namespace nx
 			Q_OBJECT
 
 		public:
-			enum class State
+			enum State
 			{
 				Stopped,
 				Playing,
 				Paused
 			};
 
-			enum class MediaStatus
+			enum MediaStatus
 			{
 				Unknown,
 				NoMedia,

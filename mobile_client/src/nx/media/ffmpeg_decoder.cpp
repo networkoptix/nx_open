@@ -3,12 +3,17 @@
 extern "C"
 {
 	#include <libavformat/avformat.h>
+	#include <libswscale/swscale.h>
 }
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/thread/mutex.h>
+#include "aligned_mem_video_buffer.h"
 
-#include "../qt5/src/qtmultimedia/src/multimedia/video/qmemoryvideobuffer_p.h"
+namespace
+{
+	int kMediaAlignment = 32;
+}
 
 namespace nx
 {
@@ -56,12 +61,14 @@ public:
 	FfmpegDecoderPrivate() 
 		: codecContext(nullptr)
 		, frame(avcodec_alloc_frame())
+		, scaleContext(nullptr)
 		, lastPTS(AV_NOPTS_VALUE)
 	{
 	}
 	~FfmpegDecoderPrivate() { 
 		closeCodecContext();
 		av_free(frame);
+		sws_freeContext(scaleContext);
 	}
 
 	void initContext(const QnConstCompressedVideoDataPtr& frame);
@@ -69,6 +76,7 @@ public:
 
 	AVCodecContext* codecContext;
 	AVFrame* frame;
+	SwsContext* scaleContext;
 	qint64 lastPTS;
 };
 
@@ -85,6 +93,7 @@ void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fram
 	{
 		qWarning() << "Can't open decoder for codec" << frame->compressionType;
 		closeCodecContext();
+		return;
 	}
 }
 
@@ -168,12 +177,44 @@ bool FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPo
 	if (gotData <= 0)
 		return gotData == 0; //< negative value means error. zerro value is buffering
 	
+	/*
 	QMemoryVideoBuffer buffer(QByteArray((const char*) d->frame->data, d->frame->width * d->frame->height * 1.5), d->frame->linesize[0]);
 	result->reset(new QVideoFrame(
 		&buffer,
 		QSize(d->frame->width, d->frame->height), 
 		toQtPixelFormat(d->frame->format))
 	);
+	*/
+
+	if (!d->scaleContext)
+	{
+		d->scaleContext = sws_getContext(d->frame->width, d->frame->height, (PixelFormat)d->frame->format,
+										 d->frame->width, d->frame->height, PIX_FMT_BGRA,
+			                             SWS_BICUBIC, NULL, NULL, NULL);
+	}
+	const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
+	const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, d->frame->height);
+	const int argbLineSize = alignedWidth * 4;
+	
+	auto alignedBuffer = new AlignedMemVideoBuffer(numBytes, kMediaAlignment, argbLineSize);
+	auto videoFrame = new QVideoFrame(alignedBuffer, QSize(d->frame->width, d->frame->height), QVideoFrame::Format_RGB32);
+	videoFrame->setStartTime(d->frame->pkt_dts / 1000); //< ffmpeg pts/dst are mixed up here, so it's pkt_dts. Also Convert usec to msec.
+		
+	videoFrame->map(QAbstractVideoBuffer::WriteOnly);
+	uchar* buffer = videoFrame->bits();
+	
+	quint8* dstData[4];
+	memset(dstData, 0, sizeof(dstData));
+	dstData[0] = (quint8*) buffer;
+
+	int dstLinesize[4];
+	memset(dstLinesize, 0, sizeof(dstLinesize));
+	dstLinesize[0] = argbLineSize;
+	
+	sws_scale(d->scaleContext, d->frame->data, d->frame->linesize, 0, d->frame->height, dstData, dstLinesize);
+	videoFrame->unmap();
+
+	result->reset(videoFrame);
 
 	return true;
 }

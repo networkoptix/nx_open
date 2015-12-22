@@ -7,7 +7,6 @@
 
 #include <utils/common/delayed.h>
 #include <ui/texture_size_helper.h>
-#include <utils/mjpeg/mjpeg_session.h>
 
 #include "nx/streaming/archive_stream_reader.h"
 #include "nx/streaming/rtsp_client_archive_delegate.h"
@@ -34,6 +33,7 @@ public:
 	std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
 	QElapsedTimer ptsTimer;                               //< main AV timer for playback
 	boost::optional<qint64> lastVideoPts;                 //< last video frame PTS
+	qint64 ptsTimerBase;                                  //< timestamp when PTS timer was started
 	bool hasAudio;
 	QSharedPointer<QVideoFrame> videoFrameToRender;       //< decoded video which is awaiting to be rendered
 protected:
@@ -41,15 +41,13 @@ protected:
 	void presentNextFrame();
 	qint64 getNextTimeToRender(qint64 pts);
 	
-	// -------------------- depracated ----------------------
-
-	QnMjpegSession *session;
+protected:
+	QUrl url;
 	Player::State state;
 	Player::MediaStatus mediaStatus;
 
-	bool waitingForFrame;
+	// -------------------- depracated ----------------------
 	QElapsedTimer frameTimer;
-	int framePresentationTime;
 
 	QAbstractVideoSurface *videoSurface;
 	int position;
@@ -64,24 +62,18 @@ protected:
 	void setState(Player::State state);
 	void setMediaStatus(Player::MediaStatus status);
 	void updateMediaStatus();
-	void processFrame();
-	void at_session_frameEnqueued();
-	
 };
-
 
 PlayerPrivate::PlayerPrivate(Player *parent)
 	: QObject(parent)
 	, q_ptr(parent)
-	, session(new QnMjpegSession())
 	, state(Player::State::Stopped)
-	, waitingForFrame(true)
-	, framePresentationTime(0)
 	, videoSurface(0)
 	, position(0)
 	, timestamp(0)
 	, reconnectOnPlay(false)
 	, maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
+	, ptsTimerBase(0)
 	, hasAudio(false)
 {
 }
@@ -96,7 +88,8 @@ void PlayerPrivate::setState(Player::State state) {
 	emit q->playbackStateChanged();
 }
 
-void PlayerPrivate::setMediaStatus(Player::MediaStatus status) {
+void PlayerPrivate::setMediaStatus(Player::MediaStatus status) 
+{
 	if (mediaStatus == status)
 		return;
 
@@ -106,83 +99,14 @@ void PlayerPrivate::setMediaStatus(Player::MediaStatus status) {
 	emit q->mediaStatusChanged();
 }
 
-void PlayerPrivate::updateMediaStatus() {
-	Player::MediaStatus status = Player::MediaStatus::Unknown;
-
-	switch (session->state()) {
-	case QnMjpegSession::Stopped:
-		status = Player::MediaStatus::Unknown;
-		break;
-	case QnMjpegSession::Connecting:
-		status = Player::MediaStatus::Loading;
-		break;
-	case QnMjpegSession::Disconnecting:
-		status = Player::MediaStatus::EndOfMedia;
-		break;
-	case QnMjpegSession::Playing:
-		status = (position == 0) ? Player::MediaStatus::Buffering : Player::MediaStatus::Buffered;
-		break;
-	}
-
-	setMediaStatus(status);
-}
-
-void PlayerPrivate::processFrame() {
-	if (!waitingForFrame)
-		return;
-
-	if (state != Player::State::Playing)
-		return;
-
-	int presentationTime;
-	QImage image;
-
-	if (!session->dequeueFrame(&image, &timestamp, &presentationTime))
-		return;
-
-	position += presentationTime;
-
-	if (frameTimer.isValid())
-		presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);
-
-	if (image.width() > maxTextureSize || image.height() > maxTextureSize)
-		image = image.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
-
-	QVideoFrame frame(image);
-	if (videoSurface) {
-		if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != frame.pixelFormat())
-			videoSurface->stop();
-
-		if (!videoSurface->isActive()) {
-			QVideoSurfaceFormat format(frame.size(), frame.pixelFormat(), frame.handleType());
-			videoSurface->start(format);
-		}
-
-		if (videoSurface->isActive())
-			videoSurface->present(frame);
-	}
-
-	frameTimer.restart();
-
-	Q_Q(Player);
-	emit q->positionChanged();
-
-	framePresentationTime = qMax(0, presentationTime);
-
-	if (framePresentationTime == 0) {
-		processFrame();
-	}
-	else {
-		waitingForFrame = false;
-		executeDelayed([this](){
-			waitingForFrame = true;
-			processFrame();
-		}, presentationTime);
-	}
+void PlayerPrivate::updateMediaStatus() 
+{
 }
 
 void PlayerPrivate::at_gotVideoFrame()
 {
+	setMediaStatus(Player::MediaStatus::Loaded);
+
 	if (videoFrameToRender)
 		return; //< we already have fame to render. Ignore next frame (will be processed later)
 
@@ -194,7 +118,6 @@ void PlayerPrivate::at_gotVideoFrame()
 		return;
 
 	qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender->startTime());
-	
 	if (nextTimeToRender > ptsTimer.elapsed())
 		executeDelayed([this]() { presentNextFrame(); }, nextTimeToRender - ptsTimer.elapsed());
 	else
@@ -223,7 +146,6 @@ void PlayerPrivate::presentNextFrame()
 	if (videoSurface && videoSurface->isActive())
 		videoSurface->present(*videoFrameToRender);
 	
-	lastVideoPts = videoFrameToRender->startTime();
 	emit q->positionChanged();
 
 	videoFrameToRender.clear();
@@ -242,28 +164,19 @@ qint64 PlayerPrivate::getNextTimeToRender(qint64 pts)
 	else 
 	{
 		/* Calculate time to present next frame */
-
-		//< Reset timer If no previous frame or pts discontinue
-		if (!lastVideoPts.is_initialized() || !qBetween(qint64(lastVideoPts), pts, qint64(lastVideoPts) + kMaxFrameDuration))
+		if (!lastVideoPts.is_initialized() || !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration))
 		{
-			lastVideoPts = pts;
+			// Reset timer If no previous frame or pts discontinue
+			lastVideoPts = ptsTimerBase = pts;
 			ptsTimer.restart();
-			return pts;
+			return 0ll;
 		}
-
-		const qint64 ptsDistance = pts - qint64(lastVideoPts);
-		return ptsTimer.elapsed() + ptsDistance;
+		else {
+			lastVideoPts = pts;
+			return pts - ptsTimerBase;
+		}
 	}
 }
-
-void PlayerPrivate::at_session_frameEnqueued() {
-	if (state != Player::State::Playing)
-		return;
-
-	if (waitingForFrame)
-		processFrame();
-}
-
 
 Player::Player(QObject *parent)
 	: QObject(parent)
@@ -271,35 +184,11 @@ Player::Player(QObject *parent)
 {
 	Q_D(Player);
 
-	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
-	
-
-	// remove this:
-
-	QThread *networkThread;
-	networkThread = new QThread();
-	networkThread->setObjectName(lit("MJPEG Session Thread"));
-	d->session->moveToThread(networkThread);
-	networkThread->start();
-
-	connect(d->session, &QnMjpegSession::frameEnqueued, d, &PlayerPrivate::at_session_frameEnqueued);
-	connect(d->session, &QnMjpegSession::urlChanged, this, &Player::sourceChanged);
-	connect(d->session, &QnMjpegSession::finished, this, &Player::playbackFinished);
-	connect(d->session, &QnMjpegSession::stateChanged, d, &PlayerPrivate::updateMediaStatus);
-	connect(this, &Player::positionChanged, d, &PlayerPrivate::updateMediaStatus);
 }
 
 Player::~Player() 
 {
 	Q_D(Player);
-
-	QnMjpegSession *session = d->session;
-	connect(session, &QnMjpegSession::stateChanged, session, [session]() {
-		if (session->state() == QnMjpegSession::Stopped) {
-			session->deleteLater();
-			QMetaObject::invokeMethod(session->thread(), "quit", Qt::QueuedConnection);
-		}
-	});
 
 	stop();
 }
@@ -320,7 +209,7 @@ Player::MediaStatus Player::mediaStatus() const
 QUrl Player::source() const {
 	Q_D(const Player);
 
-	return d->session->url();
+	return d->url;
 }
 
 QAbstractVideoSurface *Player::videoSurface() const {
@@ -362,6 +251,21 @@ void Player::setReconnectOnPlay(bool reconnectOnPlay)
 void Player::play()
 {
 	Q_D(Player);
+	
+	d->setState(State::Playing);
+	d->setMediaStatus(MediaStatus::Loading);
+	
+	QnUuid id(d->url.path().mid(1));
+	QnResourcePtr camera = qnResPool->getResourceById(id);
+	if (!camera)
+		return;
+
+	d->archiveReader.reset(new QnArchiveStreamReader(camera));
+	d->dataConsumer.reset(new PlayerDataConsumer());
+	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
+	d->archiveReader->addDataProcessor(d->dataConsumer.get());
+	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
+
 
 	d->dataConsumer->start();
 	d->archiveReader->start();
@@ -377,28 +281,24 @@ void Player::pause()
 void Player::stop()
 {
 	Q_D(Player);
+
+	if (d->archiveReader && d->dataConsumer)
+		d->archiveReader->removeDataProcessor(d->dataConsumer.get());
+
+	d->dataConsumer.reset();
+	d->archiveReader.reset();
 }
 
 void Player::setSource(const QUrl &url)
 {
 	Q_D(Player);
 
-	if (url == d->session->url())
+	if (url == d->url)
 		return;
-	
-	d->archiveReader.reset();
-	d->dataConsumer.reset();
+
+	stop();
 	d->setState(State::Stopped);
-
-	QnUuid id(url.path().mid(1));
-	QnResourcePtr camera = qnResPool->getResourceById(id);
-	if (!camera)
-		return;
-
-	d->archiveReader.reset(new QnArchiveStreamReader(camera));
-	d->dataConsumer.reset(new PlayerDataConsumer());
-	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
-	d->archiveReader->addDataProcessor(d->dataConsumer.get());
+	d->url = url;
 }
 
 void Player::setVideoSurface(QAbstractVideoSurface *videoSurface)
