@@ -5,7 +5,7 @@
                    error-prefix="'Couldn\'t save your data:'"></process-alert>
 
 
-    <form name="accountForm" class="form-horizontal">
+    <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
             <label for="email"  class="col-sm-3 control-label">Email address</label>
@@ -39,7 +39,7 @@
             <div class="col-sm-offset-3 col-sm-9">
 
                 <process-button process="save"
-                                ng-disabled="!accountForm.$valid"
+                                button-disabled="!accountForm.$valid"
                                 button-text="'Save'"></process-button>
             </div>
         </div>
@@ -52,7 +52,7 @@
                    success-message="'Your password was successfully changed.'"
                    error-prefix="'Couldn\'t change your password:'"></process-alert>
 
-    <form name="passwordForm" class="form-horizontal">
+    <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group" validate-field>
             <label for="password"  class="col-sm-3 control-label">Current password</label>
             <div class="col-sm-4">
@@ -80,7 +80,7 @@
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
                 <process-button process="changePassword"
-                                ng-disabled="!passwordForm.$valid"
+                                button-disabled="!passwordForm.$valid"
                                 button-text="'Change password'"></process-button>
             </div>
         </div>
