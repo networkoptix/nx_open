@@ -130,12 +130,7 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
 
     Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
     /* Reconnect if some permissions were changed*/
-    bool reconnect = (newPermissions != m_userPermissions);
-    /* Also reconnect if 'administrator' state was changed. */
-    bool wasAdmin =     m_userPermissions.testFlag(Qn::GlobalProtectedPermission);
-    bool becameAdmin =  newPermissions.testFlag(Qn::GlobalProtectedPermission);
-    reconnect |= (wasAdmin != becameAdmin);
-
+    const bool reconnect = (newPermissions != m_userPermissions);
     m_userPermissions = newPermissions;
     if (reconnect)
         emit reconnectRequired();
