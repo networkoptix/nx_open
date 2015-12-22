@@ -234,7 +234,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
             if (!switchToChunk(newChunk, newChunkCatalog)) {
                 if (!newChunkCatalog) {
                     m_eof = true;
-                    return -1;
+                    return time;
                 } else {
                     ignoreChunks.emplace_back(newChunk, newChunkCatalog->cameraUniqueId(),
                                               newChunkCatalog->getRole());
