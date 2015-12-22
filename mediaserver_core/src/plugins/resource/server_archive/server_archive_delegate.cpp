@@ -196,11 +196,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
             m_eof = true;
             return time;
         }
-    else if (m_reverseMode && newChunk.startTimeMs == -1)
-    {
-        m_eof = true;
-        return time;
-    }
+        else if (m_reverseMode && newChunk.startTimeMs == -1)
+        {
+            m_eof = true;
+            return time;
+        }
 
         qint64 chunkOffset = 0;
         if (newChunk.durationMs == -1) // last live chunk
