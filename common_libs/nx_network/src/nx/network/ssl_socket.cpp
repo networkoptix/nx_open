@@ -1309,7 +1309,7 @@ bool QnSSLSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
     return d->wrappedSocket->setKeepAlive( info );
 }
 
-bool QnSSLSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+bool QnSSLSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) const
 {
     Q_D(const QnSSLSocket);
     return d->wrappedSocket->getKeepAlive( result );
