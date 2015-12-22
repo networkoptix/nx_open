@@ -11,6 +11,7 @@
 #include <QtOpenGL/QGLContext>
 
 #include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/icon.h>
@@ -243,7 +244,19 @@ void QnImageButtonWidget::click() {
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     StateFlags hoverState = m_state | Hovered;
     StateFlags normalState = m_state & ~Hovered;
-    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+
+    bool corrected = false;
+    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+
+    if (corrected)
+    {
+        QnScopedPainterTransformRollback rollback(painter, roundedTransform);
+        paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+    }
+    else
+    {
+        paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+    }
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
