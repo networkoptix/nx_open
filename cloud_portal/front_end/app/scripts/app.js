@@ -21,14 +21,14 @@ angular.module('cloudApp', [
             templateUrl: 'views/account.html',
             controller: 'AccountCtrl',
             resolve: {
-                test: function ($route) { $route.current.params.passwordMode = true; }
+                test: ['$route',function ($route) { $route.current.params.passwordMode = true; }]
             }
         })
         .when('/account', {
             templateUrl: 'views/account.html',
             controller: 'AccountCtrl',
             resolve: {
-                test: function ($route) { $route.current.params.accountMode = true; }
+                test: ['$route',function ($route) { $route.current.params.accountMode = true; }]
             }
         })
         .when('/systems', {
@@ -51,7 +51,7 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
-                test: function ($route) { $route.current.params.restoring = true; }
+                test: ['$route',function ($route) { $route.current.params.restoring = true; }]
             }
         })
         .when('/restore_password/:restoreCode', {
