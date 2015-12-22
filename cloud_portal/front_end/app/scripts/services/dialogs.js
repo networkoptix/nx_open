@@ -2,9 +2,6 @@
 
 angular.module('cloudApp')
     .factory('dialogs', function ($http, $modal, $q) {
-
-        
-
         function openDialog(title, template, content, hasFooter, cancellable){
             // Check 401 against offline
 
@@ -39,7 +36,6 @@ angular.module('cloudApp')
             }
         };
     }).controller("DialogCtrl",function($scope, $modalInstance,settings){
-        console.log("DialogCtrl",settings);
         $scope.settings = settings;
 
         $scope.close = function(){

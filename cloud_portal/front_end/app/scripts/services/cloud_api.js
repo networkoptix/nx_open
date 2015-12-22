@@ -11,10 +11,8 @@ angular.module('cloudApp')
                 if(!accountCache){
                     $http.get(apiBase + '/account').then(function(response){
                         accountCache = response.data;
-                        console.log("account",accountCache);
                         defer.resolve(accountCache);
                     },function(error){
-                        console.error(error);
                         accountCache = null;
                         defer.resolve(null);
                         return null
