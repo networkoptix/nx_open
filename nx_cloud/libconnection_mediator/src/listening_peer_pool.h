@@ -23,9 +23,10 @@ public:
     ListeningPeerPool( AbstractCloudDataProvider* cloudData,
                        stun::MessageDispatcher* dispatcher );
 
-    void bind( const ConnectionSharedPtr& connection, stun::Message message );
-    void listen( const ConnectionSharedPtr& connection, stun::Message message );
-    void connect( const ConnectionSharedPtr& connection, stun::Message message );
+    void bind(const ConnectionSharedPtr& connection, stun::Message message);
+    void listen(const ConnectionSharedPtr& connection, stun::Message message);
+    void resolve(const ConnectionSharedPtr& connection, stun::Message message);
+    void connect(const ConnectionSharedPtr& connection, stun::Message message);
 
 protected:
     struct MediaserverPeer

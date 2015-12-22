@@ -34,9 +34,15 @@ public:
     void mockupAddress( SocketAddress address );
 
     /** Authorization credentials for \class MediatorSystemConnection */
-    struct SystemCredentials
+    struct NX_NETWORK_API SystemCredentials
     {
         String systemId, serverId, key;
+        
+        SystemCredentials();
+        SystemCredentials(
+            nx::String _systemId,
+            nx::String _serverId,
+            nx::String _key);
         bool operator ==( const SystemCredentials& rhs ) const;
     };
 

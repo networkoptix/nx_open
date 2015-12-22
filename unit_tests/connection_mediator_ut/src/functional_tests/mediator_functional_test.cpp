@@ -1,5 +1,5 @@
 /**********************************************************
-* Sep 29, 2015
+* Dec 21, 2015
 * akolesnikov
 ***********************************************************/
 
@@ -15,12 +15,14 @@
 #include <tuple>
 
 #include <common/common_globals.h>
-#include <utils/common/cpp14.h>
-#include <utils/common/sync_call.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket.h>
+#include <utils/common/cpp14.h>
+#include <utils/common/sync_call.h>
+#include <utils/crypt/linux_passwd_crypt.h>
 
 #include "local_cloud_data_provider.h"
+#include "socket_globals_holder.h"
 #include "version.h"
 
 
@@ -31,6 +33,9 @@ MediatorFunctionalTest::MediatorFunctionalTest()
 :
     m_port(0)
 {
+    //starting clean test
+    SocketGlobalsHolder::instance()->reinitialize();
+
     m_port = (std::rand() % 10000) + 50000;
     m_tmpDir = QDir::homePath() + "/hpm_ut.data";
     QDir(m_tmpDir).removeRecursively();
@@ -42,7 +47,8 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
 
-    m_mediatorConnector.mockupAddress(endpoint());
+    SocketGlobals::mediatorConnector().mockupAddress(endpoint());
+    registerCloudDataProvider(&m_cloudDataProvider);
 }
 
 MediatorFunctionalTest::~MediatorFunctionalTest()
@@ -121,13 +127,13 @@ SocketAddress MediatorFunctionalTest::endpoint() const
 std::shared_ptr<nx::cc::MediatorClientConnection> 
     MediatorFunctionalTest::clientConnection()
 {
-    return m_mediatorConnector.clientConnection();
+    return SocketGlobals::mediatorConnector().clientConnection();
 }
 
 std::shared_ptr<nx::cc::MediatorSystemConnection>
     MediatorFunctionalTest::systemConnection()
 {
-    return m_mediatorConnector.systemConnection();
+    return SocketGlobals::mediatorConnector().systemConnection();
 }
 
 void MediatorFunctionalTest::registerCloudDataProvider(
@@ -142,6 +148,18 @@ void MediatorFunctionalTest::registerCloudDataProvider(
     {
         return std::make_unique<CloudDataProviderStub>(cloudDataProvider);
     });
+}
+
+AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
+{
+    AbstractCloudDataProvider::System system(
+        generateSalt(16),
+        generateSalt(16),
+        true);
+    m_cloudDataProvider.addSystem(
+        system.id,
+        system);
+    return system;
 }
 
 //api::ResultCode MediatorFunctionalTest::addAccount(

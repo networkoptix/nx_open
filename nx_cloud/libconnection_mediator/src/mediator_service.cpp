@@ -82,8 +82,8 @@ int MediatorProcess::executeApplication()
 
     //STUN handlers
     stun::MessageDispatcher stunMessageDispatcher;
-    MediaserverApi mediaserverApi( cloudDataProvider.get(), &stunMessageDispatcher );
-    ListeningPeerPool listeningPeerPool( cloudDataProvider.get(), &stunMessageDispatcher );
+    MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
+    ListeningPeerPool listeningPeerPool(cloudDataProvider.get(), &stunMessageDispatcher);
 
     //accepting STUN requests by both tcp and udt
     m_multiAddressStunServer.reset(

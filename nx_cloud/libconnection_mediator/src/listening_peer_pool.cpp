@@ -1,8 +1,11 @@
+
 #include "listening_peer_pool.h"
 
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/cloud_connectivity/data/resolve_data.h>
+
 
 namespace nx {
 namespace hpm {
@@ -21,6 +24,10 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
             stun::cc::methods::listen,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { listen( connection, std::move( message ) ); } ) &&
+        dispatcher->registerRequestProcessor(
+            stun::cc::methods::resolve,
+            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
+                { resolve( connection, std::move( message ) ); } );
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connect,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
@@ -81,6 +88,65 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
             errorResponse( connection, message.header, stun::error::badRequest,
                 "This mediaserver is already bound from diferent connection" );
         }
+    }
+}
+
+void ListeningPeerPool::resolve(
+    const ConnectionSharedPtr& connection,
+    stun::Message request)
+{
+    nx::cc::api::ResolveRequest requestData;
+    if (!requestData.parse(request))
+        return errorResponse(
+            connection,
+            request.header,
+            stun::error::badRequest,
+            requestData.errorText());
+
+    QnMutexLocker lk(&m_mutex);
+    const auto peer = m_peers.search(requestData.hostName);
+    if (!peer)
+    {
+        lk.unlock();
+        NX_LOGX(lm("Could not resolve host %1. client address: %2")
+            .arg(requestData.hostName).arg(connection->socket()->getForeignAddress().toString()),
+            cl_logDEBUG2);
+
+        return errorResponse(
+            connection,
+            request.header,
+            stun::cc::error::notFound,
+            "Unknown host: " + requestData.hostName);
+    }
+
+    if (const auto peer = m_peers.search(requestData.hostName))
+    {
+        stun::Message response(stun::Header(
+            stun::MessageClass::successResponse,
+            request.header.method,
+            std::move(request.header.transactionId)));
+
+        nx::cc::api::ResolveResponse responseData;
+
+        if (!peer->endpoints.empty())
+            responseData.endpoints = peer->endpoints;
+        responseData.connectionMethods = 
+            nx::cc::api::ConnectionMethod::udpHolePunching |
+            nx::cc::api::ConnectionMethod::proxy;
+
+        responseData.serialize(&response);
+
+        if (!peer->isListening)
+        { /* TODO: StunEndpointList */
+        }
+
+        NX_LOGX(lm("Successfully resolved host %1 (requested from %2), endpoints=%3")
+            .arg(requestData.hostName).arg(connection->socket()->getForeignAddress().toString())
+            .arg(containerString(peer->endpoints)),
+            cl_logDEBUG2);
+
+        lk.unlock();
+        connection->sendMessage(std::move(response));
     }
 }
 

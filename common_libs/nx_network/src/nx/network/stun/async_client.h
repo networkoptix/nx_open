@@ -41,7 +41,7 @@ public:
 
     static const struct Timeouts { uint send, recv, reconnect; } DEFAULT_TIMEOUTS;
 
-    AsyncClient( Timeouts timeouts = DEFAULT_TIMEOUTS );
+    AsyncClient(Timeouts timeouts = DEFAULT_TIMEOUTS);
     ~AsyncClient();
 
     Q_DISABLE_COPY( AsyncClient );

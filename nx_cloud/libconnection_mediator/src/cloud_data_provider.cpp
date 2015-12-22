@@ -44,9 +44,20 @@ void AbstractCloudDataProviderFactory::setFactoryFunc(FactoryFunc factoryFunc)
 
 
 AbstractCloudDataProvider::System::System( String authKey_, bool mediatorEnabled_ )
-    : authKey( authKey_ )
+    : authKey(std::move(authKey_))
     , mediatorEnabled( mediatorEnabled_ )
 
+{
+}
+
+AbstractCloudDataProvider::System::System(
+    String id_,
+    String authKey_,
+    bool mediatorEnabled_)
+:
+    id(std::move(id_)),
+    authKey(std::move(authKey_)),
+    mediatorEnabled(mediatorEnabled_)
 {
 }
 

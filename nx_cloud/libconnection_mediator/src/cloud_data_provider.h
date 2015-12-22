@@ -17,10 +17,17 @@ public:
 
     struct System
     {
+        String id;
         String authKey;
         bool mediatorEnabled;
 
-        System( String authKey_, bool mediatorEnabled_ = false );
+        System(
+            String authKey_,
+            bool mediatorEnabled_ = false);
+        System(
+            String id_,
+            String authKey_,
+            bool mediatorEnabled_);
     };
 
     virtual boost::optional< System > getSystem( const String& systemId ) const = 0;

@@ -69,12 +69,29 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     m_promise->set_value( true );
 }
 
+
+MediatorConnector::SystemCredentials::SystemCredentials()
+{
+}
+
+MediatorConnector::SystemCredentials::SystemCredentials(
+    nx::String _systemId,
+    nx::String _serverId,
+    nx::String _key)
+:
+    systemId(std::move(_systemId)),
+    serverId(std::move(_serverId)),
+    key(std::move(_key))
+{
+}
+
 bool MediatorConnector::SystemCredentials::operator ==( const SystemCredentials& rhs ) const
 {
     return serverId == rhs.serverId &&
            systemId == rhs.systemId &&
            key      == rhs.key;
 }
+
 
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
 {

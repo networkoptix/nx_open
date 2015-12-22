@@ -30,6 +30,8 @@ namespace methods
         // TODO: specify bahavior
         listen,
 
+        resolve,    //!< Returns host's public address list and suitable connections methods
+
         /** Initiate connection to some mediaserver
          *  Request: \class PeerId, \class HostName, \class ConnectionId
          *  Response: \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
@@ -37,6 +39,8 @@ namespace methods
          */
         connect
     };
+
+    nx::String toString(Value val);
 }
 
 namespace indications
@@ -81,6 +85,7 @@ namespace attrs
         publicEndpointList,
         tcpHpEndpointList,
         udtHpEndpointList,
+        connectionMethods,
     };
 
 
@@ -119,6 +124,13 @@ namespace attrs
         static const int TYPE = hostName;
         HostName( const String& value ) : StringAttribute( TYPE, value ) {}
     };
+
+    struct NX_NETWORK_API ConnectionMethods: StringAttribute
+    {
+        static const int TYPE = connectionMethods;
+        ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
+    };
+    
 
 
     /** Base class for endpoint attributes */

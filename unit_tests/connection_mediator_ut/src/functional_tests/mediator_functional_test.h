@@ -14,21 +14,17 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/network/cloud_connectivity/mediator_connector.h>
 #include <nx/network/socket_common.h>
 
 #include <cloud_data_provider.h>
 #include <mediator_process_public.h>
 
+#include "local_cloud_data_provider.h"
+#include "mediator_connector.h"
+
 
 namespace nx {
 namespace hpm {
-
-class MediatorConnector
-:
-    public nx::cc::MediatorConnector
-{
-};
 
 class MediatorFunctionalTest
 :
@@ -55,13 +51,16 @@ public:
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
+    AbstractCloudDataProvider::System addRandomSystem();
+
 private:
     QString m_tmpDir;
     int m_port;
     std::vector<char*> m_args;
     std::unique_ptr<MediatorProcessPublic> m_mediatorInstance;
     std::future<int> m_mediatorProcessFuture;
-    MediatorConnector m_mediatorConnector;
+    //MediatorConnector m_mediatorConnector;
+    LocalCloudDataProvider m_cloudDataProvider;
 };
 
 }   //hpm
