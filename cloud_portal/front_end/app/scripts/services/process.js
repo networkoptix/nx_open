@@ -21,17 +21,28 @@ angular.module('cloudApp')
         return {
             formatError:formatError,
             init:function(caller, errorCodes){
-                var deferred = $q.defer();
-
                 return {
                     success:false,
                     error:false,
                     processing: false,
                     errorData: null,
-                    promise: deferred.promise,
+                    then:function(successHanlder, errorHandler, processHandler){
+                        this.successHanlder = successHanlder;
+                        this.errorHandler = errorHandler;
+                        this.processHandler = processHandler;
+                        return this;
+                    },
                     run:function(){
                         this.processing = true;
                         var self = this;
+
+                        var deferred = $q.defer();
+                        deferred.promise.then(
+                            this.successHanlder,
+                            this.errorHandler,
+                            this.processHandler
+                        );
+
                         return caller().then(function(data){
                             self.processing = false;
                             if(data.data.resultCode && data.data.resultCode != Config.errorCodes.ok){
