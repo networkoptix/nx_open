@@ -322,7 +322,7 @@
         }}
     },
     
-    "QnGraphicsMessageBox": {
+    "QnGraphicsMessageBoxColors": {
         "frame": "opaqueSelection",
         "window": "selection.darker(100)",
         "text": "#000000ff"
