@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "test_setup.h"
+#include "mediator_functional_test.h"
 
 #include <gtest/gtest.h>
 

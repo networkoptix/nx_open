@@ -14,7 +14,7 @@
 #include <nx/network/socket_global.h>
 
 #include "mediator_mocks.h"
-#include "functional_tests/test_setup.h"
+#include "functional_tests/mediator_functional_test.h"
 #include "local_cloud_data_provider.h"
 
 
