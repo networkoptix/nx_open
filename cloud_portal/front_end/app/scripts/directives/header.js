@@ -7,6 +7,7 @@ angular.module('cloudApp')
             templateUrl: 'views/components/header.html',
             link:function(scope,element,attrs){
                 scope.session = $sessionStorage;
+                scope.loginChecked = false;
                 scope.login = function(){
                     dialogs.login();
                 };
@@ -19,6 +20,7 @@ angular.module('cloudApp')
 
                 cloudApi.account().then(function(account){
                     scope.account = account;
+                    scope.loginChecked = true;
                 });
 
             }
