@@ -2,16 +2,16 @@
     <div class="modal-body" >
         <process-alert process="login" ></process-alert>
 
-        <form name="loginForm">
+        <form name="loginForm" novalidate>
             <div class="form-group" validate-field>
                 <label for="email">Email address</label>
                 <input type="email" class="form-control" ng-model="email" id="email" name="email"
-                       placeholder="Email" required>
+                       required autofocus>
             </div>
             <div class="form-group" validate-field>
                 <label for="password">Password</label>
                 <input type="password" class="form-control" ng-model="password" name="password" id="password"
-                       placeholder="Password" required>
+                       required>
             </div>
             <div class="checkbox">
                 <label ><input type="checkbox" ng-model="remember" name="remember" id="remember"
@@ -24,6 +24,6 @@
 
         <process-button process="login"
                         disabled="!loginForm.$valid"
-                        button-text="'Sign in'"></process-button>
+                        button-text="'Login'"></process-button>
     </div>
 </div>

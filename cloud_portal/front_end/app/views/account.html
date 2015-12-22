@@ -10,20 +10,20 @@
         <div class="form-group">
             <label for="email"  class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-9">
-                <input type="email" class="form-control" ng-model="account.email" id="email" readonly placeholder="Email">
+                <input type="email" class="form-control" ng-model="account.email" id="email" readonly >
             </div>
         </div>
 
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" ng-model="account.first_name" id="firstName" placeholder="First name">
+                <input type="text" class="form-control" ng-model="account.first_name" id="firstName" >
             </div>
         </div>
         <div class="form-group">
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" ng-model="account.last_name" id="lastName" placeholder="Last name">
+                <input type="text" class="form-control" ng-model="account.last_name" id="lastName" >
             </div>
         </div>
 
@@ -57,7 +57,7 @@
             <label for="password"  class="col-sm-3 control-label">Current password</label>
             <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="password"
-                       id="password" placeholder="Password" required>
+                       id="password" required>
             </div>
             <div class="col-sm-5">
                 <span class="help-block" ng-if="passwordForm.password.$dirty && passwordForm.password.$error.required">Current password is required.</span>
@@ -66,9 +66,9 @@
 
         <div class="form-group" validate-field>
             <label for="newPassword"  class="col-sm-3 control-label">New password</label>
-            <div class="col-sm-9">
+            <div class="col-sm-4">
                 <input type="password" class="form-control" ng-model="newPassword"
-                       id="newPassword" placeholder="New Password" required="">
+                       id="newPassword" required="">
             </div>
             <div class="col-sm-5">
                 <span class="help-block" ng-if="passwordForm.newPassword.$dirty && passwordForm.newPassword.$error.required">New password is required.</span>

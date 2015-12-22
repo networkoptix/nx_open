@@ -35,7 +35,7 @@ angular.module('cloudApp')
                 return openDialog(title, null, message, true, false);
             },
             login:function(){
-                return openDialog('Log in', 'views/login.html', null, false, true);
+                return openDialog('Login', 'views/login.html', null, false, true);
             }
         };
     }).controller("DialogCtrl",function($scope, $modalInstance,settings){

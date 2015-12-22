@@ -11,7 +11,7 @@
                        intro-message="'You are going to confirm your account. Please, enter your account email.'"
                        success-message="'Confirmation link was send to your email. Check it to continue.'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
-        <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success">
+        <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
                 <label for="emailReactivate"  class="col-sm-3 control-label">Email address</label>
                 <div class="col-sm-4">
@@ -19,7 +19,6 @@
                            ng-model="data.email"
                            id="emailReactivate"
                            name="email"
-                           placeholder="Email"
                            required>
                 </div>
                 <div class="col-sm-5">
@@ -42,7 +41,7 @@
                        intro-message="'You are going to restore your password. Please, enter your account email.'"
                        success-message="'Confirmation link was send to your email. Check it for creating a new password'"
                        error-prefix="'Couldn\'t send confirmation email:'"></process-alert>
-        <form name="restorePassword" class="form-horizontal" ng-if="!restore.success">
+        <form name="restorePassword" class="form-horizontal" ng-if="!restore.success" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-3 control-label">Email address</label>
                 <div class="col-sm-4">
@@ -50,7 +49,6 @@
                            ng-model="data.email"
                            id="email"
                            name="email"
-                           placeholder="Email"
                            required>
                 </div>
                 <div class="col-sm-5">
@@ -73,7 +71,7 @@
                        success-message="'Password successfully saved'"
                        error-prefix="'Couldn\'t save new password:'"></process-alert>
 
-        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success">
+        <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success" novalidate>
             <div class="form-group" validate-field>
                 <label for="newPassword" class="col-sm-3 control-label">New password</label>
                 <div class="col-sm-4">
@@ -81,7 +79,6 @@
                            ng-model="data.newPassword"
                            id="newPassword"
                            name="newPassword"
-                           placeholder="Password"
                            required>
                 </div>
                 <div class="col-sm-5">

@@ -1,20 +1,24 @@
 <div class="jumbotron">
-    <h1><img src="images/promo/main.png"></h1>
     <h1>NX Connect</h1>
+    <h2>Register to be happy!</h2>
 </div>
-
 
 <div class="row" >
     <process-alert process="register"
                    success-message="'Your account was successfully registered. Please, check your email to confirm it'"
                    error-prefix="'Some error has happened:'"></process-alert>
 
-    <form name="registerForm" class="form-horizontal" ng-if="!register.success" ng-init="setRegisterForm(this)">
+    <form name="registerForm" class="form-horizontal" ng-if="!register.success" ng-init="setRegisterForm(this)" novalidate autocomplete="off">
+        <!-- special hack to prevent autocompletion -->
+        <input type="text" style="display:none">
+        <input type="password" style="display:none">
+        <!-- /end of special hack -->
+
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName"
-                       name="firstName" placeholder="First name">
+                       name="firstName" autocomplete="off" autofocus>
             </div>
             <div class="col-sm-5">
 
@@ -24,17 +28,17 @@
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
             <div class="col-sm-4">
                 <input type="text" class="form-control" ng-model="account.lastName" id="lastName"
-                       name="lastName" placeholder="Last name">
+                       name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-5">
 
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="email"  class="col-sm-3 control-label">Email address</label>
+            <label for="registerEmail"  class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-4">
-                <input type="email" class="form-control" ng-model="account.email" id="email"
-                       name="email" placeholder="Email" required
+                <input type="email" class="form-control" ng-model="account.email" id="registerEmail"
+                       name="registerEmail" required autocomplete="off"
                        ng-change="hideAlreadyExists()">
             </div>
             <div class="col-sm-5">
@@ -46,10 +50,10 @@
             </div>
         </div>
         <div class="form-group" validate-field>
-            <label for="password"  class="col-sm-3 control-label">Password</label>
+            <label for="registerPassword"  class="col-sm-3 control-label">Password</label>
             <div class="col-sm-4">
-                <input type="password" class="form-control" ng-model="account.password" id="password"
-                       name="password" placeholder="Password" required>
+                <input type="password" class="form-control" ng-model="account.password" id="registerPassword"
+                       name="registerPassword" required autocomplete="off">
             </div>
             <div class="col-sm-5">
                 <span class="help-block" ng-if="registerForm.password.$dirty && registerForm.password.$error.required">Password is required.</span>
@@ -75,7 +79,7 @@
             <div class="col-sm-offset-3 col-sm-9">
                 <process-button process="register"
                                 disabled="!registerForm.$valid"
-                                button-text="'Sign up'"></process-button>
+                                button-text="'Register'"></process-button>
             </div>
         </div>
     </form>
