@@ -174,81 +174,94 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 {
     //QTime t;
     //t.start();
-    m_skipFramesToTime = 0;
-    qint64 timeMs = time/1000;
-    m_newQualityTmpData.reset();
-    m_newQualityAviDelegate.clear();
 
-    DeviceFileCatalog::TruncableChunk newChunk;
-    DeviceFileCatalogPtr newChunkCatalog;
+    DeviceFileCatalog::UniqueChunkVector ignoreChunks;
 
-    DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
-    bool isePrecSeek = /*!m_reverseMode &&  */m_quality == MEDIA_Quality_High; // do not try short LQ chunk if ForcedHigh quality and do not try short HQ chunk for LQ quality
-    m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek); // use precise find if no REW mode
-    m_currentChunkInfo.startTimeUsec = newChunk.startTimeMs * USEC_IN_MSEC;
-    m_currentChunkInfo.durationUsec = newChunk.durationMs * USEC_IN_MSEC;
-    if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
-    {
-        m_eof = true;
-        return time;
-    }
-    else if (m_reverseMode && newChunk.startTimeMs == -1)
-    {
-        m_eof = true;
-        return time;
-    }
+    while (true) {
+        m_skipFramesToTime = 0;
+        qint64 timeMs = time/1000;
+        m_newQualityTmpData.reset();
+        m_newQualityAviDelegate.clear();
 
+        DeviceFileCatalog::TruncableChunk newChunk;
+        DeviceFileCatalogPtr newChunkCatalog;
 
-    qint64 chunkOffset = 0;
-    if (newChunk.durationMs == -1) // last live chunk
-    {
-        if (!m_reverseMode && time - newChunk.startTimeMs*1000 > 1000 * 1000ll) 
+        DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
+        bool isePrecSeek = /*m_reverseMode && */m_quality == MEDIA_Quality_High; // do not try short LQ chunk if ForcedHigh quality and do not try short HQ chunk for LQ quality
+        m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek, ignoreChunks); // use precise find if no REW mode
+        m_currentChunkInfo.startTimeUsec = newChunk.startTimeMs * USEC_IN_MSEC;
+        m_currentChunkInfo.durationUsec = newChunk.durationMs * USEC_IN_MSEC;
+        if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
         {
-            // seek > 1 seconds offset at last non-closed chunk. 
-            // Ignore seek, and go to EOF (actually seek always goes to the begin of the file if file is not closed, so it is slow)
             m_eof = true;
-            return newChunk.startTimeMs*1000;
+            return time;
+        }
+        else if (m_reverseMode && newChunk.startTimeMs == -1)
+        {
+            m_eof = true;
+            return time;
         }
 
-        // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
-        chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
+        qint64 chunkOffset = 0;
+        if (newChunk.durationMs == -1) // last live chunk
+        {
+            if (!m_reverseMode && time - newChunk.startTimeMs*1000 > 1000 * 1000ll) 
+            {
+                // seek > 1 seconds offset at last non-closed chunk. 
+                // Ignore seek, and go to EOF (actually seek always goes to the begin of the file if file is not closed, so it is slow)
+                m_eof = true;
+                return newChunk.startTimeMs*1000;
+            }
 
-        // New condition: Also, last file may has zerro size (because of file write buffering), and read operation will return fail
-        // It is contains some troubles for REF from live. So avoid seek to last file at all.
-        if (m_reverseMode && recursive)
-            return seekInternal(newChunk.startTimeMs*1000 - BACKWARD_SEEK_STEP, findIFrame, false);
+            // do not seek over live chunk because it's very slow (seek always going to begin of file because mkv seek catalog is't ready)
+            chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, BACKWARD_SEEK_STEP);
 
+            // New condition: Also, last file may has zerro size (because of file write buffering), and read operation will return fail
+            // It is contains some troubles for REF from live. So avoid seek to last file at all.
+            if (m_reverseMode && recursive)
+                return seekInternal(newChunk.startTimeMs*1000 - BACKWARD_SEEK_STEP, findIFrame, false);
+
+        }
+        else {
+            chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, newChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
+        }
+
+        if (newChunk.startTimeMs != m_currentChunk.startTimeMs || 
+               (newChunkCatalog != m_currentChunkCatalog[QnServer::StoragePool::Normal] && 
+                newChunkCatalog != m_currentChunkCatalog[QnServer::StoragePool::Backup]))
+        {
+            //bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
+            if (!switchToChunk(newChunk, newChunkCatalog)) {
+                if (!newChunkCatalog) {
+                    m_eof = true;
+                    return time;
+                } else {
+                    ignoreChunks.emplace_back(newChunk, newChunkCatalog->cameraUniqueId(),
+                                              newChunkCatalog->getRole());
+                    continue;
+                }
+            }
+                //return -1;
+            //if (isStreamsFound)
+            //    m_aviDelegate->doNotFindStreamInfo(); // optimization
+        }
+
+
+        qint64 seekRez = m_aviDelegate->seek(chunkOffset, findIFrame);
+        if (seekRez == -1)
+            return seekRez;
+        qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
+        /*
+        QString s;
+        QTextStream str(&s);
+        str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
+        str.flush();
+        NX_LOG(s, cl_logDEBUG2);
+        */
+        m_lastSeekTime = rez;
+        m_afterSeek = true;
+        return rez;
     }
-    else {
-        chunkOffset = qBound(0ll, time - newChunk.startTimeMs*1000, newChunk.durationMs*1000 - BACKWARD_SEEK_STEP);
-    }
-
-    if (newChunk.startTimeMs != m_currentChunk.startTimeMs || 
-           (newChunkCatalog != m_currentChunkCatalog[QnServer::StoragePool::Normal] && 
-            newChunkCatalog != m_currentChunkCatalog[QnServer::StoragePool::Backup]))
-    {
-        //bool isStreamsFound = m_aviDelegate->isStreamsFound() && newChunkCatalog == m_currentChunkCatalog;
-        if (!switchToChunk(newChunk, newChunkCatalog))
-            return -1;
-        //if (isStreamsFound)
-        //    m_aviDelegate->doNotFindStreamInfo(); // optimization
-    }
-
-
-    qint64 seekRez = m_aviDelegate->seek(chunkOffset, findIFrame);
-    if (seekRez == -1)
-        return seekRez;
-    qint64 rez = m_currentChunk.startTimeMs*1000 + seekRez;
-    /*
-    QString s;
-    QTextStream str(&s);
-    str << "server seek:" << QDateTime::fromMSecsSinceEpoch(time/1000).toString("hh:mm:ss.zzz") << " time=" << t.elapsed();
-    str.flush();
-    NX_LOG(s, cl_logDEBUG2);
-    */
-    m_lastSeekTime = rez;
-    m_afterSeek = true;
-    return rez;
 }
 
 qint64 QnServerArchiveDelegate::seek(qint64 time, bool findIFrame)
@@ -289,7 +302,8 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
-    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false);
+    DeviceFileCatalog::UniqueChunkVector ignoreChunks;
+    m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false, ignoreChunks);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }
 

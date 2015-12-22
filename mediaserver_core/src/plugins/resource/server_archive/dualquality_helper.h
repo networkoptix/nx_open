@@ -19,11 +19,12 @@ public:
     void openCamera(const QString& cameraUniqueId);
     void setPrefferedQuality(MediaQuality quality);
     void findDataForTime(
-        const qint64                        time, 
-        DeviceFileCatalog::TruncableChunk   &resultChunk, 
-        DeviceFileCatalogPtr                &resultCatalog, 
-        DeviceFileCatalog::FindMethod       findMethod, 
-        bool                                preciseFind
+        const qint64                                time, 
+        DeviceFileCatalog::TruncableChunk           &resultChunk, 
+        DeviceFileCatalogPtr                        &resultCatalog, 
+        DeviceFileCatalog::FindMethod               findMethod, 
+        bool                                        preciseFind,
+        const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
     );
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
@@ -32,13 +33,14 @@ private:
 
 private:
     void findDataForTimeHelper(
-        const qint64                        time,
-        DeviceFileCatalog::TruncableChunk   &resultChunk,
-        DeviceFileCatalogPtr                &resultCatalog,
-        DeviceFileCatalog::FindMethod       findMethod,
-        bool                                preciseFind,
-        SearchStack                         &searchStack,
-        qint64                              previousDistance
+        const qint64                                time,
+        DeviceFileCatalog::TruncableChunk           &resultChunk,
+        DeviceFileCatalogPtr                        &resultCatalog,
+        DeviceFileCatalog::FindMethod               findMethod,
+        bool                                        preciseFind,
+        SearchStack                                 &searchStack,
+        qint64                                      previousDistance,
+        const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
     );
 
     static int64_t calcDistanceHelper(
