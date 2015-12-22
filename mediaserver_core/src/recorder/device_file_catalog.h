@@ -88,6 +88,26 @@ public:
         void truncate(qint64 timeMs);
     };
 
+    struct UniqueChunk
+    {
+        TruncableChunk              chunk;
+        QString                     cameraId;
+        QnServer::ChunksCatalog     quality;
+
+        UniqueChunk(
+            const TruncableChunk        &chunk, 
+            const QString               &cameraId,
+            QnServer::ChunksCatalog     quality
+        ) 
+          : chunk(chunk),
+            cameraId(cameraId),
+            quality(quality)
+        {}
+    };
+
+
+    typedef std::vector<UniqueChunk> UniqueChunkVector;
+
     struct EmptyFileInfo
     {
         EmptyFileInfo(): startTimeMs(0) {}
@@ -236,4 +256,12 @@ bool operator < (const DeviceFileCatalog::Chunk& first, const DeviceFileCatalog:
 bool operator < (qint64 first, const DeviceFileCatalog::Chunk& other);
 bool operator < (const DeviceFileCatalog::Chunk& other, qint64 first);
 
+inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs, 
+                         const DeviceFileCatalog::UniqueChunk    &rhs)
+{
+    return lhs.chunk.toBaseChunk().startTimeMs == rhs.chunk.toBaseChunk().startTimeMs &&
+           lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
+           lhs.cameraId == rhs.cameraId &&
+           lhs.quality == rhs.quality;
+}
 #endif // _DEVICE_FILE_CATALOG_H__
