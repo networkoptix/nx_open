@@ -128,6 +128,12 @@ namespace ec2
     }
 
     template<class T>
+    AbstractWebPageManagerPtr BaseEc2Connection<T>::getWebPageManager()
+    {
+        return m_webPageManager;
+    }
+
+    template<class T>
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
         return m_storedFileManager;

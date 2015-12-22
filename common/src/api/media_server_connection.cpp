@@ -463,7 +463,7 @@ int QnMediaServerConnection::searchCameraAsyncStop(const QnUuid &processUuid, QO
     return sendAsyncGetRequest(CameraSearchStopObject, params, QN_STRINGIZE_TYPE(QnManualCameraSearchReply), target, slot);
 }
 
-int QnMediaServerConnection::addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::addCameraAsync(const QnManualResourceSearchList& cameras, const QString &username, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
     for (int i = 0; i < cameras.size(); i++){
         params << QnRequestParam(lit("url") + QString::number(i), cameras[i].url);

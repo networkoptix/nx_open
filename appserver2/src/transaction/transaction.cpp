@@ -96,6 +96,10 @@ namespace ec2
             REGISTER_COMMAND(removeVideowall),
             REGISTER_COMMAND(videowallControl),
 
+            REGISTER_COMMAND(saveWebPage),
+            REGISTER_COMMAND(getWebPages),
+            REGISTER_COMMAND(removeWebPage),
+
             REGISTER_COMMAND(listDirectory),
             REGISTER_COMMAND(getStoredFile),
             REGISTER_COMMAND(addStoredFile),
@@ -137,7 +141,7 @@ namespace ec2
 
             REGISTER_COMMAND(markLicenseOverflow),
             REGISTER_COMMAND(getSettings),
-            
+
             REGISTER_COMMAND(getClientInfos),
             REGISTER_COMMAND(saveClientInfo),
 
@@ -147,7 +151,7 @@ namespace ec2
             REGISTER_COMMAND(getTransactionLog),
         };
 
-        QString toString(Value val) 
+        QString toString(Value val)
         {
             for (size_t i = 0; i < sizeof(COMMAND_NAMES) / sizeof(ApiCommandName); ++i)
             {
@@ -218,6 +222,8 @@ namespace ec2
                 val == removeLayout ||
                 val == saveVideowall ||
                 val == removeVideowall ||
+                val == saveWebPage ||
+                val == removeWebPage ||
                 val == saveBusinessRule ||
                 val == removeBusinessRule ||
                 val == resetBusinessRules ||
@@ -229,7 +235,7 @@ namespace ec2
                 val == getDiscoveryData ||
                 val == addLicense ||
                 val == addLicenses ||
-                val == removeLicense || 
+                val == removeLicense ||
                 val == restoreDatabase ||
                 val == markLicenseOverflow ||
                 val == saveClientInfo;
@@ -252,7 +258,7 @@ namespace ec2
             .arg(persistentInfo.dbID.toString())
             .arg(persistentInfo.sequence);
     }
-    
+
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction::PersistentInfo,    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_PERSISTENT_Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnAbstractTransaction,                    (json)(ubjson)(xml)(csv_record),   QnAbstractTransaction_Fields)
     QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ApiTransactionData,                    (json)(ubjson)(xml)(csv_record),   ApiTransactionDataFields)

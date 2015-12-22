@@ -7,7 +7,11 @@ class QnWebPageResource: public QnResource {
     typedef QnResource base_type;
 public:
     QnWebPageResource();
+    QnWebPageResource(const QUrl &url);
+
     virtual ~QnWebPageResource();
+
+    virtual QString getUniqueId() const override;
 
 };
 

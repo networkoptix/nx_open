@@ -37,17 +37,14 @@ namespace ec2
     }
 
     template<class T>
-    int QnWebPageManager<T>::save( const QnWebPageResourcePtr& resource, impl::AddWebPageHandlerPtr handler )
+    int QnWebPageManager<T>::save( const QnWebPageResourcePtr& webPage, impl::AddWebPageHandlerPtr handler )
     {
         //preparing output data
         QnWebPageResourceList webPages;
-        if (resource->getId().isNull()) {
-            resource->setId(QnUuid::createUuid());
-        }
-        webPages.push_back( resource );
+        webPages.push_back(webPage);
 
         const int reqID = generateRequestID();
-        auto tran = prepareTransaction( ApiCommand::saveWebPage, resource );
+        auto tran = prepareTransaction( ApiCommand::saveWebPage, webPage );
         using namespace std::placeholders;
         m_queryProcessor->processUpdateAsync( tran, std::bind( &impl::AddWebPageHandler::done, handler, reqID, _1, webPages ) );
         return reqID;

@@ -33,10 +33,10 @@ private:
     /** Mutex that is used to synchronize access to private fields. */
     mutable QnMutex m_mutex;
 
-    QnManualCameraSearchStatus::State m_state;
+    QnManualResourceSearchStatus::State m_state;
     bool m_singleAddressCheck;
-    QnConcurrent::QnFuture<QnManualCameraSearchCameraList>* m_scanProgress;
-    QnManualCameraSearchCameraList m_results;
+    QnConcurrent::QnFuture<QnManualResourceSearchList>* m_scanProgress;
+    QnManualResourceSearchList m_results;
     bool m_cancelled;
     QnIpRangeCheckerAsync m_ipChecker;
     int m_hostRangeSize;

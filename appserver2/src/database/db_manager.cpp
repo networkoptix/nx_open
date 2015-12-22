@@ -477,7 +477,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 
 
     m_storageTypeId = getType( "Storage" );
-    m_serverTypeId = getType( "Server" );
+    m_serverTypeId = getType( QnResourceTypePool::kServerTypeId );
     m_cameraTypeId = getType( "Camera" );
 
     QSqlQuery queryAdminUser( m_sdb );
@@ -2657,15 +2657,15 @@ ApiOjectType QnDbManager::getObjectTypeNoLock(const QnUuid& objectId)
         return ApiObject_Camera;
     else if (objectType == "Storage")
         return ApiObject_Storage;
-    else if (objectType == "Server")
+    else if (objectType == QnResourceTypePool::kServerTypeId)
         return ApiObject_Server;
     else if (objectType == "User")
         return ApiObject_User;
-    else if (objectType == "Layout")
+    else if (objectType == QnResourceTypePool::kLayoutTypeId)
         return ApiObject_Layout;
-    else if (objectType == "Videowall")
+    else if (objectType == QnResourceTypePool::kVideoWallTypeId)
         return ApiObject_Videowall;
-    else if (objectType == "WebPage")
+    else if (objectType == QnResourceTypePool::kWebPageTypeId)
         return ApiObject_WebPage;
     else
     {

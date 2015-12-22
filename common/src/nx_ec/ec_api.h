@@ -1126,6 +1126,8 @@ namespace ec2
         virtual AbstractMiscManagerPtr getMiscManager() = 0;
         virtual AbstractDiscoveryManagerPtr getDiscoveryManager() = 0;
         virtual AbstractTimeManagerPtr getTimeManager() = 0;
+        virtual AbstractWebPageManagerPtr getWebPageManager() = 0;
+
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
 
         /*!
