@@ -10,6 +10,7 @@
 #include <utils/thread/mutex.h>
 
 #include <deque>
+#include <set>
 #include <QtCore/QFileInfo>
 
 #include <server/server_globals.h>
@@ -106,7 +107,7 @@ public:
     };
 
 
-    typedef std::vector<UniqueChunk> UniqueChunkVector;
+    typedef std::set<UniqueChunk> UniqueChunkCont;
 
     struct EmptyFileInfo
     {
@@ -263,5 +264,17 @@ inline bool operator == (const DeviceFileCatalog::UniqueChunk    &lhs,
            lhs.chunk.toBaseChunk().durationMs == rhs.chunk.toBaseChunk().durationMs &&
            lhs.cameraId == rhs.cameraId &&
            lhs.quality == rhs.quality;
+}
+
+inline bool operator < (const DeviceFileCatalog::UniqueChunk    &lhs, 
+                        const DeviceFileCatalog::UniqueChunk    &rhs)
+{
+    if (lhs.cameraId != rhs.cameraId || lhs.quality != rhs.quality) {
+        return lhs.cameraId < rhs.cameraId ?
+               true : lhs.cameraId > rhs.cameraId ?
+                      false : lhs.quality < rhs.quality;
+    } else {
+        return lhs.chunk.startTimeMs < rhs.chunk.startTimeMs;
+    }
 }
 #endif // _DEVICE_FILE_CATALOG_H__

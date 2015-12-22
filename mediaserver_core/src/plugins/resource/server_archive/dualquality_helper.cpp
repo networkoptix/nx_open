@@ -48,7 +48,7 @@ void QnDualQualityHelper::findDataForTime(
     DeviceFileCatalogPtr                        &catalog,
     DeviceFileCatalog::FindMethod               findMethod,
     bool                                        preciseFind,
-    const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
+    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
 )
 {
     DeviceFileCatalogPtr normalCatalog = (m_quality == MEDIA_Quality_Low ? 
@@ -97,7 +97,7 @@ void QnDualQualityHelper::findDataForTimeHelper(
     bool                                        preciseFind,
     SearchStack                                 &searchStack,
     qint64                                      previousDistance,
-    const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
+    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
 )
 {
     if (searchStack.empty() || previousDistance == 0)
@@ -130,17 +130,12 @@ void QnDualQualityHelper::findDataForTimeHelper(
         if (currentChunk.startTimeMs == -1)
             break;
 
-        auto ignoreIt = std::find_if(
-            ignoreChunks.cbegin(), 
-            ignoreChunks.cend(),
-            [&currentCatalog, &currentChunk](const DeviceFileCatalog::UniqueChunk& chunk) 
-            {
-                return DeviceFileCatalog::UniqueChunk(
-                    currentChunk, 
-                    currentCatalog->cameraUniqueId(),
-                    currentCatalog->getRole()
-                ) == chunk;
-            }
+        auto ignoreIt = ignoreChunks.find(
+            DeviceFileCatalog::UniqueChunk(
+                currentChunk,
+                currentCatalog->cameraUniqueId(),
+                currentCatalog->getRole()
+            )
         );
 
         if (ignoreIt == ignoreChunks.cend())
