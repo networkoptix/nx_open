@@ -31,29 +31,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
-
-        <!-- <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>protobuf</artifactId>
-            <version>${protobuf.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>udt</artifactId>
-            <version>4.11-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!--
-        <dependency>
-            <groupId>com.nokia.qt.addons</groupId>
-            <artifactId>qtcolorpicker</artifactId>
-            <version>2.6.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${platform}</classifier>
-        </dependency>                      -->
     </dependencies>
 
     <profiles>
@@ -133,6 +110,9 @@
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
                                         </exec>
+                                        <exec dir="${environment.dir}" executable="${project.build.directory}/update_artifacts.${script.extension}" failifexecutionfails="true">
+                                            <arg line=""/>
+                                        </exec>                                        
                                     </target>
                                     <skip>${rsync.skip}</skip>
                                 </configuration>
@@ -219,7 +199,7 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-x64</classifier>
                 </dependency>
-                <dependency>
+                <!-- <dependency>
                     <groupId>com.digia</groupId>
                     <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
@@ -232,7 +212,7 @@
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x64${compile.options}</classifier>
-                </dependency>
+                </dependency> -->
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
