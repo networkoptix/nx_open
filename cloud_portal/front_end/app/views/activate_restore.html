@@ -28,7 +28,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <process-button process="reactivate"
-                                    disabled="!reactivateAccount.$valid"
+                                    ng-disabled="!reactivateAccount.$valid"
                                     processing-text="'Sending ...'"
                                     button-text="'Send'"></process-button>
                 </div>
@@ -58,7 +58,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <process-button process="restore"
-                                    disabled="!restorePassword.$valid"
+                                    ng-disabled="!restorePassword.$valid"
                                     processing-text="'Restoring ...'"
                                     button-text="'Restore password'"></process-button>
                 </div>
@@ -88,7 +88,7 @@
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <process-button process="change"
-                                    disabled="!restorePasswordWithCode.$valid"
+                                    ng-disabled="!restorePasswordWithCode.$valid"
                                     processing-text="'Saving ...'"
                                     button-text="'Save password'"></process-button>
                 </div>

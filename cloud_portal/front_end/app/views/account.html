@@ -39,7 +39,7 @@
             <div class="col-sm-offset-3 col-sm-9">
 
                 <process-button process="save"
-                                disabled="!accountForm.$valid"
+                                ng-disabled="!accountForm.$valid"
                                 button-text="'Save'"></process-button>
             </div>
         </div>
@@ -78,7 +78,7 @@
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
                 <process-button process="changePassword"
-                                disabled="!passwordForm.$valid"
+                                ng-disabled="!passwordForm.$valid"
                                 button-text="'Change password'"></process-button>
             </div>
         </div>

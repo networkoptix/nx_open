@@ -22,7 +22,7 @@ angular.module('cloudApp')
             templateUrl: 'views/components/process-button.html',
             scope:{
                 process:'=',
-                disabled:'=',
+                ngDisabled:'=',
                 buttonText:'=',
                 processingText:'='
             },
