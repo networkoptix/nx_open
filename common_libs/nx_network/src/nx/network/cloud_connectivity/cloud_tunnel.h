@@ -33,19 +33,30 @@ public:
     virtual void accept(SocketHandler handler) = 0;
 };
 
-/** Creates specialized AbstractTunnelConnections */
+/** Creates outgoing specialized AbstractTunnelConnections */
 class AbstractTunnelConnector
 :
     public QnStoppableAsync
 {
 public:
     /** Helps to decide which method shell be used first */
-    virtual uint32_t getPriority();
+    virtual uint32_t getPriority() = 0;
 
     /** Creates connecting AbstractTunnelConnection */
     virtual void connect(
-            std::shared_ptr<StreamSocketOptions> options,
-            std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler);
+        std::shared_ptr<StreamSocketOptions> options,
+        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
+};
+
+/** Creates incoming specialized AbstractTunnelConnections */
+class AbstractTunnelAcceptor
+:
+    public QnStoppableAsync
+{
+public:
+    virtual void accept(
+        std::function<void(String,
+                           std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
 };
 
 //!Tunnel between two peers. Tunnel can be established by backward TCP connection or by hole punching UDT connection
@@ -87,10 +98,16 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
 private:
+    const String m_peerId;
+
+    friend class TunnelPool;
     typedef std::unique_ptr<AbstractTunnelConnector> ConnectorPtr;
+
+    void adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection);
 
     QnMutex m_mutex;
     SocketHandler m_acceptHandler;
+
     std::unique_ptr<AbstractTunnelConnection> m_connection;
     std::multimap<uint32_t, ConnectorPtr> m_connectors;
     std::multimap<uint32_t, ConnectorPtr>::iterator m_connectorsItreator;
@@ -110,7 +127,8 @@ public:
         If tunnel does not exist, allocates new tunnel object and returns tunnel object
     */
     std::shared_ptr<Tunnel> get(const String& peerId,
-                                std::vector<CloudConnectType> connectTypes);
+                                std::vector<CloudConnectType> connectTypes =
+                                    std::vector<CloudConnectType>());
 
     //! Set handler to watch newly created tunnels
     void setNewHandler(std::function<void(std::shared_ptr<Tunnel>)> handler);
@@ -122,7 +140,7 @@ private:
     QnMutex m_mutex;
     std::function<void(std::shared_ptr<Tunnel>)> m_monitor;
     std::map<String, std::shared_ptr<Tunnel>> m_pool;
-    std::shared_ptr<MediatorSystemConnection> m_mediatorConnection;
+    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
 };
 
 } // namespace cc

@@ -7,6 +7,7 @@ namespace nx {
 namespace cc {
 
 Tunnel::Tunnel(String peerId, std::vector<CloudConnectType> types)
+    : m_peerId(std::move(peerId))
 {
     for (const auto type : types)
     {
@@ -14,7 +15,7 @@ Tunnel::Tunnel(String peerId, std::vector<CloudConnectType> types)
         switch(type)
         {
             case CloudConnectType::udtHp:
-                connector = std::make_unique<UdtTunnelConnector>(peerId);
+                connector = std::make_unique<UdtTunnelConnector>(m_peerId);
 
             default:
                 // Probably just log the ERROR
@@ -77,19 +78,36 @@ void Tunnel::pleaseStop(std::function<void()> handler)
         m_connection->pleaseStop(barrier.fork());
 }
 
-TunnelPool::TunnelPool()
-    : m_mediatorConnection(SocketGlobals::mediatorConnector().systemConnection())
+void Tunnel::adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection)
 {
-    m_mediatorConnection->monitorConnectionRequest(
-        [this](MediatorSystemConnection::ConnectionRequest request)
+    QnMutexLocker lock(&m_mutex);
+    if(m_connection)
     {
-        QnMutexLocker lock(&m_mutex);
-        switch(request)
+        const auto self = SocketGlobals::mediatorConnector().getSystemCredentials();
+        if( self->serverId > m_peerId )
+            std::swap(m_connection, connection);
+
+        std::shared_ptr<AbstractTunnelConnection> shared(connection.release());
+        lock.unlock();
+        shared->pleaseStop([shared]() mutable { shared.reset(); });
+    }
+
+    m_connection = std::move(connection);
+    lock.unlock();
+    // TODO: m_connection->accept(...);
+}
+
+TunnelPool::TunnelPool()
+{
+    // TODO: add other acceptor types
+    m_acceptors.push_back(std::make_unique<UdtTunnelAcceptor>());
+
+    for (auto& acceptor : m_acceptors)
+        acceptor->accept([this](String peerId,
+                                std::unique_ptr<AbstractTunnelConnection> connection)
         {
-            // TODO: create certain AbstractAbstractTunnelConnection and add it to
-            //       m_pool
-        };
-    });
+            get(peerId)->adoptConnection(std::move(connection));
+        });
 }
 
 std::shared_ptr<Tunnel> TunnelPool::get(

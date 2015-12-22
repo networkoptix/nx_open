@@ -30,11 +30,32 @@ public:
 
     void pleaseStop(std::function<void()> handler) override
     {
-        // TODO: cancel all async oiperations
+        // TODO: cancel all async operations
     }
 
 private:
     const String peerId;
+};
+
+class UdtTunnelAcceptor
+        : public AbstractTunnelAcceptor
+{
+public:
+    UdtTunnelAcceptor()
+    {
+    }
+
+    void accept(
+        std::function<void(String,
+                           std::unique_ptr<AbstractTunnelConnection>)> handler) override
+    {
+        // TODO: listen for mediator indcations and initiate UdtTunnelConnection
+    }
+
+    void pleaseStop(std::function<void()> handler) override
+    {
+        // TODO: cancel all async operations
+    }
 };
 
 class UdtTunnelConnection
