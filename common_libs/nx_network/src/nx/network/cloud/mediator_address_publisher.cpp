@@ -2,8 +2,6 @@
 
 #include "common/common_globals.h"
 #include <nx/utils/log/log.h>
-#include <nx/network/socket_global.h>
-#include <nx/network/stun/cc/custom_stun.h>
 
 namespace nx {
 namespace network {
@@ -12,10 +10,12 @@ namespace cloud {
 const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 10 );
 
-MediatorAddressPublisher::MediatorAddressPublisher()
+MediatorAddressPublisher::MediatorAddressPublisher(
+        std::shared_ptr< MediatorSystemConnection > mediatorConnection)
     : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
     , m_state( State::kInit )
     , m_timerSocket( SocketFactory::createStreamSocket() )
+    , m_mediatorConnection( std::move(mediatorConnection) )
 {
 }
 
@@ -58,9 +58,6 @@ void MediatorAddressPublisher::pingReportedAddresses( QnMutexLockerBase* lk )
     if( m_state == State::kTerminated )
         return;
 
-    if( !m_mediatorConnection )
-        m_mediatorConnection = SocketGlobals::mediatorConnector().systemConnection();
-
     if( m_reportedAddresses == m_pingedAddresses )
         return publishPingedAddresses( lk );
 
@@ -89,9 +86,6 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
 {
     if( m_state == State::kTerminated )
         return;
-
-    if( !m_mediatorConnection )
-        m_mediatorConnection = SocketGlobals::mediatorConnector().systemConnection();
 
     auto addresses = m_pingedAddresses;
     lk->unlock();

@@ -7,23 +7,15 @@
 
 namespace nx {
 namespace network {
-
-class SocketGlobals;
-
-} // namespace network
-} // namespace nx
-
-namespace nx {
-namespace network {
 namespace cloud {
 
 class NX_NETWORK_API MediatorAddressPublisher
     : public QnStoppableAsync
 {
-    MediatorAddressPublisher();
-    friend class ::nx::network::SocketGlobals;
-
 public:
+    MediatorAddressPublisher(
+            std::shared_ptr< MediatorSystemConnection > mediatorConnection );
+
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;
 
     /** Should be called before initial @fn updateAuthorization */

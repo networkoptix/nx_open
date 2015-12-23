@@ -29,7 +29,7 @@ public:
 
     inline static
     cloud::MediatorConnector& mediatorConnector()
-    { return s_instance->m_mediatorConnector; }
+    { return *s_instance->m_mediatorConnector; }
 
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
@@ -60,9 +60,9 @@ private:
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
 
+    std::unique_ptr<cloud::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::MediatorConnector m_mediatorConnector;
 };
 
 } // namespace network

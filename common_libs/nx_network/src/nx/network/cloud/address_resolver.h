@@ -8,15 +8,6 @@
 #include "cdb_endpoint_fetcher.h"
 #include "mediator_connections.h"
 
-namespace nx {
-namespace network {
-
-class SocketGlobals;
-
-} // namespace network
-} // namespace nx
-
-
 //!Types used in resolving peer names
 /*!
     \note It is not a DNS implementation! It is something proprietary used to get network address of NX peer
@@ -66,10 +57,9 @@ struct NX_NETWORK_API AddressEntry
 class NX_NETWORK_API AddressResolver
         : public QnStoppableAsync
 {
-    AddressResolver();
-    friend class ::nx::network::SocketGlobals;
-
 public:
+    AddressResolver(std::shared_ptr<MediatorClientConnection> mediatorConnection);
+
     //!Add new peer address
     /*!
         Peer addresses are resolved from time to time in the following way:\n

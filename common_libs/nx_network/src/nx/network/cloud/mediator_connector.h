@@ -10,17 +10,14 @@
 
 namespace nx {
 namespace network {
-
-class SocketGlobals;
-
 namespace cloud {
 
 class NX_NETWORK_API MediatorConnector
     : public QnStoppableAsync
 {
-    friend class ::nx::network::SocketGlobals;
-
 public:
+    MediatorConnector();
+
     /** Shell be called to enable cloud functionality for application */
     void enable( bool waitComplete = false );
 
@@ -50,9 +47,6 @@ public:
     boost::optional<SystemCredentials> getSystemCredentials();
 
     void pleaseStop( std::function<void()> handler ) override;
-
-protected:
-    MediatorConnector();
 
 private:
     void fetchEndpoint();

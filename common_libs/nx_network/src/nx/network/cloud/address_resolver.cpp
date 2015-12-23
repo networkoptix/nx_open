@@ -72,7 +72,9 @@ QString AddressEntry::toString() const
                                    lit(","), lit("("), lit(")"), lit("") ) );
 }
 
-AddressResolver::AddressResolver()
+AddressResolver::AddressResolver(
+        std::shared_ptr<MediatorClientConnection> mediatorConnection)
+    : m_mediatorConnection(std::move(mediatorConnection))
 {
 }
 
@@ -324,9 +326,6 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
 void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk )
 {
     info->second.mediatorProgress();
-    if( !m_mediatorConnection )
-        m_mediatorConnection = SocketGlobals::mediatorConnector().clientConnection();
-
     lk->unlock();
     m_mediatorConnection->resolve(
         api::ResolveRequest(info->first.toString().toUtf8()),
@@ -345,9 +344,9 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
                         AddressAttributeType::nxApiPort, it.port ) );
                     entries.push_back( std::move( entry ) );
                 }
-                info->second.setMediatorEntries(std::move(entries));
             }
 
+            info->second.setMediatorEntries(std::move(entries));
             guards = grabHandlers( SystemError::noError, info );
         });
 }
