@@ -12,16 +12,18 @@
 namespace nx {
 namespace cc {
 
-CloudStreamSocket::CloudStreamSocket()
+CloudStreamSocket::CloudStreamSocket(bool natTraversal)
     : m_nonBlockingMode(false)
     , m_socketOptions(new StreamSocketOptions)
 {
     // TODO: mux probably should initialize m_socketOptions with default values
+
+    // TODO: what to do with natTraversal?
+    static_cast<void>(natTraversal);
 }
 
 SocketAddress CloudStreamSocket::getLocalAddress() const
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->getLocalAddress();
 
@@ -33,14 +35,12 @@ SocketAddress CloudStreamSocket::getLocalAddress() const
 
 void CloudStreamSocket::close()
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         m_socketDelegate->close();
 }
 
 bool CloudStreamSocket::isClosed() const
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->isClosed();
 
@@ -54,9 +54,9 @@ bool CloudStreamSocket::isClosed() const
 #define CloudStreamSocket_setSocketOption(SETTER, TYPE, NAME)   \
     bool CloudStreamSocket::SETTER(TYPE NAME)                   \
     {                                                           \
-        const auto lock = m_asyncGuard->lock();                 \
         if (m_socketDelegate)                                   \
             return m_socketDelegate->SETTER(NAME);              \
+                                                                \
         m_socketOptions->NAME = NAME;                           \
         return true;                                            \
     }
@@ -68,11 +68,12 @@ bool CloudStreamSocket::isClosed() const
 #define CloudStreamSocket_getSocketOption(GETTER, TYPE, NAME)   \
     bool CloudStreamSocket::GETTER(TYPE* NAME) const            \
     {                                                           \
-        const auto lock = m_asyncGuard->lock();                 \
         if (m_socketDelegate)                                   \
             return m_socketDelegate->GETTER(NAME);              \
+                                                                \
         if (!m_socketOptions->NAME)                             \
             return false;                                       \
+                                                                \
         *NAME = *m_socketOptions->NAME;                         \
         return true;                                            \
     }
@@ -97,6 +98,8 @@ CloudStreamSocket_getSocketOption(getSendTimeout, unsigned int, sendTimeout)
 CloudStreamSocket_setSocketOption(setNoDelay, bool, noDelay)
 CloudStreamSocket_getSocketOption(getNoDelay, bool, noDelay)
 
+CloudStreamSocket_setSocketOption(toggleStatisticsCollection, bool, statCollect)
+
 CloudStreamSocket_setSocketOption(setKeepAlive, boost::optional<KeepAliveOptions>,
                                   keepAliveOptions)
 CloudStreamSocket_getSocketOption(getKeepAlive, boost::optional<KeepAliveOptions>,
@@ -107,21 +110,18 @@ CloudStreamSocket_getSocketOption(getKeepAlive, boost::optional<KeepAliveOptions
 
 bool CloudStreamSocket::setNonBlockingMode(bool val)
 {
-    const auto lock = m_asyncGuard->lock();
     m_nonBlockingMode = val;
     return true;
 }
 
 bool CloudStreamSocket::getNonBlockingMode(bool* val) const
 {
-    const auto lock = m_asyncGuard->lock();
     *val = m_nonBlockingMode;
     return true;
 }
 
 bool CloudStreamSocket::getMtu(unsigned int* mtuValue) const
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->getMtu(mtuValue);
 
@@ -130,7 +130,6 @@ bool CloudStreamSocket::getMtu(unsigned int* mtuValue) const
 
 bool CloudStreamSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->getLastError(errorCode);
 
@@ -141,7 +140,6 @@ bool CloudStreamSocket::getLastError(SystemError::ErrorCode* errorCode) const
 
 AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->handle();
 
@@ -157,18 +155,8 @@ bool CloudStreamSocket::reopen()
     return false;
 }
 
-bool CloudStreamSocket::toggleStatisticsCollection(bool val)
-{
-    const auto lock = m_asyncGuard->lock();
-    if (m_socketDelegate)
-        return m_socketDelegate->toggleStatisticsCollection(val);
-
-    return false;
-}
-
 bool CloudStreamSocket::getConnectionStatistics(StreamSocketInfo* info)
 {
-    const auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
         return m_socketDelegate->getConnectionStatistics(info);
 
@@ -176,9 +164,12 @@ bool CloudStreamSocket::getConnectionStatistics(StreamSocketInfo* info)
 }
 
 template<typename Future>
-bool waitFutureMs(Future& future, unsigned int timeoutMillis)
+bool waitFutureMs(Future& future, const boost::optional<unsigned int>& timeoutMillis)
 {
-    const auto timeout = std::chrono::milliseconds(timeoutMillis);
+    if (!timeoutMillis)
+        return true;
+
+    const auto timeout = std::chrono::milliseconds(*timeoutMillis);
     return future.wait_for(timeout) == std::future_status::ready;
 }
 
@@ -242,15 +233,8 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
         promise.set_value(std::make_pair(code, size));
     });
 
-    unsigned int timeout = 0;
-    {
-        const auto lock = m_asyncGuard->lock();
-        if (m_socketOptions->sendTimeout)
-            timeout = *m_socketOptions->sendTimeout;
-    }
-
     auto future = promise.get_future();
-    if (timeout && waitFutureMs(future, timeout))
+    if (waitFutureMs(future, m_socketOptions->sendTimeout))
     {
         SystemError::setLastErrorCode(SystemError::timedOut);
         return -1;
@@ -282,6 +266,42 @@ bool CloudStreamSocket::isConnected() const
     return false;
 }
 
+void CloudStreamSocket::cancelIOAsync(aio::EventType eventType,
+                                      std::function<void()> handler)
+{
+    if (eventType == aio::etWrite || eventType == aio::etNone)
+        m_asyncGuard->terminate(); // breaks outgoing connects
+
+    if (m_socketDelegate)
+        m_socketDelegate->cancelIOAsync(eventType, std::move(handler));
+}
+
+void CloudStreamSocket::postImpl( std::function<void()>&& handler )
+{
+    auto lock = m_asyncGuard->lock();
+    if (m_socketDelegate)
+    {
+        lock.unlock();
+        m_socketDelegate->post(std::move(handler));
+    }
+
+    lock.unlock();
+    handler();
+}
+
+void CloudStreamSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    auto lock = m_asyncGuard->lock();
+    if (m_socketDelegate)
+    {
+        lock.unlock();
+        m_socketDelegate->dispatch(std::move(handler));
+    }
+
+    lock.unlock();
+    handler();
+}
+
 void CloudStreamSocket::connectAsyncImpl(
     const SocketAddress& address,
     std::function<void(SystemError::ErrorCode)>&& handler)
@@ -307,7 +327,8 @@ void CloudStreamSocket::connectAsyncImpl(
                 connectHandlerBak(code);
                 return;
             }
-        });
+        },
+        true, this);
 }
 
 void CloudStreamSocket::recvAsyncImpl(
@@ -355,7 +376,8 @@ bool CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
                 m_socketDelegate.reset(new TCPSocket(true));
                 if (!m_socketOptions->apply(m_socketDelegate.get()))
                     return false;
-
+                if (!m_socketDelegate->setNonBlockingMode(true))
+                    return false;
                 m_socketDelegate->connectAsync(
                     std::move(target), std::move(m_connectHandler));
 
@@ -389,15 +411,8 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
         promise.set_value(std::make_pair(code, size));
     });
 
-    unsigned int timeout = 0;
-    {
-        const auto lock = m_asyncGuard->lock();
-        if (m_socketOptions->recvTimeout)
-            timeout = *m_socketOptions->recvTimeout;
-    }
-
     auto future = promise.get_future();
-    if (timeout && waitFutureMs(future, timeout))
+    if (waitFutureMs(future, m_socketOptions->recvTimeout))
     {
         SystemError::setLastErrorCode(SystemError::timedOut);
         return -1;

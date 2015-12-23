@@ -118,22 +118,8 @@ bool CloudServerSocket::listen(int queueLen)
     if (!m_tcpSocket->listen(queueLen))
         return false;
 
-    // accept new connections on the tcp socket
-    m_tcpSocket->acceptAsync([this](SystemError::ErrorCode code,
-                                    AbstractStreamSocket* socket)
-    {
-        accepted(code, std::unique_ptr<AbstractStreamSocket>(socket));
-    });
-
-    // ass well as incoming socket connections from cloud tunnels
-    SocketGlobals::tunnelPool().setNewHandler(
-                [this](std::shared_ptr<Tunnel> tunnel)
-    {
-
-        using namespace std::placeholders;
-        tunnel->accept(std::bind(&CloudServerSocket::accepted, this, _1, _2));
-    });
-
+    acceptTcpSockets();
+    acceptTunnelSockets();
     return true;
 }
 
@@ -157,6 +143,16 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
     SocketGlobals::tunnelPool().pleaseStop(barrier.fork());
 }
 
+void CloudServerSocket::postImpl( std::function<void()>&& handler )
+{
+    m_tcpSocket->post(std::move(handler));
+}
+
+void CloudServerSocket::dispatchImpl( std::function<void()>&& handler )
+{
+    m_tcpSocket->dispatch(std::move(handler));
+}
+
 void CloudServerSocket::acceptAsyncImpl(
     std::function<void(SystemError::ErrorCode code,
                        AbstractStreamSocket*)>&& handler )
@@ -174,17 +170,66 @@ void CloudServerSocket::acceptAsyncImpl(
     m_acceptHandlerQueue.push(std::move(handler));
 }
 
-void CloudServerSocket::accepted(SystemError::ErrorCode code,
-                                 std::unique_ptr<AbstractStreamSocket> socket)
+void CloudServerSocket::acceptTcpSockets()
+{
+    m_tcpSocket->acceptAsync([this](SystemError::ErrorCode code,
+                                    AbstractStreamSocket* socket)
+    {
+        if (code != SystemError::noError)
+        {
+            NX_LOGX(lm("accepted from TCP socket error: %1")
+                    .arg(SystemError::toString(code)), cl_logERROR);
+
+            // TODO: #mux will not be able to accept from this m_tcpSocket any
+            //       more, shell we do smth about it?
+            return;
+        }
+
+        NX_LOGX(lm("accepted from TCP socket: %1").arg(socket), cl_logDEBUG1);
+        acceptedSocket(std::unique_ptr<AbstractStreamSocket>(socket));
+        acceptTcpSockets();
+    });
+}
+
+void CloudServerSocket::acceptTunnelSockets()
+{
+    SocketGlobals::tunnelPool().setNewHandler(
+                [this](std::shared_ptr<Tunnel> tunnel)
+    {
+        const String& peerId = tunnel->getPeerId();
+        NX_LOGX(lm("handle new tunnel from peer: %1").arg(peerId), cl_logALWAYS);
+
+        tunnel->accept([&](SystemError::ErrorCode code,
+                           std::unique_ptr<AbstractStreamSocket> socket)
+        {
+            if (code != SystemError::noError)
+            {
+                NX_LOGX(lm("accepted from Tunnel error: %1")
+                        .arg(SystemError::toString(code)), cl_logERROR);
+
+                return;
+            }
+
+            NX_LOGX(lm("accepted from Tunnel socket: %1")
+                    .arg(socket.get()), cl_logDEBUG1);
+
+            acceptedSocket(std::move(socket));
+        });
+    });
+}
+
+void CloudServerSocket::acceptedSocket(std::unique_ptr<AbstractStreamSocket> socket)
 {
     QnMutexLocker lk(&m_mutex);
     if (!m_acceptHandlerQueue.empty())
     {
         auto handler = std::move(m_acceptHandlerQueue.front());
         m_acceptHandlerQueue.pop();
+        NX_LOGX(lm("deliver accepted socket: %1").arg(socket.get()),
+                cl_logDEBUG1);
 
         lk.unlock();
-        return handler(code, socket.release());
+        return handler(SystemError::noError, socket.release());
     }
 
     if (m_acceptedSocketsQueue.size() >= m_acceptedSocketsMaxCount)

@@ -576,7 +576,7 @@ struct NX_NETWORK_API SocketOptions
 //!Socket configuration options ready to apply to any \class AbstractStreamSocket
 struct NX_NETWORK_API StreamSocketOptions : SocketOptions
 {
-    boost::optional< bool > noDelay;
+    boost::optional< bool > noDelay, statCollect;
     boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
 
     inline bool apply( AbstractStreamSocket* socket )
@@ -584,8 +584,9 @@ struct NX_NETWORK_API StreamSocketOptions : SocketOptions
         if( !SocketOptions::apply( socket ) )
             return false;
 
-        SocketOptions_setOrFalse(setNoDelay,    noDelay);
-        SocketOptions_setOrFalse(setKeepAlive,  keepAliveOptions);
+        SocketOptions_setOrFalse(setNoDelay,                    noDelay);
+        SocketOptions_setOrFalse(toggleStatisticsCollection,    statCollect);
+        SocketOptions_setOrFalse(setKeepAlive,                  keepAliveOptions);
         return true;
     }
 };

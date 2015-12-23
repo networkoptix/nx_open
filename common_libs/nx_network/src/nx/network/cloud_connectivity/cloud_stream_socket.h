@@ -19,7 +19,7 @@ class CloudStreamSocket
     public AbstractStreamSocket
 {
 public:
-    CloudStreamSocket();
+    CloudStreamSocket(bool natTraversal);
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -60,10 +60,14 @@ public:
     SocketAddress getForeignAddress() const override;
     bool isConnected() const override;
 
-    void cancelIOAsync( aio::EventType eventType,
-                        std::function< void() > handler) override;
+    void cancelIOAsync(aio::EventType eventType,
+                        std::function<void()> handler) override;
 
 protected:
+    //!Implementation of AbstractSocket::*
+    void postImpl( std::function<void()>&& handler ) override;
+    void dispatchImpl( std::function<void()>&& handler ) override;
+
     //!Implementation of AbstractCommunicatingSocket::*
     void connectAsyncImpl(
         const SocketAddress& address,

@@ -97,6 +97,8 @@ public:
     /** Implementation of QnStoppableAsync::pleaseStop */
     void pleaseStop(std::function<void()> handler) override;
 
+    const String& getPeerId() const { return m_peerId; }
+
 private:
     const String m_peerId;
 

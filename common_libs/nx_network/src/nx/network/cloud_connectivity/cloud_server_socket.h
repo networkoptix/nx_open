@@ -50,14 +50,19 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
 protected:
+    //!Implementation of AbstractSocket::*
+    void postImpl( std::function<void()>&& handler ) override;
+    void dispatchImpl( std::function<void()>&& handler ) override;
+
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
     void acceptAsyncImpl(
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)>&& handler) override;
 
 private:
-    void accepted(SystemError::ErrorCode code,
-                  std::unique_ptr<AbstractStreamSocket> socket);
+    void acceptTcpSockets();
+    void acceptTunnelSockets();
+    void acceptedSocket(std::unique_ptr<AbstractStreamSocket> socket);
 
     std::unique_ptr<AbstractStreamServerSocket> m_tcpSocket;
 

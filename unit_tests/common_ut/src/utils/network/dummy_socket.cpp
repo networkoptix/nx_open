@@ -153,7 +153,7 @@ bool DummySocket::setKeepAlive( boost::optional< KeepAliveOptions > /*info*/ )
     return true;
 }
 
-bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ )
+bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ ) const
 {
     return false;
 }
