@@ -87,8 +87,16 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
                              !ui->passwordLineEdit->text().isEmpty());
     };
 
+    ui->accountLineEdit->setText(qnSettings->cloudLogin());
+    ui->passwordLineEdit->setText(qnSettings->cloudPassword());
+
     connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
+
+    if (!ui->accountLineEdit->text().isEmpty() && !ui->passwordLineEdit->text().isEmpty())
+        okButton->setFocus();
+    else
+        ui->accountLineEdit->selectAll();
 
     ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
     setWarningStyle(ui->invalidCredentialsLabel);
