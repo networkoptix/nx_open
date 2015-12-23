@@ -1,0 +1,40 @@
+/**********************************************************
+* Dec 22, 2015
+* akolesnikov
+***********************************************************/
+
+#include "result_code.h"
+
+#include <nx/network/stun/cc/custom_stun.h>
+#include <utils/common/model_functions.h>
+
+namespace nx {
+namespace network {
+namespace cloud {
+namespace api {
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
+    (ResultCode::ok, "ok")
+    (ResultCode::networkError, "networkError")
+    (ResultCode::responseParseError, "responseParseError")
+    (ResultCode::notFound, "notFound")
+    (ResultCode::otherLogicError, "otherLogicError")
+    )
+
+
+ResultCode fromStunErrorToResultCode(
+    const nx::stun::attrs::ErrorDescription& errorDescription)
+{
+    switch (errorDescription.getCode())
+    {
+        case nx::stun::cc::error::notFound:
+            return ResultCode::notFound;
+        default:
+            return ResultCode::otherLogicError;
+    }
+}
+
+} // namespace api
+} // namespace cloud
+} // namespace network
+} // namespace nx

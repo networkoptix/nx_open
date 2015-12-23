@@ -5,12 +5,13 @@
 
 #include "aio/aioservice.h"
 
-#include "cloud_connectivity/address_resolver.h"
-#include "cloud_connectivity/mediator_address_publisher.h"
-#include "cloud_connectivity/mediator_connector.h"
-#include "cloud_connectivity/cloud_tunnel.h"
+#include "cloud/address_resolver.h"
+#include "cloud/mediator_address_publisher.h"
+#include "cloud/mediator_connector.h"
+#include "cloud/cloud_tunnel.h"
 
 namespace nx {
+namespace network {
 
 class NX_NETWORK_API SocketGlobals
 {
@@ -20,19 +21,19 @@ public:
     { return s_instance->m_aioService; }
 
     inline static
-    cc::AddressResolver& addressResolver()
+    cloud::AddressResolver& addressResolver()
     { return s_instance->m_addressResolver; }
 
     inline static
-    cc::MediatorAddressPublisher& addressPublisher()
+    cloud::MediatorAddressPublisher& addressPublisher()
     { return s_instance->m_addressPublisher; }
 
     inline static
-    cc::MediatorConnector& mediatorConnector()
-    { return s_instance->m_mediatorConnector; }
+    cloud::MediatorConnector& mediatorConnector()
+    { return *s_instance->m_mediatorConnector; }
 
     inline static
-    cc::TunnelPool& tunnelPool()
+    cloud::TunnelPool& tunnelPool()
     { return s_instance->m_cloudTunnelPool; }
 
 	static void init();	/** Should be called before any socket use */
@@ -64,12 +65,13 @@ private:
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
 
-    cc::AddressResolver m_addressResolver;
-    cc::MediatorAddressPublisher m_addressPublisher;
-    cc::MediatorConnector m_mediatorConnector;
-    cc::TunnelPool m_cloudTunnelPool;
+    std::unique_ptr<cloud::MediatorConnector> m_mediatorConnector;
+    cloud::AddressResolver m_addressResolver;
+    cloud::MediatorAddressPublisher m_addressPublisher;
+    cloud::TunnelPool m_cloudTunnelPool;
 };
 
+} // namespace network
 } // namespace nx
 
 #endif  //NX_NETWORK_SOCKET_GLOBAL_H

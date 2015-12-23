@@ -162,7 +162,7 @@ void Settings::loadConfiguration()
     m_cloudDB.updateInterval = duration_cast<seconds>(
         parseTimerDuration(m_settings.value(
             kCdbUpdateInterval,
-            kDefaultCdbUpdateInterval.count()).toString()));
+            static_cast<qulonglong>(kDefaultCdbUpdateInterval.count())).toString()));
 
     readEndpointList(
         m_settings.value(kStunEndpointsToListen, kDefaultStunEndpointsToListen).toString(),

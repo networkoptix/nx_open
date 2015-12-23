@@ -740,7 +740,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !nx::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    assert( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket::close();
@@ -1174,7 +1174,7 @@ TCPServerSocket::~TCPServerSocket()
 {
     //checking that socket is not registered in aio
     Q_ASSERT_X(
-        !nx::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(&this->m_implDelegate)),
+        !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(&this->m_implDelegate)),
         Q_FUNC_INFO,
         "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
 }
@@ -1203,11 +1203,11 @@ void TCPServerSocket::pleaseStop( std::function<void()> completionHandler )
     {
         //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
 
-        nx::SocketGlobals::aioService().cancelPostedCalls(
+        nx::network::SocketGlobals::aioService().cancelPostedCalls(
             static_cast<Pollable*>(&m_implDelegate), true);
-        nx::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().removeFromWatch(
             static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-        nx::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().removeFromWatch(
             static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
 
         completionHandler();

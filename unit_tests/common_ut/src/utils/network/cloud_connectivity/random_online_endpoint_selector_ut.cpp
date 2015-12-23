@@ -9,7 +9,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud_connectivity/random_online_endpoint_selector.h>
+#include <nx/network/cloud/random_online_endpoint_selector.h>
 
 
 TEST(RandomOnlineEndpointSelector, common)
@@ -20,7 +20,7 @@ TEST(RandomOnlineEndpointSelector, common)
     for (int i = 0; i < 20; ++i)
     {
         std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
-        nx::cc::RandomOnlineEndpointSelector selector;
+        nx::network::cloud::RandomOnlineEndpointSelector selector;
 
         std::vector<SocketAddress> endpoints;
         endpoints.emplace_back("noptix.enk.me", 80);
@@ -52,7 +52,7 @@ TEST(RandomOnlineEndpointSelector, earlyCancellation)
     {
         std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
 
-        nx::cc::RandomOnlineEndpointSelector selector;
+        nx::network::cloud::RandomOnlineEndpointSelector selector;
 
         std::vector<SocketAddress> endpoints;
         endpoints.emplace_back("noptix.enk.me", 80);
@@ -79,7 +79,7 @@ TEST(RandomOnlineEndpointSelector, selectError)
         {
             std::promise<std::pair<nx_http::StatusCode::Value, SocketAddress>> promiseToSelect;
 
-            nx::cc::RandomOnlineEndpointSelector selector;
+            nx::network::cloud::RandomOnlineEndpointSelector selector;
 
             std::vector<SocketAddress> endpoints(
                 endpointNumber,

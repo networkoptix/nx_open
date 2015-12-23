@@ -1,9 +1,10 @@
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/cloud_connectivity/data/result_code.h>
+#include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/async_client.h>
 #include <utils/thread/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
@@ -13,12 +14,9 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
-#include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
 
 #include "mediator_mocks.h"
-#include "functional_tests/mediaserver_emulator.h"
-#include "functional_tests/mediator_functional_test.h"
 
 
 namespace nx {
@@ -35,7 +33,7 @@ protected:
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
-        SocketGlobals::mediatorConnector().mockupAddress( address );
+        network::SocketGlobals::mediatorConnector().mockupAddress( address );
     }
 
     const SocketAddress address;
@@ -87,60 +85,6 @@ TEST_F( ConnectTest, BindConnect )
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
     }
-}
-
-TEST_F(MediatorFunctionalTest, resolve_unkownHost)
-{
-    using namespace nx::cc::api;
-
-    startAndWaitUntilStarted();
-
-    const std::shared_ptr<nx::cc::MediatorClientConnection> client = clientConnection();
-
-    const auto system1 = addRandomSystem();
-
-    //resolving unknown system
-    ResolveResponse resolveResponse;
-    ResultCode resultCode = ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<ResultCode, ResolveResponse>(
-        std::bind(
-            &nx::cc::MediatorClientConnection::resolve,
-            client.get(),
-            ResolveRequest(system1.id),
-            std::placeholders::_1));
-
-    ASSERT_EQ(ResultCode::notFound, resultCode);
-
-    client->pleaseStopSync();
-}
-
-TEST_F(MediatorFunctionalTest, resolve_generic)
-{
-    using namespace nx::cc::api;
-
-    startAndWaitUntilStarted();
-
-    const std::shared_ptr<nx::cc::MediatorClientConnection> client = clientConnection();
-
-    const auto system1 = addRandomSystem();
-
-    //emulating local mediaserver
-    MediaServerEmulator mserverEmulator(endpoint(), system1);
-    ASSERT_TRUE(mserverEmulator.start());
-
-    //resolving 
-    ResolveResponse resolveResponse;
-    ResultCode resultCode = ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<ResultCode, ResolveResponse>(
-        std::bind(
-            &nx::cc::MediatorClientConnection::resolve,
-            client.get(),
-            ResolveRequest(system1.id),
-            std::placeholders::_1));
-
-    ASSERT_EQ(ResultCode::ok, resultCode);
-
-    client->pleaseStopSync();
 }
 
 } // namespace test

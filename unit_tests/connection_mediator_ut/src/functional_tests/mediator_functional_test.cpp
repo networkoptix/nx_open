@@ -18,6 +18,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket.h>
 #include <utils/common/cpp14.h>
+#include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
 
@@ -47,7 +48,7 @@ MediatorFunctionalTest::MediatorFunctionalTest()
     *b = strdup("-log/logLevel"); *b = strdup("DEBUG2");
     *b = strdup("-dataDir"); *b = strdup(m_tmpDir.toLatin1().constData());
 
-    SocketGlobals::mediatorConnector().mockupAddress(endpoint());
+    network::SocketGlobals::mediatorConnector().mockupAddress(endpoint());
     registerCloudDataProvider(&m_cloudDataProvider);
 }
 
@@ -124,16 +125,16 @@ SocketAddress MediatorFunctionalTest::endpoint() const
     return SocketAddress(HostAddress::localhost, m_port);
 }
 
-std::shared_ptr<nx::cc::MediatorClientConnection> 
+std::shared_ptr<nx::network::cloud::MediatorClientConnection> 
     MediatorFunctionalTest::clientConnection()
 {
-    return SocketGlobals::mediatorConnector().clientConnection();
+    return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::cc::MediatorSystemConnection>
+std::shared_ptr<nx::network::cloud::MediatorSystemConnection>
     MediatorFunctionalTest::systemConnection()
 {
-    return SocketGlobals::mediatorConnector().systemConnection();
+    return network::SocketGlobals::mediatorConnector().systemConnection();
 }
 
 void MediatorFunctionalTest::registerCloudDataProvider(
@@ -153,8 +154,8 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 {
     AbstractCloudDataProvider::System system(
-        generateSalt(16),
-        generateSalt(16),
+        generateRandomName(16),
+        generateRandomName(16),
         true);
     m_cloudDataProvider.addSystem(
         system.id,

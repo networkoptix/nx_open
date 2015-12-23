@@ -422,3 +422,15 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
+
+QByteArray generateRandomName(int length)
+{
+    const char kAlphaAndDigits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    QByteArray str;
+    str.resize(length);
+    for (int i = 0; i < length; ++i)
+        str[i] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
+
+    return str;
+}

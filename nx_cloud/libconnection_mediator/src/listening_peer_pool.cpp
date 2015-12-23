@@ -1,10 +1,12 @@
 
 #include "listening_peer_pool.h"
 
+#include <iostream>
+
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
-#include <nx/network/cloud_connectivity/data/resolve_data.h>
+#include <nx/network/cloud/data/resolve_data.h>
 
 
 namespace nx {
@@ -95,7 +97,7 @@ void ListeningPeerPool::resolve(
     const ConnectionSharedPtr& connection,
     stun::Message request)
 {
-    nx::cc::api::ResolveRequest requestData;
+    nx::network::cloud::api::ResolveRequest requestData;
     if (!requestData.parse(request))
         return errorResponse(
             connection,
@@ -119,35 +121,32 @@ void ListeningPeerPool::resolve(
             "Unknown host: " + requestData.hostName);
     }
 
-    if (const auto peer = m_peers.search(requestData.hostName))
-    {
-        stun::Message response(stun::Header(
-            stun::MessageClass::successResponse,
-            request.header.method,
-            std::move(request.header.transactionId)));
+    stun::Message response(stun::Header(
+        stun::MessageClass::successResponse,
+        request.header.method,
+        std::move(request.header.transactionId)));
 
-        nx::cc::api::ResolveResponse responseData;
+    nx::network::cloud::api::ResolveResponse responseData;
 
-        if (!peer->endpoints.empty())
-            responseData.endpoints = peer->endpoints;
-        responseData.connectionMethods = 
-            nx::cc::api::ConnectionMethod::udpHolePunching |
-            nx::cc::api::ConnectionMethod::proxy;
+    if (!peer->endpoints.empty())
+        responseData.endpoints = peer->endpoints;
+    responseData.connectionMethods = 
+        nx::network::cloud::api::ConnectionMethod::udpHolePunching |
+        nx::network::cloud::api::ConnectionMethod::proxy;
 
-        responseData.serialize(&response);
+    responseData.serialize(&response);
 
-        if (!peer->isListening)
-        { /* TODO: StunEndpointList */
-        }
-
-        NX_LOGX(lm("Successfully resolved host %1 (requested from %2), endpoints=%3")
-            .arg(requestData.hostName).arg(connection->socket()->getForeignAddress().toString())
-            .arg(containerString(peer->endpoints)),
-            cl_logDEBUG2);
-
-        lk.unlock();
-        connection->sendMessage(std::move(response));
+    if (!peer->isListening)
+    { /* TODO: StunEndpointList */
     }
+
+    NX_LOGX(lm("Successfully resolved host %1 (requested from %2), endpoints=%3")
+        .arg(requestData.hostName).arg(connection->socket()->getForeignAddress().toString())
+        .arg(containerString(peer->endpoints)),
+        cl_logDEBUG2);
+
+    lk.unlock();
+    connection->sendMessage(std::move(response));
 }
 
 void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
@@ -227,7 +226,7 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
     {
         connection.lock()->registerCloseHandler( [ = ]()
         {
-            NX_LOGX( lit("Peer %2.%3 has been desconnected")
+            NX_LOGX( lit("Peer %2.%3 has been disconnected")
                     .arg( QString::fromUtf8( systemIt->first ) )
                     .arg( QString::fromUtf8( serverIt->first ) ), cl_logDEBUG1 );
 
@@ -261,10 +260,12 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
         const auto serverIt = systemIt->second.find( ids.first() );
         if( serverIt == systemIt->second.end() )
             return boost::none;
+        else
+            return serverIt->second;
     }
 
-    // TODO: select the best server, not the first one
-    return systemIt->second.begin()->second;
+    //return systemIt->second.begin()->second;
+    return boost::none; //forbidding auto-server resolve by system name for now to avoid auto-reconnection to another server
 }
 
 } // namespace hpm

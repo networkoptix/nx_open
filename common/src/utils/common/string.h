@@ -112,4 +112,7 @@ QString htmlFormattedParagraph(const QString &text
 
 QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
 
+//!Generates random string containing only letters and digits
+QByteArray generateRandomName(int length);
+
 #endif // QN_STRING_H
