@@ -12,8 +12,9 @@
 #include <common/common_module.h>
 #include <client/client_settings.h>
 
-#include <utils/common/app_info.h>
+#include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
+#include <utils/common/string.h>
 
 #include <ui/style/warning_style.h>
 #include <ui/dialogs/message_box.h>
@@ -89,9 +90,7 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
     connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
 
-    const QString createAccountUrl = QnAppInfo::cloudPortalUrl() + kCreateAccountPath;
-    const QString createAccountText = tr("Create account");
-    ui->createAccountLabel->setText(lit("<a href=\"%2\">%1</a>").arg(createAccountText, createAccountUrl));
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
     setWarningStyle(ui->invalidCredentialsLabel);
     ui->invalidCredentialsLabel->hide();
     updateOkButton();
