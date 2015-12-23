@@ -13,11 +13,6 @@ namespace network {
 
 class SocketGlobals;
 
-} // namespace network
-} // namespace nx
-
-namespace nx {
-namespace network {
 namespace cloud {
 
 class NX_NETWORK_API MediatorConnector

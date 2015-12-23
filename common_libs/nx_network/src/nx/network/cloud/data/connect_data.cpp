@@ -9,7 +9,8 @@
 
 
 namespace nx {
-namespace cc {
+namespace network {
+namespace cloud {
 namespace api {
 
 ConnectRequest::ConnectRequest()
@@ -45,5 +46,6 @@ bool ConnectResponse::parse(const nx::stun::Message& message)
 }
 
 }   //api
-}   //cc
+}   //cloud
+}   //network
 }   //nx

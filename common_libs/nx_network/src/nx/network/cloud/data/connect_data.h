@@ -10,11 +10,12 @@
 
 #include <nx/network/socket_common.h>
 
-#include "resolve_data.h"
+#include "stun_message_data.h"
 
 
 namespace nx {
-namespace cc {
+namespace network {
+namespace cloud {
 namespace api {
 
 class NX_NETWORK_API ConnectRequest
@@ -49,7 +50,8 @@ public:
 };
 
 }   //api
-}   //cc
+}   //cloud
+}   //network
 }   //nx
 
 #endif   //NX_MEDIATOR_API_CONNECT_DATA_H
