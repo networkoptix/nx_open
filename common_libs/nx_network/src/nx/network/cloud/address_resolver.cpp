@@ -316,7 +316,7 @@ void AddressResolver::dnsResolve( HaInfoIterator info )
         }
 
         info->second.setDnsEntries( entries );
-        guards = grabHandlers( code, info );
+        guards = grabHandlers( code, info, &lk );
     };
 
     info->second.dnsProgress();
@@ -331,12 +331,12 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
         api::ResolveRequest(info->first.toString().toUtf8()),
         [this, info](api::ResultCode resultCode, api::ResolveResponse response)
         {
-            std::vector< AddressEntry > entries;
             std::vector< Guard > guards;
 
+            QnMutexLocker lk( &m_mutex );
+            std::vector< AddressEntry > entries;
             if (resultCode == api::ResultCode::ok)
             {
-                QnMutexLocker lk( &m_mutex );
                 for (const auto& it : response.endpoints)
                 {
                     AddressEntry entry( AddressType::regular, it.address );
@@ -347,12 +347,13 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
             }
 
             info->second.setMediatorEntries(std::move(entries));
-            guards = grabHandlers( SystemError::noError, info );
+            guards = grabHandlers( SystemError::noError, info, &lk );
         });
 }
 
 std::vector< Guard > AddressResolver::grabHandlers(
-        SystemError::ErrorCode lastErrorCode, HaInfoIterator info )
+        SystemError::ErrorCode lastErrorCode, HaInfoIterator info,
+        QnMutexLockerBase* /*lk*/ )
 {
     std::vector< Guard > guards;
 

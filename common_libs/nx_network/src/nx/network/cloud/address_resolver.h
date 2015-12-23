@@ -159,7 +159,8 @@ private:
     void mediatorResolve( HaInfoIterator info, QnMutexLockerBase* lk );
 
     std::vector< Guard > grabHandlers( SystemError::ErrorCode lastErrorCode,
-                                       HaInfoIterator info );
+                                       HaInfoIterator info,
+                                       QnMutexLockerBase* lk );
 
 private:
     mutable QnMutex m_mutex;
