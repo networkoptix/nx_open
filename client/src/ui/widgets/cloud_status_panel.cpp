@@ -5,6 +5,7 @@
 
 #include <common/common_module.h>
 #include <watchers/cloud_status_watcher.h>
+#include <ui/style/warning_style.h>
 
 class QnCloudStatusPanelPrivate : public QObject
 {
@@ -19,6 +20,7 @@ public:
 
 public:
     QMenu *cloudMenu;
+    QPalette originalPalette;
 };
 
 QnCloudStatusPanel::QnCloudStatusPanel(QnWorkbenchContext *context, QWidget *parent)
@@ -32,13 +34,13 @@ QnCloudStatusPanel::QnCloudStatusPanel(QnWorkbenchContext *context, QWidget *par
 
     setFlat(true);
 
-    QPalette palette = this->palette();
-    palette.setColor(QPalette::Window, qApp->palette().color(QPalette::Window));
-    d->cloudMenu->setPalette(palette);
-    palette.setColor(QPalette::Window, Qt::transparent);
-    palette.setColor(QPalette::Button, Qt::transparent);
-    palette.setColor(QPalette::Highlight, Qt::transparent);
-    setPalette(palette);
+    d->originalPalette = this->palette();
+    d->originalPalette.setColor(QPalette::Window, qApp->palette().color(QPalette::Window));
+    d->cloudMenu->setPalette(d->originalPalette);
+    d->originalPalette.setColor(QPalette::Window, Qt::transparent);
+    d->originalPalette.setColor(QPalette::Button, Qt::transparent);
+    d->originalPalette.setColor(QPalette::Highlight, Qt::transparent);
+    setPalette(d->originalPalette);
 
     d->updateUi();
 }
@@ -78,6 +80,10 @@ void QnCloudStatusPanelPrivate::updateUi()
     }
 
     // TODO: #dklychkov display status
+    if (cloudStatusWatcher->status() == QnCloudStatusWatcher::Online)
+        q->setPalette(originalPalette);
+    else
+        setWarningStyle(q);
 
     q->setText(cloudStatusWatcher->cloudLogin());
     // q->setIcon(); TODO: #dklychkov
