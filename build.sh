@@ -41,3 +41,4 @@ do
   make -f Makefile.$CONFIG -j $[NPROCESSORS+1]
   popd
 done
+

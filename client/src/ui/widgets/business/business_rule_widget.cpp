@@ -180,7 +180,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields) {
         ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
     }
 
-    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField)) {
+    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField)) {
         ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
         ui->actionResourcesHolder->setIcon(m_model->data(QnBusiness::TargetColumn, Qt::DecorationRole).value<QIcon>());
     }
@@ -239,13 +239,29 @@ void QnBusinessRuleWidget::initActionParameters() {
         m_actionWidgetsByType[m_model->actionType()] = m_actionParameters;
     }
 
-    if (m_actionParameters) {
+    const auto getTabBeforeTarget = [this]() -> QWidget *
+    {
+        if (const bool aggregationIsVisible = !QnBusiness::hasToggleState(m_model->actionType()))
+            return ui->aggregationWidget->lastTabItem();
+
+        const bool resourceIsVisible = QnBusiness::requiresCameraResource(m_model->actionType())
+            || QnBusiness::requiresUserResource(m_model->actionType());
+        if (resourceIsVisible)
+            return ui->actionResourcesHolder;
+
+        return ui->actionTypeComboBox;
+    };
+
+    if (m_actionParameters)
+    {
         ui->actionParamsLayout->addWidget(m_actionParameters);
-        m_actionParameters->updateTabOrder(ui->aggregationWidget,  ui->commentsLineEdit);
+        m_actionParameters->updateTabOrder(getTabBeforeTarget(),  ui->commentsLineEdit);
         m_actionParameters->setVisible(true);
         m_actionParameters->setModel(m_model);
-    } else {
-        setTabOrder(ui->aggregationWidget, ui->commentsLineEdit);
+    }
+    else
+    {
+        setTabOrder(getTabBeforeTarget(), ui->commentsLineEdit);
     }
 }
 

@@ -3,6 +3,7 @@
 #include <business/actions/abstract_business_action.h>
 
 #include <camera/resource_display.h>
+#include <camera/cam_display.h>
 
 #include <client/client_message_processor.h>
 
@@ -23,6 +24,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -185,9 +188,11 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
     if (!layout || workbench()->currentLayout() != layout)
         return;
 
-    if (auto camDisplay = display()->display(item)) {
-        camDisplay->setCurrentTimeUSec(DATETIME_NOW);
-        camDisplay->start();
+    if (auto resourceDisplay = display()->display(item)) {
+        if (resourceDisplay->archiveReader()) {
+            resourceDisplay->archiveReader()->setSpeed(1.0);
+            resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
+        resourceDisplay->start();
     }
-
 }

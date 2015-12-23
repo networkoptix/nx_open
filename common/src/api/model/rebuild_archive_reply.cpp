@@ -1,7 +1,7 @@
 #include "rebuild_archive_reply.h"
 
 QnStorageScanData::QnStorageScanData()
-    : state(Qn::RebuildState_Unknown)
+    : state(Qn::RebuildState_None)
     , path()
     , progress(0.0)
     , totalProgress(0.0)

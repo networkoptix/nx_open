@@ -698,6 +698,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         case QnBusiness::SayTextAction:
             return qnSkin->icon("events/sound.png");
 
+        case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         {
             bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -795,6 +796,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
                     m_actionResources.size() == 1 &&
                    !m_actionParams.presetId.isEmpty();
+        case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         {
             bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -923,6 +925,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::ExecutePtzPresetAction:
         return QnExecPtzPresetPolicy::getText(resources, detailed);
 
+    case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
     {
         bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -964,7 +967,7 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     const int DAY = HOUR * 24;
 
     if (QnBusiness::hasToggleState(m_actionType))
-        return tr("Not Applied");
+        return tr("N/A");
 
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");

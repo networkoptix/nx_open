@@ -1233,10 +1233,12 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        setValue(confStats.toBool());
-        /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(statisticsReportAllowed);
-        MSSettings::roSettings()->sync();
+        if (confStats.toString() != lit("N/A")) {
+            setValue(confStats.toBool());
+            /* Cleanup installer value. */
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit("N/A"));
+            MSSettings::roSettings()->sync();
+        }
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
     if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
@@ -2235,7 +2237,7 @@ void MediaServerProcess::run()
         for (const auto& value: storagesToRemove)
             idList.push_back(value->getId());
         if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+            qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
         qnResPool->removeResources(storagesToRemove);
     }
 

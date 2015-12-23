@@ -9,6 +9,7 @@
 #include "utils/common/log.h"
 
 #include <cmath>
+#include <algorithm>
 
 static const int SECOND_STREAM_FIND_EPS = 1000 * 5;
 static const int FIRST_STREAM_FIND_EPS = 1000 * 15;
@@ -42,11 +43,12 @@ void QnDualQualityHelper::openCamera(const QString& cameraUniqueId) {
 }
 
 void QnDualQualityHelper::findDataForTime(
-    const qint64                        time,
-    DeviceFileCatalog::TruncableChunk   &chunk,
-    DeviceFileCatalogPtr                &catalog,
-    DeviceFileCatalog::FindMethod       findMethod,
-    bool                                preciseFind
+    const qint64                                time,
+    DeviceFileCatalog::TruncableChunk           &chunk,
+    DeviceFileCatalogPtr                        &catalog,
+    DeviceFileCatalog::FindMethod               findMethod,
+    bool                                        preciseFind,
+    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
 )
 {
     DeviceFileCatalogPtr normalCatalog = (m_quality == MEDIA_Quality_Low ? 
@@ -82,18 +84,20 @@ void QnDualQualityHelper::findDataForTime(
         findMethod, 
         usePreciseFind,
         searchStack,
-        -1 // There is no previous distance yet
+        -1, // There is no previous distance yet
+        ignoreChunks 
     );
 }
 
 void QnDualQualityHelper::findDataForTimeHelper(
-    const qint64                        time,
-    DeviceFileCatalog::TruncableChunk   &resultChunk,
-    DeviceFileCatalogPtr                &resultCatalog,
-    DeviceFileCatalog::FindMethod       findMethod,
-    bool                                preciseFind,
-    SearchStack                         &searchStack,
-    qint64                              previousDistance
+    const qint64                                time,
+    DeviceFileCatalog::TruncableChunk           &resultChunk,
+    DeviceFileCatalogPtr                        &resultCatalog,
+    DeviceFileCatalog::FindMethod               findMethod,
+    bool                                        preciseFind,
+    SearchStack                                 &searchStack,
+    qint64                                      previousDistance,
+    const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
 )
 {
     if (searchStack.empty() || previousDistance == 0)
@@ -110,14 +114,39 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance
+            previousDistance,
+            ignoreChunks
         );
 
-    DeviceFileCatalog::TruncableChunk currentChunk = currentCatalog->chunkAt(
-        currentCatalog->findFileIndex(time, findMethod)
-    );
-    
-    if (currentChunk.startTimeMs == -1)
+    DeviceFileCatalog::TruncableChunk currentChunk;    
+    int chunkIndex = currentCatalog->findFileIndex(time, findMethod);
+
+    while (1)
+    { 
+        currentChunk = currentCatalog->chunkAt(
+            chunkIndex
+        );
+
+        if (currentChunk.startTimeMs == -1)
+            break;
+
+        auto ignoreIt = ignoreChunks.find(
+            DeviceFileCatalog::UniqueChunk(
+                currentChunk,
+                currentCatalog->cameraUniqueId(),
+                currentCatalog->getRole()
+            )
+        );
+
+        if (ignoreIt == ignoreChunks.cend())
+            break;
+        else 
+            chunkIndex += 
+                findMethod == DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk ?
+                1 : -1;
+    }
+
+    if (currentChunk.startTimeMs == -1) 
         return findDataForTimeHelper(
             time, 
             resultChunk, 
@@ -125,16 +154,18 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance
+            previousDistance,
+            ignoreChunks
         );
     
     qint64 currentDistance = calcDistanceHelper(currentChunk, time, findMethod);
 
-    NX_LOG(lit("current time: %4, current chunk: %1, current distance: %2, previous distance: %3")
+    NX_LOG(lit("seek time: %4, current chunk: %1, current distance: %2, previous distance: %3, camera: %5")
                 .arg(currentChunk.startTimeMs).arg(currentDistance).arg(previousDistance)
-                .arg(time),
+                .arg(time).arg(currentCatalog->cameraUniqueId()),
            cl_logDEBUG2);
-    if (previousDistance == -1)
+
+    if (previousDistance == -1) 
     {
         resultChunk   = currentChunk;
         resultCatalog = currentCatalog;
@@ -146,7 +177,8 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            currentDistance
+            currentDistance,
+            ignoreChunks
         );
     }
 
@@ -165,8 +197,12 @@ void QnDualQualityHelper::findDataForTimeHelper(
 
     if (previousDistance > currentDistance + findEps)
     {
-        if (currentChunk.containsTime(resultChunk.startTimeMs) && previousDistance != INT64_MAX)
+        if (currentChunk.containsTime(resultChunk.startTimeMs) && 
+            previousDistance != INT64_MAX && 
+            findMethod == DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk)
+        {
             currentChunk.truncate(resultChunk.startTimeMs);
+        }
 
         resultChunk = currentChunk;
         resultCatalog = currentCatalog;
@@ -179,7 +215,8 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            currentDistance
+            currentDistance,
+            ignoreChunks
         );
     }
     else
@@ -191,7 +228,8 @@ void QnDualQualityHelper::findDataForTimeHelper(
             findMethod, 
             preciseFind,
             searchStack,
-            previousDistance
+            previousDistance,
+            ignoreChunks
         );
     }
 }

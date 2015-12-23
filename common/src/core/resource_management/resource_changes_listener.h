@@ -4,6 +4,7 @@
 
 #include <utils/common/connective.h>
 
+// TODO: #ynikitenkov add versions with add/remove/specified resource slot handlers
 class QnResourceChangesListener: public Connective<QObject> {
     typedef Connective<QObject> base_type;
 public:
