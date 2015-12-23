@@ -18,6 +18,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/webpage_resource.h>
 #include <core/misc/screen_snap.h>
 
 #include <nx_ec/ec_api.h>
@@ -38,6 +39,7 @@
 #include "api_videowall_data.h"
 #include "api_peer_data.h"
 #include "api_runtime_data.h"
+#include "api_webpage_data.h"
 
 #include <utils/email/email.h>
 #include <utils/common/ldap.h>
@@ -169,7 +171,7 @@ void fromResourceToApi(const QnVirtualCameraResourcePtr &src, ApiCameraData &dst
     dst.vendor = src->getVendor();
 }
 
-template<class List> 
+template<class List>
 void fromApiToResourceList(const ApiCameraDataList &src, List &dst, QnResourceFactory *factory, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiCameraData &srcCamera: src) {
@@ -215,7 +217,7 @@ void fromResourceToApi(const QnScheduleTask &src, ApiScheduleTaskData &dst) {
 }
 
 void fromApiToResource(const ApiScheduleTaskData &src, QnScheduleTask &dst, const QnUuid &resourceId) {
-    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType, 
+    dst = QnScheduleTask(resourceId, src.dayOfWeek, src.startTime, src.endTime, src.recordingType,
                          src.beforeThreshold, src.afterThreshold, src.streamQuality, src.fps, src.recordAudio);
 }
 
@@ -263,7 +265,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
 
     QList<QnMotionRegion> regions;
     dst.motionMask = serializeMotionRegionList(src->motionRegions).toLatin1();
-    
+
     dst.scheduleTasks.clear();
     for(const QnScheduleTask &srcTask: src->scheduleTasks) {
         dst.scheduleTasks.push_back(ApiScheduleTaskData());
@@ -367,6 +369,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.users, dst.resources);
     fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);
+    fromApiToResourceList(src.webPages, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     dst.camerasWithArchiveList = src.cameraHistory;
@@ -420,7 +423,7 @@ void fromApiToResource(const ApiLayoutData &src, QnLayoutResourcePtr &dst) {
     dst->setBackgroundImageFilename(src.backgroundImageFilename);
     dst->setBackgroundSize(QSize(src.backgroundWidth, src.backgroundHeight));
     dst->setBackgroundOpacity(src.backgroundOpacity);
-    
+
     QnLayoutItemDataList dstItems;
     for (const ApiLayoutItemData &srcItem: src.items) {
         dstItems.push_back(QnLayoutItemData());
@@ -441,7 +444,7 @@ void fromResourceToApi(const QnLayoutResourcePtr &src, ApiLayoutData &dst) {
     dst.backgroundWidth = src->backgroundSize().width();
     dst.backgroundHeight = src->backgroundSize().height();
     dst.backgroundOpacity = src->backgroundOpacity();
-    
+
     const QnLayoutItemDataMap &srcItems = src->getItems();
     dst.items.clear();
     dst.items.reserve(srcItems.size());
@@ -505,7 +508,7 @@ void fromResourceToApi(const QnLicensePtr &src, ApiDetailedLicenseData &dst) {
 
 void fromResourceListToApi(const QnLicenseList &src, ApiLicenseDataList &dst) {
     dst.reserve(dst.size() + src.size());
-    
+
     for(const QnLicensePtr &srcLicense: src) {
         dst.push_back(ApiLicenseData());
         fromResourceToApi(srcLicense, dst.back());
@@ -543,7 +546,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
 {
-    for(const QnStorageResourcePtr& storage: src) 
+    for(const QnStorageResourcePtr& storage: src)
     {
         ApiStorageData dstStorage;
         fromResourceToApi(storage, dstStorage);
@@ -602,7 +605,7 @@ void fromApiToResource(const ApiMediaServerData &src, QnMediaServerResourcePtr &
     */
 }
 
-template<class List> 
+template<class List>
 void fromApiToResourceList(const ApiMediaServerDataList &src, List &dst, const ResourceContext &ctx, const overload_tag &) {
     dst.reserve(dst.size() + (int)src.size());
     for(const ApiMediaServerData &srcServer: src) {
@@ -779,9 +782,9 @@ void fromApiToResourceList(const ApiUserDataList &src, List &dst, const overload
 void fromApiToResourceList(const ApiStorageDataList &src, QnResourceList &dst, const ResourceContext &ctx) {
     dst.reserve(dst.size() + (int)src.size());
     auto resType = ctx.resTypePool->getResourceTypeByName(lit("Storage"));
-    for(const ApiStorageData &srcStorage: src) 
+    for(const ApiStorageData &srcStorage: src)
     {
-        QnStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(), 
+        QnStorageResourcePtr dstStorage = ctx.resFactory->createResource(resType->getId(),
                                                   QnResourceParams(srcStorage.id, srcStorage.url, QString())).dynamicCast<QnStorageResource>();
         fromApiToResource(srcStorage, dstStorage);
         dst.push_back(std::move(dstStorage));
@@ -963,6 +966,33 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
     }
 }
 
+
+void fromApiToResource(const ApiWebPageData &src, QnWebPageResourcePtr &dst) {
+    fromApiToResource(static_cast<const ApiResourceData &>(src), dst.data());
+}
+
+void fromResourceToApi(const QnWebPageResourcePtr &src, ApiWebPageData &dst) {
+    fromResourceToApi(src, static_cast<ApiResourceData &>(dst));
+}
+
+template<class List>
+void fromApiToResourceList(const ApiWebPageDataList &src, List &dst, const overload_tag &) {
+    dst.reserve(dst.size() + (int)src.size());
+
+    for(const ApiWebPageData &srcPage: src) {
+        QnWebPageResourcePtr dstPage(new QnWebPageResource());
+        fromApiToResource(srcPage, dstPage);
+        dst.push_back(std::move(dstPage));
+    }
+}
+
+void fromApiToResourceList(const ApiWebPageDataList &src, QnResourceList &dst) {
+    fromApiToResourceList(src, dst, overload_tag());
+}
+
+void fromApiToResourceList(const ApiWebPageDataList &src, QnWebPageResourceList &dst) {
+    fromApiToResourceList(src, dst, overload_tag());
+}
 
 
 } // namespace ec2

@@ -5,6 +5,11 @@
 #include "utils/common/log.h"
 
 const QString QnResourceTypePool::desktopCameraTypeName = lit("SERVER_DESKTOP_CAMERA");
+const QString QnResourceTypePool::kLayoutTypeId(lit("Layout"));
+const QString QnResourceTypePool::kServerTypeId(lit("Server"));
+const QString QnResourceTypePool::kVideoWallTypeId(lit("Videowall"));
+const QString QnResourceTypePool::kWebPageTypeId(lit("WebPage"));
+
 
 QnResourceType::QnResourceType()
     : m_isCameraSet(false)
@@ -81,7 +86,7 @@ QList<QnUuid> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QnMutexLocker _lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
+    QnMutexLocker _lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server
     m_paramTypeList.insert(name, defaultValue);
 }
 
@@ -112,7 +117,7 @@ const ParamTypeMap& QnResourceType::paramTypeList() const
                 continue;
             }
 
-            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
+            if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId))
             {
                 ParamTypeMap parentData = parent->paramTypeList();
                 for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
@@ -240,7 +245,7 @@ QnResourceTypePool::QnResourceTypeMap QnResourceTypePool::getResourceTypeMap() c
 
 QnResourceTypePtr QnResourceTypePool::desktopCameraResourceType() const {
     QnMutexLocker lock( &m_mutex );
-    if (!m_desktopCamResourceType) 
+    if (!m_desktopCamResourceType)
     {
         for(auto itr = m_resourceTypeMap.begin(); itr != m_resourceTypeMap.end(); ++itr)
         {

@@ -46,6 +46,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <nx_ec/dummy_handler.h>
 
@@ -327,15 +328,19 @@ void QnWorkbenchActionHandler::addToLayout(const QnLayoutResourcePtr &layout, co
 #endif
 
     {
-        //TODO: #GDM #Common refactor duplicated code
+        //TODO: #GDM #Common refactor duplicated code VMS-1725
         bool isServer = resource->hasFlags(Qn::server);
+        if (isServer && QnMediaServerResource::isFakeServer(resource))
+            return;
+
+        bool nonVideo = isServer || resource->hasFlags(Qn::web_page);
         bool isMediaResource = resource->hasFlags(Qn::media);
         bool isLocalResource = resource->hasFlags(Qn::url | Qn::local | Qn::media)
                 && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
         bool isExportedLayout = snapshotManager()->isFile(layout);
 
-        bool allowed = isServer || isMediaResource;
-        bool forbidden = isExportedLayout && (isServer || isLocalResource);
+        bool allowed = nonVideo || isMediaResource;
+        bool forbidden = isExportedLayout && (nonVideo || isLocalResource);
         if(!allowed || forbidden)
             return;
     }
@@ -908,19 +913,22 @@ void QnWorkbenchActionHandler::at_dropResourcesAction_triggered() {
             menu()->trigger(Qn::OpenInCurrentLayoutAction, parameters);
         } else {
             QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
-            if (layout->hasFlags(Qn::url | Qn::local | Qn::layout)) {
+            if (snapshotManager()->isFile(layout)) {
                 bool hasLocal = false;
                 foreach (const QnResourcePtr &resource, resources) {
-                    //TODO: #GDM #Common refactor duplicated code
+                    //TODO: #GDM #Common refactor duplicated code VMS-1725
                     hasLocal |= resource->hasFlags(Qn::url | Qn::local | Qn::media)
                             && !resource->getUrl().startsWith(QnLayoutFileStorageResource::layoutPrefix());
                     if (hasLocal)
                         break;
                 }
                 if (hasLocal)
+                {
                     QMessageBox::warning(mainWindow(),
                                          tr("Cannot add item"),
                                          tr("Cannot add a local file to Multi-Video"));
+                    return;
+                }
             }
         }
     }
@@ -1700,19 +1708,32 @@ void QnWorkbenchActionHandler::at_renameAction_triggered() {
         QnVirtualCameraResourceList modified = qnResPool->getResources().filtered<QnVirtualCameraResource>([groupId](const QnVirtualCameraResourcePtr &camera){
             return camera->getGroupId() == groupId;
         });
-        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera) {
+        qnResourcesChangesManager->saveCameras(modified, [name](const QnVirtualCameraResourcePtr &camera)
+        {
             camera->setUserDefinedGroupName(name);
         });
     } else {
-        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>()) {
-            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server) {
+        if (QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>())
+        {
+            qnResourcesChangesManager->saveServer(server, [name](const QnMediaServerResourcePtr &server)
+            {
                 server->setName(name);
             });
         }
 
-        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera) {
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            qnResourcesChangesManager->saveCamera(camera, [name](const QnVirtualCameraResourcePtr &camera)
+            {
                 camera->setName(name);
+            });
+        }
+
+        if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        {
+            qnResourcesChangesManager->saveWebPage(webPage, [name](const QnWebPageResourcePtr &webPage)
+            {
+                webPage->setName(name);
             });
         }
     }
