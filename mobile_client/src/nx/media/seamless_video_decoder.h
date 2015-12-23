@@ -9,6 +9,7 @@ namespace nx
 {
 	namespace media
 	{
+
 		/*
 		* This class encapsulate common logic related to any video decoder. It guarantee seamless decoding in case of compressed frame
 		* has changed resolution or codecId. VideoDecoder uses PhysicalDecoderFactory to instantiate compatible PhysicalDecoder to decode next frame

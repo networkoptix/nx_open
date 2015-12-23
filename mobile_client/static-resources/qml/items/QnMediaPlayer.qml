@@ -12,16 +12,19 @@ QnObject {
 
     property string resourceId
 
-    readonly property bool loading: !d.paused && d.mediaPlayer && d.mediaPlayer.loading
-    readonly property bool playing: d.mediaPlayer ? d.mediaPlayer.playing : false
-    readonly property bool atLive: d.position < 0
+    readonly property bool loading: nxPlayer.playbackState == QnPlayer.Playing && nxPlayer.mediaStatus == QnPlayer.Loading
+    readonly property bool playing: nxPlayer.playbackState == QnPlayer.Playing && nxPlayer.mediaStatus == QnPlayer.Loaded
+    readonly property bool atLive: nxPlayer.liveMode
 
-    readonly property alias failed: d.failed
+	onPlayingChanged: console.log("----> playing = " + playing)
+	onLoadingChanged: console.log("----> loading = " + loading)
 
-    readonly property alias position: d.position
-    readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
+    readonly property bool failed: nxPlayer.mediaStatus == QnPlayer.NoMedia
 
-    readonly property var mediaPlayer: d.mediaPlayer
+    readonly property alias position: nxPlayer.position
+    readonly property bool hasTimestamp: true
+
+    readonly property var mediaPlayer: nxPlayer
     readonly property var chunkProvider: chunkProvider
     readonly property var resourceHelper: resourceHelper
 
@@ -33,120 +36,19 @@ QnObject {
     QtObject {
         id: d
 
-        readonly property int lastMinuteLength: 60000
-        readonly property int maximumInitialPosition: 2000
-
-        property bool failed: false
-        property int startPosition: 0
-
-        property bool paused: false
-        property real position: -1
-        property real chunkEnd: -1
-        property int prevPlayerPosition: 0
-        property bool updateTimeline: false
-        property bool dirty: true
-        property var mediaPlayer: nxPlayer
         property bool resetUrlOnConnect: false
-
-        /* Qt MediaPlayer fails to play video if media source is frequently changed at first video load.
-           Workaround it by blocking redundant URL update at first video load.
-         */
-        property bool firstPlay: true
-
-        onPausedChanged: failureTimer.updateTimer()
-    }
-
-    Timer {
-        id: failureTimer
-
-        interval: resourceHelper.protocol == QnMediaResourceHelper.Mjpeg ? 20 * 1000 : 120 * 1000
-        repeat: false
-        running: false
-        onTriggered: {
-            if (!d.paused && d.startPosition == d.mediaPlayer.position) {
-                d.failed = true
-                d.mediaPlayer.stop()
-            }
-        }
-
-        function updateTimer() {
-            if (d.paused) {
-                stop()
-                return
-            }
-
-            d.failed = false
-            d.startPosition = d.mediaPlayer.position
-
-            restart()
-        }
     }
 
     QnPlayer {
 		id: nxPlayer
-
         source: "camera://media/" + player.resourceId
-
-        readonly property bool hasTimestamp: true
-        readonly property bool loading: playbackState == QnPlayer.Playing && mediaStatus != QnPlayer.Loaded
-        readonly property bool playing: playbackState == QnPlayer.Playing && mediaStatus == QnPlayer.Loaded
-
-		onPlaybackStateChanged: console.log("----------- Playback state: " + playbackState)
-		onMediaStatusChanged: console.log("----------- MediaStatus: " + mediaStatus)
-
-		readonly property real timestamp: position
-		property real finalTimestamp: {
-            var chunksEnd = resourceHelper.finalTimestamp
-            if (chunksEnd != -1)
-                chunksEnd = chunkProvider.closestChunkEndMs(chunksEnd - 1, false)
-            return chunksEnd
-        }
-
-        reconnectOnPlay: atLive
-
-        onTimestampChanged: {
-            if (d.position < 0)
-                return
-
-            if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
-                seek(d.chunkEnd + 1)
-                return
-            }
-
-            if (mediaPlayer.timestamp >= 0) {
-                d.position = mediaPlayer.timestamp
-                timelineCorrectionRequest(d.position)
-            }
-        }
-
-        onPlaybackFinished: {
-            if (d.position == -1)
-                return
-
-            if (!d.paused)
-                player.play(d.chunkEnd + 1)
-        }
-
-        onPositionChanged: failureTimer.updateTimer()
-
-        function getFinalTimestamp(startPos) {
-            if (startPos <= 0)
-                return -1
-
-            return Qt.binding(function() { return finalTimestamp })
-        }
+        onPositionChanged: timelineCorrectionRequest(nxPlayer.position)
+		onLiveModeChanged: timelineCorrectionRequest(nxPlayer.position)
     }
 
     QnMediaResourceHelper {
         id: resourceHelper
-
-        screenSize: Qt.size(mainWindow.width, mainWindow.height)
         resourceId: player.resourceId
-
-        onMediaUrlChanged: {
-            d.firstPlay = true
-            console.log("Media URL changed: " + mediaUrl)
-        }
     }
 
     QnCameraChunkProvider {
@@ -161,103 +63,31 @@ QnObject {
         onTriggered: chunkProvider.update()
     }
 
-    Timer {
-        interval: 5000
-        running: player.playing && d.position >= 0
-        onTriggered: d.updateTimeline = true
-    }
-
-    Connections {
-        target: connectionManager
-        onConnectionStateChanged: {
-            if (connectionManager.connectionState == QnConnectionManager.Connected) {
-                if (d.resetUrlOnConnect) {
-                    d.resetUrlOnConnect = false
-                    resourceHelper.position = position
-                }
-            } else {
-                d.resetUrlOnConnect = true
-            }
-        }
-    }
-
-    function alignedPosition(pos) {
-        return pos >= 0 ? chunkProvider.closestChunkStartMs(pos, true) : -1
-    }
-
     function playLive() {
         play(-1)
     }
 
     function play(pos) {
-        d.failed = false
+		if (pos)
+			seek(pos)
 
-        if (d.position == -1 || pos && (pos != d.position || pos == -1))
-            d.dirty = true
+        if (!playing)
+            nxPlayer.play()
 
-        d.paused = false
+        timelinePositionRequest(nxPlayer.position)
 
-        if (!d.dirty) {
-            if (!playing) {
-                d.mediaPlayer.play()
-                failureTimer.updateTimer()
-            }
-            return
-        }
-
-        var live = (new Date()).getTime()
-        var aligned = -1
-        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
-            aligned = alignedPosition(pos)
-            if (live - aligned <= d.lastMinuteLength)
-                aligned = -1
-        }
-
-        d.mediaPlayer.stop()
-
-        d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
-
-        d.chunkEnd = (d.position >= 0) ? d.mediaPlayer.getFinalTimestamp(pos) : -1
-
-        timelinePositionRequest(d.position)
-        d.updateTimeline = true
-
-        if (d.position == -1 && resourceHelper.position == -1) {
-            if (!d.firstPlay)
-                resourceHelper.updateUrl()
-            else
-                d.firstPlay = false
-        } else {
-            resourceHelper.position = d.position
-        }
-
-        d.prevPlayerPosition = 0
-        d.mediaPlayer.play()
-        failureTimer.updateTimer()
-
-        d.dirty = false
+        nxPlayer.play()
     }
 
     function pause() {
-        d.paused = true
-        d.mediaPlayer.pause()
+        nxPlayer.pause()
     }
 
     function stop() {
-        d.dirty = true
-        d.mediaPlayer.stop()
+        nxPlayer.stop()
     }
 
     function seek(pos) {
-        d.dirty = true
-
-        if (d.paused) {
-            d.position = pos
-            timelinePositionRequest(d.position)
-            d.updateTimeline = false
-        } else {
-            play(pos)
-        }
+        nxPlayer.position = pos
     }
 }
-

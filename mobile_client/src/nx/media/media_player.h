@@ -17,19 +17,20 @@ namespace nx
 			Q_OBJECT
 
 		public:
-			enum State
+			enum class State
 			{
 				Stopped,
 				Playing,
 				Paused
 			};
 
-			enum MediaStatus
+			enum class MediaStatus
 			{
 				Unknown,
 				NoMedia,
 				Loading,
 				Loaded,
+
 				Stalled,
 				Buffering,
 				Buffered,
@@ -53,8 +54,7 @@ namespace nx
 			Q_PROPERTY(State playbackState READ playbackState NOTIFY playbackStateChanged)
 			Q_PROPERTY(MediaStatus mediaStatus READ mediaStatus NOTIFY mediaStatusChanged)
 
-			// todo: rename it 
-			Q_PROPERTY(bool reconnectOnPlay READ reconnectOnPlay WRITE setReconnectOnPlay NOTIFY reconnectOnPlayChanged)
+			Q_PROPERTY(bool liveMode READ liveMode NOTIFY liveModeChanged)
 
 		public:
 			Player(QObject *parent = nullptr);
@@ -74,6 +74,8 @@ namespace nx
 			bool reconnectOnPlay() const;
 			void setReconnectOnPlay(bool reconnectOnPlay);
 
+			bool liveMode() const;
+
 		public slots:
 			void play();
 			void pause();
@@ -90,7 +92,9 @@ namespace nx
 			void playbackFinished();
 			void mediaStatusChanged();
 			void reconnectOnPlayChanged();
-
+			void liveModeChanged();
+		private:
+			qint64 posUsec() const;
 		private:
 			QScopedPointer<PlayerPrivate> d_ptr;
 			Q_DECLARE_PRIVATE(Player);

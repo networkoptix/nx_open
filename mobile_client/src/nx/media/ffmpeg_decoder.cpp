@@ -89,6 +89,7 @@ void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fram
 	codecContext = avcodec_alloc_context3(codec);
 	if (frame->context)
 		QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
+	codecContext->thread_count = 4;
 	if (avcodec_open2(codecContext, codec, nullptr) < 0)
 	{
 		qWarning() << "Can't open decoder for codec" << frame->compressionType;
@@ -139,7 +140,7 @@ QVideoFrame::PixelFormat toQtPixelFormat(int ffmpegFormat)
 	}
 }
 
-bool FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
+int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
 {
 	Q_D(FfmpegDecoder);
 
@@ -147,7 +148,7 @@ bool FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPo
 	{
 		d->initContext(frame);
 		if (!d->codecContext)
-			return false;
+			return -1;
 	}
 
 	AVPacket avpkt;
@@ -175,7 +176,7 @@ bool FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPo
 	int gotData = 0;
 	avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
 	if (gotData <= 0)
-		return gotData == 0; //< negative value means error. zerro value is buffering
+		return gotData; //< negative value means error. zerro value is buffering
 	
 	/*
 	QMemoryVideoBuffer buffer(QByteArray((const char*) d->frame->data, d->frame->width * d->frame->height * 1.5), d->frame->linesize[0]);
@@ -215,8 +216,8 @@ bool FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPo
 	videoFrame->unmap();
 
 	result->reset(videoFrame);
-
-	return true;
+	
+	return d->frame->coded_picture_number;
 }
 
 }
