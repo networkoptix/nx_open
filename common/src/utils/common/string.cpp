@@ -425,11 +425,17 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
 
 QByteArray generateRandomName(int length)
 {
-    const char kAlphaAndDigits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    static const char kAlphaAndDigits[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    static const size_t kDigitsCount = 10;
+    static_assert(kDigitsCount < sizeof(kAlphaAndDigits), "Check kAlphaAndDigits array");
+
+    if (!length)
+        return QByteArray();
 
     QByteArray str;
     str.resize(length);
-    for (int i = 0; i < length; ++i)
+    str[0] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - kDigitsCount - 1)];
+    for (int i = 1; i < length; ++i)
         str[i] = kAlphaAndDigits[rand() % (sizeof(kAlphaAndDigits) / sizeof(*kAlphaAndDigits) - 1)];
 
     return str;
