@@ -3779,6 +3779,9 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& dummy, ApiFullInfoData& da
     if ((err = doQueryNoLock(dummy, data.videowalls)) != ErrorCode::ok)
         return err;
 
+    if ((err = doQueryNoLock(dummy, data.webPages)) != ErrorCode::ok)
+        return err;
+
     if ((err = doQueryNoLock(dummy, data.rules)) != ErrorCode::ok)
         return err;
 

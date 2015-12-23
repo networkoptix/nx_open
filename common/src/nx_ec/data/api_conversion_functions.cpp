@@ -369,6 +369,7 @@ void fromApiToResourceList(const ApiFullInfoData &src, QnFullResourceData &dst, 
     fromApiToResourceList(src.users, dst.resources);
     fromApiToResourceList(src.layouts, dst.resources, ctx);
     fromApiToResourceList(src.videowalls, dst.resources);
+    fromApiToResourceList(src.webPages, dst.resources);
     fromApiToResourceList(src.licenses, dst.licenses);
     fromApiToResourceList(src.rules, dst.bRules, ctx.pool);
     dst.camerasWithArchiveList = src.cameraHistory;

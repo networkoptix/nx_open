@@ -915,7 +915,7 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
     {
         widget = new QnMediaResourceWidget(context(), item);
     }
-    else if (resource->hasFlags(Qn::url))
+    else if (resource->hasFlags(Qn::web_page))
     {
         widget = new QnWebResourceWidget(context(), item);
     }

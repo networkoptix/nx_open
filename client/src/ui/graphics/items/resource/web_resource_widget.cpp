@@ -1,5 +1,7 @@
 #include "web_resource_widget.h"
 
+#include <core/resource/resource.h>
+
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QGraphicsWebView>
 
@@ -8,10 +10,10 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 {
 
     QGraphicsWebView *webView = new QGraphicsWebView(this);
-    webView->setUrl(QUrl(lit("http://google.ru")));
+    webView->setUrl(QUrl(resource()->getUrl()));
     webView->setRenderHints(0);
-    webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true); 
-    webView->settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true); 
+    webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
+    webView->settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
 
     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
         this, [](QNetworkReply* reply, const QList<QSslError> &){ reply->ignoreSslErrors();} );
@@ -35,11 +37,6 @@ QnWebResourceWidget::~QnWebResourceWidget()
 
 }
 
-QString QnWebResourceWidget::calculateTitleText() const
-{
-    return lit("www.yandex.ru");
-}
-
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
     return Qn::EmptyOverlay;
@@ -55,4 +52,9 @@ Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter,
         return Qn::NothingRendered;
 
     return Qn::NewFrameRendered;
+}
+
+QString QnWebResourceWidget::calculateDetailsText() const
+{
+    return resource()->getUrl();
 }

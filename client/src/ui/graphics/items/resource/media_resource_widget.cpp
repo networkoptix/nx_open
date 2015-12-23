@@ -1204,13 +1204,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::IoModuleDisabledOverlay;
     }
 
-    if (resource->hasFlags(Qn::SINGLE_SHOT)) {
+    if (resource->hasFlags(Qn::local_image)) {
         if (resource->getStatus() == Qn::Offline)
             return Qn::NoDataOverlay;
         if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
-    } else if (resource->hasFlags(Qn::ARCHIVE) && resource->getStatus() == Qn::Offline) {
+    } else if (resource->hasFlags(Qn::local_video) && resource->getStatus() == Qn::Offline) {
         return Qn::NoDataOverlay;
 
 

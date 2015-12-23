@@ -12,7 +12,7 @@ public:
     virtual ~QnWebResourceWidget();
 
 protected:
-    virtual QString calculateTitleText() const override;
+    virtual QString calculateDetailsText() const override;
     virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
 
     virtual Qn::RenderStatus paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) override;
