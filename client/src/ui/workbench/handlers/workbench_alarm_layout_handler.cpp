@@ -1,5 +1,7 @@
 #include "workbench_alarm_layout_handler.h"
 
+#include <utils/aspect_ratio.h>
+
 #include <business/actions/abstract_business_action.h>
 
 #include <camera/resource_display.h>
@@ -15,7 +17,6 @@
 
 #include <ui/actions/action_manager.h>
 #include <ui/actions/action_parameters.h>
-
 #include <ui/style/skin.h>
 
 #include <ui/workbench/workbench.h>
@@ -24,6 +25,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+#include <ui/graphics/items/resource/resource_widget.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -108,13 +111,16 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
         return camera1->getId() < camera2->getId();
     });
 
-    for (const QnVirtualCameraResourcePtr &camera: sortedCameras) {
+    for (const QnVirtualCameraResourcePtr &camera: sortedCameras)
+    {
         auto existingItems = layout->items(camera->getUniqueId());
 
         /* If the camera is already on layout, just take it to LIVE */
-        if (!existingItems.isEmpty()) {
+        if (!existingItems.isEmpty())
+        {
             for (auto item: existingItems)
                 jumpToLive(layout, item);
+
             continue;
         }
 
@@ -134,6 +140,17 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
 
     if (switchToLayout)
         workbench()->setCurrentLayout(layout);
+
+
+    if (sortedCameras.empty())
+        return;
+
+    for(auto widget: display()->widgets(sortedCameras.first()))
+    {
+        const auto aspect = widget->visualChannelAspectRatio();
+        layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(aspect).toFloat());
+        break;  // Break after first camera aspect set
+    }
 }
 
 QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
