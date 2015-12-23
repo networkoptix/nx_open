@@ -1474,9 +1474,9 @@ void QnWorkbenchUi::createTitleWidget() {
     m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
-    QnCloudStatusPanel *cloudSatusPanel = new QnCloudStatusPanel(context());
+    QnCloudStatusPanel *cloudStatusPanel = new QnCloudStatusPanel(context());
     QGraphicsProxyWidget *cloudStatusPanelProxy = new QnMaskedProxyWidget();
-    cloudStatusPanelProxy->setWidget(cloudSatusPanel);
+    cloudStatusPanelProxy->setWidget(cloudStatusPanel);
 
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setContentsMargins(0, 0, 0, 0);
