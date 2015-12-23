@@ -170,7 +170,7 @@ struct in_addr HostAddress::inAddr(bool* ok) const
     if( !m_addressResolved )
     {
         Q_ASSERT( m_addrStr );
-        const auto addrs = nx::SocketGlobals::addressResolver().resolveSync(
+        const auto addrs = nx::network::SocketGlobals::addressResolver().resolveSync(
                     m_addrStr.get(), false );
 
         if ( !addrs.empty() )

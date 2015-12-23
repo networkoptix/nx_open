@@ -31,7 +31,7 @@ class Connection
 {
 public:
     Connection(
-        cc::CloudModuleEndPointFetcher* const endPointFetcher,
+        network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
         const std::string& login,
         const std::string& password);
 

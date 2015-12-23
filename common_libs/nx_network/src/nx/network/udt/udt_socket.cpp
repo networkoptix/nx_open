@@ -519,7 +519,7 @@ UdtSocket::~UdtSocket()
 
     //TODO #ak if socket is destroyed in its aio thread, it can cleanup here
 
-    assert(!nx::SocketGlobals::aioService().isSocketBeingWatched(this));
+    assert(!nx::network::SocketGlobals::aioService().isSocketBeingWatched(this));
 }
 
 UdtSocket::UdtSocket(detail::UdtSocketImpl* impl)
@@ -695,12 +695,12 @@ void UdtStreamSocket::cancelIOAsync(
 
 void UdtStreamSocket::postImpl( std::function<void()>&& handler )
 {
-    nx::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
@@ -864,12 +864,12 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
 
 void UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
 {
-    nx::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
 {
-    nx::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
 void UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {

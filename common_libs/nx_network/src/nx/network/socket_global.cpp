@@ -1,6 +1,7 @@
 #include "socket_global.h"
 
 namespace nx {
+namespace network {
 
 SocketGlobals::SocketGlobals()
     : m_log( QnLog::logs() )
@@ -40,5 +41,6 @@ QnMutex SocketGlobals::s_mutex;
 size_t SocketGlobals::s_counter( 0 );
 SocketGlobals* SocketGlobals::s_instance;
 
+} // namespace network
 } // namespace nx
 

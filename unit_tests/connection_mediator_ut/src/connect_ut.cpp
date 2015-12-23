@@ -4,7 +4,7 @@
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/cloud_connectivity/data/result_code.h>
+#include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/async_client.h>
 #include <utils/thread/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
@@ -33,7 +33,7 @@ protected:
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
-        SocketGlobals::mediatorConnector().mockupAddress( address );
+        network::SocketGlobals::mediatorConnector().mockupAddress( address );
     }
 
     const SocketAddress address;

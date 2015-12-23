@@ -7,7 +7,7 @@
 #define MEDIASERVER_EMULATOR_H
 
 #include <cloud_data_provider.h>
-#include <nx/network/cloud_connectivity/mediator_connector.h>
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
@@ -35,7 +35,7 @@ private:
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverID;
-    std::shared_ptr<nx::cc::MediatorSystemConnection> m_systemClient;
+    std::shared_ptr<nx::network::cloud::MediatorSystemConnection> m_systemClient;
 };
 
 }   //hpm

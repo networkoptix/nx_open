@@ -18,18 +18,18 @@ class SocketGlobalsHolder
 public:
     SocketGlobalsHolder()
     :
-        m_socketGlobalsGuard(std::make_unique<nx::SocketGlobals::InitGuard>())
+        m_socketGlobalsGuard(std::make_unique<nx::network::SocketGlobals::InitGuard>())
     {
     }
 
     void reinitialize()
     {
         m_socketGlobalsGuard.reset();
-        m_socketGlobalsGuard = std::make_unique<nx::SocketGlobals::InitGuard>();
+        m_socketGlobalsGuard = std::make_unique<nx::network::SocketGlobals::InitGuard>();
     }
 
 private:
-    std::unique_ptr<nx::SocketGlobals::InitGuard> m_socketGlobalsGuard;
+    std::unique_ptr<nx::network::SocketGlobals::InitGuard> m_socketGlobalsGuard;
 };
 
 #endif  //NX_SOCKET_GLOBALS_HOLDER_H

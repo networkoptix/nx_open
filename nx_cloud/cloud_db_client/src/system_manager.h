@@ -22,7 +22,7 @@ class SystemManager
     public AsyncRequestsExecutor
 {
 public:
-    SystemManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of \a SystemManager::bindSystem
     virtual void bindSystem(

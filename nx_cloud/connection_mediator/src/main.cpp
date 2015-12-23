@@ -32,7 +32,7 @@ BOOL WINAPI stopServer_WIN(DWORD dwCtrlType)
 
 int main(int argc, char* argv[])
 {
-	nx::SocketGlobals::InitGuard sgGuard;
+	nx::network::SocketGlobals::InitGuard sgGuard;
 
 #ifdef _WIN32
     SetConsoleCtrlHandler(stopServer_WIN, TRUE);

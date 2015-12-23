@@ -6,7 +6,7 @@
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
-#include <nx/network/cloud_connectivity/data/resolve_data.h>
+#include <nx/network/cloud/data/resolve_data.h>
 
 
 namespace nx {
@@ -97,7 +97,7 @@ void ListeningPeerPool::resolve(
     const ConnectionSharedPtr& connection,
     stun::Message request)
 {
-    nx::cc::api::ResolveRequest requestData;
+    nx::network::cloud::api::ResolveRequest requestData;
     if (!requestData.parse(request))
         return errorResponse(
             connection,
@@ -126,13 +126,13 @@ void ListeningPeerPool::resolve(
         request.header.method,
         std::move(request.header.transactionId)));
 
-    nx::cc::api::ResolveResponse responseData;
+    nx::network::cloud::api::ResolveResponse responseData;
 
     if (!peer->endpoints.empty())
         responseData.endpoints = peer->endpoints;
     responseData.connectionMethods = 
-        nx::cc::api::ConnectionMethod::udpHolePunching |
-        nx::cc::api::ConnectionMethod::proxy;
+        nx::network::cloud::api::ConnectionMethod::udpHolePunching |
+        nx::network::cloud::api::ConnectionMethod::proxy;
 
     responseData.serialize(&response);
 
