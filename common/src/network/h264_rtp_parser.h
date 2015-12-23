@@ -3,7 +3,9 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>

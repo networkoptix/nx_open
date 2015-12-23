@@ -8,8 +8,10 @@
 #include <map>
 #include <array>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/tuple/enum.hpp>
 #include <boost/preprocessor/cat.hpp>
+#endif
 
 #ifndef QN_NO_QT
 #   include <QtCore/QString>
@@ -266,7 +268,7 @@ void serialize(const QnUuid &value, QnUbjsonWriter<Output> *stream) {
 
 
 template <class Input>
-bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target) 
+bool deserialize(QnUbjsonReader<Input> *stream, QnUuid *target)
 {
     std::array<char, 16> tmp;
     if(!stream->template readBinaryData<>(&tmp))

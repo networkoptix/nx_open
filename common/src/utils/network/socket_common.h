@@ -16,7 +16,9 @@
 
 #include <stdint.h>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QString>
 

@@ -15,13 +15,14 @@
 #include <set>
 #include <unordered_map>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
-
+#endif
 
 //!Directed graph
 /*!
     \param NodeKey Requirements: comparable, copyable
-    \param VerticeKeyType Comparable type 
+    \param VerticeKeyType Comparable type
     \param EdgeDataType Data stored with edge type
     \note Class methods are not thread-safe
     \note Edge loops are allowed

@@ -5,7 +5,10 @@
 #include <atomic>
 #include <vector>
 #include <map>
+
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <common/common_globals.h>
 #include <api/model/backup_status_reply.h>
@@ -18,7 +21,7 @@ class QnScheduleSync: public QnLongRunnable
 {
     Q_OBJECT
 private:
-    struct ChunkKey 
+    struct ChunkKey
     {
         DeviceFileCatalog::Chunk chunk;
         QString                  cameraID;
@@ -26,24 +29,24 @@ private:
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
 
-    struct SyncData 
+    struct SyncData
     {
         int totalChunks;
         int startIndex;
         int currentIndex;
 
-        SyncData() 
-            : totalChunks(0), 
-              startIndex(0), 
-              currentIndex(0) 
+        SyncData()
+            : totalChunks(0),
+              startIndex(0),
+              currentIndex(0)
         {}
-        explicit SyncData(int startIndex) 
+        explicit SyncData(int startIndex)
             : totalChunks(0),
               startIndex(startIndex),
               currentIndex(startIndex)
         {}
     };
-    
+
     typedef std::vector<ChunkKey>         ChunkKeyVector;
     typedef std::map<ChunkKey, SyncData>  SyncDataMap;
 
@@ -62,7 +65,7 @@ public:
 signals:
     void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
 public:
-    int forceStart(); 
+    int forceStart();
     virtual void stop() override;
     int interrupt();
 
@@ -127,8 +130,8 @@ private:
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
 
     ChunkKey getOldestChunk(
-        const QString           &cameraId, 
-        QnServer::ChunksCatalog catalog, 
+        const QString           &cameraId,
+        QnServer::ChunksCatalog catalog,
         qint64                  fromTimeMs,
         SyncData                *syncData = nullptr
     ) const;
