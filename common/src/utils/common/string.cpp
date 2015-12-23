@@ -422,3 +422,8 @@ QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBol
     const auto newFormattedText = text.trimmed().replace(kNewLineSymbol, kNewLineTag);
     return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
 }
+
+QString makeHref(const QString &text, const QUrl &url)
+{
+    return lit("<a href=\"%2\">%1</a>").arg(text, url.toString());
+}
