@@ -6,8 +6,7 @@
 #include "stun_message_data.h"
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 nx::String StunMessageData::errorText() const
@@ -21,6 +20,5 @@ void StunMessageData::setErrorText(nx::String text)
 }
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx

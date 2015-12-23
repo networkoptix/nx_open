@@ -30,7 +30,7 @@ MediaServerEmulator::MediaServerEmulator(
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
     m_mediatorConnector.setSystemCredentials(
-        nx::network::cloud::MediatorConnector::SystemCredentials(
+        nx::hpm::MediatorConnector::SystemCredentials(
             m_systemData.id,
             m_serverID,
             m_systemData.authKey));
@@ -55,16 +55,16 @@ bool MediaServerEmulator::start()
     std::list<SocketAddress> localAddresses;
     localAddresses.push_back(m_httpServer.address());
 
-    nx::network::cloud::api::ResultCode resultCode = nx::network::cloud::api::ResultCode::ok;
+    nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     bool result = false;
-    std::tie(resultCode, result) = makeSyncCall<nx::network::cloud::api::ResultCode, bool>(
+    std::tie(resultCode, result) = makeSyncCall<nx::hpm::api::ResultCode, bool>(
         std::bind(
             &nx::network::cloud::MediatorSystemConnection::bind,
             m_systemClient.get(),
             std::move(localAddresses),
             std::placeholders::_1));
 
-    return resultCode == nx::network::cloud::api::ResultCode::ok;
+    return resultCode == nx::hpm::api::ResultCode::ok;
 }
 
 nx::String MediaServerEmulator::serverID() const

@@ -97,7 +97,7 @@ void ListeningPeerPool::resolve(
     const ConnectionSharedPtr& connection,
     stun::Message request)
 {
-    nx::network::cloud::api::ResolveRequest requestData;
+    api::ResolveRequest requestData;
     if (!requestData.parse(request))
         return errorResponse(
             connection,
@@ -126,13 +126,13 @@ void ListeningPeerPool::resolve(
         request.header.method,
         std::move(request.header.transactionId)));
 
-    nx::network::cloud::api::ResolveResponse responseData;
+    api::ResolveResponse responseData;
 
     if (!peer->endpoints.empty())
         responseData.endpoints = peer->endpoints;
     responseData.connectionMethods = 
-        nx::network::cloud::api::ConnectionMethod::udpHolePunching |
-        nx::network::cloud::api::ConnectionMethod::proxy;
+        api::ConnectionMethod::udpHolePunching |
+        api::ConnectionMethod::proxy;
 
     responseData.serialize(&response);
 
@@ -195,6 +195,14 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
             "Unknown host: " + hostName );
     }
 }
+
+void ListeningPeerPool::connectionResult(
+    api::ConnectionResultRequest request,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+
+}
+
 
 ListeningPeerPool::MediaserverPeer::MediaserverPeer( ConnectionWeakPtr connection_ )
     : connection( std::move( connection_ ) )

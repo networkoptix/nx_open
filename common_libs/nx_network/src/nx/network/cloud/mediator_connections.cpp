@@ -11,6 +11,8 @@ namespace cloud {
 
 typedef stun::cc::attrs::PublicEndpointList PublicEndpointList;
 
+using namespace nx::hpm;
+
 ////////////////////////////////////////////////////////////
 //// MediatorClientConnection
 ////////////////////////////////////////////////////////////
@@ -23,7 +25,9 @@ MediatorClientConnection::MediatorClientConnection(
 
 void MediatorClientConnection::connect(
     api::ConnectRequest connectData,
-    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
+    std::function<void(
+        api::ResultCode,
+        api::ConnectResponse)> completionHandler)
 {
     doRequest(
         stun::cc::methods::connect,
@@ -33,7 +37,9 @@ void MediatorClientConnection::connect(
 
 void MediatorClientConnection::resolve(
     api::ResolveRequest resolveData,
-    std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
+    std::function<void(
+        api::ResultCode,
+        api::ResolveResponse)> completionHandler)
 {
     doRequest(
         stun::cc::methods::resolve,
@@ -86,7 +92,9 @@ void MediatorClientConnection::doRequest(
                 return completionHandler(api::ResultCode::responseParseError, ResponseData());
             }
 
-            completionHandler(api::ResultCode::ok, std::move(responseData));
+            completionHandler(
+                api::ResultCode::ok,
+                std::move(responseData));
         });
 }
 

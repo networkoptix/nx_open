@@ -328,14 +328,14 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
     info->second.mediatorProgress();
     lk->unlock();
     m_mediatorConnection->resolve(
-        api::ResolveRequest(info->first.toString().toUtf8()),
-        [this, info](api::ResultCode resultCode, api::ResolveResponse response)
+        nx::hpm::api::ResolveRequest(info->first.toString().toUtf8()),
+        [this, info](nx::hpm::api::ResultCode resultCode, nx::hpm::api::ResolveResponse response)
         {
             std::vector< Guard > guards;
 
             QnMutexLocker lk( &m_mutex );
             std::vector< AddressEntry > entries;
-            if (resultCode == api::ResultCode::ok)
+            if (resultCode == nx::hpm::api::ResultCode::ok)
             {
                 for (const auto& it : response.endpoints)
                 {

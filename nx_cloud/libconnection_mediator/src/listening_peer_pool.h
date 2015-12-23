@@ -6,7 +6,13 @@
 #ifndef LISTENING_PEER_POOL_H
 #define LISTENING_PEER_POOL_H
 
+#include <functional>
+
+#include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/cloud/data/result_code.h>
+
 #include "request_processor.h"
+
 
 namespace nx {
 namespace hpm {
@@ -27,6 +33,10 @@ public:
     void listen(const ConnectionSharedPtr& connection, stun::Message message);
     void resolve(const ConnectionSharedPtr& connection, stun::Message message);
     void connect(const ConnectionSharedPtr& connection, stun::Message message);
+
+    void connectionResult(
+        api::ConnectionResultRequest request,
+        std::function<void(api::ResultCode)> completionHandler);
 
 protected:
     struct MediaserverPeer

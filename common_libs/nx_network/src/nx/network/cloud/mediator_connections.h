@@ -24,18 +24,22 @@ class NX_NETWORK_API MediatorClientConnection
 
 public:
     void connect(
-        api::ConnectRequest connectData,
-        std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+        nx::hpm::api::ConnectRequest connectData,
+        std::function<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::ConnectResponse)> completionHandler);
     void resolve(
-        api::ResolveRequest resolveData,
-        std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
+        nx::hpm::api::ResolveRequest resolveData,
+        std::function<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::ResolveResponse)> completionHandler);
 
 private:
     template<typename RequestData, typename ResponseData>
     void doRequest(
         nx::stun::cc::methods::Value method,
         RequestData requestData,
-        std::function<void(api::ResultCode, ResponseData)> completionHandler);
+        std::function<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler);
 };
 
 /** Provides system related STUN functionality */
@@ -51,7 +55,7 @@ public:
               std::function<void(bool, std::list<SocketAddress>)> handler);
 
     void bind(std::list<SocketAddress> addresses,
-              std::function<void(api::ResultCode, bool)> handler);
+              std::function<void(nx::hpm::api::ResultCode, bool)> handler);
 
 private:
     void sendAuthRequest(stun::Message request,

@@ -86,6 +86,8 @@ namespace attrs
         tcpHpEndpointList,
         udtHpEndpointList,
         connectionMethods,
+
+        connectionSucceeded,
     };
 
     NX_NETWORK_API const char* toString(AttributeType val);
@@ -132,7 +134,13 @@ namespace attrs
         static const AttributeType TYPE = connectionMethods;
         ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
     };
-    
+
+    struct NX_NETWORK_API ConnectionSucceeded: StringAttribute
+    {
+        static const AttributeType TYPE = connectionSucceeded;
+        ConnectionSucceeded(const String& value): StringAttribute(TYPE, value) {}
+    };
+
 
 
     /** Base class for endpoint attributes */

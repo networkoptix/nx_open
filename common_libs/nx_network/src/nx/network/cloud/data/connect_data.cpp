@@ -9,8 +9,7 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 ConnectRequest::ConnectRequest()
@@ -46,6 +45,5 @@ bool ConnectResponse::parse(const nx::stun::Message& message)
 }
 
 }   //api
-}   //cloud
-}   //network
+}   //hpm
 }   //nx

@@ -9,8 +9,7 @@
 #include <utils/common/model_functions.h>
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
@@ -35,6 +34,5 @@ ResultCode fromStunErrorToResultCode(
 }
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx

@@ -14,8 +14,7 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 class NX_NETWORK_API ConnectRequest
@@ -50,8 +49,7 @@ public:
 };
 
 }   //api
-}   //cloud
-}   //network
+}   //hpm
 }   //nx
 
 #endif   //NX_MEDIATOR_API_CONNECT_DATA_H

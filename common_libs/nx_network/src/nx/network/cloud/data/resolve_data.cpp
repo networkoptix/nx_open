@@ -7,9 +7,9 @@
 
 #include <nx/network/stun/cc/custom_stun.h>
 
+
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 ResolveRequest::ResolveRequest()
@@ -62,6 +62,5 @@ bool ResolveResponse::parse(const nx::stun::Message& message)
 }
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx
