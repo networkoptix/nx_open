@@ -3,8 +3,8 @@
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_CONNECTION_MEDIATOR_UT_TEST_SETUP_H
-#define NX_CONNECTION_MEDIATOR_UT_TEST_SETUP_H
+#ifndef NX_MEDIATOR_FUNCTIONAL_TEST_H
+#define NX_MEDIATOR_FUNCTIONAL_TEST_H
 
 #include <future>
 #include <vector>
@@ -66,4 +66,4 @@ private:
 }   //hpm
 }   //nx
 
-#endif  //NX_CONNECTION_MEDIATOR_UT_TEST_SETUP_H
+#endif  //NX_MEDIATOR_FUNCTIONAL_TEST_H
