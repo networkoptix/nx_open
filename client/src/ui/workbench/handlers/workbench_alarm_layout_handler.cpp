@@ -189,10 +189,10 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
         return;
 
     if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->archiveReader())
+        if (resourceDisplay->archiveReader()) {
             resourceDisplay->archiveReader()->setSpeed(1.0);
-        resourceDisplay->setCurrentTimeUSec(DATETIME_NOW);
+            resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
         resourceDisplay->start();
     }
-
 }
