@@ -175,7 +175,7 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //QTime t;
     //t.start();
 
-    DeviceFileCatalog::UniqueChunkVector ignoreChunks;
+    DeviceFileCatalog::UniqueChunkCont ignoreChunks;
 
     while (true) {
         m_skipFramesToTime = 0;
@@ -236,8 +236,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     m_eof = true;
                     return time;
                 } else {
-                    ignoreChunks.emplace_back(newChunk, newChunkCatalog->cameraUniqueId(),
-                                              newChunkCatalog->getRole());
+                    ignoreChunks.emplace(
+                        newChunk, 
+                        newChunkCatalog->cameraUniqueId(),
+                        newChunkCatalog->getRole()
+                    );
                     continue;
                 }
             }
@@ -302,7 +305,7 @@ bool QnServerArchiveDelegate::getNextChunk(DeviceFileCatalog::TruncableChunk& ch
         return false;
     }
     m_skipFramesToTime = m_currentChunk.endTimeMs()*1000;
-    DeviceFileCatalog::UniqueChunkVector ignoreChunks;
+    DeviceFileCatalog::UniqueChunkCont ignoreChunks;
     m_dialQualityHelper.findDataForTime(m_currentChunk.endTimeMs(), chunk, chunkCatalog, DeviceFileCatalog::OnRecordHole_NextChunk, false, ignoreChunks);
     return chunk.startTimeMs > m_currentChunk.startTimeMs || chunk.endTimeMs() > m_currentChunk.endTimeMs();
 }

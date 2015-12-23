@@ -25,6 +25,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
+#include <plugins/resource/archive/archive_stream_reader.h>
+
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
@@ -187,10 +189,10 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
         return;
 
     if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->camDisplay())
-            resourceDisplay->camDisplay()->setSpeed(1.0);
-        resourceDisplay->setCurrentTimeUSec(DATETIME_NOW);
+        if (resourceDisplay->archiveReader()) {
+            resourceDisplay->archiveReader()->setSpeed(1.0);
+            resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
+        }
         resourceDisplay->start();
     }
-
 }

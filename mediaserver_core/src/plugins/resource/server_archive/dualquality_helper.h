@@ -24,7 +24,7 @@ public:
         DeviceFileCatalogPtr                        &resultCatalog, 
         DeviceFileCatalog::FindMethod               findMethod, 
         bool                                        preciseFind,
-        const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
+        const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
     );
     //void findNextChunk(const DeviceFileCatalogPtr& currentCatalog, const DeviceFileCatalog::Chunk& currentChunk, DeviceFileCatalog::Chunk& nextChunk, DeviceFileCatalogPtr& nextCatalog);
 
@@ -40,7 +40,7 @@ private:
         bool                                        preciseFind,
         SearchStack                                 &searchStack,
         qint64                                      previousDistance,
-        const DeviceFileCatalog::UniqueChunkVector  &ignoreChunks 
+        const DeviceFileCatalog::UniqueChunkCont    &ignoreChunks 
     );
 
     static int64_t calcDistanceHelper(
