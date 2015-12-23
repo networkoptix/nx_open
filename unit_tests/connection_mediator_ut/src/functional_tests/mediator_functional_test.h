@@ -20,6 +20,7 @@
 #include <mediator_process_public.h>
 
 #include "local_cloud_data_provider.h"
+#include "mediaserver_emulator.h"
 #include "mediator_connector.h"
 
 
@@ -52,6 +53,12 @@ public:
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
     AbstractCloudDataProvider::System addRandomSystem();
+    std::unique_ptr<MediaServerEmulator> addServer(
+        const AbstractCloudDataProvider::System& system,
+        nx::String name);
+    std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
+        const AbstractCloudDataProvider::System& system,
+        size_t count);
 
 private:
     QString m_tmpDir;

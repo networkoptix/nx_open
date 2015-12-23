@@ -16,7 +16,8 @@ namespace hpm {
 
 MediaServerEmulator::MediaServerEmulator(
     const SocketAddress& mediatorEndpoint,
-    AbstractCloudDataProvider::System systemData)
+    AbstractCloudDataProvider::System systemData,
+    nx::String serverName)
 :
     m_httpServer(
         nullptr,
@@ -24,7 +25,7 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverID(generateRandomName(16))
+    m_serverID(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName))
 {
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
@@ -33,8 +34,6 @@ MediaServerEmulator::MediaServerEmulator(
             m_systemData.id,
             m_serverID,
             m_systemData.authKey));
-
-    //TODO #ak registering HTTP handler in m_httpMessageDispatcher
 }
 
 MediaServerEmulator::~MediaServerEmulator()
@@ -71,6 +70,11 @@ bool MediaServerEmulator::start()
 nx::String MediaServerEmulator::serverID() const
 {
     return m_serverID;
+}
+
+SocketAddress MediaServerEmulator::endpoint() const
+{
+    return m_httpServer.address();
 }
 
 }   //hpm

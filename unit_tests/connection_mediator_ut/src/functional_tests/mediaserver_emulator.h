@@ -20,14 +20,19 @@ namespace hpm {
 class MediaServerEmulator
 {
 public:
+    /*!
+        \param serverName If empty, name is generated
+    */
     MediaServerEmulator(
         const SocketAddress& mediatorEndpoint,
-        AbstractCloudDataProvider::System systemData);
+        AbstractCloudDataProvider::System systemData,
+        nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
 
     //!Attaches to a local port and registers on mediator
     bool start();
     nx::String serverID() const;
+    SocketAddress endpoint() const;
 
 private:
     MediatorConnector m_mediatorConnector;
@@ -36,6 +41,9 @@ private:
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverID;
     std::shared_ptr<nx::network::cloud::MediatorSystemConnection> m_systemClient;
+
+    MediaServerEmulator(const MediaServerEmulator&);
+    MediaServerEmulator& operator=(const MediaServerEmulator&);
 };
 
 }   //hpm
