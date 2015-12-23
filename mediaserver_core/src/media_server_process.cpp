@@ -1033,7 +1033,7 @@ void MediaServerProcess::updateAddressesList()
     QnAppServerConnectionFactory::getConnection2()->getMediaServerManager()
             ->save(m_mediaServer, this, &MediaServerProcess::at_serverSaved);
 
-    nx::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
+    nx::network::SocketGlobals::addressPublisher().updateAddresses(std::list<SocketAddress>(
         serverAddresses.begin(), serverAddresses.end()));
 }
 
@@ -2267,10 +2267,10 @@ void MediaServerProcess::run()
     //CLDeviceManager::instance().getDeviceSearcher().addDeviceServer(&FakeDeviceServer::instance());
     //CLDeviceSearcher::instance()->addDeviceServer(&IQEyeDeviceServer::instance());
 
-    nx::SocketGlobals::addressPublisher().setUpdateInterval(
+    nx::network::SocketGlobals::addressPublisher().setUpdateInterval(
         parseTimerDuration(
             MSSettings::roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
-            nx::cc::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
+            nx::network::cloud::MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL));
 
     auto updateCloudProperties = [this](const QnUserResourcePtr& admin)
     {
@@ -2278,19 +2278,19 @@ void MediaServerProcess::run()
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::cc::MediatorConnector::SystemCredentials credentials =
+            nx::network::cloud::MediatorConnector::SystemCredentials credentials =
             {
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8()
             };
 
-            nx::SocketGlobals::mediatorConnector()
+            nx::network::SocketGlobals::mediatorConnector()
                     .setSystemCredentials(std::move(credentials));
             return;
         }
 
-        nx::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
+        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
     };
 
     loadResourcesFromECS(messageProcessor.data());
@@ -2920,7 +2920,7 @@ int MediaServerProcess::main(int argc, char* argv[])
     #endif
 
     if ( !enforcedMediatorEndpoint.isEmpty() )
-        nx::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
                     enforcedMediatorEndpoint );
 
     if( showVersion )

@@ -14,7 +14,7 @@
 
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/email/email_manager_impl.h>
-#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cdb_endpoint_fetcher.h>
 #include <nx/utils/log/log.h>
 
 #include "notification.h"
@@ -28,9 +28,9 @@ EMailManager::EMailManager( const conf::Settings& settings ) throw(std::runtime_
     m_settings( settings ),
     m_terminated( false )
 {
-    nx::cc::CloudModuleEndPointFetcher endPointFetcher(
+    nx::network::cloud::CloudModuleEndPointFetcher endPointFetcher(
         "notification_module",
-        std::make_unique<nx::cc::RandomEndpointSelector>());
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>());
     std::promise<nx_http::StatusCode::Value> endpointPromise;
     auto endpointFuture = endpointPromise.get_future();
     endPointFetcher.get(
@@ -70,7 +70,7 @@ void EMailManager::sendAsync(
     {
         if (completionHandler)
         {
-            nx::SocketGlobals::aioService().post(
+            nx::network::SocketGlobals::aioService().post(
                 [asyncOperationLocker, completionHandler]() {
                 completionHandler(false);
             });

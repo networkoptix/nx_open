@@ -19,8 +19,13 @@
 #include "pollset.h"
 #include "../udt/udt_socket.h"
 
-// Forward
-namespace nx { class SocketGlobals; }
+namespace nx {
+namespace network {
+
+class SocketGlobals;
+
+} // namespace network
+} // namespace nx
 
 namespace aio
 {
@@ -45,7 +50,7 @@ namespace aio
         */
         AIOService( unsigned int threadCount = 0 );
         virtual ~AIOService();
-        friend class ::nx::SocketGlobals;
+        friend class ::nx::network::SocketGlobals;
 
     public:
         //!Returns true, if object has been successfully initialized

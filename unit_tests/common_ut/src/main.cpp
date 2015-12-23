@@ -21,7 +21,7 @@ int main( int argc, char **argv )
         cl_logDEBUG2);
 #endif
 	
-	nx::SocketGlobals::InitGuard sgGuard;
+	nx::network::SocketGlobals::InitGuard sgGuard;
     ::testing::InitGoogleTest( &argc, argv );
 
     for( int i = 0; i < argc; ++i )

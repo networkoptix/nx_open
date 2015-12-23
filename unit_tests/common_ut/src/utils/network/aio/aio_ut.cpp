@@ -36,7 +36,7 @@ private:
 TEST(aio, post)
 {
     int x = 0;
-    nx::SocketGlobals::aioService().post([&x]() { ++x; });
+    nx::network::SocketGlobals::aioService().post([&x]() { ++x; });
     std::this_thread::sleep_for(std::chrono::seconds(1));
     ASSERT_EQ(1, x);
 }
