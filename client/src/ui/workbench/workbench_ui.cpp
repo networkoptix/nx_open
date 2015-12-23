@@ -70,6 +70,7 @@
 #include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/widgets/main_window.h>
+#include <ui/widgets/cloud_status_panel.h>
 #include <ui/style/skin.h>
 #include <ui/style/noptix_style.h>
 #include <ui/workaround/qtbug_workaround.h>
@@ -1425,6 +1426,7 @@ void QnWorkbenchUi::createTitleWidget() {
     m_titleItem->setPos(0.0, 0.0);
     m_titleItem->setClickableButtons(Qt::LeftButton);
     m_titleItem->setProperty(Qn::NoHandScrollOver, true);
+    m_titleItem->setZValue(10.0);
 
     QnSingleEventSignalizer *titleMenuSignalizer = new QnSingleEventSignalizer(this);
     titleMenuSignalizer->setEventType(QEvent::GraphicsSceneContextMenu);
@@ -1472,6 +1474,10 @@ void QnWorkbenchUi::createTitleWidget() {
     m_windowButtonsWidget = new GraphicsWidget();
     m_windowButtonsWidget->setLayout(windowButtonsLayout);
 
+    QnCloudStatusPanel *cloudSattusPanel = new QnCloudStatusPanel(context());
+    QGraphicsProxyWidget *cloudStatusPanelProxy = new QnMaskedProxyWidget();
+    cloudStatusPanelProxy->setWidget(cloudSattusPanel);
+
     QGraphicsLinearLayout *titleLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     titleLayout->setContentsMargins(0, 0, 0, 0);
     titleLayout->setSpacing(2);
@@ -1479,6 +1485,8 @@ void QnWorkbenchUi::createTitleWidget() {
     titleLayout->addItem(tabBarWidget);
     titleLayout->setAlignment(tabBarWidget, Qt::AlignBottom);
     titleLayout->setStretchFactor(tabBarWidget, 0x1000);
+    titleLayout->addItem(cloudStatusPanelProxy);
+    titleLayout->setAlignment(cloudStatusPanelProxy, Qt::AlignVCenter);
     m_titleRightButtonsLayout = new QGraphicsLinearLayout();
     m_titleRightButtonsLayout->setContentsMargins(0, 4, 0, 0);
     if (QnScreenRecorder::isSupported())

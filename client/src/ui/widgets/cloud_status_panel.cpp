@@ -21,9 +21,9 @@ public:
     QMenu *cloudMenu;
 };
 
-QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
+QnCloudStatusPanel::QnCloudStatusPanel(QnWorkbenchContext *context, QWidget *parent)
     : base_type(parent)
-    , QnWorkbenchContextAware(parent)
+    , QnWorkbenchContextAware(context)
     , d_ptr(new QnCloudStatusPanelPrivate(this))
 {
     Q_D(QnCloudStatusPanel);
@@ -31,6 +31,14 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget *parent)
     connect(this, &QnCloudStatusPanel::clicked, d, &QnCloudStatusPanelPrivate::at_clicked);
 
     setFlat(true);
+
+    QPalette palette = this->palette();
+    palette.setColor(QPalette::Window, qApp->palette().color(QPalette::Window));
+    d->cloudMenu->setPalette(palette);
+    palette.setColor(QPalette::Window, Qt::transparent);
+    palette.setColor(QPalette::Button, Qt::transparent);
+    palette.setColor(QPalette::Highlight, Qt::transparent);
+    setPalette(palette);
 
     d->updateUi();
 }

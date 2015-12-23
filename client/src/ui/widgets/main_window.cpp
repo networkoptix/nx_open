@@ -351,7 +351,7 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
     tabBarLayout->addWidget(newActionButton(action(Qn::OpenCurrentUserLayoutMenu), true));
     tabBarLayout->addStretch(0x1000);
 
-    QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(this);
+    QnCloudStatusPanel *cloudPanel = new QnCloudStatusPanel(context, this);
 
     /* Layout for window buttons that can be removed from the title bar. */
     m_windowButtonsLayout = new QHBoxLayout();
