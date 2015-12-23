@@ -1,5 +1,7 @@
 #include "cloud_status_watcher.h"
 
+#include <QtCore/QUrl>
+
 #include <cdb/connection.h>
 #include <utils/common/delayed.h>
 
@@ -101,12 +103,13 @@ void QnCloudStatusWatcher::setCloudEndpoint(const QString &endpoint)
 {
     Q_D(QnCloudStatusWatcher);
 
-    const auto hostAndPort = endpoint.split(lit(":"));
-    if (hostAndPort.size() != 2)
+    QUrl url = QUrl::fromUserInput(endpoint);
+
+    if (!url.isValid())
         return;
 
-    d->cloudHost = hostAndPort[0].toStdString();
-    d->cloudPort = hostAndPort[1].toInt();
+    d->cloudHost = url.host().toStdString();
+    d->cloudPort = url.port();
 
     if (!d->cloudHost.empty() || d->cloudPort <= 0)
         return;
@@ -170,7 +173,7 @@ void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status
         break;
     case QnCloudStatusWatcher::Unauthorized:
     case QnCloudStatusWatcher::Offline:
-        if (QnCloudStatusWatcher::LoggedOut)
+        if (newStatus == QnCloudStatusWatcher::LoggedOut)
             setStatus(QnCloudStatusWatcher::LoggedOut);
         else
             setStatus(newStatus);
@@ -195,12 +198,12 @@ void QnCloudStatusWatcherPrivate::pingCloud()
                         checkAndSetStatus(QnCloudStatusWatcher::Online);
                         break;
                     case api::ResultCode::notAuthorized:
-                        emit q->error(QnCloudStatusWatcher::InvalidCredentials);
                         checkAndSetStatus(QnCloudStatusWatcher::Unauthorized);
+                        emit q->error(QnCloudStatusWatcher::InvalidCredentials);
                         break;
                     default:
-                        emit q->error(QnCloudStatusWatcher::UnknownError);
                         checkAndSetStatus(QnCloudStatusWatcher::Offline);
+                        emit q->error(QnCloudStatusWatcher::UnknownError);
                         break;
                     }
                 },
