@@ -102,6 +102,8 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     if (!layout)
         return;
 
+    const bool wasEmptyLayout = layout->items().isEmpty();
+
     /* Disable Sync on layout before adding cameras */
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
 
@@ -142,7 +144,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
         workbench()->setCurrentLayout(layout);
 
 
-    if (sortedCameras.empty())
+    if (!wasEmptyLayout || sortedCameras.empty())
         return;
 
     for(auto widget: display()->widgets(sortedCameras.first()))
