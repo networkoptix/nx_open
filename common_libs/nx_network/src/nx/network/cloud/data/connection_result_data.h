@@ -21,6 +21,7 @@ public:
     //TODO #ak add some statistics useful for later analysis
     bool connectionSucceeded;
 
+    ConnectionResultRequest();
     ConnectionResultRequest(bool _connectionSucceeded);
 
     void serialize(nx::stun::Message* const message);

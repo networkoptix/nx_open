@@ -10,6 +10,12 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+ConnectionResultRequest::ConnectionResultRequest()
+:
+    connectionSucceeded(false)
+{
+}
+
 ConnectionResultRequest::ConnectionResultRequest(bool _connectionSucceeded)
 :
     connectionSucceeded(_connectionSucceeded)

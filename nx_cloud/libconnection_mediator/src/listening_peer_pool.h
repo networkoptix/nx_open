@@ -9,7 +9,9 @@
 #include <functional>
 
 #include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/cloud/data/resolve_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <utils/serialization/lexical.h>
 
 #include "request_processor.h"
 
@@ -31,10 +33,14 @@ public:
 
     void bind(const ConnectionSharedPtr& connection, stun::Message message);
     void listen(const ConnectionSharedPtr& connection, stun::Message message);
-    void resolve(const ConnectionSharedPtr& connection, stun::Message message);
+    void resolve(
+        ConnectionSharedPtr connection,
+        api::ResolveRequest request,
+        std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
     void connect(const ConnectionSharedPtr& connection, stun::Message message);
 
     void connectionResult(
+        ConnectionSharedPtr connection,
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 

@@ -31,6 +31,7 @@ void NX_NETWORK_API serialize(const ResultCode&, QString*);
 
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription);
+int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 } // namespace api
 } // namespace hpm

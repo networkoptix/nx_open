@@ -47,7 +47,7 @@ void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
                 message.getAttribute< stun::cc::attrs::PublicEndpointList >();
         if( !endpointsAttr )
         {
-            errorResponse( connection, message.header, stun::error::badRequest,
+            sendErrorResponse( connection, message.header, stun::error::badRequest,
                            "Attribute PublicEndpointList is required" );
             return;
         }

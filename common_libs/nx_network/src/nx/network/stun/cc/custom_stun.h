@@ -37,7 +37,9 @@ namespace methods
          *  Response: \class PublicEndpointList (opt), \class TcpHpEndpointList (opt),
          *            \class UdtHpEndpointList (opt)
          */
-        connect
+        connect,
+
+        connectionResult,
     };
 
     nx::String toString(Value val);

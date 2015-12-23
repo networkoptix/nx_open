@@ -1,16 +1,17 @@
 #ifndef REQUEST_PROCESSOR_H
 #define REQUEST_PROCESSOR_H
 
-#include <nx/network/stun/server_connection.h>
-#include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/message_dispatcher.h>
 
 #include "cloud_data_provider.h"
+#include "stun_request_processing_helper.h"
+
 
 namespace nx {
 namespace hpm {
 
-/** Abstract request processor (halper base class)
+/** Abstract request processor (helper base class)
  *
  *  \todo: Attributes parsing for common functionality
  *  \todo: Add authorization
@@ -21,9 +22,6 @@ public:
     RequestProcessor( AbstractCloudDataProvider* cloudData );
     virtual ~RequestProcessor() = 0;
 
-    typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
-    typedef std::weak_ptr< stun::ServerConnection > ConnectionWeakPtr;
-
 protected:
     struct MediaserverData { String systemId, serverId; };
 
@@ -31,15 +29,6 @@ protected:
      *  sends \fn errorResponse in case of failure */
     boost::optional< MediaserverData > getMediaserverData(
             ConnectionSharedPtr connection, stun::Message& request );
-
-    /** Send success responce without attributes */
-    static void successResponse(
-            const ConnectionSharedPtr& connection, stun::Header& request );
-
-    /** Send error responce with error code and description as attribute */
-    static void errorResponse(
-            const ConnectionSharedPtr& connection, stun::Header& request,
-            int code, String reason );
 
 private:
     AbstractCloudDataProvider* m_cloudData;

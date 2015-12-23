@@ -1,12 +1,12 @@
 
 #include "listening_peer_pool.h"
 
+#include <functional>
 #include <iostream>
 
 #include <common/common_globals.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
-#include <nx/network/cloud/data/resolve_data.h>
 
 
 namespace nx {
@@ -22,21 +22,41 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
             stun::cc::methods::bind,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { bind( connection, std::move( message ) ); } ) &&
+
         dispatcher->registerRequestProcessor(
             stun::cc::methods::listen,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { listen( connection, std::move( message ) ); } ) &&
+
         dispatcher->registerRequestProcessor(
             stun::cc::methods::resolve,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
-                { resolve( connection, std::move( message ) ); } );
+            {
+                processRequestWithOutput(
+                    &ListeningPeerPool::resolve,
+                    this,
+                    connection,
+                    std::move(message));
+            });
+
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connect,
             [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
                 { connect( connection, std::move( message ) ); } );
 
+        dispatcher->registerRequestProcessor(
+            stun::cc::methods::connectionResult,
+            [this](const ConnectionSharedPtr& connection, stun::Message message)
+            {
+                processRequestWithNoOutput(
+                    &ListeningPeerPool::connectionResult,
+                    this,
+                    connection,
+                    std::move(message));
+            });
+
     // TODO: NX_LOG
-    Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register one of processors" );
+    Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
 void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
@@ -58,11 +78,11 @@ void ListeningPeerPool::bind( const ConnectionSharedPtr& connection,
                     .arg( QString::fromUtf8( mediaserver->serverId ) )
                     .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
 
-            successResponse( connection, message.header );
+            sendSuccessResponse(connection, message.header);
         }
         else
         {
-            errorResponse( connection, message.header, stun::error::badRequest,
+            sendErrorResponse( connection, message.header, stun::error::badRequest,
                 "This mediaserver is already bound from diferent connection" );
         }
     }
@@ -83,28 +103,21 @@ void ListeningPeerPool::listen( const ConnectionSharedPtr& connection,
 
             // TODO: configure StunEndpointList
             peer->isListening = true;
-            successResponse( connection, message.header );
+            sendSuccessResponse( connection, message.header );
         }
         else
         {
-            errorResponse( connection, message.header, stun::error::badRequest,
+            sendErrorResponse( connection, message.header, stun::error::badRequest,
                 "This mediaserver is already bound from diferent connection" );
         }
     }
 }
 
 void ListeningPeerPool::resolve(
-    const ConnectionSharedPtr& connection,
-    stun::Message request)
+    ConnectionSharedPtr connection,
+    api::ResolveRequest requestData,
+    std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
-    api::ResolveRequest requestData;
-    if (!requestData.parse(request))
-        return errorResponse(
-            connection,
-            request.header,
-            stun::error::badRequest,
-            requestData.errorText());
-
     QnMutexLocker lk(&m_mutex);
     const auto peer = m_peers.search(requestData.hostName);
     if (!peer)
@@ -114,17 +127,10 @@ void ListeningPeerPool::resolve(
             .arg(requestData.hostName).arg(connection->socket()->getForeignAddress().toString()),
             cl_logDEBUG2);
 
-        return errorResponse(
-            connection,
-            request.header,
-            stun::cc::error::notFound,
-            "Unknown host: " + requestData.hostName);
+        return completionHandler(
+            api::ResultCode::notFound,
+            api::ResolveResponse());
     }
-
-    stun::Message response(stun::Header(
-        stun::MessageClass::successResponse,
-        request.header.method,
-        std::move(request.header.transactionId)));
 
     api::ResolveResponse responseData;
 
@@ -133,8 +139,6 @@ void ListeningPeerPool::resolve(
     responseData.connectionMethods = 
         api::ConnectionMethod::udpHolePunching |
         api::ConnectionMethod::proxy;
-
-    responseData.serialize(&response);
 
     if (!peer->isListening)
     { /* TODO: StunEndpointList */
@@ -146,7 +150,7 @@ void ListeningPeerPool::resolve(
         cl_logDEBUG2);
 
     lk.unlock();
-    connection->sendMessage(std::move(response));
+    completionHandler(api::ResultCode::ok, std::move(responseData));
 }
 
 void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
@@ -154,19 +158,19 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
 {
     const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
     if( !userNameAttr )
-        return errorResponse( connection, message.header, stun::error::badRequest,
+        return sendErrorResponse( connection, message.header, stun::error::badRequest,
             "Attribute ClientId is required" );
 
     const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
     if( !hostNameAttr )
-        return errorResponse( connection, message.header, stun::error::badRequest,
+        return sendErrorResponse( connection, message.header, stun::error::badRequest,
             "Attribute HostName is required" );
 
     const auto userName = userNameAttr->getString();
     const auto hostName = hostNameAttr->getString();
 
     QnMutexLocker lk( &m_mutex );
-    if( const auto peer = m_peers.search( hostName ) )
+    if (const auto peer = m_peers.search(hostName))
     {
         stun::Message response( stun::Header(
             stun::MessageClass::successResponse, message.header.method,
@@ -191,16 +195,18 @@ void ListeningPeerPool::connect( const ConnectionSharedPtr& connection,
                 .arg( QString::fromUtf8( userName ) )
                 .arg( QString::fromUtf8( hostName ) ), cl_logDEBUG1 );
 
-        errorResponse( connection, message.header, stun::cc::error::notFound,
+        sendErrorResponse( connection, message.header, stun::cc::error::notFound,
             "Unknown host: " + hostName );
     }
 }
 
 void ListeningPeerPool::connectionResult(
+    ConnectionSharedPtr connection,
     api::ConnectionResultRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-
+    //TODO #ak
+    completionHandler(api::ResultCode::ok);
 }
 
 

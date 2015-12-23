@@ -33,6 +33,17 @@ ResultCode fromStunErrorToResultCode(
     }
 }
 
+int resultCodeToStunErrorCode(ResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case ResultCode::notFound:
+            return nx::stun::cc::error::notFound;
+        default:
+            return nx::stun::error::serverError;
+    }
+}
+
 } // namespace api
 } // namespace hpm
 } // namespace nx
