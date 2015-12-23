@@ -327,24 +327,28 @@ void AddressResolver::mediatorResolve( HaInfoIterator info, QnMutexLockerBase* l
         m_mediatorConnection = SocketGlobals::mediatorConnector().clientConnection();
 
     lk->unlock();
-    m_mediatorConnection->connect( info->first.toString().toUtf8(),
-                                   [this, info](std::list<SocketAddress> addresses)
-    {
-        std::vector< AddressEntry > entries;
-        std::vector< Guard > guards;
-
-        QnMutexLocker lk( &m_mutex );
-        for( const auto& it : addresses )
+    m_mediatorConnection->resolve(
+        api::ResolveRequest(info->first.toString().toUtf8()),
+        [this, info](api::ResultCode resultCode, api::ResolveResponse response)
         {
-            AddressEntry entry( AddressType::regular, it.address );
-            entry.attributes.push_back( AddressAttribute(
-                AddressAttributeType::nxApiPort, it.port ) );
-            entries.push_back( std::move( entry ) );
-        }
+            std::vector< AddressEntry > entries;
+            std::vector< Guard > guards;
 
-        info->second.setMediatorEntries( std::move(entries) );
-        guards = grabHandlers( SystemError::noError, info );
-    });
+            if (resultCode == api::ResultCode::ok)
+            {
+                QnMutexLocker lk( &m_mutex );
+                for (const auto& it : response.endpoints)
+                {
+                    AddressEntry entry( AddressType::regular, it.address );
+                    entry.attributes.push_back( AddressAttribute(
+                        AddressAttributeType::nxApiPort, it.port ) );
+                    entries.push_back( std::move( entry ) );
+                }
+                info->second.setMediatorEntries(std::move(entries));
+            }
+
+            guards = grabHandlers( SystemError::noError, info );
+        });
 }
 
 std::vector< Guard > AddressResolver::grabHandlers(

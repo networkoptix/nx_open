@@ -29,14 +29,7 @@ void ResolveRequest::serialize(nx::stun::Message* const message)
 
 bool ResolveRequest::parse(const nx::stun::Message& message)
 {
-    const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
-    if (!hostNameAttr)
-    {
-        setErrorText("Missing required attribute HostName");
-        return false;
-    }
-    hostName = hostNameAttr->getString();
-    return true;
+    return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName);
 }
 
 
@@ -55,21 +48,15 @@ void ResolveResponse::serialize(nx::stun::Message* const message)
 
 bool ResolveResponse::parse(const nx::stun::Message& message)
 {
-    const auto endpointsAttr = message.getAttribute< stun::cc::attrs::PublicEndpointList >();
-    if (!endpointsAttr)
+    if (!readAttributeValue<stun::cc::attrs::PublicEndpointList>(message, &endpoints))
+        return false;
+    nx::String connectionMethodsStr;
+    if (!readStringAttributeValue<stun::cc::attrs::ConnectionMethods>(
+            message, &connectionMethodsStr))
     {
-        setErrorText("Missing required attribute PublicEndpointList");
         return false;
     }
-    endpoints = endpointsAttr->get();
-
-    const auto connectionMethodsAttr = message.getAttribute< stun::cc::attrs::ConnectionMethods >();
-    if (!connectionMethodsAttr)
-    {
-        setErrorText("Missing required attribute ConnectionMethods");
-        return false;
-    }
-    connectionMethods = connectionMethodsAttr->getString().toLongLong();
+    connectionMethods = connectionMethodsStr.toLongLong();
 
     return true;
 }

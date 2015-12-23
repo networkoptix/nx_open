@@ -74,7 +74,7 @@ namespace error
 //TODO custom stun requests parameters
 namespace attrs
 {
-    enum Value
+    enum AttributeType
     {
         systemId = stun::attrs::userDefined,
         serverId,
@@ -88,6 +88,8 @@ namespace attrs
         connectionMethods,
     };
 
+    NX_NETWORK_API const char* toString(AttributeType val);
+
 
     /** Base class for string attributes */
     struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
@@ -97,37 +99,37 @@ namespace attrs
 
     struct NX_NETWORK_API SystemId : StringAttribute
     {
-        static const int TYPE = systemId;
+        static const AttributeType TYPE = systemId;
         SystemId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API ServerId : StringAttribute
     {
-        static const int TYPE = serverId;
+        static const AttributeType TYPE = serverId;
         ServerId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API PeerId : StringAttribute
     {
-        static const int TYPE = peerId;
+        static const AttributeType TYPE = peerId;
         PeerId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API ConnectionId : StringAttribute
     {
-        static const int TYPE = connectionId;
+        static const AttributeType TYPE = connectionId;
         ConnectionId( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API HostName : StringAttribute
     {
-        static const int TYPE = hostName;
+        static const AttributeType TYPE = hostName;
         HostName( const String& value ) : StringAttribute( TYPE, value ) {}
     };
 
     struct NX_NETWORK_API ConnectionMethods: StringAttribute
     {
-        static const int TYPE = connectionMethods;
+        static const AttributeType TYPE = connectionMethods;
         ConnectionMethods(const String& value): StringAttribute(TYPE, value) {}
     };
     
@@ -142,21 +144,21 @@ namespace attrs
 
     struct NX_NETWORK_API PublicEndpointList : EndpointList
     {
-        static const int TYPE = publicEndpointList;
+        static const AttributeType TYPE = publicEndpointList;
         PublicEndpointList( const std::list< SocketAddress >& endpoints )
             : EndpointList( TYPE, endpoints ) {}
     };
 
     struct NX_NETWORK_API TcpHpEndpointList : EndpointList
     {
-        static const int TYPE = tcpHpEndpointList;
+        static const AttributeType TYPE = tcpHpEndpointList;
         TcpHpEndpointList( const std::list< SocketAddress >& endpoints )
             : EndpointList( TYPE, endpoints ) {}
     };
 
     struct NX_NETWORK_API UdtHpEndpointList : EndpointList
     {
-        static const int TYPE = udtHpEndpointList;
+        static const AttributeType TYPE = udtHpEndpointList;
         UdtHpEndpointList( const std::list< SocketAddress >& endpoints )
             : EndpointList( TYPE, endpoints ) {}
     };

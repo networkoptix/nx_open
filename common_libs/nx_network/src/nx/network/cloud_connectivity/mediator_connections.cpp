@@ -22,38 +22,23 @@ MediatorClientConnection::MediatorClientConnection(
 }
 
 void MediatorClientConnection::connect(
-        String host, std::function<void(std::list<SocketAddress>)> handler)
+    api::ConnectRequest connectData,
+    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
-    stun::Message request(stun::Header(stun::MessageClass::request,
-                                       stun::cc::methods::connect));
-
-    request.newAttribute<stun::cc::attrs::PeerId>("SomeClientId"); // TODO
-    request.newAttribute<stun::cc::attrs::HostName>(host);
-    sendRequest(std::move(request),
-                [=](SystemError::ErrorCode code, stun::Message message)
-    {
-        if(const auto error = stun::AsyncClient::hasError(code, message))
-        {
-            NX_LOGX(*error, cl_logDEBUG1);
-            return handler(std::list<SocketAddress>());
-        }
-
-        std::list< SocketAddress > endpoints;
-        if(auto eps = message.getAttribute<PublicEndpointList>())
-            endpoints = eps->get();
-
-        handler(std::move(endpoints));
-    });
+    doRequest(
+        stun::cc::methods::connect,
+        std::move(connectData),
+        std::move(completionHandler));
 }
 
 void MediatorClientConnection::resolve(
     api::ResolveRequest resolveData,
-    std::function<void(api::ResultCode, api::ResolveResponse)> handler)
+    std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
     doRequest(
         stun::cc::methods::resolve,
         std::move(resolveData),
-        std::move(handler));
+        std::move(completionHandler));
 }
 
 template<typename RequestData, typename ResponseData>

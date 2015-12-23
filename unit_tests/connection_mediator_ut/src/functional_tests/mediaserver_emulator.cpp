@@ -7,6 +7,7 @@
 
 #include <nx/network/cloud_connectivity/data/result_code.h>
 #include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 
 
@@ -23,7 +24,7 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverID(generateSalt(16))
+    m_serverID(generateRandomName(16))
 {
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
@@ -65,6 +66,11 @@ bool MediaServerEmulator::start()
             std::placeholders::_1));
 
     return resultCode == nx::cc::api::ResultCode::ok;
+}
+
+nx::String MediaServerEmulator::serverID() const
+{
+    return m_serverID;
 }
 
 }   //hpm

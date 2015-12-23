@@ -1,60 +1,45 @@
 /**********************************************************
-* Dec 22, 2015
+* Dec 23, 2015
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_MEDIATOR_API_RESOLVE_DATA_H
-#define NX_MEDIATOR_API_RESOLVE_DATA_H
+#ifndef NX_MEDIATOR_API_CONNECT_DATA_H
+#define NX_MEDIATOR_API_CONNECT_DATA_H
 
-#include <cstdint>
 #include <list>
 
 #include <nx/network/socket_common.h>
-#include <nx/network/stun/message.h>
 
-#include "stun_message_data.h"
+#include "resolve_data.h"
 
 
 namespace nx {
 namespace cc {
 namespace api {
 
-namespace ConnectionMethod
-{
-    enum Value
-    {
-        udpHolePunching = 1,
-        tcpHolePunching = 2,
-        proxy = 4,
-        reverseConnect = 8,
-    };
-}
-
-typedef std::size_t ConnectionMethods;
-
-class NX_NETWORK_API ResolveRequest
+class NX_NETWORK_API ConnectRequest
 :
     public StunMessageData
 {
 public:
     nx::String hostName;
+    nx::String peerID;
+    nx::String connectionID;
 
-    ResolveRequest();
-    ResolveRequest(nx::String _hostName);
+    ConnectRequest();
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
 };
- 
-class NX_NETWORK_API ResolveResponse
+
+class NX_NETWORK_API ConnectResponse
 :
     public StunMessageData
 {
 public:
     std::list<SocketAddress> endpoints;
-    ConnectionMethods connectionMethods;
 
-    ResolveResponse();
+    ConnectResponse();
 
     /*!
         \note after this method call object contents are undefined
@@ -67,4 +52,4 @@ public:
 }   //cc
 }   //nx
 
-#endif  //NX_MEDIATOR_API_RESOLVE_DATA_H
+#endif   //NX_MEDIATOR_API_CONNECT_DATA_H

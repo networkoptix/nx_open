@@ -27,6 +27,7 @@ public:
 
     //!Attaches to a local port and registers on mediator
     bool start();
+    nx::String serverID() const;
 
 private:
     MediatorConnector m_mediatorConnector;

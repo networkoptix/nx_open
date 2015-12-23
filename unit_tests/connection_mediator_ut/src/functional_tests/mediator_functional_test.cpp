@@ -18,6 +18,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/socket.h>
 #include <utils/common/cpp14.h>
+#include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 #include <utils/crypt/linux_passwd_crypt.h>
 
@@ -153,8 +154,8 @@ void MediatorFunctionalTest::registerCloudDataProvider(
 AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
 {
     AbstractCloudDataProvider::System system(
-        generateSalt(16),
-        generateSalt(16),
+        generateRandomName(16),
+        generateRandomName(16),
         true);
     m_cloudDataProvider.addSystem(
         system.id,

@@ -4,6 +4,7 @@
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/cc/custom_stun.h>
 
+#include "data/connect_data.h"
 #include "data/resolve_data.h"
 #include "data/result_code.h"
 
@@ -22,10 +23,12 @@ class NX_NETWORK_API MediatorClientConnection
     friend class MediatorConnector;
 
 public:
-    void connect(String host, std::function<void(std::list<SocketAddress>)> handler);
+    void connect(
+        api::ConnectRequest connectData,
+        std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void resolve(
         api::ResolveRequest resolveData,
-        std::function<void(api::ResultCode, api::ResolveResponse)> handler);
+        std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
 
 private:
     template<typename RequestData, typename ResponseData>
