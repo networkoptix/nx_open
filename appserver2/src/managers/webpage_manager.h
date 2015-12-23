@@ -1,43 +1,26 @@
 #pragma once
 
-#include <core/resource/webpage_resource.h>
+#include <core/resource/resource_fwd.h>
 
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
-#include "nx_ec/data/api_webpage_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
+#include <nx_ec/ec_api.h>
+
+#include <transaction/transaction.h>
 
 namespace ec2
 {
-    class QnWebPageNotificationManager
-        :
-        public AbstractWebPageManager
+    class QnWebPageNotificationManager: public AbstractWebPageManager
     {
     public:
-        QnWebPageNotificationManager( const ResourceContext& resCtx ) : m_resCtx( resCtx ) {}
+        QnWebPageNotificationManager( const ResourceContext& resCtx );
 
-        void triggerNotification( const QnTransaction<ApiWebPageData>& tran )
-        {
-            assert( tran.command == ApiCommand::saveWebPage);
-            QnWebPageResourcePtr webPage(new QnWebPageResource());
-            fromApiToResource(tran.params, webPage);
-            emit addedOrUpdated( webPage );
-        }
-
-        void triggerNotification( const QnTransaction<ApiIdData>& tran )
-        {
-            assert( tran.command == ApiCommand::removeWebPage );
-            emit removed( QnUuid(tran.params.id) );
-        }
-
+        void triggerNotification( const QnTransaction<ApiWebPageData>& tran );
+        void triggerNotification( const QnTransaction<ApiIdData>& tran );
     protected:
         ResourceContext m_resCtx;
     };
 
     template<class QueryProcessorType>
-    class QnWebPageManager
-        :
-        public QnWebPageNotificationManager
+    class QnWebPageManager: public QnWebPageNotificationManager
     {
     public:
         QnWebPageManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx );

@@ -2347,12 +2347,14 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiVideowa
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageData>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageData>& tran)
+{
     ErrorCode result = saveWebPage(tran.params);
     return result;
 }
 
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageDataList>& tran) {
+ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiWebPageDataList>& tran)
+{
     for(const ApiWebPageData& webPage: tran.params)
     {
         ErrorCode err = saveWebPage(webPage);
@@ -3604,7 +3606,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiVideowallDat
 }
 
 //getWebPageList
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList) {
+ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList)
+{
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
     query.prepare(QString("\
@@ -3612,7 +3615,8 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiWebPageDataL
                           FROM vms_webpage l \
                           JOIN vms_resource r on r.id = l.resource_ptr_id ORDER BY r.guid\
                           "));
-    if (!query.exec()) {
+    if (!query.exec())
+    {
         qWarning() << Q_FUNC_INFO << query.lastError().text();
         return ErrorCode::dbError;
     }
@@ -4205,7 +4209,8 @@ ErrorCode QnDbManager::removeLayoutFromVideowallItems(const QnUuid &layout_id) {
     return ErrorCode::dbError;
 }
 
-ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params) {
+ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
+{
     qint32 internalId;
 
     ErrorCode result = insertOrReplaceResource(params, &internalId);
@@ -4217,7 +4222,8 @@ ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params) {
 }
 
 
-ErrorCode QnDbManager::removeWebPage(const QnUuid& guid) {
+ErrorCode QnDbManager::removeWebPage(const QnUuid& guid)
+{
     qint32 id = getResourceInternalId(guid);
 
     ErrorCode err = deleteTableRecord(id, "vms_webpage", "resource_ptr_id");
@@ -4231,7 +4237,8 @@ ErrorCode QnDbManager::removeWebPage(const QnUuid& guid) {
     return ErrorCode::ok;
 }
 
-ErrorCode QnDbManager::insertOrReplaceWebPage(const ApiWebPageData& data, qint32 internalId) {
+ErrorCode QnDbManager::insertOrReplaceWebPage(const ApiWebPageData& data, qint32 internalId)
+{
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("INSERT OR REPLACE INTO vms_webpage (resource_ptr_id) VALUES (:internalId)");
     QnSql::bind(data, &insQuery);

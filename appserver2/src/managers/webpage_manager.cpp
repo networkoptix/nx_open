@@ -5,20 +5,44 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "fixed_url_client_query_processor.h"
-#include "database/db_manager.h"
-#include "transaction/transaction_log.h"
 #include "server_query_processor.h"
+
+#include <core/resource/webpage_resource.h>
+
+#include <database/db_manager.h>
+
+#include <nx_ec/data/api_conversion_functions.h>
+
+#include <transaction/transaction_log.h>
 
 
 namespace ec2
 {
-    template<class QueryProcessorType>
-    QnWebPageManager<QueryProcessorType>::QnWebPageManager( QueryProcessorType* const queryProcessor, const ResourceContext& resCtx )
-        :
-        QnWebPageNotificationManager( resCtx ),
-        m_queryProcessor( queryProcessor )
+    QnWebPageNotificationManager::QnWebPageNotificationManager(const ResourceContext &resCtx)
+        : m_resCtx(resCtx)
+    {}
+
+    void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiWebPageData> &tran)
     {
+        assert(tran.command == ApiCommand::saveWebPage);
+        QnWebPageResourcePtr webPage(new QnWebPageResource());
+        fromApiToResource(tran.params, webPage);
+        emit addedOrUpdated( webPage );
     }
+
+    void QnWebPageNotificationManager::triggerNotification(const QnTransaction<ApiIdData> &tran)
+    {
+        assert(tran.command == ApiCommand::removeWebPage );
+        emit removed( QnUuid(tran.params.id) );
+    }
+
+
+
+    template<class QueryProcessorType>
+    QnWebPageManager<QueryProcessorType>::QnWebPageManager(QueryProcessorType* const queryProcessor, const ResourceContext &resCtx)
+        : QnWebPageNotificationManager(resCtx)
+        , m_queryProcessor(queryProcessor)
+    {}
 
 
     template<class T>
@@ -78,6 +102,9 @@ namespace ec2
 
     template class QnWebPageManager<ServerQueryProcessor>;
     template class QnWebPageManager<FixedUrlClientQueryProcessor>;
+
+
+
 
 }
 
