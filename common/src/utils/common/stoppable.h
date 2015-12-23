@@ -8,6 +8,7 @@
 
 #include <functional>
 #include <future>
+#include <vector>
 
 #include <nx/utils/thread/barrier_handler.h>
 

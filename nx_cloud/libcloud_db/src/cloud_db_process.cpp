@@ -186,6 +186,7 @@ int CloudDBProcess::executeApplication()
             return 0;
     
         NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
+        std::cout << QN_APPLICATION_NAME <<" has been started" << std::endl;
 
         //TODO #ak remove qt event loop
         //application's main loop

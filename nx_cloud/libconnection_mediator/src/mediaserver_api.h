@@ -14,7 +14,7 @@ class MediaserverApiBase
         : protected RequestProcessor
 {
 public:
-    MediaserverApiBase( CloudDataProviderBase* cloudData,
+    MediaserverApiBase( AbstractCloudDataProvider* cloudData,
                       stun::MessageDispatcher* dispatcher );
 
     void ping( const ConnectionSharedPtr& connection, stun::Message message );
@@ -29,7 +29,7 @@ class MediaserverApi
         : public MediaserverApiBase
 {
 public:
-    MediaserverApi( CloudDataProviderBase* cloudData,
+    MediaserverApi( AbstractCloudDataProvider* cloudData,
                     stun::MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,

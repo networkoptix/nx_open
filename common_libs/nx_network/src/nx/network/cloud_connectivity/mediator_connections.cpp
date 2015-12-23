@@ -1,13 +1,19 @@
+
 #include "mediator_connections.h"
 
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
 #include <nx/network/cloud_connectivity/mediator_connector.h>
 
+
 namespace nx {
 namespace cc {
 
 typedef stun::cc::attrs::PublicEndpointList PublicEndpointList;
+
+////////////////////////////////////////////////////////////
+//// MediatorClientConnection
+////////////////////////////////////////////////////////////
 
 MediatorClientConnection::MediatorClientConnection(
         std::shared_ptr<stun::AsyncClient> client)
@@ -39,6 +45,70 @@ void MediatorClientConnection::connect(
         handler(std::move(endpoints));
     });
 }
+
+void MediatorClientConnection::resolve(
+    api::ResolveRequest resolveData,
+    std::function<void(api::ResultCode, api::ResolveResponse)> handler)
+{
+    doRequest(
+        stun::cc::methods::resolve,
+        std::move(resolveData),
+        std::move(handler));
+}
+
+template<typename RequestData, typename ResponseData>
+void MediatorClientConnection::doRequest(
+    nx::stun::cc::methods::Value method,
+    RequestData requestData,
+    std::function<void(api::ResultCode, ResponseData)> completionHandler)
+{
+    stun::Message request(stun::Header(
+        stun::MessageClass::request,
+        method));
+    requestData.serialize(&request);
+
+    sendRequest(
+        std::move(request),
+        [this, method, /*std::move*/ completionHandler](
+            SystemError::ErrorCode code,
+            stun::Message message)
+        {
+            if (code != SystemError::noError)
+            {
+                NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
+                    arg(stun::cc::methods::toString(method)).arg(SystemError::toString(code)),
+                    cl_logDEBUG1);
+                return completionHandler(api::ResultCode::networkError, ResponseData());
+            }
+
+            ResponseData responseData;
+            if (const auto error = stun::AsyncClient::hasError(code, message))
+            {
+                api::ResultCode resultCode = api::ResultCode::otherLogicError;
+                if (const auto err = message.getAttribute< nx::stun::attrs::ErrorDescription >())
+                    resultCode = api::fromStunErrorToResultCode(*err);
+
+                NX_LOGX(*error, cl_logDEBUG1);
+                //TODO #ak get detailed error from response
+                return completionHandler(resultCode, ResponseData());
+            }
+
+            if (!responseData.parse(message))
+            {
+                NX_LOGX(lm("Failed to parse %1 response: %2").
+                    arg(stun::cc::methods::toString(method)).
+                    arg(responseData.errorText()), cl_logDEBUG1);
+                return completionHandler(api::ResultCode::responseParseError, ResponseData());
+            }
+
+            completionHandler(api::ResultCode::ok, std::move(responseData));
+        });
+}
+
+
+////////////////////////////////////////////////////////////
+//// MediatorSystemConnection
+////////////////////////////////////////////////////////////
 
 MediatorSystemConnection::MediatorSystemConnection(
         std::shared_ptr<stun::AsyncClient> client,
@@ -76,7 +146,7 @@ void MediatorSystemConnection::ping(
 
 void MediatorSystemConnection::bind(
         std::list<SocketAddress> addresses,
-        std::function<void(bool)> handler)
+        std::function<void(api::ResultCode, bool)> handler)
 {
     stun::Message request(stun::Header(stun::MessageClass::request,
                                        stun::cc::methods::bind));
@@ -88,10 +158,10 @@ void MediatorSystemConnection::bind(
         if(const auto error = stun::AsyncClient::hasError(code, message))
         {
             NX_LOGX(*error, cl_logDEBUG1);
-            return handler(false);
+            return handler(api::ResultCode::otherLogicError, false);
         }
 
-        handler(true);
+        handler(api::ResultCode::ok, true);
     });
 }
 

@@ -94,22 +94,24 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
 
     auto addresses = m_pingedAddresses;
     lk->unlock();
-    m_mediatorConnection->bind( std::move(addresses), [this](bool success)
-    {
-        QnMutexLocker lk( &m_mutex );
-        if( !success )
+    m_mediatorConnection->bind(
+        std::move(addresses),
+        [this](api::ResultCode /*resultCode*/, bool success)
         {
-            m_pingedAddresses.clear();
-            m_publishedAddresses.clear();
-            return setupUpdateTimer( &lk );
-        }
+            QnMutexLocker lk( &m_mutex );
+            if( !success )
+            {
+                m_pingedAddresses.clear();
+                m_publishedAddresses.clear();
+                return setupUpdateTimer( &lk );
+            }
 
-        m_publishedAddresses = m_pingedAddresses;
-        NX_LOGX( lm( "Published addresses: %1" )
-                 .container( m_publishedAddresses ), cl_logDEBUG1 );
+            m_publishedAddresses = m_pingedAddresses;
+            NX_LOGX( lm( "Published addresses: %1" )
+                     .container( m_publishedAddresses ), cl_logDEBUG1 );
 
-        setupUpdateTimer( &lk );
-    } );
+            setupUpdateTimer( &lk );
+        });
 }
 
 void MediatorAddressPublisher::pleaseStop(std::function<void()> handler)

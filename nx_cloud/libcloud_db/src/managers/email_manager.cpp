@@ -122,18 +122,18 @@ void EMailManager::onSendNotificationRequestDone(
 }
 
 
-static std::function<AbstractEmailManager*(
+static std::function<std::unique_ptr<AbstractEmailManager>(
     const conf::Settings& settings)> kEMailManagerFactoryFunc;
 
-AbstractEmailManager* EMailManagerFactory::create(const conf::Settings& settings)
+std::unique_ptr<AbstractEmailManager> EMailManagerFactory::create(const conf::Settings& settings)
 {
     return kEMailManagerFactoryFunc
         ? kEMailManagerFactoryFunc(settings)
-        : new EMailManager(settings);
+        : std::make_unique<EMailManager>(settings);
 }
 
 void EMailManagerFactory::setFactory(
-    std::function<AbstractEmailManager*(
+    std::function<std::unique_ptr<AbstractEmailManager>(
         const conf::Settings& settings)> factoryFunc)
 {
     kEMailManagerFactoryFunc = std::move(factoryFunc);

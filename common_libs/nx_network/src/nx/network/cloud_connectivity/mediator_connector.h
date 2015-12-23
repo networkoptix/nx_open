@@ -18,7 +18,6 @@ namespace cc {
 class NX_NETWORK_API MediatorConnector
     : public QnStoppableAsync
 {
-    MediatorConnector();
     friend class ::nx::SocketGlobals;
 
 public:
@@ -35,9 +34,15 @@ public:
     void mockupAddress( SocketAddress address );
 
     /** Authorization credentials for \class MediatorSystemConnection */
-    struct SystemCredentials
+    struct NX_NETWORK_API SystemCredentials
     {
         String systemId, serverId, key;
+        
+        SystemCredentials();
+        SystemCredentials(
+            nx::String _systemId,
+            nx::String _serverId,
+            nx::String _key);
         bool operator ==( const SystemCredentials& rhs ) const;
     };
 
@@ -45,6 +50,9 @@ public:
     boost::optional<SystemCredentials> getSystemCredentials();
 
     void pleaseStop( std::function<void()> handler ) override;
+
+protected:
+    MediatorConnector();
 
 private:
     void fetchEndpoint();

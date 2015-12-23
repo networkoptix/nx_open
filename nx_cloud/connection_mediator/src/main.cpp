@@ -3,7 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#include <mediator_service.h>
+#include <mediator_process_public.h>
 #include <nx/network/socket_global.h>
 
 #ifdef _WIN32
@@ -13,7 +13,7 @@
     #include <signal.h>
 #endif
 
-static nx::hpm::MediatorProcess* serviceInstance = NULL;
+static nx::hpm::MediatorProcessPublic* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -41,7 +41,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    nx::hpm::MediatorProcess service(argc, argv);
+    nx::hpm::MediatorProcessPublic service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

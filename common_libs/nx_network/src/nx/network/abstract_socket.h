@@ -6,6 +6,7 @@
 #ifndef ABSTRACT_SOCKET_H
 #define ABSTRACT_SOCKET_H
 
+#include <chrono>
 #include <cstdint> /* For std::uintptr_t. */
 #include <functional>
 #include <memory>
@@ -187,6 +188,13 @@ public:
     {
         //TODO #ak this method MUST replace the previous one
         return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
+    }
+    bool connect(
+        const SocketAddress& remoteSocketAddress,
+        std::chrono::milliseconds timeoutMillis)
+    {
+        //TODO #ak this method MUST replace the previous one
+        return connect(remoteSocketAddress, timeoutMillis.count());
     }
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!

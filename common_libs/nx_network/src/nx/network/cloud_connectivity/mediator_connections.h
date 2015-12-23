@@ -2,6 +2,11 @@
 #define NX_CC_MEDIATOR_CONNECTIONS_H
 
 #include <nx/network/stun/async_client_user.h>
+#include <nx/network/stun/cc/custom_stun.h>
+
+#include "data/resolve_data.h"
+#include "data/result_code.h"
+
 
 namespace nx {
 namespace cc {
@@ -18,6 +23,16 @@ class NX_NETWORK_API MediatorClientConnection
 
 public:
     void connect(String host, std::function<void(std::list<SocketAddress>)> handler);
+    void resolve(
+        api::ResolveRequest resolveData,
+        std::function<void(api::ResultCode, api::ResolveResponse)> handler);
+
+private:
+    template<typename RequestData, typename ResponseData>
+    void doRequest(
+        nx::stun::cc::methods::Value method,
+        RequestData requestData,
+        std::function<void(api::ResultCode, ResponseData)> completionHandler);
 };
 
 /** Provides system related STUN functionality */
@@ -33,7 +48,7 @@ public:
               std::function<void(bool, std::list<SocketAddress>)> handler);
 
     void bind(std::list<SocketAddress> addresses,
-              std::function<void(bool)> handler);
+              std::function<void(api::ResultCode, bool)> handler);
 
     // TODO: propper implementation
     typedef int ConnectionRequest;

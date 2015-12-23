@@ -4,6 +4,28 @@
 namespace nx {
 namespace stun {
 namespace cc {
+
+namespace methods {
+    nx::String toString(Value val)
+    {
+        switch (val)
+        {
+            case ping:
+                return "ping";
+            case bind:
+                return "bind";
+            case listen:
+                return "listen";
+            case resolve:
+                return "resolve";
+            case connect:
+                return "connect";
+            default:
+                return "unknown";
+        };
+    }
+}
+
 namespace attrs {
 
 StringAttribute::StringAttribute( int userType, const String& value )

@@ -44,7 +44,7 @@ QnSystemAdministrationDialog::QnSystemAdministrationDialog(QWidget *parent)
     addPage(UserManagement,         new QnUserManagementWidget(this),       tr("Users"));
     addPage(RoutingManagement,      routingWidget,                          tr("Routing Management"));
     addPage(TimeServerSelection,    new QnTimeServerSelectionWidget(this),  tr("Time Synchronization"));
-    addPage(CloudManagement,        new QnCloudManagementWidget(this),      tr("Cloud Management"));
+    addPage(CloudManagement,        new QnCloudManagementWidget(this),      tr("Cloud"));
 
     loadDataToUi();
 

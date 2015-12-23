@@ -21,6 +21,10 @@
 namespace nx {
 namespace hpm {
 
+namespace conf {
+    class Settings;
+}
+
 class MediatorProcess
 :
     public QtService<QtSingleCoreApplication>,
@@ -45,6 +49,7 @@ private:
 
     QString getDataDirectory();
     int printHelp();
+    void initializeLogging(const conf::Settings& settings);
 };
 
 } // namespace hpm
