@@ -1,6 +1,8 @@
 #ifndef DIRECT_MODULE_FINDER_H
 #define DIRECT_MODULE_FINDER_H
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QQueue>
 #include <QtCore/QElapsedTimer>
@@ -13,7 +15,7 @@ struct QnModuleInformation;
 class QnDirectModuleFinder : public QObject {
     Q_OBJECT
 public:
-    explicit QnDirectModuleFinder(QObject *parent = 0);
+    explicit QnDirectModuleFinder(QObject *parent);
 
     void setCompatibilityMode(bool compatibilityMode);
     bool isCompatibilityMode() const;
@@ -46,7 +48,7 @@ private:
     bool m_compatibilityMode;
 
     QSet<QUrl> m_urls;
-    int m_maxConnections;
+    const int m_maxConnections;
     QQueue<QUrl> m_requestQueue;
     QMap<QUrl, QnAsyncHttpClientReply*> m_activeRequests;
     QHash<QUrl, qint64> m_lastPingByUrl;
@@ -54,6 +56,10 @@ private:
 
     QTimer *m_checkTimer;
     QElapsedTimer m_elapsedTimer;
+
+    std::chrono::milliseconds maxPingTimeout() const;
+    std::chrono::milliseconds aliveCheckInterval() const;
+    std::chrono::milliseconds discoveryCheckInterval() const;
 };
 
 #endif // DIRECT_MODULE_FINDER_H
