@@ -176,10 +176,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //t.start();
 
     DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+    qint64 timeMs = time/1000;
+    static const int kSeekStep = 75 * 1000; // 75 seconds
 
     while (true) {
         m_skipFramesToTime = 0;
-        qint64 timeMs = time/1000;
         m_newQualityTmpData.reset();
         m_newQualityAviDelegate.clear();
 
@@ -236,11 +237,17 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     m_eof = true;
                     return time;
                 } else {
-                    ignoreChunks.emplace(
-                        newChunk, 
-                        newChunkCatalog->cameraUniqueId(),
-                        newChunkCatalog->getRole()
-                    );
+                    ignoreChunks.emplace(newChunk, newChunkCatalog->cameraUniqueId(), 
+                                         newChunkCatalog->getRole());
+
+                    // In reverse mode seek point tries to step backwards
+                    // every time we find file that can not be opened.
+                    // In forward mode - same, but opposite direction
+                    if (m_reverseMode) {
+                        timeMs = std::min(timeMs, newChunk.endTimeMs() + kSeekStep);
+                    } else {
+                        timeMs = std::max(timeMs, newChunk.startTimeMs - kSeekStep);
+                    }
                     continue;
                 }
             }
