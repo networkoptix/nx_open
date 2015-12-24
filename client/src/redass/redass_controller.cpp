@@ -1,6 +1,6 @@
 #include "redass_controller.h"
 #include "camera/cam_display.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "core/resource/camera_resource.h"
 
 static const int QUALITY_SWITCH_INTERVAL = 1000 * 5; // delay between quality switching attempts

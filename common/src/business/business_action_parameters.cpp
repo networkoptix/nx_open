@@ -2,6 +2,11 @@
 
 #include <utils/common/model_functions.h>
 
+namespace
+{
+    enum { kDefaultFixedDurationMs = 5000 };
+}
+
 QnBusinessActionParameters::QnBusinessActionParameters()
     : actionResourceId()
     , soundUrl()
@@ -17,7 +22,7 @@ QnBusinessActionParameters::QnBusinessActionParameters()
     , sayText()
     , tags()
     , text()
-    , durationMs(0)
+    , durationMs(kDefaultFixedDurationMs)
     , additionalResources()
     , forced(true)
     , presetId()

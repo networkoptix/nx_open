@@ -8,8 +8,9 @@
 #include <memory>
 #include <vector>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
-
+#endif
 
 namespace nx_hls
 {

@@ -7,7 +7,7 @@
 
 #include <chrono>
 
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 #include <utils/media/media_stream_cache.h>
 #include <streaming/hls/hls_live_playlist_manager.h>
 

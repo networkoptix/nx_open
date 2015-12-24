@@ -7,8 +7,10 @@
 #include <set>
 #include <iterator> /* For std::iterator_traits. */
 
+#ifndef Q_MOC_RUN
 #include <boost/range/mutable_iterator.hpp>
 #include <boost/preprocessor/tuple/enum.hpp>
+#endif
 
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>

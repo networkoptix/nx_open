@@ -85,6 +85,7 @@ namespace ec2 {
     struct ApiTransactionData;
     struct ApiSystemStatistics;
     struct ApiStatisticsServerInfo;
+    struct ApiWebPageData;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -132,6 +133,7 @@ namespace ec2 {
     typedef std::vector<ApiServerFootageData> ApiServerFootageDataList;
     typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
     typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
+    typedef std::vector<ApiWebPageData> ApiWebPageDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -211,6 +213,7 @@ namespace ec2 {
     (ApiLicenseOverflowData)\
     (ApiSystemStatistics)\
     (ApiStatisticsServerInfo)\
+    (ApiWebPageData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -218,7 +221,7 @@ namespace ec2 {
         (ubjson)(xml)(json)(sql_record)(csv_record)
     );
 #endif
-    
+
 } // namespace ec2
 
 #endif // QN_EC2_API_FWD_H

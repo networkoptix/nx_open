@@ -3,9 +3,9 @@
 
 #ifdef ENABLE_ARCHIVE
 
-#include <plugins/resource/archive/abstract_archive_resource.h>
+#include <nx/streaming/abstract_archive_resource.h>
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;

@@ -1,10 +1,10 @@
 #include "resource_display.h"
 #include <cassert>
-#include <core/dataprovider/media_streamdataprovider.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/abstract_renderer.h>
@@ -29,7 +29,7 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
     m_dataProvider = resource->createDataProvider(Qn::CR_Default);
 
     if(m_dataProvider != NULL) {
-        m_archiveReader = dynamic_cast<QnAbstractArchiveReader *>(m_dataProvider);
+        m_archiveReader = dynamic_cast<QnAbstractArchiveStreamReader *>(m_dataProvider);
         m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider *>(m_dataProvider);
 
         if(m_mediaProvider != NULL) {
@@ -151,15 +151,6 @@ qint64 QnResourceDisplay::currentTimeUSec() const {
     else
         return m_camera->getCamDisplay()->getCurrentTime();
     //return m_archiveReader == NULL ? -1 : m_archiveReader->currentTime();
-}
-
-void QnResourceDisplay::setCurrentTimeUSec(qint64 usec) const {
-    if(m_archiveReader == NULL) {
-        qnWarning("Resource '%1' does not support changing current time.", resource()->getUniqueId());
-        return;
-    }
-
-    m_archiveReader->previousFrame(usec);
 }
 
 void QnResourceDisplay::start() {

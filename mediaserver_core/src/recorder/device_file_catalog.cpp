@@ -17,7 +17,7 @@
 #include "plugins/resource/avi/avi_archive_delegate.h"
 #include "recording/stream_recorder.h"
 #include "plugins/resource/avi/avi_resource.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include <QtCore/QDebug>
 #include "recording_manager.h"
 #include <media_server/serverutil.h>
@@ -840,7 +840,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
                  return -1;
          }
     }
-    else if (method == OnRecordHole_PrevChunk)
+    else if (method == OnRecordHole_PrevChunk && startTimeMs <= itr->startTimeMs)
     {
         return -1;
     }

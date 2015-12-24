@@ -18,10 +18,10 @@
 #include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
-#include "core/dataconsumer/abstract_data_consumer.h"
+#include "nx/streaming/abstract_data_consumer.h"
 #include "core/resource/camera_resource.h"
 
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 
 #include "transcoding/transcoder.h"
@@ -89,7 +89,7 @@ public:
 
     void copyLastGopFromCamera(const QnVideoCameraPtr& camera)
     {
-        CLDataQueue tmpQueue(20);
+        QnDataPacketQueue tmpQueue(20);
         camera->copyLastGop(true, 0, tmpQueue, 0);
 
         if (tmpQueue.size() > 0)

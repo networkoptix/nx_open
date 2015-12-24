@@ -64,7 +64,7 @@ extern "C"
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #ifdef Q_OS_WIN
     #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
@@ -476,7 +476,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     // ===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+    QnVideoDecoderFactory::setCodecManufacture( QnVideoDecoderFactory::AUTO );
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));

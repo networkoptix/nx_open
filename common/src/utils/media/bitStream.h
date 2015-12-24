@@ -7,7 +7,9 @@
 #include <limits.h>
 #include <stdexcept>
 
-#ifndef Q_OS_WIN
+#ifdef Q_OS_WIN
+#include <WinSock2.h>
+#else
 #include <arpa/inet.h>
 #endif
 

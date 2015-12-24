@@ -20,7 +20,7 @@ class QStandardItem;
 class QUrl;
 
 class QnWorkbenchContext;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnResourceWidgetRenderer;
 class QnRenderingWidget;
 

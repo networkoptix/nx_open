@@ -2,7 +2,7 @@
 #include "ui_sign_dialog.h"
 
 #include "plugins/resource/avi/avi_resource.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "nx/streaming/abstract_archive_stream_reader.h"
 
 #include "camera/gl_renderer.h"
 #include "camera/cam_display.h"
@@ -16,7 +16,6 @@
 #include "ui/help/help_topic_accessor.h"
 #include "ui/help/help_topics.h"
 
-#include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 
 // TODO: #Elric replace with QnRenderingWidget
@@ -99,7 +98,7 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_srcVideoInfo = new QnSignInfo();
 
     m_resource = QnAviResourcePtr(new QnAviResource(checkResource->getUrl()));
-    m_reader = static_cast<QnAbstractArchiveReader*> (m_resource->createDataProvider(Qn::CR_Default));
+    m_reader = static_cast<QnAbstractArchiveStreamReader*> (m_resource->createDataProvider(Qn::CR_Default));
     m_reader->setCycleMode(false);
     m_camDispay = new QnSignDialogDisplay(m_resource);
 
@@ -114,8 +113,8 @@ SignDialog::SignDialog(QnResourcePtr checkResource, QWidget *parent) :
     m_renderer = new QnResourceWidgetRenderer(0, m_glWindow->context());
     m_glWindow->setRenderer(m_renderer);
     m_camDispay->addVideoRenderer(1, m_renderer, true);
-    m_camDispay->setSpeed(1024*1024);
     m_reader->addDataProcessor(m_camDispay);
+    m_reader->setSpeed(1024*1024);
     m_reader->start();
     m_camDispay->start();
 }

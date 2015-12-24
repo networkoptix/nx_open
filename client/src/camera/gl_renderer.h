@@ -7,7 +7,7 @@
 #include <QtOpenGL/QGLContext>
 
 #include <utils/media/frame_info.h>
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <nx/streaming/media_data_packet.h> //< For QnMetaDataV1Ptr.
 
 #include <client/client_globals.h>
 

@@ -4,7 +4,9 @@
 #include <cstdint> /* For std::intptr_t. */
 #include <sstream>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/stringize.hpp>
+#endif
 
 #include <QtCore/QString>
 #include <QtCore/QTextStream>
@@ -190,14 +192,14 @@ namespace detail {
 
 /**
  * Emits an "unexpected NULL parameter" warning.
- * 
+ *
  * \param PARAMETER                    Parameter that was found out to be NULL.
  */
 #define qnNullWarning(PARAMETER) QN_NULL_PARAMETER_I(qnWarning, PARAMETER)
 
 /**
  * Emits an "unexpected NULL parameter" critical message.
- * 
+ *
  * \param PARAMETER                    Parameter that was found out to be NULL.
  */
 #define qnNullCritical(PARAMETER) QN_NULL_PARAMETER_I(qnCritical, PARAMETER)

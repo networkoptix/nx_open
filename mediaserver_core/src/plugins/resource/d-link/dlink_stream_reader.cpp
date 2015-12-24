@@ -8,7 +8,7 @@
 #include <utils/common/synctime.h>
 #include <nx/network/http/httptypes.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 extern int getIntParam(const char* pos);
 

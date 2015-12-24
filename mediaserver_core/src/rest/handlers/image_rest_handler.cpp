@@ -14,17 +14,17 @@ extern "C"
 
 #include <QtCore/QBuffer>
 
-#include "network/tcp_connection_priv.h"
+#include <network/tcp_connection_priv.h>
 #include <utils/math/math.h>
-#include "core/resource/network_resource.h"
+#include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
-#include "core/resource_management/resource_pool.h"
-#include "core/datapacket/media_data_packet.h"
-#include "decoders/video/ffmpeg.h"
-#include "qmath.h"
-#include "camera/get_image_helper.h"
+#include <core/resource_management/resource_pool.h>
+#include <nx/streaming/media_data_packet.h>
+#include <decoders/video/ffmpeg_video_decoder.h>
+#include <qmath.h>
+#include <camera/get_image_helper.h>
 #include <http/custom_headers.h>
-#include "utils/common/util.h"
+#include <utils/common/util.h>
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time)
 {

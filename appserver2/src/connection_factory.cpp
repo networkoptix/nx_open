@@ -49,7 +49,7 @@ namespace ec2
         m_runningRequests( 0 ),
         m_sslEnabled( false )
     {
-        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager 
+        m_timeSynchronizationManager->start();  //unfortunately cannot do it in TimeSynchronizationManager
             //constructor to keep valid object destruction order
 
         srand( ::time(NULL) );
@@ -67,7 +67,7 @@ namespace ec2
         pleaseStop();
         join();
 
-        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction 
+        m_timeSynchronizationManager->pleaseStop(); //have to do it before m_transactionMessageBus destruction
             //since TimeSynchronizationManager uses QnTransactionMessageBus
 
         ec2::QnDistributedMutexManager::initStaticInstance(0);
@@ -110,7 +110,7 @@ namespace ec2
     }
 
     //!Implementation of AbstractECConnectionFactory::connectAsync
-    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo, 
+    int Ec2DirectConnectionFactory::connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,
                                                   impl::ConnectHandlerPtr handler )
     {
         QUrl url = addr;
@@ -230,6 +230,13 @@ namespace ec2
         //AbstractVideowallManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeVideowall );
         registerUpdateFuncHandler<ApiVideowallControlMessageData>( restProcessorPool, ApiCommand::videowallControl );
+
+        //AbstractWebPageManager::getWebPages
+        registerGetFuncHandler<std::nullptr_t, ApiWebPageDataList>( restProcessorPool, ApiCommand::getWebPages );
+        //AbstractWebPageManager::save
+        registerUpdateFuncHandler<ApiWebPageData>( restProcessorPool, ApiCommand::saveWebPage );
+        //AbstractWebPageManager::remove
+        registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeWebPage );
 
         //AbstractLayoutManager::getLayouts
         registerGetFuncHandler<std::nullptr_t, ApiLayoutDataList>( restProcessorPool, ApiCommand::getLayouts );

@@ -1,7 +1,7 @@
 #ifndef HTTP_TRANSACTION_RECEIVER_H
 #define HTTP_TRANSACTION_RECEIVER_H
 
-#include <core/dataconsumer/abstract_data_consumer.h>
+#include <nx/streaming/abstract_data_consumer.h>
 #include <rest/server/request_handler.h>
 
 #include <network/tcp_connection_processor.h>

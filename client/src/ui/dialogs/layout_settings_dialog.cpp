@@ -26,6 +26,7 @@
 #include <ui/style/globals.h>
 #include <ui/widgets/framed_label.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #include <utils/threaded_image_loader.h>
 #include <utils/app_server_image_cache.h>
@@ -71,7 +72,7 @@ public:
         cellAspectRatio(qnGlobals->defaultLayoutCellAspectRatio()),
         skipNextReleaseEvent(false)
     {}
-    
+
     virtual ~QnLayoutSettingsDialogPrivate(){}
 
     void clear() {
@@ -176,7 +177,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 
     if (event->type() == QEvent::LeaveWhatsThisMode)
         d->skipNextReleaseEvent = true;
-    else if (event->type() == QEvent::MouseButtonRelease) 
+    else if (event->type() == QEvent::MouseButtonRelease)
     {
         if (target == ui->imageLabel && !d->skipNextReleaseEvent)
         {
@@ -194,13 +195,14 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
 void QnLayoutSettingsDialog::readFromResource(const QnLayoutResourcePtr &layout) {
     Q_D(QnLayoutSettingsDialog);
 
-    m_cache = layout->hasFlags(Qn::url | Qn::local | Qn::layout) //TODO: #GDM #Common refactor duplicated code
+    m_cache = snapshotManager()->isFile(layout)
             ? new QnLocalFileCache(this)
             : new QnAppServerImageCache(this);
+
     connect(m_cache, &QnAppServerFileCache::fileDownloaded, this, [this](const QString &filename, QnAppServerFileCache::OperationResult status) {
         at_imageLoaded(filename, status == QnAppServerFileCache::OperationResult::ok);
     });
-        
+
     connect(m_cache, &QnAppServerFileCache::fileUploaded, this,[this](const QString &filename, QnAppServerFileCache::OperationResult status) {
         at_imageStored(filename, status == QnAppServerFileCache::OperationResult::ok);
     });
@@ -319,7 +321,7 @@ void QnLayoutSettingsDialog::updateControls() {
     QImage image;
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
-        ui->imageLabel->setText(d->state != Error 
+        ui->imageLabel->setText(d->state != Error
                             ? tr("<No picture>")
                             : d->errorText);
     } else {

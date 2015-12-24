@@ -35,6 +35,10 @@ public:
         return writeNumberInternal(QnUbjson::Int8Marker, value);
     }
 
+    void writeUInt16(quint16 value) {
+        return writeNumberInternal(QnUbjson::UInt16Marker, value);
+    }
+
     void writeInt16(qint16 value) {
         return writeNumberInternal(QnUbjson::Int16Marker, value);
     }

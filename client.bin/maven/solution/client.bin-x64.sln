@@ -5,6 +5,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.bin-x64", "src\clien
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
+		${nx_streaming.guid} = ${nx_streaming.guid}
 		${client.guid} = ${client.guid}
 		${client.core.guid} = ${client.core.guid}
 	EndProjectSection
@@ -13,6 +14,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client-x64", "..\client\src
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
+		${nx_streaming.guid} = ${nx_streaming.guid}
 		${client.core.guid} = ${client.core.guid}
 	EndProjectSection
 EndProject
@@ -23,6 +25,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client.core-x64", "..\clien
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "common-x64", "..\common\src\common-x64.vcxproj", "${common.guid}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "..\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "..\appserver2\src\appserver2-x64.vcxproj", "${appserver2.guid}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -51,6 +55,10 @@ Global
 		${common.guid}.Debug|x64.Build.0 = Debug|x64
 		${common.guid}.Release|x64.ActiveCfg = Release|x64
 		${common.guid}.Release|x64.Build.0 = Release|x64
+		${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
 		${appserver2.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
 		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
