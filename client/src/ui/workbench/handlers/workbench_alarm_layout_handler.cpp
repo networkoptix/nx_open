@@ -30,6 +30,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 
+#include <nx/streaming/archive_stream_reader.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
