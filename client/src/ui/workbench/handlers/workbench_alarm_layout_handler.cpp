@@ -29,7 +29,7 @@
 
 #include <ui/graphics/items/resource/resource_widget.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {

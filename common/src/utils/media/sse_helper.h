@@ -2,17 +2,9 @@
 #define QN_SSE_HELPER_H
 
 #include <QtCore/QString>
-#if QT_VERSION == 0x050201
-#include <QtCore/5.2.1/QtCore/private/qsimd_p.h>
-#elif QT_VERSION == 0x050401
-#include <QtCore/5.4.1/QtCore/private/qsimd_p.h>
-#elif QT_VERSION == 0x050500
-#include <QtCore/5.5.0/QtCore/private/qsimd_p.h>
-#elif QT_VERSION == 0x050501
-#include <QtCore/5.5.1/QtCore/private/qsimd_p.h>
-#else
-#error "Include proper header here!"
-#endif
+
+#include <utils/common/qt_private_headers.h>
+#include QT_CORE_PRIVATE_HEADER(qsimd_p.h)
 
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 #include <xmmintrin.h>
@@ -91,8 +83,8 @@ typedef struct
 
 /* We cannot include GCC intrinsic headers cause they cause compilation errors.
  * Instead, we place the definitions for the functions we're interested in here.
- * 
- * For more GCC intrinsics see: 
+ *
+ * For more GCC intrinsics see:
  * http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/smmintrin.h
  * http://opensource.apple.com/source/gcc/gcc-5664/gcc/config/i386/tmmintrin.h
  */
@@ -140,7 +132,7 @@ _mm_hadd_epi16 (__m128i __X, __m128i __Y)
 
 #else
 #include <smmintrin.h>
-#define sse4_attribute 
+#define sse4_attribute
 #define ssse3_attribute
 #endif
 #endif	//__i386
@@ -204,7 +196,7 @@ static inline bool useSSE42()
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
 static inline QString getCPUString()
 {
-    char CPUBrandString[0x40]; 
+    char CPUBrandString[0x40];
     int CPUInfo[4] = {-1};
 
     // Calling __cpuid with 0x80000000 as the InfoType argument
