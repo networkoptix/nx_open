@@ -633,14 +633,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     return true;
 }
 
-void QnRtspDataConsumer::lockDataQueue()
+QMutex* QnRtspDataConsumer::dataQueueMutex()
 {
-    m_dataQueueMtx.lock();
-}
-
-void QnRtspDataConsumer::unlockDataQueue()
-{
-    m_dataQueueMtx.unlock();
+    return &m_dataQueueMtx;
 }
 
 void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
@@ -648,16 +643,10 @@ void QnRtspDataConsumer::addData(const QnAbstractMediaDataPtr& data)
     m_dataQueue.push(data);
 }
 
-int QnRtspDataConsumer::copyLastGopFromCamera(bool usePrimaryStream, qint64 skipTime, quint32 cseq)
+int QnRtspDataConsumer::copyLastGopFromCamera(QnVideoCameraPtr camera, bool usePrimaryStream, qint64 skipTime, quint32 cseq)
 {
     // Fast channel zapping
     int prevSize = m_dataQueue.size();
-    QnVideoCameraPtr camera;
-    QnResourcePtr res;
-    if (m_owner->getResource()) {
-        res = m_owner->getResource()->toResourcePtr();
-        camera = qnCameraPool->getVideoCamera(res);
-    }
     int copySize = 0;
     if (camera) // && !res->hasFlags(Qn::no_last_gop))
         copySize = camera->copyLastGop(usePrimaryStream, skipTime, m_dataQueue, cseq);
