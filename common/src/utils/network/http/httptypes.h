@@ -6,6 +6,7 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <chrono>
 #include <cstring>
 #include <functional>
 #include <map>
@@ -574,6 +575,21 @@ namespace nx_http
                 \note In case of parse error, contents of this object are undefined
             */
             bool parse( const nx_http::StringType& strValue );
+            StringType toString() const;
+        };
+
+        class KeepAlive
+        {
+        public:
+            std::chrono::seconds timeout;
+            boost::optional<int> max;
+
+            KeepAlive();
+            KeepAlive(
+                std::chrono::seconds _timeout,
+                boost::optional<int> _max = boost::none);
+
+            bool parse(const nx_http::StringType& strValue);
             StringType toString() const;
         };
     }

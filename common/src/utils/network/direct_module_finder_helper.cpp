@@ -165,7 +165,9 @@ void QnDirectModuleFinderHelper::at_responseReceived(const QnModuleInformation &
 }
 
 void QnDirectModuleFinderHelper::at_timer_timeout() {
-    int pingTimeout = m_moduleFinder->pingTimeout();
+    using namespace std::chrono;
+
+    const int pingTimeout = duration_cast<milliseconds>(m_moduleFinder->pingTimeout()).count();
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (auto it = m_multicastedUrlLastPing.begin(); it != m_multicastedUrlLastPing.end(); /* no inc */) {

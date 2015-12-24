@@ -213,7 +213,8 @@ void QnTCPConnectionProcessor::sendResponse(int httpStatusCode, const QByteArray
     if( isConnectionCanBePersistent() )
     {
         d->response.headers.insert(nx_http::HttpHeader("Connection", "Keep-Alive"));
-        d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1, max=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
+        if (d->response.headers.find("Keep-Alive") == d->response.headers.end())
+            d->response.headers.insert(nx_http::HttpHeader("Keep-Alive", lit("timeout=%1").arg(KEEP_ALIVE_TIMEOUT/1000).toLatin1()) );
     }
 
     nx_http::insertOrReplaceHeader(

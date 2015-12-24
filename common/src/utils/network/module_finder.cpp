@@ -2,6 +2,7 @@
 
 #include <QtCore/QCryptographicHash>
 
+#include <api/global_settings.h>
 #include "utils/common/log.h"
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
@@ -16,9 +17,8 @@
 #include "nx_ec/dummy_handler.h"
 
 namespace {
-    const int pingTimeout = 15 * 1000;
-    const int checkInterval = 3000;
-    const int noticeableConflictCount = 5;
+    const int kCheckInterval = 3000;
+    const int kNoticeableConflictCount = 5;
 
     bool isLocalAddress(const HostAddress &address) {
         if (address.toString().isNull())
@@ -104,7 +104,7 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
     connect(m_multicastModuleFinder.data(), &QnMulticastModuleFinder::responseReceived,     this, &QnModuleFinder::at_responseReceived);
     connect(m_directModuleFinder,           &QnDirectModuleFinder::responseReceived,        this, &QnModuleFinder::at_responseReceived);
 
-    m_timer->setInterval(checkInterval);
+    m_timer->setInterval(kCheckInterval);
     connect(m_timer, &QTimer::timeout, this, &QnModuleFinder::at_timer_timeout);
 
 
@@ -156,8 +156,8 @@ QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
     return m_helper;
 }
 
-int QnModuleFinder::pingTimeout() const {
-    return ::pingTimeout;
+std::chrono::milliseconds QnModuleFinder::pingTimeout() const {
+    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
 }
 
 void QnModuleFinder::start() {
@@ -271,7 +271,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
         QMutexLocker lk(&m_itemsMutex);
 
         if (!newModuleIsValid || oldModuleIsValid) {
-            if (currentTime - item.lastConflictResponse < pingTimeout()) {
+            if (currentTime - item.lastConflictResponse < pingTimeout().count()) {
                 if (item.lastResponse >= item.lastConflictResponse)
                     ++item.conflictResponseCount;
             } else {
@@ -279,7 +279,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
             }
             item.lastConflictResponse = currentTime;
 
-            if (item.conflictResponseCount >= noticeableConflictCount && item.conflictResponseCount % noticeableConflictCount == 0) {
+            if (item.conflictResponseCount >= kNoticeableConflictCount && item.conflictResponseCount % kNoticeableConflictCount == 0) {
                 NX_LOG(lit("QnModuleFinder: Server %1 conflict: %2")
                        .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logWARNING);
             }
@@ -361,7 +361,7 @@ void QnModuleFinder::at_timer_timeout() {
     QList<SocketAddress> addressesToRemove;
 
     for (auto it = m_lastResponse.begin(); it != m_lastResponse.end(); ++it) {
-        if (currentTime - it.value() < pingTimeout())
+        if (currentTime - it.value() < pingTimeout().count())
             continue;
 
         addressesToRemove.append(it.key());
@@ -455,7 +455,7 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInforma
         return;
 
     qint64 currentTime = m_elapsedTimer.elapsed();
-    if (currentTime - m_lastSelfConflict > pingTimeout()) {
+    if (currentTime - m_lastSelfConflict > pingTimeout().count()) {
         m_selfConflictCount = 1;
         m_lastSelfConflict = currentTime;
         return;
@@ -463,7 +463,7 @@ void QnModuleFinder::handleSelfResponse(const QnModuleInformation &moduleInforma
     m_lastSelfConflict = currentTime;
     ++m_selfConflictCount;
 
-    if (m_selfConflictCount >= noticeableConflictCount && m_selfConflictCount % noticeableConflictCount == 0)
+    if (m_selfConflictCount >= kNoticeableConflictCount && m_selfConflictCount % kNoticeableConflictCount == 0)
         emit moduleConflict(moduleInformation, address);
 }
 
