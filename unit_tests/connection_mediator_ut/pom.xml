@@ -20,7 +20,7 @@
         <product.title>HD Cloud Connection Mediator Unit Tests</product.title>
         <!--Global libs-->
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lcloud_db_client -lconnection_mediator</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib -lssleay32 -llibeay32 Iphlpapi.lib</windows.oslibs>
         <linux.oslibs>-lavcodec -lavformat -lavutil -lquazip -lfaac</linux.oslibs>

@@ -17,17 +17,17 @@
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_connection_processor.h>
 
-#include <nx/utils/log.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/util.h>
-#include <nx/utils/uuid.h>
 #include <utils/media/bitStream.h>
 
 #include <nx/network/http/httptypes.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/uuid.h>
 
 #include "version.h"
 

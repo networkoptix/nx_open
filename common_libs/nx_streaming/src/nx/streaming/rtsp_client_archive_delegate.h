@@ -2,15 +2,13 @@
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
 #include <atomic>
+
 #include <nx/utils/uuid.h>
-#include <network/rtpsession.h>
-#include <network/ffmpeg_rtp_parser.h>
-
 #include <nx/streaming/abstract_archive_delegate.h>
+#include <nx/utils/thread/mutex.h>
 
-#include <utils/common/uuid.h>
-#include "utils/thread/mutex.h"
 #include "recording/time_period.h"
+
 
 struct AVFormatContext;
 class QnCustomResourceVideoLayout;
