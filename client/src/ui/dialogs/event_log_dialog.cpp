@@ -248,7 +248,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_allEvents.clear();
 
 
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);  //?
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
     for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
         m_requests << mserver->apiConnection()->getEventLogAsync(
