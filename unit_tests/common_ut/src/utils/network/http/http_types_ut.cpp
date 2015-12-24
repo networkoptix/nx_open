@@ -590,8 +590,8 @@ TEST(HttpHeaderTest, KeepAlive_parse)
         nx_http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
-        ASSERT_TRUE(keepAlive.max);
-        ASSERT_EQ(100, keepAlive.max);
+        ASSERT_TRUE(static_cast<bool>(keepAlive.max));
+        ASSERT_EQ(100, keepAlive.max.get());
     }
 
     {
@@ -600,7 +600,7 @@ TEST(HttpHeaderTest, KeepAlive_parse)
         nx_http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
-        ASSERT_FALSE(keepAlive.max);
+        ASSERT_FALSE(static_cast<bool>(keepAlive.max));
     }
 
     {
@@ -609,8 +609,8 @@ TEST(HttpHeaderTest, KeepAlive_parse)
         nx_http::header::KeepAlive keepAlive;
         ASSERT_TRUE(keepAlive.parse(testData));
         ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
-        ASSERT_TRUE(keepAlive.max);
-        ASSERT_EQ(100, keepAlive.max);
+        ASSERT_TRUE(static_cast<bool>(keepAlive.max));
+        ASSERT_EQ(100, keepAlive.max.get());
     }
 
     {

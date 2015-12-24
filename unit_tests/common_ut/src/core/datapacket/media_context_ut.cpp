@@ -216,7 +216,7 @@ TEST(QnMediaDataPacket, main)
 
     QnConstMediaContextPtr basicMediaContext(
         QnBasicMediaContext::deserialize(data));
-    ASSERT_TRUE(basicMediaContext);
+    ASSERT_TRUE(basicMediaContext != nullptr);
 
     testMediaContextFieldsEqual(
         avCodecMediaContext, basicMediaContext);
