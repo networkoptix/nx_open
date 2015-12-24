@@ -47,6 +47,7 @@ namespace {
     const QString nameSupportEmail(lit("emailSupportEmail"));
     const QString nameUpdateNotificationsEnabled(lit("updateNotificationsEnabled"));
     const QString nameServerAutoDiscoveryEnabled(lit("serverAutoDiscoveryEnabled"));
+    const QString nameCrossdomainEnabled(lit("crossdomainEnabled"));
 
     const QString ldapUri(lit("ldapUri"));
     const QString ldapAdminDn(lit("ldapAdminDn"));
@@ -68,6 +69,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_cameraSettingsOptimizationAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCameraSettingsOptimization, true, this);
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
+    m_crossdomainXmlEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameCrossdomainEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
@@ -113,6 +115,7 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_disabledVendorsAdaptor
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
+        << m_crossdomainXmlEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
         << emailAdaptors
         << ldapAdaptors
@@ -178,6 +181,14 @@ bool QnGlobalSettings::isServerAutoDiscoveryEnabled() const {
 
 void QnGlobalSettings::setServerAutoDiscoveryEnabled(bool enabled) {
     m_serverAutoDiscoveryEnabledAdaptor->setValue(enabled);
+}
+
+bool QnGlobalSettings::isCrossdomainXmlEnabled() const {
+    return m_crossdomainXmlEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setCrossdomainXmlEnabled(bool enabled) {
+    m_crossdomainXmlEnabledAdaptor->setValue(enabled);
 }
 
 void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
