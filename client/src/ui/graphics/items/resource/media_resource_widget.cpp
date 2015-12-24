@@ -223,7 +223,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
 
     m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay, Visible, true, true);
+    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -419,6 +419,16 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
 void QnMediaResourceWidget::suspendHomePtzController() {
     if (m_homePtzController)
         m_homePtzController->suspend();
+}
+
+void QnMediaResourceWidget::updateHud(bool animate)
+{
+    const auto compositeOverlayCouldBeVisible
+        = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
+
+    QnResourceWidget::updateHud(animate);
 }
 
 void QnMediaResourceWidget::resumeHomePtzController() {

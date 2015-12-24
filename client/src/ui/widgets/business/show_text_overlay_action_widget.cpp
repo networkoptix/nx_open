@@ -22,9 +22,10 @@ QString QnShowTextOverlayActionWidget::getPlaceholderText()
     return kPlaceholderText;
 }
 
-QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
-    base_type(parent),
-    ui(new Ui::ShowTextOverlayActionWidget)
+QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
+    : base_type(parent)
+    , ui(new Ui::ShowTextOverlayActionWidget)
+    , m_lastCustomText()
 {
     ui->setupUi(this);
 
@@ -44,8 +45,16 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
 
     connect(ui->customTextCheckBox,     &QCheckBox::clicked, this, [this]()
     {
-        ui->customTextEdit->setPlainText(ui->customTextCheckBox->isChecked()
-            ? model()->actionParams().text : getPlaceholderText());
+        const bool useCustomText = ui->customTextCheckBox->isChecked();
+
+        if (!useCustomText)
+        {
+            /// Previous state is "use custom text", so update temporary holder
+            m_lastCustomText = ui->customTextEdit->toPlainText();
+        }
+
+        ui->customTextEdit->setPlainText(useCustomText
+            ? m_lastCustomText : getPlaceholderText());
         paramsChanged();
     });
 
@@ -99,6 +108,7 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
 
         const bool useCustomText = !params.text.isEmpty();
+        m_lastCustomText = params.text;
         ui->customTextCheckBox->setChecked(useCustomText);
         ui->customTextEdit->setPlainText(useCustomText ? params.text : getPlaceholderText());
 

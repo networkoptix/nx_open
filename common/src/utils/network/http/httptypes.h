@@ -234,6 +234,8 @@ namespace nx_http
 
     namespace Method
     {
+        typedef StringType ValueType;
+    
         extern const StringType GET;
         extern const StringType HEAD;
         extern const StringType POST;
@@ -415,7 +417,7 @@ namespace nx_http
         public:
             QMap<BufferType, BufferType> params;
 
-            bool parse( const BufferType& str );
+            bool parse( const BufferType& str, char separator = ',' );
             void serialize( BufferType* const dstBuffer ) const;
         };
 

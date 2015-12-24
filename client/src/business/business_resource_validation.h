@@ -13,8 +13,9 @@ static bool isResourcesListValid(const QnResourceList &resources) {
     QnSharedResourcePointerList<ResourceType> filtered = resources.filtered<ResourceType>();
     if (filtered.isEmpty())
         return CheckingPolicy::emptyListIsValid();
-    else if (filtered.size() > 1)
-        return CheckingPolicy::multiChoiceListIsValid();
+    else if (filtered.size() > 1 && !CheckingPolicy::multiChoiceListIsValid())
+        return false;
+
     foreach (const QnSharedResourcePointer<ResourceType> &resource, filtered)
         if (!CheckingPolicy::isResourceValid(resource))
             return false;
