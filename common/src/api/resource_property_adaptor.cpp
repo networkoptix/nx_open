@@ -27,9 +27,15 @@ namespace {
 // -------------------------------------------------------------------------- //
 // QnAbstractResourcePropertyAdaptor
 // -------------------------------------------------------------------------- //
-QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(const QString &key, QnAbstractResourcePropertyHandler *handler, QObject *parent):
+QnAbstractResourcePropertyAdaptor::QnAbstractResourcePropertyAdaptor(
+    const QString& key,
+    const QVariant& defaultValue,
+    QnAbstractResourcePropertyHandler *handler,
+    QObject* parent)
+:
     base_type(parent),
     m_key(key),
+    m_defaultValue(defaultValue),
     m_handler(handler),
     m_pendingSave(0)
 {
@@ -88,7 +94,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
 
 QVariant QnAbstractResourcePropertyAdaptor::value() const {
     QnMutexLocker locker( &m_mutex );
-    return m_value;
+    return m_value.isValid() ? m_value : m_defaultValue;
 }
 
 QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
@@ -100,7 +106,7 @@ QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
     return QString();
 }
 
-void QnAbstractResourcePropertyAdaptor::setValue(const QVariant &value) {
+void QnAbstractResourcePropertyAdaptor::setValueInternal(const QVariant &value) {
     bool save = false;
     {
         QnMutexLocker locker( &m_mutex );
