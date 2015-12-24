@@ -255,7 +255,7 @@ namespace ec2
         int distanceToPeer(const QnUuid& dstPeer) const;
         void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
         void sendDelayedAliveTran();
-        void reconnectAllPeers(QMutexLocker* const /*lock*/);
+        void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
     
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
