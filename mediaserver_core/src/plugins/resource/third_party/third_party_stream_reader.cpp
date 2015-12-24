@@ -1,16 +1,25 @@
+
 #include "third_party_stream_reader.h"
 
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
+
 #include <QtCore/QTextStream>
 
-#include <plugins/resource/third_party/motion_data_picture.h>
-#include <nx/utils/log/log.h>
-#include <utils/media/ffmpeg_helper.h>
 #include <nx/network/http/httptypes.h>
-#include <version.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/utils/log/log.h>
+#include <plugins/resource/third_party/motion_data_picture.h>
+#include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
+#include <network/multicodec_rtp_reader.h>
+#include <utils/media/ffmpeg_helper.h>
 #include <utils/media/frame_type_extractor.h>
+#include <version.h>
+
+#include "third_party_audio_data_packet.h"
+#include "third_party_video_data_packet.h"
+
 
 namespace
 {

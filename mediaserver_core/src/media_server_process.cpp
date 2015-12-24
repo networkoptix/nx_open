@@ -169,6 +169,7 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/cloud/mediator_connector.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -2300,12 +2301,10 @@ void MediaServerProcess::run()
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::network::cloud::MediatorConnector::SystemCredentials credentials =
-            {
+            nx::network::cloud::MediatorConnector::SystemCredentials credentials(
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
-                cloudAuthKey.toUtf8()
-            };
+                cloudAuthKey.toUtf8());
 
             nx::network::SocketGlobals::mediatorConnector()
                     .setSystemCredentials(std::move(credentials));
