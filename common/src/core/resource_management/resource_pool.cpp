@@ -341,12 +341,12 @@ QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus statu
     if (status == Qn::AnyStatus)
         return m_cache.serversList;
 
-    const auto onlineFilter = [status](const QnMediaServerResourcePtr &serverResource)
+    const auto statusFilter = [status](const QnMediaServerResourcePtr &serverResource)
     {
         return (serverResource->getStatus() == status);
     };
 
-    return m_cache.serversList.filtered(onlineFilter);
+    return m_cache.serversList.filtered(statusFilter);
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const

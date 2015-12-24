@@ -36,11 +36,11 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
 
     if (allModules)
     {
-        const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
         if (useAddresses)
         {
             QList<QnModuleInformationWithAddresses> modules;
-            for (const QnMediaServerResourcePtr &server: onlineServers)
+            for (const QnMediaServerResourcePtr &server: allServers)
             {
                 QnModuleInformationWithAddresses moduleInformation = server->getModuleInformation();
                 moduleInformation.remoteAddresses = getAddresses(server);
@@ -51,7 +51,7 @@ int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequ
         else
         {
             QList<QnModuleInformation> modules;
-            for (const QnMediaServerResourcePtr &server: onlineServers)
+            for (const QnMediaServerResourcePtr &server: allServers)
                 modules.append(server->getModuleInformation());
             result.setReply(modules);
         }
