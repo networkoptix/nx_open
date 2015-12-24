@@ -117,8 +117,7 @@
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.6.0-SNAPSHOT</qt.version>
-        <qt_version>5.4.2</qt_version>
+        <qt.version>5.4.2</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
@@ -159,8 +158,7 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <!--qtlib19 is for desktop only-->
-        <qtlib19></qtlib19>
+        <qtlib19>WebChannel</qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
         <!--QT plugins used-->
@@ -418,7 +416,7 @@
                 <module>client.core</module>
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/artifacts/qt/${qt_version}/${platform}/${arch}</qt.dir>
+                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
