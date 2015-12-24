@@ -1,5 +1,7 @@
 #include "cloud_status_watcher.h"
 
+#include <algorithm>
+
 #include <QtCore/QUrl>
 
 #include <cdb/connection.h>
@@ -9,7 +11,28 @@ using namespace nx::cdb;
 
 namespace
 {
-    const int kPingInterval = 30 * 1000;
+    const int kRetryInterval = 10 * 1000;
+
+    QnCloudSystemList getCloudSystemList(const api::SystemDataList &systemsList)
+    {
+        QnCloudSystemList result;
+
+        for (const api::SystemData &systemData : systemsList.systems)
+        {
+            if (systemData.status != api::ssActivated)
+                continue;
+
+            QnCloudSystem system;
+            system.id = systemData.id;
+            system.name = QString::fromStdString(systemData.name);
+            system.authKey = systemData.authKey;
+            result.append(system);
+        }
+
+        std::sort(result.begin(), result.end());
+
+        return result;
+    }
 }
 
 class QnCloudStatusWatcherPrivate : public QObject
@@ -25,7 +48,7 @@ public:
     QString cloudLogin;
     QString cloudPassword;
 
-    QTimer *pingTimer;
+    QTimer *retryTimer;
 
     std::unique_ptr<
         api::ConnectionFactory,
@@ -35,13 +58,15 @@ public:
     QnCloudStatusWatcher::Status status;
     bool loggedIn;
 
+    QnCloudSystemList cloudSystems;
+
 public:
     void updateConnection(bool initial = false);
 
 private:
     void setStatus(QnCloudStatusWatcher::Status newStatus);
+    void setCloudSystems(const QnCloudSystemList &newCloudSystems);
     void checkAndSetStatus(QnCloudStatusWatcher::Status newStatus);
-    void pingCloud();
 };
 
 QnCloudStatusWatcher::QnCloudStatusWatcher(QObject *parent)
@@ -125,16 +150,70 @@ QnCloudStatusWatcher::Status QnCloudStatusWatcher::status() const
     return d->status;
 }
 
+void QnCloudStatusWatcher::updateSystems()
+{
+    Q_D(QnCloudStatusWatcher);
+
+    d->retryTimer->stop();
+
+    if (!d->cloudConnection)
+        return;
+
+    d->cloudConnection->systemManager()->getSystems(
+            [this](api::ResultCode result, const api::SystemDataList &systemsList)
+            {
+                QnCloudSystemList cloudSystems;
+
+                if (result == api::ResultCode::ok)
+                    cloudSystems = getCloudSystemList(systemsList);
+
+                executeDelayed(
+                        [this, result, cloudSystems]()
+                        {
+                            Q_D(QnCloudStatusWatcher);
+
+                            switch (result)
+                            {
+                            case api::ResultCode::ok:
+                                d->setCloudSystems(cloudSystems);
+                                d->checkAndSetStatus(QnCloudStatusWatcher::Online);
+                                break;
+                            case api::ResultCode::notAuthorized:
+                                d->checkAndSetStatus(QnCloudStatusWatcher::Unauthorized);
+                                emit error(QnCloudStatusWatcher::InvalidCredentials);
+                                break;
+                            default:
+                                d->checkAndSetStatus(QnCloudStatusWatcher::Offline);
+                                emit error(QnCloudStatusWatcher::UnknownError);
+                                d->retryTimer->start();
+                                break;
+                            }
+                        },
+                        0, thread()
+                );
+            }
+    );
+}
+
+QnCloudSystemList QnCloudStatusWatcher::cloudSystems() const
+{
+    Q_D(const QnCloudStatusWatcher);
+    return d->cloudSystems;
+}
+
 QnCloudStatusWatcherPrivate::QnCloudStatusWatcherPrivate(QnCloudStatusWatcher *parent)
     : QObject(parent)
     , q_ptr(parent)
     , cloudPort(-1)
-    , pingTimer(new QTimer(this))
+    , retryTimer(new QTimer(this))
     , connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
     , status(QnCloudStatusWatcher::LoggedOut)
 {
-    pingTimer->setInterval(kPingInterval);
-    connect(pingTimer, &QTimer::timeout, this, &QnCloudStatusWatcherPrivate::pingCloud);
+    Q_Q(QnCloudStatusWatcher);
+
+    retryTimer->setInterval(kRetryInterval);
+    retryTimer->setSingleShot(true);
+    connect(retryTimer, &QTimer::timeout, q, &QnCloudStatusWatcher::updateSystems);
 }
 
 void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
@@ -148,8 +227,8 @@ void QnCloudStatusWatcherPrivate::updateConnection(bool initial)
 
     cloudConnection = connectionFactory->createConnection(cloudLogin.toStdString(), cloudPassword.toStdString());
 
-    pingTimer->start();
-    pingCloud();
+    Q_Q(QnCloudStatusWatcher);
+    q->updateSystems();
 }
 
 void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStatus)
@@ -161,6 +240,17 @@ void QnCloudStatusWatcherPrivate::setStatus(QnCloudStatusWatcher::Status newStat
 
     Q_Q(QnCloudStatusWatcher);
     emit q->statusChanged(status);
+}
+
+void QnCloudStatusWatcherPrivate::setCloudSystems(const QnCloudSystemList &newCloudSystems)
+{
+    if (cloudSystems == newCloudSystems)
+        return;
+
+    cloudSystems = newCloudSystems;
+
+    Q_Q(QnCloudStatusWatcher);
+    emit q->cloudSystemsChanged(cloudSystems);
 }
 
 void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status newStatus)
@@ -181,33 +271,18 @@ void QnCloudStatusWatcherPrivate::checkAndSetStatus(QnCloudStatusWatcher::Status
     }
 }
 
-void QnCloudStatusWatcherPrivate::pingCloud()
+bool QnCloudSystem::operator <(const QnCloudSystem &other) const
 {
-    if (!cloudConnection)
-        return;
+    int comp = name.compare(other.name);
+    if (comp != 0)
+        return comp < 0;
 
-    cloudConnection->ping([this](api::ResultCode result, api::ModuleInfo)
-    {
-        executeDelayed([this, result]()
-                {
-                    Q_Q(QnCloudStatusWatcher);
+    return id < other.id;
+}
 
-                    switch (result)
-                    {
-                    case api::ResultCode::ok:
-                        checkAndSetStatus(QnCloudStatusWatcher::Online);
-                        break;
-                    case api::ResultCode::notAuthorized:
-                        checkAndSetStatus(QnCloudStatusWatcher::Unauthorized);
-                        emit q->error(QnCloudStatusWatcher::InvalidCredentials);
-                        break;
-                    default:
-                        checkAndSetStatus(QnCloudStatusWatcher::Offline);
-                        emit q->error(QnCloudStatusWatcher::UnknownError);
-                        break;
-                    }
-                },
-                0, thread()
-        );
-    });
+bool QnCloudSystem::operator ==(const QnCloudSystem &other) const
+{
+    return id == other.id &&
+           name == other.name &&
+           authKey == other.authKey;
 }

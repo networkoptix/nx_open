@@ -1,6 +1,22 @@
 #pragma once
 
+#include <string>
+
 #include <QtCore/QObject>
+
+#include <nx/utils/uuid.h>
+
+struct QnCloudSystem
+{
+    QnUuid id;
+    QString name;
+    std::string authKey;
+
+    bool operator <(const QnCloudSystem &other) const;
+    bool operator ==(const QnCloudSystem &other) const;
+};
+
+typedef QList<QnCloudSystem> QnCloudSystemList;
 
 class QnCloudStatusWatcherPrivate;
 
@@ -41,8 +57,13 @@ public:
 
     Status status() const;
 
+    void updateSystems();
+
+    QnCloudSystemList cloudSystems() const;
+
 signals:
     void statusChanged(Status status);
+    void cloudSystemsChanged(const QnCloudSystemList &cloudSystems);
     void error(ErrorCode errorCode);
 
 private:

@@ -16,10 +16,12 @@ public:
     QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent);
 
     void updateUi();
+    void updateSystems();
     void at_clicked();
 
 public:
     QMenu *cloudMenu;
+    QMenu *systemsMenu;
     QPalette originalPalette;
 };
 
@@ -53,16 +55,22 @@ QnCloudStatusPanelPrivate::QnCloudStatusPanelPrivate(QnCloudStatusPanel *parent)
     : QObject(parent)
     , q_ptr(parent)
     , cloudMenu(new QMenu(parent))
+    , systemsMenu(nullptr)
 {
     Q_Q(QnCloudStatusPanel);
 
     cloudMenu->addAction(q->action(Qn::OpenCloudMainUrl));
+    systemsMenu = cloudMenu->addMenu(tr("Connect to System..."));
     cloudMenu->addSeparator();
     cloudMenu->addAction(q->action(Qn::OpenCloudManagementUrl));
     cloudMenu->addAction(q->action(Qn::LogoutFromCloud));
 
     QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
-    connect(cloudStatusWatcher, &QnCloudStatusWatcher::statusChanged, this, &QnCloudStatusPanelPrivate::updateUi);
+    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::statusChanged,           this,   &QnCloudStatusPanelPrivate::updateUi);
+    //TODO: #dklychkov Uncomment when cloud login is implemented
+//    connect(cloudStatusWatcher,     &QnCloudStatusWatcher::cloudSystemsChanged,     this,   &QnCloudStatusPanelPrivate::updateSystems);
+
+    updateSystems();
 }
 
 void QnCloudStatusPanelPrivate::updateUi()
@@ -90,12 +98,32 @@ void QnCloudStatusPanelPrivate::updateUi()
     q->setMenu(cloudMenu);
 }
 
+void QnCloudStatusPanelPrivate::updateSystems()
+{
+    QnCloudStatusWatcher *cloudStatusWatcher = qnCommon->instance<QnCloudStatusWatcher>();
+    const QnCloudSystemList &systems = cloudStatusWatcher->cloudSystems();
+
+    systemsMenu->clear();
+    for (const QnCloudSystem &system: systems)
+    {
+        QAction *action = systemsMenu->addAction(system.name);
+        QUrl url;
+        //TODO: #dklychkov Prepare URL
+        action->setData(url);
+    }
+
+    systemsMenu->menuAction()->setVisible(!systemsMenu->actions().isEmpty());
+}
+
 void QnCloudStatusPanelPrivate::at_clicked()
 {
     Q_Q(QnCloudStatusPanel);
 
     if (q->QPushButton::menu())
+    {
+        qnCommon->instance<QnCloudStatusWatcher>()->updateSystems();
         return;
+    }
 
     q->action(Qn::LoginToCLoud)->trigger();
 }
