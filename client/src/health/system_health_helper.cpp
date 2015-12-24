@@ -68,10 +68,10 @@ QString QnSystemHealthStringsHelper::messageDescription(QnSystemHealth::MessageT
         messageParts << tr("The system is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
         break;
     case QnSystemHealth::StoragesAreFull:
-        messageParts << tr("Storages are full on the following Server:") << resourceName;
+        messageParts << tr("Storage is full on the following Server:") << resourceName;
         break;
     case QnSystemHealth::StoragesNotConfigured:
-        messageParts << tr("Storages are not configured on the following Server:") << resourceName;
+        messageParts << tr("Storage is not configured on the following Server:") << resourceName;
         break;
     case QnSystemHealth::NoLicenses:
         messageParts << tr("You have no licenses.") << tr("You cannot record video from cameras.");

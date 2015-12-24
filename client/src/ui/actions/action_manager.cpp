@@ -731,6 +731,16 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
+
+        factory().separator().
+            flags(Qn::Main);
+
+        factory(Qn::WebClientActionSubMenu).
+            flags(Qn::Main).
+            text(tr("Web Client...")).
+            autoRepeat(false).
+            requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
+
     } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
