@@ -31,4 +31,6 @@ private:
 
 private:
     QScopedPointer<Ui::ShowTextOverlayActionWidget> ui;
+
+    QString m_lastCustomText;
 };

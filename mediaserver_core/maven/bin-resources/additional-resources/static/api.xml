@@ -2011,6 +2011,24 @@
                         <caption>JSON data.</caption>
                     </result>
                 </function>
+                <function>
+                    <name>systemSettings</name>
+                    <description>Get or set global system settings. If called with no arguments, just returns list of all system settings with their values</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>{param name}</name>
+                            <description>name of system parameter. E.g., ec2AliveUpdateIntervalSec</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>{param value}</name>
+                            <description>New value for the specified parameter</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result/>
+                </function>
                 <function proprietary="true">
                     <name>execute</name>
                     <description>Execute any script from subfolder 'scripts' of media server. Script name provides directly in a URL path like '/api/execute/script1.sh'.

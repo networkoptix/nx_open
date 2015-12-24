@@ -65,8 +65,7 @@ private:
     void updateCamerasForBackup(const QnVirtualCameraResourceList &cameras);
     void updateRebuildUi(QnServerStoragesPool pool, const QnStorageScanData& reply);
     void updateBackupUi(const QnBackupStatusData& reply
-        , int overallSelectedCameras
-        , int currentServerSelectedCameras);
+        , int overallSelectedCameras);
     void updateSelectedCamerasCaption(int selectedCamerasCount);
 
     void updateColumnWidth();
@@ -120,7 +119,6 @@ private:
 
     Qn::CameraBackupQualities m_quality;
     QnVirtualCameraResourceList m_camerasToBackup;
-    QnVirtualCameraResourceList m_currentServerCamerasToBackup;
 
 private:
     void setupGrid(QTableView* tableView, bool isMainPool);

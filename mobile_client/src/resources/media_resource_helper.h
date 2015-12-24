@@ -88,6 +88,7 @@ signals:
 
 private:
     void updateMediaStreams();
+    void updateCurrentStream();
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
 
 private:
@@ -112,6 +113,7 @@ private:
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
+    bool m_useTranscoding;
     Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
     int m_maxTextureSize;

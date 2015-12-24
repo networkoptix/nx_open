@@ -145,6 +145,7 @@
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#include <rest/handlers/system_settings_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1233,10 +1234,12 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        setValue(confStats.toBool());
-        /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(statisticsReportAllowed);
-        MSSettings::roSettings()->sync();
+        if (confStats.toString() != lit("N/A")) {
+            setValue(confStats.toBool());
+            /* Cleanup installer value. */
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit("N/A"));
+            MSSettings::roSettings()->sync();
+        }
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
     if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
@@ -1464,6 +1467,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler(), RestPermissions::adminOnly);
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
