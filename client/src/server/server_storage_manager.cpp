@@ -131,8 +131,10 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
     connect(qnResPool, &QnResourcePool::resourceAdded,      this, resourceAdded);
     connect(qnResPool, &QnResourcePool::resourceRemoved,    this, resourceRemoved);
 
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+    const auto allServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr &server: allServers)
         resourceAdded(server);
+
 }
 
 QnServerStorageManager::~QnServerStorageManager() {

@@ -331,7 +331,8 @@ public:
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
 
-    enum ResourceStatus {
+    enum ResourceStatus
+    {
         Offline,
         Unauthorized,
         Online,
@@ -343,7 +344,9 @@ public:
          * QnIncompatibleServerWatcher. Fake servers can also have Unauthorized status.
          * So if you want to check if the server is fake use QnMediaServerResource::isFakeServer().
          */
-        Incompatible
+        Incompatible,
+
+        AnyStatus
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 

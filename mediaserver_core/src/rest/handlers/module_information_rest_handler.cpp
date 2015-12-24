@@ -27,25 +27,31 @@ namespace {
     }
 }
 
-int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
+int QnModuleInformationRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path)
 
     bool allModules = params.value(lit("allModules")) == lit("true");
     bool useAddresses = params.value(lit("showAddresses"), lit("true")) != lit("false");
 
-    if (allModules) {
-        if (useAddresses) {
+    if (allModules)
+    {
+        const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+        if (useAddresses)
+        {
             QList<QnModuleInformationWithAddresses> modules;
-            for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
+            for (const QnMediaServerResourcePtr &server: onlineServers)
+            {
                 QnModuleInformationWithAddresses moduleInformation = server->getModuleInformation();
                 moduleInformation.remoteAddresses = getAddresses(server);
                 modules.append(std::move(moduleInformation));
             }
             result.setReply(modules);
-        } else {
+        }
+        else
+        {
             QList<QnModuleInformation> modules;
-            for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+            for (const QnMediaServerResourcePtr &server: onlineServers)
                 modules.append(server->getModuleInformation());
             result.setReply(modules);
         }
