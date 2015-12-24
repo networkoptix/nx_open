@@ -153,7 +153,6 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
     enum RebuildState {
-        RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
         RebuildState_PartialScan = 3
@@ -313,7 +312,7 @@ public:
         io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
-        storage_fastscan = 0x8000000,   /**< Fast scan for storage in progress */
+        storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
         local_media = local | media,
         local_layout = local | layout,
