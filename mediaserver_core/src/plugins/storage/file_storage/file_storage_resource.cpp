@@ -613,7 +613,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
         else if (ENOENT == errno)
         {   // Directory does not exist.
             NX_LOG(
-                lit(["QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, directory does not exists")
+                lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, directory does not exists")
                     .arg(m_localPath),
                 cl_logDEBUG1
             );
@@ -622,7 +622,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
         else
         {   // opendir() failed for some other reason.
             NX_LOG(
-                lit(["QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, errno = %2")
+                lit("[QnFileStorageResource::isStorageDirMounted] opendir() %1 failed, errno = %2")
                     .arg(m_localPath)
                     .arg(errno),
                 cl_logDEBUG1
@@ -647,7 +647,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             // Will try to unmount, remove it and set flag meaning
             // that local path recreation + remount is needed
             NX_LOG(
-                lit(["QnFileStorageResource::isStorageDirMounted] mount result = %1 , errno = %2")
+                lit("[QnFileStorageResource::isStorageDirMounted] mount result = %1 , errno = %2")
                     .arg(retCode)
                     .arg(err),
                 cl_logDEBUG1
@@ -659,7 +659,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
     }
 
     // This part is for manually mounted folders
-    
+
     const QString notResolvedStoragePath = closeDirPath(getPath());
     const QString& storagePath = QDir(notResolvedStoragePath).absolutePath();
     //on unix, checking that storage directory is mounted, if it is to be mounted
