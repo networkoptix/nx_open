@@ -14,6 +14,8 @@ logger = logging.getLogger(__name__)
 class ErrorCodes(Enum):
     ok = 'ok'
 
+    # not authorizes
+
     # Cloud DB errors:
     cloud_invalid_response = 'cloudInvalidResponse'
 
@@ -168,12 +170,59 @@ def validate_response(func):
     return validator
 
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 def handle_exceptions(func):
     """
     Decorator for api_methods to handle all unhandled exception and return some reasonable response for a client
     :param func:
     :return:
     """
+
+
+
+    def log_error(request, error = None):
+        page_url = 'unknown'
+        user_name = 'not authorized'
+        request_data = ''
+        ip = 'unknown'
+
+        if isinstance(request, Request):
+            page_url = request.build_absolute_uri()
+            request_data = request.data
+            ip = get_client_ip(request)
+            if not isinstance(request.user, AnonymousUser):
+                user_name = request.user.email
+
+        if isinstance(error, APIException):
+            error_formatted = 'Status: {0}\nMessage: {1}\nError code: {2}\nError data: {3}'.\
+                              format(error.status_code,
+                                     error.error_text,
+                                     error.error_code,
+                                     json.dumps(error.error_data, indent=4, separators=(',', ': '))
+                                     )
+        else:
+            error_formatted = 'Unexpected error'
+
+        error_formatted = '\n{0}\nPortal URL: {1}\nUser: {2}\nUser IP:{3}\nRequest: {4}\n{5}\nCall Stack: \n{6}'.\
+            format(error.__class__.__name__,
+                   page_url,
+                   user_name,
+                   ip,
+                   request_data,
+                   error_formatted,
+                   traceback.format_exc()
+                   )
+
+        logger.error(error_formatted)
+        return error_formatted
 
     def handler(*args, **kwargs):
         # noinspection PyBroadException
@@ -183,35 +232,13 @@ def handle_exceptions(func):
                 return Response(data, status=status.HTTP_200_OK)
             return data
         except APIException as error:
-
-            request = args[0]
-            page_url = 'unknown'
-            user_name = 'not authorized'
-            request_data = ''
-
-            if isinstance(request, Request):
-                page_url = request.build_absolute_uri()
-                request_data = request.data
-                if not isinstance(request.user, AnonymousUser):
-                    user_name = request.user.email
-
+            # Do not log not_authorized errors
             if error.error_code != ErrorCodes.not_authorized and error.error_code != ErrorCodes.not_authorized.value:
-                error_formatted = '\n{8}\nStatus: {0}\nPortal URL: {5}\nUser: {6}\nRequest: {7}\n' \
-                                  'Message: {1}\nError code: {2}\nError data: {3}\nCall Stack: \n{4}'.\
-                                  format(error.status_code,
-                                         error.error_text,
-                                         error.error_code,
-                                         json.dumps(error.error_data, indent=4, separators=(',', ': ')),
-                                         traceback.format_exc(),
-                                         page_url,
-                                         user_name,
-                                         request_data,
-                                         error.__class__.__name__)
-                logger.error(error_formatted)
+                log_error(args[0], error)
+
             return error.response()
-        except:
-            detailed_error = 'Unexpected error somewhere inside:\n' + traceback.format_exc()
-            logger.error(detailed_error)
+        except Exception as error:
+            detailed_error = log_error(args[0], error)
 
             if not settings.DEBUG:
                 detailed_error = 'Unexpected error somewhere inside'

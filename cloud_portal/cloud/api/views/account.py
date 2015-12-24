@@ -1,4 +1,3 @@
-from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
@@ -9,8 +8,21 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
-from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, APIInternalException, api_success, \
-    ErrorCodes
+from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
+    APIInternalException, api_success, ErrorCodes
+
+
+def require_params(request, params_list):
+    miss_params = False
+    error_data = {}
+    for param in params_list:
+        if param not in request.data:
+            miss_params = True
+            error_data[error_data] = ['This field is required.']
+
+    if miss_params:
+        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
+                                  error_data=error_data)
 
 
 @api_view(['POST'])
@@ -30,7 +42,7 @@ def register(request):
 def login(request):
     # authorize user here
     # return user
-
+    require_params(request, ('email', 'password'))
     user = django.contrib.auth.authenticate(username=request.data['email'], password=request.data['password'])
     if user is None:
         raise APINotAuthorisedException('Username or password are invalid')
@@ -72,7 +84,8 @@ def index(request):
                                       ErrorCodes.wrong_parameters,
                                       error_data=serializer.errors)
 
-        Account.update(request.user.email, request.session['password'], request.data['first_name'], request.data['last_name'])
+        Account.update(request.user.email, request.session['password'], request.data['first_name'],
+                       request.data['last_name'])
         # if not success:
         #    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         serializer.save()
@@ -83,6 +96,7 @@ def index(request):
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def change_password(request):
+    require_params(request, ('old_password', 'new_password'))
     old_password = request.data['old_password']
     new_password = request.data['new_password']
 
@@ -95,10 +109,6 @@ def change_password(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def activate(request):
-    if 'user_email' not in request.data and 'code' not in request.data:
-        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
-                                      error_data={'code': ['This field is required.'],'user_email':['This field is required.']})
-
     if 'code' in request.data:
         code = request.data['code']
         user_data = Account.activate(code)
@@ -114,9 +124,12 @@ def activate(request):
         except ObjectDoesNotExist:
             raise APIInternalException('No email in portal_db', ErrorCodes.portal_critical_error)
         return api_success()
-
-    if 'user_email' in request.data:
+    elif 'user_email' in request.data:
         Account.reactivate(request.data['user_email'])
+    else:
+        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
+                                  error_data={'code': ['This field is required.'],
+                                              'user_email': ['This field is required.']})
 
     return api_success()
 
@@ -125,11 +138,6 @@ def activate(request):
 @permission_classes((AllowAny, ))
 @handle_exceptions
 def restore_password(request):
-
-    if 'code' not in request.data and 'user_email' not in request.data:
-        raise APIRequestException('Required parameters are absent', ErrorCodes.wrong_parameters,
-                                      error_data={'user_email': ['This field is required.']})
-
     if 'code' in request.data:
         code = request.data['code']
 
@@ -142,16 +150,16 @@ def restore_password(request):
         if not user_email or not temp_password:
             raise APIRequestException('Activation code has wrong structure:' + code, ErrorCodes.wrong_code)
 
-
-        if 'new_password' not in request.data or not request.data['new_password']:
-            raise APIRequestException('New password is absent', ErrorCodes.wrong_parameters,
-                                      error_data={'new_password': ['This field is required.']})
+        require_params(request, ('new_password',))
 
         new_password = request.data['new_password']
 
         Account.change_password(user_email, temp_password, new_password)
-    else:
+    elif 'user_email' in request.data:
         user_email = request.data['user_email']
         Account.reset_password(user_email)
-
+    else:
+        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
+                                  error_data={'code': ['This field is required.'],
+                                              'user_email': ['This field is required.']})
     return api_success()

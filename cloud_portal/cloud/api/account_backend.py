@@ -3,6 +3,7 @@ from django import db
 import models
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import APIRequestException, ErrorCodes
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class AccountBackend(object):
@@ -11,14 +12,18 @@ class AccountBackend(object):
         checkuser = Account.get(username, password)
 
         if checkuser:
-            return models.Account.objects.get(email=username)
+            try:
+                return models.Account.objects.get(email=username)
+            except ObjectDoesNotExist:
+                return None
+
         return None
 
     @staticmethod
     def get_user(user_id):
         try:
             return models.Account.objects.get(pk=user_id)
-        except models.Account.DoesNotExist:
+        except ObjectDoesNotExist:
             return None
 
 
