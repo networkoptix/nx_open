@@ -291,12 +291,12 @@ int QnFileStorageResource::mountTmpDrive() const
     umount(m_localPath.toLatin1().constData());
     rmdir(m_localPath.toLatin1().constData());
 
-    retCode = mkdir(
+    int retCode = mkdir(
         m_localPath.toLatin1().constData(),
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
-    int retCode = mount(        
+    retCode = mount(        
         srcString.toLatin1().constData(),
         m_localPath.toLatin1().constData(),
         "cifs",
