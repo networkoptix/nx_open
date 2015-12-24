@@ -39,7 +39,8 @@ angular.module('webadminApp')
             smtpTimeout: {label:"SMTP timeout", type:"number"},
             smptPassword: {label:"SMTP password", type:"text"},
             smtpUser: {label:"SMTP user", type:"text"},
-            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"}
+            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
+            crossdomainEnabled: {label:"Enable webclient flash player support (crossdomain.xml)", type:"checkbox"}
         };
 
         mediaserver.systemSettings().then(function(r){
