@@ -223,7 +223,7 @@ struct QnMetaDataV1 : public QnAbstractMediaData
     /**
      * @param data Should contain MD_WIDTH * MD_HEIGHT / CHAR_BIT bytes.
      */
-    void QnMetaDataV1::assign( const void* data, qint64 timestamp, qint64 duration );
+    void assign( const void* data, qint64 timestamp, qint64 duration );
 
     static void createMask(const QRegion& region,  char* mask, int* maskStart = 0, int* maskEnd = 0);
 
