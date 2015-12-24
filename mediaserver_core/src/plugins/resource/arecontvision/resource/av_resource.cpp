@@ -203,8 +203,9 @@ bool QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)>&& c
     url.setPassword( getAuth().password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-    const QnMacAddress cameraMAC = getMAC();
+    httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
 
+    const QnMacAddress cameraMAC = getMAC();
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
     {
