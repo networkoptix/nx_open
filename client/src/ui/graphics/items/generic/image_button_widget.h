@@ -166,7 +166,7 @@ private:
 
     MarginsF m_imageMargins;
 
-    QIcon m_innerIcon;
+    QIcon m_icon;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnImageButtonWidget::StateFlags)

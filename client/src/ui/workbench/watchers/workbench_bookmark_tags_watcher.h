@@ -4,6 +4,7 @@
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/camera_bookmark.h>
 
+// TODO: #ynikitenkov Thionk about usage only on bookmarks dialog showing 
 class QnWorkbenchBookmarkTagsWatcher : public QObject {
     Q_OBJECT
 public:

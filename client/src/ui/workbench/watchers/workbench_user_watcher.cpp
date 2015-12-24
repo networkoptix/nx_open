@@ -20,7 +20,7 @@ QnWorkbenchUserWatcher::QnWorkbenchUserWatcher(QObject *parent):
     QnWorkbenchContextAware(parent),
     m_reconnectOnPasswordChange(true)
 {
-    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {       
+    connect(QnClientMessageProcessor::instance(),   &QnClientMessageProcessor::initialResourcesReceived,    this,   [this] {
         setCurrentUser(calculateCurrentUser());
     });
 
@@ -36,7 +36,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
     if (m_user) {
         disconnect(m_user, NULL, this, NULL);
         if (m_permissionsNotifier)
-            disconnect(m_permissionsNotifier, NULL, this, NULL); 
+            disconnect(m_permissionsNotifier, NULL, this, NULL);
     }
 
     m_user = user;
@@ -47,7 +47,7 @@ void QnWorkbenchUserWatcher::setCurrentUser(const QnUserResourcePtr &user) {
 
     if (m_user) {
         connect(m_user, &QnResource::resourceChanged, this, &QnWorkbenchUserWatcher::at_user_resourceChanged); //TODO: #GDM #Common get rid of resourceChanged
-        
+
         connect(m_user, &QnUserResource::permissionsChanged, this, &QnWorkbenchUserWatcher::at_user_permissionsChanged);
     }
 
@@ -129,13 +129,8 @@ void QnWorkbenchUserWatcher::at_user_permissionsChanged(const QnResourcePtr &use
         return;
 
     Qn::Permissions newPermissions = accessController()->globalPermissions(m_user);
-    /* Reconnect if some permissions were removed */
-    bool reconnect = (newPermissions & m_userPermissions) != m_userPermissions;
-    /* Also reconnect if 'administrator' state was changed. */
-    bool wasAdmin =     m_userPermissions.testFlag(Qn::GlobalProtectedPermission);
-    bool becameAdmin =  newPermissions.testFlag(Qn::GlobalProtectedPermission);
-    reconnect |= (wasAdmin != becameAdmin); 
-
+    /* Reconnect if some permissions were changed*/
+    const bool reconnect = (newPermissions != m_userPermissions);
     m_userPermissions = newPermissions;
     if (reconnect)
         emit reconnectRequired();

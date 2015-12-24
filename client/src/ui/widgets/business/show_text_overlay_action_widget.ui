@@ -155,6 +155,12 @@
        <height>80</height>
       </size>
      </property>
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="centerOnScroll">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
   </layout>

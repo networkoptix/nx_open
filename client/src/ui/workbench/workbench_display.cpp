@@ -704,9 +704,15 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
         }
 
         if (oldWidget)
+        {
             oldWidget->setOption(QnResourceWidget::FullScreenMode, false);
+            oldWidget->setOption(QnResourceWidget::ActivityPresence, false);
+        }
         if (newWidget)
+        {
             newWidget->setOption(QnResourceWidget::FullScreenMode, true);
+            newWidget->setOption(QnResourceWidget::ActivityPresence, true);
+        }
 
         /* Hide / show other items when zoomed. */
         if(newWidget)

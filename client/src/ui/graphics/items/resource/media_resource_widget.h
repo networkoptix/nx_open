@@ -169,6 +169,9 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
+
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
