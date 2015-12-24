@@ -28,6 +28,7 @@ angular.module('webadminApp')
                 return formatUrl(storage.url);
             });
             for(var i = 0; i<$scope.storages.length;i++){
+                $scope.storages[i].accessible = parseInt($scope.storages[i].totalSpace) > 0;
                 $scope.storages[i].reservedSpaceGb = Math.round($scope.storages[i].reservedSpace / (1024*1024*1024));
                 $scope.storages[i].url = formatUrl($scope.storages[i].url);
             }
@@ -38,9 +39,9 @@ angular.module('webadminApp')
                 for(var i in $scope.storages){
                     var storage = $scope.storages[i];
                     storage.reservedSpace = storage.reservedSpaceGb * (1024*1024*1024);
-                    $scope.someSelected = $scope.someSelected || storage.isUsedForWriting && storage.isWritable;
+                    $scope.someSelected = $scope.someSelected || storage.accessible && storage.isUsedForWriting && storage.isWritable && !storage.isBackup;
 
-                    if(storage.reservedSpace > storage.freeSpace ){
+                    if(storage.accessible && storage.reservedSpace > storage.freeSpace ){
                         $scope.reduceArchiveWarning = true;
                     }
 
@@ -71,17 +72,11 @@ angular.module('webadminApp')
         };
         $scope.save = function(){
             var needConfirm = false;
-            var hasStorageForWriting;
-            _.each($scope.storages,function(storageinfo){
-                hasStorageForWriting = hasStorageForWriting || storageinfo.isUsedForWriting;
 
-                if(storageinfo.reservedSpace > storageinfo.freeSpace ){
-                    needConfirm = 'Set reserved space is greater than free space left. Possible partial remove of the video footage is expected. Do you want to continue?';
-                }
-            });
-
-            if(!hasStorageForWriting){
-                needConfirm = 'No storages were selected for writing - video will not be recorded on this server. Do you want to continue?';
+            if(!$scope.someSelected){
+                needConfirm = 'No main storage drive was selected for writing - video will not be recorded on this server. Do you want to continue?';
+            }else if($scope.reduceArchiveWarning){
+                needConfirm = 'Set reserved space is greater than free space left. Possible partial remove of the video footage is expected. Do you want to continue?';
             }
 
             if(needConfirm && !confirm(needConfirm)) {

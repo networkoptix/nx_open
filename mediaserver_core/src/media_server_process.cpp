@@ -1233,10 +1233,12 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        setValue(confStats.toBool());
-        /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(statisticsReportAllowed);
-        MSSettings::roSettings()->sync();
+        if (confStats.toString() != lit("N/A")) {
+            setValue(confStats.toBool());
+            /* Cleanup installer value. */
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit("N/A"));
+            MSSettings::roSettings()->sync();
+        }
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
     if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
@@ -2012,7 +2014,10 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-
+        qnServerDb->setBookmarkCountController([server](size_t count){
+            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+            propertyDictionary->saveParams(server->getId());
+        });
 
         propertyDictionary->saveParams(server->getId());
 
