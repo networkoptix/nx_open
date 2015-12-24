@@ -60,8 +60,10 @@ class NX_NETWORK_API Header
 {
 public:
     Header();
-    Header( MessageClass messageClass_, int method_ );
-    Header( MessageClass messageClass_, int method_, Buffer transactionId_ );
+    Header(const Header&);
+    Header(Header&&);
+    Header(MessageClass messageClass_, int method_);
+    Header(MessageClass messageClass_, int method_, Buffer transactionId_);
 
     static Buffer makeTransactionId();
 

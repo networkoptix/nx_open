@@ -11,28 +11,28 @@ namespace hpm {
 
 void sendSuccessResponse(
     const ConnectionSharedPtr& connection,
-    stun::Header& request)
+    stun::Header requestHeader)
 {
     stun::Message response(
         stun::Header(
             stun::MessageClass::successResponse,
-            request.method,
-            std::move(request.transactionId)));
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
 
     connection->sendMessage(std::move(response));
 }
 
 void sendErrorResponse(
     const ConnectionSharedPtr& connection,
-    stun::Header& request,
+    stun::Header requestHeader,
     int code,
     String reason)
 {
     stun::Message response(
         stun::Header(
             stun::MessageClass::errorResponse,
-            request.method,
-            std::move(request.transactionId)));
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
 
     response.newAttribute< stun::attrs::ErrorDescription >(
         code,

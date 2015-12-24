@@ -8,6 +8,7 @@
 
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/server_connection.h>
+#include <utils/serialization/lexical.h>
 
 
 namespace nx {
@@ -20,12 +21,12 @@ typedef std::weak_ptr< stun::ServerConnection > ConnectionWeakPtr;
 /** Send success responce without attributes */
 void sendSuccessResponse(
     const ConnectionSharedPtr& connection,
-    stun::Header& request);
+    stun::Header requestHeader);
 
 /** Send error responce with error code and description as attribute */
 void sendErrorResponse(
     const ConnectionSharedPtr& connection,
-    stun::Header& request,
+    stun::Header requestHeader,
     int code,
     String reason);
 
@@ -46,16 +47,17 @@ void processRequestWithNoOutput(
     if (!input.parse(request))
         return sendErrorResponse(
             connection,
-            request.header,
+            std::move(request.header),
             nx::stun::error::badRequest,
             input.errorText());
 
     ConnectionWeakPtr connectionWeak = connection;
 
+    auto requestHeader = std::move(request.header);
     (processor->*processingFunc)(
         connection,
         std::move(input),
-        [/*std::move*/ request, connectionWeak](api::ResultCode resultCode) mutable
+        [/*std::move*/ requestHeader, connectionWeak](api::ResultCode resultCode) mutable
     {
         auto connection = connectionWeak.lock();
         if (!connection)
@@ -64,15 +66,15 @@ void processRequestWithNoOutput(
         if (resultCode != api::ResultCode::ok)
             return sendErrorResponse(
                 connection,
-                std::move(request.header),
+                std::move(requestHeader),
                 api::resultCodeToStunErrorCode(resultCode),
                 QnLexical::serialized(resultCode).toLatin1());
 
         stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
-                request.header.method,
-                std::move(request.header.transactionId)));
+                requestHeader.method,
+                std::move(requestHeader.transactionId)));
 
         connection->sendMessage(std::move(response));
     });
@@ -92,16 +94,17 @@ void processRequestWithOutput(
     if (!input.parse(request))
         return sendErrorResponse(
             connection,
-            request.header,
+            std::move(request.header),
             nx::stun::error::badRequest,
             input.errorText());
 
     ConnectionWeakPtr connectionWeak = connection;
 
+    auto requestHeader = std::move(request.header);
     (processor->*processingFunc)(
         connection,
         std::move(input),
-        [/*std::move*/ request, connectionWeak](
+        [/*std::move*/ requestHeader, connectionWeak](
             api::ResultCode resultCode,
             OutputData outputData) mutable
     {
@@ -112,15 +115,15 @@ void processRequestWithOutput(
         if (resultCode != api::ResultCode::ok)
             return sendErrorResponse(
                 connection,
-                std::move(request.header),
+                std::move(requestHeader),
                 api::resultCodeToStunErrorCode(resultCode),
                 QnLexical::serialized(resultCode).toLatin1());
 
         stun::Message response(
             stun::Header(
                 stun::MessageClass::successResponse,
-                request.header.method,
-                std::move(request.header.transactionId)));
+                requestHeader.method,
+                std::move(requestHeader.transactionId)));
         outputData.serialize(&response);
 
         connection->sendMessage(std::move(response));

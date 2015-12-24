@@ -20,6 +20,22 @@ Header::Header()
 {
 }
 
+Header::Header(const Header& right)
+:
+    messageClass(right.messageClass),
+    method(right.method),
+    transactionId(right.transactionId)
+{
+}
+
+Header::Header(Header&& right)
+:
+    messageClass(std::move(right.messageClass)),
+    method(std::move(right.method)),
+    transactionId(std::move(right.transactionId))
+{
+}
+         
 Header::Header( MessageClass messageClass_ , int method_)
     : messageClass( messageClass_ )
     , method( method_ )
