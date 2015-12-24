@@ -30,6 +30,7 @@ namespace ec2
         ApiObject_Videowall,
         ApiObject_BusinessRule,
         ApiObject_Storage,
+        ApiObject_WebPage,
         ApiObject_Dummy
     };
     struct ApiObjectInfo
@@ -175,7 +176,7 @@ namespace ec2
         class QnQueryFilter
         {
         public:
-            //filtered field, 
+            //filtered field,
             QMap<int, QVariant> fields;
         };
 
@@ -228,6 +229,9 @@ namespace ec2
         //getVideowallList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiVideowallDataList& videowallList);
 
+        //getWebPageList
+        ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiWebPageDataList& webPageList);
+
         //getBusinessRuleList
         ErrorCode doQueryNoLock(const std::nullptr_t& /*dummy*/, ApiBusinessRuleDataList& userList);
 
@@ -251,7 +255,7 @@ namespace ec2
 
         //getTransactionLog
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiTransactionDataList& tranList);
-        
+
         //getClientInfos
         ErrorCode doQueryNoLock(const std::nullptr_t&, ApiClientInfoDataList& data);
         ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
@@ -282,6 +286,8 @@ namespace ec2
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiUpdateUploadResponceData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiVideowallDataList>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiWebPageData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiWebPageDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveryData> &tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiDatabaseDumpData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiClientInfoData>& tran);
@@ -421,7 +427,7 @@ namespace ec2
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
-        
+
         ErrorCode executeTransactionInternal(const QnTransaction<ApiTranSyncDoneData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
@@ -489,6 +495,10 @@ namespace ec2
         ErrorCode deleteVideowallMatrices(const QnUuid &videowall_guid);
         ErrorCode updateVideowallMatrices(const ApiVideowallData &data);
 
+        ErrorCode saveWebPage(const ApiWebPageData &params);
+        ErrorCode removeWebPage(const QnUuid &id);
+        ErrorCode insertOrReplaceWebPage(const ApiWebPageData &data, qint32 internalId);
+
         ErrorCode insertOrReplaceBusinessRuleTable( const ApiBusinessRuleData& businessRule);
         ErrorCode insertBRuleResource(const QString& tableName, const QnUuid& ruleGuid, const QnUuid& resourceGuid);
         ErrorCode removeBusinessRule( const QnUuid& id );
@@ -502,7 +512,7 @@ namespace ec2
         bool createDatabase();
         bool migrateBusinessEvents();
         bool doRemap(int id, int newVal, const QString& fieldName);
-        
+
         qint32 getResourceInternalId( const QnUuid& guid );
         QnUuid getResourceGuid(const qint32 &internalId);
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
@@ -529,7 +539,7 @@ namespace ec2
         bool resyncTransactionLog();
         bool addStoredFiles(const QString& baseDirectoryName, int* count = 0);
 
-        template <class ObjectType, class ObjectListType> 
+        template <class ObjectType, class ObjectListType>
         bool fillTransactionLogInternal(ApiCommand::Value command);
 
         virtual bool beforeInstallUpdate(const QString& updateName) override;

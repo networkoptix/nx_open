@@ -10,12 +10,12 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>2.5.0-SNAPSHOT</version>
+		<version>2.6.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>2.5.0-SNAPSHOT</version>
+	<version>2.6.0-SNAPSHOT</version>
     <artifactId>it930x_plugin</artifactId>
 	<packaging>pom</packaging>
     <name>HD Witness ITE it930x DVB-T Receiver Plugin</name>
@@ -26,7 +26,7 @@
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-		<global.libs>-lcommon</global.libs>
+		<global.libs>-lcommon -lnx_streaming</global.libs>
 		<!--Specific os libs used-->
         <windows.oslibs/>
 		<!--Global defines-->

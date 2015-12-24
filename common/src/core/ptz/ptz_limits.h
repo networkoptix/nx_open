@@ -1,7 +1,9 @@
 #ifndef QN_PTZ_LIMITS_H
 #define QN_PTZ_LIMITS_H
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>

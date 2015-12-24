@@ -5,7 +5,7 @@
 
 #include <server/server_globals.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/util.h"
 #include "utils/common/log.h"

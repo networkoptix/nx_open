@@ -14,7 +14,7 @@
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
 
-#include <core/datapacket/media_data_packet.h>
+#include <nx/streaming/media_data_packet.h>
 #include <utils/common/timermanager.h>
 
 #include "api/model/audit/auth_session.h"

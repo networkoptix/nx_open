@@ -32,7 +32,8 @@
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <ui/actions/action_manager.h>
 #include <ui/common/recording_status_helper.h>
@@ -716,7 +717,7 @@ void QnMediaResourceWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     for(int channel = 0; channel < channelCount(); channel++)
         m_renderer->setDisplayedRect(channel, exposedRect(channel, true, true, true));
 
-	updateInfoTextLater();
+    updateInfoTextLater();
 }
 
 Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect) {
@@ -1010,7 +1011,7 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify() {
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     if(changedFlags & DisplayMotion) {
-        if (QnAbstractArchiveReader *reader = m_display->archiveReader())
+        if (QnAbstractArchiveStreamReader *reader = m_display->archiveReader())
             reader->setSendMotion(options() & DisplayMotion);
 
         buttonBar()->setButtonsChecked(MotionSearchButton, options() & DisplayMotion);
@@ -1033,7 +1034,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     qreal mbps = 0.0;
 
     for(int i = 0; i < channelCount(); i++) {
-        const QnStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
+        const QnMediaStreamStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
         if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
@@ -1044,8 +1045,9 @@ QString QnMediaResourceWidget::calculateDetailsText() const {
     size.setWidth(size.width() * m_display->camDisplay()->channelsCount());
 
     QString codecString;
-    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
-        codecString = codecContext->codecName();
+    if(QnConstMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
+        codecString = codecContext->getCodecName();
+
 
     QString hqLqString;
     if (m_resource->hasVideo(m_display->mediaProvider()) && !m_resource->toResource()->hasFlags(Qn::local))
@@ -1214,13 +1216,13 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
             return Qn::IoModuleDisabledOverlay;
     }
 
-    if (resource->hasFlags(Qn::SINGLE_SHOT)) {
+    if (resource->hasFlags(Qn::local_image)) {
         if (resource->getStatus() == Qn::Offline)
             return Qn::NoDataOverlay;
         if (m_display->camDisplay()->isStillImage() && m_display->camDisplay()->isEOFReached())
             return Qn::NoDataOverlay;
         return Qn::EmptyOverlay;
-    } else if (resource->hasFlags(Qn::ARCHIVE) && resource->getStatus() == Qn::Offline) {
+    } else if (resource->hasFlags(Qn::local_video) && resource->getStatus() == Qn::Offline) {
         return Qn::NoDataOverlay;
 
 

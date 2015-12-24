@@ -1030,7 +1030,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
-        m_decoder = new CLFFmpegVideoDecoder(videoData->compressionType, videoData, false);
+        m_decoder = new QnFfmpegVideoDecoder(videoData->compressionType, videoData, false);
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 

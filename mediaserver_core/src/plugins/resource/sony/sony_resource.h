@@ -14,7 +14,7 @@
 #include "utils/network/http/asynchttpclient.h"
 #include "utils/network/http/linesplitter.h"
 #include "utils/network/http/asynchttpclient.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
 
 

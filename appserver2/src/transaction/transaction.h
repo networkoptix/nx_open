@@ -26,7 +26,7 @@ namespace ec2
 
             /* System */
             tranSyncRequest             = 1,    /*< ApiSyncRequestData */
-            tranSyncResponse            = 2,    /*< QnTranStateResponse */       
+            tranSyncResponse            = 2,    /*< QnTranStateResponse */
             lockRequest                 = 3,    /*< ApiLockData */
             lockResponse                = 4,    /*< ApiLockData */
             unlockRequest               = 5,    /*< ApiLockData */
@@ -64,8 +64,8 @@ namespace ec2
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */
             getCameraUserAttributes     = 312,  /*< ApiCameraAttributesDataList */
             getCamerasEx                = 313,  /*< ApiCameraDataExList */
-            
-          
+
+
             /* MediaServer resource */
             getMediaServers             = 400,  /*< ApiMediaServerDataList */
             saveMediaServer             = 401,  /*< ApiMediaServerData */
@@ -139,10 +139,15 @@ namespace ec2
             removeDiscoveryInformation  = 1403, /*< ApiDiscoveryData*/
             getDiscoveryData            = 1404, /*< ApiDiscoveryDataList */
 
+            /* WebPage resource */
+            getWebPages                 = 1500,  /*< ApiWebPageDataList */
+            saveWebPage                 = 1501,  /*< ApiWebPageData */
+            removeWebPage               = 1502,  /*< ApiIdData */
+
             /* Misc */
             forcePrimaryTimeServer      = 2001,  /*< ApiIdData */
             broadcastPeerSystemTime     = 2002,  /*< ApiPeerSystemTimeData*/
-            getCurrentTime              = 2003,  /*< ApiTimeData */         
+            getCurrentTime              = 2003,  /*< ApiTimeData */
             changeSystemName            = 2004,  /*< ApiSystemNameData */
             getKnownPeersSystemTime     = 2005,  /*< ApiPeerSystemTimeDataList */
             markLicenseOverflow         = 2006,  /*< ApiLicenseOverflowData */
@@ -208,7 +213,7 @@ namespace ec2
     public:
 		QnAbstractTransaction(): command(ApiCommand::NotDefined), isLocal(false) { peerID = qnCommon->moduleGUID(); }
         QnAbstractTransaction(ApiCommand::Value value): command(value), isLocal(false) { peerID = qnCommon->moduleGUID(); }
-        
+
         struct PersistentInfo
         {
             PersistentInfo(): sequence(0), timestamp(0) {}
@@ -233,12 +238,12 @@ namespace ec2
         QnUuid peerID;
         PersistentInfo persistentInfo;
         QnTranDeliveryInformation deliveryInfo;
-        
+
         bool isLocal; // do not propagate transactions to other server peers
 
         QString toString() const;
     };
-    
+
 
     typedef std::vector<ec2::QnAbstractTransaction> QnAbstractTransactionList;
     typedef QnAbstractTransaction::PersistentInfo QnAbstractTransaction_PERSISTENT;
@@ -252,7 +257,7 @@ namespace ec2
         QnTransaction(): QnAbstractTransaction() {}
         QnTransaction(const QnAbstractTransaction& abstractTran): QnAbstractTransaction(abstractTran) {}
         QnTransaction(ApiCommand::Value command, const T& params = T()): QnAbstractTransaction(command), params(params) {}
-        
+
         T params;
     };
 
@@ -270,7 +275,7 @@ namespace ec2
     //template <class T, class Input>
     //bool deserialize(QnInputBinaryStream<Input>* stream,  QnTransaction<T> *transaction)
     //{
-    //    return 
+    //    return
     //        QnBinary::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
     //        QnBinary::deserialize(stream, &transaction->params);
     //}
@@ -289,7 +294,7 @@ namespace ec2
     template<class T>
     bool deserialize(QnJsonContext* ctx, const QJsonValue& value, QnTransaction<T>* target)
     {
-        return 
+        return
             QJson::deserialize(ctx, value, static_cast<QnAbstractTransaction*>(target)) &&
             QJson::deserialize(ctx, value.toObject(), "params", &target->params);
     }
@@ -305,7 +310,7 @@ namespace ec2
     template <class T, class Input>
     bool deserialize(QnUbjsonReader<Input>* stream,  QnTransaction<T> *transaction)
     {
-        return 
+        return
             QnUbjson::deserialize(stream,  static_cast<QnAbstractTransaction *>(transaction)) &&
             QnUbjson::deserialize(stream, &transaction->params);
     }

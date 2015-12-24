@@ -2,7 +2,7 @@
 
 #include <QtCore/QDir>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 
 #include "avi_bluray_archive_delegate.h"
 

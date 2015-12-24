@@ -3,15 +3,17 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
 
-#include "core/datapacket/video_data_packet.h"
-#include "rtp_stream_parser.h"
-#include "utils/media/nalUnits.h"
-#include "rtpsession.h"
+#include <nx/streaming/video_data_packet.h>
+#include <nx/streaming/rtp_stream_parser.h>
+#include <utils/media/nalUnits.h>
+#include <nx/streaming/rtsp_client.h>
 
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {
@@ -20,7 +22,7 @@ public:
     virtual ~CLH264RtpParser();
     virtual void setSDPInfo(QList<QByteArray> lines) override;
 
-    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData) override;
+    virtual bool processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData) override;
 
 private:
     QMap <int, QByteArray> m_allNonSliceNal;
@@ -43,7 +45,7 @@ private:
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
-    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics);
+    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const QnRtspStatistic& statistics);
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
     void updateNalFlags(int nalUnitType);
     int getSpsPpsSize() const;

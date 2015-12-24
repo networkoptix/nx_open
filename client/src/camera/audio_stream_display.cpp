@@ -4,7 +4,7 @@
 #include <utils/media/audio_processor.h>
 
 #include "decoders/audio/audio_struct.h"
-#include "decoders/audio/abstractaudiodecoder.h"
+#include "decoders/audio/abstract_audio_decoder.h"
 
 #include "client/client_settings.h"
 
@@ -33,7 +33,7 @@ QnAudioStreamDisplay::~QnAudioStreamDisplay()
     if (m_audioSound)
         QtvAudioDevice::instance()->removeSound(m_audioSound);
 
-    foreach(CLAbstractAudioDecoder* decoder, m_decoder)
+    foreach(QnAbstractAudioDecoder* decoder, m_decoder)
     {
         delete decoder;
     }
@@ -268,7 +268,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
 
         if (m_decoder[data->compressionType] == 0)
         {
-            m_decoder[data->compressionType] = CLAudioDecoderFactory::createDecoder(data);
+            m_decoder[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
 
         }
 
@@ -276,8 +276,7 @@ void QnAudioStreamDisplay::playCurrentBuffer()
             return;
 
         //  convert format
-        QnCodecAudioFormat audioFormat;
-        audioFormat.fromAvStream(data->context->ctx());
+        QnCodecAudioFormat audioFormat(data->context);
         if (!m_isConvertMethodInitialized)
         {
             if (m_audioSound)

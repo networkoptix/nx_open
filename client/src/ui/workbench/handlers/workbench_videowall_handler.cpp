@@ -1264,7 +1264,6 @@ void QnWorkbenchVideoWallHandler::at_newVideoWallAction_triggered() {
     QnVideoWallResourcePtr videoWall(new QnVideoWallResource());
     videoWall->setId(QnUuid::createUuid());
     videoWall->setName(proposedName);
-    videoWall->setTypeByName(lit("Videowall"));
 
     qnResourcesChangesManager->saveVideoWall(videoWall, [](const QnVideoWallResourcePtr &videoWall){});
 }

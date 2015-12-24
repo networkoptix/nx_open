@@ -25,9 +25,9 @@ extern "C"
 
 #include <utils/common/log.h>
 
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "win_audio_device_info.h"
-#include "decoders/audio/ffmpeg_audio.h"
+#include "decoders/audio/ffmpeg_audio_decoder.h"
 #include "utils/media/ffmpeg_helper.h"
 
 // mux audio 1 and audio 2 to audio1 buffer
@@ -634,7 +634,7 @@ bool QnDesktopFileEncoder::init()
         m_audioCodecCtx = m_audioOutStream->codec;
         m_audioCodecCtx->codec_id = m_outputCtx->audio_codec;
         m_audioCodecCtx->codec_type = AVMEDIA_TYPE_AUDIO;
-        m_audioCodecCtx->sample_fmt = CLFFmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
+        m_audioCodecCtx->sample_fmt = QnFfmpegAudioDecoder::audioFormatQtToFfmpeg(m_audioInfo[0]->m_audioFormat);
         m_audioCodecCtx->channels = m_audioInfo.size() > 1 ? 2 : m_audioInfo[0]->m_audioFormat.channelCount();
         m_audioCodecCtx->sample_rate = m_audioInfo[0]->m_audioFormat.sampleRate();
         AVRational audioRational = {1, m_audioCodecCtx->sample_rate};
@@ -871,10 +871,10 @@ void QnDesktopFileEncoder::closeStream()
     if (m_formatCtx && m_videoPacketWrited)
         av_write_trailer(m_formatCtx);
 
-    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
 
-    QnFfmpegHelper::deleteCodecContext(m_audioCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_audioCodecCtx);
     m_audioCodecCtx = 0;
 
     if (m_formatCtx)

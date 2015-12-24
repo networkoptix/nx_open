@@ -276,6 +276,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    //TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
@@ -325,8 +326,10 @@ public:
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+
+        web_page = url | remote,   /**< Web-page resource */
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)

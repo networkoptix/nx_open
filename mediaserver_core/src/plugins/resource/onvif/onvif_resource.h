@@ -22,7 +22,7 @@
 #include <core/resource/camera_advanced_param.h>
 
 #include "utils/network/simple_http_client.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "soap_wrapper.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;

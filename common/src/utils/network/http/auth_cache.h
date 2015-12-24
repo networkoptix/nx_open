@@ -9,7 +9,9 @@
 #include <memory>
 #include <mutex>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QtCore/QUrl>
 
@@ -105,7 +107,7 @@ namespace nx_http
 
                 return *this;
             }
-            
+
             //AuthorizationCacheItem& operator=( AuthorizationCacheItem&& ) = default;
             AuthorizationCacheItem& operator=( AuthorizationCacheItem&& right )
             {
@@ -158,7 +160,7 @@ namespace nx_http
     private:
         //!Authorization header, successfully used with \a m_url
         /*!
-            //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials 
+            //TODO #ak (2.4) this information should stored globally depending on server endpoint, server path, user credentials
         */
         std::unique_ptr<AuthorizationCacheItem> m_cachedAuthorization;
         mutable std::mutex m_mutex;

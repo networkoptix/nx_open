@@ -9,7 +9,7 @@
 #include "../resource/av_resource.h"
 #include "../tools/simple_tftp_client.h"
 #include "../tools/AVJpegHeader.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "core/resource/resource_media_layout.h"
 #include "../resource/av_panoramic.h"
 

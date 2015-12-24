@@ -6,7 +6,9 @@
 #ifndef NX_UUID_H
 #define NX_UUID_H
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QtCore/QByteArray>
 #include <QtCore/QString>

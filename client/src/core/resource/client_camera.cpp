@@ -1,7 +1,8 @@
 #include "client_camera.h"
 
-#include <plugins/resource/archive/archive_stream_reader.h>
-#include <plugins/resource/archive/rtsp_client_archive_delegate.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/rtsp_client_archive_delegate.h>
+#include <redass/redass_controller.h>
 
 QnClientCameraResource::QnClientCameraResource(const QnUuid &resourceTypeId)
     : base_type(resourceTypeId)
@@ -30,6 +31,11 @@ QnConstResourceAudioLayoutPtr QnClientCameraResource::getAudioLayout(const QnAbs
 
 QnAbstractStreamDataProvider *QnClientCameraResource::createLiveDataProvider() {
     QnArchiveStreamReader *result = new QnArchiveStreamReader(toSharedPointer());
-    result->setArchiveDelegate(new QnRtspClientArchiveDelegate(result));
+    auto delegate = new QnRtspClientArchiveDelegate(result);
+    result->setArchiveDelegate(delegate);
+
+    connect(delegate, &QnRtspClientArchiveDelegate::dataDropped,
+        qnRedAssController, &QnRedAssController::onSlowStream);
+
     return result;
 }
