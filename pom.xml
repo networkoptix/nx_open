@@ -141,6 +141,7 @@
         <additional.defines/>
         <customization.defines/>
 
+        <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.dir>
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
@@ -534,7 +535,6 @@
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
-                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
