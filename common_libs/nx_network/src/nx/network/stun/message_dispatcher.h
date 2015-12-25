@@ -26,14 +26,17 @@ class NX_NETWORK_API MessageDispatcher
 {
 public:
     typedef std::function<
-        void( const std::shared_ptr< ServerConnection >&, stun::Message )
+        void(std::shared_ptr< ServerConnection >, stun::Message)
     > MessageProcessor;
+
+    virtual ~MessageDispatcher();
 
     /*!
         \param messageProcessor Ownership of this object is not passed
         \note All processors MUST be registered before connection processing is started,
               since this class methods are not thread-safe
-        \return \a true if \a requestProcessor has been registered, \a false otherwise
+        \return \a true if \a requestProcessor has been registered, 
+            \a false if processor for \a method has already been registered
         \note Message processing function MUST be non-blocking
     */
     bool registerRequestProcessor( int method, MessageProcessor processor );
@@ -43,8 +46,9 @@ public:
         \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
-    bool dispatchRequest( const std::shared_ptr< ServerConnection >& connection,
-                          stun::Message message ) const;
+    virtual bool dispatchRequest(
+        std::shared_ptr< ServerConnection > connection,
+        stun::Message message ) const;
 
 private:
     std::unordered_map< int, MessageProcessor > m_processors;

@@ -158,31 +158,31 @@ bool DummySocket::getKeepAlive( boost::optional< KeepAliveOptions >* /*result*/ 
     return false;
 }
 
-void DummySocket::postImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::post( std::function<void()> /*handler*/ )
 {
 }
 
-void DummySocket::dispatchImpl( std::function<void()>&& /*handler*/ )
+void DummySocket::dispatch( std::function<void()> /*handler*/ )
 {
 }
 
-void DummySocket::connectAsyncImpl( const SocketAddress& /*addr*/,
-                                    std::function<void( SystemError::ErrorCode )>&& /*handler*/ )
+void DummySocket::connectAsync( const SocketAddress& /*addr*/,
+                                    std::function<void( SystemError::ErrorCode )> /*handler*/ )
 {
 }
 
-void DummySocket::recvAsyncImpl( nx::Buffer* const /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
+void DummySocket::recvAsync( nx::Buffer* const /*buf*/,
+                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 
-void DummySocket::sendAsyncImpl( const nx::Buffer& /*buf*/,
-                                 std::function<void( SystemError::ErrorCode, size_t )>&& /*handler*/ )
+void DummySocket::sendAsync( const nx::Buffer& /*buf*/,
+                                 std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }
 
-void DummySocket::registerTimerImpl( unsigned int /*timeoutMs*/,
-                                     std::function<void()>&& /*handler*/ )
+void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
+                                     std::function<void()> /*handler*/ )
 {
 }
 

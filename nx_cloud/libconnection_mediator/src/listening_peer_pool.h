@@ -14,10 +14,13 @@
 #include <utils/serialization/lexical.h>
 
 #include "request_processor.h"
+#include "server/connection.h"
 
 
 namespace nx {
 namespace hpm {
+
+class MessageDispatcher;
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
 /*!
@@ -29,15 +32,21 @@ class ListeningPeerPool
 {
 public:
     ListeningPeerPool( AbstractCloudDataProvider* cloudData,
-                       stun::MessageDispatcher* dispatcher );
+                       MessageDispatcher* dispatcher );
 
-    void bind(const ConnectionSharedPtr& connection, stun::Message message);
-    void listen(const ConnectionSharedPtr& connection, stun::Message message);
+    void bind(
+        ConnectionSharedPtr connection,
+        stun::Message message);
+    void listen(
+        ConnectionSharedPtr connection,
+        stun::Message message);
     void resolve(
         ConnectionSharedPtr connection,
         api::ResolveRequest request,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
-    void connect(const ConnectionSharedPtr& connection, stun::Message message);
+    void connect(
+        ConnectionSharedPtr connection,
+        stun::Message message);
 
     void connectionResult(
         ConnectionSharedPtr connection,

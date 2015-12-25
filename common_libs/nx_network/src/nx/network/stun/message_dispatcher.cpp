@@ -8,6 +8,10 @@
 namespace nx {
 namespace stun {
 
+MessageDispatcher::~MessageDispatcher()
+{
+}
+
 bool MessageDispatcher::registerRequestProcessor(
         int method, MessageProcessor processor )
 {
@@ -15,14 +19,14 @@ bool MessageDispatcher::registerRequestProcessor(
 }
 
 bool MessageDispatcher::dispatchRequest(
-        const std::shared_ptr< ServerConnection >& connection,
+        std::shared_ptr< ServerConnection > connection,
         stun::Message message ) const
 {
     const auto it = m_processors.find( message.header.method );
     if( it == m_processors.end() )
         return false;
 
-    it->second( connection, std::move( message ) );
+    it->second( std::move(connection), std::move( message ) );
     return true;
 }
 

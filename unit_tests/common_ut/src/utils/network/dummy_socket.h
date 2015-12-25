@@ -52,13 +52,21 @@ public:
     virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
 
 protected:
-    virtual void postImpl( std::function<void()>&& handler ) override;
-    virtual void dispatchImpl( std::function<void()>&& handler ) override;
+    virtual void post( std::function<void()> handler ) override;
+    virtual void dispatch( std::function<void()> handler ) override;
 
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler ) override;
+    virtual void recvAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler ) override;
 
 private:
     SocketAddress m_localAddress;

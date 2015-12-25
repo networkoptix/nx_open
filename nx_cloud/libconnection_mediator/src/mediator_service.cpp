@@ -21,6 +21,7 @@
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
 #include "settings.h"
+#include "server/message_dispatcher.h"
 #include "version.h"
 
 
@@ -81,7 +82,7 @@ int MediatorProcess::executeApplication()
     }
 
     //STUN handlers
-    stun::MessageDispatcher stunMessageDispatcher;
+    MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
     ListeningPeerPool listeningPeerPool(cloudDataProvider.get(), &stunMessageDispatcher);
 

@@ -6,19 +6,22 @@
 
 #include <QJsonDocument>
 
+#include "server/message_dispatcher.h"
+
+
 namespace nx {
 namespace hpm {
 
 MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
-                                    stun::MessageDispatcher* dispatcher )
+                                    MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
             stun::cc::methods::ping,
-            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
-                { ping( connection, std::move( message ) ); } );
+            [this](ConnectionSharedPtr connection, stun::Message message)
+                { ping(std::move(connection), std::move(message)); });
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
@@ -29,12 +32,12 @@ struct PingCollector
     QnMutex mutex;
     size_t expected;
     std::list< SocketAddress > endpoints;
-    std::weak_ptr< stun::ServerConnection > connection;
+    ConnectionWeakPtr connection;
 
     PingCollector( size_t expected_,
-                   const std::weak_ptr< stun::ServerConnection >& connection_ )
+                   ConnectionWeakPtr connection_ )
         : expected( expected_ )
-        , connection( connection_ )
+        , connection( std::move(connection_) )
     {}
 };
 
@@ -91,7 +94,7 @@ void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
 // impl
 
 MediaserverApi::MediaserverApi( AbstractCloudDataProvider* cloudData,
-                                stun::MessageDispatcher* dispatcher )
+                                MessageDispatcher* dispatcher )
     : MediaserverApiBase( cloudData, dispatcher )
 {
 }

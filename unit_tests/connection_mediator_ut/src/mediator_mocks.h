@@ -5,6 +5,7 @@
 
 #include <listening_peer_pool.h>
 #include <mediaserver_api.h>
+#include <server/message_dispatcher.h>
 
 #include "custom_printers.h"
 
@@ -40,7 +41,7 @@ public:
                                     std::function< void( SocketAddress, bool ) > ) );
 
     MediaserverApiMock( AbstractCloudDataProvider* cloudData,
-                        stun::MessageDispatcher* dispatcher )
+                        MessageDispatcher* dispatcher )
         : MediaserverApiBase( cloudData, dispatcher ) {}
 
     inline

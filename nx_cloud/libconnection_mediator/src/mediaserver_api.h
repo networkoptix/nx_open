@@ -6,8 +6,11 @@
 
 #include "request_processor.h"
 
+
 namespace nx {
 namespace hpm {
+
+class MessageDispatcher;
 
 //! Mediaserver API communicating interface
 class MediaserverApiBase
@@ -15,7 +18,7 @@ class MediaserverApiBase
 {
 public:
     MediaserverApiBase( AbstractCloudDataProvider* cloudData,
-                      stun::MessageDispatcher* dispatcher );
+                      MessageDispatcher* dispatcher );
 
     void ping( const ConnectionSharedPtr& connection, stun::Message message );
 
@@ -30,7 +33,7 @@ class MediaserverApi
 {
 public:
     MediaserverApi( AbstractCloudDataProvider* cloudData,
-                    stun::MessageDispatcher* dispatcher );
+                    MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,
                              std::function< void( SocketAddress, bool ) > onPinged ) override;

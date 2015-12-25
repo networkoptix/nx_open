@@ -5,7 +5,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 
 #include "cloud_data_provider.h"
-#include "stun_request_processing_helper.h"
+#include "server/stun_request_processing_helper.h"
 
 
 namespace nx {

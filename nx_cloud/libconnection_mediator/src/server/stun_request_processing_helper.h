@@ -10,37 +10,65 @@
 #include <nx/network/stun/server_connection.h>
 #include <utils/serialization/lexical.h>
 
+#include "connection.h"
+
 
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< stun::ServerConnection > ConnectionSharedPtr;
-typedef std::weak_ptr< stun::ServerConnection > ConnectionWeakPtr;
+typedef std::shared_ptr< AbstractServerConnection > ConnectionSharedPtr;
+typedef std::weak_ptr< AbstractServerConnection > ConnectionWeakPtr;
 
 
 /** Send success responce without attributes */
+template<typename ConnectionPtr>
 void sendSuccessResponse(
-    const ConnectionSharedPtr& connection,
-    stun::Header requestHeader);
+    const ConnectionPtr& connection,
+    stun::Header requestHeader)
+{
+    stun::Message response(
+        stun::Header(
+            stun::MessageClass::successResponse,
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
+
+    connection->sendMessage(std::move(response));
+}
 
 /** Send error responce with error code and description as attribute */
+template<typename ConnectionPtr>
 void sendErrorResponse(
-    const ConnectionSharedPtr& connection,
+    const ConnectionPtr& connection,
     stun::Header requestHeader,
     int code,
-    String reason);
+    String reason)
+{
+    stun::Message response(
+        stun::Header(
+            stun::MessageClass::errorResponse,
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
+
+    response.newAttribute< stun::attrs::ErrorDescription >(
+        code,
+        std::move(reason));
+    connection->sendMessage(std::move(response));
+}
 
 
 //TODO #ak come up with a single implementation when variadic templates are available
 
-template<typename ProcessorType, typename InputData>
+template<
+    typename ProcessorType,
+    typename ConnectionStrongRef,
+    typename InputData>
 void processRequestWithNoOutput(
     void (ProcessorType::*processingFunc)(
-        ConnectionSharedPtr,
+        ConnectionStrongRef,
         InputData,
         std::function<void(api::ResultCode)>),
     ProcessorType* processor,
-    ConnectionSharedPtr connection,
+    ConnectionStrongRef connection,
     stun::Message request)
 {
     InputData input;
@@ -51,18 +79,12 @@ void processRequestWithNoOutput(
             nx::stun::error::badRequest,
             input.errorText());
 
-    ConnectionWeakPtr connectionWeak = connection;
-
     auto requestHeader = std::move(request.header);
     (processor->*processingFunc)(
         connection,
         std::move(input),
-        [/*std::move*/ requestHeader, connectionWeak](api::ResultCode resultCode) mutable
+        [/*std::move*/ requestHeader, connection](api::ResultCode resultCode) mutable
     {
-        auto connection = connectionWeak.lock();
-        if (!connection)
-            return;
-
         if (resultCode != api::ResultCode::ok)
             return sendErrorResponse(
                 connection,
@@ -80,14 +102,18 @@ void processRequestWithNoOutput(
     });
 }
 
-template<typename ProcessorType, typename InputData, typename OutputData>
+template<
+    typename ProcessorType,
+    typename ConnectionStrongRef,
+    typename InputData,
+    typename OutputData>
 void processRequestWithOutput(
     void (ProcessorType::*processingFunc)(
-        ConnectionSharedPtr,
+        ConnectionStrongRef,
         InputData,
         std::function<void(api::ResultCode, OutputData)>),
     ProcessorType* processor,
-    ConnectionSharedPtr connection,
+    ConnectionStrongRef connection,
     stun::Message request)
 {
     InputData input;
@@ -98,20 +124,14 @@ void processRequestWithOutput(
             nx::stun::error::badRequest,
             input.errorText());
 
-    ConnectionWeakPtr connectionWeak = connection;
-
     auto requestHeader = std::move(request.header);
     (processor->*processingFunc)(
         connection,
         std::move(input),
-        [/*std::move*/ requestHeader, connectionWeak](
+        [/*std::move*/ requestHeader, connection](
             api::ResultCode resultCode,
             OutputData outputData) mutable
     {
-        auto connection = connectionWeak.lock();
-        if (!connection)
-            return;
-
         if (resultCode != api::ResultCode::ok)
             return sendErrorResponse(
                 connection,
