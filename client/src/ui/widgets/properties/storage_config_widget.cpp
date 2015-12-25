@@ -925,6 +925,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
     if (!m_backupCancelled)
         QMessageBox::information(this,
             tr("Finished"),
-            tr("Your archive has been successfully backed up."));
+            tr("Backup is finished"));
     m_backupCancelled = false;
 }
