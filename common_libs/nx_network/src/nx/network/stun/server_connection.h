@@ -19,6 +19,8 @@
 namespace nx {
 namespace stun {
 
+class MessageDispatcher;
+
 class NX_NETWORK_API ServerConnection
 :
     public nx_api::BaseStreamProtocolConnection<
@@ -38,7 +40,8 @@ public:
 
     ServerConnection(
         StreamConnectionHolder<ServerConnection>* socketServer,
-        std::unique_ptr<AbstractCommunicatingSocket> sock );
+        std::unique_ptr<AbstractCommunicatingSocket> sock,
+        const MessageDispatcher& dispatcher);
     ~ServerConnection();
 
     void processMessage( Message message );
@@ -53,6 +56,7 @@ private:
 
     QnMutex m_mutex;
     std::function< void() > m_destructHandler;
+    const MessageDispatcher& m_dispatcher;
 };
 
 } // namespace stun

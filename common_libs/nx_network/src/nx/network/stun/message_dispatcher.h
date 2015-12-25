@@ -23,8 +23,6 @@ namespace stun {
     \note This class methods are not thread-safe
 */
 class NX_NETWORK_API MessageDispatcher
-:
-    public Singleton<MessageDispatcher>
 {
 public:
     typedef std::function<
@@ -46,7 +44,7 @@ public:
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
     bool dispatchRequest( const std::shared_ptr< ServerConnection >& connection,
-                          stun::Message message );
+                          stun::Message message ) const;
 
 private:
     std::unordered_map< int, MessageProcessor > m_processors;

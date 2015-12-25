@@ -27,7 +27,10 @@ protected:
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
         , mediaserverApi( &cloudData, &stunMessageDispatcher )
         , listeningPeerPool( &cloudData, &stunMessageDispatcher )
-        , server( false, SocketFactory::NatTraversalType::nttDisabled )
+        , server(
+            stunMessageDispatcher,
+            false,
+            SocketFactory::NatTraversalType::nttDisabled )
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );

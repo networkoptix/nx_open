@@ -14,6 +14,8 @@
 namespace nx {
 namespace stun {
 
+class MessageDispatcher;
+
 class SocketServer
 :
     public StreamSocketServer<SocketServer, ServerConnection>
@@ -21,11 +23,14 @@ class SocketServer
     typedef StreamSocketServer<SocketServer, ServerConnection> base_type;
 
 public:
-    SocketServer( bool sslRequired,
-                  SocketFactory::NatTraversalType natTraversalRequired
-                    = SocketFactory::NatTraversalType::nttAuto )
+    SocketServer(
+        const MessageDispatcher& dispatcher,
+        bool sslRequired,
+        SocketFactory::NatTraversalType natTraversalRequired
+            = SocketFactory::NatTraversalType::nttAuto )
     :
-        base_type( sslRequired, natTraversalRequired )
+        base_type(sslRequired, natTraversalRequired),
+        m_dispatcher(dispatcher)
     {
     }
 
@@ -40,8 +45,12 @@ protected:
     {
         return std::make_shared<ServerConnection>(
             this,
-            std::move(_socket) );
+            std::move(_socket),
+            m_dispatcher);
     }
+
+private:
+    const MessageDispatcher& m_dispatcher;
 };
 
 } // namespace stun

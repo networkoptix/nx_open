@@ -35,8 +35,11 @@ protected:
         SocketGlobalsHolder::instance()->reinitialize();
 
         m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
-        listeningPeerPool = std::make_unique<ListeningPeerPool>(&cloud, &stunMessageDispatcher);
+        listeningPeerPool = std::make_unique<ListeningPeerPool>(
+            &cloud,
+            &stunMessageDispatcher);
         server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
+            stunMessageDispatcher,
             false,
             SocketFactory::NatTraversalType::nttDisabled);
 

@@ -144,12 +144,12 @@ void MultipleServerSocket::pleaseStop(std::function<void()> handler)
         socket->pleaseStop(barrier.fork());
 }
 
-void MultipleServerSocket::postImpl( std::function<void()>&& handler )
+void MultipleServerSocket::post( std::function<void()> handler )
 {
     m_serverSockets.front()->post(std::move(handler));
 }
 
-void MultipleServerSocket::dispatchImpl( std::function<void()>&& handler )
+void MultipleServerSocket::dispatch( std::function<void()> handler )
 {
     m_serverSockets.front()->dispatch(std::move(handler));
 }

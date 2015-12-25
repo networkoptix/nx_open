@@ -9,15 +9,20 @@
 
 #include <common/common_globals.h>
 
+#include "message_dispatcher.h"
+
+
 namespace nx {
 namespace stun {
 
 ServerConnection::ServerConnection(
     StreamConnectionHolder<ServerConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock )
+    std::unique_ptr<AbstractCommunicatingSocket> sock,
+    const MessageDispatcher& dispatcher)
 :
-    BaseType( socketServer, std::move( sock ) ),
-    m_peerAddress( BaseType::getForeignAddress() )
+    BaseType(socketServer, std::move(sock)),
+    m_peerAddress(BaseType::getForeignAddress()),
+    m_dispatcher(dispatcher)
 {
 }
 
@@ -75,9 +80,8 @@ void ServerConnection::processBindingRequest( Message message )
 
 void ServerConnection::processCustomRequest( Message message )
 {
-    if( auto disp = MessageDispatcher::instance() )
-        if( disp->dispatchRequest( shared_from_this(), std::move(message) ) )
-            return;
+    if (m_dispatcher.dispatchRequest(shared_from_this(), std::move(message)))
+        return;
 
     stun::Message response( stun::Header(
         stun::MessageClass::errorResponse,
