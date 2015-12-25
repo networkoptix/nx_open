@@ -13,6 +13,8 @@
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
 
+#include <limits>
+
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
  * The only sane use case is for generating metainformation for enums in
@@ -818,7 +820,7 @@ public:
     /**
      * Invalid value for a timezone UTC offset.
      */
-    static const qint64 InvalidUtcOffset = INT64_MAX;
+    static const qint64 InvalidUtcOffset = std::numeric_limits<qint64>::max();
 #define InvalidUtcOffset InvalidUtcOffset
 
     /**
@@ -836,7 +838,7 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 
 /** Time value for 'now'. */
-#define DATETIME_NOW        INT64_MAX
+#define DATETIME_NOW        std::numeric_limits<qint64>::max()
 
 // TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
 // Note: -1 is used for invalid time
@@ -844,7 +846,7 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 enum { kNoTimeValue = 0 };
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
-#define DATETIME_INVALID    INT64_MIN
+#define DATETIME_INVALID    std::numeric_limits<qint64>::min()
 
 
 /**
