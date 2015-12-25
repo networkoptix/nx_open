@@ -427,7 +427,7 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}</qt.dir>
+                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
