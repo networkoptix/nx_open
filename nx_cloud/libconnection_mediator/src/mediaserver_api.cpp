@@ -20,7 +20,7 @@ MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
     const auto result =
         dispatcher->registerRequestProcessor(
             stun::cc::methods::ping,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
                 { ping(std::move(connection), std::move(message)); });
 
     // TODO: NX_LOG
@@ -32,16 +32,16 @@ struct PingCollector
     QnMutex mutex;
     size_t expected;
     std::list< SocketAddress > endpoints;
-    ConnectionWeakPtr connection;
+    ConnectionWeakRef connection;
 
     PingCollector( size_t expected_,
-                   ConnectionWeakPtr connection_ )
+                   ConnectionWeakRef connection_ )
         : expected( expected_ )
         , connection( std::move(connection_) )
     {}
 };
 
-void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
+void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
                              stun::Message message )
 {
     if( const auto mediaserver = getMediaserverData( connection, message ) )

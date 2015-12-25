@@ -16,7 +16,7 @@ RequestProcessor::~RequestProcessor()
 
 boost::optional< RequestProcessor::MediaserverData >
     RequestProcessor::getMediaserverData(
-        ConnectionSharedPtr connection, stun::Message& request)
+        ConnectionStrongRef connection, stun::Message& request)
 {
     const auto systemAttr = request.getAttribute< stun::cc::attrs::SystemId >();
     if( !systemAttr )

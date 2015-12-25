@@ -11,19 +11,8 @@
 
 #include <nx/network/stun/message.h>
 #include <nx/network/stun/server_connection.h>
+#include <nx/network/socket_common.h>
 
-
-namespace nx {
-namespace network {
-
-enum class Protocol
-{
-    udp,
-    tcp
-};
-
-}   //network
-}   //nx
 
 namespace nx {
 namespace hpm {
@@ -35,7 +24,7 @@ public:
     virtual ~AbstractServerConnection() {}
 
     virtual void sendMessage(nx::stun::Message message) = 0;
-    virtual nx::network::Protocol protocol() const = 0;
+    virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
     /**
         \note \a AbstractServerConnection::sendMessage does nothing after \a handler has been invoked
@@ -61,7 +50,7 @@ public:
     virtual ~TcpServerConnection();
 
     virtual void sendMessage(nx::stun::Message message) override;
-    virtual nx::network::Protocol protocol() const override;
+    virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
     virtual void registerCloseHandler(std::function<void()> handler) override;
 

@@ -28,7 +28,7 @@ protected:
     /** Returns mediaserver data from \a request,
      *  sends \fn errorResponse in case of failure */
     boost::optional< MediaserverData > getMediaserverData(
-            ConnectionSharedPtr connection, stun::Message& request );
+            ConnectionStrongRef connection, stun::Message& request );
 
 private:
     AbstractCloudDataProvider* m_cloudData;

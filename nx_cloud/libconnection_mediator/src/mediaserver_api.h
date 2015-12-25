@@ -20,7 +20,7 @@ public:
     MediaserverApiBase( AbstractCloudDataProvider* cloudData,
                       MessageDispatcher* dispatcher );
 
-    void ping( const ConnectionSharedPtr& connection, stun::Message message );
+    void ping( const ConnectionStrongRef& connection, stun::Message message );
 
     //! Pings \a address and verifies if the is the mediaservers with \a expectedId
     virtual void pingServer( const SocketAddress& address, const String& expectedId,

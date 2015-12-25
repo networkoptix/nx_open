@@ -22,17 +22,17 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
     const auto result =
         dispatcher->registerRequestProcessor(
             stun::cc::methods::bind,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
                 { bind( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::listen,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
                 { listen( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::resolve,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
             {
                 processRequestWithOutput(
                     &ListeningPeerPool::resolve,
@@ -43,12 +43,12 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connect,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
                 { connect( std::move(connection), std::move( message ) ); } );
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connectionResult,
-            [this](ConnectionSharedPtr connection, stun::Message message)
+            [this](ConnectionStrongRef connection, stun::Message message)
             {
                 processRequestWithNoOutput(
                     &ListeningPeerPool::connectionResult,
@@ -61,9 +61,16 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
     Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
-void ListeningPeerPool::bind( ConnectionSharedPtr connection,
+void ListeningPeerPool::bind( ConnectionStrongRef connection,
                               stun::Message message )
 {
+    if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
+        return sendErrorResponse(
+            connection,
+            message.header,
+            stun::error::badRequest,
+            "Only tcp is allowed for bind request");
+
     if( const auto mediaserver = getMediaserverData( connection, message ) )
     {
         QnMutexLocker lk( &m_mutex );
@@ -90,9 +97,16 @@ void ListeningPeerPool::bind( ConnectionSharedPtr connection,
     }
 }
 
-void ListeningPeerPool::listen( ConnectionSharedPtr connection,
+void ListeningPeerPool::listen( ConnectionStrongRef connection,
                                 stun::Message message )
 {
+    if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
+        return sendErrorResponse(
+            connection,
+            message.header,
+            stun::error::badRequest,
+            "Only tcp is allowed for listen request");
+
     if( const auto mediaserver = getMediaserverData( connection, message ) )
     {
         QnMutexLocker lk( &m_mutex );
@@ -116,7 +130,7 @@ void ListeningPeerPool::listen( ConnectionSharedPtr connection,
 }
 
 void ListeningPeerPool::resolve(
-    ConnectionSharedPtr connection,
+    ConnectionStrongRef connection,
     api::ResolveRequest requestData,
     std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
@@ -155,7 +169,7 @@ void ListeningPeerPool::resolve(
     completionHandler(api::ResultCode::ok, std::move(responseData));
 }
 
-void ListeningPeerPool::connect( ConnectionSharedPtr connection,
+void ListeningPeerPool::connect( ConnectionStrongRef connection,
                                  stun::Message message )
 {
     const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
@@ -203,7 +217,7 @@ void ListeningPeerPool::connect( ConnectionSharedPtr connection,
 }
 
 void ListeningPeerPool::connectionResult(
-    ConnectionSharedPtr connection,
+    ConnectionStrongRef connection,
     api::ConnectionResultRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
@@ -212,7 +226,7 @@ void ListeningPeerPool::connectionResult(
 }
 
 
-ListeningPeerPool::MediaserverPeer::MediaserverPeer( ConnectionWeakPtr connection_ )
+ListeningPeerPool::MediaserverPeer::MediaserverPeer( ConnectionWeakRef connection_ )
     : connection( std::move( connection_ ) )
     , isListening( false )
 {
@@ -226,7 +240,7 @@ ListeningPeerPool::MediaserverPeer::MediaserverPeer( MediaserverPeer&& peer )
 
 boost::optional< ListeningPeerPool::MediaserverPeer& >
     ListeningPeerPool::SystemPeers::peer(
-        ConnectionWeakPtr connection,
+        ConnectionWeakRef connection,
         const RequestProcessor::MediaserverData& mediaserver,
         QnMutex* mutex )
 {

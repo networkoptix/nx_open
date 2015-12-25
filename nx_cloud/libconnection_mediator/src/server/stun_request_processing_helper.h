@@ -16,8 +16,8 @@
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< AbstractServerConnection > ConnectionSharedPtr;
-typedef std::weak_ptr< AbstractServerConnection > ConnectionWeakPtr;
+typedef std::shared_ptr< AbstractServerConnection > ConnectionStrongRef;
+typedef std::weak_ptr< AbstractServerConnection > ConnectionWeakRef;
 
 
 /** Send success responce without attributes */

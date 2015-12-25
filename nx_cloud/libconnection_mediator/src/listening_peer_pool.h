@@ -35,32 +35,32 @@ public:
                        MessageDispatcher* dispatcher );
 
     void bind(
-        ConnectionSharedPtr connection,
+        ConnectionStrongRef connection,
         stun::Message message);
     void listen(
-        ConnectionSharedPtr connection,
+        ConnectionStrongRef connection,
         stun::Message message);
     void resolve(
-        ConnectionSharedPtr connection,
+        ConnectionStrongRef connection,
         api::ResolveRequest request,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
     void connect(
-        ConnectionSharedPtr connection,
+        ConnectionStrongRef connection,
         stun::Message message);
 
     void connectionResult(
-        ConnectionSharedPtr connection,
+        ConnectionStrongRef connection,
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
 protected:
     struct MediaserverPeer
     {
-        ConnectionWeakPtr connection;
+        ConnectionWeakRef connection;
         std::list< SocketAddress > endpoints;
         bool isListening;
 
-        MediaserverPeer( ConnectionWeakPtr connection_ );
+        MediaserverPeer( ConnectionWeakRef connection_ );
         MediaserverPeer( MediaserverPeer&& peer );
     };
 
@@ -68,7 +68,7 @@ protected:
     {
     public:
         boost::optional< MediaserverPeer& > peer(
-                ConnectionWeakPtr connection,
+                ConnectionWeakRef connection,
                 const RequestProcessor::MediaserverData& mediaserver,
                 QnMutex* mutex );
 

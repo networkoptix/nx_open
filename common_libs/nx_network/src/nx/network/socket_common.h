@@ -24,7 +24,21 @@
 #include "utils/common/hash.h"
 
 
-namespace nx { class DnsResolver; }
+namespace nx {
+
+class DnsResolver;
+
+namespace network {
+
+enum class TransportProtocol
+{
+    udp,
+    tcp,
+    udt
+};
+
+}   //network
+}   //nx
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!

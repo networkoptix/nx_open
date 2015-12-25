@@ -20,9 +20,9 @@ void TcpServerConnection::sendMessage(nx::stun::Message message)
     strongRef->sendMessage(std::move(message));
 }
 
-nx::network::Protocol TcpServerConnection::protocol() const
+nx::network::TransportProtocol TcpServerConnection::transportProtocol() const
 {
-    return nx::network::Protocol::tcp;
+    return nx::network::TransportProtocol::tcp;
 }
 
 SocketAddress TcpServerConnection::getSourceAddress() const
