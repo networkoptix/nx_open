@@ -5,22 +5,35 @@
 #include <utils/thread/sync_queue.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
+#include <nx/network/abstract_socket.h>
 
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
 
-template<typename ServerSocket, typename ClientSocket>
+namespace /* anonimous */ {
+
+const SocketAddress kServerAddress("localhost:12345");
+const QByteArray kTestMessage("Ping");
+const size_t kClientCount(3);
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
-    const SocketAddress& serverAddress,
-    const QByteArray& testMessage,
-    int clientCount)
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& serverAddress = kServerAddress,
+    const QByteArray& testMessage = kTestMessage,
+    int clientCount = kClientCount)
 {
-    std::thread serverThread([&serverAddress, &testMessage, clientCount]()
+    std::thread serverThread([&serverAddress, &testMessage,
+                             clientCount, &serverMaker]()
     {
-        auto server = std::make_unique< ServerSocket >();
+        auto server = serverMaker();
         ASSERT_TRUE(server->setReuseAddrFlag(true));
-        ASSERT_TRUE(server->bind(serverAddress)) << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
+
+        ASSERT_TRUE(server->bind(serverAddress))
+                << SystemError::getLastOSErrorText().toStdString();
+        ASSERT_TRUE(server->listen(clientCount))
+                << SystemError::getLastOSErrorText().toStdString();
 
         for (int i = clientCount; i > 0; --i)
         {
@@ -28,6 +41,8 @@ void socketSimpleSync(
 
             QByteArray buffer(BUF_SIZE, char(0));
             std::unique_ptr< AbstractStreamSocket > client(server->accept());
+            ASSERT_TRUE(client.get())
+                    << SystemError::getLastOSErrorText().toStdString();
 
             int bufDataSize = 0;
             for (;;)
@@ -35,7 +50,9 @@ void socketSimpleSync(
                 const auto bytesRead = client->recv(
                     buffer.data() + bufDataSize,
                     buffer.size() - bufDataSize);
-                ASSERT_NE(-1, bytesRead);
+                ASSERT_NE(-1, bytesRead)
+                        << SystemError::getLastOSErrorText().toStdString();
+
                 if (bytesRead == 0)
                     break;  //connection closed
                 bufDataSize += bytesRead;
@@ -48,11 +65,12 @@ void socketSimpleSync(
     // give the server some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-    std::thread clientThread([&serverAddress, &testMessage, clientCount]()
+    std::thread clientThread([&serverAddress, &testMessage,
+                              clientCount, &clientMaker]()
     {
         for (int i = clientCount; i > 0; --i)
         {
-            auto client = std::make_unique< ClientSocket >(false);
+            auto client = clientMaker();
             EXPECT_TRUE(client->connect(serverAddress, 500));
             EXPECT_EQ(client->send(testMessage.data(), testMessage.size() + 1),
                 testMessage.size() + 1);
@@ -63,9 +81,11 @@ void socketSimpleSync(
     clientThread.join();
 }
 
-
-template<typename ServerSocket, typename ClientSocket, typename StopSocketFunc>
+template<typename ServerSocketMaker, typename ClientSocketMaker,
+         typename StopSocketFunc>
 void socketSimpleAsync(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
     const SocketAddress& serverAddress,
     const QByteArray& testMessage,
     int clientCount,
@@ -74,7 +94,7 @@ void socketSimpleAsync(
     nx::SyncQueue< SystemError::ErrorCode > serverResults;
     nx::SyncQueue< SystemError::ErrorCode > clientResults;
 
-    auto server = std::make_unique< ServerSocket >();
+    auto server = serverMaker();
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(5000));
@@ -111,7 +131,7 @@ void socketSimpleAsync(
 
     server->acceptAsync(accept);
 
-    auto testClient = std::make_unique< ClientSocket >(false);
+    auto testClient = clientMaker();
     ASSERT_TRUE(testClient->setNonBlockingMode(true));
     ASSERT_TRUE(testClient->setSendTimeout(5000));
 
@@ -144,15 +164,33 @@ void socketSimpleAsync(
     stopSocket(std::move(server));
 }
 
-template<typename ServerSocket, typename ClientSocket>
-static void socketSimpleTrueAsync(
-    const SocketAddress& serverAddress,
-    const QByteArray& testMessage,
-    int clientCount)
+void pleaseStopSync(std::unique_ptr<QnStoppableAsync> socket) {
+    socket->pleaseStopSync();
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSimpleAsync(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& serverAddress = kServerAddress,
+    const QByteArray& testMessage = kTestMessage,
+    int clientCount = kClientCount)
+{
+    socketSimpleAsync(serverMaker, clientMaker, serverAddress, testMessage,
+                      clientCount, pleaseStopSync);
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSimpleTrueAsync(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& serverAddress = kServerAddress,
+    const QByteArray& testMessage = kTestMessage,
+    int clientCount = kClientCount)
 {
     nx::SyncQueue<bool> stopQueue;
-    socketSimpleAsync<ServerSocket, ClientSocket>(
-        serverAddress, testMessage, clientCount,
+    socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
+        serverMaker, clientMaker, serverAddress, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
         {
             QnStoppableAsync::pleaseStop([&](){ stopQueue.push(true); },
@@ -164,5 +202,7 @@ static void socketSimpleTrueAsync(
 
     ASSERT_TRUE( stopQueue.isEmpty() );
 }
+
+} // namespace /* anonimous */
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

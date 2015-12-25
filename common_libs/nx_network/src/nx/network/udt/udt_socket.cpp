@@ -375,7 +375,7 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
 bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
     Q_ASSERT(!IsClosed());
     Q_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
-    int time = static_cast<int>(millis);
+    int time = millis ? static_cast<int>(millis) : 0;
     int ret = UDT::setsockopt(
         udtHandle,0,UDT_RCVTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",udtHandle);
@@ -391,7 +391,7 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
     int ret = UDT::getsockopt(
         udtHandle,0,UDT_RCVTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",udtHandle);
-    *millis = static_cast<int>(time);
+    *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if( ret != 0 )
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
@@ -400,7 +400,7 @@ bool UdtSocketImpl::GetRecvTimeout( unsigned int* millis ) const {
 bool UdtSocketImpl::SetSendTimeout( unsigned int ms ) {
     Q_ASSERT(!IsClosed());
     Q_ASSERT( ms < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
-    int time = static_cast<int>(ms);
+    int time = ms ? static_cast<int>(ms) : -1;
     int ret = UDT::setsockopt(
         udtHandle,0,UDT_SNDTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",udtHandle);
@@ -416,7 +416,7 @@ bool UdtSocketImpl::GetSendTimeout( unsigned int* millis ) const {
     int ret = UDT::getsockopt(
         udtHandle,0,UDT_SNDTIMEO,&time,&len);
     VERIFY_(OK_(ret),"UDT::getsockopt",udtHandle);
-    *millis = static_cast<unsigned int>(time);
+    *millis = (time == -1) ? 0 : static_cast<unsigned int>(time);
     if( ret != 0 )
         SystemError::setLastErrorCode(convertToSystemError(UDT::getlasterror().getErrorCode()));
     return ret == 0;
