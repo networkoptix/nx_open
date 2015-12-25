@@ -138,7 +138,7 @@ public:
         }
     }
 
-    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+    void connectAsync( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
@@ -218,7 +218,7 @@ public:
             this );
     }
 
-    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -239,7 +239,7 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etRead, this );
     }
 
-    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void sendAsync( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -263,7 +263,7 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+    void registerTimer( unsigned int timeoutMs, std::function<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;

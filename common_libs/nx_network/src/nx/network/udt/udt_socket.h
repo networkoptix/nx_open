@@ -119,20 +119,26 @@ public:
         Q_UNUSED(result);
         return false; // not implemented yet
     }
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void(SystemError::ErrorCode)> handler) override;
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+    virtual void registerTimer(
+        unsigned int timeoutMillis,
+        std::function<void()> handler) override;
 
-protected:
-    //!Implementation of AbstractSocket::postImpl
-    virtual void postImpl( std::function<void()>&& handler ) override;
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual void dispatchImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::post
+    virtual void post( std::function<void()> handler ) override;
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch( std::function<void()> handler ) override;
 
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
-
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) override;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -173,10 +179,10 @@ public:
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
 
 protected:
-    //!Implementation of AbstractSocket::postImpl
-    virtual void postImpl( std::function<void()>&& handler ) override;
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual void dispatchImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::post
+    virtual void post( std::function<void()> handler ) override;
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch( std::function<void()> handler ) override;
     virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:

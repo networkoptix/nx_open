@@ -24,7 +24,7 @@ bool CloudStreamSocket::connect(
     auto completionHandler = [&completionPromise]( SystemError::ErrorCode errorCode ) mutable {
         completionPromise.set_value( errorCode );
     };
-    connectAsyncImpl( remoteAddress, completionHandler );
+    connectAsync( remoteAddress, completionHandler );
     asyncRequestCompletionResult.wait();
     if( asyncRequestCompletionResult.get() == SystemError::noError )
         return true;
@@ -32,9 +32,9 @@ bool CloudStreamSocket::connect(
     return false;
 }
 
-void CloudStreamSocket::connectAsyncImpl(
+void CloudStreamSocket::connectAsync(
     const SocketAddress& addr,
-    std::function<void( SystemError::ErrorCode )>&& handler )
+    std::function<void( SystemError::ErrorCode )> handler )
 {
     //TODO #ak use socket write timeout
     m_connectHandler = std::move(handler);

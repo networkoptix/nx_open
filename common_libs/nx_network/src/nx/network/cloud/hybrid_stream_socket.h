@@ -31,10 +31,10 @@ public:
         unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS ) override;
 
 protected:
-    //!Implementation of AbstractStreamSocket::connectAsyncImpl
-    virtual void connectAsyncImpl(
+    //!Implementation of AbstractStreamSocket::connectAsync
+    virtual void connectAsync(
         const SocketAddress& addr,
-        std::function<void( SystemError::ErrorCode )>&& handler ) override;
+        std::function<void( SystemError::ErrorCode )> handler ) override;
 
 private:
     std::unique_ptr<AbstractStreamSocket> m_socketDelegate;

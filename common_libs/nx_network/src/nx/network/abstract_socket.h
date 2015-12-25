@@ -147,19 +147,15 @@ public:
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    template<class HandlerType>
-    void post( HandlerType&& handler ) { postImpl( std::forward<HandlerType>(handler) ); }
+    virtual void post(std::function<void()> handler) = 0;
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    template<class HandlerType>
-    void dispatch( HandlerType&& handler ) { dispatchImpl( std::forward<HandlerType>(handler) ); }
+    virtual void dispatch(std::function<void()> handler) = 0;
 
 protected:
-    virtual void postImpl( std::function<void()>&& handler ) = 0;
-    virtual void dispatchImpl( std::function<void()>&& handler ) = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -233,11 +229,9 @@ public:
     /*!
         \note uses sendTimeout
     */
-    template<class HandlerType>
-        void connectAsync( const SocketAddress& addr, HandlerType&& handler )
-        {
-            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -253,11 +247,9 @@ public:
         \warning If \a dst->capacity() == 0, \a false is returned and no bytes read
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
-    template<class HandlerType>
-        void readSomeAsync( nx::Buffer* const dst, HandlerType&& handler )
-        {
-            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!
@@ -267,21 +259,17 @@ public:
             \endcode
             \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
-    template<class HandlerType>
-        void sendAsync( const nx::Buffer& src, HandlerType&& handler )
-        {
-            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Register timer on this socket
     /*!
         \param handler functor with no parameters
     */
-    template<class HandlerType>
-        void registerTimer( unsigned int timeoutMs, HandlerType&& handler )
-        {
-            return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler) = 0;
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
@@ -306,12 +294,6 @@ public:
     {
         cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
     }
-
-protected:
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
 };
 
 struct NX_NETWORK_API StreamSocketInfo

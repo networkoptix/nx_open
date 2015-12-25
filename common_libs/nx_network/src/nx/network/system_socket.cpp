@@ -288,20 +288,20 @@ bool Socket::setSendTimeout( unsigned int ms )
     return true;
 }
 
-bool Socket::getLastError( SystemError::ErrorCode* errorCode ) const
+bool Socket::getLastError(SystemError::ErrorCode* errorCode) const
 {
     socklen_t optLen = sizeof(*errorCode);
     return getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
 }
 
-void Socket::post( std::function<void()>&& handler )
+void Socket::post(std::function<void()> handler)
 {
-    m_baseAsyncHelper->post( std::move(handler) );
+    m_baseAsyncHelper->post(std::move(handler));
 }
 
-void Socket::dispatch( std::function<void()>&& handler )
+void Socket::dispatch(std::function<void()> handler)
 {
-    m_baseAsyncHelper->dispatch( std::move(handler) );
+    m_baseAsyncHelper->dispatch(std::move(handler));
 }
 
 unsigned short Socket::getLocalPort() const
@@ -764,24 +764,32 @@ void CommunicatingSocket::cancelIOAsync(
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
 
-void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+void CommunicatingSocket::connectAsync(
+    const SocketAddress& addr,
+    std::function<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
+    return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
 
-void CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::readSomeAsync(
+    nx::Buffer* const buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
-    return m_aioHelper->recvAsyncImpl( buf, std::move( handler ) );
+    return m_aioHelper->readSomeAsync( buf, std::move( handler ) );
 }
 
-void CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::sendAsync(
+    const nx::Buffer& buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
-    return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
+    return m_aioHelper->sendAsync( buf, std::move( handler ) );
 }
 
-void CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+void CommunicatingSocket::registerTimer(
+    unsigned int timeoutMs,
+    std::function<void()> handler )
 {
-    return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
+    return m_aioHelper->registerTimer( timeoutMs, std::move( handler ) );
 }
 
 

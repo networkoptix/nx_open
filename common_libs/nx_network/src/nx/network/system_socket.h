@@ -92,10 +92,10 @@ public:
     bool setSendTimeout( unsigned int ms );
     //!Implementation of Pollable::getLastError
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
-    //!Implementation of AbstractSocket::postImpl
-    void post( std::function<void()>&& handler );
-    //!Implementation of AbstractSocket::dispatchImpl
-    void dispatch( std::function<void()>&& handler );
+    //!Implementation of AbstractSocket::post
+    void post( std::function<void()> handler );
+    //!Implementation of AbstractSocket::dispatch
+    void dispatch( std::function<void()> handler );
 
     /**
      *   Get the local port
@@ -183,14 +183,22 @@ public:
     virtual SocketAddress getForeignAddress() const;
     //!Implementation of AbstractCommunicatingSocket::isConnected
     bool isConnected() const;
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::connectAsync
+    void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler );
+    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
+    void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler );
+    //!Implementation of AbstractCommunicatingSocket::sendAsync
+    void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler );
+    //!Implementation of AbstractCommunicatingSocket::registerTimer
+    void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     void cancelIOAsync(
         aio::EventType eventType,
