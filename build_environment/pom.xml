@@ -280,7 +280,7 @@
         </profile>
         <profile>
             <!-- Common Profile for Linux (PC / ARM), Mac -->
-            <id>unix</id>
+            <!-- <id>unix</id>
             <activation>
                 <os>
                     <family>unix</family>
@@ -294,7 +294,7 @@
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
                 </dependency>
-            </dependencies>
+            </dependencies> -->
         </profile>
         <profile>
             <id>desktop</id>
