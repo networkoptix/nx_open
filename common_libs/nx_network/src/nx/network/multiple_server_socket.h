@@ -65,6 +65,8 @@ private:
         bool isAccepting;
 
         ServerSocketData(std::unique_ptr<AbstractStreamServerSocket> socket_);
+        ServerSocketData(ServerSocketData&&);
+
         AbstractStreamServerSocket* operator->() const;
     };
 
@@ -76,6 +78,7 @@ private:
 
           AcceptedData(SystemError::ErrorCode code_,
                        AbstractStreamSocket* socket_);
+          AcceptedData(AcceptedData&&);
     };
 
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);

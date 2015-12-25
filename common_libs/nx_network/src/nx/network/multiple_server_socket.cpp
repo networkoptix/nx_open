@@ -201,8 +201,15 @@ MultipleServerSocket::ServerSocketData::ServerSocketData(
 {
 }
 
+MultipleServerSocket::ServerSocketData::ServerSocketData(
+        MultipleServerSocket::ServerSocketData&& right)
+    : socket(std::move(right.socket))
+    , isAccepting(std::move(right.isAccepting))
+{
+}
+
 AbstractStreamServerSocket*
-    MultipleServerSocket::ServerSocketData::ServerSocketData::operator->() const
+    MultipleServerSocket::ServerSocketData::operator->() const
 {
     return socket.get();
 }
@@ -212,6 +219,14 @@ MultipleServerSocket::AcceptedData::AcceptedData(
     : code(code_)
     , socket(socket_)
     , time(std::chrono::system_clock::now())
+{
+}
+
+MultipleServerSocket::AcceptedData::AcceptedData(AcceptedData&& right)
+:
+    code(std::move(right.code)),
+    socket(std::move(right.socket)),
+    time(std::move(right.time))
 {
 }
 
