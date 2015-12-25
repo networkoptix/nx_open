@@ -20,6 +20,8 @@ namespace methods {
                 return "resolve";
             case connect:
                 return "connect";
+            case connectionResult:
+                return "connectionResult";
             default:
                 return "unknown";
         };

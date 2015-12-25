@@ -59,7 +59,7 @@ QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
     case ShowTextOverlayAction:     return tr("Show text overlay");
     case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
 
-    default:        
+    default:
         break;
     }
 
@@ -145,7 +145,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
     case ServerFailureEvent:
         return tr("Server \"%1\" Failure").arg(resourceName);
 
-    case CameraIpConflictEvent:       
+    case CameraIpConflictEvent:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
     		//: Device IP Conflict at <server_name>
             tr("Device IP Conflict at %1"),
@@ -165,7 +165,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return tr("Server \'%1\' has finished an archive backup").arg(resourceName);
     case UserDefinedEvent:
         return (!params.caption.isEmpty() ? params.caption
-            : (params.resourceName.isEmpty() ? tr("Generic Event") 
+            : (params.resourceName.isEmpty() ? tr("Generic Event")
                 : tr("Generic Event at %1").arg(params.resourceName)));
     default:
         break;
@@ -232,7 +232,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
     }
     case StorageFailureEvent:
     case NetworkIssueEvent:
-    case ServerFailureEvent: 
+    case ServerFailureEvent:
     case LicenseIssueEvent:
     case BackupFinishedEvent:
     {
@@ -273,7 +273,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         }
         break;
     }
-    case ServerStartEvent: 
+    case ServerStartEvent:
         break;
     case UserDefinedEvent:
         result += params.description;
@@ -316,14 +316,14 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
 
 QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params) {
     QnUuid id = params.eventResourceId;
-    return !id.isNull() 
-        ? qnResPool->getResourceById(id) 
+    return !id.isNull()
+        ? qnResPool->getResourceById(id)
         : QnResourcePtr();
 }
 
 QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) {
     using namespace QnBusiness;
-    
+
     QString reasonParamsEncoded = params.description;
 
     QString result;
@@ -378,7 +378,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
 
     case BackupFailed: {
-        result = tr("Archive backup failed because of no backup storages available");
+        result = tr("Archive backup failed because of no backup storage available");
         break;
     }
     case BackupEndOfPeriod: {
@@ -402,10 +402,10 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case LicenseRemoved: {
         QnVirtualCameraResourceList disabledCameras;
         for (const QString &id: reasonParamsEncoded.split(L';'))
-            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id))) 
+            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
         Q_ASSERT_X(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
-       
+
         result = QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Recording on devices is disabled:"),
@@ -443,8 +443,8 @@ QString QnBusinessStringsHelper::aggregatedEventDetails(const QnAbstractBusiness
 }
 
 QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) {
-    QnNetworkResourcePtr res = !id.isNull() ? 
-                            qnResPool->getResourceById<QnNetworkResource>(id) : 
+    QnNetworkResourcePtr res = !id.isNull() ?
+                            qnResPool->getResourceById<QnNetworkResource>(id) :
                             QnNetworkResourcePtr();
     if (id.isNull())
         return QString();
@@ -456,7 +456,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
     QnMediaServerResourcePtr mserverRes = camera->getParentServer();
     if (!mserverRes)
         return QString();
-    
+
 	quint64 timeStampMs = timestampUsec / 1000;
     QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)

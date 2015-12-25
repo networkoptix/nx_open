@@ -117,32 +117,20 @@ TEST(SocketUdt_UdtPollSet, general)
     ASSERT_EQ(0, result);
 }
 
-static const QByteArray kTestMessage("Ping");
-static const size_t kClientCount(3);
-
 TEST(SocketUdt, SimpleSync)
 {
-    socketSimpleSync<UdtStreamServerSocket, UdtStreamSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount);
+    socketSimpleSync(&std::make_unique<UdtStreamServerSocket>,
+                     &std::make_unique<UdtStreamSocket>);
 }
 
 TEST(SocketUdt, SimpleAsync)
 {
-    socketSimpleAsync<UdtStreamServerSocket, UdtStreamSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount,
-        [this](std::unique_ptr<QnStoppableAsync> socket) {
-            socket->pleaseStopSync();
-        });
+    socketSimpleAsync(&std::make_unique<UdtStreamServerSocket>,
+                      &std::make_unique<UdtStreamSocket>);
 }
 
 TEST(SocketUdt, SimpleTrueAsync)
 {
-    socketSimpleTrueAsync<UdtStreamServerSocket, UdtStreamSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount);
+    socketSimpleTrueAsync(&std::make_unique<UdtStreamServerSocket>,
+                          &std::make_unique<UdtStreamSocket>);
 }

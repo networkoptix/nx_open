@@ -26,8 +26,8 @@
         <!--Specify the project to test-->      
         <master.project.directory>client</master.project.directory>
         <!--Global libs-->
-        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets</qt.libs>       
-        <global.libs>-lcommon -lnx_network -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
+        <qt.libs>core gui network opengl xml sql multimedia concurrent webkit webkitwidgets webchannel</qt.libs>       
+        <global.libs>-lcommon -lnx_network -lnx_streaming -lappserver2 -lclient -lFestival -lestools -leststring -lestbase -lquazip</global.libs>
         <ffmpeg.libs>-lavcodec -lavdevice -lavfilter -lavformat -lavutil -lswscale -lpostproc</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -lDxErr -ld3d9 -lopenal32 -lssleay32 -llibeay32 -lsigar Wldap32.lib</windows.oslibs>

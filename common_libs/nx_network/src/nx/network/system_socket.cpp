@@ -1053,6 +1053,8 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
 static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
 {
     int result = 0;
+    if (timeoutMillis == 0)
+        timeoutMillis = -1; // poll expects -1 as an infinity
 
 #ifdef _WIN32
     struct pollfd fds[1];
@@ -1167,7 +1169,6 @@ TCPServerSocket::TCPServerSocket()
         new TCPServerSocketPrivate( &m_implDelegate, this ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
-    setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
 TCPServerSocket::~TCPServerSocket()

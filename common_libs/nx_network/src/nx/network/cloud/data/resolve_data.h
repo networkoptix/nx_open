@@ -16,8 +16,7 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 namespace ConnectionMethod
@@ -65,8 +64,7 @@ public:
 };
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx
 
 #endif  //NX_MEDIATOR_API_RESOLVE_DATA_H

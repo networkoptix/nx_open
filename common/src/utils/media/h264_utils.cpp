@@ -8,12 +8,11 @@
 
 namespace
 {
-bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr data)
+bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
 {
     return data->context &&
-        data->context->ctx() &&
-        data->context->ctx()->extradata_size >= 7 &&
-        data->context->ctx()->extradata[0] == 1;
+        data->context->getExtradataSize() >= 7 &&
+        data->context->getExtradata()[0] == 1;
 }
 
 //dishonorably stolen from libavcodec source
@@ -23,11 +22,16 @@ bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr data)
       ((const uint8_t*)(x))[1])
 #endif
 
+// TODO: Code duplication with "h264_utils.cpp".
+/**
+ * @param data data->context should not be null.
+ */
 void readH264NALUsFromExtraData(
-    const QnConstCompressedVideoDataPtr data,
+    const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
-    const unsigned char* p = data->context->ctx()->extradata;
+    assert(data->context);
+    const unsigned char* p = data->context->getExtradata();
 
     //sps & pps is in the extradata, parsing it...
     //following code has been taken from libavcodec/h264.c
@@ -46,7 +50,7 @@ void readH264NALUsFromExtraData(
     {
         const int nalsize = AV_RB16(p);
         p += 2; //skipping nalusize
-        if (nalsize > data->context->ctx()->extradata_size - (p - data->context->ctx()->extradata))
+        if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
         nalUnits->emplace_back((const quint8*)p, nalsize);
         p += nalsize;
@@ -58,16 +62,15 @@ void readH264NALUsFromExtraData(
     {
         const int nalsize = AV_RB16(p);
         p += 2;
-        if (nalsize > data->context->ctx()->extradata_size - (p - data->context->ctx()->extradata))
+        if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
-
         nalUnits->emplace_back((const quint8*)p, nalsize);
         p += nalsize;
     }
 }
 
 void readH264NALUsFromAnnexBStream(
-    const QnConstCompressedVideoDataPtr data,
+    const QnConstCompressedVideoDataPtr& data,
     std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
 {
     const quint8* dataStart = reinterpret_cast<const quint8*>(data->data());

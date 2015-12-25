@@ -27,7 +27,7 @@
         <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_email -lnx_streaming</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>
         <windows.oslibs.release/>

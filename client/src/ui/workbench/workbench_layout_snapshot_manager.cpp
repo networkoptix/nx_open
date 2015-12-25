@@ -25,8 +25,8 @@ void QnWorkbenchLayoutReplyProcessor::processReply( int handle, ec2::ErrorCode e
     if(m_manager)
         m_manager.data()->processReply((int)errorCode, m_resources, handle);
 
-    emitFinished(this, 
-        (int)errorCode, //TODO: #ak need to check all dependent places and change int to ec2::ErrorCode. 
+    emitFinished(this,
+        (int)errorCode, //TODO: #ak need to check all dependent places and change int to ec2::ErrorCode.
                         //But for now it's ok, since both status and errorCode use 0 for success
         QnResourceList(m_resources), handle);
     deleteLater();
@@ -36,7 +36,7 @@ void QnWorkbenchLayoutReplyProcessor::processReply( int handle, ec2::ErrorCode e
 // -------------------------------------------------------------------------- //
 // QnWorkbenchLayoutSnapshotManager
 // -------------------------------------------------------------------------- //
-QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):    
+QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
@@ -98,7 +98,7 @@ Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayou
 
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags) {
 
-    if (flags.testFlag(Qn::ResourceIsChanged) || flags.testFlag(Qn::ResourceIsBeingSaved))
+    if (flags.testFlag(Qn::ResourceIsBeingSaved))
         Q_ASSERT_X(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
 
     QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
@@ -109,7 +109,7 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resou
     }
 
     *pos = flags;
-    
+
     emit flagsChanged(resource);
 }
 
@@ -150,7 +150,7 @@ void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource
         return;
     }
 
-    /* We don't want to get queued layout change signals that are not yet delivered, 
+    /* We don't want to get queued layout change signals that are not yet delivered,
      * so there are no options but to disconnect. */
     disconnectFrom(resource);
     {
@@ -167,7 +167,7 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
         return;
     }
 
-    /* We don't want to get queued layout change signals for these changes, 
+    /* We don't want to get queued layout change signals for these changes,
      * so there are no options but to disconnect before making them. */
     disconnectFrom(resource);
     {
@@ -241,12 +241,12 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
 
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
-    
+
     Qn::ResourceSavingFlags flags = defaultFlags(layoutResource);
     setFlags(layoutResource, flags);
 
     layoutResource->setFlags(flags & Qn::ResourceIsLocal ? layoutResource->flags() & ~Qn::remote : layoutResource->flags() | Qn::remote); // TODO: #Elric this code does not belong here.
-    
+
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
 }
@@ -263,8 +263,6 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnR
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource) {
-    if (!accessController()->hasPermissions(resource, Qn::SavePermission))
-        return;
     setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
 }
 

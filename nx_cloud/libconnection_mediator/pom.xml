@@ -27,7 +27,7 @@
         <template>lib</template>
         <!--Global libs-->
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
         <ffmpeg.libs>-lavcodec -lavformat -lavutil</ffmpeg.libs>
         <!--Specific os libs used-->
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm ssleay32.lib libeay32.lib</windows.oslibs>

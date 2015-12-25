@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 
 #include "mediaserver_emulator.h"
@@ -16,13 +17,84 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, resolve_unkownHost)
+TEST_F(MediatorFunctionalTest, resolve_generic)
 {
-    using namespace nx::network::cloud;
+    //TODO #ak adding multiple server to a system, checking that each very server is found
+
+    using namespace nx::hpm;
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<MediatorClientConnection> client = clientConnection();
+    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+        client = clientConnection();
+
+    const auto system1 = addRandomSystem();
+    auto system1Servers = addRandomServers(system1, 2);
+
+    //resolving 
+    for (int i = 0; i < system1Servers.size(); ++i)
+    {
+        api::ResolveResponse resolveResponse;
+        api::ResultCode resultCode = api::ResultCode::ok;
+        std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
+            std::bind(
+                &nx::network::cloud::MediatorClientConnection::resolve,
+                client.get(),
+                api::ResolveRequest(system1Servers[i]->serverID() + "." + system1.id),
+                std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::ok, resultCode);
+        ASSERT_TRUE(std::find(
+            resolveResponse.endpoints.begin(),
+            resolveResponse.endpoints.end(),
+            system1Servers[i]->endpoint()) != resolveResponse.endpoints.end());
+    }
+
+    client->pleaseStopSync();
+}
+
+TEST_F(MediatorFunctionalTest, resolve_same_server_name)
+{
+    using namespace nx::hpm;
+
+    startAndWaitUntilStarted();
+
+    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+        client = clientConnection();
+
+    const auto system1 = addRandomSystem();
+    auto server1 = addServer(system1, generateRandomName(16));
+    auto server2 = addServer(system1, server1->serverID());
+
+    //resolving, last added server is chosen
+    api::ResolveResponse resolveResponse;
+    api::ResultCode resultCode = api::ResultCode::ok;
+    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
+        std::bind(
+            &nx::network::cloud::MediatorClientConnection::resolve,
+            client.get(),
+            api::ResolveRequest(server1->serverID() + "." + system1.id),
+            std::placeholders::_1));
+    ASSERT_EQ(api::ResultCode::ok, resultCode);
+    ASSERT_TRUE(std::find(
+        resolveResponse.endpoints.begin(),
+        resolveResponse.endpoints.end(),
+        server2->endpoint()) != resolveResponse.endpoints.end());
+    ASSERT_TRUE(std::find(
+        resolveResponse.endpoints.begin(),
+        resolveResponse.endpoints.end(),
+        server1->endpoint()) == resolveResponse.endpoints.end());
+
+    client->pleaseStopSync();
+}
+
+TEST_F(MediatorFunctionalTest, resolve_unkownHost)
+{
+    using namespace nx::hpm;
+
+    startAndWaitUntilStarted();
+
+    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+        client = clientConnection();
 
     const auto system1 = addRandomSystem();
 
@@ -31,7 +103,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &MediatorClientConnection::resolve,
+            &nx::network::cloud::MediatorClientConnection::resolve,
             client.get(),
             api::ResolveRequest(system1.id),
             std::placeholders::_1));
@@ -41,13 +113,14 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     client->pleaseStopSync();
 }
 
-TEST_F(MediatorFunctionalTest, resolve_generic)
+TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
 {
-    using namespace nx::network::cloud;
+    using namespace nx::hpm;
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<MediatorClientConnection> client = clientConnection();
+    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+        client = clientConnection();
 
     const auto system1 = addRandomSystem();
 
@@ -60,63 +133,26 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &MediatorClientConnection::resolve,
+            &nx::network::cloud::MediatorClientConnection::resolve,
             client.get(),
             api::ResolveRequest(mserverEmulator.serverID() + "." + system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
+    ASSERT_TRUE(std::find(
+        resolveResponse.endpoints.begin(),
+        resolveResponse.endpoints.end(),
+        mserverEmulator.endpoint()) != resolveResponse.endpoints.end());
 
     //resolve by system name is forbidden
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &MediatorClientConnection::resolve,
+            &nx::network::cloud::MediatorClientConnection::resolve,
             client.get(),
             api::ResolveRequest(system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
 
     client->pleaseStopSync();
-}
-
-TEST_F(MediatorFunctionalTest, resolve_multipleServers)
-{
-    //TODO #ak adding multiple server to a system, checking that each very server is found
-
-#if 0
-    using namespace nx::network::cloud;
-
-    startAndWaitUntilStarted();
-
-    const std::shared_ptr<MediatorClientConnection> client = clientConnection();
-
-    const auto system1 = addRandomSystem();
-
-    //emulating local mediaserver
-    MediaServerEmulator mserverEmulator(endpoint(), system1);
-    ASSERT_TRUE(mserverEmulator.start());
-
-    //resolving 
-    api::ResolveResponse resolveResponse;
-    api::ResultCode resultCode = api::ResultCode::ok;
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::cc::MediatorClientConnection::resolve,
-            client.get(),
-            ResolveRequest(mserverEmulator.serverID() + "." + system1.id),
-            std::placeholders::_1));
-    ASSERT_EQ(ResultCode::ok, resultCode);
-
-    //resolve by system name is forbidden
-    std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
-        std::bind(
-            &nx::cc::MediatorClientConnection::resolve,
-            client.get(),
-            api::ResolveRequest(system1.id),
-            std::placeholders::_1));
-    ASSERT_EQ(api::ResultCode::notFound, resultCode);
-
-    client->pleaseStopSync();
-#endif
 }
 
 } // namespace test

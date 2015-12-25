@@ -30,6 +30,7 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
+        <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
@@ -53,7 +54,8 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
-
+        <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
+        
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
         <linux.release.version>${parsedVersion.majorVersion}${parsedVersion.minorVersion}${parsedVersion.incrementalVersion}</linux.release.version>
@@ -117,7 +119,7 @@
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.2.1-SNAPSHOT</qt.version>
+        <qt.version>5.4.2</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
         <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
@@ -126,7 +128,7 @@
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
-        <boost.version>1.54-SNAPSHOT</boost.version>
+        <boost.version>1.56-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
         <quazip.version>0.6.2-SNAPSHOT</quazip.version>
 
@@ -158,8 +160,7 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <!--qtlib19 is for desktop only-->
-        <qtlib19></qtlib19>
+        <qtlib19>WebChannel</qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
         <!--QT plugins used-->
@@ -346,6 +347,7 @@
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -423,10 +425,17 @@
                 </os>
             </activation>
             <modules>
+                <module>traytool</module>
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>
                 <module>client.core</module>
+                <module>nxtool</module>
+                <module>client.bin</module>
+                <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${libdir}/${arch}</qt.dir>
+                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}</qt.dir>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>

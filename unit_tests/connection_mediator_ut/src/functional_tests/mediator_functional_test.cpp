@@ -163,6 +163,33 @@ AbstractCloudDataProvider::System MediatorFunctionalTest::addRandomSystem()
     return system;
 }
 
+std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
+    const AbstractCloudDataProvider::System& system,
+    nx::String name)
+{
+    auto server = std::make_unique<MediaServerEmulator>(
+        endpoint(),
+        system,
+        std::move(name));
+    if (!server->start())
+        throw std::runtime_error("Failed to start server emulation");
+    return server;
+}
+
+std::vector<std::unique_ptr<MediaServerEmulator>> 
+    MediatorFunctionalTest::addRandomServers(
+        const AbstractCloudDataProvider::System& system,
+        size_t count)
+{
+    std::vector<std::unique_ptr<MediaServerEmulator>> systemServers;
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
+    systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
+    for (auto& server: systemServers)
+        if (!server->start())
+            throw std::runtime_error("Failed to start server emulation");
+    return systemServers;
+}
+
 //api::ResultCode MediatorFunctionalTest::addAccount(
 //    api::AccountData* const accountData,
 //    std::string* const password,

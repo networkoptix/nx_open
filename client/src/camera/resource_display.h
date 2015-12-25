@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnAbstractMediaStreamDataProvider;
 class QnAbstractStreamDataProvider;
 class QnResourceVideoLayout;
@@ -64,7 +64,7 @@ public:
     /**
      * \returns                         Archive reader associated with this display, if any.
      */
-    QnAbstractArchiveReader *archiveReader() const {
+    QnAbstractArchiveStreamReader *archiveReader() const {
         return m_archiveReader;
     }
 
@@ -94,11 +94,6 @@ public:
      * \returns                         Current time of this display, in microseconds. If the time is not defined, returns -1.
      */
     qint64 currentTimeUSec() const;
-
-    /**
-     * \param usec                      New current time for this display, in microseconds.
-     */
-    void setCurrentTimeUSec(qint64 usec) const;
 
     /**
      * \returns                         Whether this display is paused. 
@@ -138,7 +133,7 @@ private:
     QnAbstractMediaStreamDataProvider *m_mediaProvider;
 
     /** Archive data provider. */
-    QnAbstractArchiveReader *m_archiveReader;
+    QnAbstractArchiveStreamReader *m_archiveReader;
 
     /** Video camera. */
     QnClientVideoCamera *m_camera; // TODO: #Elric Compatibility layer. Remove.

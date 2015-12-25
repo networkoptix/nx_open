@@ -4,7 +4,7 @@
 
 #include "filetypesupport.h"
 #include "utils/common/synctime.h"
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 #include "core/resource/storage_resource.h"
 #include <core/resource/storage_plugin_factory.h>
 

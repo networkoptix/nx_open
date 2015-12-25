@@ -52,7 +52,7 @@ protected:
 
 class NX_NETWORK_API UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
 public:
-    UdtStreamSocket(bool natTraversal);
+    UdtStreamSocket(bool natTraversal = true);
     UdtStreamSocket(detail::UdtSocketImpl* impl);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our

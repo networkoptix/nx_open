@@ -322,10 +322,10 @@
         }}
     },
     
-    "QnGraphicsMessageBox": {
-        "frameColor": "opaqueSelection",
-        "windowColor": "selection.darker(100)",
-        "textColor": "#000000ff"
+    "QnGraphicsMessageBoxColors": {
+        "frame": "opaqueSelection",
+        "window": "selection.darker(100)",
+        "text": "#000000ff"
     },
 
     "QnFisheyeCalibrationImageWidget": {

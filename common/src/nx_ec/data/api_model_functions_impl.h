@@ -5,7 +5,11 @@
 // DO NOT INCLUDE THIS FILE UNLESS YOU KNOW WHAT ARE YOU DOING
 
 #include "api_fwd.h"
+
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/to_tuple.hpp>
+#endif
+
 #include <utils/common/model_functions.h>
 
 

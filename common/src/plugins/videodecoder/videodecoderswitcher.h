@@ -12,7 +12,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include "abstract_decoder_event_receiver.h"
-#include "../../decoders/video/abstractdecoder.h"
+#include "../../decoders/video/abstract_video_decoder.h"
 
 
 class QnAbstractVideoDecoderPlugin;

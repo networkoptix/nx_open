@@ -581,3 +581,42 @@ TEST( HttpHeaderTest, parseDigestAuthParams )
         ASSERT_EQ( params["auth"], "YWRtaW46NTFkMWMzZTUxZDc1MDo2YjA5YmJhYjFmMGY4NDE3ZmI1ZmYwNzcyZGE0MmJjNA%3D%3D" );
     }
 }
+
+TEST(HttpHeaderTest, KeepAlive_parse)
+{
+    {
+        static const char testData[] = "timeout=60, max=100";
+
+        nx_http::header::KeepAlive keepAlive;
+        ASSERT_TRUE(keepAlive.parse(testData));
+        ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
+        ASSERT_TRUE(static_cast<bool>(keepAlive.max));
+        ASSERT_EQ(100, keepAlive.max.get());
+    }
+
+    {
+        static const char testData[] = "  timeout=60 ";
+
+        nx_http::header::KeepAlive keepAlive;
+        ASSERT_TRUE(keepAlive.parse(testData));
+        ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
+        ASSERT_FALSE(static_cast<bool>(keepAlive.max));
+    }
+
+    {
+        static const char testData[] = "  timeout=60  , max=100  ";
+
+        nx_http::header::KeepAlive keepAlive;
+        ASSERT_TRUE(keepAlive.parse(testData));
+        ASSERT_EQ(std::chrono::seconds(60), keepAlive.timeout);
+        ASSERT_TRUE(static_cast<bool>(keepAlive.max));
+        ASSERT_EQ(100, keepAlive.max.get());
+    }
+
+    {
+        static const char testData[] = " max=100  ";
+
+        nx_http::header::KeepAlive keepAlive;
+        ASSERT_FALSE(keepAlive.parse(testData));
+    }
+}

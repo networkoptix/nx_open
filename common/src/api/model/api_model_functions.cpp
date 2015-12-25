@@ -22,8 +22,8 @@
 
 #define QN_MS_API_DATA_TYPES \
     (QnCameraDiagnosticsReply)\
-    (QnManualCameraSearchStatus)\
-    (QnManualCameraSearchSingleCamera)\
+    (QnManualResourceSearchStatus)\
+    (QnManualResourceSearchEntry)\
     (QnManualCameraSearchReply)\
     (QnStorageSpaceReply)\
     (QnConnectionInfo)\

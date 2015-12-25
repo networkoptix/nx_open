@@ -109,7 +109,8 @@ LIBS += -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L${qt.dir}/lib -L$$OUTPUT_PATH/bin/
 }
 LIBS += ${global.libs}
 
-INCLUDEPATH +=  ${qt.dir}/include \
+INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
+                ${qt.dir}/include \
                 ${qt.dir}/include/QtCore \
                 ${qt.dir}/include/QtZlib \
                 ${project.build.sourceDirectory} \
@@ -117,6 +118,7 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${root.dir}/common/src \
                 ${root.dir}/common_libs/nx_network/src \
                 ${root.dir}/common_libs/nx_utils/src \
+                ${root.dir}/common_libs/nx_streaming/src \
                 ${libdir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \

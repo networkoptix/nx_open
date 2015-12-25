@@ -51,32 +51,20 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-static const QByteArray kTestMessage("Ping");
-static const size_t kClientCount(3);
-
 TEST(TcpSocket, SimpleSync)
 {
-    socketSimpleSync<TCPServerSocket, TCPSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount);
+    socketSimpleSync(&std::make_unique<TCPServerSocket>,
+                     &std::make_unique<TCPSocket>);
 }
 
 TEST(TcpSocket, SimpleAsync)
 {
-    socketSimpleAsync<TCPServerSocket, TCPSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount,
-        [this](std::unique_ptr<QnStoppableAsync> socket){
-            socket->pleaseStopSync();
-        });
+    socketSimpleAsync(&std::make_unique<TCPServerSocket>,
+                      &std::make_unique<TCPSocket>);
 }
 
 TEST(TcpSocket, SimpleTrueAsync)
 {
-    socketSimpleTrueAsync<TCPServerSocket, TCPSocket>(
-        SocketAddress("localhost:12345"),
-        kTestMessage,
-        kClientCount);
+    socketSimpleTrueAsync(&std::make_unique<TCPServerSocket>,
+                          &std::make_unique<TCPSocket>);
 }

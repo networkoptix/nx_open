@@ -115,4 +115,6 @@ QString elideString(const QString &source, int maxLength, const QString &tail = 
 //!Generates random string containing only letters and digits
 QByteArray generateRandomName(int length);
 
+QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
+
 #endif // QN_STRING_H

@@ -155,7 +155,6 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
     enum RebuildState {
-        RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
         RebuildState_PartialScan = 3
@@ -279,6 +278,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    //TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
@@ -315,7 +315,7 @@ public:
         io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
-        storage_fastscan = 0x8000000,   /**< Fast scan for storage in progress */
+        storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -328,8 +328,10 @@ public:
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+
+        web_page = url | remote,   /**< Web-page resource */
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)

@@ -27,6 +27,7 @@
 #include "nx_ec/data/api_runtime_data.h"
 #include "nx_ec/data/api_license_overflow_data.h"
 #include "nx_ec/data/api_peer_system_time_data.h"
+#include "nx_ec/data/api_webpage_data.h"
 #include "utils/db/db_helper.h"
 #include "binary_transaction_serializer.h"
 #include "ubjson_transaction_serializer.h"
@@ -55,11 +56,11 @@ namespace ec2
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
-        
+
         bool contains(const QnTranState& state) const;
 
         template <class T>
-        ErrorCode saveTransaction(const QnTransaction<T>& tran) 
+        ErrorCode saveTransaction(const QnTransaction<T>& tran)
         {
             QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             return saveToDB(tran, transactionHash(tran.params), serializedTran);
@@ -157,6 +158,7 @@ namespace ec2
         QnUuid transactionHash(const ApiUserData& params) const                   { return params.id; }
         QnUuid transactionHash(const ApiLayoutData& params) const                 { return params.id; }
         QnUuid transactionHash(const ApiVideowallData& params) const              { return params.id; }
+        QnUuid transactionHash(const ApiWebPageData &params) const                { return params.id; }
         QnUuid transactionHash(const ApiBusinessRuleData& params) const           { return params.id; }
         QnUuid transactionHash(const ApiIdData& params) const                     { return params.id; }
         QnUuid transactionHash(const ApiServerFootageData& params) const       { return makeHash(params.serverGuid.toRfc4122(), "history"); }
@@ -167,7 +169,7 @@ namespace ec2
         QnUuid transactionHash(const ApiLicenseData& params) const                { return makeHash(params.key, "ApiLicense"); }    //TODO
         QnUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
         QnUuid transactionHash(const ApiDiscoveryData &params) const              { return makeHash("discovery_data", params); }
-        
+
         QnUuid transactionHash(const ApiIdDataList& /*tran*/) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiResourceParamDataList& /*tran*/) const  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiResourceParamWithRefDataList& /*tran*/) const  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
@@ -178,6 +180,7 @@ namespace ec2
         QnUuid transactionHash(const ApiMediaServerUserAttributesDataList& ) const       { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLayoutDataList& ) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiVideowallDataList& ) const              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
+        QnUuid transactionHash(const ApiWebPageDataList& ) const                { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiLicenseDataList&) const                 { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiBusinessActionData& ) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiEmailSettingsData& ) const              { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
@@ -248,7 +251,7 @@ namespace ec2
         QnDbManager* m_dbManager;
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
-        
+
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         qint64 m_baseTime;

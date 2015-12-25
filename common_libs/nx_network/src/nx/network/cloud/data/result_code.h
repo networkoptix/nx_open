@@ -11,8 +11,7 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 enum class ResultCode
@@ -32,10 +31,10 @@ void NX_NETWORK_API serialize(const ResultCode&, QString*);
 
 ResultCode NX_NETWORK_API fromStunErrorToResultCode(
     const nx::stun::attrs::ErrorDescription& errorDescription);
+int NX_NETWORK_API resultCodeToStunErrorCode(ResultCode resultCode);
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx
 
 #endif  //NX_MEDIATOR_API_RESULT_CODE_H

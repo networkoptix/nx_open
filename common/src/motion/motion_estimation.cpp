@@ -1030,7 +1030,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     if (m_decoder == 0 || m_decoder->getContext()->codec_id != videoData->compressionType)
     {
         delete m_decoder;
-        m_decoder = new CLFFmpegVideoDecoder(videoData->compressionType, videoData, false);
+        m_decoder = new QnFfmpegVideoDecoder(videoData->compressionType, videoData, false);
         m_decoder->getContext()->flags |= CODEC_FLAG_GRAY;
     }
 
@@ -1061,12 +1061,13 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     //else
     //    fillFrameRect(m_frames[idx], QRect(QPoint(0, m_frames[idx]->height/2), QPoint(m_frames[idx]->width, m_frames[idx]->height)), 40);
 #endif
-
+    bool isMaskChanged = false;
     if (m_frames[idx]->width != m_lastImgWidth || m_frames[idx]->height != m_lastImgHeight || m_isNewMask)
 	{
         reallocateMask(m_frames[idx]->width, m_frames[idx]->height);
 		m_scaleXStep = m_lastImgWidth * 65536 / MD_WIDTH;
 		m_scaleYStep = m_lastImgHeight * 65536 / MD_HEIGHT;
+        isMaskChanged = true;
 	};
 	/*
 	LARGE_INTEGER timer;
@@ -1099,7 +1100,8 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
     }
 #else
 	scaleFrame(m_frames[idx].data()->data[0], m_frames[idx]->width, m_frames[idx]->height, m_frames[idx]->linesize[0], m_frameBuffer[idx], m_frameBuffer[prevIdx], m_frameDeltaBuffer);
-	analizeMotionAmount(m_frameDeltaBuffer);
+    if (!isMaskChanged)
+	    analizeMotionAmount(m_frameDeltaBuffer);
 #endif
 
 	

@@ -9,6 +9,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <business/business_event_rule.h>
 
@@ -89,6 +90,10 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(videowallManager, &ec2::AbstractVideowallManager::addedOrUpdated,       this, [this](const QnVideoWallResourcePtr &videowall){updateResource(videowall);});
     connect(videowallManager, &ec2::AbstractVideowallManager::removed,              this, &QnCommonMessageProcessor::on_resourceRemoved );
     connect(videowallManager, &ec2::AbstractVideowallManager::controlMessage,       this, &QnCommonMessageProcessor::videowallControlMessageReceived );
+
+    auto webPageManager = connection->getWebPageManager();
+    connect(webPageManager, &ec2::AbstractWebPageManager::addedOrUpdated,           this, [this](const QnWebPageResourcePtr &webPage){updateResource(webPage);});
+    connect(webPageManager, &ec2::AbstractWebPageManager::removed,                  this, &QnCommonMessageProcessor::on_resourceRemoved );
 
     auto licenseManager = connection->getLicenseManager();
     connect(licenseManager, &ec2::AbstractLicenseManager::licenseChanged,           this, &QnCommonMessageProcessor::on_licenseChanged );
@@ -215,14 +220,14 @@ void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
     {
         //beforeRemovingResource(resourceId);
 
-        if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId)) 
+        if (QnResourcePtr ownResource = qnResPool->getResourceById(resourceId))
         {
             // delete dependent objects
             for(const QnResourcePtr& subRes: qnResPool->getResourcesByParentId(resourceId))
                 qnResPool->removeResource(subRes);
             qnResPool->removeResource(ownResource);
         }
-    
+
         afterRemovingResource(resourceId);
     }
     else
@@ -280,7 +285,7 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
         res->emitModificationSignals( modifiedFields );
 }
 
-void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData) 
+void QnCommonMessageProcessor::on_cameraHistoryChanged(const ec2::ApiServerFootageData &serverFootageData)
 {
     qnCameraHistoryPool->setServerFootageData(serverFootageData);
 }
@@ -328,7 +333,7 @@ void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessAc
 }
 
 //TODO: #rvasilenko ec2 relate logic. remove from this class
-void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id) 
+void QnCommonMessageProcessor::afterRemovingResource(const QnUuid& id)
 {
     Q_UNUSED(id)
     /*
@@ -350,7 +355,7 @@ void QnCommonMessageProcessor::resetResources(const QnResourceList& resources) {
     QHash<QnUuid, QnResourcePtr> remoteResources;
     for (const QnResourcePtr &resource: qnResPool->getResourcesWithFlag(Qn::remote))
         remoteResources.insert(resource->getId(), resource);
-    
+
     /* Packet adding. */
     qnResPool->beginTran();
     for (const QnResourcePtr& resource: resources) {
@@ -375,12 +380,12 @@ void QnCommonMessageProcessor::resetCamerasWithArchiveList(const ec2::ApiServerF
     qnCameraHistoryPool->resetServerFootageData(cameraHistoryList);
 }
 
-bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &) 
-{ 
-    return true; 
+bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
+{
+    return true;
 }
 
-void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &) 
+void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
@@ -388,7 +393,7 @@ void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
     Q_UNUSED(data)
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {  
+void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
     Q_UNUSED(data)
 }
 
@@ -432,7 +437,7 @@ void QnCommonMessageProcessor::resetPropertyList(const ec2::ApiResourceParamWith
     }
 }
 
-void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params) 
+void QnCommonMessageProcessor::resetStatusList(const ec2::ApiResourceStatusDataList& params)
 {
     auto keys = qnStatusDictionary->values().keys();
     qnStatusDictionary->clear();
@@ -458,7 +463,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::QnFullResourc
     resetStatusList(fullData.resStatusList);
 
     //on_runtimeInfoChanged(fullData.serverInfo);
-    qnSyncTime->reset();   
+    qnSyncTime->reset();
 
     if (!m_connection)
         return;

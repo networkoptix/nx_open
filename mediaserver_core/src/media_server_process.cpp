@@ -52,6 +52,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -89,6 +90,7 @@
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
+#include <plugins/resource/web_page/web_page_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
@@ -146,6 +148,7 @@
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#include <rest/handlers/system_settings_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -167,6 +170,7 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/cloud/mediator_connector.h>
 
 #include <media_server/mserver_status_watcher.h>
 #include <media_server/server_message_processor.h>
@@ -1213,6 +1217,21 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 
     {
+        //loading webpages
+        QnWebPageResourceList webPages;
+        while(( rez = ec2Connection->getWebPageManager()->getWebPagesSync(&webPages))  != ec2::ErrorCode::ok)
+        {
+            qDebug() << "QnMain::run(): Can't get webPages. Reason: " << ec2::toString(rez);
+            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
+            if (m_needStop)
+                return;
+        }
+
+        for(const QnWebPageResourcePtr &webPage: webPages)
+            messageProcessor->updateResource(webPage);
+    }
+
+    {
         //loading layouts
         QnLayoutResourceList layouts;
         while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
@@ -1284,10 +1303,12 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        setValue(confStats.toBool());
-        /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(statisticsReportAllowed);
-        MSSettings::roSettings()->sync();
+        if (confStats.toString() != lit("N/A")) {
+            setValue(confStats.toBool());
+            /* Cleanup installer value. */
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit("N/A"));
+            MSSettings::roSettings()->sync();
+        }
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
     if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
@@ -1523,6 +1544,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler(), RestPermissions::adminOnly);
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
@@ -2189,6 +2211,9 @@ void MediaServerProcess::run()
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer( &thirdPartyResourceSearcher );
 
+    QnWebPageResourceSearcher webPageResourceSearcher;
+    QnResourceDiscoveryManager::instance()->addDeviceServer( &webPageResourceSearcher );
+
 #ifdef ENABLE_DESKTOP_CAMERA
     QnDesktopCameraResourceSearcher desktopCameraResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer(&desktopCameraResourceSearcher);
@@ -2278,12 +2303,10 @@ void MediaServerProcess::run()
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::network::cloud::MediatorConnector::SystemCredentials credentials =
-            {
+            nx::network::cloud::MediatorConnector::SystemCredentials credentials(
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
-                cloudAuthKey.toUtf8()
-            };
+                cloudAuthKey.toUtf8());
 
             nx::network::SocketGlobals::mediatorConnector()
                     .setSystemCredentials(std::move(credentials));
@@ -2339,7 +2362,7 @@ void MediaServerProcess::run()
         for (const auto& value: storagesToRemove)
             idList.push_back(value->getId());
         if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+            qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
         qnResPool->removeResources(storagesToRemove);
     }
 

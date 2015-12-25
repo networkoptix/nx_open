@@ -12,8 +12,7 @@
 #include <nx/network/stun/cc/custom_stun.h>
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
 namespace api {
 
 class NX_NETWORK_API StunMessageData
@@ -61,8 +60,7 @@ private:
 };
 
 } // namespace api
-} // namespace cloud
-} // namespace network
+} // namespace hpm
 } // namespace nx
 
 #endif  //STUN_MESSAGE_DATA_H

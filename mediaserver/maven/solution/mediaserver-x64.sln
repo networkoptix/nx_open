@@ -6,6 +6,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver-x64", "src\medi
 		${appserver2.guid} = ${appserver2.guid}
 		${mediaserver_core.guid} = ${mediaserver_core.guid}
 		${nx_email.guid} = ${nx_email.guid}
+		${nx_streaming.guid} = ${nx_streaming.guid}
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
@@ -13,6 +14,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver_core-x64", "..\
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${nx_email.guid} = ${nx_email.guid}
+		${nx_streaming.guid} = ${nx_streaming.guid}
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
@@ -24,6 +26,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "..\appser
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_email-x64", "..\common_libs\nx_email\src\nx_email-x64.vcxproj", "${nx_email.guid}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "..\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +55,10 @@ Global
 		${nx_email.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_email.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_email.guid}.Release|x64.Build.0 = Release|x64
+		${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

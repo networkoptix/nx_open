@@ -7,7 +7,7 @@
 #include <QtWidgets/QMessageBox>
 #include <QtWidgets/QGraphicsProxyWidget>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <utils/common/util.h>
 #include <utils/common/warnings.h>
 #include <utils/common/scoped_value_rollback.h>

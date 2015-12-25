@@ -8,7 +8,7 @@
 
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "utils/common/request_param.h"
 #include <nx/utils/timermanager.h>
 #include <nx/network/http/asynchttpclient.h>
