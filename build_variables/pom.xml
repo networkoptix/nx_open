@@ -129,6 +129,7 @@
                                 <argument>-Ddonotrebuild=${donotrebuild}</argument>
                                 <argument>-Dnewmobile=${newmobile}</argument>
                                 <argument>-Dcompile.options=${compile.options}</argument>
+                                <argument>-Dbuild.configuration=${build.configuration}</argument>
                             </arguments>
 			    <skip>buildenv.skip</skip>
                             <workingDirectory>${root.dir}/build_environment</workingDirectory>		
