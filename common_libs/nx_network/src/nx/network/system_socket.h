@@ -276,15 +276,18 @@ public:
     static int accept(int sockDesc);
 
     //!Implementation of AbstractStreamServerSocket::listen
-    virtual bool listen( int queueLen ) override;
+    virtual bool listen(int queueLen) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(std::function< void() > handler) override;
 
 protected:
-    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
+    virtual void acceptAsync(
+        std::function<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
 
 private:
     bool setListen(int queueLen);

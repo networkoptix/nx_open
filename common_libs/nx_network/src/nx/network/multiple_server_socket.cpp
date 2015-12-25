@@ -125,7 +125,7 @@ CloudServerSocket_FORWARD_SET(listen, int);
 AbstractStreamSocket* MultipleServerSocket::accept()
 {
     std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
-    acceptAsyncImpl([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+    acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {
         promise.set_value(std::make_pair(code, socket));
     });
@@ -154,9 +154,9 @@ void MultipleServerSocket::dispatchImpl( std::function<void()>&& handler )
     m_serverSockets.front()->dispatch(std::move(handler));
 }
 
-void MultipleServerSocket::acceptAsyncImpl(
+void MultipleServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode,
-                       AbstractStreamSocket*)>&& handler)
+                       AbstractStreamSocket*)> handler)
 {
     unsigned int recvTimeout;
     if (!getRecvTimeout(&recvTimeout))

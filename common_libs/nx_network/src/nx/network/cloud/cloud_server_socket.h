@@ -31,11 +31,11 @@ public:
     virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
-    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual void acceptAsyncImpl(
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
+    virtual void acceptAsync(
         std::function<void(
             SystemError::ErrorCode,
-            AbstractStreamSocket* )>&& handler ) override;
+            AbstractStreamSocket* )> handler ) override;
 };
 
 } // namespace cloud

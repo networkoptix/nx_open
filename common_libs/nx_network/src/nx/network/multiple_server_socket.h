@@ -53,10 +53,10 @@ protected:
     void postImpl( std::function<void()>&& handler ) override;
     void dispatchImpl( std::function<void()>&& handler ) override;
 
-    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    void acceptAsyncImpl(
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
+    void acceptAsync(
         std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)>&& handler) override;
+                           AbstractStreamSocket*)> handler) override;
 
 private:
     struct ServerSocketData

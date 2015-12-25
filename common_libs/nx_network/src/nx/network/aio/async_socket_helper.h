@@ -723,7 +723,7 @@ public:
 
         QnMutexLocker lk( nx::network::SocketGlobals::aioService().mutex() );
         ++m_acceptAsyncCallCount;
-        //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+        //TODO: #ak usually acceptAsync is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
         return nx::network::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 

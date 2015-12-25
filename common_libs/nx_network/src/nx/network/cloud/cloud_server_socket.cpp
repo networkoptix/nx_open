@@ -27,10 +27,10 @@ void CloudServerSocket::pleaseStop( std::function< void() > /*handler*/ )
     //TODO #ak
 }
 
-void CloudServerSocket::acceptAsyncImpl(
+void CloudServerSocket::acceptAsync(
     std::function<void(
         SystemError::ErrorCode,
-        AbstractStreamSocket* )>&& /*handler*/ )
+        AbstractStreamSocket* )> /*handler*/ )
 {
     //TODO #ak
 }

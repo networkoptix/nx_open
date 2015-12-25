@@ -1185,19 +1185,22 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-void TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
+void TCPServerSocket::acceptAsync(
+    std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler)
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
-bool TCPServerSocket::listen( int queueLen )
+bool TCPServerSocket::listen(int queueLen)
 {
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::pleaseStop( std::function<void()> completionHandler )
+void TCPServerSocket::pleaseStop(std::function<void()> completionHandler)
 {
     //TODO #ak add general implementation to Socket class and remove this method
     m_implDelegate.dispatch( [ this, completionHandler ]()

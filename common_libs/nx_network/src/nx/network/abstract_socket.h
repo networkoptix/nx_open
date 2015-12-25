@@ -451,14 +451,11 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    template<class HandlerType>
-        void acceptAsync( HandlerType&& handler )
-        {
-            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void acceptAsync(std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler) = 0;
 
 protected:
-    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

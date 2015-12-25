@@ -872,7 +872,11 @@ void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
     nx::network::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
 }
 
-void UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
+void UdtStreamServerSocket::acceptAsync(
+    std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket* )> handler )
+{
     return m_aioHelper->acceptAsync( std::move(handler) );
 }
 

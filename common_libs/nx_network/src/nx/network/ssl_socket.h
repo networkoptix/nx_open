@@ -160,8 +160,11 @@ public:
     virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
-    //!Implementation of SSLServerSocket::acceptAsyncImpl
-    virtual void acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
+    //!Implementation of SSLServerSocket::acceptAsync
+    virtual void acceptAsync(
+        std::function<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
 
 private:
     const bool m_allowNonSecureConnect;

@@ -1600,7 +1600,10 @@ void SSLServerSocket::pleaseStop(std::function< void() > handler)
     return m_delegateSocket->pleaseStop(std::move(handler));
 }
 
-void SSLServerSocket::acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler)
+void SSLServerSocket::acceptAsync(
+    std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler)
 {
     using namespace std::placeholders;
     m_acceptHandler = std::move(handler);
