@@ -114,6 +114,8 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
+        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
+        <qt.dir>${environment.dir}/${qt.path}</qt.dir>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
@@ -141,7 +143,6 @@
         <additional.defines/>
         <customization.defines/>
 
-        <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.dir>
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlib1>Core</qtlib1>
         <qtlib2>Network</qtlib2>
@@ -428,7 +429,7 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}</qt.dir>
+                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
