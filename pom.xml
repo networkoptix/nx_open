@@ -160,7 +160,8 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <qtlib19>WebChannel</qtlib19>
+        <!-- qtlib19 is replaced with DBus in the client profile -->
+        <qtlib19></qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
         <!--QT plugins used-->
