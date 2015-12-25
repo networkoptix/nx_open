@@ -17,7 +17,7 @@ bool MessageDispatcher::dispatchRequest(
 {
     return nx::stun::MessageDispatcher::dispatchRequest(
         std::move(connection),
-        message);
+        std::move(message));
 }
 
 bool MessageDispatcher::registerRequestProcessor(
