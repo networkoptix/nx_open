@@ -18,10 +18,12 @@ QnObject {
 
 	onPlayingChanged: console.log("----> playing = " + playing)
 	onLoadingChanged: console.log("----> loading = " + loading)
+	onAtLiveChanged:  console.log("----> live = " + atLive)
+	onPositionChanged: console.log("----> position = " + position)
 
     readonly property bool failed: nxPlayer.mediaStatus == QnPlayer.NoMedia
 
-    readonly property alias position: nxPlayer.position
+    readonly property real position: nxPlayer.liveMode ? -1 : nxPlayer.position
     readonly property bool hasTimestamp: true
 
     readonly property var mediaPlayer: nxPlayer
@@ -42,8 +44,8 @@ QnObject {
     QnPlayer {
 		id: nxPlayer
         source: "camera://media/" + player.resourceId
-        onPositionChanged: timelineCorrectionRequest(nxPlayer.position)
-		onLiveModeChanged: timelineCorrectionRequest(nxPlayer.position)
+        onPositionChanged: timelineCorrectionRequest(position)
+		onLiveModeChanged: timelineCorrectionRequest(position)
     }
 
     QnMediaResourceHelper {

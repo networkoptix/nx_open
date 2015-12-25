@@ -94,8 +94,6 @@ namespace nx
 			void reconnectOnPlayChanged();
 			void liveModeChanged();
 		private:
-			qint64 posUsec() const;
-		private:
 			QScopedPointer<PlayerPrivate> d_ptr;
 			Q_DECLARE_PRIVATE(Player);
 		};

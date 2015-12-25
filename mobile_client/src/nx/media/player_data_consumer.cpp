@@ -1,6 +1,8 @@
 #include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
 
+#include <nx/streaming/archive_stream_reader.h>
+
 namespace 
 {
 	static const int kLiveMediaQueueLen = 20;       //< default media queue line
@@ -12,11 +14,14 @@ namespace nx
 namespace media
 {
 
-PlayerDataConsumer::PlayerDataConsumer():
+    PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader) :
 	QnAbstractDataConsumer(kLiveMediaQueueLen),
-	m_decoder(new SeamlessVideoDecoder())
+	m_decoder(new SeamlessVideoDecoder()),
+    m_awaitJumpCounter(0)
 {
-	
+    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,   this, &PlayerDataConsumer::onBeforeJump,   Qt::DirectConnection);
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,  this, &PlayerDataConsumer::onJumpOccured,  Qt::DirectConnection);
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled, this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
 }
 
 PlayerDataConsumer::~PlayerDataConsumer()
@@ -32,8 +37,7 @@ void PlayerDataConsumer::pleaseStop()
 
 bool PlayerDataConsumer::canAcceptData() const
 {
-	// todo: implement me
-	return true;
+    return base_type::canAcceptData();
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
@@ -94,8 +98,25 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
 	return true;
 }
 
+void PlayerDataConsumer::onBeforeJump(qint64 /* timeUsec */)
+{
+    // This function is called directly from an archiveReader thread. Should be thread safe.
+    clearUnprocessedData(); //< Clear input (undecoded) data queue
+    ++m_awaitJumpCounter;
+}
 
+void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
+{
+    // This function is called directly from an archiveReader thread. Should be thread safe.
+    // Previous jump command hasn't been executed due to new jump command received
+    --m_awaitJumpCounter;
+}
 
+void PlayerDataConsumer::onJumpOccured(qint64 /* timeUsec */)
+{
+    // This function is called directly from an archiveReader thread. Should be thread safe.
+    --m_awaitJumpCounter;
+}
 
 }
 }

@@ -18,6 +18,11 @@ namespace {
     const qint64 invalidTimestamp = -1;
 	const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
 	const qint64 kLivePosition = -1;
+
+    qint64 posUsec(qint64 posMs)
+    {
+        return posMs == kLivePosition ? DATETIME_NOW : posMs * 1000ll;
+    }
 }
 
 namespace nx
@@ -189,6 +194,8 @@ qint64 PlayerPrivate::getNextTimeToRender(qint64 pts)
 	}
 }
 
+// ----------------------- Player
+
 Player::Player(QObject *parent)
 	: QObject(parent)
 	, d_ptr(new PlayerPrivate(this))
@@ -232,18 +239,13 @@ qint64 Player::position() const
 	return d->position;
 }
 
-qint64 Player::posUsec() const
-{
-	Q_D(const Player);
-	return d->position == kLivePosition ? DATETIME_NOW : d->position * 1000ll;
-}
-
 void Player::setPosition(qint64 value)
 {
 	Q_D(Player);
-	d->position = value;
-	if (d->archiveReader)
-		d->archiveReader->jumpTo(posUsec(), posUsec());
+    if (d->archiveReader)
+        d->archiveReader->jumpTo(posUsec(value), posUsec(value));
+    else
+        d->position = value;
 }
 
 void Player::play()
@@ -264,13 +266,13 @@ void Player::play()
 	}
 
 	d->archiveReader.reset(new QnArchiveStreamReader(camera));
-	d->dataConsumer.reset(new PlayerDataConsumer());
+    d->dataConsumer.reset(new PlayerDataConsumer(d->archiveReader));
 	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
 	d->archiveReader->addDataProcessor(d->dataConsumer.get());
 	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
 
 	if (d->position != kLivePosition) 
-		d->archiveReader->jumpTo(posUsec(), posUsec()); //< second arg means precise seek
+        d->archiveReader->jumpTo(posUsec(d->position), posUsec(d->position)); //< second arg means precise seek
 
 	d->dataConsumer->start();
 	d->archiveReader->start();
