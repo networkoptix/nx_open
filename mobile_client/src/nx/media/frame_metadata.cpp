@@ -12,12 +12,14 @@ namespace media
 
 
 FrameMetadata::FrameMetadata():
-    flags(QnAbstractMediaData::MediaFlags_None)
+    flags(QnAbstractMediaData::MediaFlags_None),
+    noDelay(false)
 {
 }
 
 FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
-    flags(frame->flags)
+    flags(frame->flags),
+    noDelay(false)
 {
 }
 

@@ -28,7 +28,11 @@ namespace nx
 			virtual ~PlayerDataConsumer();
 
 			QSharedPointer<QVideoFrame> dequeueVideoFrame();
-		signals:
+        signals:
+            /* Hint to render to display current data with no delay due to seek operation in progress */
+            void hurryUp();
+
+            /* New video frame is decoded and ready to render */
 			void gotVideoFrame();
         private slots:
             void onBeforeJump(qint64 timeUsec);
@@ -37,19 +41,26 @@ namespace nx
 		protected:
 			virtual bool canAcceptData() const override;
 			virtual bool processData(const QnAbstractDataPacketPtr& data) override;
-		private:
+            virtual void pleaseStop() override;
+        private:
 			bool processVideoFrame(const QnCompressedVideoDataPtr& data);
 			bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
 			void enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFrame);
-			virtual void pleaseStop() override;
+            int getBufferingMask() const;
+            void clearOutputBuffers();
+            void setNoDelay(const QSharedPointer<QVideoFrame>& frame) const;
 		private:
 			std::unique_ptr<SeamlessVideoDecoder> m_decoder;
 			
 			std::deque<QSharedPointer<QVideoFrame>> m_decodedVideo;
 			QnWaitCondition m_queueWaitCond;
-			QnMutex m_queueMutex;
-            std::atomic<int> m_awaitJumpCounter;              //< how many jump requests are queued
+			QnMutex m_queueMutex;        //< sync with player thread
+            QnMutex m_dataProviderMutex; //< sync with dataProvider thread
+
+            int m_awaitJumpCounter; //< how many jump requests are queued
+            bool m_waitForBOF;
+            int m_buffering;
 		};
 	}
 }

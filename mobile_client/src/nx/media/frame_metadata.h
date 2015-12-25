@@ -17,6 +17,7 @@ namespace nx
             static FrameMetadata deserialize(const QSharedPointer<const QVideoFrame>& frame);
 
             QnAbstractMediaData::MediaFlags flags;
+            bool noDelay; //< display frame immediately with no delay
         };
         Q_DECLARE_METATYPE(FrameMetadata);
     }

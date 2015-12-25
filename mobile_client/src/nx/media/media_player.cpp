@@ -52,10 +52,12 @@ public:
     std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
     QUrl url;
+    QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
 protected:
+    void at_hurryUp();
 	void at_gotVideoFrame();
 	void presentNextFrame();
-	qint64 getNextTimeToRender(qint64 pts);
+    qint64 getNextTimeToRender(QSharedPointer<QVideoFrame> frame);
 
 	PlayerPrivate(Player *parent);
 
@@ -76,7 +78,10 @@ PlayerPrivate::PlayerPrivate(Player *parent)
 	, position(0)
     , videoSurface(0)
 	, maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
+    , execTimer(new QTimer(this))
 {
+    connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
+    execTimer->setSingleShot(true);
 }
 
 void PlayerPrivate::setState(Player::State state) {
@@ -120,23 +125,32 @@ void PlayerPrivate::setPosition(qint64 value)
     emit q->positionChanged();
 }
 
+void PlayerPrivate::at_hurryUp()
+{
+    if (videoFrameToRender) 
+    {
+        execTimer->stop();
+        presentNextFrame();
+    }
+}
+
 void PlayerPrivate::at_gotVideoFrame()
 {
-	setMediaStatus(Player::MediaStatus::Loaded);
+    setMediaStatus(Player::MediaStatus::Loaded);
 
-	if (videoFrameToRender)
-		return; //< we already have fame to render. Ignore next frame (will be processed later)
+    if (videoFrameToRender)
+        return; //< we already have fame to render. Ignore next frame (will be processed later)
 
-	if (state != Player::State::Playing)
-		return;
-	
-	videoFrameToRender = dataConsumer->dequeueVideoFrame();
-	if (!videoFrameToRender)
-		return;
+    if (state != Player::State::Playing)
+        return;
 
-	qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender->startTime());
-	if (nextTimeToRender > ptsTimer.elapsed())
-		executeDelayedParented([this]() { presentNextFrame(); }, nextTimeToRender - ptsTimer.elapsed(), this);
+    videoFrameToRender = dataConsumer->dequeueVideoFrame();
+    if (!videoFrameToRender)
+        return;
+
+    qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender);
+    if (nextTimeToRender > ptsTimer.elapsed())
+        execTimer->start(nextTimeToRender - ptsTimer.elapsed());
 	else
 		presentNextFrame();
 }
@@ -170,8 +184,9 @@ void PlayerPrivate::presentNextFrame()
 	at_gotVideoFrame(); //< calculate next time to render
 }
 
-qint64 PlayerPrivate::getNextTimeToRender(qint64 pts)
+qint64 PlayerPrivate::getNextTimeToRender(QSharedPointer<QVideoFrame> frame)
 {
+    const qint64 pts = frame->startTime();
 	if (hasAudio)
 	{
 		// todo: not implemented yet
@@ -179,10 +194,13 @@ qint64 PlayerPrivate::getNextTimeToRender(qint64 pts)
 	}
 	else 
 	{
+        FrameMetadata metadata = FrameMetadata::deserialize(frame);
 		/* Calculate time to present next frame */
-		if (!lastVideoPts.is_initialized() || !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration))
+		if (!lastVideoPts.is_initialized() ||                                    //< first time
+            !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
+            metadata.noDelay)                                                    //< jump occurred
 		{
-			// Reset timer If no previous frame or pts discontinue
+			// Reset timer
 			lastVideoPts = ptsTimerBase = pts;
 			ptsTimer.restart();
 			return 0ll;
@@ -243,7 +261,7 @@ void Player::setPosition(qint64 value)
 {
 	Q_D(Player);
     if (d->archiveReader)
-        d->archiveReader->jumpTo(posUsec(value), posUsec(value));
+        d->archiveReader->jumpTo(posUsec(value), 0);
     else
         d->position = value;
 }
@@ -270,6 +288,7 @@ void Player::play()
 	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
 	d->archiveReader->addDataProcessor(d->dataConsumer.get());
 	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
+    connect(d->dataConsumer.get(), &PlayerDataConsumer::hurryUp, d, &PlayerPrivate::at_hurryUp);
 
 	if (d->position != kLivePosition) 
         d->archiveReader->jumpTo(posUsec(d->position), posUsec(d->position)); //< second arg means precise seek

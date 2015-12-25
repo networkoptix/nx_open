@@ -89,7 +89,7 @@ void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fram
 	codecContext = avcodec_alloc_context3(codec);
 	if (frame->context)
 		QnFfmpegHelper::mediaContextToAvCodecContext(codecContext, frame->context);
-	codecContext->thread_count = 4;
+	//codecContext->thread_count = 4;
 	if (avcodec_open2(codecContext, codec, nullptr) < 0)
 	{
 		qWarning() << "Can't open decoder for codec" << frame->compressionType;
