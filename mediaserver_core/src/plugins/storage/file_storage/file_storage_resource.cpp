@@ -600,6 +600,10 @@ bool QnFileStorageResource::isStorageDirMounted() const
 
         auto badResultHandler = [this]()
         {   // Treat every unexpected test result the same way.
+            // Cleanup attempt will be performed.
+            // Will try to unmount, remove local mount point directory 
+            // and set flag meaning that local path recreation 
+            // + remount is needed
             umount(m_localPath.toLatin1().constData()); // directory may not exists, but this is Ok
             rmdir(m_localPath.toLatin1().constData()); // same as above
             m_dirty = true;
@@ -642,10 +646,8 @@ bool QnFileStorageResource::isStorageDirMounted() const
         int err = errno;
 
         if ((retCode == -1 && err != EBUSY) || retCode == 0)
-        {   // Bad. Mount succeeded OR it failed but for another reason that
+        {   // Bad. Mount succeeded OR it failed but for another reason than
             // local path is already mounted.
-            // Will try to unmount, remove it and set flag meaning
-            // that local path recreation + remount is needed
             NX_LOG(
                 lit("[QnFileStorageResource::isStorageDirMounted] mount result = %1 , errno = %2")
                     .arg(retCode)
