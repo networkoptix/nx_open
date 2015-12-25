@@ -18,11 +18,11 @@
     <version>3.0.0-SNAPSHOT</version>
     <artifactId>genericrtspplugin</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Generic RTSP plugin</name>	
+    <name>HD Witness Generic RTSP plugin</name> 
 
     <properties>
         <guid>${genericrtspplugin.guid}</guid>
-        <product.title>${genericrtspplugin.name}</product.title>	
+        <product.title>${genericrtspplugin.name}</product.title>    
         <!--Global libs-->
         <qt.libs>core</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
@@ -47,22 +47,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>common</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type> 
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
     </dependencies>  
     <profiles>
         <profile>
@@ -76,6 +60,6 @@
             <properties>
                 <buildLib>sharedlib</buildLib>
             </properties>
-        </profile>	      
-    </profiles>	
+        </profile>        
+    </profiles> 
 </project>

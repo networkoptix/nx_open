@@ -114,6 +114,8 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
+        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
+        <qt.dir>${environment.dir}/${qt.path}</qt.dir>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
@@ -436,7 +438,7 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${environment.dir}/artifacts/qt/${qt.version}/${platform}/${arch}/${box}</qt.dir>
+                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
@@ -543,7 +545,6 @@
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
-                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
