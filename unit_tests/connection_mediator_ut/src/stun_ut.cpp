@@ -111,7 +111,7 @@ TEST_F( StunCustomTest, BindConnect )
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
+        request.newAttribute< stun::cc::attrs::HostName >(SERVER_ID+"."+SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
