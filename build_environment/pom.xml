@@ -110,6 +110,7 @@
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
                                         </exec>
+                                        <chmod file="${project.build.directory}/update_artifacts.${script.extension}" perm="755"/>
                                         <exec dir="${environment.dir}" executable="${project.build.directory}/update_artifacts.${script.extension}" failifexecutionfails="true">
                                             <arg line=""/>
                                         </exec>                                        
