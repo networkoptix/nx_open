@@ -176,10 +176,11 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
     //t.start();
 
     DeviceFileCatalog::UniqueChunkCont ignoreChunks;
+    qint64 seekTimeMs = time/1000;
+    static const int kSeekStep = 75 * 1000; // 75 seconds
 
     while (true) {
         m_skipFramesToTime = 0;
-        qint64 timeMs = time/1000;
         m_newQualityTmpData.reset();
         m_newQualityAviDelegate.clear();
 
@@ -188,10 +189,10 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
 
         DeviceFileCatalog::FindMethod findMethod = m_reverseMode ? DeviceFileCatalog::OnRecordHole_PrevChunk : DeviceFileCatalog::OnRecordHole_NextChunk;
         bool isePrecSeek = /*m_reverseMode && */m_quality == MEDIA_Quality_High; // do not try short LQ chunk if ForcedHigh quality and do not try short HQ chunk for LQ quality
-        m_dialQualityHelper.findDataForTime(timeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek, ignoreChunks); // use precise find if no REW mode
+        m_dialQualityHelper.findDataForTime(seekTimeMs, newChunk, newChunkCatalog, findMethod, isePrecSeek, ignoreChunks); // use precise find if no REW mode
         m_currentChunkInfo.startTimeUsec = newChunk.startTimeMs * USEC_IN_MSEC;
         m_currentChunkInfo.durationUsec = newChunk.durationMs * USEC_IN_MSEC;
-        if (!m_reverseMode && newChunk.endTimeMs() < timeMs)
+        if (!m_reverseMode && newChunk.endTimeMs() < seekTimeMs)
         {
             m_eof = true;
             return time;
@@ -236,15 +237,21 @@ qint64 QnServerArchiveDelegate::seekInternal(qint64 time, bool findIFrame, bool 
                     m_eof = true;
                     return time;
                 } else {
-                    ignoreChunks.emplace(
-                        newChunk, 
-                        newChunkCatalog->cameraUniqueId(),
-                        newChunkCatalog->getRole()
-                    );
+                    ignoreChunks.emplace(newChunk, newChunkCatalog->cameraUniqueId(), 
+                                         newChunkCatalog->getRole());
+
+                    // In reverse mode seek point tries to step backwards
+                    // every time we find file that can not be opened.
+                    // In forward mode - same, but opposite direction
+                    if (m_reverseMode) {
+                        seekTimeMs = std::min(seekTimeMs, newChunk.endTimeMs() + kSeekStep);
+                    } else {
+                        seekTimeMs = std::max(seekTimeMs, newChunk.startTimeMs - kSeekStep);
+                    }
                     continue;
                 }
             }
-                //return -1;
+                //return -1;e
             //if (isStreamsFound)
             //    m_aviDelegate->doNotFindStreamInfo(); // optimization
         }
