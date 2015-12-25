@@ -18,7 +18,8 @@ class TestServer
     : public SocketServer
 {
 public:
-    TestServer() : SocketServer( false ) {}
+    TestServer(const nx::stun::MessageDispatcher& dispatcher)
+        : SocketServer(dispatcher, false) {}
 
     std::vector<std::shared_ptr<ServerConnection>> connections;
 
@@ -60,7 +61,7 @@ protected:
 
     void startServer()
     {
-        server = std::make_unique< TestServer >();
+        server = std::make_unique< TestServer >(dispatcher);
         EXPECT_TRUE( server->bind( address ) );
         EXPECT_TRUE( server->listen() );
     }
@@ -77,6 +78,7 @@ protected:
     }
 
     const SocketAddress address;
+    nx::stun::MessageDispatcher dispatcher;
     std::shared_ptr< AsyncClient > client;
     std::unique_ptr< TestServer > server;
 };

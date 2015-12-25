@@ -58,7 +58,7 @@ protected:
     virtual void connectAsync(
         const SocketAddress& addr,
         std::function<void( SystemError::ErrorCode )> handler ) override;
-    virtual void recvAsync(
+    virtual void readSomeAsync(
         nx::Buffer* const buf,
         std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
     virtual void sendAsync(

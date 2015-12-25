@@ -171,7 +171,7 @@ void DummySocket::connectAsync( const SocketAddress& /*addr*/,
 {
 }
 
-void DummySocket::recvAsync( nx::Buffer* const /*buf*/,
+void DummySocket::readSomeAsync( nx::Buffer* const /*buf*/,
                                  std::function<void( SystemError::ErrorCode, size_t )> /*handler*/ )
 {
 }

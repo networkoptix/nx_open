@@ -178,7 +178,6 @@ public:
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
 
-protected:
     //!Implementation of AbstractSocket::post
     virtual void post( std::function<void()> handler ) override;
     //!Implementation of AbstractSocket::dispatch

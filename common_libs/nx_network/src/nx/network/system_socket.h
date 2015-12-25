@@ -290,7 +290,6 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop(std::function< void() > handler) override;
 
-protected:
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     virtual void acceptAsync(
         std::function<void(
