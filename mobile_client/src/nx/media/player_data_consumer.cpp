@@ -1,8 +1,8 @@
+#include <nx/streaming/archive_stream_reader.h>
+
 #include "player_data_consumer.h"
 #include "seamless_video_decoder.h"
 #include "frame_metadata.h"
-
-#include <nx/streaming/archive_stream_reader.h>
 
 namespace 
 {
@@ -90,7 +90,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
         emit hurryUp(); //< hint to a player to avoid waiting for the currently displaying frame
     }
 
-	QSharedPointer<QVideoFrame> decodedFrame;
+    QnVideoFramePtr decodedFrame;
 	if (!m_decoder->decode(data, &decodedFrame))
 	{
         qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
@@ -102,7 +102,7 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
 	return true;
 }
 
-void PlayerDataConsumer::enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFrame)
+void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
 {
 	QnMutexLocker lock(&m_queueMutex);
 	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
@@ -114,12 +114,12 @@ void PlayerDataConsumer::enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFr
 	emit gotVideoFrame();
 }
 
-QSharedPointer<QVideoFrame> PlayerDataConsumer::dequeueVideoFrame()
+QnVideoFramePtr PlayerDataConsumer::dequeueVideoFrame()
 {
 	QnMutexLocker lock(&m_queueMutex);
 	if (m_decodedVideo.empty())
-		return QSharedPointer<QVideoFrame>(); //< no data
-	QSharedPointer<QVideoFrame> result = std::move(m_decodedVideo.front());
+        return QnVideoFramePtr(); //< no data
+    QnVideoFramePtr result = std::move(m_decodedVideo.front());
 	m_decodedVideo.pop_front();
 	lock.unlock();
 

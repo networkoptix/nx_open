@@ -6,7 +6,8 @@
 #include <nx/streaming/video_data_packet.h>
 #include <nx/streaming/audio_data_packet.h>
 
-class QVideoFrame;
+#include "media_fwd.h"
+
 class QnArchiveStreamReader;
 
 namespace nx
@@ -26,7 +27,7 @@ namespace nx
             PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader);
 			virtual ~PlayerDataConsumer();
 
-			QSharedPointer<QVideoFrame> dequeueVideoFrame();
+            QnVideoFramePtr dequeueVideoFrame();
         signals:
             /* Hint to render to display current data with no delay due to seek operation in progress */
             void hurryUp();
@@ -49,12 +50,12 @@ namespace nx
 			bool processVideoFrame(const QnCompressedVideoDataPtr& data);
 			bool processAudioFrame(const QnCompressedAudioDataPtr& data);
 
-			void enqueueVideoFrame(QSharedPointer<QVideoFrame> decodedFrame);
+            void enqueueVideoFrame(QnVideoFramePtr decodedFrame);
             int getBufferingMask() const;
 		private:
 			std::unique_ptr<SeamlessVideoDecoder> m_decoder;
 			
-			std::deque<QSharedPointer<QVideoFrame>> m_decodedVideo;
+            std::deque<QnVideoFramePtr> m_decodedVideo;
 			QnWaitCondition m_queueWaitCond;
 			QnMutex m_queueMutex;        //< sync with player thread
             QnMutex m_dataProviderMutex; //< sync with dataProvider thread

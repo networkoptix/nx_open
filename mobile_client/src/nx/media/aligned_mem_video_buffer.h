@@ -6,6 +6,9 @@ namespace nx
 {
 	namespace media
 	{
+        /* This class implements QT video buffer interface using aligned memory allocation.
+        * Some video decoders require aligned memory buffers.
+        */
 		class AlignedMemVideoBufferPrivate;
 		class AlignedMemVideoBuffer: public QAbstractVideoBuffer
 		{

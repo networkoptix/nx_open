@@ -6,11 +6,12 @@
 #include <QtOpenGL/qgl.h>
 
 #include <utils/common/delayed.h>
+#include "core/resource_management/resource_pool.h"
 #include <ui/texture_size_helper.h>
 
 #include "nx/streaming/archive_stream_reader.h"
 #include "nx/streaming/rtsp_client_archive_delegate.h"
-#include "core/resource_management/resource_pool.h"
+
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
 
@@ -48,7 +49,7 @@ public:
     QAbstractVideoSurface* videoSurface;
     int maxTextureSize;
 
-    QSharedPointer<QVideoFrame> videoFrameToRender;       //< decoded video which is awaiting to be rendered
+    QnVideoFramePtr videoFrameToRender;                   //< decoded video which is awaiting to be rendered
     std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
     QUrl url;                                             //< media URL to play
@@ -57,7 +58,7 @@ protected:
     void at_hurryUp();
 	void at_gotVideoFrame();
 	void presentNextFrame();
-    qint64 getNextTimeToRender(QSharedPointer<QVideoFrame> frame);
+    qint64 getNextTimeToRender(const QnVideoFramePtr& frame);
 
 	PlayerPrivate(Player *parent);
 
@@ -184,7 +185,7 @@ void PlayerPrivate::presentNextFrame()
 	at_gotVideoFrame(); //< calculate next time to render
 }
 
-qint64 PlayerPrivate::getNextTimeToRender(QSharedPointer<QVideoFrame> frame)
+qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
 	if (hasAudio)

@@ -58,7 +58,7 @@ public:
 	const FrameMetadata* findMetadata(int frameNum) const;
 	void clearMetadata();
 public:
-	std::deque<QSharedPointer<QVideoFrame>> queue; //< temporary  buffer for decoded data
+    std::deque<QnVideoFramePtr> queue; //< temporary  buffer for decoded data
 	VideoDecoderPtr videoDecoder;
 	FrameBasicInfo prevFrameInfo;
 	int frameNumber;
@@ -103,7 +103,7 @@ SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
 }
 
-bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
+bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
 {
 	Q_D(SeamlessVideoDecoder);
 	if (result)
@@ -112,7 +112,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QS
 	FrameBasicInfo frameInfo(frame);
 	if (!(frameInfo == d->prevFrameInfo))
 	{
-		QSharedPointer<QVideoFrame> decodedFrame;
+        QnVideoFramePtr decodedFrame;
 		if (d->videoDecoder)
 		{
 			while (1) 
@@ -136,7 +136,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QS
 	int decodedFrameNum = 0;
 	if (d->videoDecoder) 
 	{
-		QSharedPointer<QVideoFrame> decodedFrame;
+        QnVideoFramePtr decodedFrame;
 		decodedFrameNum = d->videoDecoder->decode(frame, &decodedFrame);
 		if (decodedFrame) 
 		{

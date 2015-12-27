@@ -14,6 +14,7 @@ namespace nx
 		class AbstractVideoDecoder;
 		typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
 
+        /* This class allows to register various implementation for video decoders. Exact list of decoders can be registered in runtime mode */
 		class VideoDecoderRegistry
 		{
 		public:

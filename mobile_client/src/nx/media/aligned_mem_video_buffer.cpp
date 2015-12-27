@@ -1,5 +1,6 @@
 #include "aligned_mem_video_buffer.h"
 
+// todo: there is new pattern will be available soon to avoid such hardcode.
 #if QT_VERSION == 0x050201
 #include <QtMultimedia/5.2.1/QtMultimedia/private/qabstractvideobuffer_p.h>
 #elif QT_VERSION == 0x050401
@@ -8,6 +9,8 @@
 #include <QtMultimedia/5.5.0/QtMultimedia/private/qabstractvideobuffer_p.h>
 #elif QT_VERSION == 0x050501
 #include <QtMultimedia/5.5.1/QtMultimedia/private/qabstractvideobuffer_p.h>
+#elif QT_VERSION == 0x050600
+#include <QtMultimedia/5.6.0/QtMultimedia/private/qabstractvideobuffer_p.h>
 #else
 #error "Include proper header here!"
 #endif

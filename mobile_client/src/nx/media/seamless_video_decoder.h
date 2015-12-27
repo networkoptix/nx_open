@@ -5,6 +5,8 @@
 
 #include <nx/streaming/video_data_packet.h>
 
+#include "media_fwd.h"
+
 namespace nx
 {
 	namespace media
@@ -32,7 +34,7 @@ namespace nx
 			* \param result		decoded video data. If decoder still fills internal buffer then result can be empty but function return true.
 			* \!returns true if frame is decoded without errors. For nullptr input data returns true while flushing internal buffer (result isn't null)
 			*/
-			bool decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result = nullptr);
+            bool decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr);
 
             /* Returns current frame number in range [0..int_max]. This number will be used for the next frame on 'decode' call */
             int currentFrameNumber() const;

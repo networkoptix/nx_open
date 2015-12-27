@@ -24,7 +24,7 @@ FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
     flags = frame->flags;
 }
 
-void FrameMetadata::serialize(const QSharedPointer<QVideoFrame>& frame) const
+void FrameMetadata::serialize(const QnVideoFramePtr& frame) const
 {
     frame->setMetaData(kMetadataFlagsKey, QVariant::fromValue(*this));
 }

@@ -8,6 +8,7 @@ extern "C"
 
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/thread/mutex.h>
+
 #include "aligned_mem_video_buffer.h"
 
 namespace
@@ -116,12 +117,12 @@ FfmpegDecoder::FfmpegDecoder()
 
 FfmpegDecoder::~FfmpegDecoder()
 {
-	Q_D(FfmpegDecoder);
 }
 
 bool FfmpegDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
 {
 	// todo: implement me
+    Q_UNUSED(frame);
 	return true;
 }
 
@@ -140,7 +141,7 @@ QVideoFrame::PixelFormat toQtPixelFormat(int ffmpegFormat)
 	}
 }
 
-int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result)
+int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
 {
 	Q_D(FfmpegDecoder);
 
