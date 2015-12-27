@@ -20,7 +20,7 @@ namespace {
 	const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
 	const qint64 kLivePosition = -1;
 
-    qint64 posUsec(qint64 posMs)
+    qint64 msecToUsec(qint64 posMs)
     {
         return posMs == kLivePosition ? DATETIME_NOW : posMs * 1000ll;
     }
@@ -68,18 +68,18 @@ protected:
     void setPosition(qint64 value);
 };
 
-PlayerPrivate::PlayerPrivate(Player *parent)
-	: QObject(parent)
-	, q_ptr(parent)
-	, state(Player::State::Stopped)
-    , mediaStatus(Player::MediaStatus::NoMedia)
-    , ptsTimerBase(0)
-    , hasAudio(false)
-    , liveMode(false)
-	, position(0)
-    , videoSurface(0)
-	, maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize())
-    , execTimer(new QTimer(this))
+PlayerPrivate::PlayerPrivate(Player *parent):
+    QObject(parent),
+	q_ptr(parent),
+	state(Player::State::Stopped),
+    mediaStatus(Player::MediaStatus::NoMedia),
+    ptsTimerBase(0),
+    hasAudio(false),
+    liveMode(false),
+	position(0),
+    videoSurface(0),
+	maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
+    execTimer(new QTimer(this))
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -262,7 +262,7 @@ void Player::setPosition(qint64 value)
 {
 	Q_D(Player);
     if (d->archiveReader)
-        d->archiveReader->jumpTo(posUsec(value), 0);
+        d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
         d->position = value;
 }
@@ -293,7 +293,7 @@ void Player::play()
     connect(d->dataConsumer.get(), &PlayerDataConsumer::onEOF, d, [this]() { setPosition(kLivePosition);  });
 
 	if (d->position != kLivePosition) 
-        d->archiveReader->jumpTo(posUsec(d->position), posUsec(d->position)); //< second arg means precise seek
+        d->archiveReader->jumpTo(msecToUsec(d->position), msecToUsec(d->position)); //< second arg means precise seek
 
 	d->dataConsumer->start();
 	d->archiveReader->start();

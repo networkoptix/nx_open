@@ -23,6 +23,8 @@ namespace nx
 
 			static bool isCompatible(const QnConstCompressedVideoDataPtr& frame);
             virtual int decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
+        private:
+            void ffmpegToQtVideoFrame(QnVideoFramePtr* result);
 		private:
 			QScopedPointer<FfmpegDecoderPrivate> d_ptr;
 			Q_DECLARE_PRIVATE(FfmpegDecoder);

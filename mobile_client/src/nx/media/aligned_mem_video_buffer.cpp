@@ -23,22 +23,23 @@ namespace media
 class AlignedMemVideoBufferPrivate
 {
 public:
-	AlignedMemVideoBufferPrivate()
-		: bytesPerLine(0)
-		, mapMode(QAbstractVideoBuffer::NotMapped)
-		, data(nullptr)
-		, dataSize(0)
+	AlignedMemVideoBufferPrivate():
+		bytesPerLine(0),
+		mapMode(QAbstractVideoBuffer::NotMapped),
+		data(nullptr),
+		dataSize(0)
 	{
 	}
+
 	int bytesPerLine;
 	QAbstractVideoBuffer::MapMode mapMode;
 	uchar* data;
 	int dataSize;
 };
 
-AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine)
-	: QAbstractVideoBuffer(NoHandle)
-	, d_ptr(new AlignedMemVideoBufferPrivate())
+AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
+	QAbstractVideoBuffer(NoHandle),
+	d_ptr(new AlignedMemVideoBufferPrivate())
 {
 	Q_D(AlignedMemVideoBuffer);
 	d->data = (uchar*) qMallocAligned(size, alignFactor);

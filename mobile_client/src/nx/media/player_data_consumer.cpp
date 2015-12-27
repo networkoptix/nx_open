@@ -15,7 +15,7 @@ namespace nx
 namespace media
 {
 
-PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader) :
+PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader):
     QnAbstractDataConsumer(kLiveMediaQueueLen),
     m_decoder(new SeamlessVideoDecoder()),
     m_awaitJumpCounter(0),
@@ -23,8 +23,8 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     m_hurryUpToFrame(0),
     m_noDelayState(NoDelayState::Disabled)
 {
-    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump, this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured, this, &PlayerDataConsumer::onJumpOccured, Qt::DirectConnection);
+    connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,   this, &PlayerDataConsumer::onBeforeJump,   Qt::DirectConnection);
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,  this, &PlayerDataConsumer::onJumpOccured,  Qt::DirectConnection);
     connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled, this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
 }
 
