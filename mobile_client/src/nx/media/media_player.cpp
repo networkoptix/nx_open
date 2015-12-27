@@ -44,14 +44,14 @@ public:
 	qint64 ptsTimerBase;                                  //< timestamp when PTS timer was started
 	bool hasAudio;
     bool liveMode;
-    qint64 position;
+    qint64 position;                                      //< UTC Playback position at msec 
     QAbstractVideoSurface* videoSurface;
     int maxTextureSize;
 
     QSharedPointer<QVideoFrame> videoFrameToRender;       //< decoded video which is awaiting to be rendered
     std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
-    QUrl url;
+    QUrl url;                                             //< media URL to play
     QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
 protected:
     void at_hurryUp();
@@ -212,7 +212,7 @@ qint64 PlayerPrivate::getNextTimeToRender(QSharedPointer<QVideoFrame> frame)
 	}
 }
 
-// ----------------------- Player
+// ----------------------- Player -----------------------
 
 Player::Player(QObject *parent)
 	: QObject(parent)
@@ -289,6 +289,7 @@ void Player::play()
 	d->archiveReader->addDataProcessor(d->dataConsumer.get());
 	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
     connect(d->dataConsumer.get(), &PlayerDataConsumer::hurryUp, d, &PlayerPrivate::at_hurryUp);
+    connect(d->dataConsumer.get(), &PlayerDataConsumer::onEOF, d, [this]() { setPosition(kLivePosition);  });
 
 	if (d->position != kLivePosition) 
         d->archiveReader->jumpTo(posUsec(d->position), posUsec(d->position)); //< second arg means precise seek

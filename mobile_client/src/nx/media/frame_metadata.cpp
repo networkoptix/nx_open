@@ -13,14 +13,15 @@ namespace media
 
 FrameMetadata::FrameMetadata():
     flags(QnAbstractMediaData::MediaFlags_None),
-    noDelay(false)
+    noDelay(false),
+    frameNum(0)
 {
 }
 
 FrameMetadata::FrameMetadata(const QnConstCompressedVideoDataPtr& frame):
-    flags(frame->flags),
-    noDelay(false)
+    FrameMetadata()
 {
+    flags = frame->flags;
 }
 
 void FrameMetadata::serialize(const QSharedPointer<QVideoFrame>& frame) const

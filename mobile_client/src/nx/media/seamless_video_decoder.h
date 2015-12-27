@@ -34,6 +34,9 @@ namespace nx
 			*/
 			bool decode(const QnConstCompressedVideoDataPtr& frame, QSharedPointer<QVideoFrame>* result = nullptr);
 
+            /* Returns current frame number in range [0..int_max]. This number will be used for the next frame on 'decode' call */
+            int currentFrameNumber() const;
+
 		private:
 			QScopedPointer<SeamlessVideoDecoderPrivate> d_ptr;
 			Q_DECLARE_PRIVATE(SeamlessVideoDecoder);

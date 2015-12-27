@@ -76,7 +76,9 @@ SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *p
 
 void SeamlessVideoDecoderPrivate::addMetadata(const QnConstCompressedVideoDataPtr& frame)
 {
-	metadataCache.insert(frameNumber++, new FrameMetadata(frame));
+    auto metadata = new FrameMetadata(frame);
+    metadata->frameNum = frameNumber++;
+    metadataCache.insert(metadata->frameNum, metadata);
 }
 
 const FrameMetadata* SeamlessVideoDecoderPrivate::findMetadata(int frameNum) const
@@ -86,7 +88,6 @@ const FrameMetadata* SeamlessVideoDecoderPrivate::findMetadata(int frameNum) con
 
 void SeamlessVideoDecoderPrivate::clearMetadata()
 {
-	frameNumber = 0;
 	metadataCache.clear();
 }
 
@@ -152,6 +153,12 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QS
 	*result = d->queue.front();
 	d->queue.pop_front();
 	return true;
+}
+
+int SeamlessVideoDecoder::currentFrameNumber() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    return d->frameNumber;
 }
 
 }

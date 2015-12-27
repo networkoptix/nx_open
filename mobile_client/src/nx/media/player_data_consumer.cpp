@@ -19,7 +19,9 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     QnAbstractDataConsumer(kLiveMediaQueueLen),
     m_decoder(new SeamlessVideoDecoder()),
     m_awaitJumpCounter(0),
-    m_waitForBOF(false)
+    m_buffering(0),
+    m_hurryUpToFrame(0),
+    m_noDelayState(NoDelayState::Disabled)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump, this, &PlayerDataConsumer::onBeforeJump, Qt::DirectConnection);
     connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured, this, &PlayerDataConsumer::onJumpOccured, Qt::DirectConnection);
@@ -44,17 +46,16 @@ bool PlayerDataConsumer::canAcceptData() const
 
 int PlayerDataConsumer::getBufferingMask() const
 {
-    // todo: implement me
+    // todo: not implemented yet. Reserver for future use for panoramic cameras
     return 1;
-}
-
-void PlayerDataConsumer::clearOutputBuffers()
-{
-
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
+    auto emptyFrame = std::dynamic_pointer_cast<QnEmptyMediaData>(data);
+    if (emptyFrame)
+        return processEmptyFrame(emptyFrame);
+
     auto videoFrame = std::dynamic_pointer_cast<QnCompressedVideoData>(data);
     if (videoFrame)
         return processVideoFrame(videoFrame);
@@ -63,54 +64,40 @@ bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
     if (audioFrame)
         return processAudioFrame(audioFrame);
 
-    return true; // just ignore unknown frame type
+    return true; //< just ignore unknown frame type
 }
 
-void PlayerDataConsumer::setNoDelay(const QSharedPointer<QVideoFrame>& frame) const
+bool PlayerDataConsumer::processEmptyFrame(const QnEmptyMediaDataPtr& /*data*/ )
 {
-    FrameMetadata metadata = FrameMetadata::deserialize(frame);
-    metadata.noDelay = true;
-    metadata.serialize(frame);
+    emit onEOF();
+    return true;
 }
 
 bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
 {
     const bool isBofData = (data->flags & QnAbstractMediaData::MediaFlags_BOF); //< first packet after a jump
-    bool displayImmediately = isBofData; //< display data immediately with no delay related to previous frame
+    bool displayImmediately = isBofData; //< display data immediately with no delay
     {
         QnMutexLocker lock(&m_dataProviderMutex);
-        if (m_awaitJumpCounter > 0)
-            displayImmediately = true; //< display any data immediately if more jumps are queued
-        if (m_waitForBOF)
-        {
-            if (!isBofData)
-                return true; //< Ignore data because we are waiting new data after a jump
-            // It's a first packet after a final jump
-            m_waitForBOF = false;
-            clearOutputBuffers();
-        }
+        if (m_noDelayState != NoDelayState::Disabled)
+            displayImmediately = true; //< display any data immediately (include intermediate frames between BOF frames) if jumps aren't processed yet
+        if (m_noDelayState == NoDelayState::WaitForNextBOF && isBofData)
+            m_noDelayState = NoDelayState::Disabled;
+    }
+    if (displayImmediately)
+    {
+        m_hurryUpToFrame = m_decoder->currentFrameNumber();
+        emit hurryUp(); //< hint to a player to avoid waiting for the currently displaying frame
     }
 
 	QSharedPointer<QVideoFrame> decodedFrame;
 	if (!m_decoder->decode(data, &decodedFrame))
 	{
-		qDebug() << Q_FUNC_INFO << "Can't decode video frame. skip it";
+        qWarning() << Q_FUNC_INFO << "Can't decode video frame. Frame is skipped.";
 		return true; // false result means we want to repeat this frame latter
 	}
 
-    if (displayImmediately) 
-    {
-        setNoDelay(decodedFrame);
-        {
-            QnMutexLocker lock(&m_queueMutex);
-            for (auto& frame : m_decodedVideo)
-                setNoDelay(frame);
-        }
-
-        emit hurryUp(); //< hint to a player to avoid waiting for the currently displaying frame
-    }
 	enqueueVideoFrame(std::move(decodedFrame));
-
 
 	return true;
 }
@@ -135,6 +122,14 @@ QSharedPointer<QVideoFrame> PlayerDataConsumer::dequeueVideoFrame()
 	QSharedPointer<QVideoFrame> result = std::move(m_decodedVideo.front());
 	m_decodedVideo.pop_front();
 	lock.unlock();
+
+    FrameMetadata metadata = FrameMetadata::deserialize(result);
+    if (metadata.frameNum <= m_hurryUpToFrame)
+    {
+        metadata.noDelay = true;
+        metadata.serialize(result);
+    }
+
 	m_queueWaitCond.wakeAll();
 	return result;
 }
@@ -151,6 +146,12 @@ void PlayerDataConsumer::onBeforeJump(qint64 /* timeUsec */)
     QnMutexLocker lock(&m_dataProviderMutex);
     ++m_awaitJumpCounter;
     m_buffering = getBufferingMask();
+
+    /*
+    * The purpose of this variable is prevent doing delay between frames while they are displayed
+    * We supposed to decode/display they at maximum speed unless lat jump command will be processed
+    */
+    m_noDelayState = NoDelayState::Activated;
 }
 
 void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
@@ -170,10 +171,10 @@ void PlayerDataConsumer::onJumpOccured(qint64 /* timeUsec */)
     if (--m_awaitJumpCounter == 0)
     {
         /*
-        * The purpose of this variable is prevent doing delay between frames while they are displayed
-        * We supposed to decode/display they at maximum speed unless lat jump command will be processed
+        * This function is called from dataProvider thread. PlayerConsumer may still process previous frame
+        * So, leave noDelay state a bit later, when next BOF frame will be received
         */
-        m_waitForBOF = true; 
+        m_noDelayState = NoDelayState::WaitForNextBOF;
     }
 }
 
