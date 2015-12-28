@@ -19,8 +19,6 @@
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/cpp14.h>
 
-#include <server/message_dispatcher.h>
-
 #include "mediator_mocks.h"
 #include "socket_globals_holder.h"
 
@@ -50,7 +48,7 @@ protected:
         network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 
-    MessageDispatcher stunMessageDispatcher;
+    nx::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
     std::unique_ptr<ListeningPeerPool> listeningPeerPool;

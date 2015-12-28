@@ -11,9 +11,10 @@
 #include <unordered_map>
 
 #include <nx/utils/singleton.h>
-#include "utils/common/stoppable.h"
+#include <utils/common/stoppable.h>
 
-#include "server_connection.h"
+#include "abstract_server_connection.h"
+
 
 namespace nx {
 namespace stun {
@@ -26,7 +27,7 @@ class NX_NETWORK_API MessageDispatcher
 {
 public:
     typedef std::function<
-        void(std::shared_ptr< ServerConnection >, stun::Message)
+        void(std::shared_ptr< AbstractServerConnection >, stun::Message)
     > MessageProcessor;
 
     virtual ~MessageDispatcher();
@@ -47,7 +48,7 @@ public:
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
     virtual bool dispatchRequest(
-        std::shared_ptr< ServerConnection > connection,
+        std::shared_ptr< AbstractServerConnection > connection,
         stun::Message message ) const;
 
 private:

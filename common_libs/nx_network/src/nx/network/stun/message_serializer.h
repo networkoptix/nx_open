@@ -28,6 +28,9 @@ namespace stun {
             m_initialized = true;
         }
 
+        /** Serializes full message increasing \a buffer if needed.
+            \param bytesWritten Serializes message length is written here
+         */
         nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
 
     private:

@@ -6,6 +6,8 @@
 #ifndef NX_MEDIATOR_STUN_REQUEST_PROCESSING_HELPER_H
 #define NX_MEDIATOR_STUN_REQUEST_PROCESSING_HELPER_H
 
+#include <type_traits>
+
 #include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/server_connection.h>
 #include <utils/serialization/lexical.h>
@@ -16,8 +18,8 @@
 namespace nx {
 namespace hpm {
 
-typedef std::shared_ptr< AbstractServerConnection > ConnectionStrongRef;
-typedef std::weak_ptr< AbstractServerConnection > ConnectionWeakRef;
+typedef std::shared_ptr< nx::stun::AbstractServerConnection > ConnectionStrongRef;
+typedef std::weak_ptr< nx::stun::AbstractServerConnection > ConnectionWeakRef;
 
 
 /** Send success responce without attributes */
@@ -55,20 +57,67 @@ void sendErrorResponse(
     connection->sendMessage(std::move(response));
 }
 
+template<typename OutputData>
+void serialize(
+    OutputData* outputData,
+    stun::Message* const response,
+    typename std::enable_if<!std::is_void<OutputData>::value>::type* = nullptr)
+{
+    outputData->serialize(response);
+}
 
-//TODO #ak come up with a single implementation when variadic templates are available
+template<typename OutputData>
+void serialize(
+    OutputData* /*outputData*/,
+    stun::Message* const /*response*/,
+    typename std::enable_if<std::is_void<OutputData>::value>::type* = nullptr)
+{
+}
 
 template<
-    typename ProcessorType,
     typename ConnectionStrongRef,
+    typename OutputData>
+void fillAndSendResponse(
+    nx::stun::Header requestHeader,
+    const ConnectionStrongRef& connection,
+    api::ResultCode resultCode,
+    OutputData* outputData = nullptr)
+{
+    if (resultCode != api::ResultCode::ok)
+        return sendErrorResponse(
+            connection,
+            std::move(requestHeader),
+            api::resultCodeToStunErrorCode(resultCode),
+            QnLexical::serialized(resultCode).toLatin1());
+
+    stun::Message response(
+        stun::Header(
+            stun::MessageClass::successResponse,
+            requestHeader.method,
+            std::move(requestHeader.transactionId)));
+    serialize(outputData, &response);
+
+    connection->sendMessage(std::move(response));
+}
+
+
+/** 
+    Does following:\n
+    - reads input data out of STUN \a request
+    - passes it to the member function \a processingFunc of \a processor
+    - on processin done sends response
+    //TODO #ak come up with a single implementation when variadic templates are available
+*/
+template<
+    typename ProcessorType,
     typename InputData>
 void processRequestWithNoOutput(
     void (ProcessorType::*processingFunc)(
-        ConnectionStrongRef,
+        const ConnectionStrongRef&,
         InputData,
         std::function<void(api::ResultCode)>),
     ProcessorType* processor,
-    ConnectionStrongRef connection,
+    const ConnectionStrongRef& connection,
     stun::Message request)
 {
     InputData input;
@@ -80,40 +129,52 @@ void processRequestWithNoOutput(
             input.errorText());
 
     auto requestHeader = std::move(request.header);
-    (processor->*processingFunc)(
-        connection,
-        std::move(input),
-        [/*std::move*/ requestHeader, connection](api::ResultCode resultCode) mutable
+    if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
-        if (resultCode != api::ResultCode::ok)
-            return sendErrorResponse(
+        //holding ownership of connection until request processing completion
+        (processor->*processingFunc)(
+            connection,
+            std::move(input),
+            [/*std::move*/ requestHeader, connection](api::ResultCode resultCode) mutable
+        {
+            fillAndSendResponse<ConnectionStrongRef, void>(
+                requestHeader,
                 connection,
-                std::move(requestHeader),
-                api::resultCodeToStunErrorCode(resultCode),
-                QnLexical::serialized(resultCode).toLatin1());
-
-        stun::Message response(
-            stun::Header(
-                stun::MessageClass::successResponse,
-                requestHeader.method,
-                std::move(requestHeader.transactionId)));
-
-        connection->sendMessage(std::move(response));
-    });
+                resultCode);
+        });
+    }
+    else
+    {
+        ConnectionWeakRef weakConnectionRef = connection;
+        //holding ownership of connection until request processing completion
+        (processor->*processingFunc)(
+            connection,
+            std::move(input),
+            [/*std::move*/ requestHeader, weakConnectionRef](api::ResultCode resultCode) mutable
+        {
+            //connection can be removed at any moment
+            auto connectionStrongRef = weakConnectionRef.lock();
+            if (!connectionStrongRef)
+                return;
+            fillAndSendResponse<ConnectionStrongRef, void>(
+                requestHeader,
+                connectionStrongRef,
+                resultCode);
+        });
+    }
 }
 
 template<
     typename ProcessorType,
-    typename ConnectionStrongRef,
     typename InputData,
     typename OutputData>
 void processRequestWithOutput(
     void (ProcessorType::*processingFunc)(
-        ConnectionStrongRef,
+        const ConnectionStrongRef&,
         InputData,
         std::function<void(api::ResultCode, OutputData)>),
     ProcessorType* processor,
-    ConnectionStrongRef connection,
+    const ConnectionStrongRef& connection,
     stun::Message request)
 {
     InputData input;
@@ -125,29 +186,45 @@ void processRequestWithOutput(
             input.errorText());
 
     auto requestHeader = std::move(request.header);
-    (processor->*processingFunc)(
-        connection,
-        std::move(input),
-        [/*std::move*/ requestHeader, connection](
-            api::ResultCode resultCode,
-            OutputData outputData) mutable
+    if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
-        if (resultCode != api::ResultCode::ok)
-            return sendErrorResponse(
+        //holding ownership of connection until request processing completion
+        (processor->*processingFunc)(
+            connection,
+            std::move(input),
+            [/*std::move*/ requestHeader, connection](
+                api::ResultCode resultCode,
+                OutputData outputData) mutable
+        {
+            fillAndSendResponse<ConnectionStrongRef, OutputData>(
+                requestHeader,
                 connection,
-                std::move(requestHeader),
-                api::resultCodeToStunErrorCode(resultCode),
-                QnLexical::serialized(resultCode).toLatin1());
-
-        stun::Message response(
-            stun::Header(
-                stun::MessageClass::successResponse,
-                requestHeader.method,
-                std::move(requestHeader.transactionId)));
-        outputData.serialize(&response);
-
-        connection->sendMessage(std::move(response));
-    });
+                resultCode,
+                &outputData);
+        });
+    }
+    else
+    {
+        ConnectionWeakRef weakConnectionRef = connection;
+        //holding ownership of connection until request processing completion
+        (processor->*processingFunc)(
+            connection,
+            std::move(input),
+            [/*std::move*/ requestHeader, weakConnectionRef](
+                api::ResultCode resultCode,
+                OutputData outputData) mutable
+        {
+            //connection can be removed at any moment
+            auto connectionStrongRef = weakConnectionRef.lock();
+            if (!connectionStrongRef)
+                return;
+            fillAndSendResponse<ConnectionStrongRef, OutputData>(
+                requestHeader,
+                connectionStrongRef,
+                resultCode,
+                &outputData);
+        });
+    }
 }
 
 }   //hpm

@@ -8,9 +8,12 @@
 
 
 namespace nx {
-namespace hpm {
 
+namespace stun {
 class MessageDispatcher;
+}
+
+namespace hpm {
 
 //! Mediaserver API communicating interface
 class MediaserverApiBase
@@ -18,7 +21,7 @@ class MediaserverApiBase
 {
 public:
     MediaserverApiBase( AbstractCloudDataProvider* cloudData,
-                      MessageDispatcher* dispatcher );
+                        nx::stun::MessageDispatcher* dispatcher );
 
     void ping( const ConnectionStrongRef& connection, stun::Message message );
 
@@ -33,7 +36,7 @@ class MediaserverApi
 {
 public:
     MediaserverApi( AbstractCloudDataProvider* cloudData,
-                    MessageDispatcher* dispatcher );
+                    nx::stun::MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,
                              std::function< void( SocketAddress, bool ) > onPinged ) override;

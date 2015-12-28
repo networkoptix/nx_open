@@ -18,9 +18,12 @@
 
 
 namespace nx {
-namespace hpm {
 
+namespace stun {
 class MessageDispatcher;
+}
+
+namespace hpm {
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
 /*!
@@ -32,24 +35,24 @@ class ListeningPeerPool
 {
 public:
     ListeningPeerPool( AbstractCloudDataProvider* cloudData,
-                       MessageDispatcher* dispatcher );
+                       nx::stun::MessageDispatcher* dispatcher );
 
     void bind(
-        ConnectionStrongRef connection,
+        const ConnectionStrongRef& connection,
         stun::Message message);
     void listen(
-        ConnectionStrongRef connection,
+        const ConnectionStrongRef& connection,
         stun::Message message);
     void resolve(
-        ConnectionStrongRef connection,
+        const ConnectionStrongRef& connection,
         api::ResolveRequest request,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
     void connect(
-        ConnectionStrongRef connection,
+        const ConnectionStrongRef& connection,
         stun::Message message);
 
     void connectionResult(
-        ConnectionStrongRef connection,
+        const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 

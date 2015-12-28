@@ -285,6 +285,12 @@ public:
     virtual void registerTimer(
         unsigned int timeoutMs,
         std::function<void()> handler) = 0;
+    void registerTimer(
+        std::chrono::milliseconds timeout,
+        std::function<void()> handler)
+    {
+        return registerTimer(timeout.count(), std::move(handler));
+    }
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
@@ -507,6 +513,19 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignAddress ) = 0;
+    bool sendTo(
+        const nx::Buffer& buf,
+        const SocketAddress& foreignAddress)
+    {
+        return sendTo(buf.constData(), buf.size(), foreignAddress);
+    }
+    /*!
+        \param completionHandler (errorCode, bytesSent)
+    */
+    virtual void sendToAsync(
+        const nx::Buffer& buf,
+        const SocketAddress& foreignAddress,
+        std::function<void(SystemError::ErrorCode, size_t)> completionHandler) = 0;
     //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data
@@ -518,6 +537,13 @@ public:
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress ) = 0;
+    /*!
+        \param buf Data appended here
+        \param handler(errorCode, sourceAddress, bytesRead)
+    */
+    virtual void recvFromAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     //!Returns address of previous datagram read with \a AbstractCommunicatingSocket::recv or \a AbstractDatagramSocket::recvFrom
     virtual SocketAddress lastDatagramSourceAddress() const = 0;
     //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately

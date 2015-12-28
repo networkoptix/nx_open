@@ -379,11 +379,17 @@ bool MessageSerializer::checkMessageIntegratiy() {
     return true;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const user_buffer, size_t* const bytesWritten ) {
+nx_api::SerializerState::Type MessageSerializer::serialize(
+    nx::Buffer* const user_buffer,
+    size_t* const bytesWritten )
+{
     for( int i = 0; ; ++i ) //TODO #ak ensure loop is not inifinite
     {
         if( i > 0 )
+        {
+            user_buffer->resize(0);
             user_buffer->reserve( user_buffer->capacity() * 2 );
+        }
 
         Q_ASSERT(m_initialized && checkMessageIntegratiy());
         Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);

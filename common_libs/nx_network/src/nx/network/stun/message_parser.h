@@ -73,11 +73,15 @@ namespace stun {
             \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
             \note Reads whole message even if parse error occurred
         */
-        nx_api::ParserState::Type parse( const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/ );
+        nx_api::ParserState::Type parse(
+            const nx::Buffer& /*buf*/,
+            size_t* /*bytesProcessed*/ );
 
         //!Returns current parse state
         nx_api::ParserState::Type state() const {
-            return m_state == HEADER_INITIAL_AND_TYPE ? nx_api::ParserState::init : nx_api::ParserState::inProgress;
+            return m_state == HEADER_INITIAL_AND_TYPE
+                ? nx_api::ParserState::init
+                : nx_api::ParserState::inProgress;
         }
 
         //!Resets parse state and prepares for parsing different data

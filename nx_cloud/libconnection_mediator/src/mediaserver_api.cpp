@@ -6,14 +6,12 @@
 
 #include <QJsonDocument>
 
-#include "server/message_dispatcher.h"
-
 
 namespace nx {
 namespace hpm {
 
 MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
-                                    MessageDispatcher* dispatcher )
+                                        nx::stun::MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
@@ -94,7 +92,7 @@ void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
 // impl
 
 MediaserverApi::MediaserverApi( AbstractCloudDataProvider* cloudData,
-                                MessageDispatcher* dispatcher )
+                                nx::stun::MessageDispatcher* dispatcher )
     : MediaserverApiBase( cloudData, dispatcher )
 {
 }

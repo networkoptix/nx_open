@@ -8,31 +8,29 @@
 #include <nx/utils/log/log.h>
 #include <nx/network/stun/cc/custom_stun.h>
 
-#include "server/message_dispatcher.h"
-
 
 namespace nx {
 namespace hpm {
 
 ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
-                                      MessageDispatcher* dispatcher )
-    : RequestProcessor( cloudData )
+                                      nx::stun::MessageDispatcher* dispatcher )
+    : RequestProcessor(cloudData)
 {
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
             stun::cc::methods::bind,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            [this](const ConnectionStrongRef& connection, stun::Message message)
                 { bind( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::listen,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            [this](const ConnectionStrongRef& connection, stun::Message message)
                 { listen( std::move(connection), std::move( message ) ); } ) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::resolve,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
                     &ListeningPeerPool::resolve,
@@ -43,12 +41,12 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connect,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            [this](const ConnectionStrongRef& connection, stun::Message message)
                 { connect( std::move(connection), std::move( message ) ); } );
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::connectionResult,
-            [this](ConnectionStrongRef connection, stun::Message message)
+            [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithNoOutput(
                     &ListeningPeerPool::connectionResult,
@@ -61,8 +59,8 @@ ListeningPeerPool::ListeningPeerPool( AbstractCloudDataProvider* cloudData,
     Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
-void ListeningPeerPool::bind( ConnectionStrongRef connection,
-                              stun::Message message )
+void ListeningPeerPool::bind(const ConnectionStrongRef& connection,
+                             stun::Message message)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
@@ -97,8 +95,8 @@ void ListeningPeerPool::bind( ConnectionStrongRef connection,
     }
 }
 
-void ListeningPeerPool::listen( ConnectionStrongRef connection,
-                                stun::Message message )
+void ListeningPeerPool::listen(const ConnectionStrongRef& connection,
+                               stun::Message message)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
@@ -130,7 +128,7 @@ void ListeningPeerPool::listen( ConnectionStrongRef connection,
 }
 
 void ListeningPeerPool::resolve(
-    ConnectionStrongRef connection,
+    const ConnectionStrongRef& connection,
     api::ResolveRequest requestData,
     std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
@@ -169,8 +167,8 @@ void ListeningPeerPool::resolve(
     completionHandler(api::ResultCode::ok, std::move(responseData));
 }
 
-void ListeningPeerPool::connect( ConnectionStrongRef connection,
-                                 stun::Message message )
+void ListeningPeerPool::connect(const ConnectionStrongRef& connection,
+                                stun::Message message )
 {
     const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
     if( !userNameAttr )
@@ -217,8 +215,8 @@ void ListeningPeerPool::connect( ConnectionStrongRef connection,
 }
 
 void ListeningPeerPool::connectionResult(
-    ConnectionStrongRef connection,
-    api::ConnectionResultRequest request,
+    const ConnectionStrongRef& /*connection*/,
+    api::ConnectionResultRequest /*request*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     //TODO #ak
@@ -254,7 +252,7 @@ boost::optional< ListeningPeerPool::MediaserverPeer& >
     const auto& serverIt = serverInsert.first;
     if( serverInsert.second )
     {
-        connection.lock()->registerCloseHandler( [ = ]()
+        connection.lock()->addOnConnectionCloseHandler( [ = ]()
         {
             NX_LOGX( lit("Peer %2.%3 has been disconnected")
                     .arg( QString::fromUtf8( systemIt->first ) )

@@ -17,24 +17,7 @@
 namespace nx {
 namespace hpm {
 
-class AbstractServerConnection
-{
-public:
-    AbstractServerConnection() {}
-    virtual ~AbstractServerConnection() {}
-
-    virtual void sendMessage(nx::stun::Message message) = 0;
-    virtual nx::network::TransportProtocol transportProtocol() const = 0;
-    virtual SocketAddress getSourceAddress() const = 0;
-    /**
-        \note \a AbstractServerConnection::sendMessage does nothing after \a handler has been invoked
-     */
-    virtual void registerCloseHandler(std::function<void()> handler) = 0;
-
-private:
-    AbstractServerConnection(const AbstractServerConnection&);
-    AbstractServerConnection& operator=(const AbstractServerConnection&);
-};
+#if 0
 
 /**
     \note Life time of object of this class is tied to the life time 
@@ -67,12 +50,13 @@ private:
     void connectionIsAboutToClose(
         std::shared_ptr<TcpServerConnection> strongThisRef);
 };
+#endif
 
 /** Provides ability to send response to a request message received via UDP
  */
 class UDPServerConnection   //TODO #ak rename
 :
-    public AbstractServerConnection
+    public nx::stun::AbstractServerConnection
 {
 public:
 };

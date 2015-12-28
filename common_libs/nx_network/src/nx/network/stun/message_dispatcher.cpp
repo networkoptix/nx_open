@@ -19,7 +19,7 @@ bool MessageDispatcher::registerRequestProcessor(
 }
 
 bool MessageDispatcher::dispatchRequest(
-        std::shared_ptr< ServerConnection > connection,
+        std::shared_ptr< AbstractServerConnection > connection,
         stun::Message message ) const
 {
     const auto it = m_processors.find( message.header.method );

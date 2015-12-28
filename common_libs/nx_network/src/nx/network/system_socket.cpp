@@ -1410,6 +1410,15 @@ bool UDPSocket::sendTo(
     return sendTo( buffer, bufferLen );
 }
 
+void UDPSocket::sendToAsync(
+    const nx::Buffer& buf,
+    const SocketAddress& foreignEndpoint,
+    std::function<void(SystemError::ErrorCode, size_t)> completionHandler)
+{
+    setDestAddr(foreignEndpoint);
+    sendAsync(buf, std::move(completionHandler));
+}
+
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 {
     //TODO #ak use flags
@@ -1430,6 +1439,18 @@ int UDPSocket::recvFrom(
     if( rtn >= 0 && sourceAddress )
         *sourceAddress = m_prevDatagramAddress;
     return rtn;
+}
+
+void UDPSocket::recvFromAsync(
+    nx::Buffer* const buf,
+    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+{
+    //TODO #ak #msvc2015 move handler
+    readSomeAsync(
+        buf,
+        [/*std::move*/ handler, this](SystemError::ErrorCode errCode, size_t bytesRead){
+            handler(errCode, std::move(m_prevDatagramAddress), bytesRead);
+        });
 }
 
 SocketAddress UDPSocket::lastDatagramSourceAddress() const

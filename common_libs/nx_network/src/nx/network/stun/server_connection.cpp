@@ -5,8 +5,6 @@
 
 #include "server_connection.h"
 
-#include "message_dispatcher.h"
-
 #include <common/common_globals.h>
 
 #include "message_dispatcher.h"
@@ -33,6 +31,26 @@ ServerConnection::~ServerConnection()
     //       weak_ptr is not valid any more
     if( m_destructHandler )
         m_destructHandler();
+}
+
+void ServerConnection::sendMessage(nx::stun::Message message)
+{
+    BaseType::sendMessage(std::move(message));
+}
+
+nx::network::TransportProtocol ServerConnection::transportProtocol() const
+{
+    return nx::network::TransportProtocol::tcp;
+}
+
+SocketAddress ServerConnection::getSourceAddress() const
+{
+    return socket()->getForeignAddress();
+}
+
+void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
+{
+    registerCloseHandler(std::move(handler));
 }
 
 void ServerConnection::processMessage( Message message )

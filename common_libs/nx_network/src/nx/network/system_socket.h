@@ -361,6 +361,11 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignEndpoint ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendToAsync
+    virtual void sendToAsync(
+        const nx::Buffer& buf,
+        const SocketAddress& foreignAddress,
+        std::function<void(SystemError::ErrorCode, size_t)> completionHandler) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
@@ -371,6 +376,10 @@ public:
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress ) override;
+    //!Implementation of AbstractDatagramSocket::recvFromAsync
+    virtual void recvFromAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
     //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData

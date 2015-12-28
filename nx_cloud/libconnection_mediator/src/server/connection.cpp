@@ -9,6 +9,8 @@
 namespace nx {
 namespace hpm {
 
+#if 0
+
 TcpServerConnection::~TcpServerConnection()
 {
 }
@@ -66,6 +68,8 @@ void TcpServerConnection::connectionIsAboutToClose(
         localHandler();
     }
 }
+
+#endif
 
 }   //hpm
 }   //nx
