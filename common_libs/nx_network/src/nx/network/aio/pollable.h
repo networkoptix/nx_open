@@ -11,12 +11,11 @@
 #include "../abstract_socket.h"
 #include "../common_socket_impl.h"
 
-
 class Pollable;
-//namespace aio
-//{
-//    extern template class AIOThread<Pollable>;
-//}
+namespace aio
+{
+    class AbstractAioThread;
+}
 
 #ifndef _WIN32
 static const int INVALID_SOCKET = -1;
@@ -50,6 +49,9 @@ public:
     const PollableImpl* impl() const;
 
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
+
+    aio::AbstractAioThread* getAioThread();
+    void bindToAioThread(aio::AbstractAioThread* aioThread);
 
 protected:
     AbstractSocket::SOCKET_HANDLE m_fd;

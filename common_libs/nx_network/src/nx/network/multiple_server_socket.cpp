@@ -120,6 +120,27 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
     return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
+aio::AbstractAioThread* MultipleServerSocket::getAioThread()
+{
+    aio::AbstractAioThread* first;
+    for (auto& socket : m_serverSockets)
+    {
+        const auto value = socket->getAioThread();
+        if (first)
+            Q_ASSERT(first == value);
+        else
+            first = value;
+    }
+
+    return first;
+}
+
+void MultipleServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    for (auto& socket : m_serverSockets)
+        socket->bindToAioThread(aioThread);
+}
+
 CloudServerSocket_FORWARD_SET(listen, int);
 
 AbstractStreamSocket* MultipleServerSocket::accept()

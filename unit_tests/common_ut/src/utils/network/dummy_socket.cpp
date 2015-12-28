@@ -186,7 +186,14 @@ void DummySocket::registerTimer( unsigned int /*timeoutMs*/,
 {
 }
 
+aio::AbstractAioThread* DummySocket::getAioThread()
+{
+    return nullptr;
+}
 
+void DummySocket::bindToAioThread(aio::AbstractAioThread* /*aioThread*/)
+{
+}
 
 ////////////////////////////////////////////////////////////
 //// parse utils

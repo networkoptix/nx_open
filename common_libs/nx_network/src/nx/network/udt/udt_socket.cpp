@@ -553,6 +553,16 @@ const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
     return m_impl;
 }
 
+aio::AbstractAioThread* UdtSocket::getAioThread()
+{
+    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
+}
+
+void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
+}
+
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
@@ -739,6 +749,16 @@ AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {
     return m_impl->handle();
 }
 
+aio::AbstractAioThread* UdtStreamSocket::getAioThread()
+{
+    return UdtSocket::getAioThread();
+}
+
+void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    UdtSocket::bindToAioThread(aioThread);
+}
+
 UdtStreamSocket::UdtStreamSocket( bool natTraversal )
 :
     m_aioHelper(new AsyncSocketImplHelper<UdtSocket>(this, this, natTraversal))
@@ -902,6 +922,16 @@ void UdtStreamServerSocket::acceptAsync(
 
 AbstractSocket::SOCKET_HANDLE UdtStreamServerSocket::handle() const {
     return m_impl->handle();
+}
+
+aio::AbstractAioThread* UdtStreamServerSocket::getAioThread()
+{
+    return UdtSocket::getAioThread();
+}
+
+void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    UdtSocket::bindToAioThread(aioThread);
 }
 
 UdtStreamServerSocket::UdtStreamServerSocket()

@@ -164,6 +164,32 @@ namespace aio
         //TODO #ak better remove this method, violates encapsulation
         QnMutex* mutex() const { return &m_mutex; }
 
+        template<class SocketType>
+        aio::AIOThread<SocketType>* getSocketAioThread(SocketType* sock)
+        {
+            auto thread = sock->impl()->aioThread.load(std::memory_order_relaxed);
+
+            if(!thread) // socket has not been bound to aio thread yet
+                thread = bindSocketToAioThread(sock);
+
+            Q_ASSERT(thread);
+            return thread;
+        }
+
+        template<class SocketType>
+        void bindSocketToAioThread(SocketType* sock, AbstractAioThread* aioThread)
+        {
+            const auto desired = dynamic_cast<aio::AIOThread<SocketType>*>(aioThread);
+            Q_ASSERT_X(desired, Q_FUNC_INFO, "Inappropriate AIO thread type");
+
+            aio::AIOThread<SocketType>* expected = nullptr;
+            if(!sock->impl()->aioThread.compare_exchange_strong(expected, desired))
+            {
+                Q_ASSERT_X(false, Q_FUNC_INFO,
+                           "Socket is already bound to some AIO thread");
+            }
+        }
+
         //!Same as \a AIOService::watchSocket, but does not lock mutex. Calling entity MUST lock \a AIOService::mutex() before calling this method
         /*!
             \param socketAddedToPollHandler Called after socket has been added to pollset but before pollset.poll has been called
@@ -253,11 +279,7 @@ namespace aio
                 }
             }
 
-            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load( std::memory_order_relaxed );
-            if( !threadToUse )  //socket has not been bound to aio thread yet
-                threadToUse = bindSocketToAioThread( sock );
-            assert( threadToUse );
-
+            const auto threadToUse = getSocketAioThread(sock);
             threadToUse->watchSocket(
                 sock,
                 eventToWatch,
@@ -380,12 +402,7 @@ namespace aio
         template<class SocketType, class Handler>
         void postNonSafe(QnMutexLockerBase* const /*lock*/, SocketType* sock, Handler handler)
         {
-            //if sock is not still bound to aio thread, binding it
-            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load(std::memory_order_relaxed);
-            if (!threadToUse)  //socket has not been bound to aio thread yet
-                threadToUse = bindSocketToAioThread(sock);
-            assert(threadToUse);
-            threadToUse->post(sock, std::move(handler));
+            getSocketAioThread(sock)->post(sock, std::move(handler));
         }
 
         template<class Handler>
@@ -400,12 +417,7 @@ namespace aio
         template<class SocketType, class Handler>
         void dispatchNonSafe(QnMutexLockerBase* const /*lock*/, SocketType* sock, Handler handler)
         {
-            //if sock is not still bound to aio thread, binding it
-            typename SocketAIOContext<SocketType>::AIOThreadType* threadToUse = sock->impl()->aioThread.load(std::memory_order_relaxed);
-            if (!threadToUse)  //socket has not been bound to aio thread yet
-                threadToUse = bindSocketToAioThread(sock);
-            assert(threadToUse);
-            threadToUse->dispatch(sock, std::move(handler));
+            getSocketAioThread(sock)->dispatch(sock, std::move(handler));
         }
     };
 }

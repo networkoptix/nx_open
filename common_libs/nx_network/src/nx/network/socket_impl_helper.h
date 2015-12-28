@@ -70,6 +70,10 @@ public:
     virtual void post( std::function<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
     //!Implementation of AbstractSocket::dispatch
     virtual void dispatch( std::function<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
+    //!Implementation of AbstractSocket::getAioThread
+    virtual aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
+    //!Implementation of AbstractSocket::bindToAioThread
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
 
 private:
     AbstractSocketProviderType m_abstractSocketProvider;

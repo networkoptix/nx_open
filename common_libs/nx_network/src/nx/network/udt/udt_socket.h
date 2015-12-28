@@ -39,6 +39,9 @@ public:
     CommonSocketImpl<UdtSocket>* impl();
     const CommonSocketImpl<UdtSocket>* impl() const;
 
+    aio::AbstractAioThread* getAioThread();
+    void bindToAioThread(aio::AbstractAioThread* aioThread);
+
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
     detail::UdtSocketImpl* m_impl;
@@ -79,6 +82,8 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -177,6 +182,8 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractSocket::post
     virtual void post( std::function<void()> handler ) override;

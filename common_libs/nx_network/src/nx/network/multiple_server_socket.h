@@ -40,6 +40,8 @@ public:
     bool getSendTimeout(unsigned int* millis) const override;
     bool getLastError(SystemError::ErrorCode* errorCode) const override;
     AbstractSocket::SOCKET_HANDLE handle() const override;
+    aio::AbstractAioThread* getAioThread() override;
+    void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
     //!Implementation of AbstractStreamServerSocket::*
     bool listen(int queueLen) override;
@@ -48,7 +50,6 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(std::function<void()> handler) override;
 
-protected:
     //!Implementation of AbstractSocket::*
     void post( std::function<void()> handler ) override;
     void dispatch( std::function<void()> handler ) override;

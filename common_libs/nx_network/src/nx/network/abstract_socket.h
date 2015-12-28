@@ -22,6 +22,9 @@
 
 //todo: #ak cancel asynchoronous operations
 
+// forward
+namespace aio { class AbstractAioThread; }
+
 //!Base interface for sockets. Provides methods to set different socket configuration parameters
 class NX_NETWORK_API AbstractSocket
     : public QnStoppableAsync
@@ -155,7 +158,19 @@ public:
     */
     virtual void dispatch(std::function<void()> handler) = 0;
 
-protected:
+    //!Returns AIOThread pointer to which this socket is bound to
+    /*!
+        \note if socket is not boud to any thread yet, binds it automaticly
+    */
+    virtual aio::AbstractAioThread* getAioThread() = 0;
+
+    //!Binds current socket to specified AIOThread
+    /*!
+        \note internal assert(false) in case if socket can not be bound to
+              specified tread (e.g. it's already bound to different thread or
+              certaind thread type is not the same)
+     */
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
 };
 
 //!Interface for writing to/reading from socket

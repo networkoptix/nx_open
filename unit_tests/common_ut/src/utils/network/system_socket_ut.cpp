@@ -68,3 +68,8 @@ TEST(TcpSocket, SimpleTrueAsync)
     socketSimpleTrueAsync(&std::make_unique<TCPServerSocket>,
                           &std::make_unique<TCPSocket>);
 }
+
+TEST(TcpSocket, SingleAioThread)
+{
+    socketSingleAioThread(&std::make_unique<TCPSocket>);
+}
