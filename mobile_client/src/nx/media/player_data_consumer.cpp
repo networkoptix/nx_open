@@ -161,7 +161,7 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
     // Previous jump command hasn't been executed due to new jump command received
     QnMutexLocker lock(&m_dataProviderMutex);
     --m_awaitJumpCounter;
-    Q_ASSERT(m_awaitJumpCounter > 0);
+    Q_ASSERT(m_awaitJumpCounter >= 0);
 }
 
 void PlayerDataConsumer::onJumpOccured(qint64 /* timeUsec */)
