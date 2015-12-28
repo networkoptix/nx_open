@@ -1,6 +1,8 @@
 #ifndef NETWORKOPTIXMODULEFINDER_H
 #define NETWORKOPTIXMODULEFINDER_H
 
+#include <chrono>
+
 #include <QtCore/QHash>
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
@@ -45,7 +47,7 @@ public:
     QnDirectModuleFinder *directModuleFinder() const;
     QnDirectModuleFinderHelper *directModuleFinderHelper() const;
 
-    int pingTimeout() const;
+    std::chrono::milliseconds pingTimeout() const;
 
 public slots:
     void start();
