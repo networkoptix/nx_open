@@ -65,11 +65,11 @@ public:
 	QCache<int, FrameMetadata> metadataCache;
 };
 
-SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent)
-	: QObject(parent)
-	, q_ptr(parent)
-	, frameNumber(0)
-	, metadataCache(kMetadataMaxSize)
+SeamlessVideoDecoderPrivate::SeamlessVideoDecoderPrivate(SeamlessVideoDecoder *parent):
+	QObject(parent),
+	q_ptr(parent),
+	frameNumber(0),
+	metadataCache(kMetadataMaxSize)
 {
 	
 }
@@ -93,9 +93,9 @@ void SeamlessVideoDecoderPrivate::clearMetadata()
 
 // ----------------------------------- SeamlessVideoDecoder -----------------------------------
 
-SeamlessVideoDecoder::SeamlessVideoDecoder()
-	: QObject()
-	, d_ptr(new SeamlessVideoDecoderPrivate(this))
+SeamlessVideoDecoder::SeamlessVideoDecoder():
+	QObject(),
+	d_ptr(new SeamlessVideoDecoderPrivate(this))
 {
 }
 
@@ -118,8 +118,8 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 			while (1) 
 			{
 				int decodedFrameNum = d->videoDecoder->decode(QnConstCompressedVideoDataPtr(), &decodedFrame);
-				if (decodedFrameNum < 0)
-					break; //< EOF reached
+                if (!decodedFrame)
+					break; //< decoder's buffer is flushed
 				const FrameMetadata* metadata = d->findMetadata(decodedFrameNum);
                 if (metadata)
                     metadata->serialize(decodedFrame);
@@ -148,7 +148,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 	}
 
 	if (d->queue.empty())
-		return decodedFrameNum >= 0; // return false if decode failure and no queued frame left
+		return decodedFrameNum >= 0; //< return false if decode failure and no queued frame left
 
 	*result = d->queue.front();
 	d->queue.pop_front();

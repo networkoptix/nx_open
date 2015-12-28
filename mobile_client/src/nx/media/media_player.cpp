@@ -16,7 +16,6 @@
 #include "frame_metadata.h"
 
 namespace {
-    const qint64 invalidTimestamp = -1;
 	const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
 	const qint64 kLivePosition = -1;
 
@@ -37,30 +36,29 @@ class PlayerPrivate: public QObject
 	Player *q_ptr;
 
 public:
-    Player::State state;
-    Player::MediaStatus mediaStatus;
-    
-	QElapsedTimer ptsTimer;                               //< main AV timer for playback
-	boost::optional<qint64> lastVideoPts;                 //< last video frame PTS
-	qint64 ptsTimerBase;                                  //< timestamp when PTS timer was started
-	bool hasAudio;
-    bool liveMode;
-    qint64 position;                                      //< UTC Playback position at msec 
-    QAbstractVideoSurface* videoSurface;
+    Player::State state;                                  //< Holds QT property value
+    Player::MediaStatus mediaStatus;                      //< Holds QT property value
+	bool hasAudio;                                        //< Either media has audio stream or not. Holds QT property value
+    bool liveMode;                                        //< Either media on live or archive position. Holds QT property value
+    qint64 position;                                      //< UTC Playback position at msec. Holds QT property value
+    QAbstractVideoSurface* videoSurface;                  //< Video surface to render. Holds QT property value
+    QUrl url;                                             //< media URL to play. Holds QT property value
     int maxTextureSize;
 
+    QElapsedTimer ptsTimer;                               //< main AV timer for playback
+    boost::optional<qint64> lastVideoPts;                 //< last video frame PTS
+    qint64 ptsTimerBase;                                  //< timestamp when the PTS timer was started
     QnVideoFramePtr videoFrameToRender;                   //< decoded video which is awaiting to be rendered
     std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
-    QUrl url;                                             //< media URL to play
     QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
-protected:
+private:
+    PlayerPrivate(Player *parent);
+
     void at_hurryUp();
 	void at_gotVideoFrame();
 	void presentNextFrame();
     qint64 getNextTimeToRender(const QnVideoFramePtr& frame);
-
-	PlayerPrivate(Player *parent);
 
 	void setState(Player::State state);
 	void setMediaStatus(Player::MediaStatus status);
@@ -73,12 +71,12 @@ PlayerPrivate::PlayerPrivate(Player *parent):
 	q_ptr(parent),
 	state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
-    ptsTimerBase(0),
     hasAudio(false),
     liveMode(false),
 	position(0),
     videoSurface(0),
 	maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
+    ptsTimerBase(0),
     execTimer(new QTimer(this))
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
@@ -190,13 +188,13 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
     const qint64 pts = frame->startTime();
 	if (hasAudio)
 	{
-		// todo: not implemented yet
+		// todo: audio isn't implemented yet
 		return pts;
 	}
 	else 
 	{
         FrameMetadata metadata = FrameMetadata::deserialize(frame);
-		/* Calculate time to present next frame */
+		// Calculate time to present next frame
 		if (!lastVideoPts.is_initialized() ||                                    //< first time
             !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
             metadata.noDelay)                                                    //< jump occurred
@@ -215,9 +213,9 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 
 // ----------------------- Player -----------------------
 
-Player::Player(QObject *parent)
-	: QObject(parent)
-	, d_ptr(new PlayerPrivate(this))
+Player::Player(QObject *parent):
+	QObject(parent),
+	d_ptr(new PlayerPrivate(this))
 {
 }
 
