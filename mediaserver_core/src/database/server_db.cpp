@@ -1091,36 +1091,43 @@ bool QnServerDb::deleteBookmark(const QnUuid &bookmarkId) {
 bool QnServerDb::setLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId, 
                                    QnServer::ChunksCatalog catalog, qint64 timestampMs)
 {
-    QSqlQuery updQuery(m_sdb);
-    updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (pool, camera_id, catalog, timestamp) \
-                     VALUES (:pool, :camera_id, :catalog, :timestamp)");
-    updQuery.addBindValue((int) pool);
-    updQuery.addBindValue(QnSql::serialized_field(cameraId));
-    updQuery.addBindValue((int) catalog);
-    updQuery.addBindValue(timestampMs);
-    bool result = updQuery.exec();
-    if (!result)
-        qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
-    return result;
+    QnDbTransactionLocker tran(getTransaction());
+    {
+        QSqlQuery updQuery(m_sdb);
+        updQuery.prepare("INSERT OR REPLACE INTO last_backup_time (pool, camera_id, catalog, timestamp) \
+                         VALUES (:pool, :camera_id, :catalog, :timestamp)");
+        updQuery.addBindValue((int) pool);
+        updQuery.addBindValue(QnSql::serialized_field(cameraId));
+        updQuery.addBindValue((int) catalog);
+        updQuery.addBindValue(timestampMs);
+        if (!updQuery.exec()) {
+            qWarning() << Q_FUNC_INFO << updQuery.lastError().text();
+            return false;
+        }
+    }
+
+    return tran.commit();
 }
 
 qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& cameraId, 
                                      QnServer::ChunksCatalog catalog) const
 {
     qint64 result = 0;
-
-    QSqlQuery query(m_sdb);
-    query.prepare("SELECT timestamp FROM last_backup_time "
-                  "WHERE pool = :pool AND camera_id = :camera_id AND catalog = :catalog");
-    query.addBindValue((int) pool);
-    query.addBindValue(QnSql::serialized_field(cameraId));
-    query.addBindValue((int) catalog);
-    if (query.exec()) {
-        if (query.next())
-            result = query.value(0).toLongLong();
-    }
-    else {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
+    {
+        QWriteLocker lk(&m_mutex);
+        QSqlQuery query(m_sdb);
+        query.prepare("SELECT timestamp FROM last_backup_time "
+                      "WHERE pool = :pool AND camera_id = :camera_id AND catalog = :catalog");
+        query.addBindValue((int) pool);
+        query.addBindValue(QnSql::serialized_field(cameraId));
+        query.addBindValue((int) catalog);
+        if (query.exec()) {
+            if (query.next())
+                result = query.value(0).toLongLong();
+        }
+        else {
+            qWarning() << Q_FUNC_INFO << query.lastError().text();
+        }
     }
 
     return result;
