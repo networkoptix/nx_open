@@ -56,8 +56,10 @@ private:
 
     void at_hurryUp();
 	void at_gotVideoFrame();
-	void presentNextFrame();
+	
+    void presentNextFrame();
     qint64 getNextTimeToRender(const QnVideoFramePtr& frame);
+    bool initDataProvider();
 
 	void setState(Player::State state);
 	void setMediaStatus(Player::MediaStatus status);
@@ -136,15 +138,25 @@ void PlayerPrivate::at_gotVideoFrame()
 {
     setMediaStatus(Player::MediaStatus::Loaded);
 
-    if (videoFrameToRender)
-        return; //< we already have fame to render. Ignore next frame (will be processed later)
+    if (execTimer->isActive())
+        return; //< we already have frame to render. Ignore next frame (will be processed later)
 
-    if (state != Player::State::Playing)
+    if (state == Player::State::Stopped)
         return;
 
-    videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
-        return;
+    {
+        videoFrameToRender = dataConsumer->dequeueVideoFrame();
+        if (!videoFrameToRender)
+            return;
+    }
+
+    if (state == Player::State::Paused)
+    {
+        FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
+        if (!metadata.noDelay)
+            return; //< display 'noDelay' frames only if player is paused
+    }
 
     qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender);
     if (nextTimeToRender > ptsTimer.elapsed())
@@ -210,6 +222,35 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 	}
 }
 
+bool PlayerPrivate::initDataProvider()
+{
+    QnUuid id(url.path().mid(1));
+    QnResourcePtr camera = qnResPool->getResourceById(id);
+    if (!camera) {
+        setMediaStatus(Player::MediaStatus::NoMedia);
+        return false;
+    }
+
+    archiveReader.reset(new QnArchiveStreamReader(camera));
+    dataConsumer.reset(new PlayerDataConsumer(archiveReader));
+
+    archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(archiveReader.get()));
+    archiveReader->addDataProcessor(dataConsumer.get());
+    connect(dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, this, &PlayerPrivate::at_gotVideoFrame);
+    connect(dataConsumer.get(), &PlayerDataConsumer::hurryUp, this, &PlayerPrivate::at_hurryUp);
+    connect(dataConsumer.get(), &PlayerDataConsumer::onEOF, this, [this]() { setPosition(kLivePosition);  });
+
+    if (position != kLivePosition)
+        archiveReader->jumpTo(msecToUsec(position), msecToUsec(position)); //< second arg means precise seek
+
+    dataConsumer->start();
+    archiveReader->start();
+
+    archiveReader->open();
+    return true;
+}
+
+
 // ----------------------- Player -----------------------
 
 Player::Player(QObject *parent):
@@ -271,35 +312,19 @@ void Player::play()
 	if (d->state == State::Playing)
 		return;
 
-	d->setState(State::Playing);
-	d->setMediaStatus(MediaStatus::Loading);
+    if (!d->archiveReader && !d->initDataProvider())
+        return;
 
-	QnUuid id(d->url.path().mid(1));
-	QnResourcePtr camera = qnResPool->getResourceById(id);
-	if (!camera) {
-		d->setMediaStatus(MediaStatus::NoMedia);
-		return;
-	}
-
-	d->archiveReader.reset(new QnArchiveStreamReader(camera));
-    d->dataConsumer.reset(new PlayerDataConsumer(d->archiveReader));
-	d->archiveReader->setArchiveDelegate(new QnRtspClientArchiveDelegate(d->archiveReader.get()));
-	d->archiveReader->addDataProcessor(d->dataConsumer.get());
-	connect(d->dataConsumer.get(), &PlayerDataConsumer::gotVideoFrame, d, &PlayerPrivate::at_gotVideoFrame);
-    connect(d->dataConsumer.get(), &PlayerDataConsumer::hurryUp, d, &PlayerPrivate::at_hurryUp);
-    connect(d->dataConsumer.get(), &PlayerDataConsumer::onEOF, d, [this]() { setPosition(kLivePosition);  });
-
-	if (d->position != kLivePosition) 
-        d->archiveReader->jumpTo(msecToUsec(d->position), msecToUsec(d->position)); //< second arg means precise seek
-
-	d->dataConsumer->start();
-	d->archiveReader->start();
-
-	d->archiveReader->open();
+    d->setState(State::Playing);
+    d->setMediaStatus(MediaStatus::Loading);
+    
+    d->at_gotVideoFrame(); //< renew receiving frames
 }
 
 void Player::pause() 
 {
+    Q_D(Player);
+    d->setState(State::Paused);
 }
 
 void Player::stop()
