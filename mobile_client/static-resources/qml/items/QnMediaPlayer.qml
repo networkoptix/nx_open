@@ -31,8 +31,6 @@ QnObject {
 
     readonly property alias resourceName: resourceHelper.resourceName
 
-    signal timelinePositionRequest(real position)
-
     QtObject {
         id: d
 
@@ -42,7 +40,6 @@ QnObject {
     QnPlayer {
 		id: nxPlayer
         source: "camera://media/" + player.resourceId
-        onPositionChanged: timelinePositionRequest(position)
     }
 
     QnMediaResourceHelper {

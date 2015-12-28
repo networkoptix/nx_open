@@ -129,9 +129,7 @@ Item {
                     if (!dragging)
                         return
 
-                    var live = position + 1000 >= (new Date()).getTime()
-                    if (!live)
-                        mediaPlayer.pause()
+                    mediaPlayer.seek(position)
                 }
 
                 Connections {

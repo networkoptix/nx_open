@@ -158,19 +158,6 @@ QnPage {
         onHidden: videoPlayer.forceActiveFocus()
     }
 
-    QnActiveCameraThumbnailLoader {
-        id: thumbnailLoader
-        resourceId: videoPlayer.resourceId
-        Component.onCompleted: initialize(parent)
-    }
-
-    Binding {
-        target: thumbnailLoader
-        property: "position"
-        value: d.videoNavigation.timelinePosition
-        when: d.videoNavigation.timelineDragging && !d.videoNavigation.timelineAtLive
-    }
-
     QnScalableVideo {
         id: video
 
@@ -191,25 +178,6 @@ QnPage {
                 hideUi()
             else
                 showUi()
-        }
-
-        function clearScreenshotSource() {
-            screenshotDelay.stop()
-            screenshotSource = ""
-        }
-
-        function bindScreenshotSource() {
-            screenshotSource = Qt.binding(function(){ return thumbnailLoader.thumbnailUrl })
-        }
-
-        function bindScreenshotSourceDelayed() {
-            screenshotDelay.start()
-        }
-
-        Timer {
-            id: screenshotDelay
-            interval: 150
-            onTriggered: video.bindScreenshotSource()
         }
     }
 
@@ -301,25 +269,7 @@ QnPage {
 
         onPlayingChanged: {
             if (playing)
-                video.clearScreenshotSource()
-        }
-
-        onLoadingChanged: {
-            if (!loading)
-                return
-
-            video.bindScreenshotSourceDelayed()
-            thumbnailLoader.forceLoadThumbnail(player.position)
-        }
-
-        onTimelinePositionRequest: {
-            if (player.playing) {
-                video.clearScreenshotSource()
-                return
-            }
-
-            video.bindScreenshotSourceDelayed()
-            thumbnailLoader.forceLoadThumbnail(player.position)
+                video.screenshotSource = ""
         }
 
         Component.onCompleted: player.playLive()
@@ -354,13 +304,6 @@ QnPage {
         QnVideoNavigation {
             id: videoNavigation
             mediaPlayer: player
-
-            onTimelineDraggingChanged: {
-                if (timelineDragging)
-                    video.bindScreenshotSource()
-                else if (player.playing)
-                    video.clearScreenshotSource()
-            }
 
             onPausedChanged: {
                 setKeepScreenOn(!paused)
