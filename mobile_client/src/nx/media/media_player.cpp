@@ -25,10 +25,9 @@ namespace {
     }
 }
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
+
 
 class PlayerPrivate: public QObject
 {
@@ -345,5 +344,5 @@ bool Player::liveMode() const
 }
 
 
-}
-}
+} // namespace media
+} // namespace nx

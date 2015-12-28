@@ -1,10 +1,8 @@
 #include "video_decoder_registry.h"
 #include "abstract_video_decoder.h"
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
 
 VideoDecoderRegistry* VideoDecoderRegistry::instance()
 {
@@ -22,5 +20,5 @@ std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDeco
 	return VideoDecoderPtr(); // no compatible decoder found
 }
 
-}
-}
+} // namespace media
+} // namespace nx

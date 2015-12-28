@@ -10,10 +10,9 @@ namespace
 	static const int kMaxDecodedVideoQueueSize = 2; //< max queue len for decoded video awaiting to be rendered
 }
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
+
 
 PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader):
     QnAbstractDataConsumer(kLiveMediaQueueLen),
@@ -178,5 +177,5 @@ void PlayerDataConsumer::onJumpOccured(qint64 /* timeUsec */)
     }
 }
 
-}
-}
+} // namespace media
+} // namespace nx

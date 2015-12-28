@@ -5,10 +5,8 @@ namespace
     static QString kMetadataFlagsKey(lit("metadata"));
 }
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
 
 
 FrameMetadata::FrameMetadata():
@@ -39,5 +37,5 @@ FrameMetadata FrameMetadata::deserialize(const QSharedPointer<const QVideoFrame>
 }
 
 
-}
-}
+} // namespace media
+} // namespace nx

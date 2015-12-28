@@ -39,10 +39,8 @@ namespace
 	};
 }
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
 
 
 // ----------------------------------- SeamlessVideoDecoderPrivate -----------------------------------
@@ -161,5 +159,5 @@ int SeamlessVideoDecoder::currentFrameNumber() const
     return d->frameNumber;
 }
 
-}
-}
+} // namespace media
+} // namespace nx

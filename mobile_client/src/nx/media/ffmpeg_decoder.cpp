@@ -16,10 +16,9 @@ namespace
 	int kMediaAlignment = 32;
 }
 
-namespace nx
-{
-namespace media
-{
+namespace nx {
+namespace media {
+
 
 class InitFfmpegLib
 {
@@ -205,5 +204,5 @@ void FfmpegDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
     result->reset(videoFrame);
 }
 
-}
-}
+} // namespace media
+} // namespace nx
