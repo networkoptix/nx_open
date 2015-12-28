@@ -39,6 +39,17 @@ Item {
         readonly property var locale: Qt.locale()
     }
 
+    QnCameraChunkProvider {
+        id: chunkProvider
+        resourceId: player.resourceId
+    }
+
+    Timer {
+        interval: 30000
+        triggeredOnStart: true
+        running: true
+        onTriggered: chunkProvider.update()
+    }
 
     Item {
         id: navigator
@@ -113,8 +124,8 @@ Item {
                 chunkBarHeight: dp(32)
                 textY: height - chunkBarHeight - dp(16) - dp(24)
 
-                chunkProvider: mediaPlayer.chunkProvider
-                startBound: mediaPlayer.chunkProvider.bottomBound
+                chunkProvider: chunkProvider
+                startBound: chunkProvider.bottomBound
 
                 onMoveFinished: {
                     if (playbackController.paused)
@@ -373,7 +384,7 @@ Item {
     QnCalendarPanel {
         id: calendarPanel
 
-        chunkProvider: mediaPlayer.chunkProvider
+        chunkProvider: chunkProvider
         onDatePicked: {
             hide()
             mediaPlayer.seek(date.getTime())

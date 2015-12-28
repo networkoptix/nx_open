@@ -26,23 +26,10 @@ QnObject {
     readonly property real position: nxPlayer.position
 
     readonly property var mediaPlayer: nxPlayer
-    readonly property var chunkProvider: chunkProvider
 
     QnPlayer {
 		id: nxPlayer
         source: "camera://media/" + player.resourceId
-    }
-
-    QnCameraChunkProvider {
-        id: chunkProvider
-        resourceId: player.resourceId
-    }
-
-    Timer {
-        interval: 30000
-        triggeredOnStart: true
-        running: true
-        onTriggered: chunkProvider.update()
     }
 
     function playLive() {
