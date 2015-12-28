@@ -1,60 +1,32 @@
-import QtQuick 2.4
-
-import QtMultimedia 5.0
-import QtQuick.Window 2.0
+import QtQuick 2.0
 
 import com.networkoptix.qml 1.0
 
-import ".."
-
-QnObject {
+QnPlayer
+{
     id: player
 
     property string resourceId
 
-    readonly property bool loading: nxPlayer.playbackState == QnPlayer.Playing && nxPlayer.mediaStatus == QnPlayer.Loading
-    readonly property bool playing: nxPlayer.playbackState == QnPlayer.Playing && nxPlayer.mediaStatus == QnPlayer.Loaded
-    readonly property bool atLive: nxPlayer.liveMode
+    readonly property bool loading: playbackState == QnPlayer.Playing && mediaStatus == QnPlayer.Loading
+    readonly property bool playing: playbackState == QnPlayer.Playing && mediaStatus == QnPlayer.Loaded
+    readonly property bool failed: mediaStatus == QnPlayer.NoMedia
 
 	onPlayingChanged: console.log("----> playing = " + playing)
 	onLoadingChanged: console.log("----> loading = " + loading)
-	onAtLiveChanged:  console.log("----> live = " + atLive)
+    onLiveModeChanged:  console.log("----> live = " + liveMode)
 	onPositionChanged: console.log("----> position = " + position)
 
-    readonly property bool failed: nxPlayer.mediaStatus == QnPlayer.NoMedia
+    source: "camera://media/" + resourceId
 
-    readonly property real position: nxPlayer.position
-
-    readonly property var mediaPlayer: nxPlayer
-
-    QnPlayer {
-		id: nxPlayer
-        source: "camera://media/" + player.resourceId
+    function playLive()
+    {
+        seek(-1)
+        play()
     }
 
-    function playLive() {
-        play(-1)
-    }
-
-    function play(pos) {
-		if (pos)
-			seek(pos)
-
-        if (!playing)
-            nxPlayer.play()
-
-        nxPlayer.play()
-    }
-
-    function pause() {
-        nxPlayer.pause()
-    }
-
-    function stop() {
-        nxPlayer.stop()
-    }
-
-    function seek(pos) {
-        nxPlayer.position = pos
+    function seek(pos)
+    {
+        position = pos
     }
 }

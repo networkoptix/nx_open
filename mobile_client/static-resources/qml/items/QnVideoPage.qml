@@ -23,8 +23,8 @@ QnPage {
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.atLive && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.atLive && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool cameraOffline: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.liveMode && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
@@ -84,7 +84,7 @@ QnPage {
 
                 if (Qt.application.state != Qt.ApplicationActive) {
                     if (!d.videoNavigation.paused) {
-                        d.resumeAtLive = player.atLive
+                        d.resumeAtLive = player.liveMode
                         d.resumeOnActivate = true
                         d.videoNavigation.paused = true
                     }
@@ -173,7 +173,7 @@ QnPage {
         anchors.bottomMargin: -navigationBarPlaceholder.realHeight
         anchors.rightMargin: -navigationBarPlaceholder.realWidth
 
-        source: player.mediaPlayer
+        source: player
         screenshotSource: initialResourceScreenshot
         aspectRatio: screenshotSource == initialResourceScreenshot ? resourceHelper.rotatedAspectRatio : resourceHelper.aspectRatio
         videoRotation: screenshotSource == initialResourceScreenshot ? 0 : resourceHelper.rotation

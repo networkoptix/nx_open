@@ -119,7 +119,7 @@ Item {
                 width: parent.width
                 height: dp(104)
 
-                stickToEnd: mediaPlayer.atLive && !playbackController.paused
+                stickToEnd: mediaPlayer.liveMode && !playbackController.paused
 
                 chunkBarHeight: dp(32)
                 textY: height - chunkBarHeight - dp(16) - dp(24)
@@ -128,10 +128,9 @@ Item {
                 startBound: chunkProvider.bottomBound
 
                 onMoveFinished: {
-                    if (playbackController.paused)
-                        mediaPlayer.seek(position)
-                    else
-                        mediaPlayer.play(position)
+                    mediaPlayer.seek(position)
+                    if (!playbackController.paused)
+                        mediaPlayer.play()
                 }
 
                 onPositionTapped: mediaPlayer.seek(position)
@@ -149,7 +148,7 @@ Item {
                         if (timeline.moving)
                             return
 
-                        if (mediaPlayer.atLive)
+                        if (mediaPlayer.liveMode)
                             return
 
                         timeline.position = mediaPlayer.position
