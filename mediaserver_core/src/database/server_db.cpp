@@ -1113,21 +1113,20 @@ qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& c
                                      QnServer::ChunksCatalog catalog) const
 {
     qint64 result = 0;
-    {
-        QWriteLocker lk(&m_mutex);
-        QSqlQuery query(m_sdb);
-        query.prepare("SELECT timestamp FROM last_backup_time "
-                      "WHERE pool = :pool AND camera_id = :camera_id AND catalog = :catalog");
-        query.addBindValue((int) pool);
-        query.addBindValue(QnSql::serialized_field(cameraId));
-        query.addBindValue((int) catalog);
-        if (query.exec()) {
-            if (query.next())
-                result = query.value(0).toLongLong();
-        }
-        else {
-            qWarning() << Q_FUNC_INFO << query.lastError().text();
-        }
+    QWriteLocker lk(&m_mutex);
+
+    QSqlQuery query(m_sdb);
+    query.prepare("SELECT timestamp FROM last_backup_time "
+                  "WHERE pool = :pool AND camera_id = :camera_id AND catalog = :catalog");
+    query.addBindValue((int) pool);
+    query.addBindValue(QnSql::serialized_field(cameraId));
+    query.addBindValue((int) catalog);
+    if (query.exec()) {
+        if (query.next())
+            result = query.value(0).toLongLong();
+    }
+    else {
+        qWarning() << Q_FUNC_INFO << query.lastError().text();
     }
 
     return result;
