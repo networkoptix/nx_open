@@ -116,8 +116,6 @@ Item {
                 chunkProvider: mediaPlayer.chunkProvider
                 startBound: mediaPlayer.chunkProvider.bottomBound
 
-                autoPlay: mediaPlayer.playing && !mediaPlayer.hasTimestamp
-
                 onMoveFinished: {
                     if (playbackController.paused)
                         mediaPlayer.seek(position)
@@ -138,20 +136,14 @@ Item {
 
                 Connections {
                     target: mediaPlayer
-                    onTimelineCorrectionRequest: {
+                    onPositionChanged: {
                         if (timeline.moving)
                             return
 
-                        if (mediaPlayer.hasTimestamp)
-                            timeline.position = position
-                        else
-                            timeline.correctPosition(position)
-                    }
-                    onTimelinePositionRequest: {
-                        if (timeline.moving)
+                        if (mediaPlayer.atLive)
                             return
 
-                        timeline.position = position
+                        timeline.position = mediaPlayer.position
                     }
                     onPlayingChanged: {
                         if (timeline.moving)

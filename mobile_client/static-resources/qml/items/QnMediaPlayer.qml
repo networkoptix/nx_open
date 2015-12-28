@@ -23,8 +23,7 @@ QnObject {
 
     readonly property bool failed: nxPlayer.mediaStatus == QnPlayer.NoMedia
 
-    readonly property real position: nxPlayer.liveMode ? -1 : nxPlayer.position
-    readonly property bool hasTimestamp: true
+    readonly property real position: nxPlayer.position
 
     readonly property var mediaPlayer: nxPlayer
     readonly property var chunkProvider: chunkProvider
@@ -32,7 +31,6 @@ QnObject {
 
     readonly property alias resourceName: resourceHelper.resourceName
 
-    signal timelineCorrectionRequest(real position)
     signal timelinePositionRequest(real position)
 
     QtObject {
@@ -44,8 +42,7 @@ QnObject {
     QnPlayer {
 		id: nxPlayer
         source: "camera://media/" + player.resourceId
-        onPositionChanged: timelineCorrectionRequest(position)
-		onLiveModeChanged: timelineCorrectionRequest(position)
+        onPositionChanged: timelinePositionRequest(position)
     }
 
     QnMediaResourceHelper {
@@ -75,8 +72,6 @@ QnObject {
 
         if (!playing)
             nxPlayer.play()
-
-        timelinePositionRequest(nxPlayer.position)
 
         nxPlayer.play()
     }
