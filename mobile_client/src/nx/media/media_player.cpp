@@ -51,6 +51,7 @@ public:
     std::unique_ptr<QnArchiveStreamReader> archiveReader; //< separate thread. This class performs network IO and gets compressed AV data
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
     QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
+    qint64 lastSeekTimeMs;                                //< last seek position. UTC time in msec
 private:
     PlayerPrivate(Player *parent);
 
@@ -78,7 +79,8 @@ PlayerPrivate::PlayerPrivate(Player *parent):
     videoSurface(0),
 	maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
     ptsTimerBase(0),
-    execTimer(new QTimer(this))
+    execTimer(new QTimer(this)),
+    lastSeekTimeMs(AV_NOPTS_VALUE)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -208,7 +210,8 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 		// Calculate time to present next frame
 		if (!lastVideoPts.is_initialized() ||                                    //< first time
             !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
-            metadata.noDelay)                                                    //< jump occurred
+            metadata.noDelay                                                 ||  //< jump occurred
+            pts < lastSeekTimeMs)                                                //< 'coarse' frame. Frame time is less than required jump pos
 		{
 			// Reset timer
 			lastVideoPts = ptsTimerBase = pts;
@@ -299,6 +302,7 @@ qint64 Player::position() const
 void Player::setPosition(qint64 value)
 {
 	Q_D(Player);
+    d->lastSeekTimeMs = value;
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
