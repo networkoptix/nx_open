@@ -23,6 +23,7 @@ namespace nx
             bool noDelay; //< display frame immediately with no delay
             int frameNum; //< frame number in range [0..int_max]
         };
-        Q_DECLARE_METATYPE(FrameMetadata);
     }
 }
+
+Q_DECLARE_METATYPE(nx::media::FrameMetadata);
