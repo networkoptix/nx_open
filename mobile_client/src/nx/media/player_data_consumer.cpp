@@ -96,13 +96,15 @@ bool PlayerDataConsumer::processVideoFrame(const QnCompressedVideoDataPtr& data)
 		return true; // false result means we want to repeat this frame latter
 	}
 
-	enqueueVideoFrame(std::move(decodedFrame));
+    if (decodedFrame)
+        enqueueVideoFrame(std::move(decodedFrame));
 
 	return true;
 }
 
 void PlayerDataConsumer::enqueueVideoFrame(QnVideoFramePtr decodedFrame)
 {
+    Q_ASSERT(decodedFrame);
 	QnMutexLocker lock(&m_queueMutex);
 	while (m_decodedVideo.size() >= kMaxDecodedVideoQueueSize && !needToStop())
 		m_queueWaitCond.wait(&m_queueMutex);
