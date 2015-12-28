@@ -22,14 +22,13 @@
 #include "utils/common/synctime.h"
 #include "api/runtime_info_manager.h"
 
-
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     Q_INIT_RESOURCE(common);
     m_cloudMode = false;
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
-    
+
     /* Init statics. */
     qnProductFeatures();
     store<TimerManager>(new TimerManager());
@@ -154,7 +153,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-    
+
     Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
 }
 
@@ -183,14 +182,14 @@ void QnCommonModule::updateModuleInformation() {
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
-{ 
-    m_systemIdentityTime = value; 
+{
+    m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }
 
-qint64 QnCommonModule::systemIdentityTime() const 
-{ 
-    return m_systemIdentityTime; 
+qint64 QnCommonModule::systemIdentityTime() const
+{
+    return m_systemIdentityTime;
 }
 
 void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
@@ -201,7 +200,7 @@ void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArr
 
 void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
 {
-    *hash = m_adminPaswdHash;    
+    *hash = m_adminPaswdHash;
     *digest = m_adminPaswdDigest;
 }
 
@@ -216,9 +215,9 @@ bool QnCommonModule::useLowPriorityAdminPasswordHach() const
 }
 
 QnUuid QnCommonModule::runningInstanceGUID() const
-{ 
+{
     QnMutexLocker lock(&m_mutex);
-    return m_runUuid; 
+    return m_runUuid;
 }
 
 void QnCommonModule::updateRunningInstanceGuid()

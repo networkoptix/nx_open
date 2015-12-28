@@ -37,6 +37,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 
+#include <ui/statistics/statistics_manager.h>
+
 #include <ui/dialogs/ptz_manage_dialog.h>
 
 #include <ui/workbench/handlers/workbench_action_handler.h>
@@ -411,6 +413,8 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     QnPtzManageDialog *manageDialog = new QnPtzManageDialog(this); //initializing instance of a singleton
     Q_UNUSED(manageDialog)
+
+    context->instance<statistics::QnStatisticsManager>();
 }
 
 QnMainWindow::~QnMainWindow() {
