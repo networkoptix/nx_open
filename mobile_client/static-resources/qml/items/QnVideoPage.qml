@@ -23,8 +23,8 @@ QnPage {
         property var videoNavigation: navigationLoader.item
         readonly property bool serverOffline: connectionManager.connectionState == QnConnectionManager.Connecting ||
                                               connectionManager.connectionState == QnConnectionManager.Disconnected
-        readonly property bool cameraOffline: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
-        readonly property bool cameraUnauthorized: player.atLive && player.resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
+        readonly property bool cameraOffline: player.atLive && resourceHelper.resourceStatus == QnMediaResourceHelper.Offline
+        readonly property bool cameraUnauthorized: player.atLive && resourceHelper.resourceStatus == QnMediaResourceHelper.Unauthorized
         readonly property bool failed: player.failed
 
         property bool showOfflineStatus: false
@@ -91,7 +91,7 @@ QnPage {
                 } else if (Qt.application.state == Qt.ApplicationActive) {
                     if (d.resumeOnActivate) {
                         if (d.resumeAtLive)
-                            player.resourceHelper.updateUrl()
+                            resourceHelper.updateUrl()
                         d.videoNavigation.paused = false
                         d.resumeOnActivate = false
                         d.resumeAtLive = false
@@ -99,6 +99,11 @@ QnPage {
                 }
             }
         }
+    }
+
+    QnMediaResourceHelper {
+        id: resourceHelper
+        resourceId: player.resourceId
     }
 
     Rectangle {
@@ -117,7 +122,7 @@ QnPage {
         anchors.bottom: parent.top
         backgroundOpacity: 0.0
 
-        title: player.resourceName
+        title: resourceHelper.resourceName
 
         QnMenuBackButton {
             x: dp(10)
@@ -140,17 +145,17 @@ QnPage {
 
     QnCameraMenu {
         id: cameraMenu
-        currentQuality: player.resourceHelper.resolution
+        currentQuality: resourceHelper.resolution
         onSelectQuality: qualityDialog.show()
     }
 
     QnQualityDialog {
         id: qualityDialog
-        resolutionList: player.resourceHelper.resolutions
-        currentResolution: player.resourceHelper.resolution
+        resolutionList: resourceHelper.resolutions
+        currentResolution: resourceHelper.resolution
         onQualityPicked: {
             player.pause()
-            player.resourceHelper.resolution = resolution
+            resourceHelper.resolution = resolution
             player.seek(player.position)
             if (!d.videoNavigation.paused)
                 player.play()
@@ -170,8 +175,8 @@ QnPage {
 
         source: player.mediaPlayer
         screenshotSource: initialResourceScreenshot
-        aspectRatio: screenshotSource == initialResourceScreenshot ? player.resourceHelper.rotatedAspectRatio : player.resourceHelper.aspectRatio
-        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : player.resourceHelper.rotation
+        aspectRatio: screenshotSource == initialResourceScreenshot ? resourceHelper.rotatedAspectRatio : resourceHelper.aspectRatio
+        videoRotation: screenshotSource == initialResourceScreenshot ? 0 : resourceHelper.rotation
 
         onClicked: {
             if (navigationLoader.visible)

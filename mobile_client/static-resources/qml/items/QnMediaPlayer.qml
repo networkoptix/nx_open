@@ -27,24 +27,10 @@ QnObject {
 
     readonly property var mediaPlayer: nxPlayer
     readonly property var chunkProvider: chunkProvider
-    readonly property var resourceHelper: resourceHelper
-
-    readonly property alias resourceName: resourceHelper.resourceName
-
-    QtObject {
-        id: d
-
-        property bool resetUrlOnConnect: false
-    }
 
     QnPlayer {
 		id: nxPlayer
         source: "camera://media/" + player.resourceId
-    }
-
-    QnMediaResourceHelper {
-        id: resourceHelper
-        resourceId: player.resourceId
     }
 
     QnCameraChunkProvider {
