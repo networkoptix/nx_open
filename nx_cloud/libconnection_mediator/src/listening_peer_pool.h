@@ -14,7 +14,6 @@
 #include <utils/serialization/lexical.h>
 
 #include "request_processor.h"
-#include "server/connection.h"
 
 
 namespace nx {

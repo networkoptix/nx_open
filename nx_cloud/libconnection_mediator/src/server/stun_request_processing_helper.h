@@ -12,8 +12,6 @@
 #include <nx/network/stun/server_connection.h>
 #include <utils/serialization/lexical.h>
 
-#include "connection.h"
-
 
 namespace nx {
 namespace hpm {

@@ -7,7 +7,6 @@
 #define STUN_STREAM_SOCKET_SERVER_H
 
 #include <nx/network/connection_server/stream_socket_server.h>
-#include <nx/network/connection_server/stream_socket_server.h>
 
 #include "server_connection.h"
 
