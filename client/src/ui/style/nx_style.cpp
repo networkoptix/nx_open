@@ -32,12 +32,12 @@ namespace {
 //        return color.toHsl().lightness() < 128;
 //    }
 
-    const int menuItemHPadding = dp(8);
-    const int menuItemVPadding = dp(6);
-    const int arrowSize = dp(8);
-    const int menuCheckSize = dp(16);
-    const int minimumButtonWidth = dp(80);
-    const int buttonHeight = dp(30);
+    const int kMenuItemHPadding = dp(8);
+    const int kMenuItemVPadding = dp(6);
+    const int kArrowSize = dp(8);
+    const int kMenuCheckSize = dp(16);
+    const int kMinimumButtonWidth = dp(80);
+    const int kButtonHeight = dp(28);
 
     enum Direction {
         Up,
@@ -67,8 +67,8 @@ namespace {
     void drawArrow(Direction direction, QPainter *painter, const QRectF &rect, const QColor &color) {
         QPainterPath path;
 
-        QRectF arrowRect(QPointF(), QSizeF(arrowSize, arrowSize));
-        arrowRect.moveTo(rect.left() + (rect.width() - arrowSize) / 2, rect.top() + (rect.height() - arrowSize) / 2);
+        QRectF arrowRect(QPointF(), QSizeF(kArrowSize, kArrowSize));
+        arrowRect.moveTo(rect.left() + (rect.width() - kArrowSize) / 2, rect.top() + (rect.height() - kArrowSize) / 2);
 
         RectCoordinates rc(arrowRect);
 
@@ -111,8 +111,8 @@ namespace {
     }
 
     void drawMenuCheckMark(QPainter *painter, const QRect &rect, const QColor &color) {
-        QRect checkRect(QPoint(), QSize(menuCheckSize, menuCheckSize));
-        checkRect.moveTo(rect.left() + (rect.width() - menuCheckSize) / 2, rect.top() + (rect.height() - menuCheckSize) / 2);
+        QRect checkRect(QPoint(), QSize(kMenuCheckSize, kMenuCheckSize));
+        checkRect.moveTo(rect.left() + (rect.width() - kMenuCheckSize) / 2, rect.top() + (rect.height() - kMenuCheckSize) / 2);
 
         RectCoordinates rc(checkRect);
 
@@ -150,25 +150,40 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
     case PE_PanelButtonCommand: {
         painter->save();
 
-        QColor panelColor = option->palette.color(option->palette.currentColorGroup(), QPalette::Button);;
-        QColor windowColor = option->palette.color(QPalette::Window);
+        const bool pressed = option->state & State_Sunken;
+        const bool hovered = option->state & State_MouseOver;
 
-        if (option->state.testFlag(State_Sunken))
-            panelColor = panelColor.darker(110);
-        else if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton*>(option)) {
-            if (button->features.testFlag(QStyleOptionButton::Flat))
-                return;
+        QBrush buttonBrush = option->palette.button();
+        QColor shadowColor = option->palette.color(QPalette::Dark);
+
+        if (pressed)
+        {
+            buttonBrush = option->palette.mid();
+        }
+        else if (hovered)
+        {
+            buttonBrush = option->palette.midlight();
+            shadowColor = option->palette.color(QPalette::Mid);
         }
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(panelColor);
+        painter->setBrush(buttonBrush);
         painter->setRenderHint(QPainter::Antialiasing);
         painter->drawRoundedRect(option->rect.adjusted(0, 0, 0, -1), 2, 2);
         painter->setRenderHint(QPainter::Antialiasing, false);
-        if (option->state.testFlag(State_Raised)) {
-            QPen pen(windowColor.darker(110));
-            painter->setPen(pen);
-            painter->drawLine(option->rect.left() + 2, option->rect.bottom() + 0.5, option->rect.right() - 2, option->rect.bottom() + 0.5);
+
+        QPen shadowPen(shadowColor);
+        painter->setPen(shadowPen);
+
+        if (pressed)
+        {
+            painter->drawLine(option->rect.left() + 1, option->rect.top() + 0.5,
+                              option->rect.right() - 1, option->rect.top() + 0.5);
+        }
+        else
+        {
+            painter->drawLine(option->rect.left() + 1, option->rect.bottom(),
+                              option->rect.right() - 1, option->rect.bottom());
         }
 
         painter->restore();
@@ -610,7 +625,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
                 color.setAlpha(100);
                 painter->setPen(color);
                 int y = menuItem->rect.top() + menuItem->rect.height() / 2;
-                painter->drawLine(menuItemHPadding, y, menuItem->rect.right() - menuItemHPadding, y);
+                painter->drawLine(kMenuItemHPadding, y, menuItem->rect.right() - kMenuItemHPadding, y);
                 painter->restore();
                 break;
             }
@@ -624,14 +639,14 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
                 painter->fillRect(menuItem->rect, menuItem->palette.highlight());
             }
 
-            int xPos = menuItemHPadding + dp(16);
+            int xPos = kMenuItemHPadding + dp(16);
             int y = menuItem->rect.y();
 
             int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
             if (!styleHint(SH_UnderlineShortcut, menuItem, widget, nullptr))
                 textFlags |= Qt::TextHideMnemonic;
 
-            QRect textRect(xPos, y + menuItemVPadding, menuItem->rect.width() - xPos - menuItemHPadding, menuItem->rect.height() - 2 * menuItemVPadding);
+            QRect textRect(xPos, y + kMenuItemVPadding, menuItem->rect.width() - xPos - kMenuItemHPadding, menuItem->rect.height() - 2 * kMenuItemVPadding);
 
             if (!menuItem->text.isEmpty()) {
                 QString text = menuItem->text;
@@ -650,13 +665,13 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             }
 
             if (menuItem->checked) {
-                drawMenuCheckMark(painter, QRect(menuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
+                drawMenuCheckMark(painter, QRect(kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
                                   menuItem->palette.color(selected ? QPalette::HighlightedText : QPalette::WindowText));
             }
 
             if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu) {
                 drawArrow(Right, painter,
-                          QRect(menuItem->rect.right() - menuItemVPadding - arrowSize, menuItem->rect.top(), arrowSize, menuItem->rect.height()),
+                          QRect(menuItem->rect.right() - kMenuItemVPadding - kArrowSize, menuItem->rect.top(), kArrowSize, menuItem->rect.height()),
                           menuItem->palette.color(selected ? QPalette::HighlightedText : QPalette::WindowText));
             }
 
@@ -840,15 +855,15 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
 QSize QnNxStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const {
     switch (type) {
     case CT_PushButton:
-        return QSize(qMax(minimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), buttonHeight));
+        return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
     case CT_LineEdit:
-        return QSize(size.width(), qMax(size.height(), buttonHeight));
+        return QSize(size.width(), qMax(size.height(), kButtonHeight));
     case CT_ComboBox:
-        return QSize(qMax(minimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), buttonHeight));
+        return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
     case CT_TabBarTab:
         return QSize(size.width(), qMax(size.height(), (int)dp(40)));
     case CT_MenuItem:
-        return QSize(size.width() + dp(24) + 2 * menuItemHPadding, size.height() + 2 * menuItemVPadding);
+        return QSize(size.width() + dp(24) + 2 * kMenuItemHPadding, size.height() + 2 * kMenuItemVPadding);
     default:
         break;
     }
@@ -887,6 +902,7 @@ void QnNxStyle::polish(QWidget *widget) {
         QFont font = widget->font();
         font.setWeight(QFont::DemiBold);
         widget->setFont(font);
+        widget->setAttribute(Qt::WA_Hover);
     }
 
     if (qobject_cast<QTabBar*>(widget)) {
