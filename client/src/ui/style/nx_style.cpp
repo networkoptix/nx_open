@@ -6,6 +6,7 @@
 #include <QStyleOptionButton>
 #include <QAbstractButton>
 #include <QLineEdit>
+#include <QSpinBox>
 #include <QMenu>
 #include <QAbstractItemView>
 #include <private/qfont_p.h>
@@ -189,18 +190,39 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
         painter->restore();
         return;
     }
-    case PE_FrameLineEdit: {
-        painter->save();
+    case PE_PanelLineEdit:
+    case PE_FrameLineEdit:
+        {
+            if (widget && qobject_cast<const QSpinBox*>(widget->parentWidget()))
+            {
+                // Do not draw panel for the internal line edit of spin box.
+                return;
+            }
 
-        QPen pen(option->palette.color(QPalette::Shadow));
-        painter->setPen(pen);
-        painter->setBrush(option->palette.base());
+            painter->save();
 
-        painter->drawRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5));
+            QPen pen(option->palette.color(QPalette::Shadow));
+            painter->setPen(pen);
 
-        painter->restore();
-        return;
-    }
+            QBrush brush = option->palette.base();
+            if (option->state & State_MouseOver)
+                brush = option->palette.shadow();
+
+            painter->setBrush(brush);
+
+            painter->drawRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5));
+
+            if (option->state & State_HasFocus)
+            {
+                painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
+                                  option->rect.right() - 1, option->rect.top() + 1);
+                painter->drawLine(option->rect.left() + 1, option->rect.top() + 1,
+                                  option->rect.left() + 1, option->rect.bottom() - 1);
+            }
+
+            painter->restore();
+            return;
+        }
     case PE_FrameGroupBox:
         if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame*>(option)) {
             painter->save();
@@ -502,18 +524,17 @@ void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionCom
         }
         break;
     case CC_SpinBox:
-        if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option)) {
-            if (option->subControls & SC_SpinBoxFrame) {
-                if (!spinBox->frame) {
-                    // TODO
-                } else {
-                    proxy()->drawPrimitive(PE_FrameLineEdit, option, painter, widget);
-                }
-            }
+        if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option))
+        {
+            if (option->subControls & SC_SpinBoxFrame)
+                proxy()->drawPrimitive(PE_PanelLineEdit, option, painter, widget);
 
-            if (option->subControls & SC_SpinBoxUp && option->subControls & SC_SpinBoxDown) {
-                drawArrow(Up, painter, subControlRect(control, option, SC_SpinBoxUp, widget).translated(0, dp(2)), option->palette.color(QPalette::Text));
-                drawArrow(Down, painter, subControlRect(control, option, SC_SpinBoxDown, widget).translated(0, -dp(2)), option->palette.color(QPalette::Text));
+            if (option->subControls & SC_SpinBoxUp && option->subControls & SC_SpinBoxDown)
+            {
+                drawArrow(Up, painter, subControlRect(control, option, SC_SpinBoxUp, widget)
+                          .translated(0, dp(2)), option->palette.color(QPalette::Text));
+                drawArrow(Down, painter, subControlRect(control, option, SC_SpinBoxDown, widget)
+                          .translated(0, -dp(2)), option->palette.color(QPalette::Text));
             }
             return;
         }
@@ -895,23 +916,37 @@ int QnNxStyle::styleHint(StyleHint sh, const QStyleOption *option, const QWidget
     return base_type::styleHint(sh, option, widget, shret);
 }
 
-void QnNxStyle::polish(QWidget *widget) {
+void QnNxStyle::polish(QWidget *widget)
+{
     base_type::polish(widget);
 
-    if (qobject_cast<QAbstractButton*>(widget)) {
+    if (qobject_cast<QAbstractButton*>(widget))
+    {
         QFont font = widget->font();
         font.setWeight(QFont::DemiBold);
         widget->setFont(font);
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (qobject_cast<QTabBar*>(widget)) {
+    if (qobject_cast<QTabBar*>(widget))
+    {
         QFont font = widget->font();
         font.setPointSize(font.pointSize() - 1);
         widget->setFont(font);
     }
 
-    if (qobject_cast<QMenu*>(widget)) {
+    if (qobject_cast<QLineEdit*>(widget))
+    {
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QSpinBox*>(widget))
+    {
+        widget->setAttribute(Qt::WA_Hover);
+    }
+
+    if (qobject_cast<QMenu*>(widget))
+    {
         QPalette palette = widget->palette();
         palette.setColor(QPalette::Window, QColor("#e1e7ea"));
         palette.setColor(QPalette::WindowText, QColor("#121517"));
