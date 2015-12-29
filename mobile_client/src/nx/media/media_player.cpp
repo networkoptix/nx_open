@@ -132,6 +132,7 @@ void PlayerPrivate::setPosition(qint64 value)
     position = value;
     Q_Q(Player);
     emit q->positionChanged();
+    at_hurryUp(); //< renew receiving frames
 }
 
 void PlayerPrivate::at_hurryUp()
@@ -145,26 +146,21 @@ void PlayerPrivate::at_hurryUp()
 
 void PlayerPrivate::at_gotVideoFrame()
 {
-    setMediaStatus(Player::MediaStatus::Loaded);
-
-    if (execTimer->isActive())
-        return; //< we already have frame to render. Ignore next frame (will be processed later)
-
     if (state == Player::State::Stopped)
         return;
 
+    if (videoFrameToRender)
+        return; //< we already have frame to render. Ignore next frame (will be processed later)
+
+    videoFrameToRender = dataConsumer->dequeueVideoFrame();
     if (!videoFrameToRender)
-    {
-        videoFrameToRender = dataConsumer->dequeueVideoFrame();
-        if (!videoFrameToRender)
-            return;
-    }
+        return;
 
     if (state == Player::State::Paused)
     {
         FrameMetadata metadata = FrameMetadata::deserialize(videoFrameToRender);
         if (!metadata.noDelay)
-            return; //< display 'noDelay' frames only if player is paused
+            return; //< display regular frames only if player is playing
     }
 
     qint64 nextTimeToRender = getNextTimeToRender(videoFrameToRender);
@@ -179,7 +175,9 @@ void PlayerPrivate::presentNextFrame()
 	if (!videoFrameToRender)
 		return;
 
-	/* update video surface's pixel format if need */
+    setMediaStatus(Player::MediaStatus::Loaded);
+
+    /* update video surface's pixel format if need */
 	if (videoSurface)
 	{
 		if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
@@ -200,7 +198,7 @@ void PlayerPrivate::presentNextFrame()
     setLiveMode(metadata.flags & QnAbstractMediaData::MediaFlags_LIVE);
 
 	videoFrameToRender.clear();
-	at_gotVideoFrame(); //< calculate next time to render
+    QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame); //< calculate next time to render
 }
 
 qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
@@ -332,7 +330,7 @@ void Player::play()
     d->setMediaStatus(MediaStatus::Loading);
     
     d->lastVideoPts.reset();
-    d->at_gotVideoFrame(); //< renew receiving frames
+    d->at_hurryUp(); //< renew receiving frames
 }
 
 void Player::pause() 
