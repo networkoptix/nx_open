@@ -5,13 +5,20 @@
 
 namespace statistics
 {
+    enum MetricLifetime
+    {
+        kSessionLifetime
+        , kInstanceLifetime
+    };
+
     enum MetricType
     {
-        kOccuranciesCount
+        kTriggeredCount
 
         , kActivationsCount
         , kDeactivationsCount
-        , kUptime
+        , kActiveTime
+        , kInactiveTime
     };
 
     class QnAbstractStatisticsMetric : public QObject
@@ -25,9 +32,14 @@ namespace statistics
         virtual ~QnAbstractStatisticsMetric();
 
     public:
-        virtual QString serialize() const = 0;
+        virtual QString serialize() = 0;
+
+        // Called before serialization, to fix result of metric
+        // (for prolonged metrics like kActiveTime)
+        virtual void fixValue();
 
     public:
+
         void setTurnedOn(bool turnOn);
 
         bool isTurnedOn();
@@ -63,7 +75,7 @@ namespace statistics
         public:
             // Overrides
 
-            virtual QString serialize() const override;
+            virtual QString serialize() override;
 
         private:
             ValueType m_value;
@@ -102,8 +114,9 @@ namespace statistics
         }
 
         template<typename ValueType>
-        QString QnTypedAbstractStatisticsMetric<ValueType>::serialize() const
+        QString QnTypedAbstractStatisticsMetric<ValueType>::serialize()
         {
+            this->fixValue();
             // TODO: #ynikitenkov Add fusion serialization
             return QString();
         }

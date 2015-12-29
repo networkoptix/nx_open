@@ -16,13 +16,15 @@ statistics::QnStatisticsManager::QnStatisticsManager(QObject *parent)
 {
     // TODO: #ynikitenkov Remove, for test
     m_actionsHandler->watchAction(Qn::OpenBookmarksSearchAction, lit("BookmarksSearchOpened")
-        , details::ActionMetricParams(kOccuranciesCount, details::kAllEmitters));
+        , details::ActionMetricParams(kTriggeredCount, details::kAllEmitters));
     m_actionsHandler->watchAction(Qn::BookmarksModeAction, lit("BookmarksModeActivationsCount")
         , details::ActionMetricParams(kActivationsCount, details::kAllEmitters));
     m_actionsHandler->watchAction(Qn::BookmarksModeAction, lit("BookmarksModeDectivationsCount")
         , details::ActionMetricParams(kDeactivationsCount, details::kAllEmitters));
-    m_actionsHandler->watchAction(Qn::BookmarksModeAction, lit("BookmarksModeUptime")
-        , details::ActionMetricParams(kUptime, details::kAllEmitters));
+    m_actionsHandler->watchAction(Qn::BookmarksModeAction, lit("BookmarksActiveMode")
+        , details::ActionMetricParams(kActiveTime, details::kAllEmitters));
+    m_actionsHandler->watchAction(Qn::BookmarksModeAction, lit("BookmarksInctiveMode")
+        , details::ActionMetricParams(kInactiveTime, details::kAllEmitters));
 
 
 }

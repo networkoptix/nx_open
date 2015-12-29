@@ -26,7 +26,7 @@ namespace statistics
             ActionEmitterType filter;
             QLatin1String objectTypeFilter;
 
-            ActionMetricParams(MetricType initType = kOccuranciesCount
+            ActionMetricParams(MetricType initType = kTriggeredCount
                 , ActionEmitterType initFilter = kAllEmitters
                 , QLatin1String initObjectTypeFilter = QLatin1String(nullptr));
         };

@@ -112,7 +112,7 @@ namespace
 
         : BaseType(alias, action, params, actionManager)
     {
-        const bool allowedMetricTypes = ((params.type != kOccuranciesCount)
+        const bool allowedMetricTypes = ((params.type != kTriggeredCount)
             || (params.type != kActivationsCount)
             || (params.type != kDeactivationsCount));
 
@@ -130,7 +130,7 @@ namespace
                 return;
             }
 
-            if (params.type == kOccuranciesCount)
+            if (params.type == kTriggeredCount)
                 connect(action, &QAction::triggered, this, &ActionCounterMetric::onTiggered);
             else
                 connect(action, &QAction::toggled, this, &ActionCounterMetric::onToggled);
@@ -165,37 +165,49 @@ namespace
 
     //
 
-    class ActionUptimeMetric : public BaseActionMetric<int>
+    class ActionTimeMetric : public BaseActionMetric<int>
     {
         typedef BaseActionMetric<int> BaseType;
 
     public:
-        ActionUptimeMetric(const QString &alias
+        ActionTimeMetric(const QString &alias
             , QAction *action
             , ActionMetricParams params
             , QnActionManager *actionManager);
 
-        virtual ~ActionUptimeMetric();
+        virtual ~ActionTimeMetric();
 
     private:
+        virtual void fixValue() override;
+
         void stopTimer();
 
     private:
         QElapsedTimer m_activeStateTimer;
     };
 
-    ActionUptimeMetric::ActionUptimeMetric(const QString &alias
+    ActionTimeMetric::ActionTimeMetric(const QString &alias
         , QAction *action
         , ActionMetricParams params
         , QnActionManager *actionManager)
 
         : BaseType(alias, action, params, actionManager)
     {
-        Q_ASSERT_X(params.type == kUptime, Q_FUNC_INFO
+        const bool allowedTypes = ((params.type == kActiveTime)
+            || (params.type == kInactiveTime));
+
+        Q_ASSERT_X(allowedTypes, Q_FUNC_INFO
             , "Can't create ActionUptimeMetric with specified parameters");
 
-        if (params.type != kUptime)
+        if (!allowedTypes)
             return;
+
+        const bool isActiveTimeWatched = (params.type == kActiveTime);
+        if (action->isChecked() == isActiveTimeWatched)
+        {
+            // Starts timer if conditions are met
+            m_activeStateTimer.start();
+        }
 
         const auto connectDisconnectHandler = [this, action, params]()
         {
@@ -207,8 +219,10 @@ namespace
 
             const auto triggeredHandler = [this, params, action]()
             {
+                const bool isActiveTimeWatcher = (params.type == kActiveTime);
+
                 const bool isChecked = action->isChecked();
-                if (!isChecked)
+                if (isActiveTimeWatcher != isChecked)
                 {
                     stopTimer();    // It does not matter if emitter is valid or not. Anyway
                                     // we should stop action "activity" time measurement
@@ -227,12 +241,21 @@ namespace
         connect(this, &QnAbstractStatisticsMetric::turnedOnChanged, this, connectDisconnectHandler);
     }
 
-    ActionUptimeMetric::~ActionUptimeMetric()
+    ActionTimeMetric::~ActionTimeMetric()
     {
         stopTimer();
     }
 
-    void ActionUptimeMetric::stopTimer()
+    void ActionTimeMetric::fixValue()
+    {
+        if (!m_activeStateTimer.isValid())
+            return;
+
+        stopTimer();    // Fixes current value
+        m_activeStateTimer.start(); // Continue counting of metric
+    }
+
+    void ActionTimeMetric::stopTimer()
     {
         if (!m_activeStateTimer.isValid())  // Timer has not been started
             return;
@@ -283,13 +306,14 @@ void ActionsStatisticHandler::watchAction(int id
     QnAbstractStatisticsMetricPtr actionMetric;
     switch(params.type)
     {
-    case kOccuranciesCount:
+    case kTriggeredCount:
     case kActivationsCount:
     case kDeactivationsCount:
         actionMetric.reset(new ActionCounterMetric(alias, actionInstance, params, menu()));
         break;
-    case kUptime:
-        actionMetric.reset(new ActionUptimeMetric(alias, actionInstance, params, menu()));
+    case kActiveTime:
+    case kInactiveTime:
+        actionMetric.reset(new ActionTimeMetric(alias, actionInstance, params, menu()));
         break;
     default:
          return;

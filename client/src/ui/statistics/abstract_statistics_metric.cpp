@@ -13,6 +13,10 @@ QnAbstractStatisticsMetric::~QnAbstractStatisticsMetric()
 {
 }
 
+void QnAbstractStatisticsMetric::fixValue()
+{
+}
+
 void QnAbstractStatisticsMetric::setTurnedOn(bool turnOn)
 {
     if (m_isTurnedOn == turnOn)
