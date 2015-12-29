@@ -366,6 +366,12 @@ void QnScheduleSync::initSyncData()
 template<typename NeedMoveOnCB>
 QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
+    // Let's check if at least one target backup storage is available first.
+    if (!qnBackupStorageMan->getOptimalStorageRoot(nullptr)) {
+        NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
+        return QnServer::BackupResultCode::Failed;
+    }
+
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
     QnMutexLocker lock(&m_syncPointMutex);
     auto chunk = findLastSyncChunkUnsafe();
