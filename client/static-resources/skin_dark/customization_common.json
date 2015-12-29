@@ -79,35 +79,13 @@
         "palette": {
             "_": "Main application palette. See http://qt-project.org/doc/qt-5.1/qtgui/qpalette.html#ColorRole-enum.",
         
-            "default": {},
-            "active": {
+            "default": {
                 "windowText":       "light4",
                 "button":           "dark10",
                 "light":            "light10",
                 "midlight":         "dark16",
                 "dark":             "dark8",
                 "mid":              "dark9",
-                "text":             "light4",
-                "brightText":       "light1",
-                "buttonText":       "light4",
-                "base":             "dark6",
-                "window":           "dark7",
-                "shadow":           "dark3",
-                "highlight":        "#2fa2db",
-                "highlightedText":  "#f0f0f0",
-                "link":             "#0099ff",
-                "linkVisited":      "#30aafc",
-                "alternateBase":    "dark6",
-                "toolTipBase":      "#f0f0f0",
-                "toolTipText":      "#222222"
-            },
-            "inactive": {
-                "windowText":       "light4",
-                "button":           "dark10",
-                "light":            "light10",
-                "midlight":         "dark16",
-                "dark":             "dark8",
-                "mid":              "dark10",
                 "text":             "light4",
                 "brightText":       "light1",
                 "buttonText":       "light4",
@@ -146,7 +124,7 @@
         }
     },
     
-    "QPushButton": {
+    "QAbstractButton": {
         "palette": {
             "default": {
                 "midlight": "dark11"
