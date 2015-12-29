@@ -4,9 +4,11 @@
 #include <QPainter>
 #include <QStyleOption>
 #include <QStyleOptionButton>
-#include <QAbstractButton>
+#include <QPushButton>
+#include <QToolButton>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QCheckBox>
 #include <QMenu>
 #include <QAbstractItemView>
 #include <private/qfont_p.h>
@@ -238,44 +240,48 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
             return;
         }
         break;
-    case PE_IndicatorCheckBox: {
-        painter->save();
+    case PE_IndicatorCheckBox:
+        {
+            painter->save();
 
-        QPen pen(option->palette.light(), dp(1));
-        pen.setJoinStyle(Qt::MiterJoin);
-        pen.setCapStyle(Qt::FlatCap);
-        painter->setPen(pen);
-        painter->setBrush(Qt::NoBrush);
-
-        QRectF rect = option->rect.adjusted(1, 1, -pen.widthF() - 2, -pen.widthF() - 2);
-
-        if (option->state.testFlag(State_On)) {
-            QPainterPath path;
-            path.moveTo(rect.right() - rect.width() * 0.3, rect.top());
-            path.lineTo(rect.left(), rect.top());
-            path.lineTo(rect.left(), rect.bottom());
-            path.lineTo(rect.right(), rect.bottom());
-            path.lineTo(rect.right(), rect.top() + rect.height() * 0.6);
-
+            QPen pen(option->palette.color(QPalette::WindowText));
+            pen.setJoinStyle(Qt::MiterJoin);
+            pen.setCapStyle(Qt::FlatCap);
             painter->setPen(pen);
-            painter->drawPath(path);
+            painter->setBrush(Qt::NoBrush);
 
-            path = QPainterPath();
-            path.moveTo(rect.left() + rect.width() * 0.2, rect.top() + rect.height() * 0.45);
-            path.lineTo(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.75);
-            path.lineTo(rect.right() + rect.width() * 0.05, rect.top() + rect.height() * 0.15);
+            QRectF rect = option->rect.adjusted(1, 1, -pen.widthF() - 2, -pen.widthF() - 2);
 
-            pen.setWidthF(dp(2));
-            painter->setPen(pen);
-            painter->setRenderHint(QPainter::Antialiasing);
-            painter->drawPath(path);
-        } else {
-            painter->drawRect(rect);
+            if (option->state.testFlag(State_On))
+            {
+                QPainterPath path;
+                path.moveTo(rect.right() - rect.width() * 0.3, rect.top());
+                path.lineTo(rect.left(), rect.top());
+                path.lineTo(rect.left(), rect.bottom());
+                path.lineTo(rect.right(), rect.bottom());
+                path.lineTo(rect.right(), rect.top() + rect.height() * 0.6);
+
+                painter->setPen(pen);
+                painter->drawPath(path);
+
+                path = QPainterPath();
+                path.moveTo(rect.left() + rect.width() * 0.2, rect.top() + rect.height() * 0.45);
+                path.lineTo(rect.left() + rect.width() * 0.5, rect.top() + rect.height() * 0.75);
+                path.lineTo(rect.right() + rect.width() * 0.05, rect.top() + rect.height() * 0.15);
+
+                pen.setWidthF(dp(2));
+                painter->setPen(pen);
+                painter->setRenderHint(QPainter::Antialiasing);
+                painter->drawPath(path);
+            }
+            else
+            {
+                painter->drawRect(rect);
+            }
+
+            painter->restore();
+            return;
         }
-
-        painter->restore();
-        return;
-    }
     case PE_IndicatorRadioButton: {
         painter->save();
 
@@ -595,6 +601,32 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
             QStyleOptionComboBox opt = *comboBox;
             opt.rect.setLeft(opt.rect.left() + dp(6));
+            base_type::drawControl(element, &opt, painter, widget);
+            return;
+        }
+        break;
+    case CE_CheckBox:
+        if (const QStyleOptionButton *checkBox = qstyleoption_cast<const QStyleOptionButton*>(option))
+        {
+            QStyleOptionButton opt = *checkBox;
+
+            QColor color = opt.palette.color(QPalette::Light);
+
+            if (opt.state & State_Off)
+            {
+                if (opt.state & State_MouseOver)
+                    color = opt.palette.color(QPalette::Midlight);
+            }
+            else if (opt.state & State_On || opt.state & State_NoChange)
+            {
+                if (opt.state & State_MouseOver)
+                    color = opt.palette.color(QPalette::BrightText);
+                else
+                    color = opt.palette.color(QPalette::Text);
+            }
+
+            opt.palette.setColor(QPalette::WindowText, color);
+
             base_type::drawControl(element, &opt, painter, widget);
             return;
         }
@@ -920,7 +952,8 @@ void QnNxStyle::polish(QWidget *widget)
 {
     base_type::polish(widget);
 
-    if (qobject_cast<QAbstractButton*>(widget))
+    if (qobject_cast<QPushButton*>(widget) ||
+        qobject_cast<QToolButton*>(widget))
     {
         QFont font = widget->font();
         font.setWeight(QFont::DemiBold);
@@ -935,12 +968,9 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setFont(font);
     }
 
-    if (qobject_cast<QLineEdit*>(widget))
-    {
-        widget->setAttribute(Qt::WA_Hover);
-    }
-
-    if (qobject_cast<QSpinBox*>(widget))
+    if (qobject_cast<QLineEdit*>(widget) ||
+        qobject_cast<QSpinBox*>(widget) ||
+        qobject_cast<QCheckBox*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
     }

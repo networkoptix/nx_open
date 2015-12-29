@@ -148,6 +148,17 @@
         }
     },
 
+    "QCheckBox": {
+        "palette": {
+            "default": {
+                "midlight": "light8"
+            },
+            "disabled": {
+                "midlight": "light8.setAlpha(75)"
+            }
+        }
+    },
+
     "QnMainWindow": {
         "palette": { "default": {
             "window": "#000000"
