@@ -26,7 +26,7 @@ UDPMessageResponseSender::~UDPMessageResponseSender()
 
 void UDPMessageResponseSender::sendMessage(nx::stun::Message message)
 {
-    m_udpServer->sendMessageAsync(
+    m_udpServer->sendMessage(
         m_sourceAddress,
         std::move(message),
         std::function<void(SystemError::ErrorCode)>());
