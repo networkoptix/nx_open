@@ -1,5 +1,7 @@
 //#define QN_USE_VLD
 
+#include <cstdint>
+
 #ifdef QN_USE_VLD
 #   include <vld.h>
 #endif
@@ -52,6 +54,7 @@ extern "C"
 #include "core/resource/resource_directory_browser.h"
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <core/resource/client_camera_factory.h>
 
 #include "decoders/video/ipp_h264_decoder.h"
 
@@ -70,9 +73,6 @@ extern "C"
 #include "core/resource_management/resource_discovery_manager.h"
 
 #include "api/app_server_connection.h"
-//#include <plugins/resource/server_camera/server_camera.h>
-#include <plugins/resource/server_camera/server_camera_factory.h>
-
 
 #include "plugins/plugin_manager.h"
 
@@ -116,8 +116,8 @@ extern "C"
 #include "ui/dialogs/message_box.h"
 #include <nx_ec/ec2_lib.h>
 #include <nx_ec/dummy_handler.h>
-#include <utils/network/module_finder.h>
-#include <utils/network/router.h>
+#include <network/module_finder.h>
+#include <network/router.h>
 #include <api/network_proxy_factory.h>
 #include <utils/server_interface_watcher.h>
 
@@ -266,6 +266,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QThread::currentThread()->setPriority(QThread::HighestPriority);
 
     QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+
     QnClientModule client(startupParams);
 
     /// TODO: #ynikitenkov move other initialization to QnClientModule constructor
@@ -279,14 +280,16 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     nx_http::HttpModManager httpModManager;
 
+    PluginManager pluginManager;
+
     /* Dev mode. */
-    if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5) 
+    if(QnCryptographicHash::hash(startupParams.devModeKey.toLatin1(), QnCryptographicHash::Md5)
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f")) { /* MD5("razrazraz") */
         qnRuntime->setDevMode(true);
     }
 
-    if (startupParams.softwareYuv)
-        qnRuntime->setSoftwareYuv(true);
+    qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
+    qnRuntime->setShowFullInfo(startupParams.showFullInfo);
 
     if (!startupParams.engineVersion.isEmpty()) {
         QnSoftwareVersion version(startupParams.engineVersion);
@@ -297,15 +300,19 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 
     QString logFileNameSuffix;
-    if (!startupParams.videoWallGuid.isNull()) {
+    if (!startupParams.customUri.isNull()) {
+        startupParams.allowMultipleClientInstances = true;
+
+
+    } else if (!startupParams.videoWallGuid.isNull()) {
         qnRuntime->setVideoWallMode(true);
         startupParams.allowMultipleClientInstances= true;
         startupParams.fullScreenDisabled = true;
         startupParams.versionMismatchCheckDisabled = true;
         qnRuntime->setLightModeOverride(Qn::LightModeVideoWall);
 
-        logFileNameSuffix = startupParams.videoWallItemGuid.isNull() 
-            ? startupParams.videoWallGuid.toString() 
+        logFileNameSuffix = startupParams.videoWallItemGuid.isNull()
+            ? startupParams.videoWallGuid.toString()
             : startupParams.videoWallItemGuid.toString();
         logFileNameSuffix.replace(QRegExp(lit("[{}]")), lit("_"));
     }
@@ -336,12 +343,12 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     qnSettings->setClientUpdateDisabled(startupParams.clientUpdateDisabled);
 
 #ifdef ENABLE_DYNAMIC_CUSTOMIZATION
-    QString skinRoot = dynamicCustomizationPath.isEmpty() 
-        ? lit(":") 
-        : dynamicCustomizationPath;
+    QString skinRoot = startupParams.dynamicCustomizationPath.isEmpty()
+        ? lit(":")
+        : startupParams.dynamicCustomizationPath;
 
-    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin 
-        ? skinRoot + lit("/skin_light") 
+    QString customizationPath = qnSettings->clientSkin() == Qn::LightSkin
+        ? skinRoot + lit("/skin_light")
         : skinRoot + lit("/skin_dark");
     QScopedPointer<QnSkin> skin(new QnSkin(QStringList() << skinRoot + lit("/skin") << customizationPath));
 #else
@@ -350,7 +357,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 #endif // ENABLE_DYNAMIC_CUSTOMIZATION
 
 
-    
+
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
@@ -363,7 +370,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     /* Initialize application instance. */
     QApplication::setQuitOnLastWindowClosed(true);
     QApplication::setWindowIcon(qnSkin->icon("window_icon.png"));
-    
+
     QApplication::setStyle(skin->newStyle()); // TODO: #Elric here three qWarning's are issued (bespin bug), qnDeleteLater with null receiver
 #ifdef Q_OS_MACX
     application->setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
@@ -406,7 +413,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory( startupParams.videoWallGuid.isNull() ? Qn::PT_DesktopClient : Qn::PT_VideowallClient ) );
     ec2::ResourceContext resCtx(
-        QnServerCameraFactory::instance(),
+        QnClientCameraFactory::instance(),
         qnResPool,
         qnResTypePool );
 	ec2ConnectionFactory->setContext( resCtx );
@@ -568,15 +575,18 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     QnResourceDiscoveryManager::instance()->start();
 
 
-    /* If no input files were supplied --- open connection settings dialog. */
-
-    /*
+    if (!startupParams.customUri.isEmpty()) {
+        /* Set authentication parameters from uri. */
+        QUrl appServerUrl = QUrl::fromUserInput(startupParams.customUri);
+        context->menu()->trigger(Qn::ConnectAction, QnActionParameters().withArgument(Qn::UrlRole, appServerUrl));
+    }
+    /* If no input files were supplied --- open connection settings dialog.
      * Do not try to connect in the following cases:
      * * we were not connected and clicked "Open in new window"
      * * we have opened exported exe-file
      * Otherwise we should try to connect or show Login Dialog.
      */
-    if (startupParams.instantDrop.isEmpty() && !haveInputFiles) {
+    else if (startupParams.instantDrop.isEmpty() && !haveInputFiles) {
         /* Set authentication parameters from command line. */
         QUrl appServerUrl = QUrl::fromUserInput(startupParams.authenticationString);
         if (!startupParams.videoWallGuid.isNull()) {
@@ -614,7 +624,6 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     }
 #endif
 
-    QnResource::stopCommandProc();
     QnResourceDiscoveryManager::instance()->stop();
 
     QnAppServerConnectionFactory::setEc2Connection(NULL);
@@ -669,7 +678,7 @@ int main(int argc, char **argv)
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, lit("/etc/xdg"));
     QSettings::setPath(QSettings::NativeFormat, QSettings::SystemScope, lit("/etc/xdg"));
 #endif
-     
+
 
 #ifdef Q_OS_MAC
     mac_restoreFileAccess();

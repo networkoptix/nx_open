@@ -19,6 +19,7 @@
 
 #include <client/client_globals.h>
 #include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
 class QnResourceDisplay;
@@ -26,6 +27,7 @@ class QnResourceWidgetRenderer;
 class QnFisheyeHomePtzController;
 class QnCachingCameraDataLoader;
 class QnIoModuleOverlayWidget;
+class QnCompositeTextOverlay;
 
 class QnMediaResourceWidget: public QnResourceWidget {
     Q_OBJECT
@@ -110,7 +112,7 @@ public:
 
     /**
      * This function returns a PTZ controller associated with this widget.
-     * Note that this function never returns NULL. 
+     * Note that this function never returns NULL.
      *
      * \returns                         PTZ controller associated with this widget.
      */
@@ -127,6 +129,7 @@ signals:
     void displayChanged();
     void fisheyeChanged();
     void dewarpingParamsChanged();
+    void colorsChanged();
 
 protected:
     virtual int helpTopicAt(const QPointF &pos) const override;
@@ -135,7 +138,8 @@ protected:
     virtual void channelScreenSizeChangedNotify() override;
     virtual void optionsChangedNotify(Options changedFlags) override;
 
-    virtual QString calculateInfoText() const override;
+    virtual QString calculateDetailsText() const override;
+    virtual QString calculatePositionText() const override;
     virtual QString calculateTitleText() const override;
     virtual Buttons calculateButtonsVisibility() const override;
     virtual QCursor calculateCursor() const override;
@@ -165,6 +169,9 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
+
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);
@@ -199,9 +206,11 @@ private:
     Q_SLOT void updateIoModuleVisibility(bool animate);
     Q_SLOT void updateOverlayButton();
 
-    void updateBookmarks();
+    void updateCompositeOverlayMode();
 
-    qint64 getCurrentTime() const;
+    qint64 getDisplayTimeUsec() const;
+    qint64 getUtcCurrentTimeUsec() const;
+    qint64 getUtcCurrentTimeMs() const;
 
 private:
     struct ResourceStates
@@ -258,11 +267,13 @@ private:
 
     QnMediaDewarpingParams m_dewarpingParams;
 
-    QnCameraBookmarkList m_bookmarks;
-    QnCameraBookmarksQueryPtr m_bookmarksQuery;
+    QnCompositeTextOverlay *m_compositeTextOverlay;
 
     QnIoModuleOverlayWidget *m_ioModuleOverlayWidget;
     bool m_ioCouldBeShown;
+
+    typedef QScopedPointer<QnSingleCamLicenceStatusHelper> QnSingleCamLicenceStatusHelperPtr;
+    QnSingleCamLicenceStatusHelperPtr m_ioLicenceStatusHelper;
 };
 
 Q_DECLARE_METATYPE(QnMediaResourceWidget *)

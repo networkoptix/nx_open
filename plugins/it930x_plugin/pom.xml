@@ -22,8 +22,10 @@
 
 	<properties>
 		<product.title>${project.name}</product.title>	
+        <guid>${it930x_plugin.guid}</guid>
 		<!--Global libs-->
 		<qt.libs>core</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
 		<global.libs>-lcommon</global.libs>
 		<!--Specific os libs used-->
         <windows.oslibs/>

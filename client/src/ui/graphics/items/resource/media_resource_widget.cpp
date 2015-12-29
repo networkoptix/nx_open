@@ -11,8 +11,6 @@
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
-#include <camera/camera_bookmarks_manager.h>
-#include <camera/camera_bookmarks_query.h>
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -33,7 +31,6 @@
 #include <core/ptz/home_ptz_controller.h>
 #include <core/ptz/viewport_ptz_controller.h>
 #include <core/ptz/fisheye_home_ptz_controller.h>
-#include <core/resource/camera_bookmark.h>
 
 #include <plugins/resource/archive/abstract_archive_stream_reader.h>
 
@@ -47,6 +44,7 @@
 #include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/overlays/io_module_overlay_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
+#include <ui/graphics/items/overlays/composite_text_overlay.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/style/globals.h>
@@ -55,6 +53,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
@@ -67,13 +66,21 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/synctime.h>
 #include <utils/common/collection.h>
+#include <utils/common/string.h>
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
+#include <api/common_message_processor.h>
+#include <business/actions/abstract_business_action.h>
 
-#define QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-
-namespace 
+namespace
 {
+    bool isSpecialDateTimeValueUsec(qint64 dateTimeUsec)
+    {
+        return ((dateTimeUsec == DATETIME_NOW)
+            || (dateTimeUsec == AV_NOPTS_VALUE)
+            || (dateTimeUsec == kNoTimeValue));
+    }
+
     bool getPtzObjectName(const QnPtzControllerPtr &controller, const QnPtzObject &object, QString *name) {
         switch(object.type) {
         case Qn::PresetPtzObject: {
@@ -109,23 +116,7 @@ namespace
         }
     }
 
-    enum CameraLicenseStatus {
-        LicenseNotUsed,
-        LicenseOverflow,
-        LicenseUsed
-    };
-
-    CameraLicenseStatus cameraLicenseStatus(const QnVirtualCameraResourcePtr &camera) {
-        bool licenseUsed = camera->isLicenseUsed();
-        bool overflow = QnCamLicenseUsageHelper(camera, true).isOverflowForCamera(camera);
-
-        /* We are returning overflow even if now all is OK, so user will not be suggested to enable camera. */
-        return overflow ? LicenseOverflow
-                        : (licenseUsed ? LicenseUsed : LicenseNotUsed);
-    }
-
 } // anonymous namespace
-
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent)
     : QnResourceWidget(context, item, parent)
@@ -145,9 +136,11 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     , m_ptzController(nullptr)
     , m_homePtzController(nullptr)
     , m_dewarpingParams()
-    , m_bookmarks()
+    , m_compositeTextOverlay(new QnCompositeTextOverlay(m_camera, navigator()
+        , [this](){ return getUtcCurrentTimeMs(); }, this))
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
+    , m_ioLicenceStatusHelper() /// Will be created only for IO modules
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -169,6 +162,21 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this,                       &QnMediaResourceWidget::dewarpingParamsChanged, this, &QnMediaResourceWidget::updateButtonsVisibility);
     if (m_camera)
         connect(m_camera,               &QnVirtualCameraResource::motionRegionChanged,  this, &QnMediaResourceWidget::invalidateMotionSensitivity);
+    connect(navigator(),        &QnWorkbenchNavigator::bookmarksModeEnabledChanged,     this, &QnMediaResourceWidget::updateCompositeOverlayMode);
+
+    const auto messageProcessor = QnCommonMessageProcessor::instance();
+    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived,
+            this, [this](const QnAbstractBusinessActionPtr &businessAction)
+    {
+        if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
+            return;
+        const auto &actionParams = businessAction->getParams();
+        if (actionParams.actionResourceId != m_resource->toResource()->getId())
+            return;
+        if (m_ptzController)
+            m_ptzController->activatePreset(actionParams.presetId, QnAbstractPtzController::MaxPtzSpeed);
+    });
+
 
     updateDisplay();
     updateDewarpingParams();
@@ -200,9 +208,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
             serverController.reset(new QnActivityPtzController(QnActivityPtzController::Client, serverController));
             m_ptzController.reset(new QnFallbackPtzController(fisheyeController, serverController));
         } else {
-            m_ptzController = fisheyeController; 
+            m_ptzController = fisheyeController;
         }
-    } 
+    }
     else {
         m_ptzController = fisheyeController;
     }
@@ -213,18 +221,20 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this, &QnMediaResourceWidget::updateInfoText, Qt::QueuedConnection);
 
 
+    m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
+    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
 
     /* Set up overlays */
-    if (m_camera && m_camera->hasFlags(Qn::io_module)) 
+    if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
+        m_ioLicenceStatusHelper.reset(new QnSingleCamLicenceStatusHelper(m_camera));
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
         addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
 
-        QnCamLicenseUsageWatcher *watcher = new QnCamLicenseUsageWatcher(m_camera, this);
-        connect(watcher, &QnCamLicenseUsageWatcher::licenseUsageChanged, this, 
-            [this]() { updateIoModuleVisibility(true); });
+        connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
+            , [this]() { updateIoModuleVisibility(true); });
 
         updateButtonsVisibility();
         updateIoModuleVisibility(false);
@@ -237,10 +247,15 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         QTimer *timer = new QTimer(this);
 
         connect(timer,              &QTimer::timeout,                                   this,   &QnMediaResourceWidget::updateIconButton);
-        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::offsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
-        connect(m_camera.data(),    &QnResource::statusChanged,                         this,   [this](){ updateIoModuleVisibility(true); });
-        connect(m_camera.data(),    &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
+        connect(context->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, &QnMediaResourceWidget::updateIconButton);
+        connect(m_camera,           &QnResource::statusChanged,                         this,   &QnMediaResourceWidget::updateIconButton);
+
+        if (m_camera->hasFlags(Qn::io_module))
+            connect(m_camera, &QnResource::statusChanged, this, [this](){ updateIoModuleVisibility(true); }); /// updateOverlayButton is called by updateIoModuleVisibility
+        else
+            connect(m_camera, &QnResource::statusChanged, this, &QnMediaResourceWidget::updateOverlayButton);
+
+        connect(m_camera,           &QnSecurityCamResource::scheduleTasksChanged,       this,   &QnMediaResourceWidget::updateIconButton);
         timer->start(1000 * 60); /* Update icon button every minute. */
 
         connect(statusOverlayWidget(), &QnStatusOverlayWidget::diagnosticsRequested,    this,   &QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested);
@@ -262,7 +277,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
     updateTitleText();
     updateInfoText();
-    updateBookmarks();
+    updateDetailsText();
+    updatePositionText();
+    updateCompositeOverlayMode();
     updateCursor();
     updateFisheye();
     setImageEnhancement(item->imageEnhancement());
@@ -401,6 +418,16 @@ QPoint QnMediaResourceWidget::channelGridOffset(int channel) const {
 void QnMediaResourceWidget::suspendHomePtzController() {
     if (m_homePtzController)
         m_homePtzController->suspend();
+}
+
+void QnMediaResourceWidget::updateHud(bool animate)
+{
+    const auto compositeOverlayCouldBeVisible
+        = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    setOverlayWidgetVisible(m_compositeTextOverlay, compositeOverlayCouldBeVisible, animate);
+
+    QnResourceWidget::updateHud(animate);
 }
 
 void QnMediaResourceWidget::resumeHomePtzController() {
@@ -603,7 +630,8 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display) {
 
         connect(m_display->camDisplay(), &QnCamDisplay::liveMode, this, [this](bool /* live */)
         {
-            updateIoModuleVisibility(true);
+            if (m_camera && m_camera->hasFlags(Qn::io_module))
+                updateIoModuleVisibility(true);
         });
 
         setChannelLayout(m_display->videoLayout());
@@ -652,7 +680,7 @@ void QnMediaResourceWidget::updateIconButton() {
         return;
     }
 
-    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(context(), m_camera);
+    int recordingMode = QnRecordingStatusHelper::currentRecordingMode(m_camera);
     QIcon recIcon = QnRecordingStatusHelper::icon(recordingMode);
     iconButton()->setVisible(!recIcon.isNull());
     iconButton()->setIcon(recIcon);
@@ -810,10 +838,12 @@ void QnMediaResourceWidget::paintFilledRegionPath(QPainter *painter, const QRect
 }
 
 void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, int channel, const QRectF &rect, const QnMotionRegion &region) {
-    Q_UNUSED(channel)
+    QPoint channelOffset = channelGridOffset(channel);
+
     qreal xStep = rect.width() / MD_WIDTH;
     qreal yStep = rect.height() / MD_HEIGHT;
-    qreal offset = xStep * 0.1;
+    qreal xOffset = channelOffset.x() + 0.1;
+    qreal yOffset = channelOffset.y();
     qreal fontIncrement = 1.2;
 
     painter->setPen(Qt::black);
@@ -822,6 +852,7 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
     font.setBold(true);
     painter->setFont(font);
 
+    /* Zero sensitivity is skipped as there should not be painted zeros */
     for (int sensitivity = QnMotionRegion::MIN_SENSITIVITY + 1; sensitivity <= QnMotionRegion::MAX_SENSITIVITY; ++sensitivity) {
         auto rects = region.getRectsBySens(sensitivity);
         if (rects.isEmpty())
@@ -832,8 +863,8 @@ void QnMediaResourceWidget::paintMotionSensitivityIndicators(QPainter *painter, 
             if (rect.width() < 2 || rect.height() < 2)
                 continue;
 
-            int x = rect.left(), y = rect.top();
-            painter->drawStaticText(x * xStep + offset, y * yStep, m_sensStaticText[sensitivity]);
+            qreal x = rect.left(), y = rect.top();
+            painter->drawStaticText((x + xOffset) * xStep , (y + yOffset) * yStep , m_sensStaticText[sensitivity]);
         }
     }
 }
@@ -904,9 +935,9 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const {
     auto isIoModule = [this]() {
         if (!m_resource->toResource()->flags().testFlag(Qn::io_module))
             return false;
-         
-        if (m_camera 
-            && m_display 
+
+        if (m_camera
+            && m_display
             && !m_camera->hasVideo(m_display->mediaProvider()))
                 return true;
 
@@ -997,7 +1028,7 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags) {
     base_type::optionsChangedNotify(changedFlags);
 }
 
-QString QnMediaResourceWidget::calculateInfoText() const {
+QString QnMediaResourceWidget::calculateDetailsText() const {
     qreal fps = 0.0;
     qreal mbps = 0.0;
 
@@ -1013,55 +1044,65 @@ QString QnMediaResourceWidget::calculateInfoText() const {
     size.setWidth(size.width() * m_display->camDisplay()->channelsCount());
 
     QString codecString;
-    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext()) {
+    if(QnMediaContextPtr codecContext = m_display->mediaProvider()->getCodecContext())
         codecString = codecContext->codecName();
-        if(!codecString.isEmpty())
-            codecString = lit(" (%1)").arg(codecString);
-    }
 
     QString hqLqString;
-#ifdef QN_MEDIA_RESOURCE_WIDGET_SHOW_HI_LO_RES
-    if (m_resource->hasVideo(m_display->mediaProvider()) && !(m_resource->toResource()->flags() & Qn::local))
+    if (m_resource->hasVideo(m_display->mediaProvider()) && !m_resource->toResource()->hasFlags(Qn::local))
         hqLqString = (m_renderer->isLowQualityImage(0)) ? tr("Low-Res") : tr("Hi-Res");
-#endif
 
-    QString timeString;
-    if (m_resource->toResource()->flags() & Qn::utc)
-    { 
-        /* Do not show time for regular media files. */
-        timeString = m_display->camDisplay()->isRealTimeSource() 
-            ? tr("LIVE") 
-            : QDateTime::fromMSecsSinceEpoch(getCurrentTime()).toString(lit("yyyy-MM-dd hh:mm:ss"));
-        
+    enum {
+        kDetailsTextPixelSize = 11
+    };
+
+    QString result;
+    if (m_resource->hasVideo(m_display->mediaProvider())) {
+        result.append(htmlFormattedParagraph(lit("%1x%2").arg(size.width()).arg(size.height()), kDetailsTextPixelSize, true));
+        result.append(htmlFormattedParagraph(lit("%1fps").arg(fps, 0, 'f', 2), kDetailsTextPixelSize, true));
     }
-    if (m_resource->hasVideo(m_display->mediaProvider()))
-    {
-        return lit(" %1x%2 %3fps @ %4Mbps%5 %6\t%7")
-            .arg(size.width())
-            .arg(size.height())
-            .arg(fps, 0, 'f', 2)
-            .arg(mbps, 0, 'f', 2)
-            .arg(codecString)
-            .arg(hqLqString)
-            .arg(timeString);
-    }
-    else
-    {
-        return lit(" %1Mbps%2 %3\t%4")
-            .arg(mbps, 0, 'f', 2)
-            .arg(codecString)
-            .arg(hqLqString)
-            .arg(timeString);
-    }
+    result.append(htmlFormattedParagraph(lit("%1Mbps").arg(mbps, 0, 'f', 2), kDetailsTextPixelSize, true));
+    result.append(htmlFormattedParagraph(codecString, kDetailsTextPixelSize, true));
+    result.append(htmlFormattedParagraph(hqLqString, kDetailsTextPixelSize, true));
+
+    return result;
 }
 
+QString QnMediaResourceWidget::calculatePositionText() const
+{
+    /* Do not show time for regular media files. */
+    if (!m_resource->toResourcePtr()->flags().testFlag(Qn::utc))
+        return QString();
+
+    static const auto extractTime = [](qint64 dateTimeUsec)
+    {
+        if (isSpecialDateTimeValueUsec(dateTimeUsec))
+            return QString();
+
+        enum { kMicroInMilliSeconds = 1000 };
+        static const auto kOutputFormat = lit("yyyy-MM-dd hh:mm:ss");
+
+        const auto dateTimeMs = dateTimeUsec / kMicroInMilliSeconds;
+        return QDateTime::fromMSecsSinceEpoch(dateTimeMs).toString(kOutputFormat);
+    };
+
+    const QString timeString = (m_display->camDisplay()->isRealTimeSource()
+        ? tr("LIVE") : extractTime(getDisplayTimeUsec()));
+
+    enum { kPositionTextPixelSize = 14 };
+    return htmlFormattedParagraph(timeString, kPositionTextPixelSize, true);
+}
+
+
 QString QnMediaResourceWidget::calculateTitleText() const {
+
+    QString resourceName = base_type::calculateTitleText();
+
     QnPtzObject activeObject;
     QString activeObjectName;
     if(m_ptzController->getActiveObject(&activeObject) && activeObject.type == Qn::TourPtzObject && getPtzObjectName(m_ptzController, activeObject, &activeObjectName)) {
-        return tr("%1 (Tour \"%2\" is active)").arg(m_resource->toResourcePtr()->getName()).arg(activeObjectName);
+        return tr("%1 (Tour \"%2\" is active)").arg(resourceName).arg(activeObjectName);
     } else {
-        return m_resource->toResourcePtr()->getName();
+        return resourceName;
     }
 }
 
@@ -1078,10 +1119,10 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     bool rgbImage = false;
     QString url = resource()->toResource()->getUrl().toLower();
 
-    // TODO: #Elric totally evil. Button availability should be based on actual 
+    // TODO: #Elric totally evil. Button availability should be based on actual
     // colorspace value, better via some function in enhancement implementation,
     // and not on file extension checks!
-    if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg"))) 
+    if(((resource()->toResource()->flags() & Qn::still_image)) && !url.endsWith(lit(".jpg")) && !url.endsWith(lit(".jpeg")))
         rgbImage = true;
     if (!rgbImage && hasVideo)
         result |= EnhancementButton;
@@ -1092,13 +1133,13 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
         result |= MotionSearchButton;
 
-    bool isExportedLayout = item() 
-        && item()->layout() 
+    bool isExportedLayout = item()
+        && item()->layout()
         && snapshotManager()->isFile(item()->layout()->resource());
 
-    bool isPreviewSearchLayout = item() 
-        && item()->layout() 
-        && item()->layout()->data().contains(Qn::LayoutSearchStateRole);
+    bool isPreviewSearchLayout = item()
+        && item()->layout()
+        && item()->layout()->isSearchLayout();
 
     if(m_camera
         && m_camera->hasPtzCapabilities(Qn::ContinuousPtzCapabilities)
@@ -1109,7 +1150,7 @@ QnResourceWidget::Buttons QnMediaResourceWidget::calculateButtonsVisibility() co
     ) {
         result |= PtzButton;
     }
-    
+
     if (m_dewarpingParams.enabled) {
         result |= FishEyeButton;
         result &= ~PtzButton;
@@ -1141,7 +1182,7 @@ QCursor QnMediaResourceWidget::calculateCursor() const {
 }
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     QnResourcePtr resource = m_display->resource();
@@ -1159,7 +1200,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
 
         if (!states.isRealTimeSource)
             return Qn::NoVideoDataOverlay;
-            
+
         if (m_ioCouldBeShown) /// If vidget could be shown then licences Ok
             return Qn::EmptyOverlay;
 
@@ -1171,7 +1212,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
 
         if (licenceError && isNotZoomWindow)
             return Qn::IoModuleDisabledOverlay;
-    } 
+    }
 
     if (resource->hasFlags(Qn::SINGLE_SHOT)) {
         if (resource->getStatus() == Qn::Offline)
@@ -1182,7 +1223,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const 
     } else if (resource->hasFlags(Qn::ARCHIVE) && resource->getStatus() == Qn::Offline) {
         return Qn::NoDataOverlay;
 
-        
+
     } else if (states.isOffline) {
         return Qn::OfflineOverlay;
     } else if (states.isUnauthorized) {
@@ -1273,6 +1314,8 @@ void QnMediaResourceWidget::at_camDisplay_liveChanged() {
     } else {
         resumeHomePtzController();
     }
+
+    updateCompositeOverlayMode();
 }
 
 void QnMediaResourceWidget::at_screenshotButton_clicked() {
@@ -1287,7 +1330,7 @@ void QnMediaResourceWidget::at_searchButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ptzButton_toggled(bool checked) {
-    bool ptzEnabled = 
+    bool ptzEnabled =
         checked && (m_camera && (m_camera->getPtzCapabilities() & Qn::ContinuousPtzCapabilities));
 
     setOption(ControlPtz, ptzEnabled);
@@ -1333,6 +1376,7 @@ void QnMediaResourceWidget::at_histogramButton_toggled(bool checked) {
 }
 
 void QnMediaResourceWidget::at_ioModuleButton_toggled(bool checked) {
+    Q_UNUSED(checked);
     if (m_ioModuleOverlayWidget)
         updateIoModuleVisibility(true);
 }
@@ -1423,14 +1467,19 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 }
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
+    Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
+        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for io modules");
+
+    if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
+        return;
+
     const QnImageButtonWidget * const button = buttonBar()->button(IoModuleButton);
-    const bool ioModule = m_camera && m_camera->hasFlags(Qn::io_module);
     const bool ioBtnChecked = (button && button->isChecked());
-    const bool onlyIoData = (ioModule && m_camera && !m_camera->hasVideo(m_display->mediaProvider()));
-    const bool correctLicenceStatus = !m_camera || (cameraLicenseStatus(m_camera) == LicenseUsed);
+    const bool onlyIoData = (!m_camera->hasVideo(m_display->mediaProvider()));
+    const bool correctLicenceStatus = (m_ioLicenceStatusHelper->status() == QnSingleCamLicenceStatusHelper::LicenseUsed);
 
     const auto resource = m_display->resource();
-    
+
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
     m_ioCouldBeShown = ((ioBtnChecked || onlyIoData) && correctLicenceStatus);
@@ -1447,7 +1496,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
 void QnMediaResourceWidget::updateOverlayButton() {
 
     if (m_camera) {
-        Qn::ResourceStatusOverlay overlay = calculateStatusOverlay();    
+        Qn::ResourceStatusOverlay overlay = calculateStatusOverlay();
 
         if (overlay == Qn::OfflineOverlay) {
             if (menu()->canTrigger(Qn::CameraDiagnosticsAction, m_camera)) {
@@ -1455,11 +1504,17 @@ void QnMediaResourceWidget::updateOverlayButton() {
                 return;
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
-            switch (cameraLicenseStatus(m_camera)) {
-            case LicenseNotUsed:
+
+            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query IO status overlay for resource widget which is not containing IO module");
+
+            if (!m_ioLicenceStatusHelper)
+                return;
+
+            switch (m_ioLicenceStatusHelper->status()) {
+            case QnSingleCamLicenceStatusHelper::LicenseNotUsed:
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::IoEnableButton);
                 return;
-            case LicenseOverflow:
+            case QnSingleCamLicenceStatusHelper::LicenseOverflow:
                 statusOverlayWidget()->setButtonType(QnStatusOverlayWidget::MoreLicensesButton);
                 return;
             default:
@@ -1477,15 +1532,16 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 }
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
-    if (!m_camera)
+    Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO
+        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-io modules");
+
+    if (!m_ioLicenceStatusHelper)
         return;
 
-    if (m_camera->isLicenseUsed())
-        return;  
-
-    if (QnCamLicenseUsageHelper(m_camera, true).isOverflowForCamera(m_camera))
+    const auto licenceStatus = m_ioLicenceStatusHelper->status();
+    if (licenceStatus != QnSingleCamLicenceStatusHelper::LicenseNotUsed)
         return;
-        
+
     qnResourcesChangesManager->saveCamera(m_camera, [](const QnVirtualCameraResourcePtr &camera){
         camera->setLicenseUsed(true);
     });
@@ -1501,36 +1557,47 @@ void QnMediaResourceWidget::at_item_imageEnhancementChanged() {
     setImageEnhancement(item()->imageEnhancement());
 }
 
-void QnMediaResourceWidget::updateBookmarks() {
-    if (m_bookmarksQuery)
-        return;
+void QnMediaResourceWidget::updateCompositeOverlayMode()
+{
+    const bool isLive = (m_display && m_display->camDisplay()
+        ? m_display->camDisplay()->isRealTimeSource() : false);
 
-    m_bookmarksQuery = qnCameraBookmarksManager->createQuery(QnVirtualCameraResourceSet() << m_camera);
-
-    connect(m_bookmarksQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, [this](const QnCameraBookmarkList &bookmarks) {
-        static const QString outputTemplate = lit("<b>%1</b><br>%2<hr color = \"lightgrey\">");
-
-        QString text;
-        for (const QnCameraBookmark &bookmark: bookmarks) {
-            text += outputTemplate.arg(bookmark.name, bookmark.description);
-        }
-        setBookmarksLabelText(text);
-    });
-
+    const bool bookmarksEnabled = (!isLive && navigator()->bookmarksModeEnabled() && !m_camera.isNull());
+    const auto mode = (bookmarksEnabled ? QnCompositeTextOverlay::kBookmarksMode
+        : (isLive ? QnCompositeTextOverlay::kTextOutputMode : QnCompositeTextOverlay::kUndefinedMode));
+    m_compositeTextOverlay->setMode(mode);
 }
 
-qint64 QnMediaResourceWidget::getCurrentTime() const {
+qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const {
     // get timestamp from the first channel that was painted
     int channel = std::distance(m_paintedChannels.cbegin(),
         std::find_if(m_paintedChannels.cbegin(), m_paintedChannels.cend(), [](bool value){ return value; }));
     if (channel >= channelCount())
         channel = 0;
 
-    qint64 timestampMs = (m_resource->hasVideo(m_display->mediaProvider()))
-        ? m_renderer->getTimestampOfNextFrameToRender(channel) / 1000
-        : display()->camDisplay()->getCurrentTime() / 1000;
+    qint64 timestampUsec = (m_resource->hasVideo(m_display->mediaProvider()))
+        ? m_renderer->getTimestampOfNextFrameToRender(channel)
+        : display()->camDisplay()->getCurrentTime();
 
-    if(qnSettings->timeMode() == Qn::ServerTimeMode)
-        timestampMs += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(m_resource, 0); // TODO: #Elric do offset adjustments in one place
-    return timestampMs;
+    return timestampUsec;
 }
+
+qint64 QnMediaResourceWidget::getUtcCurrentTimeMs() const
+{
+    qint64 datetimeUsec = getUtcCurrentTimeUsec();
+    if (datetimeUsec == DATETIME_NOW)
+        return qnSyncTime->currentMSecsSinceEpoch();
+    else if (datetimeUsec == AV_NOPTS_VALUE)
+        return 0;
+    else
+        return datetimeUsec/1000;
+}
+
+qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
+{
+    qint64 result = getUtcCurrentTimeUsec();
+    if (!isSpecialDateTimeValueUsec(result))
+        result += context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_resource) * 1000ll;
+    return result;
+}
+

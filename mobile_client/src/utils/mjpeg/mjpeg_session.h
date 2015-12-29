@@ -23,12 +23,17 @@ public:
 
     State state() const;
 
-    bool dequeueFrame(QImage *image, int *presentationTime);
+    bool dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime);
+
+    qint64 finalTimestampMs() const;
+    void setFinalTimestampMs(qint64 finalTimestampMs);
 
 signals:
     void frameEnqueued();
     void stateChanged();
     void urlChanged();
+    void finished();
+    void finalTimestampChanged();
 
 public slots:
     void start();

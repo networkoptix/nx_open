@@ -36,7 +36,7 @@ namespace rtu
     typedef std::shared_ptr<QString> StringPointer;
     typedef std::shared_ptr<int> IntPointer;
     typedef std::shared_ptr<bool> BoolPointer;
-    typedef std::function<void ()> Callback;
+    typedef std::function<void ()> Callback, Action;
 
     class ApplyChangesTask;
     typedef std::shared_ptr<ApplyChangesTask> ApplyChangesTaskPtr;
@@ -50,6 +50,7 @@ namespace rtu
         , kRequestTimeout
         , kUnauthorized
         , kInternalAppError
+        , kInvalidParam
         , kUnspecified
     };
 

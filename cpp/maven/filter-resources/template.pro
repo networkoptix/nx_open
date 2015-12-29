@@ -6,6 +6,9 @@ LIBTYPE = ${libtype}
 TEMPLATE = ${template}
 TARGET = ${project.artifactId}
 VERSION = ${release.version}
+unix {
+    VERSION = ${linux.release.version}
+}
 QT += ${qt.libs}
 ADDITIONAL_QT_INCLUDES=${environment.dir}/qt5-custom
 
@@ -112,7 +115,6 @@ INCLUDEPATH +=  ${qt.dir}/include \
                 ${project.build.sourceDirectory} \
                 ${project.build.directory} \
                 ${root.dir}/common/src \
-                ${root.dir}/mediaserver_core/src \
                 ${libdir}/include \
                 ${environment.dir}/include \
                 $$ADDITIONAL_QT_INCLUDES \
@@ -171,7 +173,7 @@ CONFIG += ${arch}
 win* {
   RC_FILE = ${project.build.directory}/hdwitness.rc
   ICON = ${customization.dir}/icons/hdw_logo.ico
-  LIBS += ${windows.oslibs}
+  LIBS += ${windows.oslibs} ${ffmpeg.libs}
   DEFINES += ${windows.defines}
   DEFINES += ${global.windows.defines}
   win32-msvc* {
@@ -196,7 +198,7 @@ win* {
 ## BOTH LINUX AND MAC
 unix: {
   DEFINES += QN_EXPORT=
-  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Wuninitialized
+  QMAKE_CXXFLAGS += -std=c++11 -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
 }
 
 ## LINUX
@@ -221,6 +223,7 @@ unix:!android:!mac {
   QMAKE_CXXFLAGS_WARN_ON += -Wno-unknown-pragmas -Wno-ignored-qualifiers
   DEFINES += ${linux.defines}
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
+  LIBS += ${ffmpeg.libs}
 }
 
 ## MAC OS
@@ -233,6 +236,10 @@ macx {
   CONFIG -= app_bundle objective_c
 
   INCLUDEPATH += ${qt.dir}/lib/QtCore.framework/Headers/$$QT_VERSION/QtCore/
+
+  !ios {
+    LIBS += ${ffmpeg.libs}
+  }
 }
 
 ## ANDROID
@@ -245,7 +252,14 @@ android {
   QMAKE_MOC_OPTIONS += -DQ_OS_LINUX
 }
 
-
+## iOS
+ios {
+    LIBS += ${ios.oslibs}
+    DEFINES += ${ios.defines}
+    QMAKE_MOC_OPTIONS += -DQ_OS_IOS
+    QMAKE_IOS_DEPLOYMENT_TARGET = 8.0
+    XCODEBUILD_FLAGS += -jobs 4
+}
 
 
 

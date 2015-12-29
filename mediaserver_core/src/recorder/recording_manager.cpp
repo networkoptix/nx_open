@@ -5,7 +5,6 @@
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource/camera_history.h>
 #include <core/resource_management/resource_pool.h>
 
 #include "recording/stream_recorder.h"
@@ -69,7 +68,6 @@ void QnRecordingManager::start()
 {
     m_scheduleWatchingTimer.start(1000);
     m_licenseTimer.start(1000 * 60);
-    m_updateCameraHistoryTimer.restart();
     QThread::start();
 }
 
@@ -171,26 +169,6 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
     return  cameraRes && cameraRes->isScheduleDisabled();
 }
 
-bool QnRecordingManager::updateCameraHistory() {
-    
-    if (!m_updateCameraHistoryTimer.hasExpired(UPDATE_CAMERA_HISTORY_PERIOD_MSEC))
-        return true;
-    m_updateCameraHistoryTimer.restart();
-
-    std::vector<QnUuid> archivedListNew = qnStorageMan->getCamerasWithArchive();
-    std::vector<QnUuid> archivedListOld = qnCameraHistoryPool->getServerFootageData(qnCommon->moduleGUID());
-    if (archivedListOld == archivedListNew) 
-        return true;
-    const ec2::AbstractECConnectionPtr& appServerConnection = QnAppServerConnectionFactory::getConnection2();
-    ec2::ErrorCode errCode = appServerConnection->getCameraManager()->setCamerasWithArchiveSync(qnCommon->moduleGUID(), archivedListNew);
-    if (errCode != ec2::ErrorCode::ok) {
-        qCritical() << "ECS server error during execute method addCameraHistoryItem: " << ec2::toString(errCode);
-        return false;
-    }
-    qnCameraHistoryPool->setServerFootageData(qnCommon->moduleGUID(), archivedListNew);
-    return true;
-}
-
 bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
 {
     updateCamera(camRes); // ensure recorders are created
@@ -257,8 +235,6 @@ bool QnRecordingManager::startOrStopRecording(
     const QnResourcePtr& res, const QnVideoCameraPtr& camera, 
     QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes)
 {
-    updateCameraHistory();
-
     QnSecurityCamResourcePtr cameraRes = res.dynamicCast<QnSecurityCamResource>();
     bool needRecordCamera = !isResourceDisabled(res) && !cameraRes->isDtsBased();
     if (!cameraRes->isInitialized() && needRecordCamera) {
@@ -268,22 +244,19 @@ bool QnRecordingManager::startOrStopRecording(
 
     bool someRecordingIsPresent = false;
 
-    //QnStorageManager* storageMan = QnStorageManager::instance();
-    if (needRecordCamera && res->getStatus() != Qn::Offline /* && storageMan->rebuildState() == QnStorageManager::RebuildState_None*/)
+    if (needRecordCamera && res->getStatus() != Qn::Offline)
     {
         QnLiveStreamProviderPtr providerHi = camera->getLiveReader(QnServer::HiQualityCatalog);
         QnLiveStreamProviderPtr providerLow = camera->getLiveReader(QnServer::LowQualityCatalog);
 
         someRecordingIsPresent = true;
 
-        if (providerHi)
+        if (recorderHiRes && providerHi)
         {
-            if (recorderHiRes) {
-                if (!recorderHiRes->isRunning()) {
-                    NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
-                    recorderHiRes->start();
-                    camera->inUse(recorderHiRes);
-                }
+            if (!recorderHiRes->isRunning()) {
+                NX_LOG(QString(lit("Recording started for camera %1")).arg(res->getUniqueId()), cl_logINFO);
+                recorderHiRes->start();
+                camera->inUse(recorderHiRes);
             }
             providerHi->startIfNotRunning();
         }
@@ -446,7 +419,8 @@ void QnRecordingManager::onRemoveResource(const QnResourcePtr &resource)
 {
     QnStorageResourcePtr physicalStorage = qSharedPointerDynamicCast<QnStorageResource>(resource);
     if (physicalStorage) {
-        qnStorageMan->removeStorage(physicalStorage);
+        qnNormalStorageMan->removeStorage(physicalStorage);
+        qnBackupStorageMan->removeStorage(physicalStorage);
         return;
     }
 
@@ -489,8 +463,8 @@ void QnRecordingManager::onTimer()
         auto camera = qnCameraPool->getVideoCamera(itrRec.key());
         const Recorders& recorders = itrRec.value();
 
-        if (!recorders.recorderHiRes && !recorders.recorderLowRes)
-            continue; // no recorders are created now
+        //if (!recorders.recorderHiRes && !recorders.recorderLowRes)
+        //    continue; // no recorders are created now
 
         if (recorders.recorderHiRes)
             recorders.recorderHiRes->updateScheduleInfo(time);

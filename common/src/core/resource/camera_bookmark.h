@@ -38,8 +38,6 @@ struct QnCameraBookmark {
     /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
 
-    /** \returns True if bookmark is null, false otherwise. */
-    bool isNull() const;
 
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
@@ -53,11 +51,17 @@ struct QnCameraBookmark {
         durationMs(0)
     {}
 
-    QString tagsAsString() const;
+    /** \returns True if bookmark is null, false otherwise. */
+    bool isNull() const;
 
-    static QnCameraBookmarkList mergeCameraBookmarks(const MultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
+    /** \returns True if bookmark is valid, false otherwise. */
+    bool isValid() const;
+
+    static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
+
+    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
 };
-#define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)
+#define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
 
 /**
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
@@ -80,8 +84,30 @@ struct QnCameraBookmarkSearchFilter {
     QnCameraBookmarkSearchFilter();
 
     bool isValid() const;
+
+    bool checkBookmark(const QnCameraBookmark &bookmark) const;
+
+    static QnCameraBookmarkSearchFilter invalidFilter();
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
+
+struct QnCameraBookmarkTag {
+    QString name;
+    int count;
+
+    QnCameraBookmarkTag() :
+        count(0)
+    {}
+
+    QnCameraBookmarkTag(const QString &initName
+        , int initCount) :
+        name(initName),
+        count(initCount)
+    {}
+
+    static QnCameraBookmarkTagList mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit = std::numeric_limits<int>().max());
+};
+#define QnCameraBookmarkTag_Fields (name)(count)
 
 bool operator<(const QnCameraBookmark &first, const QnCameraBookmark &other);
 bool operator<(qint64 first, const QnCameraBookmark &other);
@@ -93,8 +119,11 @@ Q_DECLARE_TYPEINFO(QnCameraBookmark, Q_MOVABLE_TYPE);
 
 Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
+Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
+
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkTag, (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
 
 #endif //QN_CAMERA_BOOKMARK_H

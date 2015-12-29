@@ -39,7 +39,7 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    QString examples = 
+    QString examples =
         lit(
         "<html><head/><body><p>%1</p>\
         <p><b>192.168.1.15</b></p>\
@@ -241,7 +241,7 @@ int QnCameraAdditionDialog::fillTable(const QnManualCameraSearchCameraList &came
         QTableWidgetItem *checkItem = new QTableWidgetItem();
         checkItem->setFlags(checkItem->flags() | Qt::ItemIsUserCheckable);
         if (enabledRow) {
-            checkItem->setCheckState(Qt::Unchecked);
+            checkItem->setCheckState(Qt::Checked);
         } else {
             checkItem->setFlags(checkItem->flags() | Qt::ItemIsTristate);
             checkItem->setFlags(checkItem->flags() &~ Qt::ItemIsEnabled);
@@ -516,7 +516,7 @@ void QnCameraAdditionDialog::at_stopScanButton_clicked() {
         return; //TODO: #GDM #CameraAddition do something
 
     m_server->apiConnection()->searchCameraAsyncStop(m_processUuid, this, SLOT(at_searchRequestReply(int, const QVariant &, int)));
-    ui->progressBar->setFormat(tr("Finished searching..."));
+    ui->progressBar->setFormat(tr("Finishing searching..."));
     ui->progressBar->setMaximum(1);
     ui->progressBar->setValue(0);
     m_processUuid = QnUuid();
@@ -562,8 +562,8 @@ void QnCameraAdditionDialog::at_addButton_clicked() {
             QMessageBox::information(
                 this,
                 tr("Success"),
-                tr("%n devices added successfully.", "", camerasToAdd.size()) 
-                    + L'\n' 
+                tr("%n devices added successfully.", "", camerasToAdd.size())
+                    + L'\n'
                     + tr("It might take a few moments to populate them in the tree."),
                 QMessageBox::Ok
             );

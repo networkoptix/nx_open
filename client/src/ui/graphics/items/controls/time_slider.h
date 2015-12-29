@@ -29,6 +29,7 @@ class QnTimeSliderPixmapCache;
 class QnTimeSliderChunkPainter;
 class QnTimePeriodList;
 class QnBookmarksViewer;
+class QnBookmarkMergeHelper;
 
 class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener {
     Q_OBJECT
@@ -97,7 +98,9 @@ public:
     };
     Q_DECLARE_FLAGS(Options, Option);
 
-    explicit QnTimeSlider(QGraphicsItem *parent = NULL);
+    explicit QnTimeSlider(QGraphicsItem *parent = NULL
+        , QGraphicsItem *tooltipParent = NULL);
+
     virtual ~QnTimeSlider();
 
     int lineCount() const;
@@ -185,6 +188,10 @@ public:
 
     QnBookmarksViewer *bookmarksViewer();
 
+    bool isBookmarksVisible() const;
+    void setBookmarksVisible(bool bookmarksVisible);
+    QnCameraBookmarkList bookmarksAtPosition(qint64 position) const;
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -194,8 +201,6 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
-
-    void bookmarksUnderCursorUpdated(const QPointF &position);
 
 protected:
     virtual void sliderChange(SliderChange change) override;
@@ -290,7 +295,7 @@ private:
 
     bool scaleWindow(qreal factor, qint64 anchor);
 
-    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QnTimePeriodList &bookmarks, const QRectF &rect);
+    void drawPeriodsBar(QPainter *painter, const QnTimePeriodList &recorded, const QnTimePeriodList &motion, const QRectF &rect);
     void drawTickmarks(QPainter *painter, const QRectF &rect);
     void drawSolidBackground(QPainter *painter, const QRectF &rect);
     void drawMarker(QPainter *painter, qint64 pos, const QColor &color);
@@ -326,6 +331,8 @@ private:
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();
 
+    void mergeBookmarks();
+
     void animateStepValues(int deltaMSecs);
     void animateThumbnails(int deltaMSecs);
     bool animateThumbnail(qreal dt, ThumbnailData &data);
@@ -340,6 +347,10 @@ private:
     qint64 animationEnd();
 
     void generateProgressPatterns();
+
+    void processBoomarksHover(QGraphicsSceneHoverEvent *event);
+
+    void updateBookmarksViewerTimestamp();
 
 private:
     Q_DECLARE_PRIVATE(GraphicsSlider);
@@ -375,6 +386,7 @@ private:
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
     QnCameraBookmarkList m_bookmarks;
+    QScopedPointer<QnBookmarkMergeHelper> m_bookmarkMergeHelper;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;
@@ -410,10 +422,11 @@ private:
 
     QLocale m_locale;
 
-    QPointF m_lastLineBarMousePos;
+    QPointF m_currentRulerRectMousePos;
     qreal m_lastLineBarValue;
 
     QnBookmarksViewer *m_bookmarksViewer;
+    bool m_bookmarksVisible;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

@@ -11,7 +11,7 @@
 #include "libavcodec/avcodec.h"
 
 #include "rtsp_connection.h"
-#include "utils/network/rtp_stream_parser.h"
+#include "network/rtp_stream_parser.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
 #include "utils/media/ffmpeg_helper.h"
 #include "core/dataprovider/media_streamdataprovider.h"
@@ -20,11 +20,11 @@
 #include "plugins/resource/archive/archive_stream_reader.h"
 #include <utils/common/string.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/network/rtsp/rtsp_types.h"
 #include "plugins/resource/archive/abstract_archive_delegate.h"
 #include "camera/camera_pool.h"
-#include "utils/network/rtpsession.h"
+#include "network/rtpsession.h"
 #include "recorder/recording_manager.h"
 #include "utils/common/util.h"
 #include "rtsp_data_consumer.h"
@@ -38,7 +38,7 @@
 #include "rtsp/rtsp_ffmpeg_encoder.h"
 #include "rtp_universal_encoder.h"
 #include "utils/common/synctime.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_listener.h"
 #include "network/authenticate_helper.h"
 #include <media_server/settings.h>
 #include <utils/common/model_functions.h>
@@ -1164,11 +1164,12 @@ int QnRtspConnectionProcessor::composePlay()
     //QnArchiveStreamReader* archiveProvider = dynamic_cast<QnArchiveStreamReader*> (d->dataProvider);
     if (d->liveMode == Mode_Live) 
     {
-        d->dataProcessor->lockDataQueue();
+        auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+        QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
         int copySize = 0;
         if (!getResource()->toResource()->hasFlags(Qn::foreigner) && (status == Qn::Online || status == Qn::Recording)) {
-            copySize = d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
+            copySize = d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, 0, d->lastPlayCSeq);
         }
 
         if (copySize == 0) {
@@ -1186,7 +1187,7 @@ int QnRtspConnectionProcessor::composePlay()
             }
         }
 
-        d->dataProcessor->unlockDataQueue();
+        dataQueueLock.unlock();
         quint32 cseq = copySize > 0 ? d->lastPlayCSeq : 0;
         d->dataProcessor->setWaitCSeq(d->startTime, cseq); // ignore rest packets before new position
         d->dataProcessor->setLiveQuality(d->quality);
@@ -1302,17 +1303,16 @@ int QnRtspConnectionProcessor::composeSetParameter()
 
             if (d->liveMode == Mode_Live)
             {
-                d->dataProcessor->lockDataQueue();
+                auto camera = qnCameraPool->getVideoCamera(getResource()->toResourcePtr());
+                QnMutexLocker dataQueueLock(d->dataProcessor->dataQueueMutex());
 
                 d->dataProcessor->setLiveQuality(d->quality);
 
                 qint64 time = d->dataProcessor->lastQueuedTime();
-                d->dataProcessor->copyLastGopFromCamera(d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
+                d->dataProcessor->copyLastGopFromCamera(camera, d->quality != MEDIA_Quality_Low, time, d->lastPlayCSeq); // for fast quality switching
 
                 // set "main" dataProvider. RTSP data consumer is going to unsubscribe from other dataProvider
                 // then it will be possible (I frame received)
-
-                d->dataProcessor->unlockDataQueue();
             }
             d->archiveDP->setQuality(d->quality, d->qualityFastSwitch);
             return CODE_OK;

@@ -1,4 +1,5 @@
 .import QtQuick.Window 2.2 as QtWindow
+.import com.networkoptix.qml 1.0 as Nx
 
 function findRootItem(item) {
     while (item.parent)
@@ -29,28 +30,29 @@ function isMobile() {
 }
 
 function openDiscoveredSession(_host, _port, _systemName) {
-    mainWindow.currentSessionId = ""
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
+    stackView.setSlideTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
             title: _systemName,
             host: _host,
             port: _port,
+            sessionId: "",
             state: "Discovered"
         }
     })
 }
 
 function openSavedSession(_sessionId, _host, _port, _login, _password, _systemName) {
-    mainWindow.currentSessionId = _sessionId
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
 
+    stackView.setSlideTransition()
     stackView.push({
         item: Qt.resolvedUrl("items/QnLoginPage.qml"),
         properties: {
@@ -59,48 +61,80 @@ function openSavedSession(_sessionId, _host, _port, _login, _password, _systemNa
             port: _port,
             login: _login,
             password: _password,
+            sessionId: _sessionId,
             state: "Saved"
         }
     })
 }
 
-function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, statusMessage) {
-    mainWindow.currentSessionId = _sessionId
+function openFailedSession(_sessionId, _host, _port, _login, _password, _systemName, status, infoParameter) {
+    var push = stackView.depth == 1
+
+    var item = null
+
+    var pageName = mainWindow.customConnection ? "newConnectionPage" : "loginPage"
+
+    if (stackView.currentItem.objectName == pageName)
+        item = stackView.currentItem
+
     sideNavigation.hide()
-    sideNavigation.enabled = false
-    menuBackButton.animateToBack()
 
-    stackView.push({
-        item: Qt.resolvedUrl("items/QnLoginPage.qml"),
-        properties: {
-            title: _systemName,
-            host: _host,
-            port: _port,
-            login: _login,
-            password: _password,
-            state: "FailedSaved"
-        }
-    })
+    if (!mainWindow.customConnection) {
+        menuBackButton.animateToBack()
+        sideNavigation.enabled = false
+    }
 
-    var item = stackView.get(stackView.depth - 1)
-    item.showWarning(status, statusMessage)
+    if (!item) {
+        var pushList = []
+        if (stackView.depth == 1)
+            pushList.push(loginPageComponent)
+        pushList.push({
+            item: Qt.resolvedUrl("items/QnLoginPage.qml"),
+            properties: {
+                title: _systemName,
+                host: _host,
+                port: _port,
+                login: _login,
+                password: _password,
+                sessionId: _sessionId,
+                state: "FailedSaved"
+            }
+        })
+        stackView.setSlideTransition()
+        stackView.push(pushList)
+        item = stackView.get(stackView.depth - 1)
+    } else {
+        if (_systemName && item.objectName != "newConnectionPage")
+            item.title = _systemName
+        item.host = _host
+        item.port = _port
+        item.login = _login
+        item.password = _password
+        item.sessionId = _sessionId
+    }
+
+    item.showWarning(status, infoParameter)
 }
 
 function gotoNewSession() {
     mainWindow.currentSessionId = ""
+    mainWindow.currentSystemName = ""
     sideNavigation.enabled = true
+    menuBackButton.animateToMenu()
 
-    if (connectionManager.connected) {
+    if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected) {
         connectionManager.disconnectFromServer(true)
         return
     }
 
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
+
     if (item) {
-        menuBackButton.animateToMenu()
+        stackView.setSlideTransition()
         stackView.pop(item)
     } else {
+        stackView.setInvertedSlideTransition()
         stackView.push(loginPageComponent)
     }
 }
@@ -112,26 +146,33 @@ function gotoResources() {
         menuBackButton.animateToMenu()
         sideNavigation.enabled = true
     }
-    stackView.pop(stackView.get(0))
+    stackView.pop(item)
 }
 
 function gotoMainScreen() {
+    if (activeResourceId)
+        stackView.setScaleTransition()
+
+    activeResourceId = ""
+
     toolBar.opacity = 1.0
     toolBar.backgroundOpacity = 1.0
     exitFullscreen()
 
-    if (connectionManager.connected)
+    if (connectionManager.connectionState != Nx.QnConnectionManager.Disconnected)
         gotoResources()
     else
         gotoNewSession()
 }
 
-function openMediaResource(uuid) {
+function openMediaResource(uuid, xHint, yHint, initialScreenshot) {
     mainWindow.activeResourceId = uuid
+    mainWindow.initialResourceScreenshot = initialScreenshot
+
     sideNavigation.hide()
     sideNavigation.enabled = false
-    menuBackButton.animateToBack()
-    toolBar.backgroundOpacity = 0.0
+
+    stackView.setScaleTransition(xHint, yHint)
     stackView.push(videoPlayerComponent)
 }
 
@@ -139,6 +180,7 @@ function openSettings() {
     sideNavigation.hide()
     sideNavigation.enabled = false
     menuBackButton.animateToBack()
+    stackView.setSlideTransition()
     stackView.push(settingsPageComponent)
 }
 
@@ -146,9 +188,13 @@ function backPressed() {
     if (sideNavigation.open) {
         sideNavigation.hide()
         return true
-    } else if (stackView.depth > 1) {
+    } else if (stackView.depth == 2 && stackView.currentItem.objectName == "newConnectionPage") {
+        // First stack item is always resources page.
+        return false
+    } else if (stackView.depth >= 2) {
         gotoMainScreen()
         return true
     }
+
     return false
 }

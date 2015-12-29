@@ -1,5 +1,11 @@
 #include "status_dictionary.h"
 
+QnResourceStatusDictionary::QnResourceStatusDictionary(QObject *parent):
+    QObject(parent)
+{
+
+}
+
 Qn::ResourceStatus QnResourceStatusDictionary::value(const QnUuid& resourceId) const
 {
     QnMutexLocker lock( &m_mutex );

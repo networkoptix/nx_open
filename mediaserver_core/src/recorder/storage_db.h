@@ -5,7 +5,7 @@
 
 #include <QElapsedTimer>
 
-#include <core/resource/camera_bookmark_fwd.h>
+
 #include <server/server_globals.h>
 
 #include "utils/db/db_helper.h"
@@ -46,15 +46,7 @@ public:
     bool flushRecords();
     QVector<DeviceFileCatalogPtr> loadFullFileCatalog();
 
-    void beforeDelete();
-    void afterDelete();
     bool replaceChunks(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const std::deque<DeviceFileCatalog::Chunk>& chunks);
-
-    bool removeCameraBookmarks(const QString& cameraUniqueId);
-    bool addOrUpdateCameraBookmark(const QnCameraBookmark &bookmark, const QString& cameraUniqueId);
-    bool deleteCameraBookmark(const QnCameraBookmark &bookmark);
-    bool getBookmarks(const QString& cameraUniqueId, const QnCameraBookmarkSearchFilter &filter, QnCameraBookmarkList &result);
-
 private:
     bool createDatabase();
 
@@ -64,7 +56,6 @@ private:
     bool addRecordInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog, const DeviceFileCatalog::Chunk& chunk);
 
     QVector<DeviceFileCatalogPtr> loadChunksFileCatalog();
-    QVector<DeviceFileCatalogPtr> loadBookmarksFileCatalog();
 
     void addCatalogFromMediaFolder(
         const QString&                  postfix, 

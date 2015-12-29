@@ -16,6 +16,8 @@
 #include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource/camera_user_attribute_pool.h>
 #include <core/resource/media_server_user_attributes.h>
+#include <core/resource/storage_resource.h>
+
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "runtime_info_manager.h"
@@ -73,8 +75,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(cameraManager, &ec2::AbstractCameraManager::userAttributesRemoved,      this, &QnCommonMessageProcessor::on_cameraUserAttributesRemoved );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraHistoryChanged,       this, &QnCommonMessageProcessor::on_cameraHistoryChanged );
     connect(cameraManager, &ec2::AbstractCameraManager::cameraRemoved,              this, &QnCommonMessageProcessor::on_resourceRemoved );
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsAdded,    this, &QnCommonMessageProcessor::cameraBookmarkTagsAdded );
-    connect(cameraManager, &ec2::AbstractCameraManager::cameraBookmarkTagsRemoved,  this, &QnCommonMessageProcessor::cameraBookmarkTagsRemoved );
 
     auto userManager = connection->getUserManager();
     connect(userManager, &ec2::AbstractUserManager::addedOrUpdated,                 this, [this](const QnUserResourcePtr &user){updateResource(user);});
@@ -293,7 +293,7 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
 }
 
 void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
-    m_rules[businessRule->id()] = businessRule;
+    m_rules.insert(businessRule->id(), businessRule);
     emit businessRuleChanged(businessRule);
 }
 

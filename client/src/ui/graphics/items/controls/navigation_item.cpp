@@ -16,18 +16,24 @@
 #include <ui/common/palette.h>
 #include <ui/style/skin.h>
 #include <ui/style/globals.h>
+#include <ui/workbench/workbench.h>
 #include <ui/graphics/items/controls/speed_slider.h>
 #include <ui/graphics/items/controls/volume_slider.h>
 #include <ui/graphics/items/generic/tool_tip_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/standard/graphics_label.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_layout.h>
+
+#include <core/resource/resource.h>
 
 #include "time_slider.h"
 #include "time_scroll_bar.h"
@@ -93,9 +99,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     m_syncButton->setIcon(qnSkin->icon("slider/buttons/sync.png"));
     m_syncButton->setPreferredSize(48, 24);
 
-    m_thumbnailsButton = newActionButton(action(Qn::ToggleThumbnailsAction));
-    m_thumbnailsButton->setIcon(qnSkin->icon("slider/buttons/thumbnails.png"));
-    m_thumbnailsButton->setPreferredSize(48, 24);
+    m_bookmarksModeButton = newActionButton(action(Qn::BookmarksModeAction));
+    m_bookmarksModeButton->setIcon(qnSkin->icon("slider/buttons/bookmarks.png"));
+    m_bookmarksModeButton->setPreferredSize(48, 24);
 
     m_calendarButton = newActionButton(action(Qn::ToggleCalendarAction));
     m_calendarButton->setIcon(qnSkin->icon("slider/buttons/calendar.png"));
@@ -109,8 +115,9 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
 
     m_volumeSlider = new QnVolumeSlider(this);
     m_volumeSlider->setCacheMode(QGraphicsItem::ItemCoordinateCache);
+    m_volumeSlider->toolTipItem()->setParentItem(parent);
 
-    m_timeSlider = new QnTimeSlider(this);
+    m_timeSlider = new QnTimeSlider(this, parent);
     m_timeSlider->setOption(QnTimeSlider::UnzoomOnDoubleClick, false);
     m_timeSlider->setRulerHeight(70.0);
 
@@ -164,7 +171,7 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     QGraphicsLinearLayout *rightLayoutHL = new QGraphicsLinearLayout(Qt::Horizontal);
     rightLayoutHL->setContentsMargins(0, 0, 0, 0);
     rightLayoutHL->setSpacing(3);
-    rightLayoutHL->addItem(m_thumbnailsButton);
+    rightLayoutHL->addItem(m_bookmarksModeButton);
     rightLayoutHL->addItem(m_calendarButton);
 
     QGraphicsLinearLayout *rightLayoutV = new QGraphicsLinearLayout(Qt::Vertical);
@@ -227,9 +234,24 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     connect(action(Qn::ToggleSyncAction),   SIGNAL(triggered()),                        this,           SLOT(at_syncButton_clicked()));
     connect(action(Qn::ToggleMuteAction),   SIGNAL(toggled(bool)),                      m_volumeSlider, SLOT(setMute(bool)));
     
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,    this,  [this]()
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        if (currentWidget)
+            disconnect(currentWidget, &QnResourceWidget::optionsChanged, this, nullptr);
+    });
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged, this, [this]()
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        if (currentWidget)
+            connect(currentWidget, &QnResourceWidget::optionsChanged, this, &QnNavigationItem::updateBookButtonEnabled);
+    });
+
     connect(navigator(),                    SIGNAL(currentWidgetAboutToBeChanged()),    m_speedSlider,  SLOT(finishAnimations()));
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateSyncButtonEnabled()));
     connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateJumpButtonsTooltips()));
+    connect(navigator(),                    SIGNAL(currentWidgetChanged()),             this,           SLOT(updateBookButtonEnabled()));
     connect(navigator(),                    SIGNAL(speedRangeChanged()),                this,           SLOT(updateSpeedSliderParametersFromNavigator()));
     connect(navigator(),                    SIGNAL(liveChanged()),                      this,           SLOT(updateLiveButtonChecked()));
     connect(navigator(),                    SIGNAL(liveSupportedChanged()),             this,           SLOT(updateLiveButtonEnabled()));
@@ -256,14 +278,13 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     addAction(action(Qn::ToggleMuteAction));
     addAction(action(Qn::ToggleSyncAction));
     addAction(action(Qn::ToggleCalendarAction));
-    addAction(action(Qn::ToggleBookmarksSearchAction));
 
     connect(action(Qn::VolumeUpAction),         SIGNAL(triggered()), m_volumeSlider,        SLOT(stepForward()));
     connect(action(Qn::VolumeDownAction),       SIGNAL(triggered()), m_volumeSlider,        SLOT(stepBackward()));
 
     /* Set help topics. */
     setHelpTopic(this,                  Qn::MainWindow_Playback_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
+    // setHelpTopic(m_bookmarksModeButton, Qn::MainWindow_???_Help); // TODO: #dklychkov Use correct help ID
     setHelpTopic(m_volumeSlider,        Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_muteButton,          Qn::MainWindow_Slider_Volume_Help);
     setHelpTopic(m_liveButton,          Qn::MainWindow_Navigation_Help);
@@ -273,7 +294,6 @@ QnNavigationItem::QnNavigationItem(QGraphicsItem *parent):
     setHelpTopic(m_jumpBackwardButton,  Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_jumpForwardButton,   Qn::MainWindow_Navigation_Help);
     setHelpTopic(m_syncButton,          Qn::MainWindow_Sync_Help);
-    setHelpTopic(m_thumbnailsButton,    Qn::MainWindow_Thumbnails_Help);
     setHelpTopic(m_calendarButton,      Qn::MainWindow_Calendar_Help);
 
 
@@ -381,6 +401,25 @@ void QnNavigationItem::updateJumpButtonsTooltips() {
     action(Qn::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
 
     updatePlaybackButtonsEnabled(); // TODO: #Elric remove this once buttonwidget <-> action enabled sync is implemented. OR when we disable actions and not buttons.
+}
+
+void QnNavigationItem::updateBookButtonEnabled()
+{
+    const auto currentWidget = navigator()->currentWidget();
+
+    const bool motionSearchMode = (currentWidget 
+        && currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+
+    const bool bookmarksEnabled = (currentWidget 
+        && currentWidget->resource()->flags().testFlag(Qn::live));
+
+    const auto layout = workbench()->currentLayout();
+    const bool bookmarkMode = (bookmarksEnabled && !motionSearchMode
+        && layout->data(Qn::LayoutBookmarksModeRole).toBool());
+
+    const auto modeAction = action(Qn::BookmarksModeAction);
+    modeAction->setEnabled(bookmarksEnabled);
+    modeAction->setChecked(bookmarkMode);
 }
 
 void QnNavigationItem::updatePlaybackButtonsEnabled() {

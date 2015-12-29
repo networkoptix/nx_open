@@ -32,6 +32,7 @@
     </dependencies>		
 
     <properties>
+        <guid>${traytool.guid}</guid>
         <product.title>${traytool.name}</product.title>
         <product.display.title>${traytool.display.name}</product.display.title>
         <template>app</template>
@@ -39,6 +40,7 @@
         <global.libs>-lcommon</global.libs>
         <!--Specific os libs used-->
         <qt.libs>core gui widgets</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <windows.oslibs>DbgHelp.lib</windows.oslibs>
         <windows.oslibs.release/>
         <windows.oslibs.debug/>

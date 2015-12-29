@@ -4,7 +4,7 @@
 #include <QtCore/QFile>
 
 #include "activate_license_rest_handler.h"
-#include <utils/network/tcp_connection_priv.h>
+#include <network/tcp_connection_priv.h>
 #include <utils/common/util.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include "utils/network/simple_http_client.h"
@@ -17,6 +17,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include <utils/serialization/json_functions.h>
 #include <utils/common/app_info.h>
+#include <nxemail/mustache/mustache_helper.h>
 
 static const int TCP_TIMEOUT = 1000 * 5;
 
@@ -117,6 +118,8 @@ int QnActivateLicenseRestHandler::executeGet(const QString &, const QnRequestPar
         if (QJson::deserialize(response, &errorMessage)) 
         {
             QString message = QnLicenseUsageHelper::activationMessage(errorMessage);
+            QVariantMap arguments = errorMessage.value(lit("arguments")).toObject().toVariantMap();
+            message = Mustache::renderTemplate(message, arguments);
             result.setError(QnJsonRestResult::CantProcessRequest, lit("Can't activate license:  %1").arg(message));
             return CODE_OK;
         }

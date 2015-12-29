@@ -26,7 +26,6 @@
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "nx_ec/data/api_camera_history_data.h"
-#include "nx_ec/data/api_camera_bookmark_data.h"
 #include "nx_ec/data/api_client_info_data.h"
 #include "nx_ec/data/api_media_server_data.h"
 #include "nx_ec/data/api_update_data.h"
@@ -89,7 +88,7 @@ void assertSorted(std::vector<T> &data, QnUuid Field::*idField) {
         return;
 
     QByteArray prev = (data[0].*idField).toRfc4122();
-    for (int i = 1; i < data.size(); ++i) {
+    for (size_t i = 1; i < data.size(); ++i) {
         QByteArray next = (data[i].*idField).toRfc4122();
         assert(next >= prev);
         prev = next;
@@ -343,14 +342,12 @@ bool createCorruptedDbBackup(const QString& dbFileName)
 bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
 {
     m_resourceFactory = factory;
-    m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
 
     const QString dbFilePath = dbUrl.toLocalFile();
     const QString dbFilePathStatic = QUrlQuery(dbUrl.query()).queryItemValue("staticdb_path");
 
-    m_sdb = QSqlDatabase::addDatabase("QSQLITE", "QnDbManager");
     QString dbFileName = closeDirPath(dbFilePath) + QString::fromLatin1("ecs.sqlite");
-    m_sdb.setDatabaseName( dbFileName);
+    addDatabase(dbFileName, "QnDbManager");
 
     QString backupDbFileName = dbFileName + QString::fromLatin1(".backup");
     bool needCleanup = QUrlQuery(dbUrl.query()).hasQueryItem("cleanupDb");
@@ -676,6 +673,7 @@ bool QnDbManager::init(QnResourceFactory* factory, const QUrl& dbUrl)
     if (!locker.commit())
         return false;
 
+    m_dbReadOnly = ec2::Settings::instance()->dbReadOnly();
     emit initialized();
     m_initialized = true;
 
@@ -1110,6 +1108,9 @@ bool QnDbManager::beforeInstallUpdate(const QString& updateName)
     else if (updateName == lit(":/updates/30_update_history_guid.sql")) {
         return removeOldCameraHistory();
     }
+    else if (updateName == lit(":/updates/33_history_refactor_dummy.sql")) {
+        return removeOldCameraHistory();
+    }
 
     return true;
 }
@@ -1399,9 +1400,22 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
                 return false;
         }
     }
+    else if (updateName == lit(":/updates/48_add_business_rules.sql")) {
+        for(const auto& bRule: QnBusinessEventRule::getRulesUpd48())
+        {
+            ApiBusinessRuleData bRuleData;
+            fromResourceToApi(bRule, bRuleData);
+            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+                return false;
+        }
+    }
     else if (updateName == lit(":/updates/43_resync_client_info_data.sql")) {
         if (!m_dbJustCreated)
             m_needResyncClientInfoData = true;
+    }
+    else if (updateName == lit(":/updates/44_upd_brule_format.sql")) {
+        if (!m_dbJustCreated)
+            m_needResyncbRules = true;
     }
 
     return true;
@@ -1477,7 +1491,7 @@ bool QnDbManager::createDatabase()
             return false;
         m_needResyncLicenses = true;
     }
-    if (!execSQLQuery("DELETE FROM vms_license", m_sdb))
+    if (!execSQLQuery("DELETE FROM vms_license", m_sdb, Q_FUNC_INFO))
         return false;
 
 
@@ -1715,7 +1729,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             max_archive_days,               \
             prefered_server_id,             \
             license_used,                   \
-            failover_priority               \
+            failover_priority,              \
+            backup_type                     \
             )                               \
          VALUES (                           \
             :cameraID,                      \
@@ -1732,7 +1747,8 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
             :maxArchiveDays,                \
             :preferedServerId,              \
             :licenseUsed,                   \
-            :failoverPriority               \
+            :failoverPriority,              \
+            :backupType                     \
             )                               \
         ");
     QnSql::bind(data, &insQuery);
@@ -1837,8 +1853,18 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiStorage
 
     QSqlQuery insQuery(m_sdb);
     insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_storage (space_limit, used_for_writing, storage_type, resource_ptr_id) \
-        VALUES (:spaceLimit, :usedForWriting, :storageType, :internalId)\
+        INSERT OR REPLACE INTO vms_storage ( \
+            space_limit, \
+            used_for_writing, \
+            storage_type, \
+            backup, \
+            resource_ptr_id) \
+        VALUES ( \
+            :spaceLimit, \
+            :usedForWriting, \
+            :storageType, \
+            :isBackup, \
+            :internalId) \
     ");
     QnSql::bind(tran.params, &insQuery);
     insQuery.bindValue(":internalId", internalId);
@@ -2086,17 +2112,29 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiMediaSe
 ErrorCode QnDbManager::insertOrReplaceMediaServerUserAttributes(const ApiMediaServerUserAttributesData& data)
 {
     QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("\
-        INSERT OR REPLACE INTO vms_server_user_attributes ( \
-            server_guid,                    \
-            server_name,                    \
-            max_cameras,                    \
-            redundancy)                     \
-        VALUES(                             \
-            :serverID,                      \
-            :serverName,                    \
-            :maxCameras,                    \
-            :allowAutoRedundancy)           \
+    insQuery.prepare("                                           \
+        INSERT OR REPLACE INTO vms_server_user_attributes (      \
+            server_guid,                                         \
+            server_name,                                         \
+            max_cameras,                                         \
+            redundancy,                                          \
+            backup_type,                                         \
+            backup_days_of_the_week,                             \
+            backup_start,                                        \
+            backup_duration,                                     \
+            backup_bitrate                                       \
+        )                                                        \
+        VALUES(                                                  \
+            :serverID,                                           \
+            :serverName,                                         \
+            :maxCameras,                                         \
+            :allowAutoRedundancy,                                \
+            :backupType,                                         \
+            :backupDaysOfTheWeek,                                \
+            :backupStart,                                        \
+            :backupDuration,                                     \
+            :backupBitrate                                       \
+        )                                                        \
         ");
     QnSql::bind(data, &insQuery);
 
@@ -2991,7 +3029,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiStorageDataList
     queryStorage.setForwardOnly(true);
     queryStorage.prepare(QString("\
         SELECT r.guid as id, r.guid, r.xtype_guid as typeId, r.parent_guid as parentId, r.name, r.url, \
-        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType \
+        s.space_limit as spaceLimit, s.used_for_writing as usedForWriting, s.storage_type as storageType, \
+        s.backup as isBackup \
         FROM vms_resource r \
         JOIN vms_storage s on s.resource_ptr_id = r.id \
         %1 \
@@ -3089,7 +3128,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraAttributes
             max_archive_days as maxArchiveDays,          \
             prefered_server_id as preferedServerId,      \
             license_used as licenseUsed,                 \
-            failover_priority as failoverPriority        \
+            failover_priority as failoverPriority,       \
+            backup_type as backupType                    \
          FROM vms_camera_user_attributes                 \
          LEFT JOIN vms_resource r on r.guid = camera_guid     \
          %1                                              \
@@ -3148,7 +3188,8 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& serverId, ApiCameraDataExList
             cu.max_archive_days as maxArchiveDays,             \
             cu.prefered_server_id as preferedServerId,         \
             cu.license_used as licenseUsed,                    \
-            cu.failover_priority as failoverPriority           \
+            cu.failover_priority as failoverPriority,          \
+            cu.backup_type as backupType                       \
         FROM vms_resource r \
         LEFT JOIN vms_resource_status rs on rs.guid = r.guid \
         JOIN vms_camera c on c.resource_ptr_id = r.id \
@@ -3304,14 +3345,19 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& mServerId, ApiMediaServerUser
         filterStr = QString("WHERE server_guid = %1").arg(guidToSqlString(mServerId));
 
     query.prepare( lit("\
-        SELECT                                \
-            server_guid as serverID,          \
-            server_name as serverName,        \
-            max_cameras as maxCameras,        \
-            redundancy as allowAutoRedundancy \
-        FROM vms_server_user_attributes       \
-        %1                                    \
-        ORDER BY server_guid                  \
+        SELECT                                                      \
+            server_guid as serverID,                                \
+            server_name as serverName,                              \
+            max_cameras as maxCameras,                              \
+            redundancy as allowAutoRedundancy,                      \
+            backup_type as backupType,                              \
+            backup_days_of_the_week as backupDaysOfTheWeek,         \
+            backup_start as backupStart,                            \
+            backup_duration as backupDuration,                      \
+            backup_bitrate as backupBitrate                         \
+        FROM vms_server_user_attributes                             \
+        %1                                                          \
+        ORDER BY server_guid                                        \
     ").arg(filterStr));
     if( !query.exec() )
     {
@@ -3340,19 +3386,6 @@ ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiServerFootag
         historyList.push_back(std::move(data));
     }
     QnSql::fetch_many(query, &historyList);
-
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ApiCameraBookmarkTagDataList& tags) {
-    QSqlQuery query(m_sdb);
-    query.setForwardOnly(true);
-    query.prepare("SELECT name FROM vms_camera_bookmark_tag");
-    if (!query.exec()) {
-        qWarning() << Q_FUNC_INFO << query.lastError().text();
-        return ErrorCode::dbError;
-    }
-    QnSql::fetch_many(query, &tags);
 
     return ErrorCode::ok;
 }
@@ -3595,7 +3628,7 @@ ErrorCode QnDbManager::doQueryNoLock(const QnUuid& resourceId, ApiResourceParamW
 // getCurrentTime
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime)
 {
-    currentTime.value = TimeSynchronizationManager::instance()->getSyncTime();
+    currentTime = TimeSynchronizationManager::instance()->getTimeInfo();
     return ErrorCode::ok;
 }
 
@@ -3809,52 +3842,6 @@ ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiLicense
     }
 
     return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::executeTransactionInternal(const QnTransaction<ApiCameraBookmarkTagDataList> &tran) {
-
-    std::function<ec2::ErrorCode (const ApiCameraBookmarkTagData &)> processTag;
-
-    switch (tran.command) {
-    case ApiCommand::addCameraBookmarkTags:
-        processTag = [this](const ApiCameraBookmarkTagData &tag) {return addCameraBookmarkTag(tag);};
-        break;
-    case ApiCommand::removeCameraBookmarkTags:
-        processTag = [this](const ApiCameraBookmarkTagData &tag) {return removeCameraBookmarkTag(tag);};
-        break;
-    default:
-        assert(false); //should never get here
-        break;
-    }
-
-    for (const ApiCameraBookmarkTagData &tag: tran.params) {
-        ErrorCode result = processTag(tag);
-        if (result != ErrorCode::ok)
-            return result;
-    }
-    return ErrorCode::ok;
-}
-
-ErrorCode QnDbManager::addCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
-    QSqlQuery insQuery(m_sdb);
-    insQuery.prepare("INSERT OR REPLACE INTO vms_camera_bookmark_tag (name) VALUES (:name)");
-    QnSql::bind(tag, &insQuery);
-    if (insQuery.exec())
-        return ErrorCode::ok;
-
-    qWarning() << Q_FUNC_INFO << insQuery.lastError().text();
-    return ErrorCode::dbError;
-}
-
-ErrorCode QnDbManager::removeCameraBookmarkTag(const ApiCameraBookmarkTagData &tag) {
-    QSqlQuery delQuery(m_sdb);
-    delQuery.prepare("DELETE FROM vms_camera_bookmark_tag WHERE name=:name");
-    QnSql::bind(tag, &delQuery);
-    if (delQuery.exec())
-        return ErrorCode::ok;
-
-    qWarning() << Q_FUNC_INFO << delQuery.lastError().text();
-    return ErrorCode::dbError;
 }
 
 ErrorCode QnDbManager::doQueryNoLock(const nullptr_t& /*dummy*/, ec2::ApiLicenseDataList& data)

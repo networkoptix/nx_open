@@ -17,7 +17,7 @@
 #include <utils/math/color_transformations.h>
 #include <utils/common/toggle.h>
 #include <utils/common/util.h>
-#include <utils/common/variant_timer.h>
+#include <utils/common/delayed.h>
 #include <utils/aspect_ratio.h>
 
 #include <client/client_runtime_settings.h>
@@ -145,6 +145,12 @@ namespace {
      * operation is performed. */
     const qreal zStep = 1.0;
 
+    /** How often splashes should be painted on items when notification appears.  */
+    const int splashPeriodMs = 500;
+
+    /** How long splashes should be painted on items when notification appears.  */
+    const int splashTotalLengthMs = 1000;
+
     enum {
         ITEM_LAYER_KEY = 0x93A7FA71,    /**< Key for item layer. */
         ITEM_ANIMATOR_KEY = 0x81AFD591  /**< Key for item animator. */
@@ -257,7 +263,8 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     /* Connect to context. */
     connect(accessController(),             SIGNAL(permissionsChanged(const QnResourcePtr &)),          this,                   SLOT(at_context_permissionsChanged(const QnResourcePtr &)));
-    connect(context()->instance<QnWorkbenchNotificationsHandler>(), SIGNAL(businessActionAdded(const QnAbstractBusinessActionPtr &)), this, SLOT(at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &)));
+    connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
+        this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
 
     /* Set up defaults. */
     connect(this, SIGNAL(geometryAdjustmentRequested(QnWorkbenchItem *, bool)), this, SLOT(adjustGeometry(QnWorkbenchItem *, bool)), Qt::QueuedConnection);
@@ -390,7 +397,7 @@ void QnWorkbenchDisplay::initSceneView() {
     static const char *qn_viewInitializedPropertyName = "_qn_viewInitialized";
     if(!m_view->property(qn_viewInitializedPropertyName).toBool()) {
         QGLWidget *viewport = newGlWidget(m_view);
-            
+
         m_view->setViewport(viewport);
 
         viewport->makeCurrent();
@@ -456,7 +463,7 @@ void QnWorkbenchDisplay::initSceneView() {
 		gridBackgroundItem()->setMapper(workbench()->mapper());
 	}
 
-    /* Set up background */ 
+    /* Set up background */
     if (!(m_lightMode & Qn::LightModeNoSceneBackground)) {
         /* Never set QObject* parent in the QScopedPointer-stored objects if not sure in the descruction order. */
         m_backgroundPainter = new QnGradientBackgroundPainter(qnSettings->background().animationPeriodSec, NULL, context());
@@ -494,11 +501,11 @@ QnGridItem *QnWorkbenchDisplay::gridItem() const {
 
 QnCurtainItem* QnWorkbenchDisplay::curtainItem() const {
     return m_curtainItem.data();
-} 
+}
 
 QnCurtainAnimator* QnWorkbenchDisplay::curtainAnimator() const {
     return m_curtainAnimator;
-} 
+}
 
 QnGridBackgroundItem *QnWorkbenchDisplay::gridBackgroundItem() const {
     return m_gridBackgroundItem.data();
@@ -696,6 +703,17 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget) 
             }
         }
 
+        if (oldWidget)
+        {
+            oldWidget->setOption(QnResourceWidget::FullScreenMode, false);
+            oldWidget->setOption(QnResourceWidget::ActivityPresence, false);
+        }
+        if (newWidget)
+        {
+            newWidget->setOption(QnResourceWidget::FullScreenMode, true);
+            newWidget->setOption(QnResourceWidget::ActivityPresence, true);
+        }
+
         /* Hide / show other items when zoomed. */
         if(newWidget)
             opacityAnimator(newWidget)->animateTo(1.0);
@@ -771,7 +789,7 @@ void QnWorkbenchDisplay::updateSelectionFromTree() {
 
     Qn::ActionScope scope = provider->currentScope();
     if (scope != Qn::TreeScope)
-        return; 
+        return;
 
     /* Just deselect all items for now. See #4480. */
     foreach (QGraphicsItem *item, scene()->selectedItems())
@@ -1273,7 +1291,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const {
 
     if (noAdjust)
         return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
-    
+
     const qreal minAdjust = 0.015;
     return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-minAdjust, -minAdjust, minAdjust, minAdjust));
 }
@@ -1576,8 +1594,8 @@ void QnWorkbenchDisplay::updateFrameWidths() {
         return;
 
     foreach(QnResourceWidget *widget, this->widgets())
-        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive() 
-            ? qnGlobals->selectedFrameWidth() 
+        widget->setFrameWidth(widget->isSelected() || widget->isLocalActive()
+            ? qnGlobals->selectedFrameWidth()
             : qnGlobals->defaultFrameWidth());
 }
 
@@ -1709,12 +1727,26 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
     }
 
+    action(Qn::BookmarksModeAction)->setChecked(layout->data(Qn::LayoutBookmarksModeRole).toBool());
+
     QnWorkbenchStreamSynchronizer *streamSynchronizer = context()->instance<QnWorkbenchStreamSynchronizer>();
     streamSynchronizer->setState(layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>());
 
-    foreach(QnWorkbenchItem *item, layout->items())
+    // Sort items to guarantee the same item placement for each time the same new layout is opened.
+    QList<QnWorkbenchItem *> sortedItems = layout->items().toList();
+    std::sort(sortedItems.begin(), sortedItems.end(), [](const QnWorkbenchItem *item1, const QnWorkbenchItem *item2) {
+        const QnLayoutItemData &data1 = item1->data();
+        const QnLayoutItemData &data2 = item2->data();
+
+        if (data1.resource.id != data2.resource.id)
+            return data1.resource.id < data2.resource.id;
+
+        return data1.resource.path < data2.resource.path;
+    });
+
+    for (QnWorkbenchItem *item: sortedItems)
         addItemInternal(item, false, !thumbnailed);
-    foreach(QnWorkbenchItem *item, layout->items())
+    for (QnWorkbenchItem *item: sortedItems)
         addZoomLinkInternal(item, item->zoomTargetItem());
 
     bool hasTimeLabels = layout->data(Qn::LayoutTimeLabelsRole).toBool();
@@ -1761,13 +1793,11 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
             widget->setOverlayVisible(true, false);
             widget->setInfoVisible(true, false);
 
-            qint64 displayTime = time;
-            if(qnSettings->timeMode() == Qn::ServerTimeMode)
-                displayTime += context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0); // TODO: #Elric do offset adjustments in one place
+            qint64 displayTime = time + context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(widget->resource());
 
             // TODO: #Elric move out, common code, another copy is in QnWorkbenchScreenshotHandler
-            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc) 
-                ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss")) 
+            QString timeString = (widget->resource()->toResource()->flags() & Qn::utc)
+                ? QDateTime::fromMSecsSinceEpoch(displayTime).toString(lit("yyyy MMM dd hh:mm:ss"))
                 : QTime(0, 0, 0, 0).addMSecs(displayTime).toString(lit("hh:mm:ss.zzz"));
             widget->setTitleTextFormat(QLatin1String("%1\t") + timeString);
         }
@@ -1800,7 +1830,7 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
     QnThumbnailsSearchState searchState = workbench()->currentLayout()->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
     if(searchState.step <= 0)
         return;
-  
+
 #ifdef QN_PREVIEW_SEARCH_DEBUG
     qDebug() << "thumbnail loaded" << dt(thumbnail.actualTime());
 #endif
@@ -1828,7 +1858,7 @@ void QnWorkbenchDisplay::at_previewSearch_thumbnailLoaded(const QnThumbnail &thu
         if (!bestMatching || diff < bestDifference) {
             bestMatching = mediaWidget;
             bestDifference = diff;
-        } 
+        }
     }
 
     if(bestMatching) {
@@ -1992,29 +2022,18 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
-    QnResourcePtr resource = qnResPool->getResourceById(businessAction->getRuntimeParams().eventResourceId);
-    if (!resource)
+    if (workbench()->currentLayout()->isSearchLayout())
         return;
 
-    // TODO: #Elric copypasta
-    QnWorkbenchLayout *layout = workbench()->currentLayout();
-    QnThumbnailsSearchState searchState = layout->data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>();
-    bool thumbnailed = searchState.step > 0 && !layout->items().empty();
-    if(thumbnailed)
-        return;
-
-    int type = businessAction->getRuntimeParams().eventType;
-
-    at_notificationTimer_timeout(resource, type);
-    QnVariantTimer::singleShot(500, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
-    QnVariantTimer::singleShot(1000, this, SLOT(at_notificationTimer_timeout(const QVariant &, const QVariant &)), QVariant::fromValue<QnResourcePtr>(resource), type);
+    if (QnResourcePtr resource = qnResPool->getResourceById(businessAction->getParams().actionResourceId)) {
+        for (int timeMs = 0; timeMs <= splashTotalLengthMs; timeMs += splashPeriodMs)
+            executeDelayed([this, resource, businessAction]{
+                showSplashOnResource(resource, businessAction);
+            }, timeMs);
+    }
 }
 
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QVariant &resource, const QVariant &type) {
-    at_notificationTimer_timeout(resource.value<QnResourcePtr>(), type.toInt());
-}
-
-void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resource, int type) {
+void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction) {
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
 
@@ -2033,7 +2052,10 @@ void QnWorkbenchDisplay::at_notificationTimer_timeout(const QnResourcePtr &resou
         splashItem->setSplashType(QnSplashItem::Rectangular);
         splashItem->setPos(rect.center() + widget->pos());
         splashItem->setRect(QRectF(-toPoint(rect.size()) / 2, rect.size()));
-        splashItem->setColor(withAlpha(QnNotificationLevels::notificationColor(static_cast<QnBusiness::EventType>(type)), 128));
+        splashItem->setColor(
+            withAlpha(
+                QnNotificationLevel::notificationColor(QnNotificationLevel::valueOf(businessAction)),
+                128));
         splashItem->setOpacity(0.0);
         splashItem->setRotation(widget->rotation());
         splashItem->animate(1000, QnGeometry::dilated(splashItem->rect(), expansion), 0.0, true, 200, 1.0);

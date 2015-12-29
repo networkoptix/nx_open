@@ -53,7 +53,8 @@ private slots:
     void updatePlaybackButtonsPressed();
     void updatePlayButtonChecked();
     void updateJumpButtonsTooltips();
-    
+    void updateBookButtonEnabled();
+
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent *event);
     void at_liveButton_clicked();
     void at_syncButton_clicked();
@@ -74,7 +75,7 @@ private:
 
     QnImageButtonWidget *m_liveButton;
     QnImageButtonWidget *m_syncButton;
-    QnImageButtonWidget *m_thumbnailsButton;
+    QnImageButtonWidget *m_bookmarksModeButton;
     QnImageButtonWidget *m_calendarButton;
 
     bool m_updatingSpeedSliderFromNavigator;

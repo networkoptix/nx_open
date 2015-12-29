@@ -6,18 +6,46 @@
 
 namespace ec2
 {
+    namespace backup 
+    {
+        //TODO: #rvasilenko move out to more general space
+        enum DayOfWeek
+        {
+            Never       = 0x00,
+            Monday      = 0x01,
+            Tuesday     = 0x02,
+            Wednesday   = 0x04,
+            Thursday    = 0x08,
+            Friday      = 0x10,
+            Saturday    = 0x20,
+            Sunday      = 0x40,
+
+            AllDays     = 0x7F
+        };
+        Q_DECLARE_FLAGS(DaysOfWeek, DayOfWeek)
+        Q_DECLARE_OPERATORS_FOR_FLAGS(DaysOfWeek)
+
+        backup::DayOfWeek fromQtDOW(Qt::DayOfWeek qtDOW);
+        backup::DaysOfWeek fromQtDOW(QList<Qt::DayOfWeek> days);
+    }
 
     struct ApiStorageData: ApiResourceData
     {
-        ApiStorageData(): spaceLimit(0), usedForWriting(0) {}
+        ApiStorageData(): spaceLimit(0), usedForWriting(0), isBackup(false) {}
 
         qint64          spaceLimit;
         bool            usedForWriting;
         QString         storageType;
-
         std::vector<ApiResourceParamData> addParams;
+        bool            isBackup;              // is storage used for backup
     };
-#define ApiStorageData_Fields ApiResourceData_Fields (spaceLimit)(usedForWriting)(storageType)(addParams)
+#define ApiStorageData_Fields   \
+    ApiResourceData_Fields      \
+    (spaceLimit)                \
+    (usedForWriting)            \
+    (storageType)               \
+    (addParams)                 \
+    (isBackup)                  
 
 
     struct ApiMediaServerData: ApiResourceData
@@ -40,17 +68,38 @@ namespace ec2
 
     struct ApiMediaServerUserAttributesData: ApiData
     {
-        ApiMediaServerUserAttributesData(): maxCameras(0), allowAutoRedundancy(false) {}
+        ApiMediaServerUserAttributesData();
 
         QnUuid          serverID;
         QString         serverName;
         int             maxCameras;
         bool            allowAutoRedundancy; // Server can take cameras from offline server automatically
+
+        // redundant storage settings
+        Qn::BackupType      backupType;
+        int                 backupDaysOfTheWeek; // Days of the week mask. See backup::DayOfWeek enum 
+        int                 backupStart;         // Seconds from 00:00:00. Error if bDOW set and this is not set
+        int                 backupDuration;      // Duration of synchronization period in seconds. -1 if not set.
+        int                 backupBitrate;       // Bitrate cap in bytes per second. Negative value if not capped. 
+                                                 // Not capped by default
     };
 
-#define ApiMediaServerUserAttributesData_Fields_Short (maxCameras)(allowAutoRedundancy)
-#define ApiMediaServerUserAttributesData_Fields (serverID) (serverName) ApiMediaServerUserAttributesData_Fields_Short
+#define ApiMediaServerUserAttributesData_Fields_Short   \
+    (maxCameras)                                        \
+    (allowAutoRedundancy)                               \
+    (backupType)                                        \
+    (backupDaysOfTheWeek)                               \
+    (backupStart)                                       \
+    (backupDuration)                                    \
+    (backupBitrate)                                     \
 
+#define ApiMediaServerUserAttributesData_Fields     \
+    (serverID)                                      \
+    (serverName)                                    \
+    ApiMediaServerUserAttributesData_Fields_Short
+
+
+    QN_FUSION_DECLARE_FUNCTIONS(ApiMediaServerUserAttributesData, (eq))
 
     struct ApiMediaServerDataEx
     :

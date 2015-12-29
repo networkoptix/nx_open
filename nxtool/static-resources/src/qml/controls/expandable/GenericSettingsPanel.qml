@@ -11,6 +11,7 @@ Expandable.ExpandableItem
 {
     id: thisComponent;
 
+    property Item nextTab: null;
     property string propertiesGroupName;
 
     property bool changed: false;

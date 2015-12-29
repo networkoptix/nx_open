@@ -60,6 +60,11 @@ namespace nx_http
         terminate();
     }
 
+    AbstractStreamSocket* AsyncHttpClient::socket()
+    {
+        return m_socket.data();
+    }
+    
     QSharedPointer<AbstractStreamSocket> AsyncHttpClient::takeSocket()
     {
         QSharedPointer<AbstractStreamSocket> result = m_socket;
@@ -120,7 +125,7 @@ namespace nx_http
     bool AsyncHttpClient::doPost(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody)
+        nx_http::StringType messageBody)
     {
         if( !url.isValid() )
             return false;
@@ -132,14 +137,14 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
         m_request.headers.insert( make_pair("Content-Encoding", "identity") );
-        m_request.messageBody = messageBody;
+        m_request.messageBody = std::move(messageBody);
         return initiateHttpMessageDelivery( url );
     }
 
     bool AsyncHttpClient::doPut(
         const QUrl& url,
         const nx_http::StringType& contentType,
-        const nx_http::StringType& messageBody )
+        nx_http::StringType messageBody )
     {
         if( !url.isValid() )
             return false;
@@ -150,7 +155,7 @@ namespace nx_http
         m_request.headers.insert( make_pair("Content-Type", contentType) );
         m_request.headers.insert( make_pair("Content-Length", StringType::number(messageBody.size())) );
         //TODO #ak support chunked encoding & compression
-        m_request.messageBody = messageBody;
+        m_request.messageBody = std::move(messageBody);
         return initiateHttpMessageDelivery( url );
     }
 
@@ -1110,21 +1115,42 @@ namespace nx_http
         const nx_http::HttpHeaders& extraHeaders,
         AsyncHttpClient::AuthType authType )
     {
-        nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-        httpClientCaptured->setAdditionalHeaders(extraHeaders);
-        httpClientCaptured->setAuthType(authType);
+        auto handler = [completionHandler](SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType msgBody ) 
+        {
+            completionHandler(osErrorCode, statusCode, msgBody);
+        };
+        return downloadFileAsyncEx(url, handler, extraHeaders, authType);
+    }
 
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders,
+        AsyncHttpClient::AuthType authType )
+    {
+        nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+        httpClient->setAdditionalHeaders(extraHeaders);
+        httpClient->setAuthType(authType);
+        return downloadFileAsyncEx(url, completionHandler, std::move(httpClient));
+    }
+
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured)
+    {
         auto requestCompletionFunc = [httpClientCaptured, completionHandler]
-            ( nx_http::AsyncHttpClientPtr httpClient ) mutable
+        ( nx_http::AsyncHttpClientPtr httpClient ) mutable
         {
             httpClientCaptured->disconnect( nullptr, (const char*)nullptr );
             httpClientCaptured.reset();
 
             if( httpClient->failed() )
                 return completionHandler(
-                    SystemError::connectionReset,
-                    nx_http::StatusCode::ok,
-                    nx_http::BufferType() );
+                SystemError::connectionReset,
+                nx_http::StatusCode::ok,
+                nx_http::StringType(),
+                nx_http::BufferType() );
 
             if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok &&
                 httpClient->response()->statusLine.statusCode != nx_http::StatusCode::partialContent )
@@ -1132,12 +1158,14 @@ namespace nx_http
                 return completionHandler(
                     SystemError::noError,
                     httpClient->response()->statusLine.statusCode,
-                    nx_http::BufferType() );
+                    nx_http::StringType(),
+                    nx_http::BufferType());
             }
 
             completionHandler( 
                 SystemError::noError,
                 httpClient->response()->statusLine.statusCode,
+                httpClient->contentType(),
                 httpClient->fetchMessageBodyBuffer() );
         };
         QObject::connect(

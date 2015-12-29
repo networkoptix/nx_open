@@ -370,7 +370,7 @@ bool QnActiResource::SetupAudioInput()
     if (!isAudioSupported())
         return true;
     bool value = isAudioEnabled();
-    QMutexLocker lock(&m_audioCfgMutex);
+    QnMutexLocker lock(&m_audioCfgMutex);
     if (value == m_audioInputOn)
         return true;
     CLHttpStatus status;
@@ -445,7 +445,7 @@ bool QnActiResource::startInputPortMonitoringAsync( std::function<void(bool)>&& 
     //registering URL commands (one command per input port)
         //GET /cgi-bin/cmd/encoder?EVENT_RSPCMD1=1,[api/camera_event/98/di/activated],[api/camera_event/98/di/deactivated]&EVENT_RSPCMD2=1,[],[]&EVENT_RSPCMD3=1,[],[]
 
-    const QString cgiPath = lit("api/camera_event/%1/di").arg(this->getId().toString());
+    const QString cgiPath = lit("/api/camera_event/%1/di").arg(this->getId().toString());
     QString setupURLCommandRequestStr;
     for( int i = 1; i <= m_inputCount; ++i )
     {

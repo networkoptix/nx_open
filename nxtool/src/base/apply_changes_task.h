@@ -10,12 +10,19 @@ namespace rtu
 {
     class HttpClient;
 
+    /// @class ApplyChangesTask
+    /// @brief Applies specified changes to selected servers and contains information about its progress
+    /// Also it is indirect source for data updates in ServersSelectionModel instance
+    /// Instance is created by ChangesManager and lives at least until all specified changes are applied or failed.
     class ApplyChangesTask : public QObject
     {
         Q_OBJECT
 
         Q_PROPERTY(bool inProgress READ inProgress NOTIFY appliedChangesCountChanged)
 
+        Q_PROPERTY(QString progressPageHeaderText READ progressPageHeaderText NOTIFY neverCalledSignal)
+        Q_PROPERTY(QString minimizedText READ minimizedText NOTIFY neverCalledSignal)
+        
         Q_PROPERTY(int totalChangesCount READ totalChangesCount NOTIFY totalChangesCountChanged)
         Q_PROPERTY(int appliedChangesCount READ appliedChangesCount NOTIFY appliedChangesCountChanged)
         Q_PROPERTY(int errorsCount READ errorsCount NOTIFY errorsCountChanged)
@@ -34,6 +41,10 @@ namespace rtu
 
     public:
         /// Property getters
+
+        QString progressPageHeaderText() const;
+
+        QString minimizedText() const;
 
         bool inProgress() const;
 
@@ -57,6 +68,8 @@ namespace rtu
         void unknownAdded(const QString &ip);
 
     signals: 
+        void neverCalledSignal();
+
         void totalChangesCountChanged();
         
         void appliedChangesCountChanged();

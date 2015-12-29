@@ -51,6 +51,7 @@ class QN_EXPORT QnResource : public QObject, public QnFromThisToShared<QnResourc
     Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
     QnResource();
+    QnResource(const QnResource&);
     virtual ~QnResource();
 
     QnUuid getId() const;
@@ -266,7 +267,9 @@ public:
 
     // should just do physical job ( network or so ) do not care about memory domain
     virtual bool getParamPhysical(const QString &id, QString &value);
+    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
     virtual bool setParamPhysical(const QString &id, const QString &value);
+    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &value, QnCameraAdvancedParamValueList &result);
     virtual bool setParamsBegin();
     virtual bool setParamsEnd();
 

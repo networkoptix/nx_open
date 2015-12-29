@@ -40,41 +40,25 @@ public:
                                     bool useIp,
                                     bool useHtml);
 
-    static QVariantHash eventDescriptionMap(const QnAbstractBusinessActionPtr& action,
-                                    const QnBusinessAggregationInfo &aggregationInfo,
-                                    bool useIp);
-
     static QString eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QString eventDetails(const QnBusinessEventParameters &params, int aggregationCount, const QString& delimiter);
-    static QVariantHash eventDetailsMap(
-        const QnAbstractBusinessActionPtr& action,
-        const QnInfoDetail& aggregationData,
-        bool useIp,
-        bool addSubAggregationData = true );
-
+    static QString eventDetails(const QnBusinessEventParameters &params, const QString& delimiter);
     static QString renderEventDetailsText(QVariantHash contextMap);
 
     //TODO: #vasilenko isPublic field is not used, why?
-    static QString motionUrl(const QnBusinessEventParameters &params, bool isPublic);
+    static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
 
     static QString toggleStateToString(QnBusiness::EventState state);
-    static QString eventTypeString(QnBusiness::EventType eventType, QnBusiness::EventState eventState, QnBusiness::ActionType actionType);
+    static QString eventTypeString(QnBusiness::EventType eventType,
+                                   QnBusiness::EventState eventState,
+                                   QnBusiness::ActionType actionType,
+                                   const QnBusinessActionParameters &actionParams);
     static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
-private:
+    static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
+
     /** Details of event: aggregation info, date and time, other info */
     static QString aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
                                               const QnBusinessAggregationInfo& aggregationInfo,
                                               const QString& delimiter);
-    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
-                                const QnBusinessAggregationInfo& aggregationInfo,
-                                bool useIp);
-    static QVariantList aggregatedEventDetailsMap(
-        const QnAbstractBusinessActionPtr& action,
-        const QList<QnInfoDetail>& aggregationDetailList,
-        bool useIp );
-
-    static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
-
     static QString eventReason(const QnBusinessEventParameters& params);
 
     static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);

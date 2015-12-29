@@ -168,7 +168,8 @@
             <id>nomobile</id>
             <activation>
                 <property>
-                    <name>!newmobile</name>
+                    <name>newmobile</name>
+                    <value>!true</value>
                 </property>
             </activation>
             <dependencies>
@@ -220,14 +221,14 @@
                 </dependency>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x86${compile.options}</classifier>
                 </dependency>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x64${compile.options}</classifier>
@@ -295,13 +296,6 @@
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
                 </dependency>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>${bespin.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
-                </dependency>
             </dependencies>
         </profile>
         <profile>
@@ -315,32 +309,10 @@
             <dependencies>
                 <dependency>
                     <groupId>com.digia</groupId>
-                    <version>5.2.1-SNAPSHOT</version>
+                    <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
-            <id>unix-noarm</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>arch</name>
-                    <value>!arm</value>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.sourceforge.cloudcity</groupId>
-                    <artifactId>bespin</artifactId>
-                    <version>1.2-SNAPSHOT</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>
@@ -374,6 +346,13 @@
                     <version>${ffmpeg.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.sourceforge.cloudcity</groupId>
+                    <artifactId>bespin</artifactId>
+                    <version>${bespin.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}-${additional.compiler}</classifier>
                 </dependency>
             </dependencies>
         </profile>
@@ -687,57 +666,21 @@
 
         <!-- Mobile client profiles -->
         <profile>
-            <id>mobile-common</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>newmobile</name>
-                </property>
-            </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>5.5.0-SNAPSHOT</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-            </dependencies>
-        </profile>
-        <profile>
             <id>mobile-android-desktop</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android-desktop</value>
                 </property>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>com.digia</groupId>
-                    <version>5.4.1-SNAPSHOT</version>
-                    <artifactId>qt</artifactId>
-                    <type>tar.gz</type>
-                    <classifier>${qt.classifier}${compile.options}</classifier>
-                </dependency>
-            </dependencies>
         </profile>
         <profile>
             <id>mobile-android</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>android</value>
                 </property>
             </activation>
@@ -746,6 +689,13 @@
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
                     <version>${openssl.version}</version>
+                    <type>tar.gz</type>
+                    <classifier>${profile.classifier}</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>net.sourceforge</groupId>
+                    <artifactId>libjpeg-turbo</artifactId>
+                    <version>1.4.2-SNAPSHOT</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}</classifier>
                 </dependency>
@@ -759,7 +709,7 @@
                     <family>mac</family>
                 </os>
                 <property>
-                    <name>newmobile</name>
+                    <name>box</name>
                     <value>ios</value>
                 </property>
             </activation>

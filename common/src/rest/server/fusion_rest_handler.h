@@ -14,17 +14,19 @@ namespace QnFusionRestHandlerDetail
     Qn::SerializationFormat formatFromParams(const QnRequestParamList& params);
 
     template <class OutputData>
-    void serialize(const OutputData& outputData, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType)
+    void serialize(const OutputData& outputData, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false)
     {
-        Qn::SerializationFormat format = formatFromParams(params);
-        switch(format) 
+        if (format == Qn::UnsupportedFormat)
+            format = Qn::JsonFormat;
+
+        switch(format)
         {
         case Qn::UbjsonFormat:
             result = QnUbjson::serialized(outputData);
             break;
         case Qn::JsonFormat:
             result = QJson::serialized(outputData);
-            if (params.contains(lit("extraFormatting")))
+            if (extraFormatting)
                 formatJSonString(result);
             break;
         case Qn::CsvFormat:
@@ -43,7 +45,7 @@ namespace QnFusionRestHandlerDetail
     void serializeRestReply(const OutputData& outputData, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestResult& _restResult)
     {
         Qn::SerializationFormat format = formatFromParams(params);
-        switch(format) 
+        switch(format)
         {
         case Qn::UbjsonFormat:
             {
@@ -75,11 +77,14 @@ public:
     QnFusionRestHandler() {}
     virtual ~QnFusionRestHandler() {}
 
-    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result, 
+    virtual int executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
                             QByteArray& resultContentType, const QnRestConnectionProcessor *processor)  override;
 
     virtual int executeGet(const QString& path, const QnRequestParamList& params,
         QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) override;
+
+protected:
+    static int genericError(int errCode, const QString &error, QByteArray& result, QByteArray& contentType, Qn::SerializationFormat format = Qn::UnsupportedFormat, bool extraFormatting = false );
 };
 
 

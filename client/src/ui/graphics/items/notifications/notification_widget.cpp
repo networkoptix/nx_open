@@ -79,9 +79,11 @@ void QnNotificationToolTipWidget::ensureThumbnail(QnImageProvider* provider) {
         m_thumbnailLabel->setPixmap(QPixmap::fromImage(provider->image()));
     } else {
         m_thumbnailLabel->setPixmap(qnSkin->pixmap("events/thumb_loading.png"));
-        connect(provider, SIGNAL(imageChanged(const QImage &)), this, SLOT(at_provider_imageChanged(const QImage &)));
-        provider->loadAsync();
     }
+    connect(provider, &QnImageProvider::imageChanged, this, [this](const QImage &image) {
+        m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
+    });
+    provider->loadAsync();
 }
 
 QString QnNotificationToolTipWidget::text() const {
@@ -144,24 +146,17 @@ void QnNotificationToolTipWidget::at_thumbnailLabel_clicked(Qt::MouseButton butt
     }
 }
 
-void QnNotificationToolTipWidget::at_provider_imageChanged(const QImage &image) {
-    if (!m_thumbnailLabel)
-        return;
-    m_thumbnailLabel->setPixmap(QPixmap::fromImage(image));
-}
-
-
 // -------------------------------------------------------------------------- //
 // QnNotificationWidget
 // -------------------------------------------------------------------------- //
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem *parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
     m_defaultActionIdx(-1),
-    m_notificationLevel(Qn::OtherNotification),
+    m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
     m_imageProvider(NULL),
     m_inToolTipPositionUpdate(false)
 {
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     setClickableButtons(Qt::RightButton | Qt::LeftButton);
     setFrameColor(QColor(110, 110, 110, 128)); // TODO: Same as in workbench_ui. Unify?
@@ -242,16 +237,16 @@ void QnNotificationWidget::setSound(const QString &soundPath, bool loop) {
         AudioPlayer::playFileAsync(soundPath);
 }
 
-Qn::NotificationLevel QnNotificationWidget::notificationLevel() const {
+QnNotificationLevel::Value QnNotificationWidget::notificationLevel() const {
     return m_notificationLevel;
 }
 
-void QnNotificationWidget::setNotificationLevel(Qn::NotificationLevel notificationLevel) {
+void QnNotificationWidget::setNotificationLevel(QnNotificationLevel::Value notificationLevel) {
     if(m_notificationLevel == notificationLevel)
         return;
 
     m_notificationLevel = notificationLevel;
-    m_color = QnNotificationLevels::notificationColor(m_notificationLevel);
+    m_color = QnNotificationLevel::notificationColor(m_notificationLevel);
 
     updateOverlayColor();
 

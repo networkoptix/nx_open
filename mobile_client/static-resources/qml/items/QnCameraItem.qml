@@ -8,19 +8,15 @@ Item {
     id: cameraItem
 
     property alias text: label.text
-    property alias thumbnail: thumbnail.source
+    property string thumbnail
     property int status
-
-    property alias thumbnailWidth: thumbnail.sourceSize.width
-    property alias thumbnailHeight: thumbnail.sourceSize.height
 
     readonly property alias hidden: d.hidden
 
     signal clicked
     signal pressAndHold
 
-    width: content.width
-    height: content.height
+    height: content.height + dp(8)
 
     QtObject {
         id: d
@@ -40,7 +36,7 @@ Item {
     Rectangle {
         id: content
 
-        width: contentColumn.width
+        width: parent.width
         height: contentColumn.height
         color: QnTheme.windowBackground
         anchors.margins: -dp(8)
@@ -51,13 +47,13 @@ Item {
             id: contentColumn
             spacing: dp(8)
 
-            width: thumbnail.width
+            width: parent.width
 
             Rectangle {
                 id: thumbnailContainer
 
-                width: thumbnailWidth
-                height: thumbnailWidth * 3 / 4
+                width: parent.width
+                height: parent.width * 3 / 4
                 color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
 
                 Column {
@@ -88,7 +84,7 @@ Item {
                         maximumLineCount: 2
                         font.pixelSize: sp(14)
                         font.weight: Font.Normal
-                        color: QnTheme.cameraOfflineText
+                        color: QnTheme.cameraText
                     }
                 }
 
@@ -100,9 +96,11 @@ Item {
 
                 Image {
                     id: thumbnail
+                    source: d.offline ? "" : cameraItem.thumbnail
                     anchors.fill: parent
                     fillMode: Qt.KeepAspectRatio
                     visible: !d.offline && status == Image.Ready
+                    asynchronous: true
                 }
             }
 
@@ -113,13 +111,14 @@ Item {
                 QnStatusIndicator {
                     id: statusIndicator
                     status: cameraItem.status
-                    y: dp(2)
+                    y: dp(4)
                 }
 
                 Text {
                     id: label
                     width: parent.width - x - parent.spacing
-                    maximumLineCount: 2
+                    height: dp(24)
+                    maximumLineCount: 1
                     font.pixelSize: sp(16)
                     font.weight: d.offline ? Font.DemiBold : Font.Normal
                     elide: Text.ElideRight
@@ -135,8 +134,8 @@ Item {
     Rectangle {
         id: hiddenDummy
 
-        width: thumbnailWidth
-        height: thumbnailWidth * 3 / 4
+        width: parent.width
+        height: width * 3 / 4
         color: QnTheme.cameraHiddenBackground
         border.width: dp(1)
         border.color: QnTheme.cameraDummyBorder
@@ -146,19 +145,19 @@ Item {
         Column {
             width: parent.width
             anchors.centerIn: parent
-            spacing: dp(8)
 
             Text {
                 width: parent.width
+                height: dp(56)
 
-                text: qsTr("Camera hidden")
+                text: qsTr("Camera\nhidden")
 
                 horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
                 font.pixelSize: sp(16)
-                font.weight: Font.Light
                 maximumLineCount: 2
                 wrapMode: Text.WordWrap
-                color: QnTheme.cameraOfflineText
+                color: QnTheme.cameraHiddenText
             }
 
             QnButton {
@@ -169,6 +168,7 @@ Item {
                 flat: true
                 text: qsTr("Undo")
                 icon: "image://icon/undo.png"
+                font.pixelSize: sp(18)
 
                 onClicked: {
                     cameraItem.z = -1

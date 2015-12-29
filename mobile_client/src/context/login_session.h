@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QVariantMap>
+#include <utils/common/software_version.h>
 
 struct QnLoginSession {
     QString id;

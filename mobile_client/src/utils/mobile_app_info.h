@@ -6,14 +6,13 @@
 class QnMobileAppInfo : public QObject {
     Q_OBJECT
 
-    Q_PROPERTY(QString productName READ productName NOTIFY productNameChanged)
 public:
     explicit QnMobileAppInfo(QObject *parent = 0);
 
-    QString productName() const;
+    Q_INVOKABLE QString productName() const;
+    Q_INVOKABLE QString organizationName() const;
 
-signals:
-    void productNameChanged();
+    Q_INVOKABLE QUrl oldMobileClientUrl() const;
 };
 
 #endif // QNMOBILEAPPINFO_H

@@ -7,8 +7,8 @@
 #include <utils/common/request_param.h>
 #include <utils/common/uuid.h>
 #include <utils/common/ldap.h>
+#include <utils/common/optional.h>
 #include <utils/serialization/json_functions.h>
-#include <utils/network/multicast_module_finder.h>
 #include <utils/math/space_mapper.h>
 
 #include <api/model/storage_space_reply.h>
@@ -24,6 +24,7 @@
 #include <api/model/test_email_settings_reply.h>
 #include <api/model/configure_reply.h>
 #include <api/model/upload_update_reply.h>
+#include <api/model/backup_status_reply.h>
 #include <api/runtime_info_manager.h>
 
 #include <core/resource/resource_fwd.h>
@@ -69,6 +70,8 @@
 
 #include <licensing/license.h>
 
+#include <network/multicast_module_finder.h>
+
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include <nx_ec/data/api_discovery_data.h>
@@ -77,6 +80,7 @@
 #include "api/model/api_ioport_data.h"
 #include "api/model/recording_stats_reply.h"
 #include "api/model/audit/audit_record.h"
+#include "health/system_health.h"
 
 namespace {
     volatile bool qn_commonMetaTypes_initialized = false;
@@ -132,6 +136,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnCameraBookmark>();
     qRegisterMetaType<QnCameraBookmarkList>();
     qRegisterMetaType<QnCameraBookmarkTags>("QnCameraBookmarkTags");/* The underlying type is identical to QStringList. */
+    qRegisterMetaType<QnCameraBookmarkTag>();
+    qRegisterMetaType<QnCameraBookmarkTagList>();
 
     qRegisterMetaType<QnLicensePtr>();
     qRegisterMetaType<QnLicenseList>();
@@ -179,6 +185,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 
+    qRegisterMetaType<QnStorageSpaceData>();
     qRegisterMetaType<QnStorageSpaceReply>();
     qRegisterMetaType<QnStorageStatusReply>();
     qRegisterMetaType<QnStatisticsReply>();
@@ -186,6 +193,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnTestEmailSettingsReply>();
     qRegisterMetaType<QnCameraDiagnosticsReply>();
     qRegisterMetaType<QnStorageScanData>();
+    qRegisterMetaType<QnBackupStatusData>();
     qRegisterMetaType<QnManualCameraSearchReply>();
     qRegisterMetaType<QnServersReply>();
     qRegisterMetaType<QnStatisticsData>();
@@ -248,14 +256,23 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
     qRegisterMetaType<ec2::ApiResourceParamDataList>("ApiResourceParamDataList");
-    qRegisterMetaType<ec2::ApiServerFootageDataList>("ec2::ApiServerFootageDataList");
-    qRegisterMetaType<ec2::ApiCameraHistoryData>("ec2::ApiCameraHistoryData");
+
+    qRegisterMetaType<ec2::ApiServerFootageData>("ApiServerFootageData");
+    qRegisterMetaType<ec2::ApiServerFootageDataList>("ApiServerFootageDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemData>("ApiCameraHistoryItemData");
+    qRegisterMetaType<ec2::ApiCameraHistoryItemDataList>("ApiCameraHistoryItemDataList");
+    qRegisterMetaType<ec2::ApiCameraHistoryData>("ApiCameraHistoryData");
+    qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ApiCameraHistoryDataList");
     qRegisterMetaType<ec2::ApiCameraHistoryDataList>("ec2::ApiCameraHistoryDataList");
 
-    qRegisterMetaType<QnUuid>( "QnUuid" );
-    qRegisterMetaTypeStreamOperators<QnUuid>( "QnUuid" );
+    qRegisterMetaType<QnUuid>();
+    qRegisterMetaTypeStreamOperators<QnUuid>();
     qRegisterMetaType<QnRecordingStatsReply>();
     qRegisterMetaType<QnAuditRecordList>();
+
+    qRegisterMetaType<QnOptionalBool>();
+
+    qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
     QnJsonSerializer::registerSerializer<Qn::PtzTraits>();

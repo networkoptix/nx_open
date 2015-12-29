@@ -7,7 +7,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/id.h"
 #include "utils/common/string.h"
-#include "models/filtered_resource_list_model.h"
+#include "models/available_camera_list_model.h"
 #include "camera/camera_thumbnail_cache.h"
 #include "mobile_client/mobile_client_roles.h"
 #include "mobile_client/mobile_client_settings.h"
@@ -17,8 +17,8 @@ namespace {
 
     const qreal defaultAspectRatio = 4.0 / 3.0;
 
-    class QnFilteredCameraListModel : public QnFilteredResourceListModel {
-        typedef QnFilteredResourceListModel base_type;
+    class QnFilteredCameraListModel : public QnAvailableCameraListModel {
+        typedef QnAvailableCameraListModel base_type;
     public:
         QnFilteredCameraListModel(QObject *parent = 0) :
             base_type(parent)
@@ -66,7 +66,8 @@ namespace {
 
     protected:
         virtual bool filterAcceptsResource(const QnResourcePtr &resource) const override {
-            if (!resource->hasFlags(Qn::live_cam))
+            bool accepted = base_type::filterAcceptsResource(resource);
+            if (!accepted)
                 return false;
 
             if (m_serverId.isNull())
@@ -176,6 +177,17 @@ void QnCameraListModel::setServerIdString(const QString &id) {
     setServerId(QnUuid::fromStringSafe(id));
 }
 
+void QnCameraListModel::refreshThumbnail(int row) {
+    if (!QnCameraThumbnailCache::instance())
+        return;
+
+    if (!hasIndex(row, 0))
+        return;
+
+    QnUuid id = QnUuid(data(index(row, 0), Qn::UuidRole).toUuid());
+    QnCameraThumbnailCache::instance()->refreshThumbnails(QList<QnUuid>() << id);
+}
+
 void QnCameraListModel::refreshThumbnails(int from, int to) {
     if (!QnCameraThumbnailCache::instance())
         return;
@@ -225,7 +237,14 @@ bool QnCameraListModel::lessThan(const QModelIndex &left, const QModelIndex &rig
     QString leftAddress = left.data(Qn::IpAddressRole).toString();
     QString rightAddress = right.data(Qn::IpAddressRole).toString();
 
-    return naturalStringLess(leftAddress, rightAddress);
+    res = naturalStringCompare(leftAddress, rightAddress);
+    if (res != 0)
+        return res < 0;
+
+    QString leftId = left.data(Qn::UuidRole).toString();
+    QString rightId = right.data(Qn::UuidRole).toString();
+
+    return leftId < rightId;
 }
 
 bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
@@ -250,7 +269,7 @@ bool QnCameraListModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourc
 void QnCameraListModel::at_thumbnailUpdated(const QnUuid &resourceId, const QString &thumbnailId) {
     m_model->refreshResource(qnResPool->getResourceById(resourceId), Qn::ThumbnailRole);
 
-    QPixmap thumbnail = QnCameraThumbnailCache::instance()->thumbnail(thumbnailId);
+    QPixmap thumbnail = QnCameraThumbnailCache::instance()->getThumbnail(thumbnailId);
     if (!thumbnail.isNull()) {
         QnAspectRatioHash aspectRatios = qnSettings->camerasAspectRatios();
         aspectRatios[resourceId] = static_cast<qreal>(thumbnail.width()) / thumbnail.height();

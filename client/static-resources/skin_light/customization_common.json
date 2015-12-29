@@ -253,7 +253,8 @@
             }
         },
         "colors": {
-            "idLabel": "#575757"
+            "idLabel": "#575757",
+            "buttonBackground": "#cccccc"
         }
     },
 
@@ -321,10 +322,10 @@
         }}
     },
     
-    "QnGraphicsMessageBox": {
-        "frameColor": "opaqueSelection",
-        "windowColor": "selection.darker(100)",
-        "textColor": "#000000ff"
+    "QnGraphicsMessageBoxColors": {
+        "frame": "opaqueSelection",
+        "window": "selection.darker(100)",
+        "text": "#000000ff"
     },
 
     "QnFisheyeCalibrationImageWidget": {
@@ -419,6 +420,15 @@
             "disabledSelectedText": "#b5d7ee",
             "disabledButtonsText":  "#000000",
             "selectionBackground": "#95bfe0"
+        }
+    },
+    
+    "QnBackupCamerasDialog": {
+        "colors": {
+            "disabled": "#808080",
+            "low":  "#4b8000",
+            "high": "#cc2200",
+            "both": "#b25900"
         }
     },
     

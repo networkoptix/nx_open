@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>QObject</name>
     <message>
@@ -20,11 +20,11 @@
     <name>QnElevationChecker</name>
     <message>
         <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">서비스를 관리할 수 있는 권한이 불충분함</translation>
+        <translation>서비스를 관리할 수 있는 권한이 불충분함.</translation>
     </message>
     <message>
         <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함</translation>
+        <translation>UAC 기능은 관리자가 아닌 일반 사용자에 대한 권한의 요청에 의해 사용되어야 함.</translation>
     </message>
 </context>
 <context>
@@ -111,7 +111,7 @@
     </message>
     <message>
         <source>Media server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 동작이 멈춥니다. 진행하시겠습니까?</translation>
     </message>
 </context>
 </TS>

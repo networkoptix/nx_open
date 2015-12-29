@@ -14,6 +14,7 @@ class QnUserResource : public QnResource
 
 public:
     QnUserResource();
+    QnUserResource(const QnUserResource&);
 
     QByteArray getHash() const;
     void setHash(const QByteArray&hash);
@@ -52,12 +53,9 @@ public:
     //!Millis since epoch (1970-01-01, UTC)
     qint64 passwordExpirationTimestamp() const;
     bool passwordExpired() const;
-    /*!
-        \return \a true if password expiration timestamp has been increased
-    */
-    Qn::AuthResult doPasswordProlongation();
-    //!Check \a digest validity with external authentication service (LDAP currently)
-    Qn::AuthResult checkDigestValidity( const QByteArray& digest );
+
+    static const qint64 PasswordProlongationAuto = -1;
+    void prolongatePassword(qint64 value = PasswordProlongationAuto);
 
 signals:
     void hashChanged(const QnResourcePtr &resource);

@@ -38,7 +38,8 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04",
                 "Avigilon|ENC-*",
-                "ACTI|V32"
+                "ACTI|V32",
+                "BOSCH|VIP-X1600-XFM4"
             ],
             "analogEncoder": true
         },
@@ -72,6 +73,12 @@
             ],
             "onvifPtzStopBroken": true
         },
+    	{
+            "keys": [
+                "ArecontVision|??05", "ArecontVision|?155"
+            ],
+            "isRTSPSupported": false
+    	},
         {
             "keys": [
                 "VIVOTEK|DM368", "VIVOTEK|FD8161", "VIVOTEK|FD8362E", "VIVOTEK|FD8361", "VIVOTEK|FD8136", 
@@ -101,14 +108,16 @@
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "ACTI|I96"
             ],
             "ptzTraits": "EightWayPtz"
         },
         {
             "keys": [
                 "ACTI|V32",
-                "ACTi Corporation|V32"
+                "ACTi Corporation|V32",
+                "AXIS|Q6000-E"
             ],
             "forceONVIF": true
         },
@@ -129,7 +138,9 @@
                 "VISTA|VK2-1080VRDIR3V9F",
                 "VISTA|VK2-1080XVFD3V9F",
                 "VISTA|VK2-3MPBIR3V9F",
-                "VISTA|VK2-3MPVRDIR3V9F"
+                "VISTA|VK2-3MPVRDIR3V9F",
+                "VISTA|VK2-3MPBIR28V12re",
+                "VISTA|VK2-3MPVRDIR28V12re"
             ],
             "ptzCapabilities": "ContinuousZoomCapability|ContinuousFocusCapability|AuxilaryPtzCapability"
         },
@@ -153,7 +164,9 @@
                 "VISTA|VK2-ENCODER",
                 "VISTA|VK2-1080PTZ",
                 "VISTA|VK2-600PTZ",
-                "*|DW-CP04"
+                "*|DW-CP04",
+                "Cellinx|STH795",
+                "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -199,13 +212,19 @@
         },
         {
             "keys": [
+                "DW|DWC-BVI2IR"
+            ],
+            "dw-pravis-chipset": true
+        },
+        {
+            "keys": [
                 "AXIS|AXISM7016Group1", "AXIS|AXISM7016Group2", "AXIS|AXISM7016Group3", "AXIS|AXISM7016Group4"
             ],
             "axisMaxZoomSpeed": 70
         },
         {
             "keys": [
-                "Honeywell|HVE4"
+                "Honeywell|HVE4", "Hikvision|DS-6704HFI"
             ],
             "forcedOnvifParams": 
             {
@@ -507,7 +526,7 @@
         },
         {
             "keys": [
-                "VISTA|VK2-1080XPTZ"
+                "VISTA|VK2-1080XPTZ","VISTA|VK2-1080XVRDPTPMF"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -612,7 +631,7 @@
                     }
                 }
             },
-			"onvifPtzDigitsAfterDecimalPoint": 0
+            "onvifPtzDigitsAfterDecimalPoint": 0
         },        
         {
             "keys": [
@@ -877,8 +896,55 @@
         },
         {
             "keys": [
+                "ACTI|I96"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-18000, 18000],
+                        "logical": [  -180,   180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ 0, 9000],
+                        "logical": [90,    0]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [30,     80,    256,    336,    512,    592,    768,    848,   1024,   1104,   1280,   1360,   1536,   1616,   1792,   1872,   2048,   2128,   2304,    2384,    2520],
+                        "logical": [ 1, 1.0319, 1.1540, 1.2209, 1.3808, 1.4651, 1.6802, 1.7936, 2.0959, 2.2587, 2.6660, 2.8696, 3.4621, 3.7953, 4.6840, 5.2209, 6.6650, 7.4982, 9.8495, 11.1825, 13.8485],
+                        "logicalMultiplier": 35.0,
+                        "space": "35MmEquiv"
+                    }
+                },
+                "toCamera": {
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0,     125,    250,    375,    500,    625,    750,    875,    1000,    1125,    1250,    1375,    1500,    1675,    1750,    1875,    2000,    2125,    2250,     2375,    2500],
+                        "logical": [1, 1.0319, 1.1540, 1.2209, 1.3808, 1.4651, 1.6802, 1.7936, 2.0959, 2.2587, 2.6660, 2.8696, 3.4621, 3.7953, 4.6840, 5.2209, 6.6650, 7.4982, 9.8495, 11.1825, 13.8485],
+                        "logicalMultiplier": 36.0,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
                 "MOOG|MOOG-EXO-HD", "MOOG|MOOG-EXO-HD|3.8.0.7"
             ]
+        },
+        {
+            "keys": [
+                "*Grandeye*|EVO-05NxD"
+            ],
+            "relayInputCountForced": 1
+        },
+        {
+            "keys": [
+                "Honeywell*|*"
+            ],
+            "portNamePrefixToIgnore": "AlarmOut"
         }
     ]
 }

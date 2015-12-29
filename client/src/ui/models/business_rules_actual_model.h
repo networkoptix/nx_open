@@ -26,11 +26,11 @@ public:
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
-    
+
     void businessRuleChanged(const QnUuid &id);
     void businessRuleDeleted(const QnUuid &id);
 public slots:
-    void saveRule(int row);
+    void saveRule(const QModelIndex &index);
 private slots:
     void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
 
@@ -39,7 +39,7 @@ private slots:
     void at_message_ruleReset(const QnBusinessEventRuleList &rules);
 
 private:
-    QMap<int, QnBusinessRuleViewModel*> m_savingRules;
+    QMap<int, QnBusinessRuleViewModelPtr> m_savingRules;
 };
 
 #endif // __QN_BUSINESS_RULES_ACTUAL_MODEL_H_

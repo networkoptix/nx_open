@@ -46,6 +46,7 @@
 #define QN_LICENSING_MAIL_ADDRESS       "${company.license.address}"
 #define QN_COMPANY_URL                  "${company.url}"
 #define QN_SUPPORT_MAIL_ADDRESS         "${company.support.address}"
+#define QN_SUPPORT_LINK                 "${company.support.link}"
 #define QN_FREE_LICENSE_COUNT           ${freeLicenseCount}
 #define QN_FREE_LICENSE_KEY             "${freeLicenseKey}"
 #define QN_FREE_LICENSE_IS_TRIAL        ${freeLicenseIsTrial}
@@ -57,6 +58,7 @@
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"
 #define QN_ARM_BOX                      "${box}"
 #define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
+#define QN_IOS_SHARED_GROUP_ID          "${ios.group_identifier}"
 #define NX_EC_EC2_PROTO_VERSION         ${nxec.ec2ProtoVersion}
 
 #define QN_AX_CLASS_ID                  "${ax.classId}"
@@ -81,7 +83,7 @@
 #define VER_COMPANYNAME_STR             "${company.name}"
 #define VER_FILEDESCRIPTION_STR         "${product.display.title}"
 #define VER_INTERNALNAME_STR            "${product.title}"
-#define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2013 Network Optix"
+#define VER_LEGALCOPYRIGHT_STR          "Copyright (c) 2011-2016 Network Optix"
 #define VER_LEGALTRADEMARKS1_STR        "All Rights Reserved"
 #define VER_LEGALTRADEMARKS2_STR        VER_LEGALTRADEMARKS1_STR
 #define VER_ORIGINALFILENAME_STR        "${project.artifactId}.exe"

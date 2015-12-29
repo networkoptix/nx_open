@@ -25,29 +25,20 @@ public:
     /// @param callback         Callback for receiving bookmarks data.
     void getBookmarksAsync(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter, BookmarksCallbackType callback);
 
-    /// @brief                  Synchronously gathers locally cached bookmarks using specified filter.
-    /// @param cameras          Set of target cameras.
-    /// @param filter           Filter parameters.
-    /// @returns                Locally cached bookmarks, filtered by the cameras and filter.
-    QnCameraBookmarkList getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const;
-
     /// @brief                  Add the bookmark to the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Update the existing bookmark on the camera.
-    /// @param camera           Target camera.
     /// @param bookmark         Target bookmark.
     /// @param callback         Callback with operation result.
-    void updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
 
     /// @brief                  Delete the existing bookmark from the camera.
-    /// @param camera           Target camera.
-    /// @param bookmark         Target bookmark.
+    /// @param bookmark         Target bookmark id.
     /// @param callback         Callback with operation result.
-    void deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback = OperationCallbackType());
+    void deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback = OperationCallbackType());
 
     /* Queries API section */
 
@@ -58,15 +49,26 @@ public:
     QnCameraBookmarksQueryPtr createQuery(const QnVirtualCameraResourceSet &cameras = QnVirtualCameraResourceSet(),
                                           const QnCameraBookmarkSearchFilter &filter = QnCameraBookmarkSearchFilter());
 
-    /// @brief                  Execute search query on local (cached) data.
+    /// @brief                  Get locally chached bookmarks for the given query.
     /// @param query            Target query.
-    /// @returns                Locally cached bookmarks, filtered by the query.
-    QnCameraBookmarkList executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const;
+    QnCameraBookmarkList cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const;
 
     /// @brief                  Asynchronously execute search query on remote (actual) data.
     /// @param query            Target query.
     /// @param callback         Callback for receiving bookmarks data.
     void executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback);
+
+signals:
+    /* TODO: #dklychkov #2.6 #bookmarks Implement notification transactions bor bookmarks which will call these signals. */
+    // So far these signals are emited when the user does something locally.
+    /// @brief                  This signal is emitted when new bookmark was added.
+    void bookmarkAdded(const QnCameraBookmark &bookmark);
+    /// @brief                  This signal is emitted when the bookmark was updated.
+    void bookmarkUpdated(const QnCameraBookmark &bookmark);
+    /// @brief                  This signal is emitted when the bookmark was removed.
+    /// @param                  The removed bookmark GUID.
+    void bookmarkRemoved(const QnUuid &bookmarkId);
+
 protected:
     Q_DECLARE_PRIVATE(QnCameraBookmarksManager);
 

@@ -9,8 +9,7 @@
 
 #include <utils/thread/mutex.h>
 
-#include <network/authenticate_helper.h>
-#include <network/universal_tcp_listener.h>
+#include <network/http_connection_listener.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/concurrent.h>
 #include <utils/network/http/auth_tools.h>
@@ -130,12 +129,12 @@ namespace ec2
             return establishConnectionToRemoteServer(url, handler, clientInfo);
     }
 
-    void Ec2DirectConnectionFactory::registerTransactionListener( QnUniversalTcpListener* universalTcpListener )
+    void Ec2DirectConnectionFactory::registerTransactionListener(QnHttpConnectionListener* httpConnectionListener)
     {
-        universalTcpListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
-        universalTcpListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
+        httpConnectionListener->addHandler<QnTransactionTcpProcessor>("HTTP", "ec2/events");
+        httpConnectionListener->addHandler<QnHttpTransactionReceiver>("HTTP", INCOMING_TRANSACTIONS_PATH);
 
-        m_sslEnabled = universalTcpListener->isSslEnabled();
+        m_sslEnabled = httpConnectionListener->isSslEnabled();
     }
 
     void Ec2DirectConnectionFactory::registerRestHandlers( QnRestProcessorPool* const restProcessorPool )
@@ -155,6 +154,7 @@ namespace ec2
         //AbstractResourceManager::remove
         registerUpdateFuncHandler<ApiIdData>( restProcessorPool, ApiCommand::removeResource );
 
+        registerGetFuncHandler<QnUuid, ApiResourceStatusDataList>( restProcessorPool, ApiCommand::getStatusList );
 
         //AbstractMediaServerManager::getServers
         registerGetFuncHandler<QnUuid, ApiMediaServerDataList>( restProcessorPool, ApiCommand::getMediaServers );
@@ -190,16 +190,14 @@ namespace ec2
         registerUpdateFuncHandler<ApiServerFootageData>( restProcessorPool, ApiCommand::addCameraHistoryItem );
         //AbstractCameraManager::getCameraHistoryItems
         registerGetFuncHandler<std::nullptr_t, ApiServerFootageDataList>( restProcessorPool, ApiCommand::getCameraHistoryItems );
-        //AbstractCameraManager::getBookmarkTags
-        registerGetFuncHandler<std::nullptr_t, ApiCameraBookmarkTagDataList>( restProcessorPool, ApiCommand::getCameraBookmarkTags );
         //AbstractCameraManager::getCamerasEx
         registerGetFuncHandler<QnUuid, ApiCameraDataExList>( restProcessorPool, ApiCommand::getCamerasEx );
 
         registerGetFuncHandler<QnUuid, ApiStorageDataList>( restProcessorPool, ApiCommand::getStorages );
 
-        //AbstractCameraManager::getBookmarkTags
-
+        //AbstractLicenseManager::addLicenses
         registerUpdateFuncHandler<ApiLicenseDataList>( restProcessorPool, ApiCommand::addLicenses );
+        //AbstractLicenseManager::removeLicense
         registerUpdateFuncHandler<ApiLicenseData>( restProcessorPool, ApiCommand::removeLicense );
 
 
@@ -329,6 +327,7 @@ namespace ec2
     void Ec2DirectConnectionFactory::setContext( const ResourceContext& resCtx )
     {
         m_resCtx = resCtx;
+        m_timeSynchronizationManager->setContext(m_resCtx);
     }
 
     void Ec2DirectConnectionFactory::setConfParams( std::map<QString, QVariant> confParams )
@@ -441,9 +440,16 @@ namespace ec2
                 QnConnectionInfo oldECConnectionInfo;
                 oldECConnectionInfo.ecUrl = httpsEcUrl;
                 if( parseOldECConnectionInfo(oldECResponse, &oldECConnectionInfo) )
-                    completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                {
+                    if (oldECConnectionInfo.version >= QnSoftwareVersion(2, 3))
+                        completionFunc(ErrorCode::ioError, QnConnectionInfo()); //ignoring response from 2.3+ server received using compatibility response
+                    else
+                        completionFunc(ErrorCode::ok, oldECConnectionInfo);
+                }
                 else
+                {
                     completionFunc(ErrorCode::badResponse, oldECConnectionInfo);
+                }
                 break;
             }
 

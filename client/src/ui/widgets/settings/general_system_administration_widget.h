@@ -16,8 +16,8 @@ class QnGeneralSystemAdministrationWidget: public QnAbstractPreferencesWidget, p
 public:
     QnGeneralSystemAdministrationWidget(QWidget *parent = NULL);
 
-    virtual void updateFromSettings() override;
-    virtual void submitToSettings() override;
+    virtual void loadDataToUi() override;
+    virtual void applyChanges() override;
 
     virtual bool hasChanges() const override;
 
@@ -25,6 +25,7 @@ public:
 protected:
     void resizeEvent(QResizeEvent *event) override;
 
+    void setReadOnlyInternal(bool readOnly) override;
 private:
     bool isDatabaseBackupAvailable() const;
 

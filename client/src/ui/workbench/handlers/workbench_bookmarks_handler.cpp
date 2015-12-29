@@ -12,6 +12,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_history.h>
 
 #include <recording/time_period.h>
 
@@ -21,53 +22,34 @@
 #include <ui/actions/action_target_provider.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
-#include "core/resource/camera_history.h"
+#include <ui/workbench/watchers/workbench_bookmark_tags_watcher.h>
 
-QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */):
-    base_type(parent),
-    QnWorkbenchContextAware(parent)
+namespace {
+
+    /* How long 'Press Ctrl-B' hint should be displayed. */
+    const int kHintTimeoutMs = 5000;
+}
+
+
+QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NULL */)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
+    , m_hintDisplayed(false)
 {
     connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
     connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
+    connect(action(Qn::BookmarksModeAction),        &QAction::toggled,      this,   &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
-    connect(context(), &QnWorkbenchContext::userChanged, this, &QnWorkbenchBookmarksHandler::updateTags);
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsAdded, this, [this](const QnCameraBookmarkTags &tags) {
-        m_tags.append(tags);
-        m_tags.removeDuplicates();
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-
-    connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::cameraBookmarkTagsRemoved, this, [this](const QnCameraBookmarkTags &tags) {
-        for (const QString &tag: tags)
-            m_tags.removeAll(tag);
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-void QnWorkbenchBookmarksHandler::updateTags() {
-    if (!context()->user()) {
-        m_tags.clear();
-        context()->navigator()->setBookmarkTags(m_tags);
-        return;
-    }
-    
-    connection()->getCameraManager()->getBookmarkTags(this, [this](int reqID, ec2::ErrorCode code, const QnCameraBookmarkTags &tags) {
-        Q_UNUSED(reqID);
-        if (code != ec2::ErrorCode::ok)
-            return;
-        m_tags = tags;
-        context()->navigator()->setBookmarkTags(m_tags);
-    });
-}
-
-QnCameraBookmarkTags QnWorkbenchBookmarksHandler::tags() const {
-    return m_tags;
+    /* Reset hint flag for each user. */
+    connect(context(), &QnWorkbenchContext::userChanged, this, [this]() { m_hintDisplayed = false; });
 }
 
 ec2::AbstractECConnectionPtr QnWorkbenchBookmarksHandler::connection() const {
@@ -83,28 +65,38 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered() {
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
-        return;
+    /*
+     * This check can be safely omitted in release - it is better to add bookmark on another server than do not
+     * add bookmark at all.
+     * //TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
+     */
+    if (QnAppInfo::beta()) {
+        QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, period.startTimeMs);
+        if (!server || server->getStatus() != Qn::Online) {
+            QMessageBox::warning(mainWindow(),
+                tr("Error"),
+                tr("Bookmarks can only be added to an online server.")); //TODO: #Elric ec2 update text if needed
+            return;
+        }
     }
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
     bookmark.name = tr("Bookmark");
     bookmark.startTimeMs = period.startTimeMs;  //this should be assigned before loading data to the dialog
-    bookmark.durationMs = period.durationMs;    //TODO: #GDM #Bookmarks should we generate description based on these values or show them in the dialog?
+    bookmark.durationMs = period.durationMs;
+    bookmark.cameraId = camera->getUniqueId();
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->addCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->addCameraBookmark(bookmark);
+
+    action(Qn::BookmarksModeAction)->setChecked(true);
 }
 
 void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
@@ -125,13 +117,13 @@ void QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered() {
     }
 
     QScopedPointer<QnCameraBookmarkDialog> dialog(new QnCameraBookmarkDialog(mainWindow()));
-    dialog->setTags(m_tags);
+    dialog->setTags(context()->instance<QnWorkbenchBookmarkTagsWatcher>()->tags());
     dialog->loadData(bookmark);
     if (!dialog->exec())
         return;
     dialog->submitData(bookmark);
 
-    qnCameraBookmarksManager->updateCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->updateCameraBookmark(bookmark);
 }
 
 void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
@@ -143,55 +135,48 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
 
     QnCameraBookmark bookmark = parameters.argument<QnCameraBookmark>(Qn::CameraBookmarkRole);
 
-    QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
-    if (!server || server->getStatus() != Qn::Online) {
-        QMessageBox::warning(mainWindow(),
-            tr("Error"),
-            tr("Bookmarks can only be deleted from an online server.")); //TODO: #Elric ec2 update text if needed
-        return;
-    }
+    const auto message = (bookmark.name.trimmed().isEmpty()
+        ? tr("Are you sure you want to delete this bookmark?")
+        : tr("Are you sure you want to delete bookmark \"%1\"?").arg(bookmark.name));
 
     if (QMessageBox::information(mainWindow(),
-            tr("Confirm Deletion"),
-            tr("Are you sure you want to delete this bookmark %1?").arg(bookmark.name),
-            QMessageBox::Ok | QMessageBox::Cancel, 
+            tr("Confirm Deletion"), message,
+            QMessageBox::Ok | QMessageBox::Cancel,
             QMessageBox::Cancel) != QMessageBox::Ok)
         return;
 
-    qnCameraBookmarksManager->deleteCameraBookmark(camera, bookmark);
+    qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
-/*
-void QnWorkbenchBookmarksHandler::at_bookmarkAdded(int status, const QnCameraBookmark &bookmark, int handle) {
-    auto camera = m_processingBookmarks.take(handle);
-    if (status != 0 || !camera)
-        return;
+void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()
+{
+    const auto bookmarkModeAction = action(Qn::BookmarksModeAction);
+    const bool checked = bookmarkModeAction->isChecked();
+    const bool enabled = bookmarkModeAction->isEnabled();
 
-    m_tags.append(bookmark.tags);
-    m_tags.removeDuplicates();
-    context()->navigator()->setBookmarkTags(m_tags);
+    bool canSaveBookmarksMode = true;    /// if bookmarks mode is going to be enabled than we always can store mode
+    if (!checked)
+    {
+        const auto currentWidget = navigator()->currentWidget();
+        canSaveBookmarksMode = (!currentWidget
+            || !currentWidget->options().testFlag(QnResourceWidget::DisplayMotion));
+    }
+
+    if (enabled && canSaveBookmarksMode)
+        workbench()->currentLayout()->setData(Qn::LayoutBookmarksModeRole, checked);
+
+    if (checked)
+        menu()->trigger(Qn::StopSmartSearchAction, QnActionParameters(display()->widgets()));
+
+    if (!m_hintDisplayed && enabled && checked && !navigator()->bookmarksModeEnabled())
+    {
+        QnGraphicsMessageBox::information(
+              tr("Press %1 to search bookmarks").arg(action(Qn::OpenBookmarksSearchAction)->shortcut().toString())
+            , kHintTimeoutMs
+            );
+        m_hintDisplayed = true;
+    }
+
+
+    navigator()->setBookmarksModeEnabled(checked);
 }
-
-
-void QnWorkbenchBookmarksHandler::at_bookmarkUpdated(int status, const QnCameraBookmark &bookmark, int handle) {
-    auto camera = m_processingBookmarks.take(handle);
-    if (status != 0 || !camera)
-        return;
-
-    m_tags.append(bookmark.tags);
-    m_tags.removeDuplicates();
-    context()->navigator()->setBookmarkTags(m_tags);
-
-//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-//         loader->updateBookmark(bookmark);
-}
-
-void QnWorkbenchBookmarksHandler::at_bookmarkDeleted(int status, const QnCameraBookmark &bookmark, int handle) {
-    auto camera = m_processingBookmarks.take(handle);
-    if (status != 0 || !camera)
-        return;
-
-//     if (QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(camera))
-//         loader->removeBookmark(bookmark);
-}
-*/

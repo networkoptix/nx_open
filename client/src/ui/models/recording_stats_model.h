@@ -15,6 +15,8 @@ class QnSortedRecordingStatsModel: public QSortFilterProxyModel
 public:
     typedef QSortFilterProxyModel base_type;
     QnSortedRecordingStatsModel(QObject *parent = 0) : base_type(parent) {}
+
+    static const QString kForeignCameras;
 protected:
     virtual bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 };
@@ -42,7 +44,7 @@ public:
     };
 
 
-    explicit QnRecordingStatsModel(QObject *parent = 0);
+    explicit QnRecordingStatsModel(bool isForecastRole, QObject *parent = 0);
     virtual ~QnRecordingStatsModel();
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -53,20 +55,17 @@ public:
     void clear();
     void setModelData(const QnRecordingStatsReply& data);
     QnRecordingStatsReply modelData() const;
-    void setForecastData(const QnRecordingStatsReply& data);
 
     QnRecordingStatsColors colors() const;
     void setColors(const QnRecordingStatsColors &colors);
 signals:
     void colorsChanged();
 private:
-    const QnRecordingStatsReply& internalModelData() const;
-    const QnFooterData& internalFooterData() const;
 
     QString displayData(const QModelIndex &index) const;
     QString footerDisplayData(const QModelIndex &index) const;
     QnResourcePtr getResource(const QModelIndex &index) const;
-    qreal chartData(const QModelIndex &index, bool isForecast) const;
+    qreal chartData(const QModelIndex &index) const;
     QString tooltipText(Columns column) const;
     QVariant footerData(const QModelIndex &index, int role) const;
 
@@ -80,9 +79,6 @@ private:
     QnRecordingStatsReply m_data;
     QnFooterData m_footer;
 
-    QnRecordingStatsReply m_forecastData;
-    QnFooterData m_forecastFooter;
-
     QnRecordingStatsColors m_colors;
-    
+    bool m_isForecastRole;
 };

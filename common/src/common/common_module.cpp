@@ -14,6 +14,13 @@
 #include <core/resource/camera_history.h>
 #include <utils/common/product_features.h>
 #include <utils/common/timermanager.h>
+#include "core/resource/camera_user_attribute_pool.h"
+#include "core/resource/media_server_user_attributes.h"
+#include "core/resource_management/resource_properties.h"
+#include "core/resource_management/status_dictionary.h"
+#include "core/resource_management/server_additional_addresses_dictionary.h"
+#include "utils/common/synctime.h"
+#include "api/runtime_info_manager.h"
 
 
 QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
@@ -31,12 +38,19 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     loadResourceData(m_dataPool, lit(":/resource_data.json"), true);
     loadResourceData(m_dataPool, QCoreApplication::applicationDirPath() + lit("/resource_data.json"), false);
 
+    instance<QnSyncTime>();
+    instance<QnCameraUserAttributePool>();
+    instance<QnMediaServerUserAttributesPool>();
+    instance<QnResourcePropertyDictionary>();
+    instance<QnResourceStatusDictionary>();
+    instance<QnServerAdditionalAddressesDictionary>();
+
     instance<QnResourcePool>();
-    instance<QnCameraHistoryPool>();
 
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
+    m_arecontRTSPEnabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
@@ -154,7 +168,7 @@ void QnCommonModule::updateModuleInformation() {
         QnModuleInformation moduleInformation = server->getModuleInformation();
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;
-        moduleInformationCopy.flags = moduleInformation.flags;
+        moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
     }
 
     QnUserResourcePtr admin = qnResPool->getAdministrator();

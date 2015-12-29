@@ -1,6 +1,7 @@
 
 #include "client_startup_parameters.h"
 
+#include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 
 namespace
@@ -18,7 +19,7 @@ namespace
         , const char *longName)
     {
         parser.addParameter(valuePtr, longName, nullptr, QString());
-    };   
+    };
 
     template<typename ValueType, typename DefaultParamType>
     void addParserParam(QnCommandLineParser &parser
@@ -27,7 +28,7 @@ namespace
         , const DefaultParamType &defaultParam)
     {
         parser.addParameter(valuePtr, longName, nullptr, QString(), defaultParam);
-    };    
+    };
 }
 
 QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
@@ -43,22 +44,20 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.screen, "--screen");
     addParserParam(commandLineParser, &result.delayedDrop, "--delayed-drop");
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
-    
+
     /* Development options */
 #ifdef ENABLE_DYNAMIC_TRANSLATION
     addParserParam(commandLineParser, &result.dynamicTranslationPath, "--translation");
 #endif
 
-#ifdef ENABLE_DYNAMIC_CUSTOMIZATION
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
-#endif
-
-    addParserParam(commandLineParser, &result.devModeKey, "--dev-mode-key");
-    addParserParam(commandLineParser, &result.softwareYuv, "--soft-yuv");
-    addParserParam(commandLineParser, &result.forceLocalSettings, "--local-settings");
-    addParserParam(commandLineParser, &result.fullScreenDisabled, "--no-fullscreen");
-    addParserParam(commandLineParser, &result.skipMediaFolderScan, "--skip-media-folder-scan");
-    addParserParam(commandLineParser, &result.engineVersion, "--override-version");
+    addParserParam(commandLineParser, &result.devModeKey,           "--dev-mode-key");
+    addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
+    addParserParam(commandLineParser, &result.forceLocalSettings,   "--local-settings");
+    addParserParam(commandLineParser, &result.fullScreenDisabled,   "--no-fullscreen");
+    addParserParam(commandLineParser, &result.skipMediaFolderScan,  "--skip-media-folder-scan");
+    addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
+    addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
 
     /* Persistent settings override. */
     addParserParam(commandLineParser, &result.logLevel, "--log-level");
@@ -70,6 +69,9 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     /* Runtime settings */
     addParserParam(commandLineParser, &result.versionMismatchCheckDisabled, "--no-version-mismatch-check");
 
+    /* Custom uri handling */
+    addParserParam(commandLineParser, &result.customUri, lit("%1://").arg(QnAppInfo::applicationUriProtocol()).toUtf8().constData());
+
     QString strVideoWallGuid;
     QString strVideoWallItemGuid;
     addParserParam(commandLineParser, &strVideoWallGuid, "--videowall");
@@ -80,6 +82,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
 
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
+
     return result;
 }
 
@@ -94,6 +97,7 @@ QnStartupParameters::QnStartupParameters()
     , softwareYuv(false)
     , forceLocalSettings(false)
     , fullScreenDisabled(kDefaultNoFullScreen)
+    , showFullInfo(false)
 
     , devModeKey()
     , authenticationString()

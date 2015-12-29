@@ -1,5 +1,4 @@
-#ifndef WORKBENCH_BOOKMARKS_HANDLER_H
-#define WORKBENCH_BOOKMARKS_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -23,17 +22,16 @@ class QnWorkbenchBookmarksHandler: public Connective<QObject>, public QnWorkbenc
 public:
     QnWorkbenchBookmarksHandler(QObject *parent = NULL);
 
-    QnCameraBookmarkTags tags() const;
 private slots:
     void at_addCameraBookmarkAction_triggered();
     void at_editCameraBookmarkAction_triggered();
     void at_removeCameraBookmarkAction_triggered();
+    void at_bookmarksModeAction_triggered();
 
-    void updateTags();
 private:
     ec2::AbstractECConnectionPtr connection() const;
 
-    QnCameraBookmarkTags m_tags;
+private:
+    /** If 'Press Ctrl-B' hint was already displayed for the current user. */
+    bool m_hintDisplayed;
 };
-
-#endif // WORKBENCH_BOOKMARKS_HANDLER_H

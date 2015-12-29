@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="de" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -13,17 +13,6 @@
         <source>Locale Code</source>
         <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
         <translation>de</translation>
-    </message>
-</context>
-<context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Eingabe %1</translation>
     </message>
 </context>
 <context>
@@ -42,7 +31,7 @@
     </message>
     <message>
         <source>Write to log</source>
-        <translation>In Log-Datei schreiben</translation>
+        <translation>In Log schreiben</translation>
     </message>
     <message>
         <source>Show notification</source>
@@ -65,10 +54,6 @@
         <translation>Unbekannt (%1)</translation>
     </message>
     <message>
-        <source>User Defined (%1)</source>
-        <translation>Benutzerdefiniert (%1)</translation>
-    </message>
-    <message>
         <source>Motion on Camera</source>
         <translation>Bewegung auf Kamera</translation>
     </message>
@@ -86,7 +71,7 @@
     </message>
     <message>
         <source>Server Conflict</source>
-        <translation>Server Konflikt</translation>
+        <translation>Serverkonflikt</translation>
     </message>
     <message>
         <source>Server Started</source>
@@ -94,7 +79,7 @@
     </message>
     <message>
         <source>License Issue</source>
-        <translation>Lizenzierungsproblem</translation>
+        <translation>Lizenzproblem</translation>
     </message>
     <message>
         <source>Any Server Issue</source>
@@ -110,7 +95,7 @@
     </message>
     <message>
         <source>Input on %1</source>
-        <translation>Input auf %1</translation>
+        <translation>Eingabe auf %1</translation>
     </message>
     <message>
         <source>Motion on %1</source>
@@ -130,7 +115,7 @@
     </message>
     <message>
         <source>Server &quot;%1&quot; Conflict</source>
-        <translation>Server Konflikt bei &quot;%1&quot;</translation>
+        <translation>Serverkonflikt bei &quot;%1&quot;</translation>
     </message>
     <message>
         <source>Server &quot;%1&quot; Started</source>
@@ -146,7 +131,7 @@
     </message>
     <message>
         <source>Url: %1</source>
-        <translation>Url: %1</translation>
+        <translation>URL: %1</translation>
     </message>
     <message>
         <source>Reason: %1</source>
@@ -154,6 +139,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>Konflikt mit Server #%1: %2</translation>
     </message>
     <message>
@@ -189,10 +175,6 @@
     <message>
         <source>RTP packet loss detected.</source>
         <translation>RTP-Paket-Verlust identifiziert.</translation>
-    </message>
-    <message>
-        <source>Server started after crash.</source>
-        <translation>Server nach Absturz neu gestartet.</translation>
     </message>
     <message>
         <source>I/O error has occurred at %1.</source>
@@ -239,10 +221,6 @@
         <translation>Unbekanntes Ereignis aufgetreten</translation>
     </message>
     <message>
-        <source>Input Port: %1</source>
-        <translation>Input Port: %1</translation>
-    </message>
-    <message>
         <source>Conflict Address: %1</source>
         <translation>Konflikt Adresse: %1</translation>
     </message>
@@ -258,59 +236,171 @@
         </translation>
     </message>
     <message>
-        <source>%1 output</source>
-        <translation>%1 Ausgabe</translation>
+        <source>Generic Event</source>
+        <translation>Generisches Event</translation>
     </message>
     <message>
-        <source>%1 output for 30 sec</source>
-        <translation>%1 Ausgabe für 30 Sek</translation>
+        <source> (%1)</source>
+        <translation> (%1)</translation>
     </message>
     <message>
-        <source>%1 recording</source>
-        <translation>%1 Aufnahme</translation>
+        <source>Caption: %1</source>
+        <translation>Überschrift: %1</translation>
     </message>
     <message>
-        <source>Input Signal on %1</source>
-        <translation>Eingangssignal an %1</translation>
+        <source>MAC #%1: %2 </source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
-        <source>%1 Disconnected</source>
-        <translation>%1 getrennt</translation>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation>Verbindung zur Kamera (primärer Stream) wurde unerwartet geschlossen.</translation>
     </message>
     <message>
-        <source>%1 IP Conflict</source>
-        <translation>%1 IP Konflikt</translation>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation>Verbindung zur Kamera (sekundärer Stream) wurde unerwartet geschlossen.</translation>
     </message>
     <message>
-        <source>Any %1 Issue</source>
-        <translation>Ein %1 Problem</translation>
+        <source>Server restarted unexpectedly.</source>
+        <translation>Server startete unerwartet neu.</translation>
     </message>
     <message>
-        <source>%1 %2 was disconnected</source>
-        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation>%1 %2 wurde getrennt</translation>
+        <source>Device output</source>
+        <translation>Geräte-Ausgabe</translation>
     </message>
     <message>
-        <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation>%1 IP Konflikt an %2</translation>
+        <source>Camera output</source>
+        <translation>Kamera-Ausgabe</translation>
     </message>
     <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2 MAC: %3</translation>
+        <source>Device output for 30 sec</source>
+        <translation>Geräte-Ausgabe für 30 Sek</translation>
     </message>
     <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Verbindung zu %1 (primärer Stream) wurde unerwartet geschlossen.</translation>
+        <source>Camera output for 30 sec</source>
+        <translation>Kamera-Ausgabe für 30 Sek</translation>
     </message>
     <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Verbindung zu %1 (sekundärer Stream) wurde unerwartet geschlossen.</translation>
+        <source>Device recording</source>
+        <translation>Geräte-Aufnahme</translation>
     </message>
     <message>
-        <source>Recording on %1 is disabled: </source>
-        <translation>Aufnahme auf %1 ist deaktiviert:</translation>
+        <source>Camera recording</source>
+        <translation>Kamera-Aufnahme</translation>
+    </message>
+    <message>
+        <source>Input Signal on Device</source>
+        <translation>Eingangssignal auf Gerät</translation>
+    </message>
+    <message>
+        <source>Input Signal on Camera</source>
+        <translation>Eingangssignal auf Kamera</translation>
+    </message>
+    <message>
+        <source>Device Disconnected</source>
+        <translation>Geräte getrennt</translation>
+    </message>
+    <message>
+        <source>Camera Disconnected</source>
+        <translation>Kamera getrennt</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict</source>
+        <translation>Geräte-IP-Konflikt</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict</source>
+        <translation>Kamera-IP-Konflikt</translation>
+    </message>
+    <message>
+        <source>Any Device Issue</source>
+        <translation>Jedes Geräte-Problem</translation>
+    </message>
+    <message>
+        <source>Any Camera Issue</source>
+        <translation>Jedes Kamera-Problem</translation>
+    </message>
+    <message>
+        <source>Device %1 was disconnected</source>
+        <translation>Gerät %1 wurde getrennt</translation>
+    </message>
+    <message>
+        <source>Camera %1 was disconnected</source>
+        <translation>Kamera %1 wurde getrennt</translation>
+    </message>
+    <message>
+        <source>IO Module %1 was disconnected</source>
+        <translation>IO Modul %1 wurde getrennt</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict at %1</source>
+        <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>Geräte-IP-Konflikt auf %1</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict at %1</source>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>Kamera-IP-Konflikt auf %1</translation>
+    </message>
+    <message>
+        <source>Connection to device was unexpectedly closed.</source>
+        <translation>Verbindung zum Gerät wurde unerwartet geschlossen.</translation>
+    </message>
+    <message>
+        <source>Recording on devices is disabled:</source>
+        <translation>Aufnahme auf den Geräten ist deaktiviert:</translation>
+    </message>
+    <message>
+        <source>Recording on cameras is disabled:</source>
+        <translation>Aufnahme auf den Kameras ist deaktiviert:</translation>
+    </message>
+    <message>
+        <source>Recording on IO modules is disabled:</source>
+        <translation>Aufnahme auf den IO Modulen ist deaktiviert:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -392,74 +482,136 @@
         <translation>Parameter:</translation>
     </message>
     <message>
-        <source>Not authorised. Url %1.</source>
-        <translation>Nicht authentifiziert. URL %1.</translation>
+        <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+        <translation>Bitte versuchen Sie das Gerät neu zu starten und führen Sie dann ein Werksreset auf der Webseite aus.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network.</source>
-        <translation>Stellen Sie sicher, dass %1 mit dem Netzwerk verbunden ist.</translation>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>Bitte versuchen Sie die Kamera neu zu starten und führen Sie dann ein Werksreset auf der Webseite aus.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Stellen Sie sicher das Port %2 zugänglich ist (Weiterleitung). Versuchen Sie bitte die %1 neu zustarten. Führen Sie dann einen Werksreset auf der Weboberfläche aus.</translation>
+        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
+        <translation>Bitte versuchen Sie das IO Modul neu zu starten und führen Sie dann ein Werksreset auf der Webseite aus.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Stellen Sie sicher, dass die %1 mit dem Netzwerk verbunden ist. Versuchen Sie die %1 neu zu starten.</translation>
+        <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+        <translation>Stellen Sie sicher, dass das Gerät im Netzwerk angeschlossen ist. Versuchen Sie das Gerät neu zu starten.</translation>
     </message>
     <message>
-        <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation>Antwort von %1 konnte nicht analysiert werden. URL %2, Name %3.</translation>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>Stellen Sie sicher, dass die Kamera im Netzwerk angeschlossen wurde. Versuchen Sie die Kamerat neu zu starten.</translation>
     </message>
     <message>
-        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Versuchen Sie bitte die %1 neu zustarten. Führen Sie dann einen Werksreset auf der Weboberfläche aus.</translation>
+        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
+        <translation>Stellen Sie sicher, dass das IO Modul im Netzwerk angeschlossen wurde. Versuchen Sie das IO Modul neu zu starten.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Zuerst, versuchen Sie die Aufnahme zu aktivieren (falls deaktiviert) und verringern Sie die FPS in den %1 Einstellungen.</translation>
+        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
+        <translation>Stellen Sie sicher, dass Port %2 erreichbar ist (Portweiterleitung).</translation>
     </message>
     <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Wenn es nicht hilft, setzen Sie die %1 über die Weboberfläche auf Werkseinstellungen zurück. Wenn das Problem weiterhin besteht, kontaktieren Sie den Support.</translation>
+        <source>Could not parse device response. Url %1, request name %2.</source>
+        <translation>Antwort des Geräts konnte nicht analysiert werden. URL %1, angeforderter Name %2.</translation>
     </message>
     <message>
-        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>%1 Anfrage &quot;%2&quot; schlug feh.l Fehler: %3.</translation>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation>Antwort der Kamera konnte nicht analysiert werden. URL %1, angeforderter Name %2.</translation>
     </message>
     <message>
-        <source>Unknown %1 Issue.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Unbekannter %1 Fehler.</translation>
+        <source>Could not parse IO module response. Url %1, request name %2.</source>
+        <translation>Antwort des IO Moduls konnte nicht analysiert werden. URL %1, angeforderter Name %2.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the %1: %2.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Ungültige Daten wurden von %1: %2 empfangen.</translation>
+        <source>Not authorized. Url %1.</source>
+        <translation>Nicht autorisiert. URL %1.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Zu viele Medien-Fehler. Öffnen Sie bitte das %1 Problem Dialog für mehr Details.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
+        <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (wenn ausgeschaltet) und senken Sie die FPS in den Geräteeinstellungen.</translation>
     </message>
     <message>
-        <source>%1 initialization process in progress.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>%1 Initialisierungsprozess in Bearbeitung.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (wenn ausgeschaltet) und senken Sie die FPS in den Kameraeinstellungen.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
+        <translation>Versuchen Sie zuerst die Aufnahme einzuschalten (wenn ausgeschaltet) und senken Sie die FPS in den IO Modul-Einstellungen.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
+        <translation>Wenn das nicht hilft, setzen Sie das Gerät über die Webseite auf Werkseinstellungen.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
+        <translation>Wenn das nicht hilft, setzen Sie die Kamera über die Webseite auf Werkseinstellungen.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
+        <translation>Wenn das nicht hilft, setzen Sie das IO Modul über die Webseite auf Werkseinstellungen.</translation>
+    </message>
+    <message>
+        <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Geräteabfrage &quot;%1&quot; schlug fehl mit Fehler: &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Kameraabfrage &quot;%1&quot; schlug fehl mit Fehler: &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>IO Modulabfrage &quot;%1&quot; schlug fehl mit Fehler: &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown device issue.</source>
+        <translation>Unbekanntes Geräteproblem.</translation>
+    </message>
+    <message>
+        <source>Unknown camera issue.</source>
+        <translation>Unbekanntes Kameraproblem.</translation>
+    </message>
+    <message>
+        <source>Unknown IO module issue.</source>
+        <translation>Unbekanntes IO MOdul-Problem.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device %1.</source>
+        <translation>Ungültige Daten wurden vom Gerät %1 empfangen.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera %1.</source>
+        <translation>Ungültige Daten wurden von Kamera %1 empfangen.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the IO module %1.</source>
+        <translation>Ungültige Daten wurden vom IO Modul %1 empfangen.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open device issues dialog for more details.</source>
+        <translation>Zu viele Medienfehler. Öffnen Sie bitte das Fehlerprotokoll für weitere Details.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open camera issues dialog for more details.</source>
+        <translation>Zu viele Medienfehler. Öffnen Sie bitte das Fehlerprotokoll für weitere Details.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <translation>Zu viele Medienfehler. Öffnen Sie bitte das Fehlerprotokoll für weitere Details.</translation>
+    </message>
+    <message>
+        <source>Device initialization process in progress.</source>
+        <translation>Geräteinitialisierungsprozess im Gange.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process in progress.</source>
+        <translation>Kamerainitialisierungsprozess im Gange.</translation>
+    </message>
+    <message>
+        <source>IO Module initialization process in progress.</source>
+        <translation>IO Modul-Initialisierungsprozess im Gange.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -717,27 +869,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>Voreinstellung #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Kann IO Port Einstellungen nicht initialisieren</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -962,97 +1093,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Email Adresse nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>No licenses</source>
-        <translation>Keine Lizenzen</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Email Server nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Einige Benutzer haben keine Emailadressen gesetzt</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Verbindung zu Server verloren</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Fehler beim Emailversand</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Email Adresse für Benutzer %1 wurde nicht gesetzt</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Wählen Sie den Server mit dem andere Benutzer ihre Zeit synchronisieren</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Wiederaufbau des Archivindex ist abgeschlossen</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Emailadresse wurde nicht gesetzt.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Emailserver nicht gesetzt.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Einige Benutzer haben keine Emailadresse angegeben.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Sie können keine Systembenachrichtigungen via Email erhalten.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Speicher ist voll auf folgendem Server:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Für den folgenden Server wurde kein Speichermedium konfiguriert:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Sie haben keine Lizenz.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Sie können keine Kameravideos aufzeichnen.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Der Wiederaufbau des Archivindexes wurde auf folgenden Servern abgeschlossen:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Speichermedien sind voll</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Speichermedien sind nicht konfiguriert</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Serverzeit ist nicht synchronisiert und die aktuelle Zeit kann nicht automatisch abgerufen werden.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1077,17 +1117,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Ungültiger Parameter</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Ausgabe %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>Eingabe %1</translation>
     </message>
 </context>
 <context>

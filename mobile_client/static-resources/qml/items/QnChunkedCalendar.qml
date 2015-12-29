@@ -12,7 +12,7 @@ Item {
     property int year: (new Date()).getFullYear()
     property int month: (new Date()).getMonth() + 1
     property date date: new Date()
-    property bool mondayIsFirstDay: true
+    property bool mondayIsFirstDay: d.locale.firstDayOfWeek == Qt.Monday
     property bool horizontal: Main.isMobile() ? !isPhone || Screen.width > Screen.height
                                               : mainWindow.width > dp(540)
     property var chunkProvider
@@ -20,7 +20,7 @@ Item {
     signal datePicked(date date)
 
     height: d.ui.height
-    width: horizontal ? d.ui.width : parent.width
+    width: horizontal ? d.ui.width : mainWindow.width
 
     QtObject {
         id: d
@@ -92,7 +92,7 @@ Item {
         QnHorizontalCalendarLayout {
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
-            monthLabel.text: d.locale.monthName(month - 1)
+            monthLabel.text: d.locale.standaloneMonthName(month - 1, Locale.LongFormat)
             yearLabel.text: year
             dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
 
@@ -105,7 +105,7 @@ Item {
 
                 d.shiftToNeighbourMonth()
             }
-            monthsList.onContentWidthChanged: {
+            monthsList.onContentHeightChanged: {
                 monthsList.positionViewAtIndex(1, ListView.Beginning)
             }
         }
@@ -118,7 +118,7 @@ Item {
             width: calendar.width
             monthsList.model: monthsModel
             monthsList.delegate: monthDelegate
-            monthLabel.text: d.locale.monthName(month - 1)
+            monthLabel.text: d.locale.standaloneMonthName(month - 1, Locale.LongFormat)
             yearLabel.text: year
             dayNamesRow.mondayIsFirstDay: mondayIsFirstDay
 
@@ -131,7 +131,7 @@ Item {
 
                 d.shiftToNeighbourMonth()
             }
-            monthsList.onContentWidthChanged: {
+            monthsList.onContentHeightChanged: {
                 monthsList.positionViewAtIndex(1, ListView.Beginning)
             }
         }

@@ -1,3 +1,64 @@
+-----------------------------------------------2.5.0.xxxx-----------------------------------------
+NEW FEATURES
+    New mobile clients - MOBILE-10
+    Bookmarks - VMS-256
+    Redundant storage - VMS-939
+    Alarm layout - VMS-1171
+    Generic Text Overlay - VMS-1170
+    PTZ as an action - VMS-260
+	
+NEW DEVICE SUPPORT
+    Axis F44 Main Unit - VMS-1199
+    Axis Q6000E panoramic camera - VMS-686
+    ACTi V23 4 Channel Encoder (With I/O Support) - VMS-1157
+    Messoa IP Cameras (With I/O Support)
+    Hikvision DS-6704HFI 4 Channel Video Server
+
+IMPROVEMENTS
+?    Alarm inputs are not discovered from OnCam 360 camera's - VISTA-75
+    Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
+    Better support of ISD Panzilla cameras - VMS-1465, VMS-936, VMS-1351
+    Vista VK2-1080XVRDPTPMF camera is mapped for advanced PTZ - VISTA-76
+    Arecont RTSP camera support - VMS-1166
+    Digital I/O support for Arecont cameras - VMS-1343
+    Added "Connect" button to the "Connection Test" dialog - VMS-263
+    Improved "Info" displaying on items - VMS-1282
+    Calendar widget can be pinned now - VMS-925
+    Added layout backgrounds support to the Video Wall mode - VMS-741
+    Transcoding is enabled by default for video export from multisensor cameras - VMS-265
+    Added warning before export if export causes video downscaling - VMS-1362
+    "Timeline mode" is renamed to "Time Mode". Now it affects timeline and timestamps in Event Logs, Audit Trail and Bookmark Log - VMS-602
+    Added a possibility to sort Alarm/Event Rules by any column - VMS-1548
+    Improved "Server Settings" and "System Administration" dialogs. Now changes can be applied without closing dialog - VMS-1244, VMS-1180
+    Storage Analytics improvements. Storage space occupied by deleted/moved out cameras is displayed separately. - VMS-1569
+    Improved time synchronization mechanism between Servers - VMS-1394, VMS-1149
+    Improved error messages for some cases of push updates failure - VMS-1536
+    Server SSL can be disabled
+    Server on Nx1 may crash on generic event. Fixed.
+    General Server improvements based on anonymous usage statistics - VMS-1529, VMS-1491, VMS-1239
+
+BUG FIXES
+    Digital I/O could not be programmed for Honeywell cameras. Fixed. - VMS-1479
+    Digital I/O could not be programmed for Sony cameras with latest firmware. Fixed. - VMS-1348
+    AV20175DN firmware update re-ordered sensors. Fixed. - VMS-1192
+    DWC-MF10M36TIR camera streams MJPEG instead of h264 by default. Fixed. - VMS-1453
+    MJPEG-stream instead of h264 is being requested from D-link 7110 - VMS-1365
+    Focus buttons VK2-Encoder were not functional. Fixed. VISTA-77
+    Triggered Event Rule with target I/O Module might turn off all active output ports on device. Fixed. - VMS-1458
+    Changes were not applied in the Client till re-login if Server's port was changed via Web Admin Interface. Fixed. - VMS-1160
+    Middle-click on the item with any default rotation always led to rotation to 0 degree. Fixed. - VMS-490
+    Chunks on the timeline weren't loaded if system time was changed back for some reasons. Fixed. - VMS-1142
+    Chunks on the timeline were displayed with local Server Time for cameras added as HTTP-links. Fixed. - VMS-821
+    Chunks weren't disappear from timeline after Server's stop. Fixed. - VMS-929
+    Client didn't update itself during "Update from local file". Fixed. - VMS-1121
+    Merge Systems failed if System name contained ":" character. Fixed. - VMS-1360
+    Rebuilding archive index failed if storage login contained '\' character. Fixed.
+    Proxying local via remote server failed. Fixed.
+    Flag "Send usage statistics" was enabled automatically after upgrade. Fixed. - VMS-1227
+    Watching LIVE video via Android Client wasn't logged in Audit Trail. Fixed. - VMS-555
+    Export with Paxton Plugin has led to the crash. Fixed. - VISTA-72
+	
+
 -----------------------------------------------2.4.1.xxxx-----------------------------------------
 NEW FEATURES
 
@@ -8,12 +69,12 @@ NEW FEATURES
 NEW DEVICE SUPPORT
 
     Bosch X1600 8 channel encoder - VMS-notlisted
-    ACTi i96 camera - VMS-notlsted
+    ACTi i96 camera - VMS-notlisted
 
 IMPROVEMENTS (TBC)
 
     Added Restart Device and Reset to Factory Defaults to Web Admin Interface (Nx1 only). 
-    Improved accuracy of Storage Analytics feature. - VMS-956
+    Improved accuracy of Storage Analytics feature - VMS-956
     Added autofocus support for Vista VK2-3MPBIR28V12re and VK2-3MPVRDIR28V12re cameras - VISTA-53
     Improved ONVIF PTZ support for Redvision dome camera RVX-IP30-IRWL-W - VMS-719
     Added PTZ presets support on Axis M7016 Encoder - VISTA-54
@@ -23,6 +84,7 @@ IMPROVEMENTS (TBC)
     "Info" icon status improvements - saved for layouts, shows camera name only when not active - VMS-307
     Improved Server Settings dialog - VMS-630
     Maximum number of cameras is limited to 12 for Nx1 in failover settings - VMS-682
+    Safe Mode indication for NX1. If NX1 is booted in safe mode, any system changes are not allowed and the corresponding warning is displayed in client
 
 BUG FIXES (TBC)
 
@@ -35,7 +97,9 @@ BUG FIXES (TBC)
     Advanced camera settings were not being requested for DW-MB421TIR camera. Fixed. - VMS-742
     MJPEG for ACTi-E921 doesn't work. Fixed. - VMS-941
     ONVIF-driven multi-channel encoders initialized incorrectly. Fixed. - VMS-585
-
+    If replace HDD with with system, than archive on another hard disk could be removed. Fixed.
+    If multicast is disabled, than camera isn't recorded evenif "enable recording" is set. Fixed.
+     
 
 -----------------------------------------------2.4.0.xxxx-----------------------------------------
 NEW FEATURES:
@@ -50,7 +114,6 @@ Axis P8221 I/O Module
 ACTi V32 16 channel IP encoder
 Digital Watchdog DWC-BVI2IR
 Latest standard Arecont and Axis cameras are supported
-
 
 
 IMPROVEMENTS:

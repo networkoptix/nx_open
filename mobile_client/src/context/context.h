@@ -62,6 +62,8 @@ public:
     Q_INVOKABLE int getNavigationBarHeight() const;
     Q_INVOKABLE bool getDeviceIsPhone() const;
 
+    Q_INVOKABLE void setKeepScreenOn(bool keepScreenOn);
+
 signals:
     /* Dummy signals to prevent non-NOTIFYable warnings */
     void connectionManagerChanged();
@@ -69,9 +71,6 @@ signals:
     void colorThemeChanged();
     void applicationInfoChanged();
     void settingsChanged();
-
-private slots:
-    void at_connectionManager_connectedChanged();
 
 private:
     QnConnectionManager *m_connectionManager;

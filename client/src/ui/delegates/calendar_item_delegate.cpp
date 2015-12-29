@@ -28,8 +28,9 @@ namespace
     int fillType(const QnTimePeriod &period, const QnTimePeriodStorage &periodStorage) 
     {
         return ((periodStorage.periods(Qn::MotionContent).intersects(period) ? kMotionFill : kNoFill)
-            | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFill)
-            | (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFill));
+            | (periodStorage.periods(Qn::RecordingContent).intersects(period) ? kRecordingFill : kNoFill));
+        // TODO: #dklychkov Reimplement it taking bookmarks from query
+            //| (periodStorage.periods(Qn::BookmarksContent).intersects(period) ? kBookmarkFill : kNoFill));
     }
 
     bool paintBackground(int fillType

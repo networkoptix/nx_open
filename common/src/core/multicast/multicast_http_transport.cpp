@@ -1,5 +1,10 @@
 #include "multicast_http_transport.h"
 
+#ifdef Q_OS_LINUX
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#endif
 
 namespace QnMulticast
 {
@@ -186,7 +191,7 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
 Transport::Transport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
-    m_mutex(QMutex::Recursive),
+    m_mutex(QnMutex::Recursive),
     m_nextSendQueued(false)
 {
     initSockets(getLocalAddressList());
@@ -263,7 +268,7 @@ void Transport::at_timer()
 {
     at_socketReadyRead();
     
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     for (auto itr = m_requests.begin(); itr != m_requests.end();)
     {
         TransportConnection& request = *itr;
@@ -289,7 +294,7 @@ void Transport::at_timer()
 
 void Transport::cancelRequest(const QUuid& requestId)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     eraseRequest(requestId);
     m_processedRequests.insert(requestId, 0);
 }
@@ -382,7 +387,7 @@ QnMulticast::Request Transport::parseRequest(const TransportConnection& transpor
 
 QUuid Transport::addRequest(const Request& request, ResponseCallback callback, int timeoutMs)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     TransportConnection transportRequest = serializeRequest(request);
     transportRequest.responseCallback = callback;
     transportRequest.timeoutMs = timeoutMs;
@@ -427,7 +432,7 @@ Transport::TransportConnection Transport::serializeRequest(const Request& reques
 
 void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_requests.push_back(serializeResponse(requestId, clientId, httpResponse));
     queueNextSendData(0);
 }
@@ -465,7 +470,7 @@ void Transport::eraseRequest(const QUuid& id)
 
 void Transport::at_socketReadyRead()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     while (m_recvSocket->hasPendingDatagrams())
     {
         QByteArray datagram;
@@ -528,7 +533,7 @@ void Transport::at_socketReadyRead()
 
 void Transport::sendNextData()
 {
-    QMutexLocker lock(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     m_nextSendQueued = false;
     int sentBytes = 0;
     for (auto itr = m_requests.begin(); itr != m_requests.end();)

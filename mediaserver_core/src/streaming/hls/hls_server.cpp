@@ -34,8 +34,7 @@
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include "utils/network/tcp_connection_priv.h"
-
+#include "network/tcp_connection_priv.h"
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -62,7 +61,10 @@ namespace nx_hls
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),
-        m_bytesSent( 0 )
+        m_bytesSent( 0 ),
+        m_minPlaylistSizeToStartStreaming(MSSettings::roSettings()->value(
+            nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
+            nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt())
     {
         setObjectName( "QnHttpLiveStreamingProcessor" );
     }
@@ -958,7 +960,6 @@ namespace nx_hls
 
     void QnHttpLiveStreamingProcessor::ensureChunkCacheFilledEnoughForPlayback( HLSSession* const session, MediaQuality streamQuality )
     {
-        static const size_t MIN_PLAYLIST_SIZE_TO_START_STREAMING = 1;
         static const size_t PLAYLIST_CHECK_TIMEOUT_MS = 1000;
 
         if( !session->isLive() )
@@ -972,17 +973,20 @@ namespace nx_hls
         std::vector<nx_hls::AbstractPlaylistManager::ChunkData> chunkList;
         bool isPlaylistClosed = false;
         size_t chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
-        if( chunksGenerated == 0 )
+        if( chunksGenerated < m_minPlaylistSizeToStartStreaming)
         {
             //no chunks generated, waiting for at least one chunk to be generated
             QElapsedTimer monotonicTimer;
             monotonicTimer.restart();
-            while( (quint64)monotonicTimer.elapsed() < session->targetDurationMS() * (MIN_PLAYLIST_SIZE_TO_START_STREAMING + 2) )
+            while( (quint64)monotonicTimer.elapsed() < session->targetDurationMS() * (m_minPlaylistSizeToStartStreaming + 2) )
             {
                 chunkList.clear();
                 chunksGenerated = session->playlistManager(streamQuality)->generateChunkList( &chunkList, &isPlaylistClosed );
-                if( chunksGenerated >= MIN_PLAYLIST_SIZE_TO_START_STREAMING )
+                if( chunksGenerated >= m_minPlaylistSizeToStartStreaming )
+                {
+                    NX_LOG(lit("HLS cache has been prefilled with %1 chunks").arg(chunksGenerated), cl_logDEBUG2);
                     break;
+                }
                 QThread::msleep( PLAYLIST_CHECK_TIMEOUT_MS );
             }
         }

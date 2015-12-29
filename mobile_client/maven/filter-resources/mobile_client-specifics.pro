@@ -14,7 +14,7 @@ INCLUDEPATH += \
     ${root.dir}/appserver2/src/ \
     ${root.dir}/client.core/src/
 
-!ios {
+unix: !ios {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
 
@@ -41,9 +41,13 @@ ios {
     OTHER_FILES += $${QMAKE_INFO_PLIST}
     OBJECTIVE_SOURCES += \
         ${basedir}/src/ui/window_utils_ios.mm
-    QMAKE_LFLAGS += \
-        ${ios.oslibs}
 
     ios_icon.files = $$files(${basedir}/${arch}/ios/images/icon*.png)
     QMAKE_BUNDLE_DATA += ios_icon
+
+    launch_image.files = $$files(${basedir}/${arch}/ios/Launch.xib)
+    QMAKE_BUNDLE_DATA += launch_image
+
+    QMAKE_XCODE_CODE_SIGN_IDENTITY = ${ios.sign.identity}
+    XCODEBUILD_FLAGS += PROVISIONING_PROFILE=${provisioning_profile_id}
 }

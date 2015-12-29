@@ -12,7 +12,7 @@ class QnWorkbenchContext;
 class QnRecordingStatusHelper: public QObject {
     Q_OBJECT
 public:
-    static int currentRecordingMode(QnWorkbenchContext *context, QnVirtualCameraResourcePtr camera);
+    static int currentRecordingMode(const QnVirtualCameraResourcePtr &camera);
     static QString tooltip(int recordingMode);
     static QString shortTooltip(int recordingMode);
     static QIcon icon(int recordingMode);

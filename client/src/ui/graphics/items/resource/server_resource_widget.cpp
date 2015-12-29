@@ -34,6 +34,8 @@
 #include <ui/workbench/workbench_item.h>
 
 #include <utils/license_usage_helper.h>
+#include <utils/common/string.h>
+#include <utils/common/qtimespan.h>
 
 namespace {
 
@@ -521,6 +523,8 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     updateButtonsVisibility();
     updateTitleText();
     //updateInfoOpacity();
+    updateInfoText();
+    updateDetailsText();
     at_statistics_received();
 }
 
@@ -687,7 +691,7 @@ void QnServerResourceWidget::updateLegend() {
 
             data.button = newButton;
             data.bar->addButton(data.mask, data.button);
-            
+
         }
     }
 }
@@ -772,19 +776,18 @@ void QnServerResourceWidget::updateHud(bool animate /*= true*/) {
 
 
 QString QnServerResourceWidget::calculateTitleText() const {
-    QString name = getFullResourceName(m_resource, true);
+    enum {
+        kMaxNameLength = 30
+    };
+
+    QString name = elideString(getFullResourceName(m_resource, true), kMaxNameLength);
 
     qint64 uptimeMs = m_resource->getStatus() == Qn::Online
         ? m_manager->uptimeMs(m_resource)
         : 0;
-    if (uptimeMs > 0) {
-        int msInDay = 24 * 3600 * 1000;
-        return tr("%1 (up %n days, %2)", "", uptimeMs / msInDay)
-            .arg(name)
-            .arg(QTime(0, 0).addMSecs(uptimeMs % msInDay).toString(lit("hh:mm"))); // TODO: #TR #Elric this hh:mm is bad even in English...
-    } else {
-        return tr("%1").arg(name);
-    }
+    return uptimeMs > 0
+        ? tr("%1 (up %2)").arg(name, QTimeSpan(uptimeMs).toApproximateString())
+        : name;
 }
 
 QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() const {
@@ -796,7 +799,7 @@ QnResourceWidget::Buttons QnServerResourceWidget::calculateButtonsVisibility() c
 }
 
 Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid()) 
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     auto status = m_resource->getStatus();

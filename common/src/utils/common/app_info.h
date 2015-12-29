@@ -16,6 +16,8 @@ struct QnAppInfo {
     static QString applicationPlatformModification();
     static QString applicationCompiler();
 
+    static QString applicationUriProtocol();
+
     static QString engineVersion();
     static QString ffmpegVersion();
     static QString sigarVersion();
@@ -37,7 +39,10 @@ struct QnAppInfo {
     
     static QString licensingEmailAddress();
     static QString companyUrl();
-    static QString supportAddress();
+
+    static QString supportEmailAddress();
+    static QString supportLink();
+
     static QString showcaseUrl();
     static QString settingsUrl();
     static QString mirrorListUrl();
@@ -49,6 +54,9 @@ struct QnAppInfo {
     static bool    freeLicenseIsTrial();
 
     static QString iosPlayButtonTint();
+
+    static QString oldAndroidClientLink();
+    static QString oldIosClientLink();
 
     // helpers:
 

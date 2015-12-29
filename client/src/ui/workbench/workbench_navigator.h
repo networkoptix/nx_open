@@ -19,6 +19,7 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/long_runnable.h>
+#include <camera/bookmark_queries_cache.h>
 
 class QAction;
 
@@ -35,9 +36,10 @@ class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
-class QnSearchLineEdit;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
+class QnPendingOperation;
+class QnCameraBookmarkAggregation;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -69,11 +71,8 @@ public:
     QnDayTimeWidget *dayTimeWidget() const;
     void setDayTimeWidget(QnDayTimeWidget *dayTimeWidget);
 
-    QnSearchLineEdit *bookmarksSearchWidget() const;
-    void setBookmarksSearchWidget(QnSearchLineEdit *bookmarksSearchWidget);
-
-    QnCameraBookmarkTags bookmarkTags() const;
-    void setBookmarkTags(const QnCameraBookmarkTags &tags);
+    bool bookmarksModeEnabled() const;
+    void setBookmarksModeEnabled(bool bookmarksModeEnabled);
 
     bool isLive() const;
     Q_SLOT bool setLive(bool live);
@@ -90,8 +89,8 @@ public:
     qreal minimalSpeed() const;
     qreal maximalSpeed() const;
 
-    qint64 position() const;
-    void setPosition(qint64 position);
+    qint64 positionUsec() const;
+    void setPosition(qint64 positionUsec);
 
     QnResourceWidget *currentWidget() const;
     WidgetFlags currentWidgetFlags() const;
@@ -116,6 +115,7 @@ signals:
     void speedChanged();
     void speedRangeChanged();
     void positionChanged();
+    void bookmarksModeEnabledChanged();
 
 protected:
     virtual QVariant currentTarget(Qn::ActionScope scope) const override;
@@ -132,7 +132,7 @@ protected:
 
     void addSyncedWidget(QnMediaResourceWidget *widget);
     void removeSyncedWidget(QnMediaResourceWidget *widget);
-    
+
     void updateItemDataFromSlider(QnResourceWidget *widget) const;
     void updateSliderFromItemData(QnResourceWidget *widget, bool preferToPreserveWindow = false);
 
@@ -171,9 +171,9 @@ protected:
     void updateSpeedRange();
 
     void updateLocalOffset();
-   
+
     Q_SLOT void updateThumbnailsLoader();
-    
+
     void updateCurrentWidgetFlags();
 
     void setAutoPaused(bool autoPaused);
@@ -190,7 +190,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);   
+    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -198,15 +198,15 @@ protected slots:
     void at_timeSlider_selectionPressed();
     void at_timeSlider_selectionReleased();
     void at_timeSlider_customContextMenuRequested(const QPointF &pos, const QPoint &screenPos);
-    void at_timeSlider_bookmarksUnderCursorUpdated(const QPointF& pos);
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
-    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks);
+    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks
+        , bool immediately);
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
-    
+
     void at_calendar_dateClicked(const QDate &date);
 
     void at_dayTimeWidget_timeClicked(const QTime &time);
@@ -215,7 +215,16 @@ private:
     QnCachingCameraDataLoader* loaderByWidget(const QnMediaResourceWidget* widget, bool createIfNotExists = true);
 
     bool hasWidgetWithCamera(const QnVirtualCameraResourcePtr &camera) const;
-    void updateHistoryForCamera(const QnVirtualCameraResourcePtr &camera);
+    void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
+    void updateSliderBookmarks();
+
+    void updateBookmarksModeState();
+
+    void resetCurrentBookmarkQuery();
+
+    void setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query);
+
+    QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -224,8 +233,6 @@ private:
     QnTimeScrollBar *m_timeScrollBar;
     QnCalendarWidget *m_calendar;
     QnDayTimeWidget *m_dayTimeWidget;
-    QnSearchLineEdit *m_bookmarksSearchWidget;
-    QnSearchQueryStrategy *m_searchQueryStrategy;
 
     QSet<QnMediaResourceWidget *> m_syncedWidgets;
     QMultiHash<QnMediaResourcePtr, QHashDummyValue> m_syncedResources;
@@ -262,12 +269,16 @@ private:
     qreal m_lastMaximalSpeed;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
-   
+
     QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
-    QnCameraBookmarkTags m_bookmarkTags;
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
-    QnCameraBookmarksQueryPtr m_bookmarkQuery;
+
+    QnBookmarkQueriesCache m_bookmarkQueries;
+    QnCameraBookmarksQueryPtr m_currentQuery;
+
+    QScopedPointer<QnCameraBookmarkAggregation> m_bookmarkAggregation;
+    QnPendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;
 

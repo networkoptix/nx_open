@@ -30,37 +30,37 @@
 
 #include "utils/common/event_processors.h"
 #include <utils/common/scoped_painter_rollback.h>
+#include <utils/common/scoped_value_rollback.h>
 #include "utils/math/color_transformations.h"
 #include "utils/common/synctime.h"
 #include <set>
 
 namespace {
 
-    const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
     const qint64 SECS_PER_HOUR = 3600;
     const qint64 SECS_PER_DAY = SECS_PER_HOUR * 24;
-    const qint64 SECS_PER_WEEK = SECS_PER_DAY * 7;
     const qint64 BYTES_IN_GB = 1000000000ll;
     const qint64 BYTES_IN_TB = 1000ll * BYTES_IN_GB;
+    const qint64 FINAL_STEP_SECONDS = 1000000000ll * 10;
 
     //TODO: #rvasilenko refactor all algorithms working with EXTRA_DATA_BASE to STL
-    const std::array<qint64, 5> EXTRA_DATA_BASE = { 
-        10 * BYTES_IN_GB, 
-        1 * BYTES_IN_TB, 
-        10 * BYTES_IN_TB, 
-        100 * BYTES_IN_TB, 
+    const std::array<qint64, 5> EXTRA_DATA_BASE = {
+        10 * BYTES_IN_GB,
+        1 * BYTES_IN_TB,
+        10 * BYTES_IN_TB,
+        100 * BYTES_IN_TB,
         1000 * BYTES_IN_TB
     };
     const int TICKS_PER_INTERVAL = 100;
     const int SPACE_INTERVAL = 4;
 
-    class QnRecordingStatsItemDelegate: public QStyledItemDelegate 
+    class QnRecordingStatsItemDelegate: public QStyledItemDelegate
     {
         typedef QStyledItemDelegate base_type;
 
     public:
-        explicit QnRecordingStatsItemDelegate(QObject *parent = NULL): 
-            base_type(parent) 
+        explicit QnRecordingStatsItemDelegate(QObject *parent = NULL):
+            base_type(parent)
         {}
 
         virtual void paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const override {
@@ -82,36 +82,27 @@ namespace {
                 painter->translate(shift);
                 opt.rect.translate(-shift);
 
-                qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
-                qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+                //qreal realData = index.data(Qn::RecordingStatChartDataRole).toReal();
+                //qreal forecastData = index.data(Qn::RecordingStatForecastDataRole).toReal();
+                qreal chartData = index.data(Qn::RecordingStatChartDataRole).toReal();
+                QColor chartColor;
+                QVariant colorData =  index.data(Qn::RecordingStatChartColorDataRole);
+                if (colorData.isValid() && colorData.canConvert<QColor>())
+                    chartColor = qvariant_cast<QColor>(colorData);
 
 
                 QColor baseColor = opt.backgroundBrush.color(); //opt.palette.color(QPalette::Normal, QPalette::Base);
-
-                QVariant value = index.data(Qn::RecordingStatColorsDataRole);
-                QnRecordingStatsColors colors;
-                if (value.isValid() && value.canConvert<QnRecordingStatsColors>())
-                    colors = qvariant_cast<QnRecordingStatsColors>(value);
 
                 if (opt.state & QStyle::State_Selected) {
                     // alternate row color
                     const int shift = 16;
                     baseColor = shiftColor(baseColor, shift, shift, shift);
-                    colors.chartMainColor = shiftColor(colors.chartMainColor, shift, shift, shift);
-                    colors.chartForecastColor = shiftColor(colors.chartForecastColor, shift, shift, shift);
                 }
                 painter->fillRect(opt.rect, baseColor);
 
                 opt.rect.adjust(2, 1, -2, -1);
 
-                if (forecastData > realData) {
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
-                }
-                else {
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * realData, opt.rect.height()), colors.chartMainColor);
-                    painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * forecastData, opt.rect.height()), colors.chartForecastColor);
-                }
+                painter->fillRect(QRect(opt.rect.left() , opt.rect.top(), opt.rect.width() * chartData, opt.rect.height()), chartColor);
 
                 painter->setFont(opt.font);
                 painter->setPen(opt.palette.foreground().color());
@@ -134,7 +125,7 @@ namespace {
         QComboBox* m_comboBox;
 
     private:
-        void updateComboBox() 
+        void updateComboBox()
         {
             QRect rect(sectionViewportPosition(QnRecordingStatsModel::BitrateColumn), 0,  sectionSize(QnRecordingStatsModel::BitrateColumn), height());
             int width = m_comboBox->minimumSizeHint().width();
@@ -181,8 +172,8 @@ namespace {
             }
         }
 
-        QComboBox* comboBox() const { 
-            return m_comboBox; 
+        QComboBox* comboBox() const {
+            return m_comboBox;
         }
 
         int durationForBitrate() const {
@@ -190,6 +181,7 @@ namespace {
         }
     };
 
+    const int minimumSectionSize = 200;
 }
 
 QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*/):
@@ -197,16 +189,17 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     QnWorkbenchContextAware(parent),
     ui(new Ui::RecordingStatisticsWidget),
     m_server(),
-    m_model(new QnRecordingStatsModel(this)),
+    m_model(new QnRecordingStatsModel(false, this)),
+    m_forecastModel(new QnRecordingStatsModel(true, this)),
     m_requests(),
+    m_updating(false),
     m_updateDisabled(false),
     m_dirty(false),
-    m_selectAllAction(NULL),
-    m_exportAction(NULL),
-    m_clipboardAction(NULL),
+    m_selectAllAction(new QAction(tr("Select All"), this)),
+    m_exportAction(new QAction(tr("Export Selection to File..."), this)),
+    m_clipboardAction(new QAction(tr("Copy Selection to Clipboard"), this)),
     m_lastMouseButton(Qt::NoButton),
     m_allData(),
-    m_hiddenCameras(),
     m_availStorages()
 
 {
@@ -218,24 +211,19 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     ui->gridEvents->setModel(sortModel);
     ui->gridEvents->setItemDelegate(new QnRecordingStatsItemDelegate(this));
 
-
     CustomHorizontalHeader* headers = new CustomHorizontalHeader(this);
     ui->gridEvents->setHorizontalHeader(headers);
-    connect(headers->comboBox(), QnComboboxCurrentIndexChanged, this, &QnRecordingStatisticsWidget::updateData);
 
     headers->setSectionsClickable(true);
     headers->setStretchLastSection(true);
     headers->setSectionResizeMode(QHeaderView::Interactive);
     headers->setSectionResizeMode(QnRecordingStatsModel::CameraNameColumn, QHeaderView::ResizeToContents);
-    headers->setMinimumSectionSize(120);
+    headers->setMinimumSectionSize(minimumSectionSize);
     headers->setSortIndicatorShown(true);
 
     for (int i = QnRecordingStatsModel::BytesColumn; i < QnRecordingStatsModel::ColumnCount; ++i)
-        ui->gridEvents->setColumnWidth(i, headers->minimumSectionSize());
+        ui->gridEvents->setColumnWidth(i, minimumSectionSize);
 
-    m_clipboardAction   = new QAction(tr("Copy Selection to Clipboard"), this);
-    m_exportAction      = new QAction(tr("Export Selection to File..."), this);
-    m_selectAllAction   = new QAction(tr("Select All"), this);
     m_selectAllAction->setShortcut(QKeySequence::SelectAll);
     m_clipboardAction->setShortcut(QKeySequence::Copy);
 
@@ -247,26 +235,20 @@ QnRecordingStatisticsWidget::QnRecordingStatisticsWidget(QWidget* parent /* = 0*
     ui->gridEvents->addAction(m_clipboardAction);
     ui->gridEvents->addAction(m_exportAction);
 
-    ui->loadingProgressBar->hide();
+    connect(m_clipboardAction,      &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
+    connect(m_exportAction,         &QAction::triggered,                    this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
+    connect(headers->comboBox(),    QnComboboxCurrentIndexChanged,          this,   &QnRecordingStatisticsWidget::updateData);
+    connect(ui->refreshButton,      &QAbstractButton::clicked,              this,   &QnRecordingStatisticsWidget::updateData);
+    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged,               this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,                 this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(ui->extraSizeSpinBox,   QnDoubleSpinBoxValueChanged,            this,   &QnRecordingStatisticsWidget::at_forecastParamsChanged);
+    connect(m_model,                &QnRecordingStatsModel::colorsChanged,  this,   &QnRecordingStatisticsWidget::updateColors);
+    connect(ui->gridEvents,         &QTableView::customContextMenuRequested,this,   &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
+    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE),
+                                    &QnPropertyNotifier::valueChanged,      ui->gridEvents, &QAbstractItemView::reset);
+    connect(m_selectAllAction,      &QAction::triggered,                    ui->gridEvents, &QTableView::selectAll);
 
-    connect(m_clipboardAction,      &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_clipboardAction_triggered);
-    connect(m_exportAction,         &QAction::triggered,                this,   &QnRecordingStatisticsWidget::at_exportAction_triggered);
-    connect(m_selectAllAction,      &QAction::triggered,                ui->gridEvents, &QTableView::selectAll);
-
-    connect(ui->refreshButton,      &QAbstractButton::clicked,          this,   &QnRecordingStatisticsWidget::updateData);
-
-    connect(ui->gridEvents,         &QTableView::clicked,               this,   &QnRecordingStatisticsWidget::at_eventsGrid_clicked);
-    connect(ui->gridEvents,         &QTableView::customContextMenuRequested, this, &QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested);
-    connect(qnSettings->notifier(QnClientSettings::IP_SHOWN_IN_TREE), &QnPropertyNotifier::valueChanged, ui->gridEvents, &QAbstractItemView::reset);
-
-    connect(ui->checkBoxForecast,   &QCheckBox::stateChanged, this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
-    connect(ui->extraSpaceSlider,   &QSlider::valueChanged,   this, &QnRecordingStatisticsWidget::at_forecastParamsChanged);
-    connect(ui->extraSizeSpinBox,   SIGNAL(valueChanged(double)),   this, SLOT(at_forecastParamsChanged()));
-
-    connect(m_model, &QnRecordingStatsModel::colorsChanged, this, &QnRecordingStatisticsWidget::at_updateColors);
-    at_updateColors();
-
-    ui->mainGridLayout->activate();
+    updateColors();
 
     setHelpTopic(this, Qn::ServerSettings_StorageAnalitycs_Help);
 }
@@ -279,11 +261,21 @@ QnMediaServerResourcePtr QnRecordingStatisticsWidget::server() const {
 }
 
 void QnRecordingStatisticsWidget::setServer(const QnMediaServerResourcePtr &server) {
+    if (m_server == server)
+        return;
     m_server = server;
 }
 
-void QnRecordingStatisticsWidget::updateFromSettings() {
+void QnRecordingStatisticsWidget::loadDataToUi() {
     updateData();
+}
+
+void QnRecordingStatisticsWidget::applyChanges() {
+    /* This widget is read-only. */
+}
+
+bool QnRecordingStatisticsWidget::hasChanges() const {
+    return false;
 }
 
 void QnRecordingStatisticsWidget::updateData() {
@@ -302,7 +294,6 @@ void QnRecordingStatisticsWidget::updateData() {
         ui->gridEvents->setDisabled(true);
         ui->stackedWidget->setCurrentWidget(ui->gridPage);
         setCursor(Qt::BusyCursor);
-        ui->loadingProgressBar->show();
     }
     else {
         requestFinished(); // just clear grid
@@ -314,8 +305,7 @@ void QnRecordingStatisticsWidget::updateData() {
 }
 
 
-void QnRecordingStatisticsWidget::at_updateColors()
-{
+void QnRecordingStatisticsWidget::updateColors() {
     auto colors = m_model->colors();
 
     QPalette palette = ui->labelUsageColor->palette();
@@ -330,6 +320,11 @@ void QnRecordingStatisticsWidget::at_updateColors()
     ui->labelForecastColor->setAutoFillBackground(true);
     ui->labelForecastColor->update();
 }
+
+void QnRecordingStatisticsWidget::resetForecast() {
+    ui->checkBoxForecast->setChecked(false);
+}
+
 
 void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
 {
@@ -346,8 +341,7 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
         m_requests.insert(handle, m_server->getId());
-        handle = m_server->apiConnection()->getStorageSpaceAsync(
-            this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        handle = m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         m_requests.insert(handle, m_server->getId());
     }
 }
@@ -373,8 +367,9 @@ void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorage
         return;
     m_requests.remove(requestNum);
     if (status == 0) {
-        for (const auto& storage: data.storages) 
+        for (const auto& storage: data.storages) {
             m_availStorages << storage;
+        }
     }
     if (m_requests.isEmpty()) {
         requestFinished();
@@ -384,23 +379,27 @@ void QnRecordingStatisticsWidget::at_gotStorageSpace(int status, const QnStorage
 void QnRecordingStatisticsWidget::requestFinished()
 {
     QnRecordingStatsReply existsCameras;
-    m_hiddenCameras.clear();
-    for (const auto& camera: m_allData) 
+    QnRecordingStatsReply hiddenCameras;
+    for (const auto& camera: m_allData)
     {
-        if (qnResPool->hasSuchResource(camera.uniqueId))
+        const auto& cam = qnResPool->getResourceByUniqueId(camera.uniqueId);
+        if (cam && cam->getParentId() == m_server->getId())
             existsCameras << camera;
         else
-            m_hiddenCameras << camera;
+            hiddenCameras << camera; // hide all cameras which belong to another server
     }
+    if (!hiddenCameras.isEmpty()) {
+        QnCamRecordingStatsData extraRecord; // data occuped by foreign cameras and cameras missed at resource pool
+        extraRecord.uniqueId = QnSortedRecordingStatsModel::kForeignCameras;
+        for (const auto& hiddenRecord: hiddenCameras)
+            extraRecord.recordedBytes += hiddenRecord.recordedBytes;
+        existsCameras << extraRecord;
+    }
+
     m_model->setModelData(existsCameras);
     ui->gridEvents->setDisabled(false);
     at_forecastParamsChanged();
     setCursor(Qt::ArrowCursor);
-    ui->loadingProgressBar->hide();
-}
-
-void QnRecordingStatisticsWidget::at_eventsGrid_clicked(const QModelIndex& /*idx*/)
-{
 }
 
 void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const QPoint&)
@@ -411,8 +410,12 @@ void QnRecordingStatisticsWidget::at_eventsGrid_customContextMenuRequested(const
     {
         QnResourcePtr resource = ui->gridEvents->model()->data(idx, Qn::ResourceRole).value<QnResourcePtr>();
         QnActionManager *manager = context()->menu();
+
         if (resource) {
-            menu = manager->newMenu(Qn::TreeScope, this, QnActionParameters(resource));
+            QnActionParameters parameters(resource);
+            parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+            menu = manager->newMenu(Qn::TreeScope, this, parameters);
             foreach(QAction* action, menu->actions())
                 action->setShortcut(QKeySequence());
         }
@@ -448,7 +451,7 @@ void QnRecordingStatisticsWidget::at_clipboardAction_triggered()
 void QnRecordingStatisticsWidget::at_mouseButtonRelease(QObject* sender, QEvent* event)
 {
     Q_UNUSED(sender)
-        QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
+    QMouseEvent* me = dynamic_cast<QMouseEvent*> (event);
     m_lastMouseButton = me->button();
 }
 
@@ -484,25 +487,25 @@ int QnRecordingStatisticsWidget::bytesToSliderPosition (qint64 value) const
 
 void QnRecordingStatisticsWidget::at_forecastParamsChanged()
 {
+    if (m_updating)
+        return;
+    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+
+    QnSortedRecordingStatsModel* sortModel = static_cast<QnSortedRecordingStatsModel*> (ui->gridEvents->model());
+    if (ui->checkBoxForecast->isChecked())
+        sortModel->setSourceModel(m_forecastModel);
+    else
+        sortModel->setSourceModel(m_model);
+
     if (!ui->gridEvents->isEnabled())
         return;
     ui->gridEvents->setEnabled(false);
 
     bool fcEnabled = ui->checkBoxForecast->isChecked();
     ui->extraSpaceSlider->setEnabled(fcEnabled);
-    for (int i = 0; i < ui->gridLayoutForecast->count(); ++i)
-        //for (const auto& object: ui->gridLayoutForecast->getItemPosition() ())
-    {
-        QWidget* object = ui->gridLayoutForecast->itemAt(i)->widget();
-        if (QSlider* slider = dynamic_cast<QSlider*>(object))
-            slider->setEnabled(fcEnabled);
-        else if (QLabel* label = dynamic_cast<QLabel*>(object))
-            label->setEnabled(fcEnabled);
-        else if (QDoubleSpinBox* spinbox = dynamic_cast<QDoubleSpinBox*>(object))
-            spinbox->setEnabled(fcEnabled);
-    }
+    ui->forecastControlWidget->setEnabled(fcEnabled);
 
-    if (ui->checkBoxForecast->isChecked()) 
+    if (ui->checkBoxForecast->isChecked())
     {
         qint64 forecastedSize = 0;
         if (sender() == ui->extraSpaceSlider) {
@@ -514,46 +517,11 @@ void QnRecordingStatisticsWidget::at_forecastParamsChanged()
             ui->extraSpaceSlider->setValue(bytesToSliderPosition(forecastedSize));
         }
 
-        m_model->setForecastData(getForecastData(forecastedSize));
+        m_forecastModel->setModelData(getForecastData(forecastedSize));
     }
     else
-        m_model->setForecastData(QnRecordingStatsReply());
-    updateColumnWidth();
+        m_forecastModel->setModelData(QnRecordingStatsReply());
     ui->gridEvents->setEnabled(true);
-}
-
-void QnRecordingStatisticsWidget::updateColumnWidth()
-{
-    int minWidth = 0;
-    auto* headers = ui->gridEvents->horizontalHeader();
-    headers->setMinimumSectionSize(0);
-
-    for (int j = 1; j < QnRecordingStatsModel::BitrateColumn; ++j)
-    {
-        for (int i = 0; i < m_model->rowCount(); ++i)
-        {
-            QModelIndex index = m_model->index(i, j);
-            QString txt = index.data(Qt::DisplayRole).toString();
-
-            QVariant value = index.data(Qt::FontRole);
-            if (value.isValid() && value.canConvert<QFont>()) {
-                QFont font = qvariant_cast<QFont>(value);
-                QFontMetrics fm(font);
-                minWidth = qMax(minWidth, fm.width(txt));
-            }
-            else {
-                QFontMetrics fm(ui->gridEvents->font());
-                minWidth = qMax(minWidth, fm.width(txt));
-            }
-        }
-    }
-
-    minWidth += SPACE_INTERVAL * 2;
-    headers->setMinimumSectionSize(minWidth);
-    for (int j = 1; j < QnRecordingStatsModel::BitrateColumn; ++j) {
-        if (headers->sectionSize(j) < minWidth)
-            headers->resizeSection(j, minWidth);
-    }
 }
 
 QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraSizeBytes)
@@ -562,32 +530,47 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
     ForecastData forecastData;
 
     // 1. collect camera related forecast params
-    for(const auto& cameraStats: modelData) 
+    bool hasExpaned = false;
+    for(const auto& cameraStats: modelData)
     {
         ForecastDataPerCamera cameraForecast;
-        cameraForecast.stats = cameraStats;
 
         QnSecurityCamResourcePtr camRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraStats.uniqueId);
         if (camRes) {
             cameraForecast.expand = !camRes->isScheduleDisabled();
             cameraForecast.expand &= (camRes->getStatus() == Qn::Online || camRes->getStatus() == Qn::Recording);
-            cameraForecast.expand &= cameraForecast.stats.archiveDurationSecs > 0 && cameraForecast.stats.recordedBytes > 0;
+            cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());
             cameraForecast.maxDays = qMax(0, camRes->maxDays());
-            cameraForecast.byterate = cameraForecast.stats.recordedBytes / cameraForecast.stats.archiveDurationSecs;
+            cameraForecast.byterate = cameraStats.recordedBytes / cameraStats.archiveDurationSecs;
+            if (cameraForecast.expand)
+                hasExpaned = true;
         }
-        cameraForecast.stats.archiveDurationSecs = 0;
+        cameraForecast.stats.uniqueId = cameraStats.uniqueId;
+        cameraForecast.stats.averageBitrate = cameraStats.averageBitrate;
         forecastData.cameras.push_back(std::move(cameraForecast));
-        forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
+        //forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
+
+        for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
+        {
+            for (const auto& storageSpaceData: m_availStorages)
+            {
+                if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
+                    forecastData.totalSpace += itr.value();
+            }
+        }
     }
-    
+
+    if (!hasExpaned)
+        return modelData; // no recording cameras at all. Do not forecast anything
+
     // 2.1 add free storage space
-    for (const auto& storageSpaceData: m_availStorages) 
+    for (const auto& storageSpaceData: m_availStorages)
     {
         QnResourcePtr storageRes = qnResPool->getResourceById(storageSpaceData.storageId);
         if (!storageRes)
             continue;
-        if (storageSpaceData.isUsedForWriting && storageSpaceData.isWritable) 
+        if (storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
             forecastData.totalSpace += qMax(0ll, storageSpaceData.freeSpace - storageSpaceData.reservedSpace);
     }
 
@@ -615,7 +598,7 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::doForecast(ForecastData forec
         if (camera.maxDays > 0)
             steps.insert(camera.maxDays * SECS_PER_DAY);
     }
-    steps.insert(INT_MAX); // final step for all cameras
+    steps.insert(FINAL_STEP_SECONDS); // final step for all cameras
 
     for (qint64 seconds: steps) {
         spendData(forecastData, seconds, [seconds](const ForecastDataPerCamera& stats)
@@ -625,8 +608,11 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::doForecast(ForecastData forec
     }
 
     QnRecordingStatsReply result;
-    for (const auto& value: forecastData.cameras)
+    for (auto& value: forecastData.cameras)
+    {
+        value.stats.recordedBytes = value.byterate * value.stats.archiveDurationSecs;
         result << value.stats;
+    }
     return result;
 }
 

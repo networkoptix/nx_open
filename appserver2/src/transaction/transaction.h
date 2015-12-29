@@ -59,9 +59,6 @@ namespace ec2
             removeCamera                = 303,  /*< ApiIdData */
             getCameraHistoryItems       = 304,  /*< ApiServerFootageDataList */
             addCameraHistoryItem        = 305,  /*< ApiServerFootageData */
-            addCameraBookmarkTags       = 306,  /*< ApiCameraBookmarkTagDataList */
-            getCameraBookmarkTags       = 307,  /*< ApiCameraBookmarkTagDataList */
-            removeCameraBookmarkTags    = 308,
             removeCameraHistoryItem     = 309,  /*< ApiServerFootageData */
             saveCameraUserAttributes    = 310,  /*< ApiCameraAttributesData */
             saveCameraUserAttributesList= 311,  /*< ApiCameraAttributesDataList */

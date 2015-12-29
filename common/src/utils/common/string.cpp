@@ -1,9 +1,100 @@
 #include "string.h"
 
+#include <QtXml/QDomDocument>
+
 #include <cmath>
 
 #include "util.h"
 
+namespace
+{
+    QString replaceNewLineToBrTag(const QString &text)
+    {
+        static const auto kNewLineSymbol = L'\n';
+        static const auto kNewLineTag = lit("<br>");
+
+        return text.trimmed().replace(kNewLineSymbol, kNewLineTag);
+    }
+
+
+    // @brief Tries to elide node text
+    // @return Resulting text length
+    int elideTextNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
+    {
+        auto textNode = node.toText();
+        if (textNode.isNull())
+            return 0;
+
+        const auto text = textNode.nodeValue();
+        const auto textSize = text.size();
+        if (textSize <= maxLength)
+            return textSize;
+
+        const auto elided = elideString(text, maxLength);
+        textNode.setNodeValue(elided);
+        return maxLength;
+    }
+
+    // @brief Tries to elide node (element) text.
+    // @return Resulting text length
+    int elideDomNode(QDomNode &node
+        , int maxLength
+        , const QString &tail)
+    {
+        // if specified node is text - elide it
+        if (auto len = elideTextNode(node, maxLength, tail))
+            return len;
+
+        int currentLength = 0;
+        QList<QDomNode> forRemove;
+        for (auto child = node.firstChild(); !child.isNull(); child = child.nextSibling())
+        {
+            if (currentLength >= maxLength)
+            {
+                // Removes all elements that are not fit to length
+                forRemove.append(child);
+                continue;
+            }
+
+            // Tries to elide text node
+            if (currentLength < maxLength)
+            {
+                if (auto length = elideTextNode(child, maxLength - currentLength, tail))
+                {
+                    currentLength += length;
+                    continue;
+                }
+            }
+
+            // if it is not text node, try to parse whole element
+            const auto elem = child.toElement();
+            if (elem.isNull())
+            {
+                // If it is not element (comment or some specific data) - skip it
+                continue;
+            }
+
+            const int textLength = elem.text().size();
+            if ((currentLength + textLength) <= maxLength)
+            {
+                // Text length of element (and all its child elements) is less then maximum
+                currentLength += textLength;
+                continue;
+            }
+
+            currentLength += elideDomNode(child, maxLength - currentLength, tail);
+        }
+
+        // Removes all elements that are not fit
+        for(auto child: forRemove)
+            node.removeChild(child);
+
+        return currentLength;
+    };
+
+}
 
 QString replaceCharacters(const QString &string, const char *symbols, const QChar &replacement) {
     if(!symbols)
@@ -26,7 +117,7 @@ QString replaceCharacters(const QString &string, const char *symbols, const QCha
     return result;
 }
 
-qint64 parseDateTime( const QString& dateTime )
+qint64 parseDateTime( const QString& dateTimeStr )
 {
     static const qint64 MIN_PER_HOUR = 60;
     static const qint64 SEC_PER_MIN = 60;
@@ -36,13 +127,13 @@ qint64 parseDateTime( const QString& dateTime )
     static const qint64 MS_PER_SEC = 1000;
     static const qint64 USEC_PER_MS = 1000;
 
-    if( dateTime.toLower().trimmed() == lit( "now" ) )
+    if( dateTimeStr.toLower().trimmed() == lit( "now" ) )
     {
         return DATETIME_NOW;
     }
-    else if( dateTime.contains( L'T' ) || (dateTime.contains( L'-' ) && !dateTime.startsWith( L'-' )) )
+    else if( dateTimeStr.contains( L'T' ) || (dateTimeStr.contains( L'-' ) && !dateTimeStr.startsWith( L'-' )) )
     {
-        const QStringList dateTimeParts = dateTime.split( L'.' );
+        const QStringList dateTimeParts = dateTimeStr.split( L'.' );
         QDateTime tmpDateTime = QDateTime::fromString( dateTimeParts[0], Qt::ISODate );
         if( dateTimeParts.size() > 1 )
             tmpDateTime = tmpDateTime.addMSecs( dateTimeParts[1].toInt() / 1000 );
@@ -50,16 +141,27 @@ qint64 parseDateTime( const QString& dateTime )
     }
     else
     {
-        auto somethingSinceEpoch = dateTime.toLongLong();
+        auto somethingSinceEpoch = dateTimeStr.toLongLong();
         //detecting millis or usec?
-        if( somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS) )
+        if( somethingSinceEpoch > 0 && somethingSinceEpoch < (DAY_PER_NON_LEAP_YEAR * HOUR_PER_DAY * MIN_PER_HOUR * SEC_PER_MIN * MS_PER_SEC * USEC_PER_MS) )
             return somethingSinceEpoch * USEC_PER_MS;   //dateTime is in millis
         else
             return somethingSinceEpoch;
     }
 }
 
-QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString pattern) {
+qint64 parseDateTimeMsec( const QString& dateTimeStr )
+{
+    static const qint64 kUsecPerMs = 1000;
+
+    qint64 usecSinceEpoch = parseDateTime(dateTimeStr);
+    if (usecSinceEpoch < 0 || usecSinceEpoch == DATETIME_NOW)
+        return usecSinceEpoch;  //special values are returned "as is"
+
+    return usecSinceEpoch / kUsecPerMs;
+}
+
+QString formatFileSize(qint64 size, int precision, int prefixThreshold, Qn::MetricPrefix minPrefix, Qn::MetricPrefix maxPrefix, bool useBinaryPrefixes, const QString &pattern) {
     static const char *metricSuffixes[] = {"B", "kB",  "MB",  "GB",  "TB",  "PB",  "EB",  "ZB",  "YB"};
     static const char *binarySuffixes[] = {"B", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"};
 
@@ -190,12 +292,12 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 
 bool isNumberStart(const QChar &c) {
     /* We don't want to handle negative numbers as this leads to very strange
-     * results. Think how "1-1" and "1-2" are going to be compared in this 
+     * results. Think how "1-1" and "1-2" are going to be compared in this
      * case. */
 
-    return 
-#if 0 
-        c == L'-' || c == L'+' || 
+    return
+#if 0
+        c == L'-' || c == L'+' ||
 #endif
         c.isDigit();
 }
@@ -209,7 +311,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
     isNumber = false;
     QChar curr = string[ pos ];
     // TODO:: Fix it
-    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed 
+    // If you don't want to handle sign of the number, this isNumberStart is not needed indeed
     if ( isNumberStart(curr) )
     {
 #if 0
@@ -236,7 +338,7 @@ void ExtractToken( QString & buffer, const QString & string, int & pos, bool & i
             }
 
             /* We don't want to handle exponential notation.
-             * Besides, this implementation is buggy as it treats '14easd' 
+             * Besides, this implementation is buggy as it treats '14easd'
              * as a number. */
 #if 0
             if ( !curr.isNull() && curr.toLower() == L'e' )
@@ -387,4 +489,36 @@ void trimInPlace( QString* const str, const QString& symbols )
 
 QString htmlBold(const QString &source) {
     return lit("<b>%1</b>").arg(source);
+}
+
+QString elideString(const QString &source, int maxLength, const QString &tail)
+{
+    if (source.length() <= maxLength)
+        return source;
+
+    const auto tailLength = tail.length();
+    const auto elidedText = source.left(maxLength > tailLength ? maxLength - tailLength : 0);
+    return (elidedText + tail);
+}
+
+QString htmlFormattedParagraph( const QString &text , int pixelSize , bool isBold /*= false */, bool isItalic /*= false*/ ) {
+    static const auto kPTag = lit("<p style=\" text-ident: 0; font-size: %1px; font-weight: %2; font-style: %3; color: #FFF; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; \">%4</p>");
+
+    if (text.isEmpty())
+        return QString();
+
+    const QString boldValue = (isBold ? lit("bold") : lit("normal"));
+    const QString italicValue (isItalic ? lit("italic") : lit("normal"));
+
+    const auto newFormattedText = replaceNewLineToBrTag(text);
+    return kPTag.arg(QString::number(pixelSize), boldValue, italicValue, newFormattedText);
+}
+
+QString elideHtml(const QString &html, int maxLength, const QString &tail)
+{
+    QDomDocument dom;
+    dom.setContent(replaceNewLineToBrTag(html));
+    auto root = dom.documentElement();
+    elideDomNode(root, maxLength, tail);
+    return dom.toString();
 }

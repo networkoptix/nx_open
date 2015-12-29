@@ -114,7 +114,7 @@ protected:
     QnWorkbenchNotificationsHandler* notificationsHandler() const;
 
 protected slots:
-   
+
     void submitDelayedDrops();
     void submitInstantDrop();
 
@@ -167,7 +167,7 @@ protected slots:
     void at_preferencesSmtpTabAction_triggered();
     void at_preferencesNotificationTabAction_triggered();
     void at_userSettingsAction_triggered();
-    
+
     void at_mediaFileSettingsAction_triggered();
     void at_cameraIssuesAction_triggered();
     void at_cameraBusinessRulesAction_triggered();
@@ -230,6 +230,7 @@ private:
 
     void openLayoutSettingsDialog(const QnLayoutResourcePtr &layout);
     void openFailoverPriorityDialog();
+    void openBackupCamerasDialog();
 
     QnAdjustVideoDialog* adjustVideoDialog();
 
@@ -242,6 +243,9 @@ private:
     void deleteDialogs();
 
     void closeApplication(bool force = false);
+
+    qint64 getFirstBookmarkTimeMs();
+
 private:
     QPointer<QWidget> m_widget;
     QPointer<QMenu> m_mainMenu;
@@ -269,7 +273,7 @@ private:
     QnStorageResourcePtr m_exportStorage;
 
     QTimer *m_tourTimer;
-    struct CameraMovingInfo 
+    struct CameraMovingInfo
     {
         CameraMovingInfo() {}
         CameraMovingInfo(const QnVirtualCameraResourceList& cameras, const QnMediaServerResourcePtr& dstServer): cameras(cameras), dstServer(dstServer) {}

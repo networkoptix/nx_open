@@ -143,6 +143,17 @@ bool StreamingChunkCacheKey::live() const
     return m_isLive;
 }
 
+bool StreamingChunkCacheKey::mediaStreamParamsEqualTo(const StreamingChunkCacheKey& right) const
+{
+    return srcResourceUniqueID() == right.srcResourceUniqueID() &&
+           channel() == right.channel() &&
+           streamQuality() == right.streamQuality() &&
+           pictureSizePixels() == right.pictureSizePixels() &&
+           containerFormat() == right.containerFormat() &&
+           videoCodec() == right.videoCodec() &&
+           audioCodec() == right.audioCodec();
+}
+
 bool StreamingChunkCacheKey::operator<( const StreamingChunkCacheKey& right ) const
 {
     if( m_uniqueResourceID < right.m_uniqueResourceID )

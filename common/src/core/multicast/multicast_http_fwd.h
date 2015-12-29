@@ -2,7 +2,7 @@
 
 #include <QUuid>
 #include <QUrl>
-#include <QAuthenticator>
+#include <QtNetwork/QAuthenticator>
 #include <QQueue>
 #include <functional>
 

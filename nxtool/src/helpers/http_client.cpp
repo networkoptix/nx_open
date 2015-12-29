@@ -180,7 +180,7 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
                     errorCallback(RequestError::kSuccess);
                 else if (httpCode == kHttpUnauthorized)
                     errorCallback(RequestError::kUnauthorized);
-                else 
+                else
                     errorCallback(RequestError::kUnspecified);
 
                 break;

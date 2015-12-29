@@ -49,4 +49,7 @@ namespace ec2
 
 } // namespace ec2
 
+Q_DECLARE_METATYPE(ec2::ApiResourceParamData)
+Q_DECLARE_METATYPE(ec2::ApiResourceParamWithRefData)
+
 #endif // __RESOURCE_TRANSACTION_DATA_H__

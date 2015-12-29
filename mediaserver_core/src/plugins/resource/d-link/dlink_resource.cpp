@@ -7,34 +7,60 @@
 #include "dlink_stream_reader.h"
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 
-
 const QString QnPlDlinkResource::MANUFACTURE(lit("Dlink"));
 
-QnDlink_cam_info::QnDlink_cam_info():
-    hasMPEG4(false),
-    hasFixedQuality(false),
-    numberOfVideoProfiles(0)
+namespace 
+{
+
+    bool sizeCompare(const QSize &s1, const QSize &s2)
+    {
+        return s1.width() > s2.width();
+    }
+
+    bool profileCompare(const QnDlink_ProfileInfo &left, const QnDlink_ProfileInfo &right)
+    {
+        bool isH264Left = (left.codec == "H264");
+        bool isH264Right = (right.codec == "H264");
+        if (isH264Left != isH264Right)
+            return isH264Left > isH264Right;
+        return left.number < right.number;
+    }
+
+    int extractProfileNum(const QByteArray& key) 
+    {
+        QByteArray result;
+        int rightPos = key.size()-1;
+        while (rightPos >= 0 && key.at(rightPos) >= '0' && key.at(rightPos) <= '9')
+            --rightPos;
+        return key.mid(rightPos+1).toInt();
+    }
+
+    bool hasLiteralContinuation(const QByteArray& key, const QByteArray&prefix) 
+    {
+        QByteArray suffix = key.mid(prefix.size());
+        for (int i = 0; i < suffix.size(); ++i) {
+            bool isDigit = suffix.at(i) >= '0' && suffix.at(i) <= '9';
+            if (!isDigit)
+                return true;
+        }
+        return false;
+    }
+}
+
+
+QnDlink_cam_info::QnDlink_cam_info()
 {
 }
 
 void QnDlink_cam_info::clear()
 {
-    numberOfVideoProfiles = 0;
-    hasMPEG4 = false;
-    hasH264 = QString();
-    hasFixedQuality = false;
 
-    videoProfileUrls.clear();
     resolutions.clear();
     possibleBitrates.clear();
     possibleFps.clear();
 
     possibleQualities.clear();
-}
-
-bool QnDlink_cam_info::inited() const
-{
-    return numberOfVideoProfiles > 0;
+    profiles.clear();
 }
 
 // returns resolution with width not less than width
@@ -61,7 +87,7 @@ QSize QnDlink_cam_info::resolutionCloseTo(int width) const
 }
 
 // returns next up bitrate 
-QString QnDlink_cam_info::bitrateCloseTo(int val)
+QByteArray QnDlink_cam_info::bitrateCloseTo(int val)
 {
 
     QSize result;
@@ -69,10 +95,10 @@ QString QnDlink_cam_info::bitrateCloseTo(int val)
     if (possibleBitrates.size()==0)
     {
         Q_ASSERT(false);
-        return QString();
+        return QByteArray();
     }
 
-    QMap<int, QString>::iterator it = possibleBitrates.lowerBound(val);
+    auto it = possibleBitrates.lowerBound(val);
     if (it == possibleBitrates.end())
         it--;
 
@@ -200,28 +226,6 @@ QnDlink_cam_info QnPlDlinkResource::getCamInfo() const
     return m_camInfo;
 }
 
-static QStringList getValues(const QString& line)
-{
-    QStringList result;
-
-    int index = line.indexOf(QLatin1Char('='));
-
-    if (index < 0)
-        return result;
-
-    QString values = line.mid(index+1);
-
-    return values.split(QLatin1Char(','));
-}
-
-extern QString getValueFromString(const QString& line);
-
-
-static bool sizeCompare(const QSize &s1, const QSize &s2)
-{
-    return s1.width() > s2.width();
-}
-
 CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 {
     QnPhysicalCameraResource::initInternal();
@@ -240,32 +244,30 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
         return CameraDiagnostics::UnknownErrorResult();
 
 
-    QString file_s = QLatin1String(cam_info_file);
-    QStringList lines = file_s.split(QLatin1String("\r\n"), QString::SkipEmptyParts);
+    QList<QByteArray> lines = cam_info_file.split('\n');
 
     m_camInfo.clear();
 
-    for(const QString& line: lines)
+    QMap<int, QnDlink_ProfileInfo> profilesMap;
+
+    for(QByteArray line: lines)
     {
-        if (line.contains(QLatin1String("videos=")))
+        line = line.trimmed();
+        int splitterPos = line.indexOf(L'=');
+        if (splitterPos == -1)
+            continue;
+        const QByteArray key = line.left(splitterPos).trimmed();
+        const QByteArray value = line.mid(splitterPos+1).trimmed();
+
+        if (key == "videos")
         {
-            if (line.contains(QLatin1String("H.264")))
-                m_camInfo.hasH264 = QLatin1String("H.264");
-            else
-                if (line.contains(QLatin1String("H264")))
-                    m_camInfo.hasH264 = QLatin1String("H264");
-
-
-            if (line.contains(QLatin1String("MPEG4")))
-                m_camInfo.hasMPEG4 = true;
-
+            ; // nothing to do
         }
-        else if (line.contains(QLatin1String("resolutions=")))
+        else if (key == "resolutions")
         {
-            QStringList vals = getValues(line);
-            for(const QString& val:  vals)
+            for(const QByteArray& val:  value.split(','))
             {
-                QStringList wh_s = val.split(QLatin1Char('x'));
+                QList<QByteArray> wh_s = val.split('x');
                 if (wh_s.size()<2)
                     continue;
 
@@ -273,25 +275,20 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
             }
 
         }
-        else if (line.contains(QLatin1String("framerates=")))
+        else if (key == "framerates")
         {
-            QStringList vals = getValues(line);
-            for(const QString& val:  vals)
-            {
+            QList<QByteArray> vals = value.split(',');
+            for(const QByteArray& val:  vals)
                 m_camInfo.possibleFps.push_back( val.toInt() );
-
-            }
         }
-        else if (line.contains(QLatin1String("vbitrates=")))
+        else if (key == "vbitrates")
         {
-            QStringList vals = getValues(line);
-            for(const QString& bs: vals)
+            for(const QByteArray& bs: value.split(','))
             {
-                bool m = bs.toLower().contains(QLatin1Char('m'));
-                bool k = bs.toLower().contains(QLatin1Char('k'));
+                bool m = bs.toLower().contains('m');
+                bool k = bs.toLower().contains('k');
 
-                QString t = bs;
-
+                QByteArray t = bs;
                 if (m || k)
                     t = t.left(t.length()-1);
                 
@@ -301,37 +298,30 @@ CameraDiagnostics::Result QnPlDlinkResource::initInternal()
 
                 m_camInfo.possibleBitrates[val] = bs;
             }
-
-            
         }
-        else if (line.contains(QLatin1String("vprofilenum=")))
-        {
-            m_camInfo.numberOfVideoProfiles = getValueFromString(line).toInt();
+        else if (key == "vprofilenum") {
+            ; // nothing to do
         }
-        else if (line.contains(QLatin1String("qualities=")))
-        {
-            m_camInfo.possibleQualities = getValueFromString(line).split(lit(","));
-            m_camInfo.hasFixedQuality = true;
+        else if (key == "qualities") {
+            m_camInfo.possibleQualities = value.split(',');
         }
-        else if (line.contains(QLatin1String("vprofileurl")))
-        {
-            for(int i = 1; i <= m_camInfo.numberOfVideoProfiles; ++i)
-            {
-                QString s = QLatin1String("vprofileurl") + QString::number(i);
-                if (line.contains(s))
-                {
-                    m_camInfo.videoProfileUrls[i] = getValueFromString(line);
-                    break;
-                }
-            }
+        else if (key.startsWith("vprofileurl")) {
+            profilesMap[extractProfileNum(key)].url = QLatin1String(value);
         }
-
-
+        else if (key.startsWith("vprofile") && !hasLiteralContinuation(key, "vprofile")) {
+            profilesMap[extractProfileNum(key)].codec = value.toUpper();
+        }
     }
 
 
     qSort(m_camInfo.possibleFps.begin(), m_camInfo.possibleFps.end(), qGreater<int>());
     qSort(m_camInfo.resolutions.begin(), m_camInfo.resolutions.end(), sizeCompare);
+    
+    for (auto itr = profilesMap.begin(); itr != profilesMap.end(); ++itr) {
+        itr.value().number = itr.key();
+        m_camInfo.profiles << itr.value();
+    }
+    qSort(m_camInfo.profiles.begin(), m_camInfo.profiles.end(), profileCompare);
 
     // =======remove elements with diff aspect ratio
     if (m_camInfo.resolutions.size() < 2)

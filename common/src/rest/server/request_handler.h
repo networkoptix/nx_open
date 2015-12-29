@@ -35,8 +35,9 @@ class QnRestRequestHandler: public QObject {
 public:
     QnRestRequestHandler();
 
-    // TODO: #Elric #EC2 replace QnRequestParamList -> QnRequestParams
-
+    //TODO: #rvasilenko #EC2 replace QnRequestParamList -> QnRequestParams
+    //TODO: #rvasilenko replace parameters set with a single struct, 8 arguments is far too many
+    //TODO: #rvasilenko looks like QnRestConnectionProcessor* is used only to get and modify its headers
     /*!
         \return http statusCode
     */

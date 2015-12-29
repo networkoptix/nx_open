@@ -21,13 +21,11 @@
 #include <core/misc/screen_snap.h>
 
 #include <nx_ec/ec_api.h>
-#include <network/authenticate_helper.h>
 
 #include "api_business_rule_data.h"
 #include "api_camera_data.h"
 #include "api_camera_attributes_data.h"
 #include "api_camera_data_ex.h"
-#include "api_camera_bookmark_data.h"
 #include "api_camera_history_data.h"
 #include "api_email_data.h"
 #include "api_full_info_data.h"
@@ -251,6 +249,7 @@ void fromApiToResource(const ApiCameraAttributesData &src, const QnCameraUserAtt
     dst->maxDays = src.maxArchiveDays;
     dst->preferedServerId = src.preferedServerId;
     dst->failoverPriority = src.failoverPriority;
+    dst->backupQualities = src.backupType;
 }
 
 void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributesData& dst)
@@ -279,6 +278,7 @@ void fromResourceToApi(const QnCameraUserAttributesPtr& src, ApiCameraAttributes
     dst.maxArchiveDays = src->maxDays;
     dst.preferedServerId = src->preferedServerId;
     dst.failoverPriority = src->failoverPriority;
+    dst.backupType = src->backupQualities;
 }
 
 void fromApiToResourceList(const ApiCameraAttributesDataList& src, QnCameraUserAttributesList& dst)
@@ -538,6 +538,7 @@ void fromResourceToApi(const QnStorageResourcePtr &src, ApiStorageData &dst) {
     dst.spaceLimit = src->getSpaceLimit();
     dst.usedForWriting = src->isUsedForWriting();
     dst.storageType = src->getStorageType();
+    dst.isBackup = src->isBackup();
 }
 
 void fromResourceToApi(const QnStorageResourceList &src, ApiStorageDataList &dst)
@@ -556,6 +557,7 @@ void fromApiToResource(const ApiStorageData &src, QnStorageResourcePtr &dst) {
     dst->setSpaceLimit(src.spaceLimit);
     dst->setUsedForWriting(src.usedForWriting);
     dst->setStorageType(src.storageType);
+    dst->setBackup(src.isBackup);
 }
 
 void fromResourceToApi(const QnMediaServerResourcePtr& src, ApiMediaServerData &dst) {
@@ -628,6 +630,11 @@ void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, ApiMediaServer
     dst.serverName = src->name;
     dst.maxCameras = src->maxCameras;
     dst.allowAutoRedundancy = src->isRedundancyEnabled;
+    dst.backupType = src->backupSchedule.backupType;
+    dst.backupDaysOfTheWeek = src->backupSchedule.backupDaysOfTheWeek;
+    dst.backupStart = src->backupSchedule.backupStartSec;
+    dst.backupDuration = src->backupSchedule.backupDurationSec;
+    dst.backupBitrate = src->backupSchedule.backupBitrate;
 }
 
 void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst) {
@@ -635,6 +642,11 @@ void fromApiToResource(const ApiMediaServerUserAttributesData& src, QnMediaServe
     dst->name = src.serverName;
     dst->maxCameras = src.maxCameras;
     dst->isRedundancyEnabled = src.allowAutoRedundancy;
+    dst->backupSchedule.backupType = src.backupType;
+    dst->backupSchedule.backupDaysOfTheWeek = src.backupDaysOfTheWeek;
+    dst->backupSchedule.backupStartSec = src.backupStart;
+    dst->backupSchedule.backupDurationSec = src.backupDuration;
+    dst->backupSchedule.backupBitrate = src.backupBitrate;
 }
 
 void fromApiToResourceList(const ApiMediaServerUserAttributesDataList &src, QnMediaServerUserAttributesList& dst) {
@@ -949,17 +961,6 @@ void fromResourceToApi(const QnVideoWallControlMessage &message, ApiVideowallCon
         data.params.insert(std::pair<QString, QString>(iter.key(), iter.value()));
         ++iter;
     }
-}
-
-void fromApiToResource(const ApiCameraBookmarkTagDataList &data, QnCameraBookmarkTags &tags) {
-    for (const ApiCameraBookmarkTagData &tag: data)
-        tags << tag.name;
-}
-
-void fromResourceToApi(const QnCameraBookmarkTags &tags, ApiCameraBookmarkTagDataList &data) {
-    data.reserve(data.size() + tags.size());
-    for (const QString &tag: tags)
-        data.push_back(ApiCameraBookmarkTagData(tag));
 }
 
 

@@ -17,13 +17,13 @@ class QPainter;
 class QnResourceDisplay;
 class QnProgressDialog;
 
-struct QnScreenshotParameters 
+struct QnScreenshotParameters
 {
     QnScreenshotParameters();
 
-    qint64 timestampMsec;    //in microseconds since epoch
+    qint64 utcTimestampMsec;
     bool isUtc;
-    qint64 adjustedTimeMsec;
+    qint64 displayTimeMsec;
     QString filename;
     Qn::Corner timestampPosition;
     QnItemDewarpingParams itemDewarpingParams;
@@ -70,7 +70,7 @@ public:
     QnWorkbenchScreenshotHandler(QObject *parent = NULL);
 
 private:
-    QnImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters) const;
+    QnImageProvider* getLocalScreenshotProvider(QnMediaResourceWidget *widget, const QnScreenshotParameters &parameters, bool forced = false) const;
 
 private slots:
     void at_takeScreenshotAction_triggered();

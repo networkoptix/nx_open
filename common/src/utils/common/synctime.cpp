@@ -17,12 +17,14 @@ enum {
 // -------------------------------------------------------------------------- //
 // QnSyncTime
 // -------------------------------------------------------------------------- //
-QnSyncTime::QnSyncTime()
+QnSyncTime::QnSyncTime(QObject *parent)
 :
+    QObject(parent),
     m_lastReceivedTime( 0 ),
     m_lastWarnTime( 0 ),
     m_lastLocalTime( 0 ),
-    m_syncTimeRequestIssued( false )
+    m_syncTimeRequestIssued( false ),
+    m_refCounter( 1 )
 {
     reset();
 }
@@ -66,6 +68,36 @@ void QnSyncTime::reset()
 {
     m_lastWarnTime = 0;
     m_lastLocalTime = 0;
+}
+
+unsigned int QnSyncTime::addRef()
+{
+    return ++m_refCounter;
+}
+
+unsigned int QnSyncTime::releaseRef()
+{
+    return --m_refCounter;
+}
+
+void* QnSyncTime::queryInterface(const nxpl::NX_GUID& interfaceID)
+{
+    if (memcmp(&interfaceID, &nxpl::IID_TimeProvider, sizeof(nxpl::IID_TimeProvider)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::TimeProvider*>(this);
+    }
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
+    {
+        addRef();
+        return static_cast<nxpl::PluginInterface*>(this);
+    }
+    return NULL;
+}
+
+uint64_t QnSyncTime::millisSinceEpoch() const
+{
+    return const_cast<QnSyncTime*>(this)->currentMSecsSinceEpoch();
 }
 
 void QnSyncTime::updateTime(qint64 newTime)

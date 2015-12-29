@@ -7,25 +7,19 @@ import "../main.js" as Main
 
 import "../controls"
 
-QnFlickable {
+Item {
     id: cameraFlow
 
-    property alias model: repeater.model
+    property alias model: cameraGrid.model
 
-    contentWidth: width
-    contentHeight: content.height
-    topMargin: dp(16)
-    leftMargin: dp(16)
-    rightMargin: dp(16)
-    bottomMargin: dp(16)
+    clip: true
 
     QtObject {
         id: d
 
         property var pendingHiddenItems: []
         property real maxItemWidth: dp(192)
-        property int thumbnailsInRow: Math.max(2, Math.floor(flow.width / maxItemWidth))
-        property real thumbnailWidth: flow.width / thumbnailsInRow - flow.spacing * (1 - (1 / thumbnailsInRow))
+        property int thumbnailsInRow: Math.max(2, Math.floor(cameraGrid.width / maxItemWidth))
 
         function hidePendingItems() {
             if (pendingHiddenItems.length == 0)
@@ -36,209 +30,237 @@ QnFlickable {
         }
     }
 
-    Column {
-        id: content
+    QnGridView {
+        id: cameraGrid
 
-        width: parent.width
-        x: -cameraFlow.leftMargin
+        anchors.fill: parent
 
-        Item {
-            id: flowContent
+        readonly property real spacing: dp(8)
 
-            width: parent.width
-            height: flow.height
-            clip: true
+        topMargin: spacing
+        bottomMargin: spacing
 
-            Flow {
-                id: flow
+        model: QnCameraListModel {
+            id: camerasModel
+            showOffline: settings.showOfflineCameras
+            hiddenCameras: settings.hiddenCameras
+        }
 
-                property bool loaded: false
+        cellWidth: (width - spacing) / d.thumbnailsInRow
+        cellHeight: cellWidth * 3 / 4 + dp(24) + dp(16)
 
-                spacing: dp(16)
-                width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
-                x: cameraFlow.leftMargin
+        delegate: Item {
+            width: cameraGrid.cellWidth
+            height: cameraGrid.cellHeight
 
-                Repeater {
-                    id: repeater
+            QnCameraItem {
+                anchors.right: parent.right
+                width: parent.width - cameraGrid.spacing
 
-                    model: QnCameraListModel {
-                        id: camerasModel
-                        showOffline: settings.showOfflineCameras
-                        hiddenCameras: settings.hiddenCameras
-                    }
+                text: model.resourceName
+                status: model.resourceStatus
+                thumbnail: model.thumbnail
 
-                    QnCameraItem {
-                        text: model.resourceName
-                        status: model.resourceStatus
-                        thumbnail: model.thumbnail
-                        thumbnailWidth: d.thumbnailWidth
-
-                        onClicked: Main.openMediaResource(model.uuid)
-                        onHiddenChanged: {
-                            // use temporary object to update QML property correctly
-                            var items = d.pendingHiddenItems
-
-                            if (hidden) {
-                                items.push(model.uuid)
-                            } else {
-                                var index = items.indexOf(model.uuid)
-                                if (index != -1)
-                                    items.splice(index, 1)
-                            }
-
-                            d.pendingHiddenItems = items
-                        }
-                    }
+                onClicked: {
+                    var point = mapToItem(stackView, width / 2, height / 2)
+                    Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y), model.thumbnail)
                 }
+                onHiddenChanged: {
+                    // use temporary object to update QML property correctly
+                    var items = d.pendingHiddenItems
 
-                move: Transition {
-                    NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
-                }
-                add: Transition {
-                    id: addTransition
-                    enabled: flow.loaded
-                    SequentialAnimation {
-                        ScriptAction {
-                            script: {
-                                console.log("depacited")
-                                console.log(addTransition.ViewTransition.targetIndexes)
-                                addTransition.ViewTransition.item.opacity = 0.0
-                            }
-                        }
-                        PauseAnimation {
-                            duration: 100
-                        }
-                        ParallelAnimation {
-                            NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
-                            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-                        }
-                        ScriptAction {
-                            script: {
-                                console.log("opacited")
-                                addTransition.ViewTransition.item.opacity = 1.0
-                            }
-                        }
+                    if (hidden) {
+                        items.push(model.uuid)
+                    } else {
+                        var index = items.indexOf(model.uuid)
+                        if (index != -1)
+                            items.splice(index, 1)
                     }
+
+                    d.pendingHiddenItems = items
                 }
             }
 
-            Behavior on height {
-                id: flowHeightBehavior
-                enabled: flow.loaded
-                NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            Timer {
+                id: refreshTimer
+
+                interval: 60 * 1000
+                repeat: true
+                running: connectionManager.connectionState == QnConnectionManager.Connected
+                triggeredOnStart: true
+
+                onTriggered: camerasModel.refreshThumbnail(index)
             }
         }
 
-        Column {
-            id: hiddenCamerasContent
+        move: Transition {
+            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+        }
+        displaced: Transition {
+            NumberAnimation { properties: "x,y"; duration: 500; easing.type: Easing.OutCubic }
+        }
+        add: Transition {
+            id: addTransition
+            NumberAnimation { property: "y"; from: addTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+        }
+        populate: Transition {
+            id: populateTransition
+            NumberAnimation { property: "y"; from: populateTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
+        }
+        remove: Transition {
+            NumberAnimation { property: "opacity"; to: 0.0; duration: 250; easing.type: Easing.OutCubic }
+        }
 
+        footer: hiddenCamerasComponent
+    }
+
+    QnScrollIndicator {
+        flickable: cameraGrid
+    }
+
+    Component {
+        id: hiddenCamerasComponent
+
+        Item {
             width: cameraFlow.width
-            visible: hiddenCamerasList.count > 0
+            height: hiddenCamerasContent.height
 
-            Item {
-                height: dp(24)
-                width: parent.width
+            Column {
+                id: hiddenCamerasContent
 
-                Rectangle {
-                    anchors.verticalCenter: parent.bottom
-                    anchors.verticalCenterOffset: -dp(8)
+                property bool collapsed: true
+
+                width: parent.width - cameraGrid.spacing * 2
+                x: cameraGrid.spacing
+                visible: hiddenCamerasList.count > 0
+
+                Item {
+                    height: dp(24)
                     width: parent.width
-                    height: dp(1)
-                    color: QnTheme.listSeparator
-                }
-            }
 
-            Item {
-                width: parent.width
-                height: dp(48)
-
-                Image {
-                    source: "image://icon/section_open.png"
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(16)
-                    rotation: settings.hiddenCamerasCollapsed ? 180 : 0
-                    Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-                    scale: iconScale()
+                    Rectangle {
+                        anchors.verticalCenter: parent.bottom
+                        anchors.verticalCenterOffset: -dp(8)
+                        width: parent.width
+                        height: dp(1)
+                        color: QnTheme.listSeparator
+                    }
                 }
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    x: dp(72)
-                    text: qsTr("Hidden cameras")
-                    font.pixelSize: sp(15)
-                    font.weight: Font.DemiBold
-                    color: QnTheme.listSectionText
-                }
+                Item {
+                    width: parent.width
+                    height: dp(48)
 
-                QnMaterialSurface {
-                    onClicked: settings.hiddenCamerasCollapsed = !settings.hiddenCamerasCollapsed
-                }
-            }
+                    Image {
+                        source: "image://icon/section_open.png"
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: dp(16)
+                        rotation: hiddenCamerasContent.collapsed ? 180 : 0
+                        Behavior on rotation { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
+                        scale: iconScale()
+                    }
 
-            Item {
-                width: parent.width
-                height: settings.hiddenCamerasCollapsed ? 0 : hiddenCamerasColumn.height
-                clip: true
+                    Text {
+                        anchors.verticalCenter: parent.verticalCenter
+                        x: dp(72)
+                        text: qsTr("Hidden cameras")
+                        font.pixelSize: sp(16)
+                        font.weight: Font.DemiBold
+                        color: QnTheme.listSectionText
+                    }
 
-                Behavior on height { NumberAnimation { duration: 500; easing.type: Easing.OutCubic } }
-
-                Column {
-                    id: hiddenCamerasColumn
-                    width: parent.width - cameraFlow.leftMargin - cameraFlow.rightMargin
-                    x: cameraFlow.leftMargin
-
-                    Repeater {
-                        id: hiddenCamerasList
-                        model: QnCameraListModel {
-                            id: hiddenCamerasModel
-                            showOffline: settings.showOfflineCameras
-                            hiddenCameras: settings.hiddenCameras
-                            hiddenCamerasOnly: true
-                        }
-
-                        QnHiddenCameraItem {
-                            text: model.resourceName
-                            status: model.resourceStatus
-
-                            onClicked: Main.openMediaResource(model.uuid)
-                            onShowClicked: {
-                                var originalList = settings.hiddenCameras
-
-                                var hiddenCameras = d.pendingHiddenItems
-                                d.pendingHiddenItems = []
-
-                                for (var i = 0; i < originalList.length; i++) {
-                                    if (originalList[i] !== model.uuid)
-                                        hiddenCameras.push(originalList[i])
-                                }
-
-                                settings.hiddenCameras = hiddenCameras
+                    QnMaterialSurface {
+                        onClicked: {
+                            hiddenCamerasContent.collapsed = !hiddenCamerasContent.collapsed
+                            if (hiddenCamerasContent.collapsed) {
+                                expandAnimation.stop()
+                                collapseAnimation.start()
+                            } else {
+                                collapseAnimation.stop()
+                                expandAnimation.start()
                             }
                         }
                     }
-                    move: Transition {
-                        NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutCubic }
+                }
+
+                Item {
+                    id: hiddenList
+                    width: parent.width
+                    height: 0
+                    clip: true
+
+                    ParallelAnimation {
+                        id: expandAnimation
+                        NumberAnimation {
+                            target: hiddenList
+                            property: "height"
+                            to: hiddenCamerasColumn.height
+                            duration: 500
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: cameraGrid
+                            property: "contentY"
+                            to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
+                            duration: 500
+                            easing.type: Easing.OutCubic
+                        }
                     }
-                    add: Transition {
-                        id: hiddenIntemAddTransition
-                        SequentialAnimation {
-                            ScriptAction {
-                                script: {
-                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 0.0
+
+                    ParallelAnimation {
+                        id: collapseAnimation
+                        NumberAnimation {
+                            target: hiddenList
+                            property: "height"
+                            to: 0
+                            duration: 500
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+
+                    Column {
+                        id: hiddenCamerasColumn
+                        width: parent.width - cameraGrid.leftMargin - cameraGrid.rightMargin
+                        x: cameraGrid.leftMargin
+
+                        Repeater {
+                            id: hiddenCamerasList
+                            model: QnCameraListModel {
+                                id: hiddenCamerasModel
+                                showOffline: settings.showOfflineCameras
+                                hiddenCameras: settings.hiddenCameras
+                                hiddenCamerasOnly: true
+                            }
+
+                            QnHiddenCameraItem {
+                                text: model.resourceName
+                                status: model.resourceStatus
+
+                                onClicked: {
+                                    var point = mapToItem(stackView, width / 2, height / 2)
+                                    Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y), model.thumbnail)
+                                }
+                                onShowClicked: {
+                                    var originalList = settings.hiddenCameras
+
+                                    var hiddenCameras = d.pendingHiddenItems
+                                    d.pendingHiddenItems = []
+
+                                    for (var i = 0; i < originalList.length; i++) {
+                                        if (originalList[i] !== model.uuid)
+                                            hiddenCameras.push(originalList[i])
+                                    }
+
+                                    settings.hiddenCameras = hiddenCameras
                                 }
                             }
-                            PauseAnimation {
-                                duration: 100
-                            }
-                            ParallelAnimation {
-                                NumberAnimation { property: "opacity"; to: 1.0; duration: 500; easing.type: Easing.OutCubic }
-                                NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
-                            }
-                            ScriptAction {
-                                script: {
-                                    hiddenIntemAddTransition.ViewTransition.item.opacity = 1.0
-                                }
-                            }
+                        }
+                        move: Transition {
+                            NumberAnimation { properties: "y"; duration: 500; easing.type: Easing.OutCubic }
+                        }
+                        add: Transition {
+                            id: hiddenIntemAddTransition
+                            NumberAnimation { property: "y"; from: hiddenIntemAddTransition.ViewTransition.destination.y + dp(56); duration: 500; easing.type: Easing.OutCubic }
                         }
                     }
                 }
@@ -274,41 +296,8 @@ QnFlickable {
         }
     }
 
-    Timer {
-        id: refreshTimer
-
-        interval: 2 * 60 * 1000
-        repeat: true
-        running: true
-
-        triggeredOnStart: true
-
-        onTriggered: {
-            model.refreshThumbnails(0, repeater.count)
-        }
-    }
-
-    onWidthChanged: updateLayout()
-
     onVisibleChanged: {
         if (!visible)
             d.hidePendingItems()
-    }
-
-    Timer {
-        id: loadedTimer
-        interval: 500
-        onTriggered: flow.loaded = true
-        repeat: false
-        running: false
-    }
-
-    function setLoaded() {
-        loadedTimer.running = true
-        updateLayout()
-    }
-
-    function updateLayout() {
-        model.updateLayout(resourcesPage.width, 3.0)
     }
 }

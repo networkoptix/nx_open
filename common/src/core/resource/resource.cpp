@@ -83,17 +83,10 @@ public:
     bool execute()
     {
         bool success = isConnectedToTheResource();
-        
         QnCameraAdvancedParamValueList result;
-        if (success) {
-            for(const QString &id: m_ids) {
-                QString value;
-                if (m_resource->getParamPhysical(id, value))
-                    result << QnCameraAdvancedParamValue(id, value);
-                else
-                    success = false;
-            }
-        }
+        if (success)
+            success = m_resource->getParamsPhysical(m_ids, result);
+        
         emit m_resource->asyncParamsGetDone(m_resource, result);
         return success;
     }
@@ -152,16 +145,8 @@ public:
         bool success = isConnectedToTheResource();
 
         QnCameraAdvancedParamValueList result;
-        if (success) {
-            m_resource->setParamsBegin();
-            for(const QnCameraAdvancedParamValue &value: m_values) {
-                if (m_resource->setParamPhysical(value.id, value.value))
-                    result << value;
-                else
-                    success = false;
-            }
-            m_resource->setParamsEnd();
-        }
+        if (success)
+            success = m_resource->setParamsPhysical(m_values, result);
         emit m_resource->asyncParamsSetDone(m_resource, result);
         return success;
     }
@@ -189,6 +174,29 @@ QnResource::QnResource():
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
     m_removedFromPool(false),
     m_initInProgress(false)
+{
+}
+
+QnResource::QnResource(const QnResource& right)
+:
+    QObject(),
+    m_parentId(right.m_parentId),
+    m_name(right.m_name),
+    m_url(right.m_url),
+    m_resourcePool(right.m_resourcePool),
+    m_id(right.m_id),
+    m_typeId(right.m_typeId),
+    m_flags(right.m_flags),
+    m_lastDiscoveredTime(right.m_lastDiscoveredTime),
+    m_tags(right.m_tags),
+    m_initialized(right.m_initialized),
+    m_lastInitTime(right.m_lastInitTime),
+    m_prevInitializationResult(right.m_prevInitializationResult),
+    m_lastMediaIssue(right.m_lastMediaIssue),
+    m_initializationAttemptCount(right.m_initializationAttemptCount),
+    m_locallySavedProperties(right.m_locallySavedProperties),
+    m_removedFromPool(right.m_removedFromPool),
+    m_initInProgress(right.m_initInProgress)
 {
 }
 
@@ -466,10 +474,37 @@ bool QnResource::getParamPhysical(const QString &id, QString &value) {
     return false;
 }
 
+bool QnResource::getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result) 
+{
+    bool success = true;
+    for(const QString &id: idList) {
+        QString value;
+        if (getParamPhysical(id, value))
+            result << QnCameraAdvancedParamValue(id, value);
+        else
+            success = false;
+    }
+    return success;
+}
+
 bool QnResource::setParamPhysical(const QString &id, const QString &value) {
     Q_UNUSED(id)
     Q_UNUSED(value)
     return false;
+}
+
+bool QnResource::setParamsPhysical(const QnCameraAdvancedParamValueList &valueList, QnCameraAdvancedParamValueList &result)
+{
+    bool success = true;
+    setParamsBegin();
+    for(const QnCameraAdvancedParamValue &value: valueList) {
+        if (setParamPhysical(value.id, value.value))
+            result << value;
+        else
+            success = false;
+    }
+    setParamsEnd();
+    return success;
 }
 
 bool QnResource::setParamsBegin() {
@@ -859,25 +894,31 @@ QnInitResPool* QnResource::initAsyncPoolInstance()
 
 #ifdef ENABLE_DATA_PROVIDERS
 Q_GLOBAL_STATIC(QnResourceCommandProcessor, QnResourceCommandProcessor_instance)
+static bool qnResourceCommandProcessorInitialized = false;
 
 void QnResource::startCommandProc()
 {
     QnResourceCommandProcessor_instance()->start();
+    qnResourceCommandProcessorInitialized = true;
 }
 
 void QnResource::stopCommandProc()
 {
-    QnResourceCommandProcessor_instance()->stop();
+    if (qnResourceCommandProcessorInitialized)
+        QnResourceCommandProcessor_instance()->stop();
 }
 
-void QnResource::addCommandToProc(const QnResourceCommandPtr& command)
-{
-    QnResourceCommandProcessor_instance()->putData(command);
+void QnResource::addCommandToProc(const QnResourceCommandPtr& command) {
+    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    if (qnResourceCommandProcessorInitialized)
+        QnResourceCommandProcessor_instance()->putData(command);
 }
 
-int QnResource::commandProcQueueSize()
-{
-    return QnResourceCommandProcessor_instance()->queueSize();
+int QnResource::commandProcQueueSize() {
+    Q_ASSERT_X(qnResourceCommandProcessorInitialized, Q_FUNC_INFO, "Processor is not started");
+    if (qnResourceCommandProcessorInitialized)
+        return QnResourceCommandProcessor_instance()->queueSize();
+    return 0;
 }
 #endif // ENABLE_DATA_PROVIDERS
 

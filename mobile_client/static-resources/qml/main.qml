@@ -16,12 +16,15 @@ Window {
     visible: true
 
     property string activeResourceId
+    property string initialResourceScreenshot
 
+    property string currentSystemName
     property string currentHost
     property int currentPort
     property string currentLogin
     property string currentPasswrod
     property string currentSessionId
+    property bool customConnection: false
 
     readonly property bool isPhone: getDeviceIsPhone()
 
@@ -29,8 +32,6 @@ Window {
 
     QnToolBar {
         id: toolBar
-
-        z: 5.0
 
         width: mainWindow.width - navigationBarPlaceholder.width
 
@@ -74,6 +75,12 @@ Window {
     Item {
         id: navigationBarPlaceholder
 
+        property real realWidth: 0
+        property real realHeight: 0
+
+        width: realWidth == 0 ? 1 : realWidth
+        height: realHeight == 0 ? 1 : realHeight
+
         anchors.bottom: parent.bottom
         anchors.right: parent.right
     }
@@ -83,12 +90,15 @@ Window {
         activeSessionId: currentSessionId
     }
 
-    StackView {
+    QnMainStackView {
         id: stackView
+
         anchors.top: toolBar.bottom
-        anchors.bottom: navigationBarPlaceholder.top
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: navigationBarPlaceholder.realHeight
         anchors.left: parent.left
-        anchors.right: navigationBarPlaceholder.left
+        anchors.right: parent.right
+        anchors.rightMargin: navigationBarPlaceholder.realWidth
 
         onCurrentItemChanged: {
             if (currentItem) {
@@ -100,11 +110,11 @@ Window {
 
     Item {
         id: overlayBound
-        anchors.top: parent.top
+
+        anchors.fill: parent
         anchors.topMargin: toolBar.statusBarHeight
-        anchors.bottom: navigationBarPlaceholder.top
-        anchors.left: parent.left
-        anchors.right: navigationBarPlaceholder.left
+        anchors.bottomMargin: navigationBarPlaceholder.realHeight
+        anchors.rightMargin: navigationBarPlaceholder.realWidth
 
         z: 10.0
 
@@ -154,6 +164,7 @@ Window {
         QnVideoPage {
             id: videoPlayerContent
             resourceId: activeResourceId
+            initialScreenshot: initialResourceScreenshot
         }
     }
 
@@ -167,29 +178,31 @@ Window {
     Connections {
         target: connectionManager
 
-        onConnectedChanged: {
-            if (connectionManager.connected) {
+        onConnectionStateChanged: {
+            var connectionState = connectionManager.connectionState
+            if (connectionState == QnConnectionManager.Connected) {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
-                Main.gotoResources()
-            } else {
+                if (stackView.currentItem.objectName == "newConnectionPage" || stackView.currentItem.objectName == "loginPage") {
+                    stackView.setFadeTransition()
+                    Main.gotoResources()
+                }
+            } else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
-                Main.gotoNewSession()
+                if (stackView.currentItem.objectName != "newConnectionPage" && stackView.currentItem.objectName != "loginPage")
+                    Main.gotoNewSession()
             }
         }
 
         onConnectionFailed: {
-            if (stackView.depth > 1) /* we are in login page */
-                return
-
             Main.openFailedSession(
                         currentSessionId,
                         currentHost, currentPort,
                         currentLogin, currentPasswrod,
-                        loginSessionManager.lastUsedSessionSystemName(),
-                        status, statusMessage)
+                        currentSystemName,
+                        status, infoParameter)
         }
     }
 
@@ -200,11 +213,11 @@ Window {
 
     Component.onCompleted: {
         updateNavigationBarPlaceholderSize()
-        currentSessionId = loginSessionManager.lastUsedSessionId
-        if (currentSessionId) {
+        if (loginSessionManager.lastUsedSessionId) {
+            currentSystemName = loginSessionManager.lastUsedSessionSystemName()
             stackView.push(resourcesPageComponent)
             LoginFunctions.connectToServer(
-                        currentSessionId,
+                        loginSessionManager.lastUsedSessionId,
                         loginSessionManager.lastUsedSessionHost(), loginSessionManager.lastUsedSessionPort(),
                         loginSessionManager.lastUsedSessionLogin(), loginSessionManager.lastUsedSessionPassword())
         } else {
@@ -219,11 +232,11 @@ Window {
         var navBarSize = getNavigationBarHeight()
 
         if (isPhone && Screen.primaryOrientation == Qt.LandscapeOrientation) {
-            navigationBarPlaceholder.width = navBarSize
-            navigationBarPlaceholder.height = 1
+            navigationBarPlaceholder.realWidth = navBarSize
+            navigationBarPlaceholder.realHeight = 0
         } else {
-            navigationBarPlaceholder.width = 1
-            navigationBarPlaceholder.height = navBarSize
+            navigationBarPlaceholder.realWidth = 0
+            navigationBarPlaceholder.realHeight = navBarSize
         }
     }
 

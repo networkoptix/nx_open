@@ -86,7 +86,10 @@ void QnEnumLexicalSerializerData::serializeEnum(int value, QString *target) cons
     }
 
     /* Return empty string in case of failure. */
-    *target = m_nameByValue.value(value); 
+    *target = m_nameByValue.value(value);
+    /* Try numeric second. */
+    if (target->isEmpty())
+        *target = QString::number(value);
 }
 
 bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *target) const {
@@ -95,11 +98,14 @@ bool QnEnumLexicalSerializerData::deserializeEnum(const QString &value, int *tar
         if(QnLexical::deserialize(value, target))
             return true;
 
-    if(m_caseSensitivity == Qt::CaseSensitive) {
-        return deserializeEnumInternal(m_valueByName, value, target);
-    } else {
-        return deserializeEnumInternal(m_valueByLowerName, value.toLower(), target);
-    }
+    bool success;
+    if(m_caseSensitivity == Qt::CaseSensitive)
+        success = deserializeEnumInternal(m_valueByName, value, target);
+    else
+        success = deserializeEnumInternal(m_valueByLowerName, value.toLower(), target);
+    if (success)
+        return success;
+    return QnLexical::deserialize(value, target); // try number again
 }
 
 bool QnEnumLexicalSerializerData::deserializeEnumInternal(const QHash<QString, int> &hash, const QString &value, int *target) const {
@@ -153,6 +159,7 @@ bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *ta
     QStringList names = value.split(L'|');
 
     *target = 0;
+    bool valid = true;
 
     for(const QString &name: names) {
         QString trimmedName = name.trimmed();
@@ -170,17 +177,20 @@ bool QnEnumLexicalSerializerData::deserializeFlags(const QString &value, int *ta
             if(trimmedName.size() >= 3 && trimmedName.startsWith(QStringLiteral("0x"))) {
                 bool ok = false;
                 nameValue = trimmedName.toInt(&ok, 16);
-                if(!ok)
-                    return false;
+                if(!ok) {
+                    valid = false;
+                    continue;
+                }
             } else {
-                return false;
+                valid = false;
+                continue;
             }
         }
 
         *target |= nameValue;
     }
 
-    return true;
+    return valid;
 }
 
 void QnEnumLexicalSerializerData::serialize(int value, QString *target) const {

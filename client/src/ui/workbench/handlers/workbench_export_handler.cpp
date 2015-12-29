@@ -13,7 +13,7 @@
 #include <camera/client_video_camera.h>
 #include <camera/client_video_camera_export_tool.h>
 #include <camera/camera_data_manager.h>
-
+#include <core/resource/camera_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -88,15 +88,17 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     connect(action(Qn::ExportLayoutAction),        &QAction::triggered, this,   &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
 }
 
-#ifdef Q_OS_WIN
 QString QnWorkbenchExportHandler::binaryFilterName() const {
-#ifdef Q_OS_WIN64
-    return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
-#else
-    return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
+#ifdef Q_OS_WIN
+    #ifdef Q_OS_WIN64
+        return tr("Executable %1 Media File (x64) (*.exe)").arg(QnAppInfo::organizationName());
+    #else
+        return tr("Executable %1 Media File (x86) (*.exe)").arg(QnAppInfo::organizationName());
+    #endif
 #endif
+    return QString();
 }
-#endif
+
 
 bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
     if (m_filesIsUse.contains(filename)) {
@@ -126,6 +128,15 @@ bool QnWorkbenchExportHandler::lockFile(const QString &filename) {
 void QnWorkbenchExportHandler::unlockFile(const QString &filename) {
     m_filesIsUse.remove(filename);
 }
+
+bool QnWorkbenchExportHandler::isBinaryExportSupported() const {
+#ifdef Q_OS_WIN
+    return !qnRuntime->isActiveXMode();
+#else
+    return false;
+#endif
+}
+
 
 bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &layout,
                                                      const QnTimePeriod &exportPeriod,
@@ -171,48 +182,94 @@ bool QnWorkbenchExportHandler::saveLayoutToLocalFile(const QnLayoutResourcePtr &
     return tool->start();
 }
 
-//TODO: #GDM Monstrous function, refactor required
-void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
+QnMediaResourceWidget *QnWorkbenchExportHandler::extractMediaWidget(const QnActionParameters &parameters)
+{
+    if(parameters.size() == 1)
+        return dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
+
+    if((parameters.size() == 0) && display()->widgets().size() == 1)
+        return dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
+
+    return dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
+}
+
+void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered()
+{
     QnActionParameters parameters = menu()->currentParameters(sender());
+    QnMediaResourceWidget *widget = extractMediaWidget(parameters);
+    QnMediaResourcePtr mediaResource = parameters.resource().dynamicCast<QnMediaResource>();
 
-    QnActionTargetProvider *provider = menu()->targetProvider();
-    if(!provider)
+    /* Either resource or widget must be provided */
+    if (!mediaResource && !widget)
+    {
+        QMessageBox::critical(
+              mainWindow()
+            , tr("Unable to export file.")
+            , tr("Exactly one item must be selected for export, but %n item(s) are currently selected." , "", parameters.size())
+            );
         return;
-    parameters.setItems(provider->currentParameters(Qn::SceneScope).items());
-
-    QnMediaResourceWidget *widget = NULL;
-    Qn::Corner timestampPos = Qn::NoCorner;
-
-    if(parameters.size() != 1) {
-        if(parameters.size() == 0 && display()->widgets().size() == 1) {
-            widget = dynamic_cast<QnMediaResourceWidget *>(display()->widgets().front());
-        } else {
-            widget = dynamic_cast<QnMediaResourceWidget *>(display()->activeWidget());
-            if (!widget) {
-                QMessageBox::critical(
-                    mainWindow(),
-                    tr("Unable to export file."),
-                    tr("Exactly one item must be selected for export, but %n item(s) are currently selected.", "", parameters.size())
-                );
-                return;
-            }
-        }
-    } else {
-        widget = dynamic_cast<QnMediaResourceWidget *>(parameters.widget());
     }
-    if(!widget)
+
+    if (!mediaResource)
+        mediaResource = widget->resource();
+
+    QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+    auto dataProvider = camera
+        ? camera->createDataProvider(Qn::CR_Default)
+        : widget
+        ? widget->display()->dataProvider()
+        : nullptr;
+
+    if (!mediaResource || !dataProvider)
         return;
 
-    bool wasLoggedIn = !context()->user().isNull();
+    // Creates default layout item data (if there is no widget
+    // selected - bookmarks export, for example). Media resource
+    // is used because it should be presented to export data
+    const auto createDefaultLayoutItemData =
+        [](const QnMediaResourcePtr &mediaResource) -> QnLayoutItemData
+    {
+        const auto resource = mediaResource->toResourcePtr();
+
+        QnLayoutItemData result;
+        result.uuid = QnUuid::createUuid();
+        result.resource.path = resource->getUniqueId();
+        result.resource.id = resource->getId();
+        result.flags = (Qn::SingleSelectedRole | Qn::SingleRole);
+        result.combinedGeometry = QRect(0, 0, 1, 1);
+        result.rotation = resource->hasProperty(QnMediaResource::rotationKey())
+            ? resource->getProperty(QnMediaResource::rotationKey()).toInt()
+            : 0;
+        return result;
+    };
+
+    QnLayoutItemData itemData = widget
+        ? widget->item()->data()
+        : createDefaultLayoutItemData(mediaResource);
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
+
+    exportTimeSelection(mediaResource, dataProvider, itemData, period);
+}
+
+
+//TODO: #GDM Monstrous function, refactor required
+//TODO: #ynikitenkov refactor to use QnResourcePtr
+void QnWorkbenchExportHandler::exportTimeSelection(
+      const QnMediaResourcePtr &mediaResource
+    , const QnAbstractStreamDataProvider *dataProvider
+    , const QnLayoutItemData &itemData
+    , const QnTimePeriod &period
+    )
+{
+    bool wasLoggedIn = !context()->user().isNull();
 
     // TODO: #Elric implement more precise estimation
     if(period.durationMs > maxRecordingDurationMsec &&
             QMessageBox::warning(
                 mainWindow(),
                 tr("Warning!"),
-                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n' 
+                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n'
               + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
               + tr("Do you want to continue?"),
                 QMessageBox::Yes | QMessageBox::No,
@@ -220,7 +277,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                 ) == QMessageBox::No)
         return;
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return;
@@ -237,38 +294,34 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             + filterSeparator
             + mkvFileFilter;
 
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode())
-        allowedFormatFilter += 
-            filterSeparator
-            + binaryFilterName();
-#endif
-
-    QnLayoutItemData itemData = widget->item()->data();
+    if (isBinaryExportSupported())
+        allowedFormatFilter += filterSeparator + binaryFilterName();
 
     QString fileName;
     QString selectedExtension;
     QString selectedFilter;
+    bool binaryExport = false;
     ImageCorrectionParams contrastParams = itemData.contrastParams;
     QnItemDewarpingParams dewarpingParams = itemData.dewarpingParams;
     int rotation = itemData.rotation;
     QRectF zoomRect = itemData.zoomRect;
-    qreal customAr = widget->resource()->customAspectRatio();
+    qreal customAr = mediaResource->customAspectRatio();
 
-    int timeOffset = 0;
-    if (qnSettings->timeMode() == Qn::ServerTimeMode) {
-        // time difference between client and server
-        timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->localOffset(widget->resource(), 0);
-    }
+    int timeOffset = context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(mediaResource);
 
-    QString namePart = replaceNonFileNameCharacters(widget->resource()->toResourcePtr()->getName(), L'_');
-    QString timePart = (widget->resource()->toResource()->flags() & Qn::utc)
+    QString namePart = replaceNonFileNameCharacters(mediaResource->toResourcePtr()->getName(), L'_');
+    QString timePart = (mediaResource->toResource()->flags() & Qn::utc)
             ? QDateTime::fromMSecsSinceEpoch(period.startTimeMs + timeOffset).toString(lit("yyyy_MMM_dd_hh_mm_ss"))
-            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs + timeOffset).toString(lit("hh_mm_ss"));
+            : QTime(0, 0, 0, 0).addMSecs(period.startTimeMs).toString(lit("hh_mm_ss"));
     QString suggestion = QnEnvironment::getUniqueFileName(previousDir, namePart + lit("_") + timePart);
 
+    Qn::Corner timestampPos = Qn::NoCorner;
+
+    bool transcodeWarnShown = false;
+    QnImageFilterHelper imageParameters;
+
     while (true) {
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -284,15 +337,13 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         setHelpTopic(dialog.data(), Qn::Exporting_Help);
 
-        QnAbstractWidgetControlDelegate* delegate = NULL;
-#ifdef Q_OS_WIN
-        if (!qnRuntime->isActiveXMode())
-            delegate = new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this);
-#endif
+        QnAbstractWidgetControlDelegate* delegate = isBinaryExportSupported()
+            ? new QnTimestampsCheckboxControlDelegate(binaryFilterName(), this)
+            : nullptr;
+
         QComboBox* comboBox = 0;
-        bool doTranscode = false;
-        const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
-        if (widget->resource()->hasVideo(archive)) {
+        bool transcodeCheckbox = false;
+        if (mediaResource->hasVideo(dataProvider)) {
             comboBox = new QComboBox(dialog.data());
             comboBox->addItem(tr("No Timestamp"), Qn::NoCorner);
             comboBox->addItem(tr("Top Left Corner (requires transcoding)"), Qn::TopLeftCorner);
@@ -300,19 +351,23 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             comboBox->addItem(tr("Bottom Left Corner (requires transcoding)"), Qn::BottomLeftCorner);
             comboBox->addItem(tr("Bottom Right Corner (requires transcoding)"), Qn::BottomRightCorner);
 
+            bool isPanoramic = mediaResource->getVideoLayout(0)->channelCount() > 1;
+            if (isPanoramic)
+                comboBox->setCurrentIndex(comboBox->count() - 1); /* Bottom right, as on layout */
+
             dialog->addWidget(tr("Timestamps:"), comboBox, delegate);
 
-            doTranscode = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
-            if (doTranscode) 
+            transcodeCheckbox = contrastParams.enabled || dewarpingParams.enabled || itemData.rotation || customAr || !zoomRect.isNull();
+            if (transcodeCheckbox)
             {
-                dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &doTranscode, delegate);
+                dialog->addCheckBox(tr("Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)"), &transcodeCheckbox, delegate);
             }
         }
 
         if (!dialog->exec())
             return;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -322,10 +377,19 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         if (fileName.isEmpty())
             return;
 
+        binaryExport = isBinaryExportSupported()
+            ? selectedFilter.contains(binaryFilterName())
+            : false;
+
         if (comboBox)
             timestampPos = (Qn::Corner) comboBox->itemData(comboBox->currentIndex()).toInt();
 
-        if (!doTranscode) {
+        if (binaryExport) {
+            transcodeCheckbox = false;
+            timestampPos = Qn::NoCorner;
+        }
+
+        if (!transcodeCheckbox) {
             contrastParams.enabled = false;
             dewarpingParams.enabled = false;
             rotation = 0;
@@ -334,8 +398,8 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         }
 
         if (dialog->selectedNameFilter().contains(aviFileFilter)) {
-            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(widget->resource());
-            const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (widget->display()->dataProvider());
+            QnCachingCameraDataLoader* loader = context()->instance<QnCameraDataManager>()->loader(mediaResource);
+            const QnArchiveStreamReader* archive = dynamic_cast<const QnArchiveStreamReader*> (dataProvider);
             if (loader && archive) {
                 QnTimePeriodList periods = loader->periods(Qn::RecordingContent).intersected(period);
                 if (periods.size() > 1 && archive->getDPAudioLayout()->channelCount() > 0) {
@@ -343,7 +407,7 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
                         mainWindow(),
                         tr("AVI format is not recommended"),
                         tr("AVI format is not recommended for export of non-continuous recording when audio track is present."
-                           "Do you want to continue?"), 
+                           "Do you want to continue?"),
                         QMessageBox::Yes | QMessageBox::No
                     );
                     if (result != QMessageBox::Yes)
@@ -352,19 +416,66 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
             }
         }
 
-        if(doTranscode || timestampPos != Qn::NoCorner) {
-            QMessageBox::StandardButton button = QMessageBox::question(
-                        mainWindow(),
-                        tr("Save As"),
-                        tr("You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?"),
-                        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
-                        QMessageBox::No
-                        );
-            if(button != QMessageBox::Yes)
-                return;
+        imageParameters.setSrcRect(zoomRect);
+        imageParameters.setContrastParams(contrastParams);
+        imageParameters.setDewarpingParams(mediaResource->getDewarpingParams(), dewarpingParams);
+        imageParameters.setRotation(rotation);
+        imageParameters.setCustomAR(customAr);
+        imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
+        imageParameters.setVideoLayout(mediaResource->getVideoLayout());
+
+        auto videoLayout = mediaResource->getVideoLayout();
+        bool doTranscode = transcodeCheckbox ||
+                           timestampPos != Qn::NoCorner ||
+                           (!binaryExport && videoLayout && videoLayout->channelCount() > 1);
+
+        if(doTranscode)
+        {
+            const QnVirtualCameraResourcePtr camera = mediaResource.dynamicCast<QnVirtualCameraResource>();
+            if (camera && !transcodeWarnShown)
+            {
+                const int bigValue = std::numeric_limits<int>::max();
+                for (const auto& stream: camera->mediaStreams().streams)
+                {
+                    auto filters = imageParameters.createFilterChain(stream.getResolution(), QSize(bigValue, bigValue));
+                    const QSize resultResolution = imageParameters.updatedResolution( filters, stream.getResolution() );
+                    if (resultResolution.width() > imageParameters.defaultResolutionLimit.width() ||
+                        resultResolution.height() > imageParameters.defaultResolutionLimit.height())
+                    {
+                        transcodeWarnShown = true;
+                        int result = QMessageBox::warning(
+                            mainWindow(),
+                            tr("Selected format is not recommended"),
+                            tr("Selected format is not recommended for this camera due to video downscaling. "
+                            "We recommend to export selected video either to the '.nov' or '.exe' format. "
+                            "Do you want to continue?"),
+                            QMessageBox::Yes | QMessageBox::No
+                            );
+                        if (result != QMessageBox::Yes)
+                            return;
+                        else
+                            break; // do not show warning for other tracks
+                    }
+
+                }
+            }
+            if (!transcodeWarnShown)
+            {
+                transcodeWarnShown = true;
+                QMessageBox::StandardButton button = QMessageBox::question(
+                            mainWindow(),
+                            tr("Save As"),
+                            tr("You are about to export video with filters that require transcoding. This may take some time. Do you want to continue?"),
+                            QMessageBox::Yes | QMessageBox::No,
+                            QMessageBox::No
+                            );
+                if(button != QMessageBox::Yes)
+                    return;
+            }
         }
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return;
@@ -396,16 +507,15 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
         break;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
      if (wasLoggedIn && !context()->user())
         return;
 
     qnSettings->setLastExportDir(QFileInfo(fileName).absolutePath());
 
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode()
-        && selectedFilter.contains(binaryFilterName()))
+
+    if (binaryExport)
     {
         QnLayoutResourcePtr existingLayout = qnResPool->getResourceByUrl(QnLayoutFileStorageResource::layoutPrefix() + fileName).dynamicCast<QnLayoutResource>();
         if (!existingLayout)
@@ -415,49 +525,37 @@ void QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered() {
 
         QnLayoutResourcePtr newLayout(new QnLayoutResource(qnResTypePool));
 
-        itemData.uuid = QnUuid::createUuid();
+        Q_ASSERT_X(!itemData.uuid.isNull(), Q_FUNC_INFO, "Make sure itemData is valid");
         newLayout->addItem(itemData);
         saveLayoutToLocalFile(newLayout, period, fileName, Qn::LayoutExport, false, true);
-        return;
     }
-#endif
+    else
+    {
+        QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
+        exportProgressDialog->setWindowTitle(tr("Exporting Video"));
+        exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
+        exportProgressDialog->setModal(false);
 
-    QnProgressDialog *exportProgressDialog = new QnWorkbenchStateDependentDialog<QnProgressDialog>(mainWindow());
-    exportProgressDialog->setWindowTitle(tr("Exporting Video"));
-    exportProgressDialog->setLabelText(tr("Exporting to \"%1\"...").arg(fileName));
-    exportProgressDialog->setModal(false);
+        qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(mediaResource, Qn::InvalidUtcOffset);
 
-    QnMediaResourcePtr resource = widget->resource();
-    QnClientVideoCamera* camera = new QnClientVideoCamera(resource);
+        QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
+            mediaResource,
+            period,
+            fileName,
+            imageParameters,
+            serverTimeZone,
+            this);
 
-    qint64 serverTimeZone = context()->instance<QnWorkbenchServerTimeWatcher>()->utcOffset(resource, Qn::InvalidUtcOffset);
+        connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
 
-    QnImageFilterHelper imageParameters;
-    imageParameters.setSrcRect(zoomRect);
-    imageParameters.setContrastParams(contrastParams);
-    imageParameters.setDewarpingParams(resource->getDewarpingParams(), dewarpingParams);
-    imageParameters.setRotation(rotation);
-    imageParameters.setCustomAR(customAr);
-    imageParameters.setTimeCorner(timestampPos, timeOffset, 0);
-    imageParameters.setVideoLayout(resource->getVideoLayout());
+        connect(tool,   &QnClientVideoCameraExportTool::finished,       this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
+        connect(tool,   &QnClientVideoCameraExportTool::finished,       exportProgressDialog,   &QnProgressDialog::deleteLater);
+        connect(tool,   &QnClientVideoCameraExportTool::rangeChanged,   exportProgressDialog,   &QnProgressDialog::setRange);
+        connect(tool,   &QnClientVideoCameraExportTool::valueChanged,   exportProgressDialog,   &QnProgressDialog::setValue);
 
-    QnClientVideoCameraExportTool *tool = new QnClientVideoCameraExportTool(
-                                              camera,
-                                              period,
-                                              fileName,
-                                              imageParameters,
-                                              serverTimeZone,
-                                              this);
-
-    connect(exportProgressDialog,   &QnProgressDialog::canceled,    tool,                   &QnClientVideoCameraExportTool::stop);
-
-    connect(tool,   &QnClientVideoCameraExportTool::finished,       this,                   &QnWorkbenchExportHandler::at_camera_exportFinished);
-    connect(tool,   &QnClientVideoCameraExportTool::finished,       exportProgressDialog,   &QnProgressDialog::deleteLater);
-    connect(tool,   &QnClientVideoCameraExportTool::rangeChanged,   exportProgressDialog,   &QnProgressDialog::setRange);
-    connect(tool,   &QnClientVideoCameraExportTool::valueChanged,   exportProgressDialog,   &QnProgressDialog::setValue);
-
-    tool->start();
-    exportProgressDialog->show();
+        tool->start();
+        exportProgressDialog->show();
+    }
 }
 
 void QnWorkbenchExportHandler::at_layout_exportFinished(bool success, const QString &filename) {
@@ -565,16 +663,11 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
     bool readOnly = false;
 
     QString mediaFileFilter = tr("%1 Media File (*.nov)").arg(QnAppInfo::organizationName());
-
-#ifdef Q_OS_WIN
-    if (!qnRuntime->isActiveXMode())
-        mediaFileFilter +=
-            filterSeparator
-            + binaryFilterName();
-#endif
+    if (isBinaryExportSupported())
+        mediaFileFilter += filterSeparator + binaryFilterName();
 
     while (true) {
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -594,7 +687,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         if (!dialog->exec())
             return false;
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -622,7 +715,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
             }
         }
 
-        /* Check if we were disconnected (server shut down) while the dialog was open. 
+        /* Check if we were disconnected (server shut down) while the dialog was open.
          * Skip this check if we were not logged in before. */
         if (wasLoggedIn && !context()->user())
             return false;
@@ -633,7 +726,7 @@ bool QnWorkbenchExportHandler::doAskNameAndExportLocalLayout(const QnTimePeriod&
         break;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return false;
@@ -667,8 +760,8 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning!"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n' 
-          + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n' 
+            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n'
+          + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
           + tr("Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No
             );
@@ -676,7 +769,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
             return;
     }
 
-    /* Check if we were disconnected (server shut down) while the dialog was open. 
+    /* Check if we were disconnected (server shut down) while the dialog was open.
      * Skip this check if we were not logged in before. */
     if (wasLoggedIn && !context()->user())
         return;

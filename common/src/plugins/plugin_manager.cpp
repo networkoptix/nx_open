@@ -20,46 +20,12 @@
 #include "camera_plugin.h"
 
 
-class PluginManagerWrapper
-{
-public:
-    PluginManagerWrapper()
-    :
-        m_pluginManager( NULL )
-    {
-    }
-
-    ~PluginManagerWrapper()
-    {
-        delete m_pluginManager.load();
-        m_pluginManager.store(NULL);
-    }
-
-    PluginManager* getPluginManager( const QString& pluginDir )
-    {
-        if( !m_pluginManager.load() )
-        {
-            PluginManager* newInstance = new PluginManager( pluginDir );
-            if( !m_pluginManager.testAndSetOrdered( NULL, newInstance ) )
-                delete newInstance;
-            //else
-            //    newInstance->loadPlugins();
-        }
-        return m_pluginManager.load();
-    }
-
-private:
-    QAtomicPointer<PluginManager> m_pluginManager;
-};
-
-
-Q_GLOBAL_STATIC(PluginManagerWrapper, pluginManagerWrapper);
-
-//static QAtomicPointer<PluginManager> pluginManagerInstance;
-
-PluginManager::PluginManager( const QString& pluginDir )
+PluginManager::PluginManager(
+    const QString& pluginDir,
+    nxpl::PluginInterface* const pluginContainer)
 :
-    m_pluginDir( pluginDir )
+    m_pluginDir( pluginDir ),
+    m_pluginContainer( pluginContainer )
 {
 }
 
@@ -75,12 +41,6 @@ PluginManager::~PluginManager()
 
     //releasing plugins
     std::for_each( m_nxPlugins.begin(), m_nxPlugins.end(), std::mem_fun( &nxpl::PluginInterface::releaseRef ) );
-}
-
-//!Guess what
-PluginManager* PluginManager::instance( const QString& pluginDir )
-{
-    return pluginManagerWrapper()->getPluginManager( pluginDir );
 }
 
 void PluginManager::loadPlugins(
@@ -213,13 +173,20 @@ bool PluginManager::loadNxPlugin(
 
     //checking, whther plugin supports nxpl::Plugin interface
     nxpl::Plugin* pluginObj = static_cast<nxpl::Plugin*>(obj->queryInterface( nxpl::IID_Plugin ));
-    if( pluginObj )
+    if (pluginObj)
     {
         //reporting settings to plugin
         if( !settingsForPlugin.empty() )
             pluginObj->setSettings( &settingsForPlugin[0], settingsForPlugin.size() );
 
         pluginObj->releaseRef();
+    }
+
+    nxpl::Plugin2* plugin2Obj = static_cast<nxpl::Plugin2*>(obj->queryInterface(nxpl::IID_Plugin2));
+    if (plugin2Obj)
+    {
+        if (m_pluginContainer)
+            plugin2Obj->setPluginContainer(m_pluginContainer);
     }
 
     emit pluginLoaded();

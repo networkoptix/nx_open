@@ -7,7 +7,6 @@
 
 #include "http/httptypes.h"
 #include "../common/util.h"
-#include "network/authenticate_helper.h"
 #include "network/authutil.h"
 
 
@@ -129,7 +128,8 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
         request.append("POST ");
         if( !requestStr.startsWith('/') )
             request.append('/');
-        request.append(requestStr);
+        QByteArray encodedRequest = QUrl(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        request.append(encodedRequest);
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
         request.append(m_hostString.toUtf8());
@@ -316,7 +316,10 @@ CLHttpStatus CLSimpleHTTPClient::doGET(const QByteArray& _requestStr, bool recur
         QByteArray request;
 
         request.append("GET ");
-        request.append(requestStr);
+
+        QByteArray encodedRequest = QUrl(QLatin1String(requestStr)).toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
+        request.append(encodedRequest);
+
         request.append(" HTTP/1.1\r\n");
         request.append("Host: ");
         request.append(m_hostString.toUtf8());

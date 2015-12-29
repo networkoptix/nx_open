@@ -3,6 +3,7 @@
 
 #include <QtGui/QPainter>
 
+#include <ui/common/notification_levels.h>
 #include <ui/graphics/items/standard/graphics_widget.h>
 #include <ui/graphics/items/generic/clickable_widgets.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -80,7 +81,6 @@ protected:
     virtual void clickedNotify(QGraphicsSceneMouseEvent *event) override;
 
 private slots:
-    void at_provider_imageChanged(const QImage &image);
     void at_thumbnailLabel_clicked(Qt::MouseButton button);
 
 private:
@@ -102,12 +102,14 @@ public:
 
     QString text() const;
 
-    void addActionButton(const QIcon &icon, const QString &tooltip, Qn::ActionId actionId,
+    void addActionButton(const QIcon &icon,
+                         const QString &tooltip = QString(),
+                         Qn::ActionId actionId = Qn::NoAction,
                          const QnActionParameters &parameters = QnActionParameters(),
                          bool defaultAction = false);
 
-    Qn::NotificationLevel notificationLevel() const;
-    void setNotificationLevel(Qn::NotificationLevel notificationLevel);
+    QnNotificationLevel::Value notificationLevel() const;
+    void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
 
     /**
      * \param rect                      Rectangle where all tooltips should fit, in parent(!) coordinates.
@@ -166,7 +168,7 @@ private:
     QnProxyLabel *m_textLabel;
     QnImageButtonWidget *m_closeButton;
     QColor m_color;
-    Qn::NotificationLevel m_notificationLevel;
+    QnNotificationLevel::Value m_notificationLevel;
     QnImageProvider* m_imageProvider;
 
     QnFramedWidget *m_overlayWidget;

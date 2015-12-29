@@ -253,7 +253,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
         NX_LOG( deadLockMsg, cl_logALWAYS );
         std::cerr<<deadLockMsg.toStdString()<<std::endl;
-        assert( false );
+        //assert( false );
         return;
     }
 
@@ -319,7 +319,7 @@ void MutexLockAnalyzer::afterMutexLocked( const MutexLockKey& mutexLockPosition 
 
             NX_LOG( deadLockMsg, cl_logALWAYS );
             std::cerr<<deadLockMsg.toStdString()<<std::endl;
-            assert( false );
+            //assert( false );
         }
     }
 
@@ -341,13 +341,23 @@ void MutexLockAnalyzer::beforeMutexUnlocked( const MutexLockKey& mutexLockPositi
 
     ThreadContext& threadContext = m_threadContext[QnLongRunnable::currentThreadSystemId()];
 
-    assert( !threadContext.currentLockPath.empty() );
+    if (threadContext.currentLockPath.empty())
+    {
+        lk.unlock();
+        assert( false );
+        lk.relock();
+    }
     if( threadContext.currentLockPath.front().lockRecursionDepth > 0 )
     {
         --threadContext.currentLockPath.front().lockRecursionDepth;
         return;
     }
-    assert( mutexLockPosition == threadContext.currentLockPath.front() );
+    if (mutexLockPosition != threadContext.currentLockPath.front())
+    {
+        lk.unlock();
+        assert( false );
+        lk.relock();
+    }
     threadContext.currentLockPath.pop_front();
 }
 

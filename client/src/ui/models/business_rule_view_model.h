@@ -1,5 +1,4 @@
-#ifndef BUSINESS_RULE_VIEW_MODEL_H
-#define BUSINESS_RULE_VIEW_MODEL_H
+#pragma once
 
 #include <QtCore/QVariant>
 
@@ -11,6 +10,8 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
+
+#include <utils/common/uuid.h>
 
 namespace QnBusiness {
     enum Columns {
@@ -95,6 +96,8 @@ public:
     QnResourceList actionResources() const;
     void setActionResources(const QnResourceList &value);
 
+    bool isActionProlonged() const;
+
     QnBusinessActionParameters actionParams() const;
     void setActionParams(const QnBusinessActionParameters& params);
 
@@ -115,13 +118,12 @@ public:
     QString comments() const;
     void setComments(const QString value);
 
-    bool system() const;
-
     QStandardItemModel* eventTypesModel();
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
+
 signals:
-    void dataChanged(QnBusinessRuleViewModel* source, QnBusiness::Fields fields);
+    void dataChanged(QnBusiness::Fields fields);
 
 private:
     void updateActionTypesModel();
@@ -154,15 +156,14 @@ private:
     IDList  m_actionResources;
     QnBusinessActionParameters m_actionParams;
 
-    int m_aggregationPeriod;
+    int m_aggregationPeriodSec;
     bool m_disabled;
     QString m_comments;
     QString m_schedule;
-    bool m_system;
 
     QStandardItemModel *m_eventTypesModel;
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
 };
 
-#endif // BUSINESS_RULE_VIEW_MODEL_H
+typedef QSharedPointer<QnBusinessRuleViewModel> QnBusinessRuleViewModelPtr;

@@ -1,29 +1,21 @@
-/**********************************************************
-* 2 apr 2013
-* akolesnikov
-***********************************************************/
-
 #include "third_party_stream_reader.h"
 
 #ifdef ENABLE_THIRD_PARTY
 
 #include <algorithm>
-
 #include <QtCore/QTextStream>
-
-#include "utils/network/http/httptypes.h"
-#include "utils/network/multicodec_rtp_reader.h"
-#include "utils/common/log.h"
-#include "utils/media/ffmpeg_helper.h"
 
 #include "core/datapacket/third_party_audio_data_packet.h"
 #include "core/datapacket/third_party_video_data_packet.h"
-
+#include "network/multicodec_rtp_reader.h"
 #include "plugins/plugin_tools.h"
 #include "plugins/resource/onvif/dataprovider/onvif_mjpeg.h"
-
-#include "motion_data_picture.h"
+#include <plugins/resource/third_party/motion_data_picture.h>
+#include "utils/common/log.h"
+#include "utils/media/ffmpeg_helper.h"
+#include "utils/network/http/httptypes.h"
 #include "version.h"
+#include "utils/media/frame_type_extractor.h"
 
 namespace
 {

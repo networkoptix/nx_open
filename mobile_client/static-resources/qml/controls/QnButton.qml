@@ -6,29 +6,33 @@ Item {
     id: button
 
     property color color: QnTheme.buttonBackground
+    property alias clickColor: materialSurface.color
     property color textColor: QnTheme.buttonText
     property bool flat: false
     property bool iconic: icon != "" && text == ""
+    property real verticalPadding: dp(6)
+    property real horizontalPadding: dp(4)
 
     property alias text: textLabel.text
     property alias icon: icon.source
+    property alias font: textLabel.font
 
     readonly property alias pressed: materialSurface.pressed
 
     signal clicked()
 
-    height: dp(48)
-    width: label.width + dp(24)
+    implicitHeight: dp(48)
+    implicitWidth: label.width + dp(24)
 
     Rectangle {
         id: background
 
         anchors {
             fill: parent
-            leftMargin: dp(4)
-            rightMargin: dp(4)
-            topMargin: dp(6)
-            bottomMargin: dp(6)
+            leftMargin: horizontalPadding
+            rightMargin: horizontalPadding
+            topMargin: verticalPadding
+            bottomMargin: verticalPadding
         }
 
         color: flat ? "transparent" : button.color
@@ -65,9 +69,8 @@ Item {
             visible: text != ""
             anchors.verticalCenter: parent.verticalCenter
             color: textColor
-            font.pixelSize: sp(14)
+            font.pixelSize: sp(16)
             font.weight: Font.DemiBold
-            font.capitalization: Font.AllUppercase
         }
     }
 }

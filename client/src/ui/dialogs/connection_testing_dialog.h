@@ -25,10 +25,11 @@ public:
     explicit QnConnectionTestingDialog(QWidget *parent = NULL);
     virtual ~QnConnectionTestingDialog();
 
-    void testEnterpriseController(const QUrl &url);
+    void testConnection(const QUrl &url);
 
 signals:
     void resourceChecked(bool success);
+    void connectRequested();
 
 private slots:
     void tick();
@@ -46,6 +47,7 @@ private:
     QScopedPointer<Ui::ConnectionTestingDialog> ui;
     QTimer* m_timeoutTimer;
     QUrl m_url;
+    QPushButton* m_connectButton;
 };
 
 #endif // CONNECTION_TESTING_DIALOG_H

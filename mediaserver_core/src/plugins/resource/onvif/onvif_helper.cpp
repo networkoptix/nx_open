@@ -138,7 +138,7 @@ PasswordHelper::PasswordHelper()
 
     setPasswordInfo(BASLER_MANUFACTURER, ADMIN1, ADMIN1);
 
-    setPasswordInfo(BOSH_DINION_MANUFACTURER);
+    setPasswordInfo(BOSH_DINION_MANUFACTURER, "service", "service");
 
     setPasswordInfo(BRICKCOM_MANUFACTURER, ADMIN1, ADMIN1);
 
@@ -355,6 +355,10 @@ NameHelper::NameHelper()
 
         QString normalizedManufacturer = rt->getManufacture().toLower().replace(UNNEEDED_CHARACTERS, QString());
         QString normalizedName = rt->getName().toLower().replace(UNNEEDED_CHARACTERS, QString());
+
+        // todo: refactor it. it should be a pair with vendor + camera model here
+        if (normalizedName.toLower() == lit("panoramic"))
+            continue; // skip av abstract resource type
 
         if (normalizedName == normalizedManufacturer + QString(lit("camera")))
             continue;

@@ -6,6 +6,7 @@
 
 #include <utils/thread/mutex.h>
 
+#include <utils/common/log.h>
 #include <utils/common/synctime.h>
 #include <utils/media/media_stream_cache.h>
 
@@ -27,11 +28,10 @@ namespace nx_hls
         m_blockID( -1 ),
         m_removedChunksToKeepCount( MSSettings::roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
-            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() ),
-        m_eventRegistrationID( 0 )
+            nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP ).toInt() )
     {
         using namespace std::placeholders;
-        m_eventRegistrationID = m_mediaStreamCache->addKeyFrameEventReceiver( std::bind( &HLSLivePlaylistManager::onKeyFrame, this, _1 ) );
+        m_mediaStreamCache->addEventReceiver( this );
 
         m_inactivityTimer.restart();
     }
@@ -43,7 +43,7 @@ namespace nx_hls
             m_mediaStreamCache->unblockData( m_blockID );
             m_blockID = -1;
         }
-        m_mediaStreamCache->removeKeyFrameEventReceiver( m_eventRegistrationID );
+        m_mediaStreamCache->removeEventReceiver( this );
     }
 
     //!Same as \a generateChunkList, but returns \a chunksToGenerate last chunks of available data
@@ -99,6 +99,7 @@ namespace nx_hls
         m_chunks.clear();
         while( !m_timestampToBlock.empty() )
             m_timestampToBlock.pop();
+        m_currentChunk = AbstractPlaylistManager::ChunkData();
     }
 
     qint64 HLSLivePlaylistManager::inactivityPeriod() const
@@ -107,9 +108,16 @@ namespace nx_hls
         return m_inactivityTimer.elapsed();
     }
 
+    void HLSLivePlaylistManager::onDiscontinue()
+    {
+        clear();
+    }
+
     void HLSLivePlaylistManager::onKeyFrame( quint64 currentPacketTimestampUSec )
     {
         QnMutexLocker lk( &m_mutex );
+
+        NX_LOG(lit("HLSLivePlaylistManager. got key frame %1").arg(currentPacketTimestampUSec), cl_logDEBUG2);
 
         if( m_currentChunk.mediaSequence > 0 )
         {
@@ -126,6 +134,8 @@ namespace nx_hls
                 if( chunkIter == m_chunks.end() )
                 {
                     m_chunks.push_back( m_currentChunk );
+                    NX_LOG(lit("HLSLivePlaylistManager. Added chunk (%1:%2). Total chunks %3").
+                        arg(m_chunks.back().startTimestamp).arg(m_chunks.back().duration).arg(m_chunks.size()), cl_logDEBUG2);
                 }
                 else
                 {
@@ -171,6 +181,9 @@ namespace nx_hls
                         keepChunkDataTillTimestamp ) );
 
                     m_totalPlaylistDuration -= m_chunks.front().duration;
+
+                    NX_LOG(lit("HLSLivePlaylistManager. Removing chunk (%1:%2). Total chunks left %3").
+                        arg(m_chunks.front().startTimestamp).arg(m_chunks.front().duration).arg(m_chunks.size()), cl_logDEBUG2);
                     m_chunks.pop_front();
                 }
 

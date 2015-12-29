@@ -19,34 +19,40 @@ void QnCameraBookmarksManager::getBookmarksAsync(const QnVirtualCameraResourceSe
                                                  , BookmarksCallbackType callback)
 {
     Q_D(QnCameraBookmarksManager);
-    d->getBookmarksAsync(cameras, filter, callback);
+    auto internalCallback = [callback](bool success, const QnCameraBookmarkList &bookmarks, int requestId) {
+        Q_UNUSED(requestId);
+        if (callback)
+            callback(success, bookmarks);
+    };
+    d->getBookmarksAsync(cameras, filter, internalCallback);
 }
 
+void QnCameraBookmarksManager::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    Q_D(QnCameraBookmarksManager);
+    d->addCameraBookmark(bookmark, callback);
 
-QnCameraBookmarkList QnCameraBookmarksManager::getLocalBookmarks(const QnVirtualCameraResourceSet &cameras, const QnCameraBookmarkSearchFilter &filter) const {
+    emit bookmarkAdded(bookmark);
+}
+
+void QnCameraBookmarksManager::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark");
+    Q_D(QnCameraBookmarksManager);
+    d->updateCameraBookmark(bookmark, callback);
+
+    emit bookmarkUpdated(bookmark);
+}
+
+void QnCameraBookmarksManager::deleteCameraBookmark(const QnUuid &bookmarkId, OperationCallbackType callback) {
+    Q_D(QnCameraBookmarksManager);
+    d->deleteCameraBookmark(bookmarkId, callback);
+
+    emit bookmarkRemoved(bookmarkId);
+}
+
+QnCameraBookmarkList QnCameraBookmarksManager::cachedBookmarks(const QnCameraBookmarksQueryPtr &query) const {
     Q_D(const QnCameraBookmarksManager);
-    return d->getLocalBookmarks(cameras, filter);
-}
-
-
-void QnCameraBookmarksManager::addCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    Q_D(QnCameraBookmarksManager);
-    d->addCameraBookmark(camera, bookmark, callback);
-}
-
-void QnCameraBookmarksManager::updateCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    Q_D(QnCameraBookmarksManager);
-    d->updateCameraBookmark(camera, bookmark, callback);
-}
-
-void QnCameraBookmarksManager::deleteCameraBookmark(const QnVirtualCameraResourcePtr &camera, const QnCameraBookmark &bookmark, OperationCallbackType callback) {
-    Q_D(QnCameraBookmarksManager);
-    d->deleteCameraBookmark(camera, bookmark, callback);
-}
-
-QnCameraBookmarkList QnCameraBookmarksManager::executeQueryLocal(const QnCameraBookmarksQueryPtr &query) const {
-    Q_D(const QnCameraBookmarksManager);
-    return d->executeQueryLocal(query);
+    return d->cachedBookmarks(query);
 }
 
 void QnCameraBookmarksManager::executeQueryRemoteAsync(const QnCameraBookmarksQueryPtr &query, BookmarksCallbackType callback) {

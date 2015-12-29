@@ -15,7 +15,7 @@ Item {
     property alias chunkProvider: timeline.chunkProvider
     property alias startBound: timeline.startBound
     property alias autoPlay: timeline.autoPlay
-    readonly property bool dragging: mouseArea.pressed || pinchArea.pinch.active
+    readonly property bool dragging: timeline.dragging
     readonly property bool moving: timeline.moving
     readonly property var timelineView: timeline
 
@@ -44,6 +44,7 @@ Item {
         anchors.fill: parent
 
         property bool moving: false
+        property bool dragging: false
 
         textColor: QnTheme.timelineText
         chunkColor: QnTheme.timelineChunk
@@ -67,15 +68,14 @@ Item {
         pinch.dragAxis: Qt.XAxis
 
         onPinchStarted: {
-            timeline.moving = true
-            timeline.startPinch(pinch.center.x, pinch.scale)
+            timeline.startZoom(pinch.scale)
+            timeline.dragging = false
         }
         onPinchUpdated: {
-            timeline.updatePinch(pinch.center.x, pinch.scale)
+            timeline.updateZoom(pinch.scale)
         }
         onPinchFinished: {
-            timeline.finishPinch(pinch.center.x, pinch.scale)
-            root.dragFinished()
+            timeline.finishZoom(pinch.scale)
         }
 
         MouseArea {
@@ -85,6 +85,7 @@ Item {
 
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton
+            drag.threshold: dp(10)
 
             onPressed: {
                 pressX = mouseX
@@ -93,6 +94,7 @@ Item {
                 if (pressX != -1 && Math.abs(pressX - mouseX) > drag.threshold) {
                     preventStealing = true
                     timeline.moving = true
+                    timeline.dragging = true
                     timeline.startDrag(pressX)
                     pressX = -1
                 }
@@ -101,16 +103,14 @@ Item {
             onReleased: {
                 preventStealing = false
                 pressX = -1
-                timeline.finishDrag(mouse.x)
 
-                if (timeline.moving)
+                if (timeline.moving) {
+                    timeline.dragging = false
                     root.dragFinished()
-            }
-            onClicked: {
-                if (moving)
-                    return
-
-                positionTapped(timeline.positionAtX(mouse.x))
+                    timeline.finishDrag(mouse.x)
+                } else {
+                    positionTapped(timeline.positionAtX(mouse.x))
+                }
             }
             onWheel: {
                 if (wheel.angleDelta.y > 0)

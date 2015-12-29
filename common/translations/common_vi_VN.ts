@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="vi_VN" sourcelanguage="en">
+<TS version="2.1" language="vi_VN" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -15,22 +15,7 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>người dùng định nghĩa (%1)</translation>
-    </message>
     <message>
         <source>Motion on Camera</source>
         <translation>Máy ảnh chuyển</translation>
@@ -153,6 +138,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>Mâu thuẫn máy chủ #%1:%2</translation>
     </message>
     <message>
@@ -186,10 +172,6 @@
     <message>
         <source>RTP packet loss detected.</source>
         <translation>RTP Phát hiện mất gói tin.</translation>
-    </message>
-    <message>
-        <source>Server started after crash.</source>
-        <translation>Bắt đầu sau khi tai nạn máy chủ.</translation>
     </message>
     <message>
         <source>I/O error has occurred at %1.</source>
@@ -236,10 +218,6 @@
         <translation>Một sự kiện chưa biết</translation>
     </message>
     <message>
-        <source>Input Port: %1</source>
-        <translation>Nhập các cổng giao tiếp：%1</translation>
-    </message>
-    <message>
         <source>Conflict Address: %1</source>
         <translation>xung đột địa chỉ：%1</translation>
     </message>
@@ -254,59 +232,171 @@
         </translation>
     </message>
     <message>
-        <source>%1 output</source>
-        <translation>%1 đầu ra</translation>
+        <source>Generic Event</source>
+        <translation>sự kiện chung</translation>
     </message>
     <message>
-        <source>%1 output for 30 sec</source>
-        <translation>%1 đầu ra 30 sec</translation>
+        <source> (%1)</source>
+        <translation> (%1)</translation>
     </message>
     <message>
-        <source>%1 recording</source>
-        <translation>%1 ghi âm</translation>
+        <source>Caption: %1</source>
+        <translation>Chú thích: %1</translation>
     </message>
     <message>
-        <source>Input Signal on %1</source>
-        <translation>Tín hiệu đầu vào %1</translation>
+        <source>MAC #%1: %2 </source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation>MAC #%1: %2 </translation>
     </message>
     <message>
-        <source>%1 Disconnected</source>
-        <translation>%1 ngắt kết nối</translation>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation>Kết nối với camera (luồng chính) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
-        <source>%1 IP Conflict</source>
-        <translation>%1 IP xung đột</translation>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation>Kết nối với camera (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
     </message>
     <message>
-        <source>Any %1 Issue</source>
-        <translation>Bất kỳ vấn đề %1</translation>
+        <source>Server restarted unexpectedly.</source>
+        <translation>Máy chủ khởi động lại đột ngột.</translation>
     </message>
     <message>
-        <source>%1 %2 was disconnected</source>
-        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
-        <translation>%1 %2 đã được ngắt kết nối</translation>
+        <source>Device output</source>
+        <translation>sản lượng thiết bị</translation>
     </message>
     <message>
-        <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
-        <translation>%1 IP xung đột tại %2</translation>
+        <source>Camera output</source>
+        <translation>sản lượng máy ảnh</translation>
     </message>
     <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
-        <translation>%1 #%2 MAC: %3</translation>
+        <source>Device output for 30 sec</source>
+        <translation>Sản lượng thiết bị cho 30 sec</translation>
     </message>
     <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation>Kết nối với %1 (luồng chính) đã bất ngờ đóng cửa.</translation>
+        <source>Camera output for 30 sec</source>
+        <translation>sản lượng máy ảnh cho 30 sec</translation>
     </message>
     <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation>Kết nối với %1 (dòng thứ cấp) đã bất ngờ đóng cửa.</translation>
+        <source>Device recording</source>
+        <translation>thiết bị ghi âm</translation>
     </message>
     <message>
-        <source>Recording on %1 is disabled: </source>
-        <translation>Ghi trên %1 là người khuyết tật:</translation>
+        <source>Camera recording</source>
+        <translation>camera ghi âm</translation>
+    </message>
+    <message>
+        <source>Input Signal on Device</source>
+        <translation>tín hiệu đầu vào trên thiết bị</translation>
+    </message>
+    <message>
+        <source>Input Signal on Camera</source>
+        <translation>tín hiệu đầu vào trên camera</translation>
+    </message>
+    <message>
+        <source>Device Disconnected</source>
+        <translation>thiết bị ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>Camera Disconnected</source>
+        <translation>camera bị ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict</source>
+        <translation>Thiết bị IP xung đột</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict</source>
+        <translation>Camera IP xung đột</translation>
+    </message>
+    <message>
+        <source>Any Device Issue</source>
+        <translation>Bất kỳ vấn đề thiết bị</translation>
+    </message>
+    <message>
+        <source>Any Camera Issue</source>
+        <translation>Bất kỳ hành máy ảnh</translation>
+    </message>
+    <message>
+        <source>Device %1 was disconnected</source>
+        <translation>thiết bị %1 đã được ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>Camera %1 was disconnected</source>
+        <translation>Máy ảnh %1 đã được ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>IO Module %1 was disconnected</source>
+        <translation>IO Mô-đun %1 đã được ngắt kết nối</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict at %1</source>
+        <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>Thiết bị IP xung đột tại %1</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict at %1</source>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>Camera IP xung đột tại %1</translation>
+    </message>
+    <message>
+        <source>Connection to device was unexpectedly closed.</source>
+        <translation>Kết nối với thiết bị đã bất ngờ đóng cửa.</translation>
+    </message>
+    <message>
+        <source>Recording on devices is disabled:</source>
+        <translation>Ghi trên các thiết bị bị vô hiệu hóa:</translation>
+    </message>
+    <message>
+        <source>Recording on cameras is disabled:</source>
+        <translation>Ghi âm trên máy ảnh bị vô hiệu hóa:</translation>
+    </message>
+    <message>
+        <source>Recording on IO modules is disabled:</source>
+        <translation>Ghi trên các module IO là người khuyết tật:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show text overlay</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show on Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Generic Event at %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Input Port: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed because of no backup storages available</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is successfully completed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -388,74 +478,136 @@
         <translation>tham số:</translation>
     </message>
     <message>
-        <source>Not authorised. Url %1.</source>
-        <translation>Trái phép. nơi %1.</translation>
+        <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+        <translation>Hãy cố gắng để khởi động lại thiết bị, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network.</source>
-        <translation>Hãy chắc chắn rằng %1 được cắm vào mạng.</translation>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>Hãy cố gắng để khởi động lại máy, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp). Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
+        <translation>Hãy cố gắng để khởi động lại các module IO, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Hãy chắc chắn rằng %1 được cắm vào mạng. Cố gắng khởi động lại máy %1.</translation>
+        <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+        <translation>Hãy chắc chắn rằng thiết bị được cắm vào mạng. Hãy thử khởi động lại thiết bị.</translation>
     </message>
     <message>
-        <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation>Không thể phân tích phản ứng %1. Url %2, yêu cầu tên %3.</translation>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
     </message>
     <message>
-        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Hãy cố gắng để khởi động lại máy %1, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
+        <translation>Hãy chắc chắn rằng các mô-đun IO được cắm vào mạng. Hãy thử khởi động lại các module IO.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt %1.</translation>
+        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
+        <translation>Hãy chắc chắn rằng cổng %2 có thể truy cập (ví dụ chuyển tiếp).</translation>
     </message>
     <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên %1 trang web. Nếu vấn đề vẫn còn, xin vui lòng liên hệ với hỗ trợ.</translation>
+        <source>Could not parse device response. Url %1, request name %2.</source>
+        <translation>Không thể phân tích phản ứng thiết bị. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
-        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Yêu cầu %1 &quot;%2&quot; thất bại với lỗi &quot;%3&quot;.</translation>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation>Không thể phân tích ứng của máy ảnh. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
-        <source>Unknown %1 Issue.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Không biết vấn đề %1.</translation>
+        <source>Could not parse IO module response. Url %1, request name %2.</source>
+        <translation>Không thể phân tích IO module đáp trả. Url %1, yêu cầu tên %2.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the %1: %2.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Dữ liệu không hợp lệ đã nhận được từ %1: %2.</translation>
+        <source>Not authorized. Url %1.</source>
+        <translation>Không được cho phép. Url %1.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề %1 thoại để biết thêm chi tiết.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt thiết bị.</translation>
     </message>
     <message>
-        <source>%1 initialization process in progress.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation>Quá trình khởi tạo %1 tiến hành.</translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt camera.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
+        <translation>Đầu tiên, hãy thử bật ghi âm (nếu nó tắt) và giảm fps trong cài đặt mô-đun IO.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
+        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên thiết bị web-page.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
+        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên máy ảnh web-page.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
+        <translation>Nếu nó không giúp, phục hồi mặc định nhà máy trên các module web-page IO.</translation>
+    </message>
+    <message>
+        <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Yêu cầu thiết bị &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>Yêu cầu máy ảnh &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>IO đun yêu cầu &quot;%1&quot; thất bại với lỗi &quot;%2&quot;.</translation>
+    </message>
+    <message>
+        <source>Unknown device issue.</source>
+        <translation>Không biết vấn đề thiết bị.</translation>
+    </message>
+    <message>
+        <source>Unknown camera issue.</source>
+        <translation>Không biết vấn đề camera.</translation>
+    </message>
+    <message>
+        <source>Unknown IO module issue.</source>
+        <translation>chưa biết IO mô-đun vấn đề.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device %1.</source>
+        <translation>Dữ liệu không hợp lệ đã nhận được từ các thiết bị %1.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera %1.</source>
+        <translation>Dữ liệu không hợp lệ đã nhận được từ các camera %1.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the IO module %1.</source>
+        <translation>Dữ liệu không hợp lệ đã nhận được từ các mô-đun IO %1.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open device issues dialog for more details.</source>
+        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề thiết bị thoại để biết thêm chi tiết.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open camera issues dialog for more details.</source>
+        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề camera thoại để biết thêm chi tiết.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở IO vấn đề mô-đun thoại để biết thêm chi tiết.</translation>
+    </message>
+    <message>
+        <source>Device initialization process in progress.</source>
+        <translation>Thiết bị quá trình khởi tạo trong tiến trình.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process in progress.</source>
+        <translation>Quá trình khởi tạo camera trong tiến trình.</translation>
+    </message>
+    <message>
+        <source>IO Module initialization process in progress.</source>
+        <translation>Quá trình khởi tạo IO Module trong tiến trình.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -707,27 +859,6 @@
     </message>
 </context>
 <context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>cài sẵn #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation>Không thể khởi tạo cài đặt cổng IO</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-</context>
-<context>
     <name>QnPropertyStorage</name>
     <message>
         <source>Invalid value for &apos;%1&apos; argument - expected %2, provided &apos;%3&apos;.</source>
@@ -946,97 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>No licenses</source>
-        <translation>Không có ủy quyền hợp lệ</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>Địa chỉ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>Máy chủ email không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>Kết nối đến máy chủ bị mất</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>Lỗi trong khi gửi email</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>Địa chỉ email không được thiết lập cho người dùng %1</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>Chọn máy chủ cho những người khác để đồng bộ thời gian với</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>Địa chỉ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>Bạn không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>Máy chủ email không được thiết lập.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>Một số người dùng đã không được thiết lập địa chỉ email của họ.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>Họ không thể nhận được các thông báo hệ thống thông qua email.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>Kho có đầy đủ trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>Kho không được cấu hình trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>Bạn không có giấy phép.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>Bạn không có thể ghi lại video từ máy ảnh.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>Xây dựng lại chỉ mục lưu trữ được hoàn thành trên máy chủ sau đây:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation>Lưu trữ đầy</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation>Thiết bị lưu trữ không được thiết lập</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation>Lần máy chủ không đồng bộ và một thời gian chung không thể được phát hiện tự động.</translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1061,17 +1101,6 @@
     <message>
         <source>Invalid Parameter</source>
         <translation>Lập luận không hợp lệ</translation>
-    </message>
-</context>
-<context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation>Đầu ra %1</translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation>đầu vào %1</translation>
     </message>
 </context>
 <context>

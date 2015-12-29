@@ -1,6 +1,8 @@
 #include "crash_reporter.h"
 
 #include <api/app_server_connection.h>
+#include <api/global_settings.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 
@@ -31,10 +33,11 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
     #if defined( _WIN32 )
         const QDir crashDir(QString::fromStdString(win32_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(win32_exception::getCrashPattern());
-    #elif defined ( __linux__ )
+    #elif defined (Q_OS_LINUX) && !defined(Q_OS_ANDROID)
         const QDir crashDir(QString::fromStdString(linux_exception::getCrashDirectory()));
         const auto crashFilter = prefix + QString::fromStdString(linux_exception::getCrashPattern());
     #else
+        Q_UNUSED(prefix)
         const QDir crashDir;
         const QString crashFilter;
         return QFileInfoList(); // do nothing. not implemented
@@ -80,10 +83,11 @@ CrashReporter::~CrashReporter()
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
     const auto admin = qnResPool->getAdministrator();
-    if (!admin) return false;
+    if (!admin) 
+        return false;
 
-    const auto msManager = QnAppServerConnectionFactory::getConnection2()->getMediaServerManager();
-    if (!Ec2StaticticsReporter::isAllowed(msManager))
+    
+    if (!qnGlobalSettings->isStatisticsAllowed())
     {
         NX_LOG(lit("CrashReporter::scanAndReport: Automatic report system is disabled"),
                cl_logINFO);

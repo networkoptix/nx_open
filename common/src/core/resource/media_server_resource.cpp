@@ -4,23 +4,41 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
 
-#include <utils/common/app_info.h>
-#include "utils/common/delete_later.h"
 #include "api/session_manager.h"
 #include <api/app_server_connection.h>
 #include <api/model/ping_reply.h>
 #include <api/network_proxy_factory.h>
-#include <rest/server/json_rest_result.h>
-#include "utils/common/sleep.h"
-#include "utils/network/networkoptixmodulerevealcommon.h"
-#include "utils/common/util.h"
-#include "media_server_user_attributes.h"
-#include "../resource_management/resource_pool.h"
-#include "utils/serialization/lexical.h"
-#include "core/resource/security_cam_resource.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
+
+#include <core/resource/storage_resource.h>
+#include <core/resource/security_cam_resource.h>
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource/server_backup_schedule.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/resource_pool.h>
+
 #include "nx_ec/ec_proto_version.h"
-#include <network/authenticate_helper.h>
+
+#include <rest/server/json_rest_result.h>
+
+#include <utils/common/app_info.h>
+#include "utils/common/delete_later.h"
+#include "utils/common/sleep.h"
+#include "utils/common/util.h"
+#include "utils/network/http/asynchttpclient.h"
+#include "network/networkoptixmodulerevealcommon.h"
+#include "utils/serialization/lexical.h"
+#include "api/server_rest_connection.h"
+
+namespace {
+    const QString protoVersionPropertyName = lit("protoVersion");
+    const QString safeModePropertyName = lit("ecDbReadOnly");
+
+    quint16 portFromUrl(const QString &strUrl)
+    {
+        const QUrl url(strUrl);
+        return url.port(DEFAULT_APPSERVER_PORT);
+    }
+}
 
 
 class QnMediaServerResourceGuard: public QObject {
@@ -107,7 +125,7 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-    
+
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
         if( !(*lk)->name.isEmpty() )
@@ -142,8 +160,8 @@ void QnMediaServerResource::setApiUrl(const QString &apiUrl)
             return;
 
         m_apiUrl = apiUrl;
-        if (m_restConnection)
-            m_restConnection->setUrl(m_apiUrl);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_apiUrl);
     }
     emit apiUrlChanged(::toSharedPointer(this));
 }
@@ -200,18 +218,27 @@ QList<QUrl> QnMediaServerResource::getIgnoredUrls() const
 }
 
 quint16 QnMediaServerResource::getPort() const {
-    QUrl url(getApiUrl());
-    return url.port(DEFAULT_APPSERVER_PORT);
+    return portFromUrl(getApiUrl());
 }
 
 QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
     QnMutexLocker lock( &m_mutex );
 
-    /* We want the video server connection to be deleted in its associated thread, 
+    /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
-    if (!m_restConnection && !m_apiUrl.isEmpty())
-        m_restConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+    if (!m_apiConnection && !m_apiUrl.isEmpty())
+        m_apiConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
+
+    return m_apiConnection;
+}
+
+rest::QnConnectionPtr QnMediaServerResource::restConnection()
+{
+    QnMutexLocker lock( &m_mutex );
+
+    if (!m_restConnection)
+        m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
 
     return m_restConnection;
 }
@@ -239,12 +266,12 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
     setUrl(lit("%1://%2").arg(urlScheme).arg(primaryAddress.toString()));
 }
 
-Qn::PanicMode QnMediaServerResource::getPanicMode() const 
+Qn::PanicMode QnMediaServerResource::getPanicMode() const
 {
     return m_panicModeCache.get();
 }
 
-Qn::PanicMode QnMediaServerResource::calculatePanicMode() const 
+Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 {
     QString strVal = getProperty(QnMediaResource::panicRecordingKey());
     Qn::PanicMode result = Qn::PM_None;
@@ -305,7 +332,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
         /*
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
-        
+
         // Keep indices unchanged (Server does not provide this info).
         for(const QnAbstractStorageResourcePtr &storage: m_storages)
         {
@@ -321,10 +348,16 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
         setStorages(otherStorages);
         */
     }
-    if (netAddrListChanged || getPort() != localOther->getPort()) {
+
+
+    const bool currentPortChanged = (portFromUrl(m_apiUrl) != localOther->getPort());
+    if (netAddrListChanged || currentPortChanged )
+    {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
-        if (m_restConnection)
-            m_restConnection->setUrl(m_apiUrl);
+        if (m_apiConnection)
+            m_apiConnection->setUrl(m_apiUrl);
+        if (currentPortChanged )
+            modifiedFields << "portChanged";
     } else {
         m_url = oldUrl; //rollback changed value to autodetected
     }
@@ -347,6 +380,21 @@ int QnMediaServerResource::getMaxCameras() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
     return (*lk)->maxCameras;
+}
+
+QnServerBackupSchedule QnMediaServerResource::getBackupSchedule() const {
+    QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+    return (*lk)->backupSchedule;
+}
+
+void QnMediaServerResource::setBackupSchedule(const QnServerBackupSchedule &value) {
+    {
+        QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
+        if ((*lk)->backupSchedule == value)
+            return;
+        (*lk)->backupSchedule = value;
+    }
+    emit backupScheduleChanged(::toSharedPointer(this));
 }
 
 void QnMediaServerResource::setRedundancy(bool value)
@@ -412,11 +460,14 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.type = QnModuleInformation::nxMediaServerId();
     moduleInformation.customization = QnAppInfo::customizationName();
     moduleInformation.sslAllowed = false;
-    moduleInformation.protoVersion = getProperty(lit("protoVersion")).toInt();
+    moduleInformation.protoVersion = getProperty(protoVersionPropertyName).toInt();
     moduleInformation.name = getName();
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx_ec::EC2_PROTO_VERSION;
-    
+
+    if (hasProperty(safeModePropertyName))
+        moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
+
     QnMutexLocker lock( &m_mutex );
 
     moduleInformation.version = m_version;
@@ -424,9 +475,38 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.systemName = m_systemName;
     moduleInformation.port = QUrl(m_apiUrl).port();
     moduleInformation.id = getId();
-    moduleInformation.flags = getServerFlags();
+    moduleInformation.serverFlags = getServerFlags();
 
     return moduleInformation;
+}
+
+void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
+    Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
+
+    QList<QHostAddress> addressList;
+    for (const QString &address: moduleInformation.remoteAddresses)
+        addressList.append(QHostAddress(address));
+    setNetAddrList(addressList);
+
+    if (!addressList.isEmpty()) {
+        QString address = addressList.first().toString();
+        quint16 port = moduleInformation.port;
+        QString url = QString(lit("http://%1:%2")).arg(address).arg(port);
+        setApiUrl(url);
+        setUrl(url);
+    }
+    if (!moduleInformation.name.isEmpty())
+        setName(moduleInformation.name);
+    setVersion(moduleInformation.version);
+    setSystemInfo(moduleInformation.systemInformation);
+    setSystemName(moduleInformation.systemName);
+    setProperty(protoVersionPropertyName, QString::number(moduleInformation.protoVersion));
+    setProperty(safeModePropertyName, QnLexical::serialized(moduleInformation.ecDbReadOnly));
+
+    if (moduleInformation.ecDbReadOnly)
+        addFlags(Qn::read_only);
+    else
+        removeFlags(Qn::read_only);
 }
 
 bool QnMediaServerResource::isEdgeServer(const QnResourcePtr &resource) {
@@ -459,18 +539,21 @@ bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
 
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
-    if (getStatus() != newStatus) 
+    if (getStatus() != newStatus)
     {
         {
             QnMutexLocker lock( &m_mutex );
             m_statusTimer.restart();
+            Q_ASSERT_X(newStatus == Qn::Incompatible || newStatus == Qn::Unauthorized || m_originalGuid.isNull(),
+                       Q_FUNC_INFO,
+                       "Incompatible servers should not take any status but incompatible or unauthorized");
         }
 
         QnResource::setStatus(newStatus, silenceMode);
-        if (!silenceMode) 
+        if (!silenceMode)
         {
             QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-            for(const QnResourcePtr& res: childList) 
+            for(const QnResourcePtr& res: childList)
             {
                 if (res->hasFlags(Qn::depend_on_parent_status))
                     emit res->statusChanged(res);

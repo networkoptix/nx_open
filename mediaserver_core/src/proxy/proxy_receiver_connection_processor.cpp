@@ -1,7 +1,7 @@
 
 #include "proxy_receiver_connection_processor.h"
 #include "network/universal_request_processor_p.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
 
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
@@ -12,12 +12,12 @@ public:
 };
 
 QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
-                                                     QnUniversalTcpListener* owner):
+                                                     QnHttpConnectionListener* owner):
     QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
 {
     Q_D(QnProxyReceiverConnection);
 
-    d->owner = owner;
+    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->takeSocketOwnership = false;
     setObjectName( lit("QnProxyReceiverConnection") );
 }

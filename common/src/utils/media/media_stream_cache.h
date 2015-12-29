@@ -15,7 +15,13 @@
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <utils/thread/mutex.h>
 
-
+class QnMediaStreamEventReceiver
+{
+public:
+    virtual void onKeyFrame(quint64 currentPacketTimestampUSec) = 0;
+    virtual void onDiscontinue() = 0;
+    virtual ~QnMediaStreamEventReceiver() {}
+};
 
 namespace detail
 {
@@ -61,7 +67,9 @@ public:
     /*!
         \param cacheSizeMillis Data older than, \a last_frame_timestamp - \a cacheSizeMillis is dropped
     */
-    MediaStreamCache( unsigned int cacheSizeMillis );
+    MediaStreamCache(
+        unsigned int cacheSizeMillis,
+        unsigned int maxCacheSizeMillis);
     virtual ~MediaStreamCache();
 
     //!Implementation of QnAbstractDataReceptor::canAcceptData
@@ -100,11 +108,11 @@ public:
     /*!
         \return id of event receiver
     */
-    int addKeyFrameEventReceiver( std::function<void (quint64)> keyFrameEventReceiver );
+    void addEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
     /*!
         \param receiverID id received from \a MediaStreamCache::addKeyFrameEventReceiver
     */
-    void removeKeyFrameEventReceiver( int receiverID );
+    void removeEventReceiver( QnMediaStreamEventReceiver* eventReceiver );
 
     //!Prevents data starting with \a timestamp from removal
     /*!
@@ -118,7 +126,8 @@ public:
 
     //!Time (millis) from last usage of this object
     qint64 inactivityPeriod() const;
-
+protected:
+    virtual bool needConfigureProvider() const override { return false; }
 private:
     std::shared_ptr<detail::MediaStreamCache> m_sharedImpl;
 };

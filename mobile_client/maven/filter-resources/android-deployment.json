@@ -6,7 +6,7 @@
    "toolchain-prefix": "arm-linux-androideabi",
    "tool-prefix": "arm-linux-androideabi",
    "toolchain-version": "4.8",
-   "ndk-host": "linux-x86_64",
+   "ndk-host": "linux-x86",
    "target-architecture": "armeabi-v7a",
    "android-package-source-directory": "${project.build.directory}/android",
    "android-extra-libs": "${libdir}/lib/${build.configuration}/libssl.so,${libdir}/lib/${build.configuration}/libcrypto.so",

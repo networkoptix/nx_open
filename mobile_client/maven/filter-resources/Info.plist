@@ -6,14 +6,12 @@
 	<string></string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleGetInfoString</key>
-	<string>Created by Qt/QMake</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleExecutable</key>
 	<string>mobile_client</string>
 	<key>CFBundleIdentifier</key>
-	<string>${namespace.major}.${namespace.minor}.${namespace.additional}2</string>
+	<string>${ios.new_bundle_identifier}</string>
 	<key>CFBundleDisplayName</key>
 	<string>${display.product.name}</string>
 	<key>CFBundleName</key>
@@ -21,11 +19,11 @@
 	<key>CFBundleShortVersionString</key>
 	<string>${project.version.name}</string>
 	<key>CFBundleVersion</key>
-	<string>${project.version.name}.${project.version.code}</string>
+	<string>${project.version.code}</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string>Launch</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -43,14 +41,11 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>icon_80x80</string>
-				<string>icon_58x58</string>
-				<string>icon_29x29</string>
-				<string>icon_120x120</string>
-				<string>icon_57x57.png</string>
-				<string>icon_114x114.png</string>
-				<string>icon_72x72.png</string>
-				<string>icon_144x144.png</string>
+				<string>icon_120x120.png</string>
+				<string>icon_180x180.png</string>
+				<string>icon_80x80.png</string>
+				<string>icon_58x58.png</string>
+				<string>icon_87x87.png</string>
 			</array>
 		</dict>
 	</dict>
@@ -60,19 +55,13 @@
 		<dict>
 			<key>CFBundleIconFiles</key>
 			<array>
-				<string>icon_58x58</string>
-				<string>icon_29x29</string>
-				<string>icon_80x80</string>
-				<string>icon_40x40</string>
-				<string>icon_100x100</string>
-				<string>icon_50x50</string>
-				<string>icon_152x152</string>
-				<string>icon_76x76</string>
-				<string>icon_120x120</string>
-				<string>icon_57x57.png</string>
-				<string>icon_114x114.png</string>
-				<string>icon_72x72.png</string>
-				<string>icon_144x144.png</string>
+				<string>icon_76x76.png</string>
+				<string>icon_152x152.png</string>
+				<string>icon_167x167.png</string>
+				<string>icon_60x60.png</string>
+				<string>icon_120x120.png</string>
+				<string>icon_29x29.png</string>
+				<string>icon_58x58.png</string>
 			</array>
 		</dict>
 	</dict>

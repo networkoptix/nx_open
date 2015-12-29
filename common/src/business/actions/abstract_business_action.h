@@ -19,6 +19,11 @@ namespace QnBusiness
     bool requiresUserResource(ActionType actionType);
 
     bool hasToggleState(ActionType actionType);
+    bool canBeInstant(ActionType actionType);
+    bool supportsDuration(ActionType actionType);
+    bool allowsAggregation(ActionType actionType);
+
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters);
 
     QList<ActionType> allActions();
 }
@@ -35,7 +40,8 @@ protected:
 
 public:
     virtual ~QnAbstractBusinessAction();
-    QnBusiness::ActionType actionType() const { return m_actionType; }
+
+    QnBusiness::ActionType actionType() const;
 
     /**
      * Resource depend of action type.
@@ -65,6 +71,8 @@ public:
     /** How much times action was instantiated during the aggregation period. */
     void setAggregationCount(int value);
     int getAggregationCount() const;
+
+    bool isProlonged() const;
 
     /** Return action unique key for external outfit (port number for output action e.t.c). Do not count resourceId 
      * This function help to share physical resources between actions

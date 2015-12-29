@@ -8,10 +8,12 @@ import "../controls"
 QnListView {
     id: camerasList
 
-    leftMargin: dp(16)
-    rightMargin: dp(16)
-    topMargin: dp(16)
-    bottomMargin: dp(16)
+    clip: true
+
+    leftMargin: dp(8)
+    rightMargin: dp(8)
+    topMargin: dp(8)
+    bottomMargin: dp(8)
     spacing: dp(8)
 
     delegate: QnCameraListItem {
@@ -19,7 +21,10 @@ QnListView {
         status: model.resourceStatus
         thumbnail: model.thumbnail
 
-        onClicked: Main.openMediaResource(model.uuid)
+        onClicked: {
+            var point = mapToItem(stackView, width / 2, height / 2)
+            Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y), model.thumbnail)
+        }
     }
 
     QnScrollIndicator {

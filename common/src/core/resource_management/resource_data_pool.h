@@ -2,8 +2,8 @@
 #define QN_RESOURCE_DATA_POOL_H
 
 #include <QtCore/QObject>
-#include <utils/thread/mutex.h>
 
+#include <utils/thread/mutex.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/resource_fwd.h>
 
@@ -38,6 +38,7 @@ private:
 
     /** Cache of the search results to avoid using too much regexps. */
     mutable QHash<QString, QnResourceData> m_cachedResultByKey;
+    mutable QnMutex m_cachedDataMtx;
 };
 
 

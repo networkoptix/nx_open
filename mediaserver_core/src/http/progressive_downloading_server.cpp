@@ -12,9 +12,10 @@
 #include <utils/common/util.h>
 #include <utils/common/string.h>
 #include <utils/common/model_functions.h>
+#include <utils/common/adaptive_sleep.h>
 #include <utils/fs/file.h>
-#include <utils/network/tcp_connection_priv.h>
-#include <utils/network/tcp_listener.h>
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
 
 #include "core/resource_management/resource_pool.h"
 #include "core/dataconsumer/abstract_data_consumer.h"
@@ -34,13 +35,20 @@
 #include "common/common_module.h"
 #include "audit/audit_manager.h"
 
-
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
 
 // -------------------------- QnProgressiveDownloadingDataConsumer ---------------------
 
 static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
+
+namespace
+{
+    bool isArchiveTimestamp(qint64 timestamp)
+    {
+        return timestamp != (qint64) AV_NOPTS_VALUE && timestamp != (qint64) DATETIME_NOW;
+    }
+}
 
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
@@ -50,7 +58,8 @@ public:
         bool standFrameDuration,
         bool dropLateFrames,
         unsigned int maxFramesToCacheBeforeDrop,
-        bool liveMode)
+        bool liveMode,
+        bool continuousTimestamps)
     :
         QnAbstractDataConsumer(50),
         m_owner(owner),
@@ -63,6 +72,7 @@ public:
         m_lastRtTime( 0 ),
         m_endTimeUsec( AV_NOPTS_VALUE ),
         m_liveMode(liveMode),
+        m_continuousTimestamps(continuousTimestamps),
         m_needKeyData(false)
     {
         if( dropLateFrames )
@@ -165,17 +175,6 @@ protected:
         if (media && m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
-        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE))
-        {
-            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
-                media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
-            {
-                m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
-            }
-            m_lastMediaTime = media->timestamp;
-            media->timestamp += m_utcShift;
-        }
-
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
 
         QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
@@ -214,6 +213,7 @@ private:
     qint64 m_lastRtTime;
     qint64 m_endTimeUsec;
     bool m_liveMode;
+    bool m_continuousTimestamps;
     bool m_needKeyData;
     AuditHandle m_auditHandle;
 
@@ -221,6 +221,17 @@ private:
     {
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
+
+        if (isArchiveTimestamp(timestamp) && m_continuousTimestamps)
+        {
+            if (isArchiveTimestamp(m_lastMediaTime) && timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000)
+            {
+                m_utcShift -= (timestamp - m_lastMediaTime) - 1000000/60;
+            }
+            m_lastMediaTime = timestamp;
+            timestamp += m_utcShift;
+        }
+
         QByteArray outPacket;
         if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG)
         {
@@ -354,6 +365,7 @@ static QAtomicInt QnProgressiveDownloadingConsumer_count = 0;
 static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
 static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
 static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime transcode optimization
+static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
@@ -545,9 +557,37 @@ void QnProgressiveDownloadingConsumer::run()
             d->transcoder.setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
         }
 
+        boost::optional<CameraMediaStreams> mediaStreams;
+        if (const auto physicalResource = resource.dynamicCast<QnPhysicalCameraResource>())
+            mediaStreams = physicalResource->mediaStreams();
+
+        QnServer::ChunksCatalog qualityToUse = QnServer::HiQualityCatalog;
+        QnTranscoder::TranscodeMethod transcodeMethod =
+            d->videoCodec == CODEC_ID_H264
+                ? QnTranscoder::TM_DirectStreamCopy
+                : QnTranscoder::TM_FfmpegTranscode;
+        if (static_cast<bool>(mediaStreams) &&
+            transcodeMethod == QnTranscoder::TM_FfmpegTranscode)
+        {
+            const auto requestedResolutionStr = lit("%1x%2").arg(videoSize.width()).arg(videoSize.height());
+            for (const auto& streamInfo: mediaStreams->streams)
+            {
+                if (!streamInfo.transcodingRequired
+                    && streamInfo.codec == d->videoCodec
+                    && (resolutionStr.isEmpty() || 
+                        requestedResolutionStr == streamInfo.resolution))
+                {
+                    qualityToUse = streamInfo.encoderIndex == 0
+                        ? QnServer::HiQualityCatalog
+                        : QnServer::LowQualityCatalog;
+                    transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
+                }
+            }
+        }
+
         if (d->transcoder.setVideoCodec(
                 d->videoCodec,
-                d->videoCodec == CODEC_ID_H264 ? QnTranscoder::TM_DirectStreamCopy : QnTranscoder::TM_FfmpegTranscode,
+                transcodeMethod,
                 quality,
                 videoSize,
                 -1,
@@ -571,6 +611,8 @@ void QnProgressiveDownloadingConsumer::run()
             dropLateFrames = true;
         }
 
+        bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
+
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
         
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
@@ -593,7 +635,8 @@ void QnProgressiveDownloadingConsumer::run()
             standFrameDuration,
             dropLateFrames,
             maxFramesToCacheBeforeDrop,
-            isLive);
+            isLive,
+            continuousTimestamps);
 
         qint64 timeUSec = DATETIME_NOW;
         if (isLive)
@@ -612,7 +655,7 @@ void QnProgressiveDownloadingConsumer::run()
                 sendResponse(CODE_NOT_FOUND, "text/plain");
                 return;
             }
-            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(QnServer::HiQualityCatalog);
+            QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
             dataProvider = liveReader;
             if (liveReader) {
                 dataConsumer.copyLastGopFromCamera(camera);

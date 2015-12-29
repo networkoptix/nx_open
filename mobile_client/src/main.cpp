@@ -3,6 +3,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQml/QtQml>
 #include <QtQml/QQmlFileSelector>
+#include <QtQuick/QQuickWindow>
 
 #include <time.h>
 
@@ -11,10 +12,9 @@
 #include "nx_ec/ec2_lib.h"
 #include "common/common_module.h"
 #include "core/resource_management/resource_pool.h"
-#include "plugins/resource/server_camera/server_camera_factory.h"
+#include "core/resource/mobile_client_camera_factory.h"
 #include "utils/common/app_info.h"
 #include "utils/common/log.h"
-#include "utils/network/module_finder.h"
 
 #include "context/context.h"
 #include "mobile_client/mobile_client_module.h"
@@ -24,6 +24,7 @@
 #include "ui/camera_thumbnail_provider.h"
 #include "ui/icon_provider.h"
 #include "ui/window_utils.h"
+#include "ui/texture_size_helper.h"
 #include "camera/camera_thumbnail_cache.h"
 
 #include "version.h"
@@ -33,9 +34,13 @@ int runUi(QGuiApplication *application) {
     QnCameraThumbnailProvider *thumbnailProvider = new QnCameraThumbnailProvider();
     thumbnailProvider->setThumbnailCache(thumbnailsCache.data());
 
+    QnCameraThumbnailProvider *activeCameraThumbnailProvider = new QnCameraThumbnailProvider();
+
+#ifndef Q_OS_IOS
     QFont font;
     font.setFamily(lit("Roboto"));
     QGuiApplication::setFont(font);
+#endif
 
     QnContext context;
 
@@ -47,7 +52,11 @@ int runUi(QGuiApplication *application) {
 
     QnIconProvider *iconProvider = new QnIconProvider(&fileSelector);
 
-    context.colorTheme()->readFromFile(fileSelector.select(lit(":/color_theme.json")));
+    QStringList colorThemeFiles;
+    colorThemeFiles.append(fileSelector.select(lit(":/color_theme.json")));
+    if (QFile::exists(lit(":/color_theme_custom.json")))
+        colorThemeFiles.append(fileSelector.select(lit(":/color_theme_custom.json")));
+    context.colorTheme()->readFromFiles(colorThemeFiles);
     qApp->setPalette(context.colorTheme()->palette());
 
     QQmlEngine engine;
@@ -59,17 +68,20 @@ int runUi(QGuiApplication *application) {
 #endif
 
     engine.addImageProvider(lit("thumbnail"), thumbnailProvider);
+    engine.addImageProvider(lit("active"), activeCameraThumbnailProvider);
     engine.addImageProvider(lit("icon"), iconProvider);
     engine.rootContext()->setContextObject(&context);
     engine.rootContext()->setContextProperty(lit("screenPixelMultiplier"), QnResolutionUtil::instance()->densityMultiplier());
 
     QQmlComponent mainComponent(&engine, QUrl(lit("qrc:///qml/main.qml")));
-    QScopedPointer<QObject> mainWindow(mainComponent.create());
+    QScopedPointer<QQuickWindow> mainWindow(qobject_cast<QQuickWindow*>(mainComponent.create()));
+
+    QScopedPointer<QnTextureSizeHelper> textureSizeHelper(new QnTextureSizeHelper(mainWindow.data()));
 
 #if !defined(Q_OS_ANDROID) && !defined(Q_OS_IOS)
     if (mainWindow) {
-        mainWindow->setProperty("width", 480);
-        mainWindow->setProperty("height", 800);
+        mainWindow->setWidth(480);
+        mainWindow->setHeight(800);
     }
 #endif
 
@@ -90,7 +102,7 @@ int runApplication(QGuiApplication *application) {
 
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(getConnectionFactory(Qn::PT_MobileClient)); // TODO: #dklychkov check connection type
     ec2::ResourceContext resourceContext(
-        QnServerCameraFactory::instance(),
+        QnMobileClientCameraFactory::instance(),
         qnResPool,
         qnResTypePool);
     ec2ConnectionFactory->setContext(resourceContext);
@@ -103,9 +115,6 @@ int runApplication(QGuiApplication *application) {
     runtimeData.peer.dataFormat = Qn::JsonFormat;
     runtimeData.brand = QnAppInfo::productNameShort();
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
-
-    QScopedPointer<QnModuleFinder> moduleFinder(new QnModuleFinder(true, false));
-    moduleFinder->start();
 
     int result = runUi(application);
 

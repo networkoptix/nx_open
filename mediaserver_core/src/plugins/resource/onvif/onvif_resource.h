@@ -15,6 +15,7 @@
 #include <QSharedPointer>
 #include <utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
+#include <QElapsedTimer>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -206,7 +207,9 @@ public:
     static int calcTimeDrift(const QString& deviceUrl);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
+    virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
     virtual bool setParamPhysical(const QString &id, const QString& value) override;
+    virtual bool setParamsPhysical(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
 
     virtual QnAbstractPtzController *createPtzControllerInternal() override;
     //bool fetchAndSetDeviceInformation(bool performSimpleCheck);
@@ -262,6 +265,11 @@ protected:
 
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values);
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value);
+    virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result);
+
+    virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
+        return CameraDiagnostics::NoErrorResult();
+    }
 
 private:
     void setMaxFps(int f);
@@ -317,7 +325,7 @@ protected:
     virtual bool subscribeToCameraNotifications();
 
     bool createPullPointSubscription();
-
+    bool loadXmlParametersInternal(QnCameraAdvancedParams &params, const QString& paramsTemplateFileName) const;
 private slots:
     void onRenewSubscriptionTimer( quint64 timerID );
 
@@ -479,6 +487,8 @@ private:
     qint64 m_prevPullMessageResponseClock;
     QSharedPointer<GSoapAsyncPullMessagesCallWrapper> m_asyncPullMessagesCallWrapper;
 
+    QString m_portNamePrefixToIgnore;
+
     void removePullPointSubscription();
     void pullMessages( quint64 timerID );
     void onPullMessagesDone(GSoapAsyncPullMessagesCallWrapper* asyncWrapper, int resultCode);
@@ -509,8 +519,9 @@ private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;
     std::unique_ptr<QnOnvifMaintenanceProxy> m_maintenanceProxy;
-    QDateTime m_advSettingsLastUpdated;
+    QElapsedTimer m_advSettingsLastUpdated;
     QnCameraAdvancedParamValueMap m_advancedParamsCache;
+protected:
     QnCameraAdvancedParams m_advancedParameters;
 };
 

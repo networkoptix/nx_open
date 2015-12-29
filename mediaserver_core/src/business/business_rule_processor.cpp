@@ -3,15 +3,12 @@
 #include <QtCore/QList>
 #include <QtCore/QBuffer>
 #include <QtGui/QImage>
-#include <QtConcurrent>
 
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
-#include <api/global_settings.h>
 
 #include <business/business_action_factory.h>
 #include <business/business_event_rule.h>
-#include <business/actions/system_health_business_action.h>
 #include <business/business_action_parameters.h>
 
 #include <core/resource/resource.h>
@@ -20,105 +17,19 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include "mustache/mustache_helper.h"
-
 #include <utils/common/synctime.h>
 #include <utils/common/log.h>
 #include <utils/common/app_info.h>
-#include <utils/common/timermanager.h>
-#include <utils/email/email.h>
-#include <utils/email/email_manager_impl.h>
 
 #include "business/business_strings_helper.h"
-#include "nx_ec/data/api_email_data.h"
 #include "common/common_module.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
-
-namespace {
-    const QString tpProductLogoFilename(lit("productLogoFilename"));
-    const QString tpEventLogoFilename(lit("eventLogoFilename"));
-    const QString tpProductLogo(lit("productLogo.png"));
-    const QString tpCompanyName(lit("companyName"));
-    const QString tpCompanyUrl(lit("companyUrl"));
-    const QString tpSupportEmail(lit("supportEmail"));
-    const QString tpSystemName(lit("systemName"));
-    const QString tpImageMimeType(lit("image/png"));
-    const QString tpScreenshotFilename(lit("screenshot"));
-    const QString tpScreenshot(lit("screenshot.jpeg"));
-};
-
-struct QnEmailAttachmentData {
-
-    QnEmailAttachmentData(QnBusiness::EventType eventType) {
-        switch (eventType) {
-        case QnBusiness::CameraMotionEvent:
-            templatePath = lit(":/email_templates/camera_motion.mustache");
-            imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
-            break;
-        case QnBusiness::CameraInputEvent:
-            templatePath = lit(":/email_templates/camera_input.mustache");
-            imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
-            break;
-        case QnBusiness::CameraDisconnectEvent:
-            templatePath = lit(":/email_templates/camera_disconnect.mustache");
-            imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
-            break;
-        case QnBusiness::StorageFailureEvent:
-            templatePath = lit(":/email_templates/storage_failure.mustache");
-            imageName = lit("storage.png");
-            imagePath = lit(":/skin/email_attachments/storage.png");
-            break;
-        case QnBusiness::NetworkIssueEvent:
-            templatePath = lit(":/email_templates/network_issue.mustache");
-            imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
-            break;
-        case QnBusiness::CameraIpConflictEvent:
-            templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
-            imageName = lit("camera.png");
-            imagePath = lit(":/skin/email_attachments/camera.png");
-            break;
-        case QnBusiness::ServerFailureEvent:
-            templatePath = lit(":/email_templates/mediaserver_failure.mustache");
-            imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
-            break;
-        case QnBusiness::ServerConflictEvent:
-            templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
-            imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
-            break;
-        case QnBusiness::ServerStartEvent:
-            templatePath = lit(":/email_templates/mediaserver_started.mustache");
-            imageName = lit("server.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
-            break;
-        case QnBusiness::LicenseIssueEvent:
-            templatePath = lit(":/email_templates/license_issue.mustache");
-            imageName = lit("license.png");
-            imagePath = lit(":/skin/email_attachments/server.png");
-            break;
-        default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "All cases must be implemented.");
-            break;
-        }
-
-        Q_ASSERT_X(!templatePath.isEmpty() && !imageName.isEmpty() && !imagePath.isEmpty(), Q_FUNC_INFO, "Template path must be filled");
-    }
-
-    QString templatePath;
-    QString imageName;
-    QString imagePath;
-};
+#include "core/resource/resource_name.h"
 
 QnBusinessRuleProcessor* QnBusinessRuleProcessor::m_instance = 0;
 
-QnBusinessRuleProcessor::QnBusinessRuleProcessor():
-        m_emailManager(new EmailManagerImpl())
+QnBusinessRuleProcessor::QnBusinessRuleProcessor()
 {
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDelivered, this, &QnBusinessRuleProcessor::at_actionDelivered);
     connect(qnBusinessMessageBus, &QnBusinessMessageBus::actionDeliveryFail, this, &QnBusinessRuleProcessor::at_actionDeliveryFailed);
@@ -145,44 +56,40 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor():
 
 QnBusinessRuleProcessor::~QnBusinessRuleProcessor()
 {
-    quit();
-    wait();
-
-    QnMutexLocker lk( &m_mutex );
-    while( !m_aggregatedEmails.isEmpty() )
-    {
-        const quint64 taskID = m_aggregatedEmails.begin()->periodicTaskID;
-        lk.unlock();
-        TimerManager::instance()->joinAndDeleteTimer( taskID );
-        lk.relock();
-        if( m_aggregatedEmails.begin()->periodicTaskID == taskID )  //task has not been removed in sendAggregationEmail while we were waiting
-            m_aggregatedEmails.erase( m_aggregatedEmails.begin() );
-    }
 }
 
 QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
-    if (action->actionType() == QnBusiness::SendMailAction) {
-        // looking for server with public IP address
-        const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
-        if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
-            return QnMediaServerResourcePtr(); // do not proxy
-        for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
+    switch(action->actionType())
+    {
+        case QnBusiness::SendMailAction:
         {
-            if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
-                return mServer;
+            // looking for server with public IP address
+            const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+            if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
+                return QnMediaServerResourcePtr(); // do not proxy
+
+            const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+            for (const QnMediaServerResourcePtr& mServer: onlineServers)
+            {
+                if (mServer->getServerFlags() & Qn::SF_HasPublicIP)
+                    return mServer;
+            }
+            return QnMediaServerResourcePtr();
         }
-        return QnMediaServerResourcePtr();
+        case QnBusiness::DiagnosticsAction:
+        case QnBusiness::ShowPopupAction:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
+        case QnBusiness::SayTextAction:
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
+        default:
+            if (!res)
+                return QnMediaServerResourcePtr(); // can not find routeTo resource
+            return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
     }
-
-    if (!res)
-        return QnMediaServerResourcePtr();
-
-    if (action->actionType() == QnBusiness::DiagnosticsAction)
-        return QnMediaServerResourcePtr(); // no need transfer to other mServer. Execute action here.
-    if (!res)
-        return QnMediaServerResourcePtr(); // can not find routeTo resource
-    return qnResPool->getResourceById<QnMediaServerResource>(res->getParentId());
 }
 
 bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
@@ -194,7 +101,7 @@ bool QnBusinessRuleProcessor::needProxyAction(const QnAbstractBusinessActionPtr&
 void QnBusinessRuleProcessor::doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
 {
     const QnMediaServerResourcePtr routeToServer = getDestMServer(action, res);
-    if (routeToServer) 
+    if (routeToServer)
     {
         // todo: it is better to use action.clone here
         ec2::ApiBusinessActionData actionData;
@@ -215,49 +122,72 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 {
     if (needProxyAction(action, res))
         doProxyAction(action, res);
-    else
-        executeActionInternal(action, res);
+    else {
+        auto actionCopy = QnBusinessActionFactory::cloneAction(action);
+        if (res)
+            actionCopy->getParams().actionResourceId = res->getId();
+        executeActionInternal(actionCopy);
+    }
 }
 
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
-    QnNetworkResourceList resList = qnResPool->getResources<QnNetworkResource>(action->getResources());
-    if (resList.isEmpty()) {
-        executeAction(action, QnResourcePtr());
+    if (!action) {
+        Q_ASSERT_X(0, Q_FUNC_INFO, "No action to execute");
+        return; // something wrong. It shouldn't be
     }
-    else {
-        for(const QnResourcePtr& res: resList)
+
+    QnNetworkResourceList resources = qnResPool->getResources<QnNetworkResource>(action->getResources());
+
+    switch (action->actionType())
+    {
+    case QnBusiness::ShowTextOverlayAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+        if (action->getParams().useSource)
+        {
+            if (QnVirtualCameraResourcePtr sourceCamera = qnResPool->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId))
+                resources << sourceCamera;
+            resources << qnResPool->getResources<QnNetworkResource>(action->getRuntimeParams().metadata.cameraRefs);
+        }
+        break;
+    default:
+        break;
+    }
+
+    if (resources.isEmpty())
+    {
+        if (QnBusiness::requiresCameraResource(action->actionType()))
+            return; //camera does not exist anymore
+        else
+            executeAction(action, QnResourcePtr());
+    }
+    else
+    {
+        for(const QnResourcePtr& res: resources)
             executeAction(action, res);
     }
 }
 
-bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res)
+bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActionPtr& action)
 {
-    if (QnBusiness::hasToggleState(action->actionType()))
-    {
+    QnResourcePtr res = qnResPool->getResourceById(action->getParams().actionResourceId);
+    if (action->isProlonged()) {
         // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
         QString actionKey = action->getExternalUniqKey();
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
 
-        if (action->getToggleState() == QnBusiness::ActiveState)
-        {
+        if (action->getToggleState() == QnBusiness::ActiveState) {
             if (++m_actionInProgress[actionKey] > 1)
                 return true; // ignore duplicated start
-        }
-        else if (action->getToggleState() == QnBusiness::InactiveState)
-        {
+        } else if (action->getToggleState() == QnBusiness::InactiveState) {
             if (--m_actionInProgress[actionKey] > 0)
                 return true; // ignore duplicated stop
             m_actionInProgress.remove(actionKey);
         }
     }
 
-    switch( action->actionType() )
-    {
-    case QnBusiness::SendMailAction:
-        return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
-
+    switch (action->actionType()) {
     case QnBusiness::DiagnosticsAction:
         return true;
 
@@ -265,6 +195,8 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
     case QnBusiness::PlaySoundOnceAction:
     case QnBusiness::PlaySoundAction:
     case QnBusiness::SayTextAction:
+    case QnBusiness::ShowOnAlarmLayoutAction:
+    case QnBusiness::ShowTextOverlayAction:
         return broadcastBusinessAction(action);
 
     default:
@@ -333,22 +265,11 @@ bool QnBusinessRuleProcessor::containResource(const QnResourceList& resList, con
 
 bool QnBusinessRuleProcessor::checkRuleCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule) const
 {
-    if (!bEvent->checkCondition(rule->eventState(), rule->eventParams()))
+    if (!bEvent->isEventStateMatched(rule->eventState(), rule->actionType()))
         return false;
     if (!rule->isScheduleMatchTime(qnSyncTime->currentDateTime()))
         return false;
     return true;
-}
-
-QString QnBusinessRuleProcessor::formatEmailList(const QStringList &value) {
-    QString result;
-    for (int i = 0; i < value.size(); ++i)
-    {
-        if (i > 0)
-            result.append(L' ');
-        result.append(QString(QLatin1String("%1")).arg(value[i].trimmed()));
-    }
-    return result;
 }
 
 QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
@@ -410,7 +331,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(const 
         return QnAbstractBusinessActionPtr();
 
 
-    if (rule->aggregationPeriod() == 0)
+    if (rule->aggregationPeriod() == 0 || !QnBusiness::allowsAggregation(rule->actionType()))
         return QnBusinessActionFactory::instantiateAction(rule, bEvent);
 
     QString eventKey = rule->getUniqueId();
@@ -456,21 +377,21 @@ void QnBusinessRuleProcessor::at_timer()
 bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule)
 {
     bool resOK = !bEvent->getResource() || rule->eventResources().isEmpty() || rule->eventResources().contains(bEvent->getResource()->getId());
-//    auto resList = rule->eventResourceObjects<QnResource>();
-//    bool resOK = !bEvent->getResource() || resList.isEmpty() || resList.contains(bEvent->getResource());
     if (!resOK)
+        return false;
+    if (!bEvent->checkEventParams(rule->eventParams()))
         return false;
 
 
     if (!QnBusiness::hasToggleState(bEvent->getEventType()))
         return true;
-    
+
     // for continue event put information to m_eventsInProgress
     QnUuid resId = bEvent->getResource() ? bEvent->getResource()->getId() : QnUuid();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
     if (bEvent->getToggleState() == QnBusiness::ActiveState)
         runtimeRule.resources[resId] = bEvent;
-    else 
+    else
         runtimeRule.resources.remove(resId);
 
     return true;
@@ -479,7 +400,7 @@ bool QnBusinessRuleProcessor::checkEventCondition(const QnAbstractBusinessEventP
 QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstractBusinessEventPtr& bEvent)
 {
     QnAbstractBusinessActionList result;
-    for(const QnBusinessEventRulePtr& rule: m_rules)    
+    for(const QnBusinessEventRulePtr& rule: m_rules)
     {
         if (rule->isDisabled() || rule->eventType() != bEvent->getEventType())
             continue;
@@ -488,7 +409,7 @@ QnAbstractBusinessActionList QnBusinessRuleProcessor::matchActions(const QnAbstr
         {
             QnAbstractBusinessActionPtr action;
 
-            if (QnBusiness::hasToggleState(rule->actionType()))
+            if (rule->isActionProlonged())
                 action = processToggleAction(bEvent, rule);
             else
                 action = processInstantAction(bEvent, rule);
@@ -515,160 +436,6 @@ void QnBusinessRuleProcessor::at_actionDeliveryFailed(const QnAbstractBusinessAc
     Q_UNUSED(action)
     //TODO: #vasilenko implement me
 }
-
-QByteArray QnBusinessRuleProcessor::getEventScreenshotEncoded(const QnBusinessEventParameters& params, QSize dstSize) const
-{
-    Q_UNUSED(params);
-    Q_UNUSED(dstSize);
-
-    return QByteArray();
-}
-
-static const unsigned int MS_PER_SEC = 1000;
-static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
-
-bool QnBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
-{
-    //QnMutexLocker lk( &m_mutex );  m_mutex is locked down the stack
-
-    //aggregating by recipients and eventtype
-    if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
-        action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
-    {
-        return sendMailInternal( action, 1 );  //currently, aggregating only cameraDisconnected and networkIssue events
-    }
-
-    QStringList recipients;
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
-        QString email = user->getEmail();
-        if (!email.isEmpty() && QnEmailAddress::isValid(email))
-            recipients << email;
-    }
-
-    SendEmailAggregationKey aggregationKey( action->getRuntimeParams().eventType, recipients.join(';') );
-    SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
-    if( !aggregatedData.action )
-    {
-        aggregatedData.action = QnSendMailBusinessActionPtr( new QnSendMailBusinessAction( *action ) );
-        using namespace std::placeholders;
-        aggregatedData.periodicTaskID = TimerManager::instance()->addTimer(
-            std::bind(&QnBusinessRuleProcessor::sendAggregationEmail, this, aggregationKey),
-            emailAggregationPeriodMS );
-    }
-
-    ++aggregatedData.eventCount;
-
-    //adding event source (camera) to the aggregation info
-    QnBusinessAggregationInfo aggregationInfo = aggregatedData.action->aggregationInfo();
-    aggregationInfo.append( action->getRuntimeParams(), action->aggregationInfo() );
-    aggregatedData.action->setAggregationInfo( aggregationInfo );
-
-    return true;
-}
-
-void QnBusinessRuleProcessor::sendAggregationEmail( const SendEmailAggregationKey& aggregationKey )
-{
-    QnMutexLocker lk( &m_mutex );
-
-    auto aggregatedActionIter = m_aggregatedEmails.find(aggregationKey);
-    if( aggregatedActionIter == m_aggregatedEmails.end() )
-        return;
-
-    if( !sendMailInternal( aggregatedActionIter->action, aggregatedActionIter->eventCount ) )
-    {
-        NX_LOG( lit("Failed to send aggregated email"), cl_logDEBUG1 );
-    }
-
-    m_aggregatedEmails.erase( aggregatedActionIter );
-}
-
-bool QnBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessActionPtr& action, int aggregatedResCount )
-{
-    Q_ASSERT( action );
-
-    QStringList log;
-    QStringList recipients;
-    for (const QnUserResourcePtr &user: qnResPool->getResources<QnUserResource>(action->getResources())) {
-        QString email = user->getEmail();
-        log << QString(QLatin1String("%1 <%2>")).arg(user->getName()).arg(user->getEmail());
-        if (!email.isEmpty() && QnEmailAddress::isValid(email))
-            recipients << email;
-    }
-
-    QStringList additional = action->getParams().emailAddress.split(QLatin1Char(';'), QString::SkipEmptyParts);
-    for(const QString &email: additional) {
-        log << email;
-        QString trimmed = email.trimmed();
-        if (trimmed.isEmpty())
-            continue;
-        if (QnEmailAddress::isValid(trimmed))
-            recipients << email;
-    }
-
-    if( recipients.isEmpty() )
-    {
-        NX_LOG( lit("Action SendMail (rule %1) missing valid recipients. Ignoring...").arg(action->getBusinessRuleId().toString()), cl_logWARNING );
-        NX_LOG( lit("All recipients: ") + log.join(QLatin1String("; ")), cl_logWARNING );
-        return false;
-    }
-
-    NX_LOG( lit("Processing action SendMail. Sending mail to %1").
-        arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
-
-
-    QVariantHash contextMap = QnBusinessStringsHelper::eventDescriptionMap(action, action->aggregationInfo(), true);
-    QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);
-
-    QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
-
-    QnEmailAttachmentList attachments;
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(attachmentData.imageName, attachmentData.imagePath, tpImageMimeType)));
-    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
-    contextMap[tpCompanyName] = QnAppInfo::organizationName();
-    contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
-    contextMap[tpSupportEmail] = emailSettings.supportEmail;
-    contextMap[tpSystemName] = emailSettings.signature;
-
-    QByteArray screenshotData = this->getEventScreenshotEncoded(action->getRuntimeParams(), QSize(640, 480));
-    if (!screenshotData.isNull()) {
-        QBuffer screenshotStream(&screenshotData);
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpScreenshot, screenshotStream, lit("image/jpeg"))));
-        contextMap[tpScreenshotFilename] = lit("cid:") + tpScreenshot;
-    }
-
-    QString messageBody = renderTemplateFromFile(attachmentData.templatePath, contextMap);
-
-    ec2::ApiEmailData data(
-        recipients,
-        aggregatedResCount > 1
-            ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams(), aggregatedResCount)
-            : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true),
-        messageBody,
-        emailSettings.timeout,
-        attachments
-    );
-    QtConcurrent::run(std::bind(&QnBusinessRuleProcessor::sendEmailAsync, this, data));
-
-    /*
-     * This action instance is not used anymore but storing into the Events Log db.
-     * Therefore we are storing all used emails in order to not recalculate them in
-     * the event log processing methods. --rvasilenko
-     */
-    action->getParams().emailAddress = formatEmailList(recipients);
-    return true;
-}
-
-void QnBusinessRuleProcessor::sendEmailAsync(const ec2::ApiEmailData& data)
-{
-    if (!m_emailManager->sendEmail(data))
-    {
-        QnAbstractBusinessActionPtr action(new QnSystemHealthBusinessAction(QnSystemHealth::EmailSendError));
-        broadcastBusinessAction(action);
-        NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
-    }
-};
 
 void QnBusinessRuleProcessor::at_broadcastBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {

@@ -11,9 +11,10 @@ FocusScope {
     property alias text: textInput.text
     property alias validator: textInput.validator
     property alias echoMode: textInput.echoMode
+    property alias passwordMaskDelay: textInput.passwordMaskDelay
     property alias inputMethodHints: textInput.inputMethodHints
-    property int leftPadding: dp(6)
-    property int rightPadding: dp(6)
+    property int leftPadding: dp(8)
+    property int rightPadding: dp(8)
     property alias passwordCharacter: textInput.passwordCharacter
     property bool showError: false
     property alias showDecoration: decoration.visible
@@ -24,12 +25,13 @@ FocusScope {
     property color activeColor: showError ? QnTheme.inputBorderActiveError : QnTheme.inputBorderActive
     property color textColor: showError ? QnTheme.inputTextError : QnTheme.inputText
     property color placeholderColor: showError ? QnTheme.inputPlaceholderError : QnTheme.inputPlaceholder
+    property color cursorColor: activeColor
+    property alias selectionAllowed: textInput.selectionAllowed
 
     signal accepted()
     signal editingFinished()
 
-    height: dp(36)
-
+    implicitHeight: dp(48)
     implicitWidth: Math.round(textInput.contentHeight * 8)
 
     activeFocusOnTab: true
@@ -37,13 +39,14 @@ FocusScope {
     Item {
         id: decoration
         anchors.fill: parent
+        anchors.margins: dp(4)
 
         Rectangle {
             anchors {
                 left: parent.left
                 right: parent.right
+                bottom: parent.bottom
             }
-            y: parent.height
             border.width: 0
             height: textInput.activeFocus ? CommonFunctions.dp(1) : CommonFunctions.dp(1)
             color: textInput.activeFocus ? activeColor : inactiveColor
@@ -79,65 +82,25 @@ FocusScope {
             rightMargin: textPadding / 3 + rightPadding
         }
 
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            cursorShape: Qt.IBeamCursor
-            onClicked: textField.forceActiveFocus()
-        }
+        QnTextInput {
+            id: textInput
+            focus: true
 
-        QnFlickable {
-            id: flickable
-            flickableDirection: Flickable.HorizontalFlick
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: textInput.height
-            y: Math.round((parent.height - textInput.height) / 2)
+            width: parent.width
+            anchors.verticalCenter: parent.verticalCenter
 
-            interactive: contentWidth - 4 > width
-            contentWidth: textInput.width + 2
-            contentHeight: textInput.height
-            clip: textInput.contentWidth > width - leftMargin - rightMargin
-            boundsBehavior: Flickable.StopAtBounds
+            color: textField.textColor
+            cursorColor: textField.cursorColor
+            font.pixelSize: sp(16)
+            font.weight: Font.Normal
+            renderType: TextInput.NativeRendering
 
-            TextInput {
-                id: textInput
-                focus: true
-                selectByMouse: Qt.platform.os !== "android" // Workaround for QTBUG-36515
+            verticalAlignment: Text.AlignVCenter
 
-                color: textField.textColor
+            Keys.forwardTo: textField
 
-                verticalAlignment: Text.AlignVCenter
-                clip: false
-
-                Keys.forwardTo: textField
-                autoScroll: false
-
-                renderType: TextInput.NativeRendering
-
-                onAccepted: {
-                    Qt.inputMethod.commit()
-                    Qt.inputMethod.hide()
-                    textField.accepted()
-                }
-
-                font.pixelSize: sp(16)
-                font.weight: Font.Normal
-
-                onEditingFinished: textField.editingFinished()
-                onCursorPositionChanged: {
-                    if (!cursorVisible)
-                        return
-
-                    var rect = cursorRectangle
-                    if (rect.x < flickable.contentX)
-                        flickable.contentX = rect.x
-                    var right = rect.x + rect.width
-                    if (right > flickable.contentX + flickable.width)
-                        flickable.contentX = right - flickable.width
-                }
-            }
+            onAccepted: textField.accepted()
+            onEditingFinished: textField.editingFinished()
         }
 
         Text {

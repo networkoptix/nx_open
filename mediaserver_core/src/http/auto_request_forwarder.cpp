@@ -17,7 +17,7 @@
 #include <utils/common/string.h>
 #include <utils/fs/file.h>
 #include <utils/network/rtsp/rtsp_types.h>
-#include <utils/network/rtpsession.h>
+#include <network/rtpsession.h>
 
 #include "streaming/streaming_params.h"
 
@@ -66,7 +66,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer = 
-                        QnCameraHistoryPool::instance()->getMediaServerOnTime( virtualCameraRes, timestampMs );
+                        qnCameraHistoryPool->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }

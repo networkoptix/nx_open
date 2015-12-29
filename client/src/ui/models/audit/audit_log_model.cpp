@@ -8,18 +8,19 @@
 
 #include "business/business_strings_helper.h"
 
-#include "client/client_globals.h"
-#include "client/client_settings.h"
-
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include "core/resource_management/resource_pool.h"
 
 #include <ui/common/ui_resource_name.h>
-#include "ui/style/resource_icon_cache.h"
-#include "ui/style/skin.h"
+#include <ui/style/resource_icon_cache.h>
+#include <ui/style/skin.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/watchers/workbench_server_time_watcher.h>
 
 #include <utils/common/warnings.h>
 #include <utils/common/synctime.h>
@@ -211,8 +212,9 @@ void QnAuditLogModel::setDetail(QnAuditRecord* record, bool showDetail)
     record->addParam("detail", showDetail ? "1" : "0");
 }
 
-QnAuditLogModel::QnAuditLogModel(QObject *parent):
-    base_type(parent)
+QnAuditLogModel::QnAuditLogModel(QObject *parent)
+    : base_type(parent)
+    , QnWorkbenchContextAware(parent)
     , m_index(new DataIndex())
 {
     
@@ -246,17 +248,17 @@ QString QnAuditLogModel::getResourceNameById(const QnUuid &id)
     return getResourceName(qnResPool->getResourceById(id));
 }
 
-QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime)
-{
+QString QnAuditLogModel::formatDateTime(int timestampSecs, bool showDate, bool showTime) const {
     if (timestampSecs == 0)
         return QString();
-    QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(timestampSecs * 1000ll);
+   
+    QDateTime dateTime = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(timestampSecs * 1000ll);
     if (showDate && showTime)
-        return dateTime.toString(Qt::DefaultLocaleShortDate);
+        return dateTime.toString(Qt::SystemLocaleShortDate);
     else if (showDate)
-        return dateTime.date().toString(Qt::DefaultLocaleShortDate);
+        return dateTime.date().toString(Qt::SystemLocaleShortDate);
     else if (showTime)
-        return dateTime.time().toString(Qt::DefaultLocaleShortDate);
+        return dateTime.time().toString(Qt::SystemLocaleShortDate);
     else
         return QString();
 }
@@ -303,9 +305,15 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_ExportVideo:
             return tr("Exporting video");
         case Qn::AR_CameraUpdate:
-            return tr("%1 updated").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device updated"),
+                tr("Camera updated")
+                );
         case Qn::AR_CameraInsert:
-            return tr("%1 added").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device added"),
+                tr("Camera added")
+                );
         case Qn::AR_SystemNameChanged:
             return tr("System name changed");
         case Qn::AR_SystemmMerge:
@@ -319,7 +327,10 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
         case Qn::AR_EmailSettings:
             return tr("E-mail settings changed");
         case Qn::AR_CameraRemove:
-            return tr("%1 removed").arg(getDefaultDeviceNameUpper());
+            return QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Device removed"),
+                tr("Camera removed")
+                );
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
@@ -371,8 +382,7 @@ QString QnAuditLogModel::getResourcesString(const std::vector<QnUuid>& resources
     return result;
 }
 
-QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
-{
+QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const {
     QString result;
     switch (data->eventType)
     {
@@ -394,7 +404,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data)
         result = tr("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
-        result += getNumericDevicesName(getCameras(data->resources));
+        result += QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
         break;
     default:
         result = getResourcesString(data->resources);
@@ -422,7 +432,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
         case Qn::AR_CameraInsert:
         case Qn::AR_CameraUpdate:
         {
-            QString txt = getNumericDevicesName(getCameras(data->resources));
+            QString txt = QnDeviceDependentStrings::getNumericName(getCameras(data->resources));
             QString linkColor = lit("#%1").arg(QString::number(m_colors.httpLink.rgb(), 16));
             if (hovered)
                 result +=  QString(lit("<font color=%1><u><b>%2</b></u></font>")).arg(linkColor).arg(txt);
@@ -460,8 +470,7 @@ QString QnAuditLogModel::htmlData(const Column& column,const QnAuditRecord* data
 }
 
 
-QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
-{
+QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
     Column columnsToFilter[] = 
     {
         TimestampColumn,
@@ -479,8 +488,7 @@ QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record)
     return result;
 }
 
-QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data)
-{
+QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* data) const {
     QString result = textData(column, data);
     if (column == DescriptionColumn && (data->isPlaybackType() || data->eventType == Qn::AR_CameraUpdate || data->eventType == Qn::AR_CameraInsert))
         result += getResourcesString(data->resources); // text description doesn't contain resources for that types, but their names need for search
@@ -488,8 +496,7 @@ QString QnAuditLogModel::searchData(const Column& column, const QnAuditRecord* d
 }
 
 
-QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data)
-{
+QString QnAuditLogModel::textData(const Column& column,const QnAuditRecord* data) const {
     switch(column) {
     case SelectRowColumn:
         return QString();
@@ -612,7 +619,10 @@ QVariant QnAuditLogModel::headerData(int section, Qt::Orientation orientation, i
             case EventTypeColumn:
                 return tr("Activity");
             case CameraNameColumn:
-                return tr("%1 name").arg(getDefaultDeviceNameUpper());
+                return QnDeviceDependentStrings::getDefaultNameFromSet(
+                    tr("Device name"),
+                    tr("Camera name")
+                    );
             case CameraIpColumn:
                 return tr("IP");
             case DateColumn:
@@ -760,8 +770,8 @@ bool QnAuditLogModel::skipDate(const QnAuditRecord *record, int row) const
     if (row < 1) 
         return false;
 
-    QDate d1 = QDateTime::fromMSecsSinceEpoch(record->createdTimeSec*1000).date();
-    QDate d2 = QDateTime::fromMSecsSinceEpoch(m_index->at(row-1)->createdTimeSec*1000).date();
+    QDate d1 = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(record->createdTimeSec*1000).date();
+    QDate d2 = context()->instance<QnWorkbenchServerTimeWatcher>()->displayTime(m_index->at(row-1)->createdTimeSec*1000).date();
     return d1 == d2;
 }
 

@@ -5,7 +5,10 @@
 #include <QtWidgets/QCheckBox>
 #include <QtGui/QKeyEvent>
 
+#include <common/common_module.h>
+
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/event_processors.h>
@@ -19,6 +22,8 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <client/client_globals.h>
+
+#include <ui/workbench/watchers/workbench_safemode_watcher.h>
 
 #define CUSTOM_RIGHTS (quint64)0x0FFFFFFF
 
@@ -77,6 +82,11 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent):
 
     updateAll();
     updateSizeLimits();
+
+    auto okButton = ui->buttonBox->button(QDialogButtonBox::Ok);
+    QnWorkbenchSafeModeWatcher* safeModeWatcher = new QnWorkbenchSafeModeWatcher(this);
+    safeModeWatcher->addWarningLabel(ui->buttonBox);
+    safeModeWatcher->addControlledWidget(okButton, QnWorkbenchSafeModeWatcher::ControlMode::Disable);
 }
 
 QnUserSettingsDialog::~QnUserSettingsDialog() {
@@ -309,7 +319,7 @@ void QnUserSettingsDialog::setValid(Element element, bool valid) {
     }
 
     bool allValid = std::all_of(m_valid.cbegin(), m_valid.cend(), [](bool value){return value;});
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(allValid);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(allValid && !qnCommon->isReadOnly());
 }
 
 void QnUserSettingsDialog::updateElement(Element element) {
@@ -508,7 +518,10 @@ void QnUserSettingsDialog::createAccessRightsAdvanced() {
         previous = createAccessRightCheckBox(tr("Administrator"),
                      Qn::ExcludingAdminPermission,
                      previous);
-    previous = createAccessRightCheckBox(tr("Can adjust %1 settings").arg(getDefaultDevicesName(true, false)), Qn::GlobalEditCamerasPermission, previous);
+    previous = createAccessRightCheckBox(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Can adjust devices settings"),
+        tr("Can adjust cameras settings")
+        ), Qn::GlobalEditCamerasPermission, previous);
     previous = createAccessRightCheckBox(tr("Can use PTZ controls"), Qn::GlobalPtzControlPermission, previous);
     previous = createAccessRightCheckBox(tr("Can view video archives"), Qn::GlobalViewArchivePermission, previous);
     previous = createAccessRightCheckBox(tr("Can export video"), Qn::GlobalExportPermission, previous);

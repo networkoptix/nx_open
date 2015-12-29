@@ -5,6 +5,7 @@
 
 #include <core/resource/resource.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx_ec/data/api_runtime_data.h>
@@ -12,6 +13,7 @@
 #include <ui/actions/actions.h>
 #include <ui/actions/action_parameters.h>
 #include <ui/actions/action_manager.h>
+#include <ui/common/read_only.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/workbench/workbench.h>
@@ -38,15 +40,17 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     connect(ui->eventLogButton,         &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBusinessLogAction); } );
     connect(ui->healthMonitorButton,    &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenInNewLayoutAction, qnResPool->getResourcesWithFlag(Qn::server)); } );
     connect(ui->bookmarksButton,      &QPushButton::clicked, this, [this] { menu()->trigger(Qn::OpenBookmarksSearchAction); });
+
+    connect(ui->systemSettingsWidget, &QnAbstractPreferencesWidget::hasChangesChanged, this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
-void QnGeneralSystemAdministrationWidget::updateFromSettings() {
-    ui->systemSettingsWidget->updateFromSettings();
+void QnGeneralSystemAdministrationWidget::loadDataToUi() {
+    ui->systemSettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
 }
 
-void QnGeneralSystemAdministrationWidget::submitToSettings() {
-    ui->systemSettingsWidget->submitToSettings();
+void QnGeneralSystemAdministrationWidget::applyChanges() {
+    ui->systemSettingsWidget->applyChanges();
 }
 
 bool QnGeneralSystemAdministrationWidget::hasChanges() const  {
@@ -63,14 +67,19 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
-    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log...")));
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log")));
+    ui->bookmarksLabel->setText(shortcutString(Qn::OpenBookmarksSearchAction, tr("Open Bookmarks List")));
+    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Open Devices List"),
+        tr("Open Cameras List")
+        )));
 
-    //: "Open Cameras List..." or "Open Devices List...", etc
-    ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, tr("Open %1 List...").arg(getDefaultDevicesName())));
 
-    //: "Cameras List..." or "Devices List...", etc
-    ui->cameraListButton->setText(tr("%1 List...").arg(getDefaultDevicesName()));
+    ui->cameraListButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Devices List..."),
+        tr("Cameras List...")
+        ));
 
     ui->systemSettingsWidget->retranslateUi();
 }
@@ -98,4 +107,11 @@ void QnGeneralSystemAdministrationWidget::resizeEvent(QResizeEvent *event) {
 
 bool QnGeneralSystemAdministrationWidget::isDatabaseBackupAvailable() const {
     return QnRuntimeInfoManager::instance()->remoteInfo().data.box != lit("isd");
+}
+
+void QnGeneralSystemAdministrationWidget::setReadOnlyInternal(bool readOnly) {
+    using ::setReadOnly;
+
+    setReadOnly(ui->systemSettingsWidget, readOnly);
+    setReadOnly(ui->backupWidget, readOnly);
 }

@@ -34,6 +34,7 @@ namespace QnBusiness
         case ServerConflictEvent:
         case ServerStartEvent:
         case LicenseIssueEvent:
+        case BackupFinishedEvent:
             return AnyServerEvent;
 
         case AnyBusinessEvent:
@@ -54,7 +55,7 @@ namespace QnBusiness
             result << CameraDisconnectEvent << NetworkIssueEvent << CameraIpConflictEvent;
             break;
         case AnyServerEvent:
-            result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent << LicenseIssueEvent;
+            result << StorageFailureEvent << ServerFailureEvent << ServerConflictEvent << ServerStartEvent << LicenseIssueEvent << BackupFinishedEvent;
             break;
         case AnyBusinessEvent:
             result << CameraMotionEvent << CameraInputEvent <<
@@ -81,6 +82,7 @@ namespace QnBusiness
             << ServerConflictEvent 
             << ServerStartEvent 
             << LicenseIssueEvent
+            << BackupFinishedEvent
             << UserDefinedEvent;
         return result;
     }
@@ -155,4 +157,10 @@ QnBusinessEventParameters QnAbstractBusinessEvent::getRuntimeParams() const {
     params.eventResourceId = m_resource ? m_resource->getId() : QnUuid();
 
     return params;
+}
+
+bool QnAbstractBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const
+{
+    Q_UNUSED(params);
+    return true;
 }

@@ -14,6 +14,7 @@
 
 #include <helpers/time_helper.h>
 #include <helpers/rest_client.h>
+#include <helpers/itf_helpers.h>
 
 class rtu::RtuContext::Impl : public QObject
 {
@@ -281,53 +282,15 @@ void rtu::RtuContext::applyTaskCompleted(const ApplyChangesTaskPtr &task)
     m_impl->applyTaskCompleted(task);
 }
 
-bool isValidIpV4Address(const QString &address)
-{
-    const QHostAddress &ipHostAddress = QHostAddress(address);
-    return (!ipHostAddress.isNull() 
-        && (ipHostAddress.protocol() == QAbstractSocket::IPv4Protocol));
-}
-
 bool rtu::RtuContext::isValidSubnetMask(const QString &mask) const
 {
-    if (!isValidIpV4Address(mask))
-        return false;
-
-    quint32 value = QHostAddress(mask).toIPv4Address();
-    value = ~value;
-    return ((value & (value + 1)) == 0);
+    return helpers::isValidSubnetMask(mask);
 }
 
 bool rtu::RtuContext::isDiscoverableFromCurrentNetwork(const QString &ip
     , const QString &mask) const
 {
-    if (!isValidSubnetMask(mask) || !isValidIpV4Address(ip))
-        return false;
-
-    const auto &allInterfaces = QNetworkInterface::allInterfaces();
-    for(const auto &itf: allInterfaces)
-    {
-        const QNetworkInterface::InterfaceFlags flags = itf.flags();
-        if (!itf.isValid() || !(flags & QNetworkInterface::IsUp)
-            || !(flags & QNetworkInterface::IsRunning) 
-            || (flags & QNetworkInterface::IsLoopBack))
-        {
-            continue;
-        }
-
-        for (const QNetworkAddressEntry &address: itf.addressEntries())
-        {
-            const QString &itfIp = address.ip().toString();
-            const QString &itfMask = address.netmask().toString();
-            if (!isValidIpV4Address(itfIp) || !isValidSubnetMask(itfMask))
-                continue;
-
-            if (isDiscoverableFromNetwork(ip, mask, itfIp, itfMask))
-                return true;
-        }
-    }
-
-    return false;
+    return helpers::isDiscoverableFromCurrentNetwork(ip, mask);
 }
 
 bool rtu::RtuContext::isDiscoverableFromNetwork(const QString &ip
@@ -335,21 +298,8 @@ bool rtu::RtuContext::isDiscoverableFromNetwork(const QString &ip
     , const QString &subnet
     , const QString &subnetMask) const
 {
-    if (!isValidIpV4Address(ip) || !isValidSubnetMask(mask)
-        || !isValidIpV4Address(subnet) || !isValidSubnetMask(subnetMask))
-    {
-        return false;
-    }
-
-    const quint32 longMask = std::max(QHostAddress(mask).toIPv4Address()
-        , QHostAddress(subnetMask).toIPv4Address());
-
-    const quint32 ipNetwork = (QHostAddress(ip).toIPv4Address() & longMask );
-    const quint32 secondNetwork = (QHostAddress(subnet).toIPv4Address() & longMask);
-
-    return (ipNetwork == secondNetwork);
+    return helpers::isDiscoverableFromNetwork(ip, mask, subnet, subnetMask);
 }
-
 
 QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     , const QTime &time
@@ -384,7 +334,7 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
 
 QString rtu::RtuContext::toolDisplayName() const
 {
-    return QString(QN_APPLICATION_DISPLAY_NAME);
+    return QStringLiteral(QN_APPLICATION_DISPLAY_NAME);
 }
 
 bool rtu::RtuContext::isBeta() const
@@ -394,22 +344,22 @@ bool rtu::RtuContext::isBeta() const
 
 QString rtu::RtuContext::toolVersion() const
 {
-    return QString(QN_APPLICATION_VERSION);
+    return QStringLiteral(QN_APPLICATION_VERSION);
 }
 
 QString rtu::RtuContext::toolRevision() const
 {
-    return QString(QN_APPLICATION_REVISION);
+    return QStringLiteral(QN_APPLICATION_REVISION);
 }
 
-QString rtu::RtuContext::toolSupportMail() const
+QString rtu::RtuContext::toolSupportLink() const
 {
-    return QString(QN_SUPPORT_MAIL_ADDRESS);
+    return QStringLiteral(QN_SUPPORT_LINK);
 }
 
 QString rtu::RtuContext::toolCompanyUrl() const
 {
-    return QString(QN_COMPANY_URL);
+    return QStringLiteral(QN_COMPANY_URL);
 }
 
 int rtu::RtuContext::currentPage() const

@@ -14,7 +14,7 @@ Item {
     signal pressAndHold
 
     width: parent.width
-    height: dp(56)
+    height: dp(48)
 
     QtObject {
         id: d
@@ -54,11 +54,9 @@ Item {
 
         Image {
             id: thumbnail
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
+            anchors.fill: parent
             fillMode: Qt.KeepAspectRatio
-            sourceSize.width: parent.width
-            sourceSize.height: parent.height
+            asynchronous: true
             visible: !d.offline && status == Image.Ready
         }
     }
@@ -80,8 +78,12 @@ Item {
         Text {
             id: label
             width: parent.width - statusIndicator.width - 2 * anchors.margins
-            font.pixelSize: sp(15)
-            font.weight: Font.DemiBold
+            height: dp(48)
+            verticalAlignment: Text.AlignVCenter
+            maximumLineCount: 2
+            wrapMode: Text.WordWrap
+            font.pixelSize: sp(16)
+            font.weight: d.offline ? Font.DemiBold : Font.Normal
             elide: Text.ElideRight
             color: d.offline ? QnTheme.cameraOfflineText : QnTheme.cameraText
         }

@@ -15,7 +15,7 @@
 #include <common/common_module.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/log.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 
 namespace {
     const int checkTimeout = 15 * 60 * 1000;

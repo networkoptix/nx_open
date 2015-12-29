@@ -10,7 +10,7 @@
 #include <QtCore/QList>
 #include <QtCore/QUrl>
 
-#include <utils/network/module_information.h>
+#include "network/module_information.h"
 
 #include <api/model/connection_info.h>
 #include <api/model/email_attachment.h>
@@ -34,7 +34,7 @@
 #include "ec_api_fwd.h"
 
 class QnRestProcessorPool;
-class QnUniversalTcpListener;
+class QnHttpConnectionListener;
 struct QnModuleInformation;
 
 //!Contains API classes for the new Server
@@ -303,6 +303,13 @@ namespace ec2
             return removeStorages( storages, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode removeStoragesSync( const ApiIdDataList& storages) {
+            return impl::doSyncCall<impl::SimpleHandler>( 
+                [=](const impl::SimpleHandlerPtr &handler) { return this->removeStorages(storages, handler); });
+        }
+
+
+
         /*!
             \param mediaServerId if not NULL, returned list contains at most one element: the one, corresponding to \a mediaServerId. 
                 If NULL, returned list contains data of all known servers
@@ -456,27 +463,6 @@ namespace ec2
             return impl::doSyncCall<impl::GetCameraUserAttributesHandler>( std::bind(fn, this, cameraId, std::placeholders::_1), cameraAttrsList );
         }
 
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int addBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
-            return addBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode, const QnCameraBookmarkTags& usage)
-        */
-        template<class TargetType, class HandlerType> int getBookmarkTags( TargetType* target, HandlerType handler ) {
-            return getBookmarkTags( std::static_pointer_cast<impl::GetCameraBookmarkTagsHandler>(std::make_shared<impl::CustomGetCameraBookmarkTagsHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
-        /*!
-            \param handler Functor with params: (ErrorCode)
-        */
-        template<class TargetType, class HandlerType> int removeBookmarkTags( const QnCameraBookmarkTags &tags, TargetType* target, HandlerType handler ) {
-            return removeBookmarkTags(tags, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
-        }
-
     signals:
         void cameraAddedOrUpdated( QnVirtualCameraResourcePtr camera );
         void cameraHistoryChanged( ApiServerFootageData cameraHistory );
@@ -484,9 +470,6 @@ namespace ec2
 
         void userAttributesChanged( QnCameraUserAttributesPtr attributes );
         void userAttributesRemoved( QnUuid id );
-
-        void cameraBookmarkTagsAdded(const QnCameraBookmarkTags &tags);
-        void cameraBookmarkTagsRemoved(const QnCameraBookmarkTags &tags);
 
     protected:
         virtual int addCamera( const QnVirtualCameraResourcePtr&, impl::AddCameraHandlerPtr handler ) = 0;
@@ -497,10 +480,6 @@ namespace ec2
         virtual int saveUserAttributes( const QnCameraUserAttributesList& cameras, impl::SimpleHandlerPtr handler ) = 0;
         virtual int getUserAttributes( const QnUuid& cameraId, impl::GetCameraUserAttributesHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
-        
-        virtual int addBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
-        virtual int getBookmarkTags(impl::GetCameraBookmarkTagsHandlerPtr handler) = 0;
-        virtual int removeBookmarkTags(const QnCameraBookmarkTags &tags, impl::SimpleHandlerPtr handler) = 0;
     };
 
 
@@ -1221,7 +1200,7 @@ namespace ec2
         }
 
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
-        virtual void registerTransactionListener( QnUniversalTcpListener* universalTcpListener ) = 0;
+        virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setContext( const ResourceContext& resCtx ) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
 
@@ -1248,6 +1227,7 @@ namespace ec2
 }
 
 Q_DECLARE_METATYPE(ec2::QnFullResourceData);
+Q_DECLARE_METATYPE(ec2::QnPeerTimeInfo);
 Q_DECLARE_METATYPE(ec2::QnPeerTimeInfoList);
 
 #endif  //EC_API_H

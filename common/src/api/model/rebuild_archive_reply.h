@@ -1,25 +1,20 @@
-#ifndef REBUILD_ARCHIVE_REPLY_H
-#define REBUILD_ARCHIVE_REPLY_H
-
-#include <QtCore/QMetaType>
+#pragma once
 
 #include <utils/common/model_functions_fwd.h>
 
+/** Info about storage rebuild process (if running). */
 struct QnStorageScanData
 {
-    QnStorageScanData(): state(Qn::RebuildState_Unknown), progress(0.0) {}
-    QnStorageScanData(Qn::RebuildState state, const QString& path, qreal progress): state(state), path(path), progress(progress) {}
+    QnStorageScanData();
+    QnStorageScanData(Qn::RebuildState state, const QString& path, qreal progress, qreal totalProgress);
 
-    Qn::RebuildState state;
-    QString path;
-    qreal progress;
+    Qn::RebuildState state;     /**< Current process state */
+    QString path;               /**< Url of the storage being processed */
+    qreal progress;             /**< Progress of the current storage (0.0 to 1.0). */
+    qreal totalProgress;        /**< Total progress of the process (0.0 to 1.0). */
 };
-#define QnStorageScanData_Fields (state)(path)(progress)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnStorageScanData, (json)(metatype))
+#define QnStorageScanData_Fields (state)(path)(progress)(totalProgress)
 
+QN_FUSION_DECLARE_FUNCTIONS(QnStorageScanData, (json)(metatype)(eq))
 
-#include <QtCore/QMetaType>
-
-
-#endif // REBUILD_ARCHIVE_REPLY_H

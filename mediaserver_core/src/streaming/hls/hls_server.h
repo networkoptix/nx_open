@@ -11,7 +11,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <utils/network/http/httpstreamreader.h>
-#include <utils/network/tcp_connection_processor.h>
+#include <network/tcp_connection_processor.h>
 
 #include "camera/video_camera.h"
 #include "hls_playlist_manager.h"
@@ -63,6 +63,7 @@ namespace nx_hls
         bool m_useChunkedTransfer;
         QString m_currentFileName;
         size_t m_bytesSent;
+        const size_t m_minPlaylistSizeToStartStreaming;
 
         //!Processes \a request, generates and sends (asynchronously) response
         void processRequest( const nx_http::Request& request );

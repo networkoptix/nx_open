@@ -93,11 +93,11 @@ namespace nx_http
         bool doPost(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         bool doPut(
             const QUrl& url,
             const nx_http::StringType& contentType,
-            const nx_http::StringType& messageBody );
+            nx_http::StringType messageBody );
         const nx_http::Request& request() const;
         /*!
             Response is valid only after signal \a responseReceived() has been emitted
@@ -141,6 +141,7 @@ namespace nx_http
         */
         void setMessageBodyReadTimeoutMs( unsigned int messageBodyReadTimeoutMs );
 
+        AbstractStreamSocket* socket();
         QSharedPointer<AbstractStreamSocket> takeSocket();
 
         void addAdditionalHeader( const StringType& key, const StringType& value );
@@ -389,11 +390,24 @@ namespace nx_http
         std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::BufferType)> completionHandler,
         const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
         AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
     //!Calls previous function and waits for completion
     SystemError::ErrorCode downloadFileSync(
         const QUrl& url,
         int* const statusCode,
         nx_http::BufferType* const msgBody );
+
+    //!Same as downloadFileAsync but provide contentType at callback
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int /*statusCode*/, nx_http::StringType /*contentType*/, nx_http::BufferType /*msgBody */)> completionHandler,
+        const nx_http::HttpHeaders& extraHeaders = nx_http::HttpHeaders(),
+        AsyncHttpClient::AuthType authType = AsyncHttpClient::authBasicAndDigest );
+
+    bool downloadFileAsyncEx(
+        const QUrl& url,
+        std::function<void(SystemError::ErrorCode, int, nx_http::StringType, nx_http::BufferType)> completionHandler,
+        nx_http::AsyncHttpClientPtr httpClientCaptured);
 }
 
 #endif  //ASYNCHTTPCLIENT_H

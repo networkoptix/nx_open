@@ -1,13 +1,10 @@
 #include "camera_thumbnail_provider.h"
 
-#include "utils/common/id.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/security_cam_resource.h"
-#include "camera/camera_thumbnail_cache.h"
+#include "camera/thumbnail_cache_base.h"
 
-QnCameraThumbnailProvider::QnCameraThumbnailProvider() :
-    QQuickImageProvider(QQuickImageProvider::Pixmap),
-    m_thumbnailCache(0)
+QnCameraThumbnailProvider::QnCameraThumbnailProvider()
+    : QQuickImageProvider(QQuickImageProvider::Pixmap)
+    , m_thumbnailCache(nullptr)
 {
 }
 
@@ -15,7 +12,7 @@ QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size,
     if (!m_thumbnailCache)
         return QPixmap();
 
-    QPixmap thumbnail = m_thumbnailCache->thumbnail(id);
+    QPixmap thumbnail = m_thumbnailCache->getThumbnail(id);
     if (requestedSize.isEmpty()) {
         *size = thumbnail.size();
     } else {
@@ -26,7 +23,7 @@ QPixmap QnCameraThumbnailProvider::requestPixmap(const QString &id, QSize *size,
     return thumbnail;
 }
 
-void QnCameraThumbnailProvider::setThumbnailCache(QnCameraThumbnailCache *thumbnailCache) {
+void QnCameraThumbnailProvider::setThumbnailCache(QnThumbnailCacheBase *thumbnailCache) {
     m_thumbnailCache = thumbnailCache;
 }
 

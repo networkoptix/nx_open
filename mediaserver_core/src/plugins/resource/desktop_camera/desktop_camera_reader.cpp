@@ -5,7 +5,7 @@
 #include "desktop_camera_reader.h"
 #include "utils/common/sleep.h"
 #include "utils/common/log.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
 
@@ -117,7 +117,7 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
 
         int packetSize = (m_recvBuffer[2]<<8) + m_recvBuffer[3];
         quint8 streamIndex = m_recvBuffer[1];
-        Q_ASSERT(streamIndex <= 1);
+        //Q_ASSERT(streamIndex <= 1);
         bufferSize = 0;
         while (m_socket->isConnected() && bufferSize < packetSize)
         {

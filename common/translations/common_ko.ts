@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="ko" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -15,22 +15,7 @@
     </message>
 </context>
 <context>
-    <name>QnActiResource</name>
-    <message>
-        <source>Output %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessStringsHelper</name>
-    <message>
-        <source>User Defined (%1)</source>
-        <translation>사용자 정의 (%1)</translation>
-    </message>
     <message>
         <source>Motion on Camera</source>
         <translation>카메라의 모션</translation>
@@ -153,6 +138,7 @@
     </message>
     <message>
         <source>Conflicting Server #%1: %2</source>
+        <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>%1 서버 충돌 중: %2</translation>
     </message>
     <message>
@@ -188,10 +174,6 @@
         <translation>RTP 패킷 손실이 발생함.</translation>
     </message>
     <message>
-        <source>Server started after crash.</source>
-        <translation>서버 비정상 종료 후 시작.</translation>
-    </message>
-    <message>
         <source>I/O error has occurred at %1.</source>
         <translation>%1에 I/O 오류 발생.</translation>
     </message>
@@ -209,103 +191,211 @@
     </message>
     <message>
         <source>start</source>
-        <translation type="unfinished"></translation>
+        <translation>시작</translation>
     </message>
     <message>
         <source>stop</source>
-        <translation type="unfinished"></translation>
+        <translation>멈춤</translation>
     </message>
     <message>
         <source>While %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>On %1 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>%1 --&gt; %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Server &apos;%1&apos; has a license problem</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 %1 라이센스 문제 보유 </translation>
     </message>
     <message>
         <source>An unknown event has occurred</source>
-        <translation type="unfinished">알지 못하는 이벤트 발생</translation>
-    </message>
-    <message>
-        <source>Input Port: %1</source>
-        <translation type="unfinished">입력포트: %1</translation>
+        <translation>알지 못하는 이벤트 발생</translation>
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished">주소 충돌: %1</translation>
+        <translation>주소 충돌: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
-        <translation type="unfinished"></translation>
+        <translation>서버 접속 연결 실패.</translation>
     </message>
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n 초간 데이터 받기 실패.</numerusform>
         </translation>
     </message>
     <message>
-        <source>%1 output</source>
+        <source>Generic Event</source>
+        <translation>일반 이벤트</translation>
+    </message>
+    <message>
+        <source> (%1)</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Caption: %1</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>MAC #%1: %2 </source>
+        <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+        <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+        <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+        <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+        <source>Server restarted unexpectedly.</source>
+        <translation>서버가 예상치 못하게 재시작되었습니다.</translation>
+    </message>
+    <message>
+        <source>Device output</source>
+        <translation>장치 출력</translation>
+    </message>
+    <message>
+        <source>Camera output</source>
+        <translation>카메라 출력</translation>
+    </message>
+    <message>
+        <source>Device output for 30 sec</source>
+        <translation>30초간 장치 출력</translation>
+    </message>
+    <message>
+        <source>Camera output for 30 sec</source>
+        <translation>30초간 카메라 출력</translation>
+    </message>
+    <message>
+        <source>Device recording</source>
+        <translation>장치 녹화</translation>
+    </message>
+    <message>
+        <source>Camera recording</source>
+        <translation>카메라 녹화</translation>
+    </message>
+    <message>
+        <source>Input Signal on Device</source>
+        <translation>장치의 입력 신호</translation>
+    </message>
+    <message>
+        <source>Input Signal on Camera</source>
+        <translation>카메라 입력 신호</translation>
+    </message>
+    <message>
+        <source>Device Disconnected</source>
+        <translation>장치 해제</translation>
+    </message>
+    <message>
+        <source>Camera Disconnected</source>
+        <translation>카메라 해제</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict</source>
+        <translation>장치 IP 충돌</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict</source>
+        <translation>카메라 IP 충돌</translation>
+    </message>
+    <message>
+        <source>Any Device Issue</source>
+        <translation>모든 장치 문제</translation>
+    </message>
+    <message>
+        <source>Any Camera Issue</source>
+        <translation>모든 카메라 문제</translation>
+    </message>
+    <message>
+        <source>Device %1 was disconnected</source>
+        <translation>장치%1 연결 끊김</translation>
+    </message>
+    <message>
+        <source>Camera %1 was disconnected</source>
+        <translation>카메라 %1연결끊김</translation>
+    </message>
+    <message>
+        <source>IO Module %1 was disconnected</source>
+        <translation>IO장치 %1연결 끊김</translation>
+    </message>
+    <message>
+        <source>Device IP Conflict at %1</source>
+        <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>%1에서 장치 IP 충돌</translation>
+    </message>
+    <message>
+        <source>Camera IP Conflict at %1</source>
+        <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
+        <translation>%1에서 카메라 IP 충돌</translation>
+    </message>
+    <message>
+        <source>Connection to device was unexpectedly closed.</source>
+        <translation>장치 연결이 예상치 못하게 끊김.</translation>
+    </message>
+    <message>
+        <source>Recording on devices is disabled:</source>
+        <translation>장치에서 녹화 가 중지되었습니다:</translation>
+    </message>
+    <message>
+        <source>Recording on cameras is disabled:</source>
+        <translation>카메라에서 녹화가 중지 되었습니다:</translation>
+    </message>
+    <message>
+        <source>Recording on IO modules is disabled:</source>
+        <translation>IO장치에서 녹화가 중지 되었습니다:</translation>
+    </message>
+    <message>
+        <source>Execute PTZ preset</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 output for 30 sec</source>
+        <source>Show text overlay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 recording</source>
+        <source>Show on Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Input Signal on %1</source>
+        <source>Archive backup finished</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 Disconnected</source>
+        <source>Server &apos;%1&apos; has finished an archive backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 IP Conflict</source>
+        <source>Generic Event at %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Any %1 Issue</source>
+        <source>Input Port: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 %2 was disconnected</source>
-        <extracomment>Camera &lt;camera_name&gt; was disconnected</extracomment>
+        <source>Archive backup failed because of no backup storages available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 IP Conflict at %2</source>
-        <extracomment>Camera IP Conflict at &lt;camera_name&gt;</extracomment>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>%1 #%2 MAC: %3</source>
-        <extracomment>Camera #5 MAC: 00-55-11-22-54-55</extracomment>
+        <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Connection to %1 (primary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to %1 (secondary stream) was unexpectedly closed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Recording on %1 is disabled: </source>
+        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -388,73 +478,135 @@
         <translation>변수:</translation>
     </message>
     <message>
-        <source>Not authorised. Url %1.</source>
-        <translation type="unfinished">%1. Url에 대한 권한이 없습니다.</translation>
+        <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+        <translation>장치 재시작후 장치 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network.</source>
-        <translation type="unfinished"></translation>
+        <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+        <translation>카메라 재시작후 카메라 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
     <message>
-        <source>Make sure port %2 is accessible (e.g. forwarded). Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
+        <translation>IO장치 재시작후 IO장치 웹페이지를 통해 장치를 초기화 해주세요.</translation>
     </message>
     <message>
-        <source>Make sure the %1 is plugged into the network. Try to reboot the %1.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+        <translation>장치가 네트워크에 연결되었는지 확인후, 장치 재시작 하세요.</translation>
     </message>
     <message>
-        <source>Could not parse %1 response. Url %2, request name %3.</source>
-        <translation type="unfinished"></translation>
+        <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+        <translation>카메라가 네트워크에 연결되었는지 확인후, 카메라 재시작 하세요.</translation>
     </message>
     <message>
-        <source>Please try to reboot the %1, then restore factory defaults on the web-page.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)
-----------
-%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
+        <translation>IO 장치가 네트워크에 연결되었는지 확인후, IO장치 재시작 하세요.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in %1 settings.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Make sure port %2 is accessible (e.g. forwarded).</source>
+        <translation>%2포트가 접속가능한지 확인하세요.</translation>
     </message>
     <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the %1 web-page. If the problem persists, please contact support.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Could not parse device response. Url %1, request name %2.</source>
+        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
     </message>
     <message>
-        <source>%1 request &quot;%2&quot; failed with error &quot;%3&quot;.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Could not parse camera response. Url %1, request name %2.</source>
+        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
     </message>
     <message>
-        <source>Unknown %1 Issue.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Could not parse IO module response. Url %1, request name %2.</source>
+        <translation>장치로 부터 반응 없음 :URL%1, 요청이름 %2.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the %1: %2.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>Not authorized. Url %1.</source>
+        <translation>로그인 정보 오류. URL %1.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open %1 issues dialog for more details.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;camera&quot;, &quot;io module&quot;, etc..)</extracomment>
-        <translation type="unfinished"></translation>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in device settings.</source>
+        <translation>먼저, 장치설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
     </message>
     <message>
-        <source>%1 initialization process in progress.</source>
-        <extracomment>%1 - will be substituted by type of device (&quot;Camera&quot;, &quot;IO Module&quot;, etc..)</extracomment>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in camera settings.</source>
+        <translation>먼저, 카메라설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
+        <translation>먼저, IO장치설정에서 녹화설정을 셋팅하고 fps를 줄여보세요.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
+        <translation>문제가 해결되지 않았습니다. 장치 웹페이지를 통해 초기화 하세요.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
+        <translation>문제가 해결되지 않았습니다. 카메라 웹페이지를 통해 초기화 하세요.</translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
+        <translation>문제가 해결되지 않았습니다. IO장치 웹페이지를 통해 초기화 하세요.</translation>
+    </message>
+    <message>
+        <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>%1에 대한 장치 요청 %2 에러로 실패.</translation>
+    </message>
+    <message>
+        <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>%1에 대한 카메라 요청 %2 에러로 실패.</translation>
+    </message>
+    <message>
+        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation>%1에 대한 IO장치 요청 %2 에러로 실패.</translation>
+    </message>
+    <message>
+        <source>Unknown device issue.</source>
+        <translation>알려지지 않은 장치 문제.</translation>
+    </message>
+    <message>
+        <source>Unknown camera issue.</source>
+        <translation>알려지지 않은 카메라 문제.</translation>
+    </message>
+    <message>
+        <source>Unknown IO module issue.</source>
+        <translation>알려지지 않은 IO장치 문제.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the device %1.</source>
+        <translation>장치 %1로 부터 유효하지 않은 데이터 입수됨.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the camera %1.</source>
+        <translation>카메라 %1로 부터 유효하지 않은 데이터 입수됨.</translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the IO module %1.</source>
+        <translation>IO장치 %1로 부터 유효하지 않은 데이터 입수됨.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open device issues dialog for more details.</source>
+        <translation>미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open camera issues dialog for more details.</source>
+        <translation>미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
+        <translation>미디어 에러 경고, 상세 내용은 장치 문제 창을 열어서 확인하세요.</translation>
+    </message>
+    <message>
+        <source>Device initialization process in progress.</source>
+        <translation>장치 초기화 진행중.</translation>
+    </message>
+    <message>
+        <source>Camera initialization process in progress.</source>
+        <translation>카메라 초기화 진행중.</translation>
+    </message>
+    <message>
+        <source>IO Module initialization process in progress.</source>
+        <translation>IO장치 초기화 진행중.</translation>
+    </message>
+    <message>
+        <source>Camera plugin error. %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -477,7 +629,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished">윈도우 탐색기의 실행이 실패함</translation>
+        <translation>윈도우 탐색기의 실행이 실패함.</translation>
     </message>
 </context>
 <context>
@@ -492,11 +644,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
+        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished">오디오 디코더를 초기화 할 수 없습니다.</translation>
+        <translation>오디오 디코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -534,7 +686,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished">오디오 인코더를 초기화 할 수 없습니다.</translation>
+        <translation>오디오 인코더를 초기화 할 수 없습니다.</translation>
     </message>
 </context>
 <context>
@@ -577,79 +729,79 @@
     </message>
     <message>
         <source>I/O Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>시작</translation>
     </message>
     <message>
         <source>Analog Encoder</source>
-        <translation type="unfinished">아날로그 인코더</translation>
+        <translation>아날로그 인코더</translation>
     </message>
     <message>
         <source>Trial Licenses</source>
-        <translation type="unfinished">기간제한 인증키</translation>
+        <translation>기간제한 인증키</translation>
     </message>
     <message>
         <source>Analog Licenses</source>
-        <translation type="unfinished">아날로그 인증키</translation>
+        <translation>아날로그 인증키</translation>
     </message>
     <message>
         <source>Professional Licenses</source>
-        <translation type="unfinished">정식 인증키</translation>
+        <translation>정식 인증키</translation>
     </message>
     <message>
         <source>Edge Licenses</source>
-        <translation type="unfinished">Edge 인증키</translation>
+        <translation>Edge 인증키</translation>
     </message>
     <message>
         <source>Vmax Licenses</source>
-        <translation type="unfinished">Vmax 인증키</translation>
+        <translation>Vmax 인증키</translation>
     </message>
     <message>
         <source>Analog Encoder Licenses</source>
-        <translation type="unfinished">아날로그 인코더 인증키</translation>
+        <translation>아날로그 인코더 인증키</translation>
     </message>
     <message>
         <source>Video Wall Licenses</source>
-        <translation type="unfinished">비디오 월 인증키</translation>
+        <translation>비디오 월 인증키</translation>
     </message>
     <message>
         <source>I/O Module Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치 라이센스</translation>
     </message>
     <message>
         <source>Start Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>라이센스 시작</translation>
     </message>
     <message>
         <source>Invalid Signature</source>
-        <translation type="unfinished">유효하지 않은 서명</translation>
+        <translation>유효하지 않은 서명</translation>
     </message>
     <message>
         <source>Server with matching hardware ID not found</source>
-        <translation type="unfinished"></translation>
+        <translation>서버와 연관된 HW ID 가 일치 하지 않습니다</translation>
     </message>
     <message>
         <source>Invalid Customization</source>
-        <translation type="unfinished">유효하지 않은 변경</translation>
+        <translation>유효하지 않은 변경</translation>
     </message>
     <message>
         <source>Invalid Type</source>
-        <translation type="unfinished">유효하지 않은 방식</translation>
+        <translation>유효하지 않은 방식</translation>
     </message>
     <message>
         <source>Invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않음</translation>
     </message>
     <message>
         <source>Invalid Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation>유효하지 않은 라이센스</translation>
     </message>
     <message>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation>이 라이센스는 상위 버젼의 SW가 필요합니다.</translation>
     </message>
 </context>
 <context>
@@ -684,19 +836,19 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished">인증키를 등록하는 동안 문제가 발생하였습니다. 데이터 베이스에서 오류가 발생했습니다.</translation>
+        <translation>인증키를 등록하는 동안 문제가 발생하였습니다. 데이터 베이스에서 오류가 발생했습니다.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-        <translation type="unfinished">입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
+        <translation>입력한 인증키가 유효하지 않습니다. 입력한 인증키가 맞는지 다시 확인해 주십시오. 문제가 지속 될 경우 관리자를 통해 정상적인 인증키인지 확인하십시오.</translation>
     </message>
     <message>
         <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
+        <translation>부정확한 인증키의 등록을 시도 중입니다. 관리자를 통해 유효한 인증키를 발급 받으십시오.</translation>
     </message>
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
-        <translation type="unfinished">{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
+        <translation>{{hwid}} on {{time}}에서 이미 사용된 인증 키입니다. 관리자를 통해 유효한 인증키를 발급 받으세요.</translation>
     </message>
 </context>
 <context>
@@ -704,27 +856,6 @@
     <message>
         <source>Server</source>
         <translation>서버</translation>
-    </message>
-</context>
-<context>
-    <name>QnNewDWPtzController</name>
-    <message>
-        <source>Preset #</source>
-        <translation>프리셋 #</translation>
-    </message>
-</context>
-<context>
-    <name>QnPlAxisResource</name>
-    <message>
-        <source>Can&apos;t initialize IO port settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPlOnvifResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -738,87 +869,87 @@
     <name>QnResourceNameStrings</name>
     <message numerus="yes">
         <source>%n Camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO Module(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n Device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
-        <translation type="unfinished">
+        <translation>
             <numerusform></numerusform>
         </translation>
     </message>
     <message>
         <source>Cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>cameras</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>Camera</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>camera</source>
-        <translation type="unfinished"></translation>
+        <translation>카메라</translation>
     </message>
     <message>
         <source>IO Modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>IO modules</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>IO Module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>IO module</source>
-        <translation type="unfinished"></translation>
+        <translation>IO장치</translation>
     </message>
     <message>
         <source>Devices</source>
-        <translation type="unfinished"></translation>
+        <translation>장치</translation>
     </message>
     <message>
         <source>devices</source>
-        <translation type="unfinished"></translation>
+        <translation>장치</translation>
     </message>
     <message>
         <source>Device</source>
-        <translation type="unfinished"></translation>
+        <translation>장치</translation>
     </message>
     <message>
         <source>device</source>
-        <translation type="unfinished"></translation>
+        <translation>장치</translation>
     </message>
 </context>
 <context>
@@ -837,15 +968,15 @@
     </message>
     <message>
         <source>Trial License</source>
-        <translation type="unfinished">기간한정 인증키</translation>
+        <translation>기간한정 인증키</translation>
     </message>
     <message>
         <source>Licensed To: </source>
-        <translation type="unfinished">인증키:</translation>
+        <translation>인증키:</translation>
     </message>
     <message>
         <source>FREE License</source>
-        <translation type="unfinished">무료 인증키</translation>
+        <translation>무료 인증키</translation>
     </message>
 </context>
 <context>
@@ -946,97 +1077,6 @@
     </message>
 </context>
 <context>
-    <name>QnSystemHealthStringsHelper</name>
-    <message>
-        <source>No licenses</source>
-        <translation>인증키 없음</translation>
-    </message>
-    <message>
-        <source>Email address is not set</source>
-        <translation>이메일 주소를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Email server is not set</source>
-        <translation>이메일 서버를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses</source>
-        <translation>일부 사용자가 이메일 주소를 설정하지 않음</translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
-        <translation>서버 연결 실패</translation>
-    </message>
-    <message>
-        <source>Error while sending email</source>
-        <translation>이메일을 보내는 동안 오류 발생</translation>
-    </message>
-    <message>
-        <source>Email address is not set for user %1</source>
-        <translation>%1 사용자에 대한 이메일 주소가 설정되지 않음</translation>
-    </message>
-    <message>
-        <source>Select server for others to synchronize time with</source>
-        <translation>타 위치에서 시간 동기화 서버로 선택 함</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed</source>
-        <translation>저장기 인덱서의 재 설정이 완료됨</translation>
-    </message>
-    <message>
-        <source>Email address is not set.</source>
-        <translation>이메일 주소를 설정하지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>You cannot receive system notifications via email.</source>
-        <translation>이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Email server is not set.</source>
-        <translation>이메일 서버가 설정되어있지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Some users have not set their email addresses.</source>
-        <translation>일부 사용자가 이메일 주소를 설정하지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>They cannot receive system notifications via email.</source>
-        <translation>그들은 이메일을 통해 시스템 알람을 받을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Storages are full on the following Server:</source>
-        <translation>용량이 부족한 서버 목록:</translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation>저장기 설정이 되지 않은 서버 목록:</translation>
-    </message>
-    <message>
-        <source>You have no licenses.</source>
-        <translation>인증키가 없습니다.</translation>
-    </message>
-    <message>
-        <source>You cannot record video from cameras.</source>
-        <translation>카메라에서 비디오를 저장할 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Rebuilding archive index is completed on the following Server:</source>
-        <translation>저장기 인덱스 재 설정이 완료된 서버 목록:</translation>
-    </message>
-    <message>
-        <source>Storage is full</source>
-        <translation type="unfinished">저장기의 용량이 꽉참</translation>
-    </message>
-    <message>
-        <source>Storage is not configured</source>
-        <translation type="unfinished">저장기 구성이 되어있지 않음</translation>
-    </message>
-    <message>
-        <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnTCPConnectionProcessor</name>
     <message>
         <source>OK</source>
@@ -1064,17 +1104,6 @@
     </message>
 </context>
 <context>
-    <name>QnThirdPartyResource</name>
-    <message>
-        <source>Otput %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Input %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnTranscoder</name>
     <message>
         <source>OpenCL transcoding is not implemented.</source>
@@ -1086,11 +1115,11 @@
     </message>
     <message>
         <source>OpenCLTranscode is not implemented.</source>
-        <translation type="unfinished">OpenCLTranscode가 구현되어있지 않음</translation>
+        <translation>OpenCLTranscode가 구현되어있지 않음.</translation>
     </message>
     <message>
         <source>Unknown transcode method</source>
-        <translation type="unfinished">알수없는 변환 방법</translation>
+        <translation>알수없는 변환 방법</translation>
     </message>
 </context>
 <context>

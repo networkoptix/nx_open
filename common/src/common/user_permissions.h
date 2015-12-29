@@ -13,7 +13,7 @@ namespace Qn {
         /* Generic permissions. */
         ReadPermission                          = 0x00010000,   /**< Generic read access. Having this access right doesn't necessary mean that all information is readable. */
         WritePermission                         = 0x00020000,   /**< Generic write access. Having this access right doesn't necessary mean that all information is writable. */ 
-        SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to appserver. */
+        SavePermission                          = 0x00040000,   /**< Generic save access. Entity can be saved to the server. */
         RemovePermission                        = 0x00080000,   /**< Generic delete permission. */
         ReadWriteSavePermission                 = ReadPermission | WritePermission | SavePermission,
         WriteNamePermission                     = 0x01000000,   /**< Permission to edit resource's name. */

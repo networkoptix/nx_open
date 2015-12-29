@@ -6,6 +6,7 @@
 #include <QtCore/QMimeData>
 
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -97,18 +98,30 @@ void QnCameraListDialog::updateWindowTitle() {
     }
     Q_ASSERT_X(cameras.size() == m_resourceSearch->rowCount(), Q_FUNC_INFO, "Make sure all found resources are cameras");
 
-    const QString title = m_model->server()
-        //: "Cameras List for Server (192.168.0.1) - 5 Cameras found
-        ? tr("%1 List for '%2' - %3 found")
-            .arg(getDefaultDevicesName())
-            .arg(getFullResourceName(m_model->server(), true))
-            .arg(getNumericDevicesName(cameras))
-        //: "Cameras List for Server (192.168.0.1) - 5 Cameras found
-        : tr("%1 List - %2 found")
-            .arg(getDefaultDevicesName())
-            .arg(getNumericDevicesName(cameras))
-            ;
+    const QString titleServerPart = m_model->server()
+        ? QnDeviceDependentStrings::getDefaultNameFromSet(
+                //: Devices List for Server (192.168.0.1)
+                tr("Devices List for %1"),
 
+                //: Cameras List for Server (192.168.0.1)
+                tr("Cameras List for %1")
+            ).arg(getFullResourceName(m_model->server(), true))
+        : QnDeviceDependentStrings::getDefaultNameFromSet(
+            tr("Devices List"),
+            tr("Cameras List")
+            );
+
+
+    const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
+        QnCameraDeviceStringSet(
+            tr("%n devices found",      nullptr, cameras.size()),
+            tr("%n cameras found",      nullptr, cameras.size()),
+            tr("%n IO modules found",   nullptr, cameras.size())
+        ),
+        cameras
+     );
+
+    const QString title = lit("%1 - %2").arg(titleServerPart).arg(titleCamerasPart);
     setWindowTitle(title);
 }
 
@@ -138,9 +151,13 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
         if (QnResourcePtr resource = idx.data(Qn::ResourceRole).value<QnResourcePtr>())
             resources.push_back(resource);
 
+
     QScopedPointer<QMenu> menu;
     if (!resources.isEmpty()) {
-        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, resources, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
+        QnActionParameters parameters(resources);
+        parameters.setArgument(Qn::NodeTypeRole, Qn::ResourceNode);
+
+        menu.reset(context()->menu()->newMenu(Qn::TreeScope, this, parameters, QnActionManager::DontReuseActions)); /* We'll be changing hotkeys, so we cannot reuse global actions. */
         foreach(QAction *action, menu->actions())
             action->setShortcut(QKeySequence());
     }
@@ -162,7 +179,10 @@ void QnCameraListDialog::at_camerasView_customContextMenuRequested(const QPoint 
 }
 
 void QnCameraListDialog::at_exportAction_triggered() {
-    QnGridWidgetHelper::exportToFile(ui->camerasView, this, tr("Export selected %1 to a file.").arg(getDefaultDeviceNameLower()));
+    QnGridWidgetHelper::exportToFile(ui->camerasView, this, QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Export selected devices to a file."),
+        tr("Export selected cameras to a file.")
+        ));
 }
 
 void QnCameraListDialog::at_clipboardAction_triggered() {

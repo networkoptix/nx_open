@@ -22,6 +22,7 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource_name.h>
+#include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
@@ -155,7 +156,7 @@ void QnResourceBrowserToolTipWidget::pointTo(const QPointF &pos) {
 // -------------------------------------------------------------------------- //
 // QnResourceBrowserWidget
 // -------------------------------------------------------------------------- //
-QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context): 
+QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchContext *context):
     QWidget(parent),
     QnWorkbenchContextAware(parent, context),
     ui(new Ui::ResourceBrowserWidget()),
@@ -170,7 +171,10 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->typeComboBox->addItem(tr("Any Type"), 0);
     ui->typeComboBox->addItem(tr("Video Files"), static_cast<int>(Qn::local | Qn::video));
     ui->typeComboBox->addItem(tr("Image Files"), static_cast<int>(Qn::still_image));
-    ui->typeComboBox->addItem(tr("Live %1").arg(getDefaultDevicesName()), static_cast<int>(Qn::live));
+    ui->typeComboBox->addItem(QnDeviceDependentStrings::getDefaultNameFromSet(
+        tr("Live Devices"),
+        tr("Live Cameras")
+        ), static_cast<int>(Qn::live));
 
     ui->clearFilterButton->setIcon(qnSkin->icon("tree/clear.png"));
     ui->clearFilterButton->setIconSize(QSize(16, 16));
@@ -181,6 +185,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget *parent, QnWorkbenchCon
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BackgroundOpacity | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
 //    ui->resourceTreeWidget->setFilterVisible(); //TODO: #Elric why don't we enable this? looks good and useful
+
+    ui->searchTreeWidget->setCheckboxesVisible(false);
 
     /* This is needed so that control's context menu is not embedded into the scene. */
     ui->filterLineEdit->setWindowFlags(ui->filterLineEdit->windowFlags() | Qt::BypassGraphicsProxyWidget);
@@ -291,11 +297,11 @@ void QnResourceBrowserWidget::setLayoutFilter(QnWorkbenchLayout *layout, const Q
 }
 
 void QnResourceBrowserWidget::killSearchTimer() {
-    if (m_filterTimerId == 0) 
+    if (m_filterTimerId == 0)
         return;
 
     killTimer(m_filterTimerId);
-    m_filterTimerId = 0; 
+    m_filterTimerId = 0;
 }
 
 void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSelection) {
@@ -309,7 +315,7 @@ void QnResourceBrowserWidget::showContextMenuAt(const QPoint &pos, bool ignoreSe
 
     QnActionManager *manager = context()->menu();
 
-    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection 
+    QScopedPointer<QMenu> menu(manager->newMenu(Qn::TreeScope, mainWindow(), ignoreSelection
         ? QnActionParameters().withArgument(Qn::NodeTypeRole, Qn::RootNode)
         : currentParameters(Qn::TreeScope)));
 
@@ -499,10 +505,13 @@ bool QnResourceBrowserWidget::showOwnTooltip(const QPointF &pos) {
         m_tooltipWidget->pointTo(QPointF(geometry().right(), pos.y()));
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if (resource && (resource->flags() & Qn::live_cam) && resource.dynamicCast<QnNetworkResource>()) {
-            m_tooltipWidget->setResourceId(resource->getId());
-            m_thumbnailManager->selectResource(resource);
-        } else {
+        if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+        {
+            m_tooltipWidget->setResourceId(camera->getId());
+            m_thumbnailManager->selectResource(camera);
+        }
+        else
+        {
             m_tooltipWidget->setResourceId(QnUuid());
             m_tooltipWidget->setPixmap(QPixmap());
         }
@@ -564,7 +573,7 @@ void QnResourceBrowserWidget::updateFilter(bool force) {
 
     if(!force) {
 //        int pos = qMax(filter.lastIndexOf(QLatin1Char('+')), filter.lastIndexOf(QLatin1Char('\\'))) + 1;
-        
+
         int pos = 0;
         /* Estimate size of the each term in filter expression. */
         while (pos < filter.size()){
@@ -614,7 +623,7 @@ void QnResourceBrowserWidget::contextMenuEvent(QContextMenuEvent *event) {
     while(child && child != ui->resourceTreeWidget && child != ui->searchTreeWidget)
         child = child->parentWidget();
 
-    /** 
+    /**
      * Note that we cannot use event->globalPos() here as it doesn't work when
      * the widget is embedded into graphics scene.
      */
@@ -667,7 +676,7 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent *event) {
             }
 
             QnResourceSearchProxyModel *model = layoutModel(layout, true);
-            
+
             QString filter = ui->filterLineEdit->text();
             Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
 
@@ -752,9 +761,11 @@ void QnResourceBrowserWidget::at_tabWidget_currentChanged(int index) {
         ui->searchTreeWidget->setModel(model);
         ui->searchTreeWidget->expandAll();
 
-        /* View re-creates selection model for each model that is supplied to it, 
+        /* View re-creates selection model for each model that is supplied to it,
          * so we have to re-connect each time the model changes. */
         connect(ui->searchTreeWidget->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SIGNAL(selectionChanged()), Qt::UniqueConnection);
+
+        ui->filterLineEdit->setFocus();
     }
 
     emit currentTabChanged();
@@ -784,11 +795,11 @@ void QnResourceBrowserWidget::at_thumbnailClicked() {
 void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel *model) const {
     /* Always accept servers for administrator users. */
     if (accessController()->hasGlobalPermissions(Qn::GlobalProtectedPermission)) {
-        model->addCriterion(QnResourceCriterion(Qn::server)); 
+        model->addCriterion(QnResourceCriterion(Qn::server));
     }
     else {
         /* Always skip servers for common users, but always show user and layouts */
-        model->addCriterion(QnResourceCriterion(Qn::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next)); 
+        model->addCriterion(QnResourceCriterion(Qn::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
         model->addCriterion(QnResourceCriterion(Qn::user));
         model->addCriterion(QnResourceCriterion(Qn::layout));
     }

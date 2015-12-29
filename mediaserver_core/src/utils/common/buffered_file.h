@@ -2,8 +2,9 @@
 #define __BUFFERED_FILE_H__
 
 #include <memory>
+#include <list>
 
-#include <utils/thread/wait_condition.h>
+#include <QtCore/QWaitCondition>
 #include <QtCore/QString>
 #include <QtCore/QQueue>
 #include "utils/fs/file.h"
@@ -21,7 +22,7 @@ public:
     virtual ~QueueFileWriter();
 
     // write all data in a row
-    qint64 write (QBufferedFile* file, const char * data, qint64 len);
+    qint64 writeRanges (QBufferedFile* file, std::vector<QnMediaCyclicBuffer::Range> range);
     
     /*
     * Returns storage usage in range [0..1]
@@ -34,35 +35,46 @@ private:
 private:
     struct FileBlockInfo
     {
-        FileBlockInfo(): file(0), data(0), len(0), result(0) {}
-        FileBlockInfo(QBufferedFile* _file, const char * _data, qint64 _len): file(_file), data(_data), len(_len), result(0) {}
+        FileBlockInfo(QBufferedFile* _file): file(_file) , result(0) {}
+        int dataSize() const {
+            int result = 0;
+            for (const auto& range: ranges)
+                result += range.size;
+            return result;
+        }
+
+
         QBufferedFile* file;
-        const char* data;
-        int len;
+        std::vector<QnMediaCyclicBuffer::Range> ranges;
         QnMutex mutex;
         QnWaitCondition condition;
         qint64 result;
     };
 
-    CLThreadQueue<FileBlockInfo*> m_dataQueue;
+    std::list<FileBlockInfo*> m_dataQueue;
+    QnMutex m_dataMutex;
+    QnWaitCondition m_dataWaitCond;
 
     typedef QPair<qint64, int> WriteTimingInfo;
     QQueue<WriteTimingInfo> m_writeTimings;
     int m_writeTime;
     mutable QnMutex m_timingsMutex;
+private:
+    void putData(FileBlockInfo* fb);
+    FileBlockInfo* popData();
 };
 
 class QnWriterPool
 {
 public:
-    typedef QMap<QString, QueueFileWriter*> WritersMap;
+    typedef QMap<QnUuid, QueueFileWriter*> WritersMap;
 
     QnWriterPool();
     ~QnWriterPool();
 
     static QnWriterPool* instance();
 
-    QueueFileWriter* getWriter(const QString& fileName);
+    QueueFileWriter* getWriter(const QnUuid& writePoolId);
     WritersMap getAllWriters();
 private:
     QnMutex m_mutex;
@@ -77,7 +89,7 @@ public:
     * @param ioBlockSize - IO block size
     * @param minBufferSize - do not empty buffer(after IO operation) less then minBufferSize
     */
-    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize);
+    QBufferedFile(const std::shared_ptr<IQnFile>& fileImpl, int ioBlockSize, int minBufferSize, const QnUuid& writerPoolId);
     virtual ~QBufferedFile();
 
     /*
@@ -120,6 +132,7 @@ private:
     QnByteArray m_cachedBuffer; // cached file begin
     QnByteArray m_tmpBuffer;
     qint64 m_lastSeekPos;
+    QnUuid m_writerPoolId;
 };
 
 #endif // __BUFFERED_FILE_H__

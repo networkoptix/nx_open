@@ -1,6 +1,6 @@
 <div class="videowindow">
 
-    <div class="camera-view-informer camera-loading" ng-if="loading" ng-hide="debugMode">
+    <div class="camera-view-informer camera-loading" ng-if="loading">
         <div class="camera-view-preloader camera-view-message-icon"></div>
     </div>
 
@@ -35,13 +35,18 @@
         Please, use Microsoft Edge or Google Chrome browsers.<br>
     </div>
 
+    <div class="camera-view-informer" ng-if="ubuntuNX">
+        Video cannot be played.<br>
+        Your browser doesn't support video from ARM-based servers. Please, use Chromium browser instead.<br>
+    </div>
+
     <div class="camera-view-informer" ng-if="errorLoading">
         Video cannot be played.<br>
         Some error happened.<br>
     </div>
 
 
-    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading && !debugMode}">
+    <div class="videoplayer" ng-if="flashls" ng-class="{'invisible':loading}">
         <objecter ng-id="'flashvideoembed'"
                 ng-name="'flashvideoembed'"
                 ng-source="flashSource"
@@ -49,6 +54,6 @@
         </objecter>
     </div>
 
-    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading && !debugMode}">
+    <div class="videoplayer" ng-hide="!native" ng-class="{'invisible': loading}">
     </div>
 </div>

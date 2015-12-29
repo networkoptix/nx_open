@@ -1,0 +1,168 @@
+{
+    "palette" : {
+        "base" : {
+            "color_1" :     "#000000",
+            "color_2" :     "#080707",
+            "color_3" :     "#0d0e0f",
+            "color_4" :     "#121517",
+            "color_5" :     "#171c1f",
+            "color_6" :     "#1c2327",
+            "color_7" :     "#212a2f",
+            "color_8" :     "#263137",
+            "color_9" :     "#2b383f",
+            "color_10" :    "#303f47",
+            "color_11" :    "#35464f",
+            "color_12" :    "#3a4d57",
+            "color_13" :    "#3f545f",
+            "color_14" :    "#445b67",
+            "color_15" :    "#49626f",
+            "color_16" :    "#4e6977",
+            "color_17" :    "#53707f"
+        },
+        "contrast" : {
+            "color_1" :     "#698796",
+            "color_2" :     "#91a7b2",
+            "color_3" :     "#9bafb9",
+            "color_4" :     "#a5b7c0",
+            "color_5" :     "#afbfc7",
+            "color_6" :     "#b9c7ce",
+            "color_7" :     "#c3cfd5",
+            "color_8" :     "#cdd7dc",
+            "color_9" :     "#d7dfe3",
+            "color_10" :    "#e1e7ea",
+            "color_11" :    "#ebeff1",
+            "color_12" :    "#f5f7f8",
+            "color_13" :    "#ffffff"
+        },
+        "accent" : {
+            "color_1" :     "#076281",
+            "color_2" :     "#117297",
+            "color_3" :     "#1b82ad",
+            "color_4" :     "#2592c3",
+            "color_5" :     "#2fa2db",
+            "color_6" :     "#39b2ef",
+            "color_7" :     "#43c2ff"
+        },
+        "attention" : {
+            "color_1" :     "#6b2814",
+            "color_2" :     "#d65029"
+        }
+    },
+
+    "window" : {
+        "background" :      "palette.base.color_5",
+        "text" :            "palette.contrast.color_13",
+        "accent" :          "palette.accent.color_5",
+        "accentText" :      "palette.contrast.color_13"
+    },
+
+    "button" : {
+        "background" :              "palette.base.color_9",
+        "accentBackground" :        "window.accent",
+        "attentionBackground" :     "palette.attention.color_2",
+        "text" :                    "window.text",
+        "accentText" :              "window.accentText"
+    },
+
+    "input" : {
+        "border" :              "palette.base.color_10",
+        "borderActive" :        "window.accent",
+        "placeholder" :         "palette.base.color_10",
+        "text" :                "window.text",
+        "borderError" :         "palette.attention.color_1",
+        "borderActiveError" :   "palette.attention.color_2",
+        "textError" :           "palette.attention.color_2",
+        "placeholderError" :    "palette.base.color_10"
+    },
+
+    "checkBox" : {
+        "text":             "window.text",
+        "boxOff":           "window.text",
+        "boxOn":            "window.text"
+    },
+
+    "list" : {
+        "sectionText" :     "palette.contrast.color_1",
+        "text" :            "window.text",
+        "subText" :         "palette.contrast.color_2",
+        "separator" :       "palette.base.color_4",
+        "disabledText" :    "palette.base.color_17"
+    },
+
+    "sessionItem" : {
+        "background" :              "palette.base.color_7",
+        "backgroundActive" :        "palette.base.color_9",
+        "backgroundIncompatible" :  "palette.base.color_6",
+        "activeMark" :              "window.accent",
+        "incompatibleMark" :        "palette.attention.color_2"
+    },
+
+    "sideNavigation" : {
+        "background" :      "palette.base.color_8",
+        "splitter" :        "palette.base.color_10",
+        "section" :         "window.accent"
+    },
+
+    "popupMenu" : {
+        "background" :      "palette.contrast.color_11",
+        "text" :            "palette.base.color_1"
+    },
+
+    "dialog" : {
+        "background" :          "palette.contrast.color_11",
+        "clickBackground" :     "palette.contrast.color_7",
+        "text" :                "palette.base.color_1",
+        "titleText" :           "palette.base.color_1",
+        "selectedBackground":   "window.accent",
+        "selectedText" :        "window.accentText",
+        "buttonSplitter" :      "palette.contrast.color_7"
+    },
+
+    "cameras" : {
+        "background" :          "palette.base.color_4",
+        "text" :                "window.text",
+        "offlineText" :         "palette.base.color_11",
+        "recordingIndicator" :  "#d70000",
+        "offlineBackground" :   "palette.base.color_7",
+        "hiddenText" :          "palette.base.color_15",
+        "hiddenBackground" :    "palette.base.color_5",
+        "dummyBorder" :         "palette.base.color_7",
+        "showButtonBackground" : "palette.base.color_7"
+    },
+
+    "toast" : {
+        "background" :      "window.accent",
+        "text" :            "window.accentText"
+    },
+
+    "timeline" : {
+        "text" :            "#b391a7b2",
+        "chunkBar" :        "#223925",
+        "chunk" :           "#3a911e"
+    },
+
+    "calendar" : {
+        "background" :          "#f5263137",
+        "text" :                "window.text",
+        "archiveIndicator" :    "timeline.chunk",
+        "dayName" :             "palette.contrast.color_1",
+        "holidayName" :         "#a82f2f",
+        "disabledText" :        "palette.contrast.color_1",
+        "selectedBackground" :  "calendar.text",
+        "selectedText" :        "palette.base.color_5",
+        "splitter" :            "palette.base.color_9"
+    },
+
+    "other" : {
+        "attentionBackground" : "palette.attention.color_2",
+        "loadingText" :         "palette.base.color_13",
+        "preloaderDot" :        "palette.base.color_9",
+        "preloaderCircle" :     "palette.base.color_13",
+        "scrollIndicator" :     "palette.base.color_9",
+        "playPause" :           "palette.contrast.color_13",
+        "playPauseBackground" : "#32171c1f",
+        "navigationPanelBackground" : "palette.base.color_3",
+        "offlineDimmer" :       "#cc171c1f",
+        "cameraStatus" :        "palette.base.color_13"
+    }
+}

@@ -212,19 +212,6 @@ namespace Qn {
     };
 
     /**
-     * Importance level of a notification. 
-     */
-    enum NotificationLevel {
-        NoNotification,
-        OtherNotification,
-        CommonNotification,
-        ImportantNotification,
-        CriticalNotification,
-        SystemNotification,
-        LevelCount
-    };
-
-    /**
      * Modes of layout export.
      */
     enum LayoutExportMode {
@@ -296,6 +283,11 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::LightModeFlags), 
     (metatype)(numeric)
+    )
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+    (Qn::Permission)(Qn::Permissions), 
+    (lexical)
     )
 
 //TODO: #GDM #2.4 move back to client_module_functions.cpp. See commit a0edb9aa5abede1b5c9ab1c9ce52cc912286d090.

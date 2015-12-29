@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Fragment>
-    <DirectoryRef Id="AxClient23Dir">
+    <DirectoryRef Id="AxClientDir">
       <Component Id="cmpB3D4F3658BAA459B93E5CFB40B240519">
         <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.AxSourceDir)\ax${ax.className}2.dll">
           <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
@@ -150,7 +150,7 @@
     </DirectoryRef>
   </Fragment>
   <Fragment>
-    <ComponentGroup Id="AxClient23DirComponents">
+    <ComponentGroup Id="AxClientDirComponents">
       <ComponentRef Id="cmp3E8A91F11BA0CC36AA4DD87F303B6E32" />
       <ComponentRef Id="cmp1EC586C67603C547D26471D8FCA5AFBE" />
       <ComponentRef Id="cmp20AC17A5BAEA316D29CD40EFD564EA3E" />

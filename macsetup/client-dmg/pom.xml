@@ -24,6 +24,17 @@
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>client.bin</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/client.bin/pom.xml</systemPath>            
+        </dependency>        
+    </dependencies>		
 	
 	<build>
 		<directory>${arch}</directory>

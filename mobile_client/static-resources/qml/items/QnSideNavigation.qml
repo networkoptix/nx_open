@@ -12,15 +12,14 @@ QnNavigationDrawer {
     property string activeSessionId
     readonly property alias savedSessionsModel: savedSessionsModel
 
-    parent: _findRootItem()
-
     color: QnTheme.sideNavigationBackground
 
     QnFlickable {
         id: flickable
 
         width: panel.width
-        height: panel.height
+        anchors.top: parent.top
+        anchors.bottom: bottomButtons.top
 
         flickableDirection: Flickable.VerticalFlick
         contentHeight: content.height
@@ -41,7 +40,7 @@ QnNavigationDrawer {
 
                 Text {
                     id: sectionLabel
-                    height: dp(48)
+                    height: dp(56)
                     x: dp(16)
                     verticalAlignment: Text.AlignVCenter
                     text: qsTr("Saved connections")
@@ -53,7 +52,7 @@ QnNavigationDrawer {
                         width: content.width - 2 * sectionLabel.x
                         height: dp(1)
                         anchors.bottom: sectionLabel.bottom
-                        anchors.bottomMargin: dp(8)
+                        anchors.bottomMargin: dp(12)
                         color: QnTheme.sideNavigationSection
                     }
                 }
@@ -63,9 +62,8 @@ QnNavigationDrawer {
 
                     width: parent.width
 
-                    model: QnLoginSessionsModel {
+                    model: QnSavedSessionsModel {
                         id: savedSessionsModel
-                        displayMode: QnLoginSessionsModel.ShowSaved
                     }
 
                     QnSessionItem {
@@ -85,66 +83,52 @@ QnNavigationDrawer {
                 width: parent.width
                 height: Math.max(dp(8), panel.height - savedSessions.height - bottomButtons.height)
             }
-
-            Column {
-                id: bottomButtons
-
-                width: parent.width
-
-                Rectangle {
-                    x: dp(16)
-                    width: parent.width - 2 * x
-                    height: dp(1)
-                    color: QnTheme.sideNavigationSplitter
-                }
-
-                Item {
-                    width: parent.width
-                    height: dp(8)
-                }
-
-                QnSideNavigationButtonItem {
-                    id: newConnectionButton
-                    text: qsTr("New connection")
-                    icon: "image://icon/plus.png"
-                    active: !activeSessionId
-
-                    onClicked: {
-                        panel.hide()
-                        Main.gotoNewSession()
-                    }
-                }
-
-                QnSideNavigationButtonItem {
-                    id: settingsButton
-                    text: qsTr("Settings")
-                    icon: "image://icon/settings.png"
-
-                    onClicked: Main.openSettings()
-                }
-
-                Text {
-                    x: dp(16)
-                    height: dp(48)
-                    verticalAlignment: Text.AlignVCenter
-                    text: qsTr("© 2015 Network Optix")
-                    font.pixelSize: sp(12)
-                    color: QnTheme.sideNavigationCopyright
-                }
-
-                Item {
-                    width: parent.width
-                    height: navigationBarPlaceholder.height + dp(8)
-                    visible: navigationBarPlaceholder.height > 1
-                }
-            }
         }
     }
 
-    function _findRootItem() {
-        var p = panel;
-        while (p.parent != null)
-            p = p.parent;
-        return p;
+    Column {
+        id: bottomButtons
+
+        width: parent.width
+        anchors.bottom: parent.bottom
+
+        Rectangle {
+            width: parent.width
+            height: dp(9)
+            color: panel.color
+
+            Rectangle {
+                x: dp(16)
+                width: parent.width - 2 * x
+                height: dp(1)
+                color: QnTheme.sideNavigationSplitter
+            }
+        }
+
+        QnSideNavigationButtonItem {
+            id: newConnectionButton
+            text: qsTr("New connection")
+            icon: "image://icon/plus.png"
+            active: !activeSessionId
+
+            onClicked: {
+                panel.hide()
+                Main.gotoNewSession()
+            }
+        }
+
+        QnSideNavigationButtonItem {
+            id: settingsButton
+            text: qsTr("Settings")
+            icon: "image://icon/settings.png"
+
+            onClicked: Main.openSettings()
+        }
+
+        Item {
+            width: parent.width
+            height: navigationBarPlaceholder.height + dp(8)
+            visible: navigationBarPlaceholder.height > 1
+        }
     }
 }

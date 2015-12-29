@@ -8,16 +8,16 @@
 
 /**
  * \file
- * 
+ *
  * This header file contains common typedefs for different resource types.
- * 
+ *
  * It is to be included from headers that use these typedefs in declarations,
  * but don't need the definitions of the actual resource classes.
  */
 
 // TODO: #Elric move out?
 // <--
-class QnScheduleTask; 
+class QnScheduleTask;
 
 struct QnCameraHistoryItem;
 
@@ -34,6 +34,8 @@ class QnVideoWallMatrix;
 class QnVideoWallControlMessage;
 
 class QnLayoutItemData;
+
+struct QnServerBackupSchedule;
 
 class QnResourceCommand;
 typedef std::shared_ptr<QnResourceCommand> QnResourceCommandPtr;

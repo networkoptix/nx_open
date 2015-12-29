@@ -4,13 +4,13 @@
 #include <QtCore/QRegExp>
 
 #include "rest_connection_processor.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/tcp_listener.h"
+#include "network/tcp_connection_priv.h"
+#include "network/tcp_listener.h"
 #include "request_handler.h"
-#include "network/authenticate_helper.h"
 #include "utils/gzip/gzip_compressor.h"
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/user_resource.h>
+#include "common/user_permissions.h"
 
 static const QByteArray NOT_ADMIN_UNAUTHORIZED_HTML("\
     <!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\"\"http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd\">\
@@ -105,13 +105,23 @@ void QnRestConnectionProcessor::run()
     QnRestRequestHandlerPtr handler = QnRestProcessorPool::instance()->findHandler(url.path());
     if (handler) 
     {
-        const auto admin = qnResPool->getAdministrator();
-        if (admin && d->authUserId != admin->getId() && handler->permissions() == RestPermissions::adminOnly)
+        if (handler->permissions() == RestPermissions::adminOnly)
         {
-            sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
-            return;
-        }
+            QnUserResourcePtr user = qnResPool->getResourceById<QnUserResource>(d->authUserId);
+            if (!user)
+            {
+                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                return;
+            }
 
+
+            bool isAdmin = user->isAdmin() || ((user->getPermissions() & (Qn::GlobalProtectedPermission | Qn::GlobalEditProtectedUserPermission)) > 0);
+            if (!isAdmin)
+            {
+                sendUnauthorizedResponse(false, NOT_ADMIN_UNAUTHORIZED_HTML);
+                return;
+            }
+        }
 
         if (d->request.requestLine.method.toUpper() == "GET") {
             rez = handler->executeGet(url.path(), params, d->response.messageBody, contentType, this);

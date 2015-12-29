@@ -12,7 +12,7 @@
 #include "dxva/dxva.h"
 #endif
 #include "utils/media/ffmpeg_helper.h"
-
+#include "utils/media/frame_type_extractor.h"
 
 struct AVCodec;
 struct AVCodecContext;
@@ -116,6 +116,7 @@ private:
     mutable double m_prevSampleAspectRatio;
     bool m_forcedMtDecoding;
     qint64 m_prevTimestamp;
+    bool m_spsFound;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

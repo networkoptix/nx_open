@@ -14,6 +14,8 @@
 #include "business/business_fwd.h"
 #include "api/model/api_ioport_data.h"
 
+#include <mutex>
+#include <map>
 
 class QnAbstractArchiveDelegate;
 class QnDataProviderFactory;
@@ -126,6 +128,9 @@ public:
     virtual QnAbstractArchiveDelegate* createArchiveDelegate() { return 0; }
     virtual QnAbstractStreamDataProvider* createArchiveDataProvider() { return 0; }
 
+    //!Returns user-defined camera name (if not empty), default name otherwise
+    QString getUserDefinedName() const;
+
     //!Returns user-defined group name (if not empty) or server-defined group name
     virtual QString getGroupName() const;
     //!Returns server-defined group name
@@ -159,6 +164,12 @@ public:
 
     bool isManuallyAdded() const;
     void setManuallyAdded(bool value);
+
+    Qn::CameraBackupQualities getBackupQualities() const;
+    void setBackupQualities(Qn::CameraBackupQualities value);
+
+    /** Get backup qualities, substantiating default value. */
+    Qn::CameraBackupQualities getActualBackupQualities() const;
 
     QString getModel() const;
     void setModel(const QString &model);
@@ -242,6 +253,10 @@ public:
 
     // Allow getting multi video layout directly from a RTSP SDP info
     virtual bool allowRtspVideoLayout() const { return true; }
+
+    bool isCameraInfoSavedToDisk(int pool) const;
+    void setCameraInfoSavedToDisk(int pool);
+
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -259,6 +274,7 @@ signals:
     void statusFlagsChanged(const QnResourcePtr &resource);
     void licenseUsedChanged(const QnResourcePtr &resource);
     void failoverPriorityChanged(const QnResourcePtr &resource);
+    void backupQualitiesChanged(const QnResourcePtr &resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
 
@@ -311,6 +327,10 @@ protected:
     */
     virtual void stopInputPortMonitoringAsync();
     virtual bool isInputPortMonitored() const;
+
+private:
+    void resetCameraInfoDiskFlags() const;
+
 private:
     QnDataProviderFactory *m_dpFactory;
     QAtomicInt m_inputPortListenerCount;
@@ -331,6 +351,8 @@ private:
     mutable CachedValue<bool> m_cachedIsIOModule;
     Qn::MotionTypes calculateSupportedMotionType() const;
     Qn::MotionType calculateMotionType() const;
+
+    mutable std::map<int, bool> m_cameraInfoSavedToDisk; // Storage pool to flag
 
 private slots:
     void resetCachedValues();

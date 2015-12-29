@@ -59,6 +59,8 @@ public:
     { removeResources(QnResourceList() << resource); }
 
     QnResourceList getResources() const;
+    QnResourceList getResources(const QVector<QnUuid>& idList) const;
+    QnResourceList getResources(const std::vector<QnUuid>& idList) const;
 
     template <class Resource>
     QnSharedResourcePointerList<Resource> getResources() const {
@@ -131,7 +133,10 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
-    QnMediaServerResourceList getAllServers() const;
+
+    // @note Never returns fake servers
+    QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag
@@ -159,7 +164,7 @@ public:
      * @return                                  List of valid indices containing the videowall and items' uuid.
      */
     QnVideoWallItemIndexList getVideoWallItemsByUuid(const QList<QnUuid> &uuids) const;
-    
+
     /**
      * @brief getVideoWallMatrixByUuid          Find videowall matrix by uuid.
      * @param uuid                              Unique id of the matrix.

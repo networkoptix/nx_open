@@ -34,11 +34,18 @@ public:
     virtual bool isValid(const QnResourcePtr &resource) const;
 
     /**
+     * @brief isMultiChoiceAllowed  Check if the delegate allows to select several resources in the list.
+     */
+    virtual bool isMultiChoiceAllowed() const;
+
+    /**
      * @brief isFlat                Check if the delegate frame should ne attached to resources list seamlessly;
      */
     virtual bool isFlat() const;
 
     virtual QnResourcePoolModelCustomColumnDelegate* customColumnDelegate() const;
+
+    virtual int helpTopicId() const;
 };
 
 template<typename CheckingPolicy>
@@ -78,6 +85,10 @@ public:
 
         // return true for resources of other type - so root elements will not be highlighted
         return !derived || isResourceValid(derived);
+    }
+
+    bool isMultiChoiceAllowed() const override {
+        return CheckingPolicy::multiChoiceListIsValid();
     }
 private:
     QLabel* m_warningLabel;

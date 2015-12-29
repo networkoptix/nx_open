@@ -2,14 +2,32 @@
 
 #include <utils/common/model_functions.h>
 
-QnBusinessActionParameters::QnBusinessActionParameters() {
-    userGroup = QnBusiness::EveryOne;
-    fps = 10;
-    streamQuality = Qn::QualityHighest;
-    recordingDuration = 0;
-    recordAfter = 0;
-    relayAutoResetTimeout = 0;
+namespace
+{
+    enum { kDefaultFixedDurationMs = 5000 };
 }
+
+QnBusinessActionParameters::QnBusinessActionParameters()
+    : actionResourceId()
+    , soundUrl()
+    , emailAddress()
+    , userGroup(QnBusiness::EveryOne)
+    , fps(10)
+    , streamQuality(Qn::QualityHighest)
+    , recordingDuration(0)
+    , recordAfter(0)
+    , relayOutputId()
+    , relayAutoResetTimeout(0)
+    , inputPortId()
+    , sayText()
+    , tags()
+    , text()
+    , durationMs(kDefaultFixedDurationMs)
+    , additionalResources()
+    , forced(true)
+    , presetId()
+    , useSource(false)
+{}
 
 
 bool QnBusinessActionParameters::isDefault() const

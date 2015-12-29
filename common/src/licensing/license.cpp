@@ -60,8 +60,14 @@ namespace {
         RSA* publicRSAKey = PEM_read_bio_RSA_PUBKEY(bp, 0, 0, 0);
         BIO_free(bp);
 
-        if (publicRSAKey == 0 || signature.size() != RSA_size(publicRSAKey))
+        if (publicRSAKey == 0)
             return false;
+
+        if (signature.size() != RSA_size(publicRSAKey))
+        {
+            RSA_free(publicRSAKey);
+            return false;
+        }
 
         // Decrypt data
         QScopedArrayPointer<unsigned char> decrypted(new unsigned char[signature.size()]);
@@ -334,6 +340,14 @@ bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
         return gotError(errCode, FutureLicense);
 
     return gotError(errCode, NoError);
+}
+
+QString QnLicense::validationInfo(ValidationMode mode) const {
+    ErrorCode code;
+    if (isValid(&code, mode))
+        return lit("Ok");
+
+    return errorMessage(code);
 }
 
 bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {

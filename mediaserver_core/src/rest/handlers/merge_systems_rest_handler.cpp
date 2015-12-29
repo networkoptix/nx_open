@@ -16,9 +16,9 @@
 #include "media_server/serverutil.h"
 #include "media_server/server_connector.h"
 #include "utils/network/simple_http_client.h"
-#include "utils/network/tcp_connection_priv.h"
-#include "utils/network/module_finder.h"
-#include "utils/network/direct_module_finder.h"
+#include "network/tcp_connection_priv.h"
+#include "network/module_finder.h"
+#include "network/direct_module_finder.h"
 #include "utils/common/app_info.h"
 #include "utils/common/model_functions.h"
 #include "api/model/ping_reply.h"
@@ -27,12 +27,17 @@
 #include "http/custom_headers.h"
 #include "settings.h"
 
-namespace {
+namespace
+{
     const int requestTimeout = 60000;
     ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
 }
 
-int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor* owner) 
+int QnMergeSystemsRestHandler::executeGet(
+        const QString &path,
+        const QnRequestParams &params,
+        QnJsonRestResult &result,
+        const QnRestConnectionProcessor *owner)
 {
     Q_UNUSED(path)
     if (MSSettings::roSettings()->value(nx_ms_conf::EC_DB_READ_ONLY).toInt()) {
@@ -46,7 +51,6 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     }
 
     QUrl url = params.value(lit("url"));
-    QString user = params.value(lit("user"), lit("admin"));
     QString password = params.value(lit("password"));
     QString currentPassword = params.value(lit("currentPassword"));
     bool takeRemoteSettings = params.value(lit("takeRemoteSettings"), lit("false")) != lit("false");
@@ -89,7 +93,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     /* Get module information to get system name. */
 
     QAuthenticator auth;
-    auth.setUser(user);
+    auth.setUser(admin->getName());
     auth.setPassword(password);
 
     CLSimpleHTTPClient client(url, 10000, auth);
@@ -133,7 +137,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyRemoteSettings(url, moduleInformation.systemName, user, password, admin, owner)) {
+        if (!applyRemoteSettings(url, moduleInformation.systemName, password, admin, owner)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -148,7 +152,7 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
             return nx_http::StatusCode::ok;
         }
 
-        if (!applyCurrentSettings(url, user, password, currentPassword, admin, mergeOneServer, owner)) {
+        if (!applyCurrentSettings(url, password, currentPassword, admin, mergeOneServer, owner)) {
             result.setError(QnJsonRestResult::CantProcessRequest, lit("CONFIGURATION_ERROR"));
             return nx_http::StatusCode::ok;
         }
@@ -178,11 +182,16 @@ int QnMergeSystemsRestHandler::executeGet(const QString &path, const QnRequestPa
     return nx_http::StatusCode::ok;
 }
 
-bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, const QString &user, const QString &password, const QString &currentPassword, const QnUserResourcePtr &admin, bool oneServer,
-                                                     const QnRestConnectionProcessor* owner)
+bool QnMergeSystemsRestHandler::applyCurrentSettings(
+        const QUrl &remoteUrl,
+        const QString &password,
+        const QString &currentPassword,
+        const QnUserResourcePtr &admin,
+        bool oneServer,
+        const QnRestConnectionProcessor *owner)
 {
     QAuthenticator authenticator;
-    authenticator.setUser(user);
+    authenticator.setUser(admin->getName());
     authenticator.setPassword(password);
 
     QString systemName = QString::fromUtf8(QUrl::toPercentEncoding(qnCommon->localSystemName()));
@@ -211,12 +220,11 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
 
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
+    QString requestStr = lit("/api/configure?systemName=%1").arg(systemName);
+    requestStr += lit("&sysIdTime=%1").arg(qnCommon->systemIdentityTime());
+    requestStr += lit("&tranLogTime=%1").arg(ec2Connection->getTransactionLogTime());
     if (oneServer) {
-        auto authSession = owner->authSession();
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&sysIdTime=%2&tranLogTime=%3")
-            .arg(systemName)
-            .arg(qnCommon->systemIdentityTime())
-            .arg(ec2Connection->getTransactionLogTime()));
+        CLHttpStatus status = client.doGET(requestStr);
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
@@ -226,10 +234,7 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
         authenticator.setPassword(currentPassword);
         CLSimpleHTTPClient client(remoteUrl, requestTimeout, authenticator);
         client.addHeader(Qn::AUTH_SESSION_HEADER_NAME, owner->authSession().toByteArray());
-        CLHttpStatus status = client.doGET(lit("/api/configure?systemName=%1&wholeSystem=true&sysIdTime=%2&tranLogTime=%3")
-            .arg(systemName)
-            .arg(qnCommon->systemIdentityTime())
-            .arg(ec2Connection->getTransactionLogTime()));
+        CLHttpStatus status = client.doGET(requestStr + lit("&wholeSystem=true"));
         if (status != CLHttpStatus::CL_HTTP_SUCCESS)
             return false;
     }
@@ -237,14 +242,20 @@ bool QnMergeSystemsRestHandler::applyCurrentSettings(const QUrl &remoteUrl, cons
     return true;
 }
 
-bool QnMergeSystemsRestHandler::applyRemoteSettings(const QUrl &remoteUrl, const QString &systemName, const QString &user, const QString &password, QnUserResourcePtr &admin,
-                                                    const QnRestConnectionProcessor* owner) 
+bool QnMergeSystemsRestHandler::applyRemoteSettings(
+        const QUrl &remoteUrl,
+        const QString &systemName,
+        const QString &password,
+        QnUserResourcePtr &admin,
+        const QnRestConnectionProcessor *owner)
 {
     qint64 remoteSysTime = 0;
     qint64 remoteTranLogTime = 0;
-    {   /* Read admin user from the remote server */
+
+    {
+        /* Read admin user from the remote server */
         QAuthenticator authenticator;
-        authenticator.setUser(user);
+        authenticator.setUser(admin->getName());
         authenticator.setPassword(password);
 
         ec2::ApiUserDataList users;

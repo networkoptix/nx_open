@@ -10,14 +10,16 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QList>
-#include <utils/thread/mutex.h>
-#include <utils/thread/mutex.h>
 #include <QtCore/QPluginLoader>
 #include <QSharedPointer>
 #include <QtCore/QString>
 #include <QtCore/QSettings>
 
+#include <utils/common/singleton.h>
+#include <utils/thread/mutex.h>
+
 #include "plugin_api.h"
+#include "plugin_container_api.h"
 
 
 //!Loads custom application plugins and provides plugin management methods
@@ -33,7 +35,8 @@
 */
 class PluginManager
 :
-    public QObject
+    public QObject,
+    public Singleton<PluginManager>
 {
     Q_OBJECT
 
@@ -46,7 +49,9 @@ public:
         AllPlugins = QtPlugin | NxPlugin
     };
 
-    PluginManager( const QString& pluginDir = QString() );
+    PluginManager(
+        const QString& pluginDir = QString(),
+        nxpl::PluginInterface* const pluginContainer = nullptr);
     virtual ~PluginManager();
 
     //!Searches for plugins of type \a T among loaded plugins
@@ -90,15 +95,13 @@ public:
         const QSettings* settings,
         PluginType pluginsToLoad = AllPlugins );
 
-    //!Guess what
-    static PluginManager* instance( const QString& pluginDir = QString() );
-
 signals:
     //!Emitted just after new plugin has been loaded
     void pluginLoaded();
 
 private:
     const QString m_pluginDir;
+    nxpl::PluginInterface* const m_pluginContainer;
     QList<QSharedPointer<QPluginLoader> > m_qtPlugins;
     QList<nxpl::PluginInterface*> m_nxPlugins;
     mutable QnMutex m_mutex;

@@ -2,7 +2,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/storage_resource.h>
@@ -22,57 +22,37 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return CODE_INVALID_PARAMETER;
 
-    QnStorageResourcePtr storage = qnStorageMan->getStorageByUrlExact(storageUrl);
-    bool exists = storage;
+    QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
+    if (!storage)
+        storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
+        
     if (!storage) {
         storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
-        if(storage) {
-            storage->setUrl(storageUrl);
-            storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);
-
-            //const auto storagePath = QnStorageResource::toNativeDirPath(storage->getUrl());
-            //const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
-            //const auto it = std::find_if(partitions.begin(), partitions.end(),
-            //                             [&](const QnPlatformMonitor::PartitionSpace& part)
-            //    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
-    
-            //const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
-            //if (storage->getStorageType().isEmpty())
-            //    storage->setStorageType(QnLexical::serialized(storageType));
-        }
-        else
+        if (!storage)
             return CODE_INVALID_PARAMETER;
+
+        storage->setUrl(storageUrl);
+        storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);           
     }
     
+    Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage must exist here");
+    bool exists = !storage.isNull();
+
     QnStorageStatusReply reply;
-    reply.pluginExists = storage;
-    reply.storage.storageId = exists ? storage->getId() : QnUuid();
-    reply.storage.url = storageUrl;
-    reply.storage.freeSpace = storage ? storage->getFreeSpace() : -1;
-    reply.storage.reservedSpace = storage ? storage->getSpaceLimit() : -1;
-    reply.storage.totalSpace = storage ? storage->getTotalSpace() : -1;
-    reply.storage.isExternal = storage && storage->isExternal();
-    reply.storage.storageType = storage->getStorageType();
+    reply.pluginExists = exists;
+    reply.storage.url  = storageUrl;
+
+    if (storage) {
+        reply.storage = QnStorageSpaceData(storage);
 #ifdef WIN32
-    if (!reply.storage.isExternal) {
-        reply.storage.isWritable = false;
-        reply.storage.isUsedForWriting = false;
-    }
-    else 
+        if (!reply.storage.isExternal) {
+            /* Do not allow to create several local storages on one hard drive. */
+            reply.storage.isWritable = false;
+            reply.storage.isUsedForWriting = false;
+        }
 #endif
-    {
-        reply.storage.isWritable = storage ? 
-                                   storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile : 
-                                   false;
-        reply.storage.isUsedForWriting = exists ? storage->isUsedForWriting() : false;
     }
         
-    // TODO: #Elric remove once UnknownSize is dropped.
-    if(reply.storage.totalSpace == QnStorageResource::UnknownSize)
-        reply.storage.totalSpace = -1;
-    if(reply.storage.freeSpace == QnStorageResource::UnknownSize)
-        reply.storage.freeSpace = -1;
-
     result.setReply(reply);
     return CODE_OK;
 }

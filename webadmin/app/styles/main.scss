@@ -18,6 +18,8 @@ body {
   html {
     position: fixed;
     width: 100%;
+    overflow:auto;
+    padding-bottom: 0px;
   }
 }
 
@@ -120,7 +122,11 @@ body {
 .fixed {
   position: fixed;
 }
-
+@media screen and (min-height: 1024px) {
+  .fixed-lg {
+    position: fixed;
+  }
+}
 /* sidebar */
 .bs-docs-sidebar {
   padding-left: 20px;
@@ -226,6 +232,7 @@ body {
   padding-top:7px;
   padding-left:13px;
   padding-bottom:7px;
+  white-space: nowrap;
   display:inline-block;
 }
 

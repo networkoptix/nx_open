@@ -14,9 +14,11 @@
     <name>HD Witness storage plugin testing client program</name>	
 
     <properties>
+        <guid>${storage_plugin_test_client.guid}</guid>
         <product.title>${storage_plugin_test_client.name}</product.title>	
         <!--Global libs-->
         <qt.libs>core</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

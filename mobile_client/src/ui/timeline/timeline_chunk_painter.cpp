@@ -20,15 +20,16 @@ void QnTimelineChunkPainter::setColors(const std::array<QColor, Qn::TimePeriodCo
     m_color = colors;
 }
 
-void QnTimelineChunkPainter::start(qint64 startPos, qint64 centralPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd) {
+void QnTimelineChunkPainter::start(qint64 startPos, const QRectF &rect, int chunkCount, qint64 windowStart, qint64 windowEnd) {
     m_position = startPos;
     m_rect = rect.toRect();
     m_windowStart = windowStart;
     m_windowEnd = windowEnd;
-    m_centralPosition = centralPos;
-    m_centralCoordinate = xFromValue(m_centralPosition);
     m_minChunkLength = (windowEnd - windowStart) / rect.width();
-    int rectCount = chunkCount + 2;
+
+    // There cannot be more rectangles than count of pixels
+    const int maxRectCount = rect.width();
+    int rectCount = qMin(maxRectCount, chunkCount * 2 + 2);
     /* +2 is for the situations like this:
      *            chunk
      *             \/
@@ -45,9 +46,6 @@ void QnTimelineChunkPainter::paintChunk(qint64 length, Qn::TimePeriodContent con
     Q_ASSERT(length >= 0);
 
     if (length < 0)
-        return;
-
-    if (m_index >= m_geometry->vertexCount() - 4)
         return;
 
     if (m_pendingLength > 0 && m_pendingLength + length > m_minChunkLength) {
@@ -89,6 +87,9 @@ void QnTimelineChunkPainter::storeChunk(qint64 length, Qn::TimePeriodContent con
 }
 
 void QnTimelineChunkPainter::flushChunk() {
+    if (m_index > m_geometry->vertexCount() - 6)
+        return;
+
     qint64 leftPosition = m_pendingPosition;
     qint64 rightPosition = m_pendingPosition + m_pendingLength;
 
@@ -122,22 +123,10 @@ void QnTimelineChunkPainter::addRect(const QRectF &rect, const QColor &color) {
 QColor QnTimelineChunkPainter::currentColor(const std::array<QColor, Qn::TimePeriodContentCount + 1> &colors) const {
     qreal rc = m_weights[Qn::RecordingContent];
     qreal mc = m_weights[Qn::MotionContent];
-    qreal bc = m_weights[Qn::BookmarksContent];
     qreal nc = m_weights[Qn::TimePeriodContentCount];
     qreal sum = m_pendingLength;
 
-    if (!qFuzzyIsNull(bc) && !qFuzzyIsNull(mc)) {
-        qreal localSum = mc + bc;
-        return linearCombine(mc / localSum, colors[Qn::MotionContent], bc / localSum, colors[Qn::BookmarksContent]);
-    }
-
-    if (!qFuzzyIsNull(bc)) {
-        /* Make sure bookmark is noticeable even if there isn't much of it.
-             * Note that these adjustments don't change sum. */
-        rc = rc * (1.0 - lineBarMinNoticeableFraction);
-        bc = sum * lineBarMinNoticeableFraction + bc * (1.0 - lineBarMinNoticeableFraction);
-        nc = nc * (1.0 - lineBarMinNoticeableFraction);
-    } else if (!qFuzzyIsNull(mc)) {
+    if (!qFuzzyIsNull(mc)) {
         /* Make sure motion is noticeable even if there isn't much of it.
              * Note that these adjustments don't change sum. */
         rc = rc * (1.0 - lineBarMinNoticeableFraction);
@@ -150,10 +139,4 @@ QColor QnTimelineChunkPainter::currentColor(const std::array<QColor, Qn::TimePer
         nc = sum * (1.0 - lineBarMinNoticeableFraction);
     }
 
-    return  linearCombine(
-                1.0,
-                linearCombine(rc / sum, colors[Qn::RecordingContent], mc / sum, colors[Qn::MotionContent]),
-                1.0,
-                linearCombine(bc / sum, colors[Qn::BookmarksContent], nc / sum, colors[Qn::TimePeriodContentCount])
-            );
-}
+return linearCombine(rc / sum, colors[Qn::RecordingContent], 1.0, linearCombine(mc / sum, colors[Qn::MotionContent], nc / sum, colors[Qn::TimePeriodContentCount]));}

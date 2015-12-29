@@ -1,5 +1,5 @@
 #include "rebuild_archive_rest_handler.h"
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "utils/common/synctime.h"
 #include "utils/common/util.h"
 #include <media_server/serverutil.h>
@@ -12,13 +12,15 @@
 int QnRebuildArchiveRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
 {
     Q_UNUSED(path);
-
     QString method = params.value("action");
-    auto reply = QnStorageManager::instance()->rebuildInfo();
+    bool useMainPool = !params.contains("mainPool") || params.value("mainPool").toInt() != 0;
+    auto storagePool = useMainPool ? QnStorageManager::normalInstance() : QnStorageManager::backupInstance();
+
+    auto reply = storagePool->rebuildInfo();
     if (method == "start")
-        reply = QnStorageManager::instance()->rebuildCatalogAsync();
+        reply = storagePool->rebuildCatalogAsync();
     else if (method == "stop")
-        QnStorageManager::instance()->cancelRebuildCatalogAsync();
+        storagePool->cancelRebuildCatalogAsync();
 
     result.setReply(reply);
     return CODE_OK;

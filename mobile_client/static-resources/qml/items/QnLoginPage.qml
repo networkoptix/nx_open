@@ -16,9 +16,11 @@ QnPage {
     property alias port: portField.text
     property alias login: loginField.text
     property alias password: passwordField.text
-    property string sessionId: mainWindow.currentSessionId
+    property string sessionId: ""
 
     property string newConnectionLabel: qsTr("New Connection")
+
+    property var oldClientOfferDialog: oldClientOfferDialog
 
     title: newConnectionLabel
 
@@ -28,6 +30,8 @@ QnPage {
 
     property int _warningAnimationDuration: 500
 
+    objectName: "loginPage"
+
     Connections {
         target: menuBackButton
         onClicked: {
@@ -36,9 +40,41 @@ QnPage {
         }
     }
 
+    Item {
+        id: warning
+
+        width: parent.width
+        height: warningRect.height + dp(8)
+
+        Rectangle {
+            id: warningRect
+
+            width: parent.width
+            height: _showWarning ? dp(40) : 0
+            clip: true
+            anchors.horizontalCenter: parent.horizontalCenter
+
+            color: QnTheme.attentionBackground
+
+            Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
+
+            Text {
+                id: warningText
+                anchors.horizontalCenter: parent.horizontalCenter
+                // Two lines below are the hack to prevent text from moving when the header changes its size
+                anchors.verticalCenter: parent.bottom
+                anchors.verticalCenterOffset: -dp(20)
+                font.pixelSize: sp(16)
+                font.weight: Font.DemiBold
+                color: QnTheme.windowText
+            }
+        }
+    }
+
     QnFlickable {
         id: flickable
         anchors.fill: parent
+        anchors.topMargin: warning.height
         topMargin: dp(16)
         leftMargin: dp(16)
         rightMargin: dp(16)
@@ -50,32 +86,10 @@ QnPage {
         Column {
             id: content
             width: parent.width - flickable.leftMargin - flickable.rightMargin
-            spacing: dp(16)
-
-            Rectangle {
-                id: warningRect
-                height: _showWarning ? dp(48) : 0
-                width: loginPage.width
-                anchors.horizontalCenter: parent.horizontalCenter
-                color: QnTheme.attentionBackground
-                clip: true
-
-                Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
-
-                Text {
-                    id: warningText
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.verticalCenter: parent.top
-                    anchors.verticalCenterOffset: dp(24)
-                    font.pixelSize: sp(16)
-                    font.weight: Font.Bold
-                    color: QnTheme.windowText
-                }
-            }
+            spacing: dp(24)
 
             Row {
                 width: parent.width
-                spacing: dp(16)
 
                 QnTextField {
                     id: hostField
@@ -83,42 +97,60 @@ QnPage {
                     placeholderText: qsTr("Host")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    KeyNavigation.tab: loginField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
 
                 QnTextField {
                     id: portField
                     width: parent.width * 2 / 5 - parent.spacing
-                    placeholderText: qsTr("Port")
+                    placeholderText: qsTr("Port (optional)")
                     showError: _serverError
                     onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
                     inputMethodHints: Qt.ImhDigitsOnly
+                    validator: IntValidator { bottom: 0; top: 32767 }
+                    KeyNavigation.tab: loginField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
             }
 
-            QnTextField {
-                id: loginField
+            Column {
                 width: parent.width
-                placeholderText: qsTr("Login")
-                showError: _authError
-                onTextChanged: loginPage.removeWarnings()
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
-            }
 
-            QnTextField {
-                id: passwordField
-                width: parent.width
-                placeholderText: qsTr("Password")
-                echoMode: TextInput.Password
-                showError: _authError
-                onTextChanged: loginPage.removeWarnings()
-                inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                QnTextField {
+                    id: loginField
+                    width: parent.width
+                    placeholderText: qsTr("Login")
+                    showError: _authError
+                    onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+                    KeyNavigation.tab: passwordField
+                    onAccepted: KeyNavigation.tab.forceActiveFocus()
+                }
+
+                QnTextField {
+                    id: passwordField
+                    width: parent.width
+                    placeholderText: qsTr("Password")
+                    echoMode: TextInput.Password
+                    passwordMaskDelay: 1500
+                    showError: _authError
+                    onTextChanged: loginPage.removeWarnings()
+                    selectionAllowed: false
+                    inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                    KeyNavigation.tab: hostField
+                    onAccepted: connect()
+                }
             }
 
             Row {
                 id: editButtons
                 width: parent.width
-                spacing: dp(16)
+                spacing: dp(8)
                 visible: false
 
                 QnButton {
@@ -126,7 +158,7 @@ QnPage {
                     text: qsTr("Save")
                     width: parent.width * 3 / 5
 
-                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, portField.text, loginField.text, passwordField.text, title)
+                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, title)
                 }
 
                 QnButton {
@@ -144,17 +176,9 @@ QnPage {
                 width: parent.width
                 text: qsTr("Connect")
                 color: QnTheme.buttonAccentBackground
+                textColor: QnTheme.buttonAccentText
 
-                onClicked: {
-                    loginPage.removeWarnings()
-
-                    if (_showWarning) {
-                        _showWarning = false
-                        delayedLoginTimer.start()
-                    } else {
-                        loginWithCurrentFields()
-                    }
-                }
+                onClicked: connect()
             }
 
             Loader {
@@ -171,27 +195,26 @@ QnPage {
             spacing: dp(1)
 
             Text {
-                height: dp(48)
+                height: dp(40)
                 verticalAlignment: Text.AlignVCenter
                 text: qsTr("Auto-discovered systems")
                 color: QnTheme.listSectionText
-                font.pixelSize: sp(14)
-                font.weight: Font.DemiBold
+                font.pixelSize: sp(16)
             }
 
             Repeater {
                 id: discoveredSessionRepeater
                 width: parent.width
 
-                model: QnLoginSessionsModel {
+                model: QnDiscoveredSessionsModel {
                     id: discoveredSessionsModel
-                    displayMode: QnLoginSessionsModel.ShowDiscovered
                 }
 
                 QnDiscoveredSessionItem {
                     systemName: model.systemName
                     host: model.address
                     port: model.port
+                    version: model.serverVersion
                 }
             }
         }
@@ -242,7 +265,7 @@ QnPage {
             if (!activePage)
                 return
 
-            showWarning(status, statusMessage)
+            showWarning(status, infoParameter)
         }
     }
 
@@ -254,13 +277,42 @@ QnPage {
         onTriggered: loginWithCurrentFields()
     }
 
-    function showWarning(status, message) {
+    QnOldClientOfferDialog {
+        id: oldClientOfferDialog
+    }
+
+    function connect() {
+        loginPage.removeWarnings()
+        connectButton.forceActiveFocus()
+
+        if (_showWarning) {
+            _showWarning = false
+            delayedLoginTimer.start()
+        } else {
+            loginWithCurrentFields()
+        }
+    }
+
+    function showWarning(status, infoParameter) {
+        var message = ""
+        if (status == QnConnectionManager.Unauthorized)
+            message = qsTr("Incorrect login or password")
+        else if (status == QnConnectionManager.NetworkError)
+            message = qsTr("Server or network is not available")
+        else if (status == QnConnectionManager.InvalidServer)
+            message = qsTr("Incompatible server")
+        else if (status == QnConnectionManager.InvalidVersion)
+            message = qsTr("Incompatible server version %1").arg(infoParameter)
+
         warningText.text = message
         if (status === QnConnectionManager.Unauthorized)
             _authError = true
         else
             _serverError = true
         _showWarning = true
+
+        if (status == QnConnectionManager.InvalidVersion)
+            oldClientOfferDialog.show()
     }
 
     function removeWarnings() {
@@ -270,7 +322,12 @@ QnPage {
 
     function loginWithCurrentFields() {
         var sessionId = (state == "FailedSaved" ? loginPage.sessionId : "")
-        LoginFunctions.connectToServer(sessionId, hostField.text, portField.text, loginField.text, passwordField.text)
+        var customConnection = (loginPage.objectName == "newConnectionPage")
+        LoginFunctions.connectToServer(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, customConnection)
+    }
+
+    function actualPort() {
+        return portField.text ? portField.text : connectionManager.defaultServerPort()
     }
 
     focus: true

@@ -2,8 +2,12 @@
 
 #include "ec2_connection.h"
 
+#include <api/global_settings.h>
+
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/resource/media_server_resource.h>
+
 #include <utils/common/synctime.h>
 
 static const uint DEFAULT_TIME_CYCLE = 30 * 24 * 60 * 60; /* secs => about a month */
@@ -99,11 +103,23 @@ namespace ec2
             return res;
 
         dbManager_queryOrReturn(ApiLicenseDataList, licenses);
-        for (auto& lic : licenses) outData->licenses.push_back(std::move(lic));
+        for (auto& license : licenses)
+        {
+            QnLicense qnLicense(license.licenseBlock);
+            ApiLicenseStatistics statLicense(std::move(license));
+            statLicense.validation = qnLicense.validationInfo();
+            outData->licenses.push_back(std::move(statLicense));
+        }
 
         dbManager_queryOrReturn(ApiBusinessRuleDataList, bRules);
         for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
         
+        if ((res = dbManager->doQuery(nullptr, outData->layouts)) != ErrorCode::ok)
+            return res;
+
+        dbManager_queryOrReturn(ApiUserDataList, users);
+        for (auto& u : users) outData->users.push_back(std::move(u));
+
         #undef dbManager_queryOrReturn
 
         outData->systemId = getOrCreateSystemId();
@@ -116,46 +132,6 @@ namespace ec2
         outData->systemId = getOrCreateSystemId();
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
-    }
-
-    bool Ec2StaticticsReporter::isDefined(const QnMediaServerResourceList &servers)
-    {
-        /* Returns if any of the server has explicitly defined value. */
-        return boost::algorithm::any_of(servers, [](const QnMediaServerResourcePtr& ms) {
-            return ms->hasProperty(Qn::STATISTICS_REPORT_ALLOWED);
-        });
-    }
-
-    bool Ec2StaticticsReporter::isAllowed(const QnMediaServerResourceList &servers)
-    {
-        int overweight = 0;
-        for (const QnMediaServerResourcePtr &server: servers)
-        {
-            const auto allowedForServer = server->getProperty(Qn::STATISTICS_REPORT_ALLOWED);
-            if (!allowedForServer.isEmpty())
-                overweight += QnLexical::deserialized<bool>(allowedForServer) ? 1 : -1;
-        }
-
-        const bool allowed = (overweight >= 0);
-        NX_LOG(lit("Ec2StaticticsReporter::isAllowed = %1 (%2 of %3 overweight)")
-               .arg(allowed).arg(overweight).arg(servers.size()), cl_logDEBUG2);
-
-        return allowed;
-    }
-
-    bool Ec2StaticticsReporter::isAllowed(const AbstractMediaServerManagerPtr& msManager)
-    {
-        QnMediaServerResourceList msList;
-        if (msManager->getServersSync(QnUuid(), &msList) != ErrorCode::ok)
-            return false;
-        return isAllowed(msList);
-    }
-
-    void Ec2StaticticsReporter::setAllowed(const QnMediaServerResourceList &servers, bool value)
-    {
-        const QString serializedValue = QnLexical::serialized(value);
-        for (const QnMediaServerResourcePtr &server: servers)
-            server->setProperty(Qn::STATISTICS_REPORT_ALLOWED, serializedValue);
     }
 
     QnUserResourcePtr Ec2StaticticsReporter::getAdmin(const AbstractUserManagerPtr& manager)
@@ -222,7 +198,14 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        if (!isAllowed(m_msManager))
+        {   /* Security check */
+            const auto admin = qnResPool->getAdministrator();
+            Q_ASSERT_X(admin, Q_FUNC_INFO, "Administrator must exist here");
+            if (!admin) 
+                return;
+        }
+
+        if (!qnGlobalSettings->isStatisticsAllowed())
         {
             NX_LOG(lit("Ec2StaticticsReporter: Automatic report system is disabled"), cl_logINFO);
 

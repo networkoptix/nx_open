@@ -7,7 +7,7 @@
 #include <common/common_module.h>
 
 #include <utils/common/warnings.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 
 #include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
@@ -98,12 +98,19 @@ Qn::ActionVisibility QnVideoWallReviewModeCondition::check(const QnActionParamet
 bool QnPreviewSearchModeCondition::isPreviewSearchMode(const QnActionParameters &parameters) const {
     return
         parameters.scope() == Qn::SceneScope &&
-        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+        context()->workbench()->currentLayout()->isSearchLayout();
 }
 
 Qn::ActionVisibility QnPreviewSearchModeCondition::check(const QnActionParameters &parameters) {
     Q_UNUSED(parameters)
     if (m_hide == isPreviewSearchMode(parameters))
+        return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnForbiddenInSafeModeCondition::check(const QnActionParameters &parameters) {
+    Q_UNUSED(parameters)
+    if (qnCommon->isReadOnly())
         return Qn::InvisibleAction;
     return Qn::EnabledAction;
 }
@@ -126,6 +133,15 @@ QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *co
     m_conditions.append(condition1);
     m_conditions.append(condition2);
     m_conditions.append(condition3);
+}
+
+QnConjunctionActionCondition::QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QnActionCondition *condition4, QObject *parent):
+    QnActionCondition(parent)
+{
+    m_conditions.append(condition1);
+    m_conditions.append(condition2);
+    m_conditions.append(condition3);
+    m_conditions.append(condition4);
 }
 
 Qn::ActionVisibility QnConjunctionActionCondition::check(const QnActionParameters &parameters) {
@@ -488,13 +504,17 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
     if(!(Qn::NormalTimePeriod & period.type()))
         return Qn::DisabledAction;
 
-    if(m_centralItemRequired && !context()->workbench()->item(Qn::CentralRole))
-        return Qn::DisabledAction;
-
     // Export selection
     if (m_centralItemRequired) {
+        
+        const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
+        
+        /// If parameters contain periods it means we need current selected item
+        if (containsAvailablePeriods && !context()->workbench()->item(Qn::CentralRole))
+            return Qn::DisabledAction;
+
         QnResourcePtr resource = parameters.resource();
-        if(resource->flags() & Qn::sync) {
+        if(containsAvailablePeriods && resource && resource->flags().testFlag(Qn::sync)) {
             QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
             if(!periods.intersects(period))
                 return Qn::DisabledAction;
@@ -521,7 +541,10 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
         return Qn::DisabledAction;
 
     QnResourcePtr resource = parameters.resource();
-    if(resource->flags() & Qn::sync) {
+    if (!resource->flags().testFlag(Qn::live))
+        return Qn::InvisibleAction;
+
+    if(resource->flags().testFlag(Qn::sync)) {
         QnTimePeriodList periods = parameters.argument<QnTimePeriodList>(Qn::TimePeriodsRole);
         if(!periods.intersects(period))
             return Qn::DisabledAction;
@@ -549,7 +572,7 @@ Qn::ActionVisibility QnPreviewActionCondition::check(const QnActionParameters &p
     if (isPanoramic)
         return Qn::InvisibleAction;
 
-    if (context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole))
+    if (context()->workbench()->currentLayout()->isSearchLayout())
         return Qn::EnabledAction;
 
 #if 0
@@ -755,7 +778,7 @@ Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &
 Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters &parameters) {
     bool isPreviewSearchMode = 
         parameters.scope() == Qn::SceneScope &&
-        context()->workbench()->currentLayout()->data().contains(Qn::LayoutSearchStateRole);
+        context()->workbench()->currentLayout()->isSearchLayout();
     if (isPreviewSearchMode)
         return Qn::InvisibleAction;
     return QnActionCondition::check(parameters);
@@ -1089,6 +1112,29 @@ Qn::ActionVisibility QnIoModuleActionCondition::check(const QnResourceList &reso
 
     return pureIoModules ? Qn::EnabledAction : Qn::InvisibleAction;
 }
+
+Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResourceList &resources) {
+    bool found = false;
+
+    for (const QnResourcePtr &resource: resources) {
+        QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
+        if (!server)
+            return Qn::InvisibleAction;
+
+        if (!QnMediaServerResource::isFakeServer(resource))
+            return Qn::InvisibleAction;
+
+        if (server->getModuleInformation().ecDbReadOnly)
+            return Qn::InvisibleAction;
+
+        found = true;
+    }
+
+    return found 
+        ? Qn::EnabledAction 
+        : Qn::InvisibleAction;
+}
+
 
 Qn::ActionVisibility QnFakeServerActionCondition::check(const QnResourceList &resources) {
     bool found = false;

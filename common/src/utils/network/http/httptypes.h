@@ -6,6 +6,7 @@
 #ifndef HTTPTYPES_H
 #define HTTPTYPES_H
 
+#include <chrono>
 #include <cstring>
 #include <functional>
 #include <map>
@@ -220,6 +221,7 @@ namespace nx_http
             notAcceptable = 406,
             proxyAuthenticationRequired = 407,
             rangeNotSatisfiable = 416,
+            invalidParameter = 451,
             internalServerError = 500,
             notImplemented = 501,
             serviceUnavailable = 503
@@ -474,7 +476,7 @@ namespace nx_http
             AuthScheme::Value authScheme;
             QMap<BufferType, BufferType> params;
 
-            WWWAuthenticate();
+            WWWAuthenticate(AuthScheme::Value authScheme = AuthScheme::none);
 
             bool parse( const BufferType& str );
         };
@@ -574,6 +576,21 @@ namespace nx_http
                 \note In case of parse error, contents of this object are undefined
             */
             bool parse( const nx_http::StringType& strValue );
+            StringType toString() const;
+        };
+
+        class KeepAlive
+        {
+        public:
+            std::chrono::seconds timeout;
+            boost::optional<int> max;
+
+            KeepAlive();
+            KeepAlive(
+                std::chrono::seconds _timeout,
+                boost::optional<int> _max = boost::none);
+
+            bool parse(const nx_http::StringType& strValue);
             StringType toString() const;
         };
     }

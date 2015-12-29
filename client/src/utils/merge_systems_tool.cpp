@@ -10,7 +10,7 @@
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 #include "common/common_module.h"
-#include "utils/network/module_finder.h"
+#include "network/module_finder.h"
 #include "utils/common/log.h"
 #include "client/client_settings.h"
 #include "ui/workbench/workbench_context.h"
@@ -33,6 +33,8 @@ namespace {
             return QnMergeSystemsTool::BackupError;
         else if (str == lit("STARTER_LICENSE_ERROR"))
             return QnMergeSystemsTool::StarterLicenseError;
+        else if (str == lit("SAFE_MODE"))
+            return QnMergeSystemsTool::SafeModeError;
         else
             return QnMergeSystemsTool::InternalError;
     }
@@ -45,40 +47,45 @@ QnMergeSystemsTool::QnMergeSystemsTool(QObject *parent) :
 {
 }
 
-void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &user, const QString &password) {
+void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
+{
     if (!m_serverByRequestHandle.isEmpty())
         return;
 
     m_foundModule.first = NotFoundError;
 
-    foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
-        int handle = server->apiConnection()->pingSystemAsync(url, user, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr &server: onlineServers)
+    {
+        int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
         m_serverByRequestHandle[handle] = server;
         NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(url.toString()).arg(server->getApiUrl()), cl_logDEBUG1);
     }
 }
 
-int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password, bool ownSettings) {
+int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password, bool ownSettings)
+{
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
-    if (!ownSettings) {
+    if (!ownSettings && context()->user()->isAdmin())
+    {
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
-        m_password = password;
+        m_adminPassword = password;
     }
+
     NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl()).arg(url.toString()), cl_logDEBUG1);
-    return proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
-int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &user, const QString &password) {
+int QnMergeSystemsTool::configureIncompatibleServer(const QnMediaServerResourcePtr &proxy, const QUrl &url, const QString &password)
+{
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
-    return proxy->apiConnection()->mergeSystemAsync(url, user, password, currentPassword, true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
+    return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, true, true, true, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
 
-void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
+void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
+{
     QnMediaServerResourcePtr server = m_serverByRequestHandle.take(handle);
     if (!server)
         return;
@@ -87,13 +94,20 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 
     ErrorCode errorCode = (status == 0) ? errorStringToErrorCode(errorString) : InternalError;
 
-    if (errorCode == NoError || errorCode == StarterLicenseError) {
+    auto isOk = [](ErrorCode errorCode) { return errorCode == NoError || errorCode == StarterLicenseError; };
+
+    if (isOk(errorCode) && moduleInformation.ecDbReadOnly)
+        errorCode = ErrorCode::SafeModeError;
+
+    if (isOk(errorCode))
+    {
         m_serverByRequestHandle.clear();
         emit systemFound(moduleInformation, server, errorCode);
         return;
     }
 
-    if (errorCode != NotFoundError) {
+    if (errorCode != NotFoundError)
+    {
         m_foundModule.first = errorCode;
         m_foundModule.second = moduleInformation;
     }
@@ -102,16 +116,18 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
         emit systemFound(m_foundModule.second, QnMediaServerResourcePtr(), m_foundModule.first);
 }
 
-void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString) {
+void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
+{
     NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2").arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
 
-    if (status == 0 && errorString.isEmpty() && !m_password.isEmpty()) {
-        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_password);
+    if (status == 0 && errorString.isEmpty() && !m_adminPassword.isEmpty())
+    {
+        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_adminPassword);
         QUrl url = QnAppServerConnectionFactory::url();
-        url.setPassword(m_password);
+        url.setPassword(m_adminPassword);
         QnAppServerConnectionFactory::setUrl(url);
     }
-    m_password.clear();
+    m_adminPassword.clear();
     context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
     QnMergeSystemsTool::ErrorCode errCode = InternalError;

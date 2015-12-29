@@ -22,7 +22,8 @@ FocusScope {
 
             popup.hidden()
 
-            d.lastFocusedItem.forceActiveFocus()
+            if (Window.activeFocusItem == popup)
+                d.lastFocusedItem.forceActiveFocus()
         }
     }
 
@@ -56,6 +57,8 @@ FocusScope {
             showAnimation.start()
         else
             popup.shown()
+
+        forceActiveFocus()
     }
 
     function hide() {

@@ -27,14 +27,14 @@ public:
     virtual ~QnWorkbenchNotificationsHandler();
 
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
-    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnResourcePtr& resource);
+    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
 
 signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
     void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
 
-    void businessActionAdded(const QnAbstractBusinessActionPtr& businessAction);
-    void businessActionRemoved(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationAdded(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationRemoved(const QnAbstractBusinessActionPtr& businessAction);
     
     void cleared();
 
@@ -53,18 +53,18 @@ private slots:
     void at_emailSettingsChanged();
 
 private:
-    void addBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    void addNotification(const QnAbstractBusinessActionPtr& businessAction);
 
     /**
      * Check that system health message can be displayed to admins only.
      */
     bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, bool visible);
    // void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnActionParameters& actionParams, bool visible );
-    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible );
+    void setSystemHealthEventVisible( QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
 
-    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible );
+    void setSystemHealthEventVisibleInternal( QnSystemHealth::MessageType message, const QVariant& params, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 

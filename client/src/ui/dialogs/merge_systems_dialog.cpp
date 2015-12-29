@@ -127,8 +127,7 @@ void QnMergeSystemsDialog::at_urlComboBox_editingFinished() {
 void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     m_discoverer.clear();
     m_url.clear();
-    m_user.clear();
-    m_password.clear();
+    m_adminPassword.clear();
     updateConfigurationBlock();
 
     QUrl url = QUrl::fromUserInput(ui->urlComboBox->currentText());
@@ -147,9 +146,8 @@ void QnMergeSystemsDialog::at_testConnectionButton_clicked() {
     }
 
     m_url = url;
-    m_user = lit("admin");
-    m_password = password;
-    m_mergeTool->pingSystem(m_url, m_user, m_password);
+    m_adminPassword = password;
+    m_mergeTool->pingSystem(m_url, m_adminPassword);
     ui->buttonBox->showProgress(tr("Testing..."));
 }
 
@@ -162,7 +160,7 @@ void QnMergeSystemsDialog::at_mergeButton_clicked() {
     ui->configurationWidget->setEnabled(false);
     m_mergeButton->setEnabled(false);
 
-    m_mergeTool->mergeSystem(m_discoverer, m_url, m_user, m_password, ownSettings);
+    m_mergeTool->mergeSystem(m_discoverer, m_url, m_adminPassword, ownSettings);
     ui->buttonBox->showProgress(tr("Merging Systems..."));
 }
 
@@ -201,6 +199,9 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(const QnModuleInformation &m
     case QnMergeSystemsTool::VersionError:
         updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
         break;
+    case QnMergeSystemsTool::SafeModeError:
+        updateErrorLabel(tr("The discovered system %1 is in safe mode.").arg(moduleInformation.systemName));
+        break;
     default:
         updateErrorLabel(tr("The system was not found."));
         break;
@@ -227,7 +228,7 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             message = tr("The password is invalid.");
             break;
         case QnMergeSystemsTool::VersionError:
-            updateErrorLabel(tr("The discovered system %1 has an incompatible version %2.").arg(moduleInformation.systemName).arg(moduleInformation.version.toString()));
+            message = tr("System has an incompatible version.");
             break;
         case QnMergeSystemsTool::BackupError:
             message = tr("Could not create a backup of the server database.");
@@ -237,6 +238,9 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(int errorCode, const QnMod
             break;
         case QnMergeSystemsTool::ForbiddenError:
             message = tr("Operation is not permitted.");
+            break;
+        case QnMergeSystemsTool::SafeModeError:
+            message = tr("System is in safe mode.");
             break;
         default:
             break;

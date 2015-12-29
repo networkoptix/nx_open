@@ -14,11 +14,13 @@
     <name>HD Witness Ftp storage plugin</name>	
 
     <properties>
+        <guid>${ftpstorageplugin.guid}</guid>
         <product.title>${ftpstorageplugin.name}</product.title>	
         <libtype>plugin</libtype>
         <buildLib>sharedlib</buildLib>
         <!--Global libs-->
         <qt.libs>core</qt.libs>
+        <ffmpeg.libs></ffmpeg.libs>
         <global.libs/>
         <!--Specific os libs used-->
         <windows.oslibs/>

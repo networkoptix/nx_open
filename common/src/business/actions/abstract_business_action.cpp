@@ -25,6 +25,9 @@ namespace QnBusiness {
         case CameraOutputOnceAction:
         case BookmarkAction:
         case CameraRecordingAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return true;
 
         default:
@@ -45,12 +48,16 @@ namespace QnBusiness {
         case PlaySoundOnceAction:
         case PlaySoundAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowTextOverlayAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case SendMailAction:
             return true;
 
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
             return false;
         }
     }
@@ -64,6 +71,8 @@ namespace QnBusiness {
         case ShowPopupAction:
         case PlaySoundOnceAction:
         case SayTextAction:
+        case ExecutePtzPresetAction:
+        case ShowOnAlarmLayoutAction:
             return false;
 
         case CameraOutputAction:
@@ -71,11 +80,57 @@ namespace QnBusiness {
         case PanicRecordingAction:
         case PlaySoundAction:
         case BookmarkAction:
+        case ShowTextOverlayAction:
             return true;
 
         default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            break;
+        }
+        return false;
+    }
+
+    bool canBeInstant(ActionType actionType) {
+        if (!hasToggleState(actionType))
+            return true;
+
+        return supportsDuration(actionType);
+    }
+
+    bool supportsDuration(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return true;
+        default:
             return false;
         }
+    }
+
+    bool allowsAggregation(ActionType actionType) {
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return false;
+        default:
+            return true;
+        }
+    }
+
+    bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &parameters) {
+        if (!hasToggleState(actionType))
+            return false;
+
+        switch (actionType) {
+        case BookmarkAction:
+        case ShowTextOverlayAction:
+            return parameters.durationMs <= 0;
+
+        default:
+            break;
+        }
+
+        return true;
     }
 
     QList<ActionType> allActions() {
@@ -91,7 +146,11 @@ namespace QnBusiness {
             << ShowPopupAction
             << PlaySoundAction
             << PlaySoundOnceAction
-            << SayTextAction;
+            << SayTextAction
+            << ExecutePtzPresetAction
+            << ShowTextOverlayAction
+            << ShowOnAlarmLayoutAction            
+            ;
         return result;
     }
 }
@@ -107,6 +166,10 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType 
 
 QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {
+}
+
+QnBusiness::ActionType QnAbstractBusinessAction::actionType() const {
+    return m_actionType; 
 }
 
 void QnAbstractBusinessAction::setResources(const QVector<QnUuid>& resources) {
@@ -164,6 +227,10 @@ bool QnAbstractBusinessAction::isReceivedFromRemoteHost() const {
 int QnAbstractBusinessAction::getAggregationCount() const
 {
     return m_aggregationCount;
+}
+
+bool QnAbstractBusinessAction::isProlonged() const {
+    return QnBusiness::isActionProlonged(m_actionType, m_params);
 }
 
 void QnAbstractBusinessAction::setAggregationCount(int value)

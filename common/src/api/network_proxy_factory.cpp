@@ -7,9 +7,10 @@
 #include <core/resource/resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
-#include <network/authenticate_helper.h>
-#include <utils/network/router.h>
+#include <network/router.h>
 #include "http/custom_headers.h"
+#include "utils/common/synctime.h"
+#include "network/authutil.h"
 
 
 // -------------------------------------------------------------------------- //
@@ -40,13 +41,15 @@ QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourceP
         if (!proxy.user().isEmpty()) {
             Q_ASSERT( via );
             QUrlQuery urlQuery(url);
+            auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
             urlQuery.addQueryItem(
                 lit("proxy_auth"),
-                QLatin1String(QnAuthHelper::createHttpQueryAuthParam(
+                QLatin1String(createHttpQueryAuthParam(
                     proxy.user(),
                     proxy.password(),
                     via->realm(),
-                    nx_http::Method::GET )) );
+                    nx_http::Method::GET,
+                    nonce)));
             url.setQuery(urlQuery);
         }
 

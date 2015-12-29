@@ -2,9 +2,10 @@
 
 #include <QtCore/QUrlQuery>
 
+#include <api/global_settings.h>
 #include <nx_ec/ec_proto_version.h>
 
-#include "utils/network/tcp_connection_priv.h"
+#include "network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/api_full_info_data.h"
 #include "database/db_manager.h"
@@ -12,6 +13,7 @@
 #include "transaction/transaction_transport.h"
 #include "http/custom_headers.h"
 #include "audit/audit_manager.h"
+#include "settings.h"
 
 
 namespace ec2
@@ -76,6 +78,16 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
+    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    {
+        sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
+        return;
+    }
+
+    d->response.headers.emplace(
+        "Keep-Alive",
+        nx_http::header::KeepAlive(
+            QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
 
     if( d->request.requestLine.method == nx_http::Method::POST ||
         d->request.requestLine.method == nx_http::Method::PUT )
@@ -174,6 +186,11 @@ void QnTransactionTcpProcessor::run()
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
         }
+
+        d->response.headers.emplace(
+            "Keep-Alive",
+            nx_http::header::KeepAlive(
+                QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
     }
 
     QnUuid connectionGuid;

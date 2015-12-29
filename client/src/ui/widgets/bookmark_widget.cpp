@@ -4,10 +4,10 @@
 #include <core/resource/camera_bookmark.h>
 
 namespace {
-    const int defaultTimeoutIdx = 3;
+    const int defaultTimeoutIdx = 0;
 }
 
-QnBookmarkWidget::QnBookmarkWidget(QWidget *parent /*= 0*/):
+QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::BookmarkWidget)
 {
@@ -15,37 +15,35 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent /*= 0*/):
 
     connect(ui->tagsListLabel, &QLabel::linkActivated, this, [this](const QString &link) {
         if (m_selectedTags.contains(link))
-            m_selectedTags.removeOne(link);
+            m_selectedTags.remove(link);
         else
-            m_selectedTags.append(link.trimmed());
-        m_selectedTags.removeDuplicates();
-        ui->tagsLineEdit->setText(m_selectedTags.join(lit(", ")));
+            m_selectedTags.insert(link.trimmed());
+        ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(m_selectedTags));
         updateTagsList();
     });
 
-    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text) {
-        m_selectedTags = text.split(QRegExp(lit("[ ,]")), QString::SkipEmptyParts);
-        m_selectedTags.removeDuplicates();
+    connect(ui->tagsLineEdit, &QLineEdit::textEdited, this, [this](const QString &text)
+    {
+        m_selectedTags.clear();
+        for(auto &tag: text.split(L',', QString::SkipEmptyParts).toSet())
+            m_selectedTags.insert(tag.trimmed());
+
         updateTagsList();
     });
 
-    QDateTime start = QDateTime::fromMSecsSinceEpoch(0);
-    ui->timeoutComboBox->clear();
-    ui->timeoutComboBox->addItem(tr("Do not lock archive"), 0);
-    ui->timeoutComboBox->addItem(tr("1 month"), start.addMonths(1).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("3 month"), start.addMonths(3).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("6 month"), start.addMonths(6).toMSecsSinceEpoch());
-    ui->timeoutComboBox->addItem(tr("year"), start.addYears(1).toMSecsSinceEpoch());
-    ui->timeoutComboBox->setCurrentIndex(defaultTimeoutIdx);
+    // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
+    // Then change defaultTimeoutIdx constant value to '3'.
+    ui->timeoutComboBox->hide();
+    ui->timeoutLabel->hide();
 }
 
 QnBookmarkWidget::~QnBookmarkWidget() {}
 
-QnCameraBookmarkTags QnBookmarkWidget::tags() const {
+const QnCameraBookmarkTagList &QnBookmarkWidget::tags() const {
     return m_allTags;
 }
 
-void QnBookmarkWidget::setTags(const QnCameraBookmarkTags &tags) {
+void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
     m_allTags = tags;
     updateTagsList();
 }
@@ -66,8 +64,7 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     ui->timeoutComboBox->setCurrentIndex(timeoutIdx < 0 ? defaultTimeoutIdx : timeoutIdx);
 
     m_selectedTags = bookmark.tags;
-    m_selectedTags.removeDuplicates();
-    ui->tagsLineEdit->setText(m_selectedTags.join(lit(", ")));
+    ui->tagsLineEdit->setText(QnCameraBookmark::tagsToString(bookmark.tags));
 
     updateTagsList();
 }
@@ -85,11 +82,11 @@ void QnBookmarkWidget::updateTagsList() {
     QString usedTag = lit("<a style=\"text-decoration:none;\" href=\"%1\"><font style=\"color:#009933\">%1</font><\a><span style=\"text-decoration:none;\"> </span>");
 
     QString tags;
-    foreach(const QString &tag, m_allTags) {
-        if (m_selectedTags.contains(tag)) {
-            tags.append(usedTag.arg(tag));
+    foreach(const QnCameraBookmarkTag &tag, m_allTags) {
+        if (m_selectedTags.contains(tag.name)) {
+            tags.append(usedTag.arg(tag.name));
         } else {
-            tags.append(unusedTag.arg(tag));
+            tags.append(unusedTag.arg(tag.name));
         }
     }
 

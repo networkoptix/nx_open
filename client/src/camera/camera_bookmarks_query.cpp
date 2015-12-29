@@ -50,8 +50,8 @@ void QnCameraBookmarksQuery::setFilter(const QnCameraBookmarkSearchFilter &value
     emit queryChanged();
 }
 
-QnCameraBookmarkList QnCameraBookmarksQuery::executeLocal() const {
-    return qnCameraBookmarksManager->executeQueryLocal(toSharedPointer());
+QnCameraBookmarkList QnCameraBookmarksQuery::cachedBookmarks() const {
+    return qnCameraBookmarksManager->cachedBookmarks(toSharedPointer());
 }
 
 void QnCameraBookmarksQuery::executeRemoteAsync(BookmarksCallbackType callback) {

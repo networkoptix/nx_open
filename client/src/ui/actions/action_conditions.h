@@ -110,6 +110,14 @@ private:
     bool m_hide;
 };
 
+/** Condition class for actions, that are forbidden in safe mode. */
+class QnForbiddenInSafeModeCondition: public QnActionCondition {
+public:
+    QnForbiddenInSafeModeCondition(QObject *parent):
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 /**
  * Condition wich is a conjunction of two or more conditions.
  * It acts like logical AND, e.g. an action is enabled if the all conditions in the conjunction is true.
@@ -121,6 +129,7 @@ public:
     QnConjunctionActionCondition(const QList<QnActionCondition*> conditions, QObject *parent = NULL);
     QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QObject *parent = NULL);
     QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QObject *parent = NULL);
+    QnConjunctionActionCondition(QnActionCondition *condition1, QnActionCondition *condition2, QnActionCondition *condition3, QnActionCondition *condition4, QObject *parent = NULL);
 
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 
@@ -673,6 +682,14 @@ public:
     QnIoModuleActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 };
+
+class QnMergeToCurrentSystemActionCondition: public QnActionCondition {
+public:
+    QnMergeToCurrentSystemActionCondition(QObject *parent = NULL): QnActionCondition(parent) {}
+
+    virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
+};
+
 
 class QnFakeServerActionCondition: public QnActionCondition {
 public:

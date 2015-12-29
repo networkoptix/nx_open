@@ -6,6 +6,8 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
+
 #include <nx_ec/ec_proto_version.h>
 #include <utils/bsf/sized_data_decoder.h>
 #include <utils/common/timermanager.h>
@@ -26,10 +28,10 @@
 #include "core/resource/media_server_resource.h"
 #include "api/app_server_connection.h"
 #include "core/resource/user_resource.h"
-#include "api/global_settings.h"
 #include "database/db_manager.h"
 #include "http/custom_headers.h"
 #include "version.h"
+#include "settings.h"
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -111,6 +113,9 @@ void QnTransactionTransport::default_initializer()
     m_base64EncodeOutgoingTransactions = false;
     m_sentTranSequence = 0;
     m_waiterCount = 0;
+    m_tcpKeepAliveTimeout = QnGlobalSettings::instance()->connectionKeepAliveTimeout();
+    m_keepAliveProbeCount = QnGlobalSettings::instance()->keepAliveProbeCount();
+    m_idleConnectionTimeout = m_tcpKeepAliveTimeout * m_keepAliveProbeCount;
 }
 
 QnTransactionTransport::QnTransactionTransport(
@@ -132,7 +137,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_contentEncoding = contentEncoding;
     m_connectionGuid = connectionGuid;
 
-    if( !m_outgoingDataSocket->setSendTimeout( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE ) )
+    if( !m_outgoingDataSocket->setSendTimeout(m_idleConnectionTimeout.count()) )
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
         NX_LOG(QnLog::EC2_TRAN_LOG,
@@ -144,6 +149,16 @@ QnTransactionTransport::QnTransactionTransport(
     //TODO #ak use binary filter stream for serializing transactions
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
+
+    auto keepAliveHeaderIter = request.headers.find("Keep-Alive");
+    if (keepAliveHeaderIter != request.headers.end())
+    {
+        nx_http::header::KeepAlive keepAliveHeader;
+        if (keepAliveHeader.parse(keepAliveHeaderIter->second))
+            m_tcpKeepAliveTimeout = std::max(
+                std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
+                keepAliveHeader.timeout);
+    }
 
     if( m_connectionType == ConnectionType::bidirectional )
         m_incomingDataSocket = m_outgoingDataSocket;
@@ -473,7 +488,7 @@ void QnTransactionTransport::fillAuthInfo( const nx_http::AsyncHttpClientPtr& ht
         QUrl url = QnAppServerConnectionFactory::url();
         httpClient->setUserName(url.userName().toLower());
         if (dbManager) {
-            QnUserResourcePtr adminUser = QnGlobalSettings::instance()->getAdminUser();
+            QnUserResourcePtr adminUser = qnResPool->getAdministrator();
             if (adminUser) {
                 httpClient->setUserPassword(adminUser->getDigest());
                 httpClient->setAuthType(nx_http::AsyncHttpClient::authDigestWithPasswordHash);
@@ -493,8 +508,8 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
     setState(ConnectingStage1);
 
     m_httpClient = nx_http::AsyncHttpClient::create();
-    m_httpClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
-    m_httpClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
+    m_httpClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
+    m_httpClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
     connect(
         m_httpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
         this, &QnTransactionTransport::at_responseReceived,
@@ -513,6 +528,11 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
+    m_httpClient->addAdditionalHeader(
+        "Keep-Alive",
+        nx_http::header::KeepAlive(
+            std::chrono::duration_cast<std::chrono::seconds>(
+                m_tcpKeepAliveTimeout)).toString());
 
     QUrlQuery q;
     {
@@ -888,7 +908,7 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
     {
         assert( m_outgoingDataSocket );
         if( !m_outgoingDataSocket->registerTimer(
-                TCP_KEEPALIVE_TIMEOUT,
+                m_tcpKeepAliveTimeout.count(),
                 std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, 0) ) )
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("Error registering internal time. peer %1. Disconnecting...").
@@ -901,7 +921,7 @@ void QnTransactionTransport::startSendKeepAliveTimerNonSafe()
         //we using http client to send transactions
         m_sendKeepAliveTask = TimerManager::instance()->addTimer(
             std::bind(&QnTransactionTransport::sendHttpKeepAlive, this, std::placeholders::_1),
-            TCP_KEEPALIVE_TIMEOUT );
+            m_tcpKeepAliveTimeout.count());
     }
 }
 
@@ -980,7 +1000,7 @@ bool QnTransactionTransport::isHttpKeepAliveTimeout() const
 {
     QnMutexLocker lock( &m_mutex );
     return (m_lastReceiveTimer.isValid() &&  //if not valid we still have not begun receiving transactions
-         (m_lastReceiveTimer.elapsed() > TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE));
+         (m_lastReceiveTimer.elapsed() > m_idleConnectionTimeout.count()));
 }
 
 void QnTransactionTransport::serializeAndSendNextDataBuffer()
@@ -1082,8 +1102,8 @@ void QnTransactionTransport::serializeAndSendNextDataBuffer()
         if( !m_outgoingTranClient )
         {
             m_outgoingTranClient = nx_http::AsyncHttpClient::create();
-            m_outgoingTranClient->setSendTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
-            m_outgoingTranClient->setResponseReadTimeoutMs( TCP_KEEPALIVE_TIMEOUT * KEEPALIVE_MISSES_BEFORE_CONNECTION_FAILURE );
+            m_outgoingTranClient->setSendTimeoutMs(m_idleConnectionTimeout.count());
+            m_outgoingTranClient->setResponseReadTimeoutMs(m_idleConnectionTimeout.count());
             m_outgoingTranClient->addAdditionalHeader(
                 Qn::EC2_CONNECTION_GUID_HEADER_NAME,
                 m_connectionGuid.toByteArray() );
@@ -1307,6 +1327,16 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 m_incomingTransactionStreamParser,
                 nx_bsf::last( m_incomingTransactionStreamParser ),
                 std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
+        }
+
+        auto keepAliveHeaderIter = m_httpClient->response()->headers.find("Keep-Alive");
+        if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
+        {
+            nx_http::header::KeepAlive keepAliveHeader;
+            if (keepAliveHeader.parse(keepAliveHeaderIter->second))
+                m_tcpKeepAliveTimeout = std::max(
+                    std::chrono::duration_cast<std::chrono::seconds>(m_tcpKeepAliveTimeout),
+                    keepAliveHeader.timeout);
         }
 
         m_incomingDataSocket = m_httpClient->takeSocket();

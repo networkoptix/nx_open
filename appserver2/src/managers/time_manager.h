@@ -57,6 +57,8 @@
 
 namespace ec2
 {
+    struct ResourceContext;
+
     /*!
         \note \a sequence has less priority than \a TimeSynchronizationManager::peerIsServer and \a TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
     */
@@ -115,13 +117,6 @@ namespace ec2
         Q_OBJECT
 
     public:
-        //!Need this flag to synchronize by server peer only
-        static const int peerIsServer                            = 0x1000;
-        static const int peerTimeSynchronizedWithInternetServer  = 0x0008;
-        static const int peerTimeSetByUser                       = 0x0004;
-        static const int peerHasMonotonicClock                   = 0x0002;
-        static const int peerIsNotEdgeServer                     = 0x0001;
-
         /*!
             \note \a TimeSynchronizationManager::start MUST be called before using class instance
         */
@@ -140,6 +135,7 @@ namespace ec2
         
         //!Returns synchronized time (millis from epoch, UTC)
         qint64 getSyncTime() const;
+        ApiTimeData getTimeInfo() const;
         //!Called when primary time server has been changed by user
         void primaryTimeServerChanged( const QnTransaction<ApiIdData>& tran );
         void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
@@ -157,7 +153,8 @@ namespace ec2
         void processTimeSyncInfoHeader(
             const QnUuid& peerID,
             const nx_http::StringType& serializedTimeSync,
-            AbstractStreamSocket* sock );
+            boost::optional<qint64> requestRttMillis);
+        void setContext(const ResourceContext& resCtx);
 
     signals:
         //!Emitted when there is ambiguity while choosing primary time server automatically
@@ -202,6 +199,8 @@ namespace ec2
             nx_http::AuthInfoCache::AuthorizationCacheItem authData;
             TimerManager::TimerGuard syncTimerID;
             nx_http::AsyncHttpClientPtr httpClient;
+            //!request round-trip time 
+            boost::optional<qint64> rttMillis;
 
             PeerContext(
                 SocketAddress _peerAddress,
@@ -255,6 +254,7 @@ namespace ec2
         bool m_timeSynchronized;
         int m_internetSynchronizationFailureCount;
         std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
+        ResourceContext m_resCtx;
 
         /*!
             \param lock Locked \a m_mutex. This method will unlock it to emit \a TimeSynchronizationManager::timeChanged signal
@@ -292,7 +292,8 @@ namespace ec2
         void synchronizeWithPeer( const QnUuid& peerID );
         void timeSyncRequestDone(
             const QnUuid& peerID,
-            nx_http::AsyncHttpClientPtr clientPtr );
+            nx_http::AsyncHttpClientPtr clientPtr,
+            qint64 requestRttMillis);
         TimeSyncInfo getTimeSyncInfoNonSafe() const;
         void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
         void onBeforeSendingTransaction(
@@ -303,6 +304,7 @@ namespace ec2
             const nx_http::HttpHeaders& headers);
         void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
         void checkSystemTimeForChange();
+        void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
 
     private slots:
         void onNewConnectionEstablished(QnTransactionTransport* transport );

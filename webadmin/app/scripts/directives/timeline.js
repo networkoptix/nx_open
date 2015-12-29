@@ -133,6 +133,10 @@ angular.module('webadminApp')
                     end: 0
                 };
 
+
+
+
+
                 scope.timelineConfig = timelineConfig;
 
                 var rulerPreset = {
@@ -256,6 +260,7 @@ angular.module('webadminApp')
                 };
                 scope.selectPreset(scope.presets[3]);
 
+                scope.playbackNotSupported = window.jscd.mobile;
                 /**
                  * This is main timeline module.
                  *
@@ -921,6 +926,7 @@ angular.module('webadminApp')
                     if(scope.positionProvider.playedPosition > lastMinute && scope.positionProvider.playing){
                         scope.goToLive();
                     }
+
                     drawMarker(context, scope.positionProvider.playedPosition, timelineConfig.timeMarkerColor, timelineConfig.timeMarkerTextColor)
                 }
 
@@ -1275,9 +1281,10 @@ angular.module('webadminApp')
 
                 };
 
+                var dragged = false;
                 scope.draginit = function(event){
                     updateMouseCoordinate(event);
-
+                    dragged = false;
                     if(mouseOverLeftScrollButton){
                         scope.startScroll(true);
                         return;
@@ -1300,10 +1307,16 @@ angular.module('webadminApp')
 
                     if(catchScrollBar) {
                         var moveScroll = mouseInScrollbar - catchScrollBar;
+                        if(moveScroll !== 0 ){
+                            dragged = true;
+                        }
                         scope.scaleManager.scroll(scope.scaleManager.scroll() + moveScroll / scope.viewportWidth);
                     }
                     if(catchTimeline) {
                         var moveScroll = catchTimeline - mouseInTimeline;
+                        if(moveScroll !== 0 ){
+                            dragged = true;
+                        }
                         catchTimeline = mouseInTimeline;
                         scope.scaleManager.scrollByPixels(moveScroll);
                     }
@@ -1311,9 +1324,14 @@ angular.module('webadminApp')
                 scope.drastart = function(event){
                 };
                 scope.dragend = function(event){
+
                     catchScrollBar = false;
                     catchTimeline = false;
                     scope.scaleManager.releaseWatching();
+
+                    if(!dragged){
+                        return;
+                    }
 
                     preventClick = true;
                     setTimeout(function(){
@@ -1484,6 +1502,18 @@ angular.module('webadminApp')
                         scope.goToLive(true);
                     }
                 });
+
+                if(scope.positionProvider) {
+                    scope.playingTime = dateFormat(scope.positionProvider.playedPosition,timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                }
+                if(scope.playbackNotSupported) {
+                    scope.$watch('positionProvider.playedPosition', function (mode) {
+                        if(scope.positionProvider) {
+                            scope.playingTime = dateFormat(scope.positionProvider.playedPosition, timelineConfig.dateFormat + ' ' + timelineConfig.timeFormat);
+                        }
+                    });
+                }
+
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here

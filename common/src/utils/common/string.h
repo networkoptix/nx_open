@@ -54,21 +54,33 @@ inline QString datetimeSaveDialogSuggestion(const QDateTime& dt) {
         - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
         - date in ISO format (YYYY-MM-DDTHH:mm:ss)
         - special value "now". In this case \a DATETIME_NOW is returned
+        - negative value. In this case value returned "as is"
     \return usec since epoch
 */
-qint64 parseDateTime( const QString& dateTime );
+qint64 parseDateTime( const QString& dateTimeStr );
+
+
+/*!
+    \param dateTime Can be one of following:\n
+        - usec or millis since since 1971-01-01 (not supporting 1970 to be able to distinguish millis and usec)
+        - date in ISO format (YYYY-MM-DDTHH:mm:ss)
+        - special value "now". In this case \a DATETIME_NOW is returned
+        - negative value. In this case value returned "as is"
+    \return msec since epoch
+*/
+qint64 parseDateTimeMsec( const QString& dateTimeStr );
 
 /**
  * \param size                          File size to format. Can be negative.
  * \param precision                     Maximal number of decimal digits after comma.
- * \param prefixThreshold               
+ * \param prefixThreshold
  * \param minPrefix
  * \param maxPrefix
  * \param useBinaryPrefixes
- * \param pattern                       Pattern to use for result construction. 
+ * \param pattern                       Pattern to use for result construction.
  *                                      <tt>%1</tt> will be replaced with size in resulting units, and <tt>%2</tt> with unit name.
  */
-QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString pattern = QLatin1String("%1 %2"));
+QString formatFileSize(qint64 size, int precision = 1, int prefixThreshold = 1, Qn::MetricPrefix minPrefix = Qn::NoPrefix, Qn::MetricPrefix maxPrefix = Qn::YottaPrefix, bool useBinaryPrefixes = true, const QString &pattern = QLatin1String("%1 %2"));
 
 int naturalStringCompare(const QString &lhs, const QString &rhs, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive, bool enableFloat = false);
 QStringList naturalStringSort(const QStringList &list, Qt::CaseSensitivity caseSensitive = Qt::CaseSensitive);
@@ -92,5 +104,14 @@ QString generateUniqueString(const QStringList &usedStrings, const QString &defa
 void trimInPlace( QString* const str, const QString& symbols = QLatin1String(" ") );
 
 QString htmlBold(const QString &source);
+QString htmlFormattedParagraph(const QString &text
+    , int pixelSize
+    , bool isBold = false
+    , bool isItalic = false);
+
+
+QString elideString(const QString &source, int maxLength, const QString &tail = lit("..."));
+
+QString elideHtml(const QString &html, int maxLength, const QString &tail = lit("..."));
 
 #endif // QN_STRING_H

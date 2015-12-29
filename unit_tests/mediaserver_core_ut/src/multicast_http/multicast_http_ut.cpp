@@ -11,11 +11,12 @@
 #include <sstream>
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
+#include "media_server/serverutil.h"
 
 namespace
 {
     const QByteArray UT_SERVER_GUID("{9DBF7579-3235-4910-A66C-0EB5DE8C443B}");
-    const int MT_REQUESTS = 20;
+    const int MT_REQUESTS = 10;
 
 }
 
@@ -47,6 +48,39 @@ public:
         connect(&processor, &MediaServerProcess::started, this, [this]() { m_processorStarted = true; } );
     }
 
+    void setState(State value)
+    {
+        m_state = value;
+        QString stateName;
+        switch (m_state) {
+            case StateSingleTest:
+                stateName = lit("StateSingleTest");
+                break;
+            case StateAuthTest:
+                stateName = lit("StateAuthTest");
+                break;
+            case StateTimeoutTest:
+                stateName = lit("StateTimeoutTest");
+                break;
+            case StatePasswordlTest:
+                stateName = lit("StatePasswordlTest");
+                break;
+            case StateParralelTest:
+                stateName = lit("StateParralelTest");
+                break;
+            case StateParralelTestInProgress:
+                stateName = lit("StateParralelTestInProgress");
+                break;
+            case StateStopping:
+                stateName = lit("StateStopping");
+                break;
+            default:
+                stateName = lit("Unknown");
+                break;
+        }
+        qDebug() << "MulticastHttpTestWorker: goes to state: " << stateName;
+    }
+
     void doSingleTest()
     {
         QnMulticast::Request request;
@@ -67,7 +101,7 @@ public:
             ASSERT_TRUE(!d.isEmpty());
             m_runningRequestId = QUuid();
 
-            m_state = StateAuthTest;
+            setState(StateAuthTest);
         }, 3000);
     }
 
@@ -87,7 +121,7 @@ public:
             ASSERT_TRUE(response.httpResult == 401); // HTTP Unauthorized
             m_runningRequestId = QUuid();
 
-            m_state = StateTimeoutTest;
+            setState(StateTimeoutTest);
         }, 3000);
     }
 
@@ -97,7 +131,7 @@ public:
         ASSERT_TRUE(errCode == QnMulticast::ErrCode::timeout);
         m_runningRequestId = QUuid();
         if (++m_requests == 5)
-            m_state = StateParralelTest;
+            setState(StateParralelTest);
         else 
         {
             QnMulticast::Request request;
@@ -148,7 +182,7 @@ public:
             {
                 ASSERT_EQ(m_firstRequest, MT_REQUESTS);
                 m_processor.stopAsync();
-                m_state = StateStopping;
+                setState(StateStopping);
             }
             newPassword = QString::number(m_requests);
         };
@@ -157,7 +191,7 @@ public:
 
     void doParallelTest()
     {
-        m_state = StateParralelTestInProgress;
+        setState(StateParralelTestInProgress);
         m_firstRequest = 0;
         m_requests = 0;
         QnMulticast::Request request1;
@@ -179,14 +213,16 @@ public:
                 ASSERT_TRUE(!response.messageBody.isEmpty());
                 QJsonDocument d = QJsonDocument::fromJson(response.messageBody);
                 ASSERT_TRUE(!d.isEmpty());
-                if (response.messageBody.contains("\"flags\""))
+                if (response.messageBody.contains("\"serverFlags\""))
                     ++m_firstRequest;
-                if (++m_requests == MT_REQUESTS * 2) 
+                ++m_requests;
+                qDebug() << "doParallelTest(). completed: " << m_requests << "of" << MT_REQUESTS * 2;
+                if (m_requests == MT_REQUESTS * 2) 
                 {
                     ASSERT_EQ(m_firstRequest, MT_REQUESTS);
                     //m_processor.stopAsync();
                     m_requests = 0;
-                    m_state = StatePasswordlTest;
+                    setState(StatePasswordlTest);
                 }
             };
 
@@ -239,6 +275,8 @@ TEST(MulticastHttpTest, main)
     QScopedPointer<QnMediaServerModule> module(new QnMediaServerModule());
     MSSettings::roSettings()->setValue(lit("serverGuid"), UT_SERVER_GUID);
     MSSettings::roSettings()->setValue(lit("removeDbOnStartup"), lit("1"));
+    QString eventsDbName = MSSettings::roSettings()->value( "eventsDBFilePath", closeDirPath(getDataDirectory()) + QString(lit("mserver.sqlite")) ).toString();
+    QFile::remove(eventsDbName);
     MSSettings::roSettings()->setValue(lit("systemName"), QnUuid::createUuid().toString()); // random value
     MSSettings::roSettings()->setValue(lit("port"), 0);
     MediaServerProcess mserverProcessor(argc, argv);

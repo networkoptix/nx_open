@@ -1,29 +1,40 @@
 #include "custom_business_event.h"
 #include <utils/common/model_functions.h>
+#include "network/authutil.h"
+#include <business/actions/abstract_business_action.h>
 
 QnCustomBusinessEvent::QnCustomBusinessEvent(QnBusiness::EventState toggleState, 
                                              qint64 timeStamp, const 
                                              QString& resourceName, 
                                              const QString& caption, 
                                              const QString& description,
-                                             const QnEventMetaData& metadata):
+                                             QnEventMetaData metadata):
     base_type(QnBusiness::UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
     m_description(description),
-    m_metadata(metadata)
+    m_metadata(std::move(metadata))
 {
     
 }
 
-bool QnCustomBusinessEvent::checkCondition(QnBusiness::EventState state, const QnBusinessEventParameters &params) const {
-    bool stateOK =  state == QnBusiness::UndefinedState || state == getToggleState();
-    if (!stateOK)
-        return false;
+bool QnCustomBusinessEvent::isEventStateMatched(QnBusiness::EventState state, QnBusiness::ActionType actionType) const {
+    return state == QnBusiness::UndefinedState || state == getToggleState() || QnBusiness::hasToggleState(actionType);
+}
 
-    QStringList resourceNameKeywords = params.resourceName.split(L' ', QString::SkipEmptyParts);
-    QStringList captionKeywords      = params.caption.split(L' ', QString::SkipEmptyParts);
-    QStringList descriptionKeywords  = params.description.split(L' ', QString::SkipEmptyParts);
+bool QnCustomBusinessEvent::checkEventParams(const QnBusinessEventParameters &params) const 
+{
+    auto unquote = [](const QStringList& dataList) 
+    {
+        QStringList result;
+        for (const auto& data: dataList)
+            result << unquoteStr(data);
+        return result;
+    };
+
+    QStringList resourceNameKeywords = unquote(smartSplit(params.resourceName, L' ', QString::SkipEmptyParts));
+    QStringList captionKeywords      = unquote(smartSplit(params.caption, L' ', QString::SkipEmptyParts));
+    QStringList descriptionKeywords  = unquote(smartSplit(params.description, L' ', QString::SkipEmptyParts));
 
     auto mathKeywords = [](const QStringList& keywords, const QString& pattern) 
     {

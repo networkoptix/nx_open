@@ -71,6 +71,8 @@ public:
     //!true, if live stream requested. false if archive requested
     bool live() const;
 
+    bool mediaStreamParamsEqualTo(const StreamingChunkCacheKey& right) const;
+
     bool operator<( const StreamingChunkCacheKey& right ) const;
     bool operator>( const StreamingChunkCacheKey& right ) const;
     bool operator==( const StreamingChunkCacheKey& right ) const;

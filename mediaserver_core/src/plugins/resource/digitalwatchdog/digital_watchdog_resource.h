@@ -35,6 +35,7 @@ protected:
 
     virtual bool loadAdvancedParamsUnderLock(QnCameraAdvancedParamValueMap &values) override;
     virtual bool setAdvancedParameterUnderLock(const QnCameraAdvancedParameter &parameter, const QString &value) override;
+    virtual bool setAdvancedParametersUnderLock(const QnCameraAdvancedParamValueList &values, QnCameraAdvancedParamValueList &result) override;
 private:
     bool isDualStreamingEnabled(bool& unauth);
     void enableOnvifSecondStream();
@@ -43,7 +44,7 @@ private:
 private:
     bool m_hasZoom;
 
-    QScopedPointer<DWCameraProxy> m_cameraProxy;
+    QScopedPointer<DWAbstractCameraProxy> m_cameraProxy;
 };
 
 #endif //ENABLE_ONVIF

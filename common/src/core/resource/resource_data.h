@@ -29,6 +29,11 @@ public:
 
     void add(const QnResourceData &other);
 
+    bool contains(const QString &key) const
+    {
+        return m_dataByKey.contains(key);
+    }
+
 private:
     typedef void (*CopyFunction)(const void *src, void *dst);
 

@@ -6,7 +6,6 @@
 #include <business/actions/panic_business_action.h>
 #include <business/actions/recording_business_action.h>
 #include <business/actions/sendmail_business_action.h>
-#include <business/actions/bookmark_business_action.h>
 #include <business/actions/common_business_action.h>
 
 #include <core/resource/resource.h>
@@ -23,9 +22,6 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
 
 QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
     QnResourceList resList = qnResPool->getResources<QnResource>(rule->actionResources());
-    if (QnBusiness::requiresCameraResource(rule->actionType()) && resList.isEmpty())
-        return QnAbstractBusinessActionPtr(); //camera does not exist anymore
-    //TODO: #GDM #Business check resource type?
 
     QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
     runtimeParams.sourceServerId = qnCommon->moduleGUID();
@@ -68,15 +64,31 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::PlaySoundOnceAction:
         case QnBusiness::PlaySoundAction:
         case QnBusiness::SayTextAction:
-            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+            break;
 
         case QnBusiness::CameraOutputAction:        return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(false, runtimeParams));
         case QnBusiness::CameraOutputOnceAction:    return QnAbstractBusinessActionPtr(new QnCameraOutputBusinessAction(true, runtimeParams));
         case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
-        case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
+        
+        case QnBusiness::BookmarkAction:
+        case QnBusiness::ExecutePtzPresetAction:
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            break; 
+
         default: 
-            return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+            Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
+            break;
     }
+
+    return QnAbstractBusinessActionPtr(new QnCommonBusinessAction(actionType, runtimeParams));
+}
+
+QnAbstractBusinessActionPtr QnBusinessActionFactory::cloneAction(QnAbstractBusinessActionPtr action)
+{
+    QnAbstractBusinessActionPtr result = createAction(action->actionType(), action->getRuntimeParams());
+    *result = *action;
+    return result;
 }
