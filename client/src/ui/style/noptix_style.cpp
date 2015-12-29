@@ -742,4 +742,4 @@ qreal QnNoptixStyle::hoverProgress(const QStyleOption *option, const QWidget *wi
     }
 
     return progress;
-1}
+}
