@@ -20,6 +20,7 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     m_awaitJumpCounter(0),
     m_buffering(0),
     m_hurryUpToFrame(0),
+    m_lastMediaTimeUsec(AV_NOPTS_VALUE),
     m_noDelayState(NoDelayState::Disabled)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,   this, &PlayerDataConsumer::onBeforeJump,   Qt::DirectConnection);
@@ -47,6 +48,18 @@ int PlayerDataConsumer::getBufferingMask() const
 {
     // todo: not implemented yet. Reserver for future use for panoramic cameras
     return 1;
+}
+
+void PlayerDataConsumer::putData(const QnAbstractDataPacketPtr& data)
+{
+    if (data->timestamp != AV_NOPTS_VALUE && data->timestamp != DATETIME_NOW)
+        m_lastMediaTimeUsec = data->timestamp;
+    base_type::putData(data);
+}
+
+qint64 PlayerDataConsumer::lastMediaTimeUsec() const
+{
+    return m_lastMediaTimeUsec;
 }
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)

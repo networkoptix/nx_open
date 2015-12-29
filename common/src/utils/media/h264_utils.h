@@ -16,7 +16,7 @@
     Those are suitable for SDP
 */
 void extractSpsPps(
-    const QnCompressedVideoDataPtr& videoData,
+    const QnConstCompressedVideoDataPtr& videoData,
     QSize* const newResolution,
     std::map<QString, QString>* const customStreamParams);
 

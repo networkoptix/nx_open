@@ -15,12 +15,22 @@
 #error "Include proper header here!"
 #endif
 
+int QAbstractVideoBufferPrivate::map(
+    QAbstractVideoBuffer::MapMode mode,
+    int *numBytes,
+    int bytesPerLine[4],
+    uchar *data[4])
+{
+    data[0] = q_ptr->map(mode, numBytes, bytesPerLine);
+    return data[0] ? 1 : 0;
+}
+
 namespace nx
 {
 namespace media
 {
 
-class AlignedMemVideoBufferPrivate
+class AlignedMemVideoBufferPrivate : public QAbstractVideoBufferPrivate
 {
 public:
 	AlignedMemVideoBufferPrivate():
@@ -38,8 +48,9 @@ public:
 };
 
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
-	QAbstractVideoBuffer(NoHandle),
-	d_ptr(new AlignedMemVideoBufferPrivate())
+	//QAbstractVideoBuffer(NoHandle),
+	//d_ptr(new AlignedMemVideoBufferPrivate())
+    QAbstractVideoBuffer(*new AlignedMemVideoBufferPrivate(), NoHandle)
 {
 	Q_D(AlignedMemVideoBuffer);
 	d->data = (uchar*) qMallocAligned(size, alignFactor);

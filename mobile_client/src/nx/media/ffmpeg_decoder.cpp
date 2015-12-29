@@ -81,6 +81,7 @@ public:
 	AVFrame* frame;
 	SwsContext* scaleContext;
 	qint64 lastPTS;
+    QSize scaleContextSize;
 };
 
 void FfmpegDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& frame)
@@ -158,6 +159,8 @@ int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFra
 		// there is known a ffmpeg bug. It returns below time for the very last packet while flusing internal buffer.
 		// So, repeat this time for the empty packet in order to aviod the bug
 		avpkt.pts = avpkt.dts = d->lastPTS;
+        avpkt.data = nullptr;
+        avpkt.size = 0;
 	}
 
 	int gotData = 0;
@@ -173,8 +176,11 @@ void FfmpegDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
 {
     Q_D(FfmpegDecoder);
 
-    if (!d->scaleContext)
+    QSize size(d->frame->width, d->frame->height);
+    if (size != d->scaleContextSize)
     {
+        d->scaleContextSize = size;
+        sws_freeContext(d->scaleContext);
         d->scaleContext = sws_getContext(d->frame->width, d->frame->height, (PixelFormat) d->frame->format,
                                          d->frame->width, d->frame->height, PIX_FMT_BGRA,
                                          SWS_BICUBIC, NULL, NULL, NULL);

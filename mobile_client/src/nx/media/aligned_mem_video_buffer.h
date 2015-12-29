@@ -13,7 +13,7 @@ namespace nx
 		class AlignedMemVideoBuffer: public QAbstractVideoBuffer
 		{
 			Q_DECLARE_PRIVATE(AlignedMemVideoBuffer)
-			QScopedPointer<AlignedMemVideoBufferPrivate> d_ptr;
+			//QScopedPointer<AlignedMemVideoBufferPrivate> d_ptr;
 		public:
 			AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine);
 			~AlignedMemVideoBuffer();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <atomic>
 
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/video_data_packet.h>
@@ -28,6 +29,7 @@ namespace nx
 			virtual ~PlayerDataConsumer();
 
             QnVideoFramePtr dequeueVideoFrame();
+            qint64 lastMediaTimeUsec() const;
         signals:
             /* Hint to render to display current data with no delay due to seek operation in progress */
             void hurryUp();
@@ -44,6 +46,7 @@ namespace nx
 		protected:
 			virtual bool canAcceptData() const override;
 			virtual bool processData(const QnAbstractDataPacketPtr& data) override;
+            virtual void putData(const QnAbstractDataPacketPtr& data) override;
             virtual void pleaseStop() override;
         private:
             bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
@@ -63,6 +66,7 @@ namespace nx
             int m_awaitJumpCounter; //< how many jump requests are queued
             int m_buffering;        //< reserved for future use for panoramic cameras
             int m_hurryUpToFrame;   //< display all data with no delay till this number
+            std::atomic<qint64> m_lastMediaTimeUsec; //< UTC usec timestamp for the very last packet
             
             enum class NoDelayState
             {

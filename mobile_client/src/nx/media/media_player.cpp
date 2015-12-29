@@ -16,12 +16,19 @@
 #include "frame_metadata.h"
 
 namespace {
-	const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
-	const qint64 kLivePosition = -1;
+	static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
+	static const qint64 kLivePosition = -1;
+    static const int kMaxDelayForResyncMs = 200; //< resync playback timer if video frame late
+    static const int kMaxLiveBufferMs = 200; //< maximum durartion for live buffer
 
-    qint64 msecToUsec(qint64 posMs)
+    static qint64 msecToUsec(qint64 posMs)
     {
         return posMs == kLivePosition ? DATETIME_NOW : posMs * 1000ll;
+    }
+
+    static qint64 usecToMsec(qint64 posUsec)
+    {
+        return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
     }
 }
 
@@ -211,7 +218,10 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 		if (!lastVideoPts.is_initialized() ||                                    //< first time
             !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
             metadata.noDelay                                                 ||  //< jump occurred
-            pts < lastSeekTimeMs)                                                //< 'coarse' frame. Frame time is less than required jump pos
+            pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
+            pts - ptsTimerBase < -kMaxDelayForResyncMs                       ||    //< resync because of video frame is late more than threshold
+            (liveMode && usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts > kMaxLiveBufferMs) //< live buffer overflow
+            )
 		{
 			// Reset timer
 			lastVideoPts = ptsTimerBase = pts;
@@ -249,7 +259,6 @@ bool PlayerPrivate::initDataProvider()
     dataConsumer->start();
     archiveReader->start();
 
-    archiveReader->open();
     return true;
 }
 
@@ -322,6 +331,7 @@ void Player::play()
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
     
+    d->lastVideoPts.reset();
     d->at_gotVideoFrame(); //< renew receiving frames
 }
 
