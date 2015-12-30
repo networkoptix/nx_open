@@ -49,8 +49,7 @@ private:
     QnCompressedVideoDataPtr createVideoData(
         const quint8            *rtpBuffer,
         quint32                 rtpTime,
-        const RtspStatistic     &statistics,
-        int                     addHeaderSize
+        const RtspStatistic     &statistics
     );
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine

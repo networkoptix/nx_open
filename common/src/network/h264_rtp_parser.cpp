@@ -158,14 +158,21 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
 QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
     const quint8            *rtpBuffer,
     quint32                 rtpTime,
-    const RtspStatistic     &statistics,
-    int                     addHeaderSize
+    const RtspStatistic     &statistics
 )
 {
+    int addHeaderSize = 0;
+    if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
+        addHeaderSize = getSpsPpsSize();
+
+    int totalSize = m_videoFrameSize + addHeaderSize;
+    if (totalSize > MAX_ALLOWED_FRAME_SIZE)
+        return QnCompressedVideoDataPtr();
+
     QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(
         new QnWritableCompressedVideoData(
             CL_MEDIA_ALIGNMENT,
-            m_videoFrameSize + addHeaderSize
+            totalSize
         )
     );
     result->compressionType = CODEC_ID_H264;
@@ -269,16 +276,13 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
 
     bool isPacketLost = m_prevSequenceNum != -1 && quint16(m_prevSequenceNum) != quint16(sequenceNum-1);
     
-    auto checkVideoFrameSizeFailed = [&isPacketLost, this](int addHeaderSize)
+    if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
-        if (m_videoFrameSize + addHeaderSize > MAX_ALLOWED_FRAME_SIZE)
-        {
-            NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
-            clearInternalBuffer();
-            isPacketLost = true;
-        }
-        return isPacketLost;
-    };
+        NX_LOG("Too large RTP/H.264 frame. Truncate video buffer", cl_logWARNING);
+        clearInternalBuffer();
+        isPacketLost = true;
+    }
+    return isPacketLost;
 
     auto processPacketLost = [this, sequenceNum]()
     {
@@ -293,7 +297,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
     };
 
-    if (checkVideoFrameSizeFailed(0))
+    if (isPacketLost)
         processPacketLost();
 
     m_prevSequenceNum = sequenceNum;
@@ -392,17 +396,6 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             break; // ignore unknown data
     }
 
-    int addHeaderSize = 0;
-    if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
-        addHeaderSize = getSpsPpsSize();
-
-    if (checkVideoFrameSizeFailed(addHeaderSize))
-    {
-        processPacketLost();
-        m_prevSequenceNum = sequenceNum;
-        return false;
-    }
-
     if (isPacketLost && !m_keyDataExists)
         return clearInternalBuffer();
 
@@ -410,9 +403,13 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         m_mediaData = createVideoData(
             rtpBufferBase,
             ntohl(rtpHeader->timestamp),
-            statistics,
-            addHeaderSize
+            statistics
         ); // last packet
+        if (!m_mediaData)
+        {
+            processPacketLost();
+            return false;
+        }
         gotData = true;
     }
     return true;
