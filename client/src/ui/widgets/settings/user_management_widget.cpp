@@ -148,19 +148,6 @@ void QnUserManagementWidget::updateSelection() {
         return accessController()->hasPermissions(user, Qn::RemovePermission) 
             && !user->isAdmin();
     }));
-
-    QColor normalColor = this->palette().color(QPalette::Window);
-
-    /* Here all children palette will be overwritten, so restoring it manually. */
-    setPaletteColor(ui->backgroundWidget, QPalette::Window, selectionActive 
-        ? m_colors.selectionBackground 
-        : normalColor);
-
-    for (QPushButton* button: ui->selectionPage->findChildren<QPushButton*>(QString(), Qt::FindDirectChildrenOnly)) {
-        setPaletteColor(button, QPalette::Window, normalColor);       
-        setPaletteColor(button, QPalette::Disabled, QPalette::WindowText, m_colors.disabledButtonsText);
-    }
-    setPaletteColor(m_header, QPalette::Window, normalColor);
     
     update();
 }

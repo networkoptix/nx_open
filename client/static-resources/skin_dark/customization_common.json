@@ -124,6 +124,15 @@
         }
     },
     
+    "QFrame": {
+        "palette": {
+            "default": {
+                "mid": "dark7",
+                "dark": "dark5"
+            }
+        }
+    },
+
     "QAbstractButton": {
         "palette": {
             "default": {

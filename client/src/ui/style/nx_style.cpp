@@ -147,8 +147,11 @@ QnNxStylePrivate::QnNxStylePrivate() :
 
 QnNxStyle::QnNxStyle() {}
 
-void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
-    switch (element) {
+void QnNxStyle::drawPrimitive(
+        PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+{
+    switch (element)
+    {
     case PE_FrameFocusRect:
         return;
     case PE_PanelButtonTool:
@@ -612,7 +615,27 @@ void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionCom
 }
 
 void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
-    switch (element) {
+    switch (element)
+    {
+    case CE_ShapedFrame:
+        if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame *>(option))
+        {
+            switch (frame->frameShape)
+            {
+            case QFrame::HLine:
+                {
+                    painter->setPen(frame->palette.color(QPalette::Dark));
+                    painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
+                    painter->setPen(frame->palette.color(QPalette::Mid));
+                    painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
+                                      frame->rect.right(), frame->rect.top() + 1);
+                }
+                return;
+            default:
+                break;
+            }
+        }
+        break;
     case CE_ComboBoxLabel:
         if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
             QStyleOptionComboBox opt = *comboBox;
