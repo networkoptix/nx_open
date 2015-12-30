@@ -621,9 +621,9 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         break;
     case CE_CheckBox:
     case CE_RadioButton:
-        if (const QStyleOptionButton *checkBox = qstyleoption_cast<const QStyleOptionButton*>(option))
+        if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton*>(option))
         {
-            QStyleOptionButton opt = *checkBox;
+            QStyleOptionButton opt = *button;
 
             QColor color = opt.palette.color(QPalette::Light);
 
@@ -634,7 +634,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             }
             else if (opt.state & State_On || opt.state & State_NoChange)
             {
-                if (opt.state & State_MouseOver)
+                if (element != CE_RadioButton && opt.state & State_MouseOver)
                     color = opt.palette.color(QPalette::BrightText);
                 else
                     color = opt.palette.color(QPalette::Text);
