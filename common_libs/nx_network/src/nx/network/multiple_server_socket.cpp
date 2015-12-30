@@ -122,7 +122,7 @@ AbstractSocket::SOCKET_HANDLE MultipleServerSocket::handle() const
 
 aio::AbstractAioThread* MultipleServerSocket::getAioThread()
 {
-    aio::AbstractAioThread* first;
+    aio::AbstractAioThread* first(nullptr);
     for (auto& socket : m_serverSockets)
     {
         const auto value = socket->getAioThread();
