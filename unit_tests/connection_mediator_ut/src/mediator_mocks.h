@@ -40,7 +40,7 @@ public:
                                     std::function< void( SocketAddress, bool ) > ) );
 
     MediaserverApiMock( AbstractCloudDataProvider* cloudData,
-                        stun::MessageDispatcher* dispatcher )
+                        nx::stun::MessageDispatcher* dispatcher )
         : MediaserverApiBase( cloudData, dispatcher ) {}
 
     inline

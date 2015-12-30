@@ -5,7 +5,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 
 #include "cloud_data_provider.h"
-#include "stun_request_processing_helper.h"
+#include "server/stun_request_processing_helper.h"
 
 
 namespace nx {
@@ -28,7 +28,7 @@ protected:
     /** Returns mediaserver data from \a request,
      *  sends \fn errorResponse in case of failure */
     boost::optional< MediaserverData > getMediaserverData(
-            ConnectionSharedPtr connection, stun::Message& request );
+            ConnectionStrongRef connection, stun::Message& request );
 
 private:
     AbstractCloudDataProvider* m_cloudData;

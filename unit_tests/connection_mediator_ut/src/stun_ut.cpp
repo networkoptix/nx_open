@@ -27,7 +27,10 @@ protected:
         : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
         , mediaserverApi( &cloudData, &stunMessageDispatcher )
         , listeningPeerPool( &cloudData, &stunMessageDispatcher )
-        , server( false, SocketFactory::NatTraversalType::nttDisabled )
+        , server(
+            stunMessageDispatcher,
+            false,
+            SocketFactory::NatTraversalType::nttDisabled )
     {
         EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
         EXPECT_TRUE( server.listen() );
@@ -111,7 +114,7 @@ TEST_F( StunCustomTest, BindConnect )
     {
         stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
+        request.newAttribute< stun::cc::attrs::HostName >(SERVER_ID+"."+SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );

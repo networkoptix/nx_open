@@ -92,10 +92,10 @@ public:
     bool setSendTimeout( unsigned int ms );
     //!Implementation of Pollable::getLastError
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
-    //!Implementation of AbstractSocket::postImpl
-    void post( std::function<void()>&& handler );
-    //!Implementation of AbstractSocket::dispatchImpl
-    void dispatch( std::function<void()>&& handler );
+    //!Implementation of AbstractSocket::post
+    void post( std::function<void()> handler );
+    //!Implementation of AbstractSocket::dispatch
+    void dispatch( std::function<void()> handler );
 
     /**
      *   Get the local port
@@ -183,14 +183,22 @@ public:
     virtual SocketAddress getForeignAddress() const;
     //!Implementation of AbstractCommunicatingSocket::isConnected
     bool isConnected() const;
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler );
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler );
+    //!Implementation of AbstractCommunicatingSocket::connectAsync
+    void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler );
+    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
+    void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler );
+    //!Implementation of AbstractCommunicatingSocket::sendAsync
+    void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler );
+    //!Implementation of AbstractCommunicatingSocket::registerTimer
+    void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler );
     //!Implementation of AbstractCommunicatingSocket::cancelAsyncIO
     void cancelIOAsync(
         aio::EventType eventType,
@@ -276,15 +284,17 @@ public:
     static int accept(int sockDesc);
 
     //!Implementation of AbstractStreamServerSocket::listen
-    virtual bool listen( int queueLen ) override;
+    virtual bool listen(int queueLen) override;
     //!Implementation of AbstractStreamServerSocket::accept
     virtual AbstractStreamSocket* accept() override;
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override;
+    virtual void pleaseStop(std::function< void() > handler) override;
 
-protected:
-    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) override;
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
+    virtual void acceptAsync(
+        std::function<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
 
 private:
     bool setListen(int queueLen);
@@ -351,6 +361,11 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignEndpoint ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendToAsync
+    virtual void sendToAsync(
+        const nx::Buffer& buf,
+        const SocketAddress& foreignAddress,
+        std::function<void(SystemError::ErrorCode, size_t)> completionHandler) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port
@@ -361,6 +376,10 @@ public:
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress ) override;
+    //!Implementation of AbstractDatagramSocket::recvFromAsync
+    virtual void recvFromAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler) override;
     //!Implementation of AbstractDatagramSocket::lastDatagramSourceAddress
     virtual SocketAddress lastDatagramSourceAddress() const override;
     //!Implementation of AbstractDatagramSocket::hasData

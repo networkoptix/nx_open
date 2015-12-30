@@ -39,6 +39,9 @@ public:
     CommonSocketImpl<UdtSocket>* impl();
     const CommonSocketImpl<UdtSocket>* impl() const;
 
+    aio::AbstractAioThread* getAioThread();
+    void bindToAioThread(aio::AbstractAioThread* aioThread);
+
 protected:
     UdtSocket( detail::UdtSocketImpl* impl );
     detail::UdtSocketImpl* m_impl;
@@ -79,6 +82,8 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const override;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const override;
     virtual AbstractSocket::SOCKET_HANDLE handle() const override;
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
     // AbstractCommunicatingSocket ------- interface
     virtual bool connect(
         const SocketAddress& remoteAddress,
@@ -119,20 +124,26 @@ public:
         Q_UNUSED(result);
         return false; // not implemented yet
     }
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void(SystemError::ErrorCode)> handler) override;
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
+    virtual void registerTimer(
+        unsigned int timeoutMillis,
+        std::function<void()> handler) override;
 
-protected:
-    //!Implementation of AbstractSocket::postImpl
-    virtual void postImpl( std::function<void()>&& handler ) override;
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual void dispatchImpl( std::function<void()>&& handler ) override;
+    //!Implementation of AbstractSocket::post
+    virtual void post( std::function<void()> handler ) override;
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch( std::function<void()> handler ) override;
 
 private:
     std::unique_ptr<AsyncSocketImplHelper<UdtSocket>> m_aioHelper;
-
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    virtual void registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) override;
 
 private:
     Q_DISABLE_COPY(UdtStreamSocket)
@@ -171,13 +182,14 @@ public:
     virtual bool getSendTimeout( unsigned int* millis ) const;
     virtual bool getLastError( SystemError::ErrorCode* errorCode ) const;
     virtual AbstractSocket::SOCKET_HANDLE handle() const;
+    virtual aio::AbstractAioThread* getAioThread() override;
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
 
-protected:
-    //!Implementation of AbstractSocket::postImpl
-    virtual void postImpl( std::function<void()>&& handler ) override;
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual void dispatchImpl( std::function<void()>&& handler ) override;
-    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) ;
+    //!Implementation of AbstractSocket::post
+    virtual void post( std::function<void()> handler ) override;
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch( std::function<void()> handler ) override;
+    virtual void acceptAsync( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )> handler ) ;
 
 private:
     std::unique_ptr<AsyncServerSocketHelper<UdtSocket>> m_aioHelper;

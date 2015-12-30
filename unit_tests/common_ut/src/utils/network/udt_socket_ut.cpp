@@ -134,3 +134,8 @@ TEST(SocketUdt, SimpleTrueAsync)
     socketSimpleTrueAsync(&std::make_unique<UdtStreamServerSocket>,
                           &std::make_unique<UdtStreamSocket>);
 }
+
+TEST(SocketUdt, SingleAioThread)
+{
+    socketSingleAioThread(&std::make_unique<UdtStreamSocket>);
+}

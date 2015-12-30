@@ -111,6 +111,8 @@ public:
 
     void terminate()
     {
+        //this method is to cancel all asynchronous operations when called socket's within aio thread
+
         this->terminateAsyncIO();
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
@@ -119,12 +121,9 @@ public:
         {
             nx::network::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
 
-            if( m_connectSendHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
-            if( m_recvHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
-            if( m_timerHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
             //TODO #ak not sure whether this call always necessary
             nx::network::SocketGlobals::aioService().cancelPostedCalls( this->m_socket );
         }
@@ -138,7 +137,7 @@ public:
         }
     }
 
-    void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+    void connectAsync( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
     {
         //TODO with UDT we have to maintain pollset.add(socket), socket.connect, pollset.poll pipeline
 
@@ -218,7 +217,7 @@ public:
             this );
     }
 
-    void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void readSomeAsync( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -239,7 +238,7 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etRead, this );
     }
 
-    void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+    void sendAsync( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -263,7 +262,7 @@ public:
         nx::network::SocketGlobals::aioService().watchSocketNonSafe( &lk, this->m_socket, aio::etWrite, this );
     }
 
-    void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+    void registerTimer( unsigned int timeoutMs, std::function<void()> handler )
     {
         if( this->m_socket->impl()->terminated.load( std::memory_order_relaxed ) > 0 )
             return;
@@ -723,7 +722,7 @@ public:
 
         QnMutexLocker lk( nx::network::SocketGlobals::aioService().mutex() );
         ++m_acceptAsyncCallCount;
-        //TODO: #ak usually acceptAsyncImpl is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
+        //TODO: #ak usually acceptAsync is called repeatedly. SHOULD avoid unneccessary watchSocket and removeFromWatch calls
         return nx::network::SocketGlobals::aioService().watchSocketNonSafe(&lk, m_sock, aio::etRead, this);
     }
 

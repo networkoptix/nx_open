@@ -12,11 +12,15 @@
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 
+#include <nx/utils/log/log.h>
+#include <nx/network/socket_global.h>
+#include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/http/server/http_stream_socket_server.h>
+#include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/stun/udp_server.h>
 #include <platform/process/current_process.h>
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/log/log.h>
 #include <utils/common/systemerror.h>
-#include <nx/network/socket_global.h>
 
 #include "listening_peer_pool.h"
 #include "mediaserver_api.h"
@@ -62,7 +66,7 @@ int MediatorProcess::executeApplication()
     if (settings.http().addrToListenList.empty())
     {
         NX_LOG( "No HTTP address to listen", cl_logERROR );
-        return 1;
+        return 2;
     }
 
     TimerManager timerManager;
@@ -81,29 +85,45 @@ int MediatorProcess::executeApplication()
     }
 
     //STUN handlers
-    stun::MessageDispatcher stunMessageDispatcher;
+    nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
     ListeningPeerPool listeningPeerPool(cloudDataProvider.get(), &stunMessageDispatcher);
 
     //accepting STUN requests by both tcp and udt
-    m_multiAddressStunServer.reset(
-        new MultiAddressServer<stun::SocketServer>( false, SocketFactory::NatTraversalType::nttDisabled ) );
-
-    if (!m_multiAddressStunServer->bind(settings.stun().addrToListenList))
+    MultiAddressServer<stun::SocketServer> tcpStunServer(
+        stunMessageDispatcher,
+        false,
+        SocketFactory::NatTraversalType::nttDisabled);
+    if (!tcpStunServer.bind(settings.stun().addrToListenList))
     {
-        NX_LOG(lit("Can not bind to %1")
+        NX_LOG(lit("Can not bind to TCP addresses: %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-        return 2;
+        return 3;
+    }
+
+    MultiAddressServer<stun::UDPServer> udpStunServer(stunMessageDispatcher);
+    if (!udpStunServer.bind(settings.stun().addrToListenList))
+    {
+        NX_LOG(lit("Can not bind to UDP addresses: %1")
+            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+        return 4;
     }
 
     // process privilege reduction
     CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
 
-    if (!m_multiAddressStunServer->listen())
+    if (!tcpStunServer.listen())
     {
-        NX_LOG(lit("Can not listen on %1")
+        NX_LOG(lit("Can not listen on TCP addresses %1")
             .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
-        return 3;
+        return 5;
+    }
+
+    if (!udpStunServer.listen())
+    {
+        NX_LOG(lit("Can not listen on UDP addresses %1")
+            .arg(containerString(settings.stun().addrToListenList)), cl_logERROR);
+        return 6;
     }
 
     NX_LOG(lit("STUN Server is listening on %1")
@@ -115,7 +135,6 @@ int MediatorProcess::executeApplication()
     const int result = application()->exec();
 
     //stopping accepting incoming connections
-    m_multiAddressStunServer.reset();
 
     return result;
 }

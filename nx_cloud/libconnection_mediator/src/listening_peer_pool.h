@@ -17,6 +17,11 @@
 
 
 namespace nx {
+
+namespace stun {
+class MessageDispatcher;
+}
+
 namespace hpm {
 
 //!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
@@ -29,29 +34,35 @@ class ListeningPeerPool
 {
 public:
     ListeningPeerPool( AbstractCloudDataProvider* cloudData,
-                       stun::MessageDispatcher* dispatcher );
+                       nx::stun::MessageDispatcher* dispatcher );
 
-    void bind(const ConnectionSharedPtr& connection, stun::Message message);
-    void listen(const ConnectionSharedPtr& connection, stun::Message message);
+    void bind(
+        const ConnectionStrongRef& connection,
+        stun::Message message);
+    void listen(
+        const ConnectionStrongRef& connection,
+        stun::Message message);
     void resolve(
-        ConnectionSharedPtr connection,
+        const ConnectionStrongRef& connection,
         api::ResolveRequest request,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
-    void connect(const ConnectionSharedPtr& connection, stun::Message message);
+    void connect(
+        const ConnectionStrongRef& connection,
+        stun::Message message);
 
     void connectionResult(
-        ConnectionSharedPtr connection,
+        const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
         std::function<void(api::ResultCode)> completionHandler);
 
 protected:
     struct MediaserverPeer
     {
-        ConnectionWeakPtr connection;
+        ConnectionWeakRef connection;
         std::list< SocketAddress > endpoints;
         bool isListening;
 
-        MediaserverPeer( ConnectionWeakPtr connection_ );
+        MediaserverPeer( ConnectionWeakRef connection_ );
         MediaserverPeer( MediaserverPeer&& peer );
     };
 
@@ -59,7 +70,7 @@ protected:
     {
     public:
         boost::optional< MediaserverPeer& > peer(
-                ConnectionWeakPtr connection,
+                ConnectionWeakRef connection,
                 const RequestProcessor::MediaserverData& mediaserver,
                 QnMutex* mutex );
 

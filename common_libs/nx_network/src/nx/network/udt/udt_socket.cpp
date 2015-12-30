@@ -553,6 +553,16 @@ const CommonSocketImpl<UdtSocket>* UdtSocket::impl() const
     return m_impl;
 }
 
+aio::AbstractAioThread* UdtSocket::getAioThread()
+{
+    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
+}
+
+void UdtSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
+}
+
 // =====================================================================
 // UdtStreamSocket implementation
 // =====================================================================
@@ -693,34 +703,60 @@ void UdtStreamSocket::cancelIOAsync(
                                       std::move(cancellationDoneHandler));
 }
 
-void UdtStreamSocket::postImpl( std::function<void()>&& handler )
+void UdtStreamSocket::post( std::function<void()> handler )
 {
-    nx::network::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().post(
+        static_cast<UdtSocket*>(this),
+        std::move(handler) );
 }
 
-void UdtStreamSocket::dispatchImpl( std::function<void()>&& handler )
+void UdtStreamSocket::dispatch( std::function<void()> handler )
 {
-    nx::network::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().dispatch(
+        static_cast<UdtSocket*>(this),
+        std::move(handler) );
 }
 
-void UdtStreamSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) {
-    return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
+void UdtStreamSocket::connectAsync(
+    const SocketAddress& addr,
+    std::function<void( SystemError::ErrorCode )> handler )
+{
+    return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
 
-void UdtStreamSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-    return m_aioHelper->recvAsyncImpl(buf, std::move(handler));
+void UdtStreamSocket::readSomeAsync(
+    nx::Buffer* const buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
+{
+    return m_aioHelper->readSomeAsync(buf, std::move(handler));
 }
 
-void UdtStreamSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) {
-    return m_aioHelper->sendAsyncImpl(buf, std::move(handler));
+void UdtStreamSocket::sendAsync(
+    const nx::Buffer& buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
+{
+    return m_aioHelper->sendAsync(buf, std::move(handler));
 }
 
-void UdtStreamSocket::registerTimerImpl( unsigned int timeoutMillis, std::function<void()>&& handler ) {
-    return m_aioHelper->registerTimerImpl(timeoutMillis, std::move(handler));
+void UdtStreamSocket::registerTimer(
+    unsigned int timeoutMillis,
+    std::function<void()> handler ) 
+{
+    return m_aioHelper->registerTimer(timeoutMillis, std::move(handler));
 }
 
 AbstractSocket::SOCKET_HANDLE UdtStreamSocket::handle() const {
     return m_impl->handle();
+}
+
+aio::AbstractAioThread* UdtStreamSocket::getAioThread()
+{
+    return UdtSocket::getAioThread();
+}
+
+void UdtStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    UdtSocket::bindToAioThread(aioThread);
 }
 
 UdtStreamSocket::UdtStreamSocket( bool natTraversal )
@@ -862,22 +898,40 @@ bool UdtStreamServerSocket::getLastError( SystemError::ErrorCode* errorCode ) co
     return m_impl->GetLastError(errorCode);
 }
 
-void UdtStreamServerSocket::postImpl( std::function<void()>&& handler )
+void UdtStreamServerSocket::post( std::function<void()> handler )
 {
-    nx::network::SocketGlobals::aioService().post( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().post(
+        static_cast<UdtSocket*>(this),
+        std::move(handler) );
 }
 
-void UdtStreamServerSocket::dispatchImpl( std::function<void()>&& handler )
+void UdtStreamServerSocket::dispatch( std::function<void()> handler )
 {
-    nx::network::SocketGlobals::aioService().dispatch( static_cast<UdtSocket*>(this), std::move(handler) );
+    nx::network::SocketGlobals::aioService().dispatch(
+        static_cast<UdtSocket*>(this),
+        std::move(handler) );
 }
 
-void UdtStreamServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) {
+void UdtStreamServerSocket::acceptAsync(
+    std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket* )> handler )
+{
     return m_aioHelper->acceptAsync( std::move(handler) );
 }
 
 AbstractSocket::SOCKET_HANDLE UdtStreamServerSocket::handle() const {
     return m_impl->handle();
+}
+
+aio::AbstractAioThread* UdtStreamServerSocket::getAioThread()
+{
+    return UdtSocket::getAioThread();
+}
+
+void UdtStreamServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    UdtSocket::bindToAioThread(aioThread);
 }
 
 UdtStreamServerSocket::UdtStreamServerSocket()

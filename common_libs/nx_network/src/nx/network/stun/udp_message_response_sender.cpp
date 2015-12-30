@@ -1,0 +1,52 @@
+/**********************************************************
+* Dec 28, 2015
+* akolesnikov
+***********************************************************/
+
+#include "udp_message_response_sender.h"
+
+#include "udp_server.h"
+
+
+namespace nx {
+namespace stun {
+
+UDPMessageResponseSender::UDPMessageResponseSender(
+    UDPServer* udpServer,
+    SocketAddress sourceAddress)
+:
+    m_udpServer(udpServer),
+    m_sourceAddress(std::move(sourceAddress))
+{
+}
+
+UDPMessageResponseSender::~UDPMessageResponseSender()
+{
+}
+
+void UDPMessageResponseSender::sendMessage(nx::stun::Message message)
+{
+    m_udpServer->sendMessage(
+        m_sourceAddress,
+        std::move(message),
+        std::function<void(SystemError::ErrorCode)>());
+}
+
+nx::network::TransportProtocol UDPMessageResponseSender::transportProtocol() const
+{
+    return nx::network::TransportProtocol::udp;
+}
+
+SocketAddress UDPMessageResponseSender::getSourceAddress() const
+{
+    return m_sourceAddress;
+}
+
+void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()> /*handler*/)
+{
+    //TODO #ak
+    assert(false);
+}
+
+}   //stun
+}   //nx

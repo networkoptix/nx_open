@@ -203,6 +203,51 @@ void socketSimpleTrueAsync(
     ASSERT_TRUE( stopQueue.isEmpty() );
 }
 
+template<typename ClientSocketMaker>
+void socketSingleAioThread(
+    const ClientSocketMaker& clientMaker,
+    int clientCount = kClientCount)
+{
+    aio::AbstractAioThread* aioThread(nullptr);
+    std::vector<decltype(clientMaker())> sockets;
+    nx::SyncQueue<std::thread::id> threadIdQueue;
+
+    for (auto i = 0; i < clientCount; ++i)
+    {
+        auto client = clientMaker();
+        ASSERT_TRUE(client->setNonBlockingMode(true));
+        ASSERT_TRUE(client->setSendTimeout(100));
+        ASSERT_TRUE(client->setRecvTimeout(100));
+
+        if (aioThread)
+            client->bindToAioThread(aioThread);
+        else
+            aioThread = client->getAioThread();
+
+        client->connectAsync("12.34.56.78:9999",
+                                 [&](SystemError::ErrorCode code)
+        {
+            EXPECT_NE(code, SystemError::noError);
+            threadIdQueue.push(std::this_thread::get_id());
+        });
+
+        sockets.push_back(std::move(client));
+    }
+
+    boost::optional<std::thread::id> aioThreadId;
+    for (auto i = 0; i < clientCount; ++i)
+    {
+        const auto threadId = threadIdQueue.pop();
+        if (aioThreadId)
+            ASSERT_EQ(*aioThreadId, threadId);
+        else
+            aioThreadId = threadId;
+    }
+
+    for (auto& each : sockets)
+        each->pleaseStopSync();
+}
+
 } // namespace /* anonimous */
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

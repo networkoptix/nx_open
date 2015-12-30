@@ -62,6 +62,9 @@ public:
     Header();
     Header(const Header&);
     Header(Header&&);
+    /**
+        \note \a transactionId is generated using \a Header::makeTransactionId
+    */
     Header(MessageClass messageClass_, int method_);
     Header(MessageClass messageClass_, int method_, Buffer transactionId_);
 

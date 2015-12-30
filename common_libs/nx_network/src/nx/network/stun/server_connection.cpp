@@ -5,19 +5,22 @@
 
 #include "server_connection.h"
 
+#include <common/common_globals.h>
+
 #include "message_dispatcher.h"
 
-#include <common/common_globals.h>
 
 namespace nx {
 namespace stun {
 
 ServerConnection::ServerConnection(
     StreamConnectionHolder<ServerConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock )
+    std::unique_ptr<AbstractCommunicatingSocket> sock,
+    const MessageDispatcher& dispatcher)
 :
-    BaseType( socketServer, std::move( sock ) ),
-    m_peerAddress( BaseType::getForeignAddress() )
+    BaseType(socketServer, std::move(sock)),
+    m_peerAddress(BaseType::getForeignAddress()),
+    m_dispatcher(dispatcher)
 {
 }
 
@@ -28,6 +31,26 @@ ServerConnection::~ServerConnection()
     //       weak_ptr is not valid any more
     if( m_destructHandler )
         m_destructHandler();
+}
+
+void ServerConnection::sendMessage(nx::stun::Message message)
+{
+    BaseType::sendMessage(std::move(message));
+}
+
+nx::network::TransportProtocol ServerConnection::transportProtocol() const
+{
+    return nx::network::TransportProtocol::tcp;
+}
+
+SocketAddress ServerConnection::getSourceAddress() const
+{
+    return socket()->getForeignAddress();
+}
+
+void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
+{
+    registerCloseHandler(std::move(handler));
 }
 
 void ServerConnection::processMessage( Message message )
@@ -75,9 +98,8 @@ void ServerConnection::processBindingRequest( Message message )
 
 void ServerConnection::processCustomRequest( Message message )
 {
-    if( auto disp = MessageDispatcher::instance() )
-        if( disp->dispatchRequest( shared_from_this(), std::move(message) ) )
-            return;
+    if (m_dispatcher.dispatchRequest(shared_from_this(), std::move(message)))
+        return;
 
     stun::Message response( stun::Header(
         stun::MessageClass::errorResponse,
