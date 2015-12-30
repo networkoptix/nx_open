@@ -366,8 +366,12 @@ void QnRtspClientArchiveDelegate::reopen()
     if (m_blockReopening)
         return;
 
-    for (int i = 0; i < REOPEN_TIMEOUT/10 && !m_closing; ++i)
-        QnSleep::msleep(10);
+    if (m_reopenTimer.isValid() && m_reopenTimer.elapsed() < REOPEN_TIMEOUT)
+    {
+        for (int i = 0; i < (REOPEN_TIMEOUT - m_reopenTimer.elapsed()) / 10 && !m_closing; ++i)
+            QnSleep::msleep(10);
+    }
+    m_reopenTimer.restart();
 
     if (m_camera)
         openInternal();

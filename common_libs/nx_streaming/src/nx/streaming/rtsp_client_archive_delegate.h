@@ -1,6 +1,7 @@
 #ifndef __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 #define __RTSP_CLIENT_ARCHIVE_DELEGATE_H
 
+#include <QElapsedTimer>
 #include <atomic>
 
 #include <nx/streaming/abstract_archive_delegate.h>
@@ -122,6 +123,7 @@ private:
     } m_auth;
     
     std::atomic_flag m_footageUpToDate;
+    QElapsedTimer m_reopenTimer;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;
