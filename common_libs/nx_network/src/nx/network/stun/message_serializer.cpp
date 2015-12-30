@@ -15,6 +15,19 @@ namespace stun {
 
 using namespace attrs;
 
+MessageSerializer::MessageSerializer()
+:
+    m_message(nullptr),
+    m_initialized(false)
+{
+}
+
+void MessageSerializer::setMessage(const Message* message)
+{
+    m_message = message;
+    m_initialized = true;
+}
+
 class MessageSerializer::MessageSerializerBuffer {
 public:
     MessageSerializerBuffer( nx::Buffer* buffer ) :

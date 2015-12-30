@@ -36,9 +36,7 @@ class NX_NETWORK_API UDPServer
         MessageSerializer> base_type;
 
 public:
-    UDPServer(
-        const MessageDispatcher& dispatcher,
-        SocketFactory::NatTraversalType natTraversalType);
+    UDPServer(const MessageDispatcher& dispatcher);
     virtual ~UDPServer();
 
     bool listen();

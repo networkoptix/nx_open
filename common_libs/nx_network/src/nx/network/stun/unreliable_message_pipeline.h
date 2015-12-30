@@ -14,19 +14,22 @@
 #include <utils/common/systemerror.h>
 
 #include "nx/network/socket_common.h"
+#include "nx/network/socket_factory.h"
 
 
 namespace nx {
 namespace network {
 
 /** Pipeline for transferring messages over unreliable transport (datagram socket).
-    \a CustomPipeline MUST inherit this class and implement following methods:
+    \a CustomPipeline MUST implement following methods:
     \code {*.cpp}
         //Received message from remote host
         void messageReceived(SocketAddress sourceAddress, MessageType mesage);
         //Unrecoverable error with socket
         void ioFailure(SystemError::ErrorCode);
     \endcode
+    All these methods are invoked within socket thread
+    \note This is helper class for implementing various UDP server/client
  */
 template<
     class CustomPipeline,
@@ -45,24 +48,28 @@ class UnreliableMessagePipeline
     > self_type;
 
 public:
-    UnreliableMessagePipeline(SocketFactory::NatTraversalType natTraversalType)
+    UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
-        m_socket(SocketFactory::createDatagramSocket(natTraversalType))
+        m_customPipeline(customPipeline),
+        m_socket(SocketFactory::createDatagramSocket())
     {
     }
 
+    /**
+        \note \a completionHandler is invoked in socket's aio thread
+    */
     virtual void pleaseStop(std::function<void()> completionHandler) override
     {
         m_socket->pleaseStop(std::move(completionHandler));
     }
 
+    /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress)
     {
         return m_socket->bind(localAddress);
     }
 
-    /** Starts receving messages */
-    void start()
+    void startReceivingMessages()
     {
         using namespace std::placeholders;
         m_readBuffer.resize(0);
@@ -79,30 +86,66 @@ public:
     /** Messages are pipelined. I.e. this method can be called before previous message has been sent */
     void sendMessage(
         SocketAddress destinationEndpoint,
-        MessageType message,
+        const MessageType& message,
         std::function<void(SystemError::ErrorCode)> completionHandler)
     {
+        //serializing message
+        SerializerType messageSerializer;
+        nx::Buffer serializedMessage;
+        serializedMessage.reserve(nx::network::kTypicalMtuSize);
+        messageSerializer.setMessage(&message);
+        size_t bytesWritten = 0;
+        assert(messageSerializer.serialize(&serializedMessage, &bytesWritten) ==
+                nx_api::SerializerState::done);
+
         m_socket->dispatch(std::bind(
             &self_type::sendMessageInternal,
             this,
             std::move(destinationEndpoint),
-            std::move(message),
+            std::move(serializedMessage),
             std::move(completionHandler)));
+    }
+
+    const std::unique_ptr<AbstractDatagramSocket>& socket() const
+    {
+        return m_socket;
     }
 
 private:
     struct OutgoingMessageContext
     {
         SocketAddress destinationEndpoint;
-        MessageType message;
+        nx::Buffer serializedMessage;
         std::function<void(SystemError::ErrorCode)> completionHandler;
+
+        OutgoingMessageContext(
+            SocketAddress _destinationEndpoint,
+            nx::Buffer _serializedMessage,
+            std::function<void(SystemError::ErrorCode)> _completionHandler)
+        :
+            destinationEndpoint(std::move(_destinationEndpoint)),
+            serializedMessage(std::move(_serializedMessage)),
+            completionHandler(std::move(_completionHandler))
+        {
+        }
+
+        OutgoingMessageContext(OutgoingMessageContext&& rhs)
+        :
+            destinationEndpoint(std::move(rhs.destinationEndpoint)),
+            serializedMessage(std::move(rhs.serializedMessage)),
+            completionHandler(std::move(rhs.completionHandler))
+        {
+        }
+
+    private:
+        OutgoingMessageContext(const OutgoingMessageContext&);
+        OutgoingMessageContext& operator=(const OutgoingMessageContext&);
     };
 
+    CustomPipeline* m_customPipeline;
     std::unique_ptr<AbstractDatagramSocket> m_socket;
     nx::Buffer m_readBuffer;
-    nx::Buffer m_writeBuffer;
     ParserType m_messageParser;
-    SerializerType m_messageSerializer;
     std::deque<OutgoingMessageContext> m_sendQueue;
 
     void onBytesRead(
@@ -116,10 +159,10 @@ private:
         {
             NX_LOGX(lm("Error reading from socket. %1").
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
-            static_cast<CustomPipeline*>(this)->ioFailure(errorCode);
+            m_customPipeline->ioFailure(errorCode);
             m_socket->registerTimer(
                 kRetryReadAfterFailureTimeout,
-                [this]() { start(); });
+                [this]() { startReceivingMessages(); });
             return;
         }
 
@@ -129,7 +172,7 @@ private:
         m_messageParser.setMessage(&msg);
         if (m_messageParser.parse(m_readBuffer, &bytesParsed) == nx_api::ParserState::done)
         {
-            static_cast<CustomPipeline*>(this)->messageReceived(
+            m_customPipeline->messageReceived(
                 std::move(sourceAddress),
                 std::move(msg));
         }
@@ -148,13 +191,13 @@ private:
 
     void sendMessageInternal(
         SocketAddress destinationEndpoint,
-        MessageType message,
+        nx::Buffer serializedMessage,
         std::function<void(SystemError::ErrorCode)> completionHandler)
     {
-        OutgoingMessageContext msgCtx = {
-            destinationEndpoint,
-            std::move(message),
-            std::move(completionHandler) };
+        OutgoingMessageContext msgCtx(
+            std::move(destinationEndpoint),
+            std::move(serializedMessage),
+            std::move(completionHandler));
 
         m_sendQueue.emplace_back(std::move(msgCtx));
         if (m_sendQueue.size() == 1)
@@ -165,20 +208,14 @@ private:
     {
         OutgoingMessageContext& msgCtx = m_sendQueue.front();
 
-        m_writeBuffer.resize(0);
-        m_writeBuffer.reserve(1);
-        m_messageSerializer.setMessage(&msgCtx.message);
-        size_t bytesWritten = 0;
-        assert(m_messageSerializer.serialize(&m_writeBuffer, &bytesWritten) ==
-            nx_api::SerializerState::done);
         using namespace std::placeholders;
         m_socket->sendToAsync(
-            m_writeBuffer,
+            msgCtx.serializedMessage,
             msgCtx.destinationEndpoint,
             std::bind(&self_type::messageSent, this, _1, _2));
     }
 
-    void messageSent(SystemError::ErrorCode errorCode, size_t /*bytesSent*/)
+    void messageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
     {
         assert(!m_sendQueue.empty());
         if (errorCode != SystemError::noError)
@@ -186,6 +223,10 @@ private:
             NX_LOGX(lm("Failed to send message destinationEndpoint %1. %2").
                 arg(m_sendQueue.front().destinationEndpoint.toString()).
                 arg(SystemError::toString(errorCode)), cl_logDEBUG1);
+        }
+        else
+        {
+            assert(bytesSent == m_sendQueue.front().serializedMessage.size());
         }
 
         if (m_sendQueue.front().completionHandler)

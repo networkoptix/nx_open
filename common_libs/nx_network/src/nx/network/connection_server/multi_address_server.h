@@ -22,6 +22,17 @@ template<class SocketServerType>
 {
 public:
     //TODO #ak introduce generic implementation when variadic templates available
+    template<typename Arg1>
+    MultiAddressServer(Arg1 arg1)
+    {
+        m_socketServerFactory =
+            [arg1]() -> std::unique_ptr<SocketServerType>
+        {
+            return std::make_unique<SocketServerType>(
+                std::move(arg1));
+        };
+    }
+
     template<typename Arg1, typename Arg2>
     MultiAddressServer(
         Arg1 arg1,

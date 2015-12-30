@@ -111,6 +111,8 @@ public:
 
     void terminate()
     {
+        //this method is to cancel all asynchronous operations when called socket's within aio thread
+
         this->terminateAsyncIO();
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
 
@@ -119,12 +121,9 @@ public:
         {
             nx::network::SocketGlobals::addressResolver().cancel( this );    //TODO #ak must not block here!
 
-            if( m_connectSendHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
-            if( m_recvHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
-            if( m_timerHandlerTerminatedFlag )
-                nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etWrite );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etRead );
+            nx::network::SocketGlobals::aioService().removeFromWatch( this->m_socket, aio::etTimedOut );
             //TODO #ak not sure whether this call always necessary
             nx::network::SocketGlobals::aioService().cancelPostedCalls( this->m_socket );
         }

@@ -41,6 +41,8 @@ static const size_t kUDPHeaderSize = 8;
 static const size_t kIPHeaderSize = 20;
 static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
 
+static const size_t kTypicalMtuSize = 1500;
+
 }   //network
 }   //nx
 

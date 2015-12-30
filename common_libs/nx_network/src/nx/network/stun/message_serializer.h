@@ -22,14 +22,13 @@ namespace stun {
     class NX_NETWORK_API MessageSerializer
     {
     public:
+        MessageSerializer();
+
         //!Set message to serialize
-        void setMessage( const Message* message ) {
-            m_message = message;
-            m_initialized = true;
-        }
+        void setMessage(const Message* message);
 
         /** Serializes full message increasing \a buffer if needed.
-            \param bytesWritten Serializes message length is written here
+            \param bytesWritten Serialized message length is written here
          */
         nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
 

@@ -19,8 +19,7 @@
 namespace nx {
 namespace stun {
 
-//!Dispatches STUN protocol messages to corresponding processor
-/*!
+/** Dispatches STUN protocol messages to corresponding processor.
     \note This class methods are not thread-safe
 */
 class NX_NETWORK_API MessageDispatcher
@@ -32,7 +31,7 @@ public:
 
     virtual ~MessageDispatcher();
 
-    /*!
+    /**
         \param messageProcessor Ownership of this object is not passed
         \note All processors MUST be registered before connection processing is started,
               since this class methods are not thread-safe
@@ -40,10 +39,11 @@ public:
             \a false if processor for \a method has already been registered
         \note Message processing function MUST be non-blocking
     */
-    bool registerRequestProcessor( int method, MessageProcessor processor );
+    bool registerRequestProcessor(int method, MessageProcessor processor);
+    /** Register processor that will receive all unhandled requests */
+    void registerDefaultRequestProcessor(MessageProcessor processor);
 
-    //!Pass message to corresponding processor
-    /*!
+    /** Pass message to corresponding processor
         \param message This object is not moved in case of failure to find processor
         \return \a true if request processing passed to corresponding processor and async processing has been started, \a false otherwise
     */
@@ -53,6 +53,7 @@ public:
 
 private:
     std::unordered_map< int, MessageProcessor > m_processors;
+    MessageProcessor m_defaultProcessor;
 };
 
 } // namespace stun

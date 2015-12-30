@@ -19,11 +19,9 @@ namespace stun {
 
 static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
-UDPServer::UDPServer(
-    const MessageDispatcher& dispatcher,
-    SocketFactory::NatTraversalType natTraversalType)
+UDPServer::UDPServer(const MessageDispatcher& dispatcher)
 :
-    base_type(natTraversalType),
+    base_type(this),
     m_dispatcher(dispatcher)
 {
 }
@@ -35,7 +33,7 @@ UDPServer::~UDPServer()
 
 bool UDPServer::listen()
 {
-    start();
+    startReceivingMessages();
     return true;
 }
 
