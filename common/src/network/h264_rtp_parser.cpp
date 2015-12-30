@@ -282,7 +282,6 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         clearInternalBuffer();
         isPacketLost = true;
     }
-    return isPacketLost;
 
     auto processPacketLost = [this, sequenceNum]()
     {
