@@ -64,27 +64,26 @@ public:
     void cancelIOAsync(aio::EventType eventType,
                         std::function<void()> handler) override;
 
-protected:
     //!Implementation of AbstractSocket::*
-    void postImpl( std::function<void()>&& handler ) override;
-    void dispatchImpl( std::function<void()>&& handler ) override;
+    void post( std::function<void()> handler ) override;
+    void dispatch( std::function<void()> handler ) override;
 
     //!Implementation of AbstractCommunicatingSocket::*
-    void connectAsyncImpl(
+    void connectAsync(
         const SocketAddress& address,
-        std::function<void(SystemError::ErrorCode)>&& handler) override;
+        std::function<void(SystemError::ErrorCode)> handler) override;
 
-    void recvAsyncImpl(
+    void readSomeAsync(
         nx::Buffer* const buf,
-        std::function<void(SystemError::ErrorCode, size_t)>&& handler) override;
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
-    void sendAsyncImpl(
+    void sendAsync(
         const nx::Buffer& buf,
-        std::function<void(SystemError::ErrorCode, size_t)>&& handler) override;
+        std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
-    void registerTimerImpl(
+    void registerTimer(
         unsigned int timeoutMs,
-        std::function<void()>&& handler) override;
+        std::function<void()> handler) override;
 
 private:
     bool startAsyncConnect(const SocketAddress& originalAddress,

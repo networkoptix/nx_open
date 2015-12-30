@@ -144,19 +144,19 @@ void CloudServerSocket::pleaseStop(std::function<void()> handler)
     SocketGlobals::tunnelPool().pleaseStop(barrier.fork());
 }
 
-void CloudServerSocket::postImpl( std::function<void()>&& handler )
+void CloudServerSocket::post( std::function<void()> handler )
 {
     m_tcpSocket->post(std::move(handler));
 }
 
-void CloudServerSocket::dispatchImpl( std::function<void()>&& handler )
+void CloudServerSocket::dispatch( std::function<void()> handler )
 {
     m_tcpSocket->dispatch(std::move(handler));
 }
 
-void CloudServerSocket::acceptAsyncImpl(
+void CloudServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode code,
-                       AbstractStreamSocket*)>&& handler )
+                       AbstractStreamSocket*)> handler )
 {
     QnMutexLocker lk(&m_mutex);
     if (!m_acceptedSocketsQueue.empty())

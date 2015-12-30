@@ -178,7 +178,7 @@ bool CloudStreamSocket::connect(
     unsigned int timeoutMillis)
 {
     std::promise<SystemError::ErrorCode> promise;
-    connectAsyncImpl(remoteAddress, [&](SystemError::ErrorCode code)
+    connectAsync(remoteAddress, [&](SystemError::ErrorCode code)
     {
         promise.set_value(code);
     });
@@ -227,7 +227,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
-    sendAsyncImpl(nx::Buffer(static_cast<const char*>(buffer), bufferLen),
+    sendAsync(nx::Buffer(static_cast<const char*>(buffer), bufferLen),
                   [&](SystemError::ErrorCode code, size_t size)
     {
         promise.set_value(std::make_pair(code, size));
@@ -276,7 +276,7 @@ void CloudStreamSocket::cancelIOAsync(aio::EventType eventType,
         m_socketDelegate->cancelIOAsync(eventType, std::move(handler));
 }
 
-void CloudStreamSocket::postImpl( std::function<void()>&& handler )
+void CloudStreamSocket::post( std::function<void()> handler )
 {
     auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
@@ -289,7 +289,7 @@ void CloudStreamSocket::postImpl( std::function<void()>&& handler )
     handler();
 }
 
-void CloudStreamSocket::dispatchImpl( std::function<void()>&& handler )
+void CloudStreamSocket::dispatch( std::function<void()> handler )
 {
     auto lock = m_asyncGuard->lock();
     if (m_socketDelegate)
@@ -302,9 +302,9 @@ void CloudStreamSocket::dispatchImpl( std::function<void()>&& handler )
     handler();
 }
 
-void CloudStreamSocket::connectAsyncImpl(
+void CloudStreamSocket::connectAsync(
     const SocketAddress& address,
-    std::function<void(SystemError::ErrorCode)>&& handler)
+    std::function<void(SystemError::ErrorCode)> handler)
 {
     m_connectHandler = std::move(handler);
 
@@ -331,19 +331,9 @@ void CloudStreamSocket::connectAsyncImpl(
         true, this);
 }
 
-void CloudStreamSocket::recvAsyncImpl(
-    nx::Buffer* const buf,
-    std::function<void(SystemError::ErrorCode, size_t)>&& handler)
-{
-    if (m_socketDelegate)
-        m_socketDelegate->readSomeAsync(buf, std::move(handler));
-    else
-        handler(SystemError::notConnected, 0);
-}
-
-void CloudStreamSocket::sendAsyncImpl(
+void CloudStreamSocket::sendAsync(
     const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)>&& handler)
+    std::function<void(SystemError::ErrorCode, size_t)> handler)
 {
     if (m_socketDelegate)
         m_socketDelegate->sendAsync(buf, std::move(handler));
@@ -351,9 +341,9 @@ void CloudStreamSocket::sendAsyncImpl(
         handler(SystemError::notConnected, 0);
 }
 
-void CloudStreamSocket::registerTimerImpl(
+void CloudStreamSocket::registerTimer(
     unsigned int timeoutMs,
-    std::function<void()>&& handler)
+    std::function<void()> handler)
 {
     // TODO: #mux shell we create extra pollable and use directly with AIOService?
 }
@@ -406,7 +396,7 @@ bool CloudStreamSocket::startAsyncConnect(const SocketAddress& originalAddress,
 int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
 {
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
-    sendAsyncImpl(*buf, [&](SystemError::ErrorCode code, size_t size)
+    sendAsync(*buf, [&](SystemError::ErrorCode code, size_t size)
     {
         promise.set_value(std::make_pair(code, size));
     });

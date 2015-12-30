@@ -50,15 +50,14 @@ public:
     //!Implementation of QnStoppable::pleaseStop
     void pleaseStop(std::function<void()> handler) override;
 
-protected:
     //!Implementation of AbstractSocket::*
-    void postImpl( std::function<void()>&& handler ) override;
-    void dispatchImpl( std::function<void()>&& handler ) override;
+    void post( std::function<void()> handler ) override;
+    void dispatch( std::function<void()> handler ) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
-    void acceptAsyncImpl(
+    void acceptAsync(
         std::function<void(SystemError::ErrorCode,
-                           AbstractStreamSocket*)>&& handler) override;
+                           AbstractStreamSocket*)> handler) override;
 
 private:
     void acceptTcpSockets();
