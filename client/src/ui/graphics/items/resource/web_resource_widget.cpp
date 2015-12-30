@@ -5,6 +5,59 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtWebKitWidgets/QGraphicsWebView>
 
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_context.h>
+
+namespace
+{
+    class SelectByClickOverlay : public QGraphicsWidget
+    {
+    public:
+        SelectByClickOverlay(QnWebResourceWidget *parent
+            , QnWorkbenchItem *item
+            , QnWorkbench *workbench);
+
+    private:
+        void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+    private:
+        QnWebResourceWidget * const m_widget;
+        QnWorkbenchItem * const m_item;
+        QnWorkbench * const m_workbench;
+    };
+
+    SelectByClickOverlay::SelectByClickOverlay(QnWebResourceWidget *parent
+        , QnWorkbenchItem *item
+        , QnWorkbench *workbench)
+        : QGraphicsWidget(parent)
+        , m_widget(parent)
+        , m_item(item)
+        , m_workbench(workbench)
+    {}
+
+    void SelectByClickOverlay::mousePressEvent(QGraphicsSceneMouseEvent *event)
+    {
+        if((event->button() == Qt::LeftButton) && (m_widget->flags() & ItemIsSelectable))
+        {
+            m_workbench->setItem(Qn::RaisedRole, nullptr);
+
+            const bool multiSelect = ((event->modifiers() & Qt::ControlModifier) != 0);
+            if (multiSelect)
+            {
+                if (!m_widget->isSelected())
+                    m_widget->selectThisWidget(false);
+                else
+                    m_widget->setSelected(false);
+            }
+            else
+                m_widget->selectThisWidget(true);
+
+        }
+        event->ignore();
+    }
+
+}
+
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
 {
@@ -25,11 +78,13 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
-
     updateTitleText();
     updateInfoText();
     updateDetailsText();
     updateButtonsVisibility();
+
+    addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench())
+        , Visible, true, true, TopControlsLayer);
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()

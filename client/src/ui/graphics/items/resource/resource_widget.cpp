@@ -1021,11 +1021,11 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
     if (fullscreenModeChanged)
     {
         const bool fullscreenMode = options().testFlag(FullScreenMode);
-        const auto newChecked = (fullscreenMode
-            ? checkedButtons() | FullscreenButton
-            : checkedButtons() & (~FullscreenButton));
+        const auto newIcon = fullscreenMode
+            ? qnSkin->icon("item/exit_fullscreen.png")
+            : qnSkin->icon("item/fullscreen.png");
 
-        setCheckedButtons(newChecked);
+        buttonBar()->button(FullscreenButton)->setIcon(newIcon);
     }
 }
 
