@@ -10,7 +10,6 @@
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
 #include <common/common_module.h>
-#include <platform/platform_abstraction.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -601,9 +600,8 @@ qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
 
-    qint64 spaceLimit = QnFileStorageResource::isLocal(url) ?
-                        defaultStorageSpaceLimit :
-                        QnStorageResource::kNasStorageLimit;
+    return QnFileStorageResource::isLocal(url) ?  defaultStorageSpaceLimit :
+                                                  QnStorageResource::kNasStorageLimit;
 }
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)

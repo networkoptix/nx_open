@@ -5,7 +5,7 @@
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
-
+#include <platform/platform_abstraction.h>
 
 /*
 * QnFileStorageResource uses custom implemented IO access
