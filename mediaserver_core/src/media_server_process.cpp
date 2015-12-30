@@ -441,15 +441,7 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setParentId(serverId);
     storage->setUrl(path);
 
-    qint64 defaultSpaceLimit = MSSettings::roSettings()->value(
-        nx_ms_conf::MIN_STORAGE_SPACE,
-        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
-    ).toLongLong(); 
-
-    qint64 spaceLimit = QnFileStorageResource::isLocal(path) ?
-                        defaultSpaceLimit :
-                        QnFileStorageResource::kNasStorageLimit;
-
+    auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
     storage->setSpaceLimit(spaceLimit);
     storage->setUsedForWriting(storage->isWritable());
 

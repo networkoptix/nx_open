@@ -52,6 +52,10 @@ public:
 
     // true if storage is located on local disks
     static bool isLocal(const QString &url);
+    // calculate space limit judging by storage URL
+    static qint64 calcSpaceLimit(const QString &url);
+    // calculate space limit judging by partition type 
+    static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
 private:
     virtual QString getPath() const override;

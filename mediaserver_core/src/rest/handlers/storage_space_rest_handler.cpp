@@ -57,21 +57,14 @@ int QnStorageSpaceRestHandler::executeGet(
 {
     QnStorageSpaceReply reply;
 
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
-        nx_ms_conf::MIN_STORAGE_SPACE,
-        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
-    ).toLongLong();
-
-    auto enoughSpace = [defaultStorageSpaceLimit](const QnStorageResourcePtr& storage) 
+    auto enoughSpace = [](const QnStorageResourcePtr& storage) 
     {   /* We should always display invalid storages. */
         qint64 totalSpace = storage->getTotalSpace();
-        qint64 spaceLimit = QnFileStorageResource::isLocal(storage->getUrl()) ?
-                            defaultStorageSpaceLimit :
-                            QnStorageResource::kNasStorageLimit;
-
         if (totalSpace == QnStorageResource::UnknownSize)
             return true;
-        return totalSpace >= spaceLimit;
+        return totalSpace >= QnFileStorageResource::calcSpaceLimit(
+            storage->getUrl()
+        );
     };
 
     auto filterDeprecated = [] (const QnStorageResourcePtr &storage){
@@ -102,23 +95,14 @@ int QnStorageSpaceRestHandler::executeGet(
         reply.storages.push_back(data);
     }
 
-    auto calcSpaceLimit = [defaultStorageSpaceLimit](
-        QnPlatformMonitor::PartitionType ptype
-    )
-    {
-        return ptype == QnPlatformMonitor::LocalDiskPartition ?
-               defaultStorageSpaceLimit :
-               QnStorageResource::kNasStorageLimit;
-    };
-
-    auto partitionEnoughSpace = [defaultStorageSpaceLimit, calcSpaceLimit](
+    auto partitionEnoughSpace = [](
         QnPlatformMonitor::PartitionType    ptype,
         qint64                              size
     ) 
     {   
         if (size == QnStorageResource::UnknownSize)
             return true;
-        return size >= calcSpaceLimit(ptype);
+        return size >= QnFileStorageResource::calcSpaceLimit(ptype);
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
@@ -154,7 +138,7 @@ int QnStorageSpaceRestHandler::executeGet(
         data.url = partition.path + QnAppInfo::mediaFolderName();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = defaultStorageSpaceLimit;
+        data.reservedSpace = QnFileStorageResource::calcSpaceLimit(partition.type);
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.storageType = QnLexical::serialized(partition.type);
 
@@ -164,7 +148,9 @@ int QnStorageSpaceRestHandler::executeGet(
         
         if (storage) {
             storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(calcSpaceLimit(partition.type));
+            storage->setSpaceLimit(
+                QnFileStorageResource::calcSpaceLimit(partition.type)
+            );
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->isWritable();

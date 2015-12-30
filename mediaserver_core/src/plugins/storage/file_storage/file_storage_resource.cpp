@@ -594,6 +594,30 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
     return storage;
 }
 
+qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    qint64 spaceLimit = QnFileStorageResource::isLocal(url) ?
+                        defaultStorageSpaceLimit :
+                        QnStorageResource::kNasStorageLimit;
+}
+
+qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    return ptype == QnPlatformMonitor::LocalDiskPartition ?
+           defaultStorageSpaceLimit :
+           QnStorageResource::kNasStorageLimit;
+}
+
 bool QnFileStorageResource::isLocal(const QString &url)
 {
     if (url.contains(lit("://")))
