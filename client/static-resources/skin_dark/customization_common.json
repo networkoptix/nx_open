@@ -159,6 +159,17 @@
         }
     },
 
+    "QRadioButton": {
+        "palette": {
+            "default": {
+                "midlight": "light8"
+            },
+            "disabled": {
+                "midlight": "light8.setAlpha(75)"
+            }
+        }
+    },
+
     "QTabBar": {
         "palette": {
             "default": {

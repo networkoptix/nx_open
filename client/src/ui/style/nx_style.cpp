@@ -282,28 +282,29 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
             painter->restore();
             return;
         }
-    case PE_IndicatorRadioButton: {
-        painter->save();
+    case PE_IndicatorRadioButton:
+        {
+            painter->save();
 
-        QPen pen(option->palette.light(), dpr(1.5));
-        painter->setPen(pen);
-        painter->setBrush(Qt::NoBrush);
-        painter->setRenderHint(QPainter::Antialiasing);
-        painter->drawEllipse(option->rect.adjusted(1, 2, -1, 0));
+            QPen pen(option->palette.color(QPalette::WindowText), 1.5);
+            painter->setPen(pen);
+            painter->setBrush(Qt::NoBrush);
+            painter->setRenderHint(QPainter::Antialiasing);
+            painter->drawEllipse(option->rect.adjusted(1, 2, -1, 0));
 
-        if (option->state.testFlag(State_On)) {
-            painter->setBrush(option->palette.light());
-            painter->setPen(Qt::NoPen);
-            int markSize = option->rect.width() * 0.5;
-            QRectF rect(option->rect.left() + (option->rect.width() - markSize) / 2,
-                        option->rect.top() + (option->rect.height() - markSize) / 2 + 1,
-                        markSize, markSize);
-            painter->drawEllipse(rect);
+            if (option->state.testFlag(State_On)) {
+                painter->setBrush(option->palette.windowText());
+                painter->setPen(Qt::NoPen);
+                int markSize = option->rect.width() * 0.5;
+                QRectF rect(option->rect.left() + (option->rect.width() - markSize) / 2,
+                            option->rect.top() + (option->rect.height() - markSize) / 2 + 1,
+                            markSize, markSize);
+                painter->drawEllipse(rect);
+            }
+
+            painter->restore();
+            return;
         }
-
-        painter->restore();
-        return;
-    }
     case PE_FrameTabBarBase: {
         if (const QStyleOptionTabBarBase *tabBar = qstyleoption_cast<const QStyleOptionTabBarBase*>(option)) {
             QRect rect = tabBar->tabBarRect;
@@ -604,6 +605,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         }
         break;
     case CE_CheckBox:
+    case CE_RadioButton:
         if (const QStyleOptionButton *checkBox = qstyleoption_cast<const QStyleOptionButton*>(option))
         {
             QStyleOptionButton opt = *checkBox;
