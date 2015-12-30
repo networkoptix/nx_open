@@ -52,24 +52,24 @@ namespace ite
         void findAndSwapCamerasRx(CameraPtr cam1, CameraPtr cam2);
 
     private:
-        static DiscoveryManager * Instance;
-
-        mutable std::mutex m_mutex;
-        std::atomic_bool m_needScan;
-        std::atomic_bool m_blockAutoScan;
-        std::vector<CameraPtr> m_cameras;
-        Timer m_rescanTimer;
-
-        int scan(bool isManual);
-
-        // refactor
-
-        std::vector<RxDevicePtr>  m_rxDevices;
         // run once on first findCameras call
         void scan_2();
+        // To speed up camera's going operational
+        // we can try to search camera using Frequency, Rx and Tx Ids,
+        // from camera info.
+        // Speed up actually will take place only if we saved this camera
+        // info at the prevous server launches.
+        RxDevicePtr findCameraByInfo(const nxcip::CameraInfo &info);
 
     private:
-        std::atomic<bool> m_firstFind;
+        static DiscoveryManager * Instance;
+
+        mutable std::mutex 			m_mutex;
+        std::atomic_bool 			m_needScan;
+        std::atomic_bool 			m_blockAutoScan;
+        std::vector<CameraPtr> 		m_cameras;
+        Timer 						m_rescanTimer;
+        std::vector<RxDevicePtr>  	m_rxDevices;
     };
 }
 

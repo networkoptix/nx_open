@@ -64,7 +64,7 @@ namespace ite
     void RxDevice::startWatchDog()
     {
         // starting watchdog thread
-        static const int WATCHDOG_GOOD_TIMEOUT = 1000;      // ms
+        static const int WATCHDOG_GOOD_TIMEOUT = 3000;      // ms
         static const int WATCHDOG_BAD_TIMEOUT = 60 * 1000;  // ms
 
         debug_printf("[Rx watchdog] Rx %d, starting watch dog.\n", m_rxID);
@@ -74,10 +74,6 @@ namespace ite
                 int timeout = WATCHDOG_GOOD_TIMEOUT;
                 while (true)
                 {
-                    std::this_thread::sleep_for(
-                        std::chrono::milliseconds(timeout)
-                    );
-
                     stats();
                     debug_printf("[Rx watchdog] Rx %d getting stats DONE; stats: %d; m_deviceReady: %d\n",
                         m_rxID,
@@ -180,6 +176,10 @@ namespace ite
                                 timeout = WATCHDOG_BAD_TIMEOUT;
                         }
                     }
+
+                    std::this_thread::sleep_for(
+                        std::chrono::milliseconds(timeout)
+                    );
                 }
             }
         ).detach();
@@ -271,6 +271,7 @@ namespace ite
                         m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
                         return true;
                     }
+                    std::this_thread::sleep_for(std::chrono::milliseconds(100));
                 }
                 debug_printf("[search] No Tx for this Rx\n");
                 m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
@@ -288,34 +289,35 @@ namespace ite
 
         std::lock_guard<std::mutex> lock(m_mutex);
 
-        bool readyToStart = false;
-        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
-        {
-            if (m_it930x->lockFrequency(TxDevice::freq4chan(i)))
-            {
-                stats();
-                if (good())
-                {
-                    readyToStart = true;
-                    m_it930x->unlockFrequency();
-                    break;
-                }
-                else
-                    m_it930x->unlockFrequency();
-            }
-        }
+//        bool readyToStart = false;
+//        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
+//        {
+//            if (m_it930x->lockFrequency(TxDevice::freq4chan(i)))
+//            {
+//                stats();
+//                if (good())
+//                {
+//                    readyToStart = true;
+//                    m_it930x->unlockFrequency();
+//                    break;
+//                }
+//                else
+//                    m_it930x->unlockFrequency();
+//            }
+//        }
 
-        if (!readyToStart)
-            return false;
+//        if (!readyToStart)
+//            return false;
 
-        printf(
-            "[search] Rx %d. Detected some signal. Ready to start search\n",
-            m_rxID
-        );
+//        printf(
+//            "[search] Rx %d. Detected some signal. Ready to start search\n",
+//            m_rxID
+//        );
 
         for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
         {
             if (testChannel(i, bestChan, bestStrength, txID))
+            {
                 debug_printf(
                     "[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n",
                     m_rxID,
@@ -323,13 +325,15 @@ namespace ite
                     bestStrength,
                     txID
                 );
+                break;
+            }
             if (bestStrength == 100)
                 break;
-            else
-            {
-                debug_printf("[search] Rx: %d; couldn't lock channel\n", m_rxID);
-                m_it930x->unlockFrequency();
-            }
+//            else
+//            {
+//                debug_printf("[search] Rx: %d; \n", m_rxID);
+//                m_it930x->unlockFrequency();
+//            }
         }
 
         if (bestStrength != 0)
@@ -386,7 +390,7 @@ namespace ite
         strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
         std::stringstream ss;
-        ss << m_txDev->txID() << ' ' << TxDevice::freq4chan(m_channel);
+        ss << m_rxID << ' ' <<  m_txDev->txID() << ' ' << TxDevice::freq4chan(m_channel);
 
         unsigned len = std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1);
         strncpy(info.auxiliaryData, ss.str().c_str(), len);

@@ -1,6 +1,8 @@
 #include <vector>
 #include <cassert>
 #include <future>
+#include <string>
+#include <sstream>
 
 #include <dirent.h>
 
@@ -27,8 +29,7 @@ namespace ite
 
     DiscoveryManager::DiscoveryManager()
     :   m_needScan(true),
-        m_blockAutoScan(false),
-        m_firstFind(true)
+        m_blockAutoScan(false)
     {
         Instance = this;
         m_rescanTimer.restart();
@@ -140,6 +141,56 @@ namespace ite
         cam1->rxDeviceRef().swap(cam2->rxDeviceRef());
     }
 
+    RxDevicePtr DiscoveryManager::findCameraByInfo(const nxcip::CameraInfo &info)
+    {	// We can find camera by (rxId, txId, channel) unique key.
+        // This information is stored in CameraInfo::auxillary data string.
+        // Format is 'rxId txId chan'.
+
+        std::stringstream ss(info.auxiliaryData);
+
+        auto extractInt = [&ss]()
+        {
+            int tmp;
+            try {
+                ss >> tmp;
+            } catch (const std::exception &) {
+                return -1;
+            }
+            if (ss.fail())
+                return -1;
+            return tmp;
+        };
+
+        int rxId = extractInt();
+        int txId = extractInt();
+        int chan = extractInt();
+
+        if (rxId == -1 || txId == -1 || chan == -1)
+        {	// Bailing out if any of the key data is absent
+            debug_printf(
+                "[DiscoveryManager::findCameraByInfo] failed to extract auxillary camera data, original string is %s\n",
+                info.auxiliaryData
+            );
+            return RxDevicePtr();
+        }
+
+        // When this function is called m_mutex is already locked.
+        // So no locks here.
+        for (auto &rxDev : m_rxDevices)
+        {
+            if (rxDev->rxID() == rxId)
+            {	// Blocks for some time here
+//                rxDev->stopWatchDog();
+//                bool searchResult = rxDev->findTxExact(txId, chan);
+//                rxDev->startWatchDog();
+
+//                if (searchResult)
+//                    return rxDev;
+            }
+        }
+        return RxDevicePtr();
+    }
+
     nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
     {
         std::lock_guard<std::mutex> lock(m_mutex);
@@ -153,6 +204,8 @@ namespace ite
         CameraManager * cam = nullptr;
         debug_printf("[DiscoveryManager::createCameraManager] trying to get cam %d\n", txID);
 
+        // First lets find out if there are any rxDev which is locked on this tx right now
+        // and if there are any CameraManager objects that operates with this tx.
         auto cameraIt = std::find_if(
             m_cameras.begin(),
             m_cameras.end(),
@@ -171,61 +224,76 @@ namespace ite
             }
         );
 
-        if (rxIt == m_rxDevices.end())
-        {
-            debug_printf("[DiscoveryManager::createCameraManager] no camera found\n");
-            if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
-            {
-                debug_printf("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
-                std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                (*cameraIt)->rxDeviceRef().reset();
-            }
-            return nullptr;
-        }
+        // Second let's deal with Rx
+        RxDevicePtr foundRxDev;
 
-        if (cameraIt != m_cameras.end())
-        {
-            if ((*cameraIt)->rxDeviceRef())
-            {
-                if ((*cameraIt)->rxDeviceRef() == *rxIt)
-                {
-                    debug_printf("[DiscoveryManager::createCameraManager] camera rxDevice already correct. Camera found!\n");
-                }
-                else
-                {
-                    debug_printf("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
-                    std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                    (*cameraIt)->rxDeviceRef().reset();
-                    (*cameraIt)->rxDeviceRef() = *rxIt;
-                    (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt).get());
-                }
-                cam = cameraIt->get();
-                cam->addRef();
-                return cam;
+        if (rxIt == m_rxDevices.end())
+        { 	// No camera found in already present cameras. But we have one option left.
+            // Let's try to find a camera by caminfo. Maybe we've already
+            // dicovered this camera earlier (on the previous mediaserver run).
+            if ((bool)(foundRxDev = findCameraByInfo(info)))
+            {	// success!
+                debug_printf("[Discovery manager::createCameraManager] found camera by camera info.");
             }
             else
-            {
-                debug_printf("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
-                std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                (*cameraIt)->rxDeviceRef() = *rxIt;
-                (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt).get());
-
-                cam = cameraIt->get();
-                cam->addRef();
-                return cam;
+            {	// No luck. Maybe this camera will be discovered later
+                debug_printf("[DiscoveryManager::createCameraManager] no camera found\n");
+                if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
+                {	// Notify camera that its rx device is no longer operational
+                    debug_printf("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
+                    std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+                    (*cameraIt)->rxDeviceRef().reset();
+                }
+                return nullptr;
             }
         }
         else
         {
+            foundRxDev = *rxIt;
+        }
+
+        // Now we know if rx is operational. Let's deal with related cameraManager.
+        if (cameraIt != m_cameras.end())
+        {	// related camera found
+            if ((*cameraIt)->rxDeviceRef())
+            {	// camera has ref to some rx device
+                if ((*cameraIt)->rxDeviceRef() == foundRxDev)
+                {	// Good! Camera's rx and found from the pool match
+                    debug_printf("[DiscoveryManager::createCameraManager] camera rxDevice already correct. Camera found!\n");
+                }
+                else
+                {	// Camera has reference to some other rx device. This may be the case if cameras have been
+                    // physically replugged. Not critical though, we can just replace rxs.
+                    debug_printf("[DiscoveryManager::createCameraManager] camera rxDevice is not correct, replacing. Camera found!\n");
+                    std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+                    (*cameraIt)->rxDeviceRef().reset();
+                    (*cameraIt)->rxDeviceRef() = foundRxDev;
+                    (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt).get());
+                }
+                cam = cameraIt->get();
+                cam->addRef();
+            }
+            else
+            {	// This can be if camera's been unplugged and then replugged to the same port
+                debug_printf("[DiscoveryManager::createCameraManager] No rxDevice for camera. Setting one and returning. Camera found!\n");
+                std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+                (*cameraIt)->rxDeviceRef() = foundRxDev;
+                (*cameraIt)->rxDeviceRef()->setCamera((*cameraIt).get());
+
+                cam = cameraIt->get();
+                cam->addRef();
+            }
+        }
+        else
+        {	// This should occur once after launch. Creating brand new CameraManager.
             debug_printf(
                 "[DiscoveryManager::createCameraManager] creating new camera with rx device %d. Camera found!\n",
-                (*rxIt)->rxID()
+                (foundRxDev)->rxID()
             );
-            CameraPtr newCam(new CameraManager(*rxIt));
+            CameraPtr newCam(new CameraManager(foundRxDev));
             m_cameras.push_back(newCam);
             cam = newCam.get();
             cam->addRef();
-            return cam;
         }
 
         return cam;

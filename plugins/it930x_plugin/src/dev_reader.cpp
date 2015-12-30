@@ -307,7 +307,9 @@ namespace ite
             m_hasThread = true;
         }
         catch (std::system_error& )
-        {}
+        {
+            debug_printf("[reader] Failed to create reader thread\n");
+        }
     }
 
     void DevReader::stop()

@@ -140,25 +140,30 @@ namespace ite
         bool lockFrequency(unsigned frequency, unsigned bandwidth = Bandwidth_6M)
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+            Bool isLocked = False;
 
             try
             {
                 if (m_devStream)
-                    throw DtvException("It930x.lockFrequency()", 0);
+                    throw DtvException("It930x.lockFrequency() DevStream is NOT null", 0);
 
                 unsigned ret = DTV_AcquireChannel(m_handle, frequency, bandwidth);
                 if (ret)
-                    throw DtvException("DTV_AcquireChannel", ret);
+                    throw DtvException("It930x.lockFrequency() DTV_AcquireChannel failed", ret);
 
-                Bool isLocked = False;
                 ret = DTV_IsLocked(m_handle, &isLocked);
                 if (ret)
-                    throw DtvException("DTV_IsLocked", ret);
+                    throw DtvException("It930x.lockFrequency() DTV_IsLocked failed", ret);
+
             }
-            catch (const std::exception&)
+            catch (const std::exception& e)
             {
+                printf("It930x.lockFrequency() exception: %s\n", e.what());
                 return false;
             }
+
+            if (!isLocked)
+                return false;
 
             m_devStream.reset( new It930Stream(this) );
             return true;

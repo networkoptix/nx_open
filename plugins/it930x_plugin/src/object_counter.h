@@ -2,7 +2,8 @@
 #define OBJECT_COUNTER
 
 #if 0
-#define debug_printf printf
+#include <time.h>
+#define debug_printf(...) fprintf(stdout, "<%.1f> ", clock()/100000.0), fprintf(stdout, __VA_ARGS__)
 #else
 inline void debug_printf(const char * , ...) {}
 #endif

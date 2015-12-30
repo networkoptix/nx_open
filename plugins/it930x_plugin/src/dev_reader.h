@@ -405,6 +405,7 @@ namespace ite
 
     class DevReader : public ObjectCounter<DevReader>
     {
+        friend class DevReadThread;
     public:
         DevReader(It930x * dev = nullptr);
 
@@ -415,8 +416,17 @@ namespace ite
         void stop();
         void wait();
 
-        void setThreadObj(DevReadThread * ptr) { m_threadObject = ptr; }
-        bool hasThread() const { return m_threadObject; }
+        void setThreadObj(DevReadThread * ptr)
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            m_threadObject = ptr;
+        }
+
+        bool hasThread() const
+        {
+            std::lock_guard<std::mutex> lk(m_mutex);
+            return m_threadObject;
+        }
 
         bool sync()
         {
