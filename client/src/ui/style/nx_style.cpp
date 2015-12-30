@@ -306,20 +306,18 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
     }
     case PE_FrameTabBarBase: {
         if (const QStyleOptionTabBarBase *tabBar = qstyleoption_cast<const QStyleOptionTabBarBase*>(option)) {
-            painter->save();
-
             QRect rect = tabBar->tabBarRect;
             rect.setLeft(tabBar->rect.left());
             rect.setRight(tabBar->rect.right());
+            painter->fillRect(rect, option->palette.window());
 
-            QPen pen(tabBar->palette.shadow(), dp(1));
-            painter->setPen(pen);
-
-            painter->fillRect(rect, option->palette.button());
-            painter->drawLine(rect.bottomLeft(), rect.bottomRight());
-
+            painter->save();
+            painter->setPen(tabBar->palette.color(QPalette::Dark));
+            painter->drawLine(rect.topLeft(), rect.topRight());
             painter->restore();
+            return;
         }
+        break;
     }
     case PE_FrameTabWidget:
         return;
@@ -632,22 +630,65 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         }
         break;
     case CE_TabBarTabShape:
-        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option)) {
-            if (tab->state & QStyle::State_Selected) {
-                QRect rect = tab->rect;
-                rect.setTop(rect.bottom() - dp(2));
-                rect.setBottom(rect.bottom() - dp(1));
-                painter->fillRect(rect, tab->palette.highlight());
+        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+        {
+            switch (tab->shape)
+            {
+            case QTabBar::TriangularNorth:
+                if (!(tab->state & QStyle::State_Selected) && (tab->state & QStyle::State_MouseOver))
+                {
+                    painter->save();
+
+                    painter->fillRect(tab->rect, tab->palette.mid());
+
+                    painter->setPen(tab->palette.color(QPalette::Window));
+                    painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
+
+                    painter->restore();
+                }
+
+                return;
+            default:
+                break;
             }
-            return;
         }
         break;
     case CE_TabBarTabLabel:
-        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option)) {
-            QRect rect = tab->rect;
-            drawItemText(painter, rect, Qt::AlignCenter | Qt::TextHideMnemonic,
+        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+        {
+            painter->save();
+
+            if (tab->shape == QTabBar::TriangularNorth)
+            {
+                QFont font = painter->font();
+                font.setPixelSize(font.pixelSize() - 1);
+                painter->setFont(font);
+            }
+
+            int textFlags = Qt::AlignCenter | Qt::TextHideMnemonic;
+            QPalette::ColorRole colorRole = QPalette::WindowText;
+
+            if (tab->state & QStyle::State_Selected)
+            {
+                colorRole = QPalette::Highlight;
+
+                QFontMetrics fm(painter->font());
+                QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
+
+                rect.setTop(tab->rect.bottom() - 2);
+                rect.setBottom(tab->rect.bottom() - 1);
+                painter->fillRect(rect, tab->palette.brush(colorRole));
+            }
+            else if (tab->state & State_MouseOver)
+            {
+                colorRole = QPalette::Light;
+            }
+
+            drawItemText(painter, tab->rect, Qt::AlignCenter | Qt::TextHideMnemonic,
                          tab->palette, tab->state & QStyle::State_Enabled, tab->text,
-                         tab->state & QStyle::State_Selected ? QPalette::Highlight : QPalette::WindowText);
+                         colorRole);
+
+            painter->restore();
             return;
         }
     case CE_HeaderSection:
@@ -898,6 +939,10 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
     case PM_ExclusiveIndicatorWidth:
     case PM_ExclusiveIndicatorHeight:
         return dp(16);
+    case PM_TabBarTabHSpace:
+        return 9;
+    case PM_TabBarBaseOverlap:
+        return 9;
     default:
         break;
     }
@@ -961,16 +1006,10 @@ void QnNxStyle::polish(QWidget *widget)
         widget->setAttribute(Qt::WA_Hover);
     }
 
-    if (qobject_cast<QTabBar*>(widget))
-    {
-        QFont font = widget->font();
-        font.setPointSize(font.pointSize() - 1);
-        widget->setFont(font);
-    }
-
     if (qobject_cast<QLineEdit*>(widget) ||
         qobject_cast<QSpinBox*>(widget) ||
-        qobject_cast<QCheckBox*>(widget))
+        qobject_cast<QCheckBox*>(widget) ||
+        qobject_cast<QTabBar*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
     }

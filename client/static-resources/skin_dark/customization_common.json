@@ -92,8 +92,8 @@
                 "base":             "dark6",
                 "window":           "dark6",
                 "shadow":           "dark3",
-                "highlight":        "#2fa2db",
-                "highlightedText":  "#f0f0f0",
+                "highlight":        "brand_core",
+                "highlightedText":  "brand_contrast",
                 "link":             "#0099ff",
                 "linkVisited":      "#30aafc",
                 "alternateBase":    "dark6",
@@ -155,6 +155,20 @@
             },
             "disabled": {
                 "midlight": "light8.setAlpha(75)"
+            }
+        }
+    },
+
+    "QTabBar": {
+        "palette": {
+            "default": {
+                "window": "dark8",
+                "dark": "dark7",
+                "windowText": "light12",
+                "light": "light11"
+            },
+            "disabled": {
+                "windowText": "dark12"
             }
         }
     },
