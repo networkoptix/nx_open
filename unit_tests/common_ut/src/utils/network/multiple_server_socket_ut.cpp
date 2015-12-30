@@ -10,33 +10,43 @@ namespace nx {
 namespace network {
 namespace test {
 
-static std::unique_ptr<AbstractStreamServerSocket> makeTcpUdtServerSocket()
+class MultipleServerSocketTester
+    : public MultipleServerSocket
 {
-    return MultipleServerSocket::make<TCPServerSocket, UdtStreamServerSocket>();
+public:
+    MultipleServerSocketTester()
+    {
+        addSocket(std::make_unique<TCPServerSocket>());
+        addSocket(std::make_unique<TCPServerSocket>());
+    }
+
+    bool bind(const SocketAddress& localAddress) override
+    {
+        auto port = localAddress.port;
+        for(auto& socket : m_serverSockets)
+            if (!socket->bind(SocketAddress(localAddress.address, port++)))
+                return false;
+
+        return true;
+    }
+};
+
+TEST(MultipleServerSocket, TcpSimpleSync)
+{
+    socketSimpleSync(&std::make_unique<MultipleServerSocketTester>,
+                     &std::make_unique<TCPSocket>);
 }
 
-static std::atomic<int> makeTcpOrUdtClientSocketId(0);
-static std::unique_ptr<AbstractStreamSocket> makeTcpOrUdtClientSocket()
+TEST(MultipleServerSocket, TcpSimpleAsync)
 {
-    if (++makeTcpOrUdtClientSocketId % 2)
-        return std::make_unique<TCPSocket>();
-    else
-        return std::make_unique<UdtStreamSocket>();
+    socketSimpleAsync(&std::make_unique<MultipleServerSocketTester>,
+                      &std::make_unique<TCPSocket>);
 }
 
-TEST(MultipleServerSocket, TcpUdtSimpleSync)
+TEST(MultipleServerSocket, TcpSimpleTrueAsync)
 {
-    socketSimpleSync(&makeTcpUdtServerSocket, &makeTcpOrUdtClientSocket);
-}
-
-TEST(MultipleServerSocket, TcpUdtSimpleAsync)
-{
-    socketSimpleAsync(&makeTcpUdtServerSocket, &makeTcpOrUdtClientSocket);
-}
-
-TEST(MultipleServerSocket, TcpUdtSimpleTrueAsync)
-{
-    socketSimpleTrueAsync(&makeTcpUdtServerSocket, &makeTcpOrUdtClientSocket);
+    socketSimpleTrueAsync(&std::make_unique<MultipleServerSocketTester>,
+                          &std::make_unique<TCPSocket>);
 }
 
 } // namespace test
