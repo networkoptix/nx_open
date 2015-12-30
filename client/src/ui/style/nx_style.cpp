@@ -689,12 +689,15 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             {
                 colorRole = QPalette::Highlight;
 
-                QFontMetrics fm(painter->font());
-                QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
+                if (tab->shape == QTabBar::TriangularNorth)
+                {
+                    QFontMetrics fm(painter->font());
+                    QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
 
-                rect.setTop(tab->rect.bottom() - 2);
-                rect.setBottom(tab->rect.bottom() - 1);
-                painter->fillRect(rect, tab->palette.brush(colorRole));
+                    rect.setTop(tab->rect.bottom() - 2);
+                    rect.setBottom(tab->rect.bottom() - 1);
+                    painter->fillRect(rect, tab->palette.brush(colorRole));
+                }
             }
             else if (tab->state & State_MouseOver)
             {
@@ -959,7 +962,9 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
     case PM_TabBarTabHSpace:
         return 9;
     case PM_TabBarBaseOverlap:
-        return 9;
+        return 2;
+    case PM_TabBarBaseHeight:
+        return 36;
     default:
         break;
     }
@@ -976,7 +981,12 @@ QSize QnNxStyle::sizeFromContents(ContentsType type, const QStyleOption *option,
     case CT_ComboBox:
         return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
     case CT_TabBarTab:
-        return QSize(size.width(), qMax(size.height(), (int)dp(40)));
+        {
+            int height = qMax(size.height(), pixelMetric(PM_TabBarBaseHeight, option, widget));
+            if (qobject_cast<const QTabBar*>(widget))
+                height = qMin(height, widget->maximumHeight());
+            return QSize(size.width(), height);
+        }
     case CT_MenuItem:
         return QSize(size.width() + dp(24) + 2 * kMenuItemHPadding, size.height() + 2 * kMenuItemVPadding);
     default:
