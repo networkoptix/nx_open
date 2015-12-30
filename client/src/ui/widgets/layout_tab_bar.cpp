@@ -45,6 +45,7 @@ QnLayoutTabBar::QnLayoutTabBar(QWidget *parent, QnWorkbenchContext *context):
     setDrawBase(false);
     setShape(QTabBar::RoundedNorth);
     setTabsClosable(true);
+    setMaximumHeight(32);
 
     connect(this, SIGNAL(currentChanged(int)),      this, SLOT(at_currentChanged(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),   this, SLOT(at_tabCloseRequested(int)));

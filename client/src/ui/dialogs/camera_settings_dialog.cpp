@@ -49,6 +49,7 @@ QnCameraSettingsDialog::QnCameraSettingsDialog(QWidget *parent):
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->addWidget(m_settingsWidget);
     layout->addWidget(m_buttonBox);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     //connect(m_buttonBox,        &QDialogButtonBox::accepted,        this,   &QnCameraSettingsDialog::acceptIfSafe);
 
