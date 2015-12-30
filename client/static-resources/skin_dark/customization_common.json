@@ -94,8 +94,8 @@
                 "shadow":           "dark3",
                 "highlight":        "brand_core",
                 "highlightedText":  "brand_contrast",
-                "link":             "#0099ff",
-                "linkVisited":      "#30aafc",
+                "link":             "blue10",
+                "linkVisited":      "blue11",
                 "alternateBase":    "dark6",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
@@ -113,10 +113,10 @@
                 "base":             "dark6.setAlpha(75)",
                 "window":           "dark6",
                 "shadow":           "dark3.setAlpha(75)",
-                "highlight":        "#2fa2db",
-                "highlightedText":  "#f0f0f0",
-                "link":             "#0099ff",
-                "linkVisited":      "#30aafc",
+                "highlight":        "brand_core",
+                "highlightedText":  "brand_contrast.setAlpha(75)",
+                "link":             "blue10.setAlpha(75)",
+                "linkVisited":      "blue11.setAlpha(75)",
                 "alternateBase":    "dark6.setAlpha(75)",
                 "toolTipBase":      "#f0f0f0",
                 "toolTipText":      "#222222"
@@ -132,9 +132,9 @@
                 "mid": "dark9"
             },
             "disabled" : {
-                "midlight": "dark11.setOpacity(75)",
-                "dark": "dark8.setOpacity(75)",
-                "mid": "dark9.setOpacity(75)"
+                "midlight": "dark11setAlpha(75)",
+                "dark": "dark8.setAlpha(75)",
+                "mid": "dark9.setAlpha(75)"
             }
         }
     },
