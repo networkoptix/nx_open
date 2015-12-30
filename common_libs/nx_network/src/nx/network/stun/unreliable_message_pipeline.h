@@ -236,6 +236,9 @@ private:
         if (!m_sendQueue.empty())
             sendOutNextMessage();
     }
+
+    UnreliableMessagePipeline(const UnreliableMessagePipeline&);
+    UnreliableMessagePipeline& operator=(const UnreliableMessagePipeline&);
 };
 
 }   //network
