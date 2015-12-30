@@ -2037,6 +2037,19 @@ void MediaServerProcess::run()
             propertyDictionary->saveParams(server->getId());
         });
 
+        QFile hddList(Qn::HDD_LIST_FILE);
+        if (hddList.open(QFile::ReadOnly))
+        {
+            const auto content = QString::fromUtf8(hddList.readAll());
+            if (content.size())
+            {
+                auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
+                for (auto& hdd : hhds) hdd = hdd.trimmed();
+                server->setProperty(Qn::HDD_LIST, hhds.join(", "),
+                                    QnResource::NO_ALLOW_EMPTY);
+            }
+        }
+
         propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
