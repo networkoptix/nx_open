@@ -1,7 +1,7 @@
 #ifndef NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 #define NX_NETWORK_MULTIPLE_SERVER_SOCKET_H
 
-#include <nx/network/system_socket.h>
+#include "system_socket.h"
 #include <utils/common/cpp14.h>
 #include <queue>
 
@@ -11,14 +11,13 @@ namespace network {
 class MultipleServerSocket
     : public AbstractStreamServerSocket
 {
+protected:
     MultipleServerSocket();
 
 public:
-    // TODO: #mux reimplement with variadic template
-    template<typename S1, typename S2>
-    static std::unique_ptr<AbstractStreamServerSocket> make();
-
-    ~MultipleServerSocket();
+    template<typename S1, typename S2, typename = typename std::enable_if<
+        !(std::is_base_of<S1, S2>::value && std::is_base_of<S2, S1>::value)>::type>
+    std::unique_ptr<AbstractStreamServerSocket> make();
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -59,45 +58,34 @@ public:
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
-private:
-    struct ServerSocketData
+protected:
+    struct ServerSocketHandle
     {
         std::unique_ptr<AbstractStreamServerSocket> socket;
         bool isAccepting;
 
-        ServerSocketData(std::unique_ptr<AbstractStreamServerSocket> socket_);
-        ServerSocketData(ServerSocketData&&);
+        ServerSocketHandle(std::unique_ptr<AbstractStreamServerSocket> socket_);
+        ServerSocketHandle(ServerSocketHandle&&);
 
         AbstractStreamServerSocket* operator->() const;
     };
 
-    struct AcceptedData
-    {
-          SystemError::ErrorCode code;
-          std::unique_ptr<AbstractStreamSocket> socket;
-          std::chrono::time_point<std::chrono::system_clock> time;
-
-          AcceptedData(SystemError::ErrorCode code_,
-                       AbstractStreamSocket* socket_);
-          AcceptedData(AcceptedData&&);
-    };
-
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
-    void accepted(ServerSocketData* source, SystemError::ErrorCode code,
+    void accepted(ServerSocketHandle* source, SystemError::ErrorCode code,
                   AbstractStreamSocket* socket);
 
-private:
+protected:
     bool m_nonBlockingMode;
-    std::vector<ServerSocketData> m_serverSockets;
+    unsigned int m_recvTmeout;
+    mutable SystemError::ErrorCode m_lastError;
+    std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
+    std::vector<ServerSocketHandle> m_serverSockets;
 
     mutable QnMutex m_mutex;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
-    std::queue<AcceptedData> m_acceptedInfos;
-
 };
 
-// TODO: #mux reimplement with variadic template
-template<typename S1, typename S2>
+template<typename S1, typename S2, typename>
 std::unique_ptr<AbstractStreamServerSocket> MultipleServerSocket::make()
 {
     std::unique_ptr<MultipleServerSocket> self(new MultipleServerSocket);
