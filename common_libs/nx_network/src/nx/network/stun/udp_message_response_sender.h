@@ -28,7 +28,9 @@ public:
         SocketAddress sourceAddress);
     virtual ~UDPMessageResponseSender();
 
-    virtual void sendMessage(nx::stun::Message message) override;
+    virtual void sendMessage(
+        nx::stun::Message message,
+        std::function<void(SystemError::ErrorCode)> handler) override;
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
     virtual void addOnConnectionCloseHandler(std::function<void()> handler) override;

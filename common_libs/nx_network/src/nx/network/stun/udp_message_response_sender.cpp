@@ -24,12 +24,14 @@ UDPMessageResponseSender::~UDPMessageResponseSender()
 {
 }
 
-void UDPMessageResponseSender::sendMessage(nx::stun::Message message)
+void UDPMessageResponseSender::sendMessage(
+    nx::stun::Message message,
+    std::function<void(SystemError::ErrorCode)> handler)
 {
     m_udpServer->sendMessage(
         m_sourceAddress,
         std::move(message),
-        std::function<void(SystemError::ErrorCode)>());
+        std::move(handler));
 }
 
 nx::network::TransportProtocol UDPMessageResponseSender::transportProtocol() const

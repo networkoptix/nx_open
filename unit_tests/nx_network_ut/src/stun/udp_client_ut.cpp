@@ -82,7 +82,7 @@ private:
                 nx::stun::MessageClass::successResponse,
                 nx::stun::bindingMethod,
                 message.header.transactionId));
-        connection->sendMessage(std::move(response));
+        connection->sendMessage(std::move(response), nullptr);
     }
 };
 
@@ -128,7 +128,7 @@ TEST_F(StunUDP, client_test_sync)
 
 TEST_F(StunUDP, client_test_async)
 {
-    static const int kRequestToSendcount = 1000;
+    static const int kRequestToSendCount = 1000;
     static const int kLocalServersCount = 10;
     static const std::chrono::seconds kMaxResponsesWaitTime(3);
 
@@ -140,7 +140,7 @@ TEST_F(StunUDP, client_test_async)
     std::condition_variable cond;
     std::set<nx::String> expectedTransactionIDs;
 
-    for (int i = 0; i < kRequestToSendcount; ++i)
+    for (int i = 0; i < kRequestToSendCount; ++i)
     {
         nx::stun::Message requestMessage(
             stun::Header(
