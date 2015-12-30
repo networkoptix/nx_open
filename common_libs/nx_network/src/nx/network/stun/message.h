@@ -68,6 +68,8 @@ public:
     Header(MessageClass messageClass_, int method_);
     Header(MessageClass messageClass_, int method_, Buffer transactionId_);
 
+    Header& operator=(Header&& rhs);    //TODO #ak #msvc2015 =default
+
     static Buffer makeTransactionId();
 
     static const int TRANSACTION_ID_SIZE = 12;
@@ -231,6 +233,8 @@ namespace attrs
 class NX_NETWORK_API Message
 {
 public:
+    //TODO #ak #msvc2015 remove following macro conditions
+
 	#if defined(_MSC_VER) && (_MSC_VER < 1900)
 		typedef std::shared_ptr< attrs::Attribute > AttributePtr;
 	#else
