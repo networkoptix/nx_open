@@ -11,6 +11,7 @@
 #include <QCheckBox>
 #include <QRadioButton>
 #include <QMenu>
+#include <QDialogButtonBox>
 #include <QAbstractItemView>
 #include <private/qfont_p.h>
 #include <QtMath>
@@ -930,6 +931,13 @@ QRect QnNxStyle::subElementRect(QStyle::SubElement subElement, const QStyleOptio
     switch (subElement) {
     case SE_LineEditContents:
         rect.setLeft(rect.left() + dp(6));
+        break;
+    case SE_PushButtonLayoutItem:
+        if (qobject_cast<const QDialogButtonBox *>(widget))
+        {
+            const int shift = 8;
+            rect = option->rect.adjusted(-shift, -shift, shift, shift);
+        }
         break;
     default:
         break;
