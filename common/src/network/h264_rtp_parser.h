@@ -43,7 +43,14 @@ private:
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
-    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics);
+
+    QnCompressedVideoDataPtr createVideoData(
+        const quint8            *rtpBuffer,
+        quint32                 rtpTime,
+        const RtspStatistic     &statistics,
+        int                     addHeaderSize
+    );
+
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
     void updateNalFlags(int nalUnitType);
     int getSpsPpsSize() const;
