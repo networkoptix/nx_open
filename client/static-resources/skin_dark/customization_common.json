@@ -184,6 +184,15 @@
         }
     },
 
+    "QGroupBox": {
+        "palette": {
+            "default": {
+                "shadow": "dark10",
+                "midlight": "light16"
+            }
+        }
+    },
+
     "QnMainWindow": {
         "palette": { "default": {
             "window": "#000000"

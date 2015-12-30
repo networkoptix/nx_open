@@ -227,20 +227,7 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
             return;
         }
     case PE_FrameGroupBox:
-        if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame*>(option)) {
-            painter->save();
-
-            QPen pen(frame->palette.midlight(), dp(1));
-            painter->setPen(pen);
-
-            QRectF rect = frame->rect.adjusted(pen.widthF() / 2, pen.widthF() / 2, -1 - pen.widthF() / 2, -1 - pen.widthF() / 2);
-
-            painter->drawLine(rect.topLeft(), rect.topRight());
-
-            painter->restore();
-            return;
-        }
-        break;
+        return;
     case PE_IndicatorCheckBox:
         {
             painter->save();
@@ -508,20 +495,32 @@ void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionCom
         }
         break;
     case CC_GroupBox:
-        if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option)) {
+        if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
+        {
             painter->save();
 
-            QRect labelRect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxLabel, widget);
+            const bool flat = groupBox->features.testFlag(QStyleOptionFrame::Flat);
+            QStyleOptionGroupBox opt = *groupBox;
 
-            QPen pen(groupBox->palette.midlight(), dp(1));
-            painter->setPen(pen);
+            if (flat)
+            {
+                QFont font = painter->font();
+                font.setPixelSize(font.pixelSize() + 2);
+                font.setWeight(QFont::DemiBold);
+                painter->setFont(font);
+                opt.fontMetrics = QFontMetrics(font);
+            }
+
+            QRect labelRect = subControlRect(CC_GroupBox, &opt, SC_GroupBoxLabel, widget);
 
             if (groupBox->subControls & SC_GroupBoxFrame) {
-                QRect rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget).adjusted(pen.widthF() / 2, pen.widthF() / 2, -1 - pen.widthF() / 2, -1 - pen.widthF() / 2);
+                QRect rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget).adjusted(0, 0, -1, -1);
 
-                if (groupBox->features & QStyleOptionFrame::Flat) {
+                if (flat) {
+                    painter->setPen(groupBox->palette.color(QPalette::Shadow));
                     painter->drawLine(rect.topLeft(), rect.topRight());
                 } else {
+                    painter->setPen(groupBox->palette.color(QPalette::Dark));
                     QPainterPath path;
                     path.moveTo(labelRect.left() - dp(8), rect.top());
                     path.lineTo(rect.topLeft());
@@ -533,12 +532,14 @@ void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionCom
                 }
             }
 
-            painter->restore();
-
             if (groupBox->subControls & SC_GroupBoxLabel) {
-                QPalette::ColorRole textRole = groupBox->features & QStyleOptionFrame::Flat ? QPalette::Text : QPalette::WindowText;
-                drawItemText(painter, labelRect, Qt::AlignCenter, groupBox->palette, groupBox->state & QStyle::State_Enabled, groupBox->text, textRole);
+                QPalette::ColorRole textRole = flat ? QPalette::WindowText : QPalette::Midlight;
+                drawItemText(painter, labelRect, Qt::AlignCenter,
+                             groupBox->palette, groupBox->state & QStyle::State_Enabled,
+                             groupBox->text, textRole);
             }
+
+            painter->restore();
 
             return;
         }
@@ -907,7 +908,7 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
             case SC_GroupBoxContents: {
                 if (groupBox->features & QStyleOptionFrame::Flat) {
                     QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
-                    rect.setTop(labelRect.bottom() + dp(16));
+                    rect.setTop(labelRect.bottom() + dp(24));
                 }
                 break;
             }
