@@ -15,6 +15,8 @@ class QnStorageResource
     Q_PROPERTY(int maxStoreTime READ getMaxStoreTime WRITE setMaxStoreTime)
 
 public:
+    static const qint64 kNasStorageLimit;
+
     QnStorageResource();
     virtual ~QnStorageResource();
 

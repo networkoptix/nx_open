@@ -10,6 +10,7 @@
 #include "recorder/file_deletor.h"
 #include "utils/fs/file.h"
 #include <common/common_module.h>
+#include <platform/platform_abstraction.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -591,6 +592,25 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
         ).toLongLong()
     );
     return storage;
+}
+
+bool QnFileStorageResource::isLocal(const QString &url)
+{
+    if (url.contains(lit("://")))
+        return false;
+
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions =
+        platformMonitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition 
+        );
+
+    for (const auto &partition : partitions)
+        if (url.startsWith(partition.path))
+            return true;
+
+    return false;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

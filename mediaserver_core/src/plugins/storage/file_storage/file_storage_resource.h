@@ -50,6 +50,9 @@ public:
         return m_localPath.isEmpty() ? getPath() : m_localPath;
     }
 
+    // true if storage is located on local disks
+    static bool isLocal(const QString &url);
+
 private:
     virtual QString getPath() const override;
     QString removeProtocolPrefix(const QString& url);
