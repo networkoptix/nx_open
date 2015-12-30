@@ -72,8 +72,9 @@ public:
 
     enum Button {
         CloseButton                 = 0x1,
-        InfoButton                  = 0x2,
-        RotateButton                = 0x4
+        FullscreenButton            = 0x2,
+        InfoButton                  = 0x4,
+        RotateButton                = 0x8
     };
     Q_DECLARE_FLAGS(Buttons, Button)
 

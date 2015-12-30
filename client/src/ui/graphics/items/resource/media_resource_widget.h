@@ -34,14 +34,14 @@ class QnMediaResourceWidget: public QnResourceWidget {
     typedef QnResourceWidget base_type;
 
 public:
-    static const Button ScreenshotButton    = static_cast<Button>(0x008);
-    static const Button MotionSearchButton  = static_cast<Button>(0x010);
-    static const Button PtzButton           = static_cast<Button>(0x020);
-    static const Button FishEyeButton       = static_cast<Button>(0x040);
-    static const Button ZoomWindowButton    = static_cast<Button>(0x080);
-    static const Button EnhancementButton   = static_cast<Button>(0x100);
-    static const Button DbgScreenshotButton = static_cast<Button>(0x200);
-    static const Button IoModuleButton      = static_cast<Button>(0x400);
+    static const Button ScreenshotButton    = static_cast<Button>(0x010);
+    static const Button MotionSearchButton  = static_cast<Button>(0x020);
+    static const Button PtzButton           = static_cast<Button>(0x040);
+    static const Button FishEyeButton       = static_cast<Button>(0x080);
+    static const Button ZoomWindowButton    = static_cast<Button>(0x100);
+    static const Button EnhancementButton   = static_cast<Button>(0x200);
+    static const Button DbgScreenshotButton = static_cast<Button>(0x400);
+    static const Button IoModuleButton      = static_cast<Button>(0x800);
 
     QnMediaResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent = NULL);
     virtual ~QnMediaResourceWidget();

@@ -39,6 +39,7 @@
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/overlays/resource_status_overlay_widget.h>
 #include <ui/graphics/items/overlays/scrollable_overlay_widget.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -347,6 +348,20 @@ void QnResourceWidget::createButtons() {
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
+
+    QnImageButtonWidget *fullscreenButton= new QnImageButtonWidget();
+    fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
+    fullscreenButton->setCheckable(true);
+    fullscreenButton->setChecked(options().testFlag(FullScreenMode));
+    fullscreenButton->setProperty(Qn::NoBlockMotionSelection, true);
+    fullscreenButton->setToolTip(tr("Fullscreen mode"));
+    connect(fullscreenButton, &QnImageButtonWidget::clicked, this, [this]()
+    {
+        // Toggles fullscreen item mode
+        const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
+        workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
+    });
+
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -360,6 +375,8 @@ void QnResourceWidget::createButtons() {
     m_buttonBar->addButton(CloseButton, closeButton);
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
+    m_buttonBar->addButton(FullscreenButton, fullscreenButton);
+
     connect(m_buttonBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
     m_iconButton = new QnImageButtonWidget();
@@ -675,6 +692,9 @@ QnResourceWidget::Buttons QnResourceWidget::visibleButtons() const {
 QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
     Buttons result = InfoButton;
 
+    if (resource()->flags().testFlag(Qn::web_page))
+        result |= FullscreenButton;
+
     if (!(m_options & WindowRotationForbidden))
         result |= RotateButton;
 
@@ -989,9 +1009,24 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
         || (changedFlags.testFlag(InfoOverlaysForbidden));
 
     if (updateHudWoAnimation)
+    {
         updateHud(false);
-    else if (changedFlags.testFlag(FullScreenMode) || changedFlags.testFlag(ActivityPresence))
+        return;
+    }
+
+    const bool fullscreenModeChanged = changedFlags.testFlag(FullScreenMode);
+    if (fullscreenModeChanged || changedFlags.testFlag(ActivityPresence))
         updateHud(true);
+
+    if (fullscreenModeChanged)
+    {
+        const bool fullscreenMode = options().testFlag(FullScreenMode);
+        const auto newChecked = (fullscreenMode
+            ? checkedButtons() | FullscreenButton
+            : checkedButtons() & (~FullscreenButton));
+
+        setCheckedButtons(newChecked);
+    }
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {
