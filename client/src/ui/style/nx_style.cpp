@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QRadioButton>
 #include <QMenu>
 #include <QAbstractItemView>
 #include <private/qfont_p.h>
@@ -250,7 +251,7 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
             painter->setPen(pen);
             painter->setBrush(Qt::NoBrush);
 
-            QRectF rect = option->rect.adjusted(1, 1, -pen.widthF() - 2, -pen.widthF() - 2);
+            QRectF rect = option->rect.adjusted(2, 2, -3, -3);
 
             if (option->state.testFlag(State_On))
             {
@@ -277,6 +278,14 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
             else
             {
                 painter->drawRect(rect);
+
+                if (option->state.testFlag(State_NoChange))
+                {
+                    pen.setWidth(2);
+                    painter->setPen(pen);
+                    painter->drawLine(QPointF(rect.left() + 2, rect.top() + rect.height() / 2.0),
+                                      QPointF(rect.right() - 1, rect.top() + rect.height() / 2.0));
+                }
             }
 
             painter->restore();
@@ -286,20 +295,26 @@ void QnNxStyle::drawPrimitive(PrimitiveElement element, const QStyleOption *opti
         {
             painter->save();
 
-            QPen pen(option->palette.color(QPalette::WindowText), 1.5);
+            QRect rect = option->rect.adjusted(1, 1, -2, -2);
+
+            QPen pen(option->palette.color(QPalette::WindowText), 1.2);
             painter->setPen(pen);
             painter->setBrush(Qt::NoBrush);
             painter->setRenderHint(QPainter::Antialiasing);
-            painter->drawEllipse(option->rect.adjusted(1, 2, -1, 0));
+            painter->drawEllipse(rect);
 
-            if (option->state.testFlag(State_On)) {
+            if (option->state.testFlag(State_On))
+            {
                 painter->setBrush(option->palette.windowText());
                 painter->setPen(Qt::NoPen);
-                int markSize = option->rect.width() * 0.5;
-                QRectF rect(option->rect.left() + (option->rect.width() - markSize) / 2,
-                            option->rect.top() + (option->rect.height() - markSize) / 2 + 1,
-                            markSize, markSize);
-                painter->drawEllipse(rect);
+                painter->drawEllipse(rect.adjusted(3, 3, -3, -3));
+            }
+            else if (option->state.testFlag(State_NoChange))
+            {
+                pen.setWidth(2);
+                painter->setPen(pen);
+                painter->drawLine(QPointF(rect.left() + 4, rect.top() + rect.height() / 2.0),
+                                  QPointF(rect.right() - 3, rect.top() + rect.height() / 2.0));
             }
 
             painter->restore();
@@ -1011,6 +1026,7 @@ void QnNxStyle::polish(QWidget *widget)
     if (qobject_cast<QLineEdit*>(widget) ||
         qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
+        qobject_cast<QRadioButton*>(widget) ||
         qobject_cast<QTabBar*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
