@@ -12,19 +12,19 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
-    <number>4</number>
+    <number>16</number>
    </property>
    <property name="leftMargin">
-    <number>7</number>
+    <number>16</number>
    </property>
    <property name="topMargin">
-    <number>7</number>
+    <number>16</number>
    </property>
    <property name="rightMargin">
-    <number>7</number>
+    <number>16</number>
    </property>
    <property name="bottomMargin">
-    <number>7</number>
+    <number>16</number>
    </property>
    <item>
     <widget class="QLineEdit" name="filterLineEdit">
@@ -53,6 +53,9 @@
       </property>
       <item>
        <widget class="QTableView" name="usersTable">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::NoSelection</enum>
         </property>

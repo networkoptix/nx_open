@@ -11,6 +11,21 @@
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,1,0,0">
+   <property name="spacing">
+    <number>8</number>
+   </property>
+   <property name="leftMargin">
+    <number>16</number>
+   </property>
+   <property name="topMargin">
+    <number>16</number>
+   </property>
+   <property name="rightMargin">
+    <number>16</number>
+   </property>
+   <property name="bottomMargin">
+    <number>16</number>
+   </property>
    <item>
     <widget class="QnWordWrappedLabel" name="dayWarningLabel" native="true"/>
    </item>
@@ -484,6 +499,9 @@
    </item>
    <item>
     <widget class="QTableView" name="tableView">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -513,6 +531,12 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>QnProgressWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/progress_widget.h</header>
@@ -522,12 +546,6 @@
    <class>QnProgressBar</class>
    <extends>QProgressBar</extends>
    <header location="global">ui/widgets/progress_bar.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QnWordWrappedLabel</class>
-   <extends>QWidget</extends>
-   <header location="global">ui/widgets/word_wrapped_label.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
