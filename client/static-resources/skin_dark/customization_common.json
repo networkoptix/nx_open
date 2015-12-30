@@ -127,7 +127,14 @@
     "QAbstractButton": {
         "palette": {
             "default": {
-                "midlight": "dark11"
+                "midlight": "dark11",
+                "dark": "dark8",
+                "mid": "dark9"
+            },
+            "disabled" : {
+                "midlight": "dark11.setOpacity(75)",
+                "dark": "dark8.setOpacity(75)",
+                "mid": "dark9.setOpacity(75)"
             }
         }
     },
@@ -135,7 +142,8 @@
     "QLineEdit": {
         "palette": {
             "default": {
-                "base": "dark4"
+                "base": "dark4",
+                "shadow": "dark3"
             }
         }
     },
@@ -143,7 +151,8 @@
     "QSpinBox": {
         "palette": {
             "default": {
-                "base": "dark4"
+                "base": "dark4",
+                "shadow": "dark3"
             }
         }
     },
