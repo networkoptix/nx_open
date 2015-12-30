@@ -21,7 +21,8 @@ static const std::chrono::seconds kRetryReadAfterFailureTimeout(1);
 
 UDPServer::UDPServer(const MessageDispatcher& dispatcher)
 :
-    base_type(this),
+    m_messagePipeline(this),
+    m_boundToLocalAddress(false),
     m_dispatcher(dispatcher)
 {
 }
@@ -31,10 +32,43 @@ UDPServer::~UDPServer()
     pleaseStopSync();
 }
 
+void UDPServer::pleaseStop(std::function<void()> handler)
+{
+    m_messagePipeline.pleaseStop(std::move(handler));
+}
+
+bool UDPServer::bind(const SocketAddress& localAddress)
+{
+    m_boundToLocalAddress = true;
+    return m_messagePipeline.bind(localAddress);
+}
+
 bool UDPServer::listen()
 {
-    startReceivingMessages();
+    if (!m_boundToLocalAddress)
+    {
+        if (!bind(SocketAddress(HostAddress::anyHost, 0)))
+            return false;
+        m_boundToLocalAddress = true;
+    }
+    m_messagePipeline.startReceivingMessages();
     return true;
+}
+
+SocketAddress UDPServer::address() const
+{
+    return m_messagePipeline.address();
+}
+
+void UDPServer::sendMessage(
+    SocketAddress destinationEndpoint,
+    const Message& message,
+    std::function<void(SystemError::ErrorCode)> completionHandler)
+{
+    m_messagePipeline.sendMessage(
+        std::move(destinationEndpoint),
+        message,
+        std::move(completionHandler));
 }
 
 void UDPServer::messageReceived(SocketAddress sourceAddress, Message mesage)

@@ -20,31 +20,45 @@ namespace stun {
 
 class MessageDispatcher;
 
-/** Receives STUN message over udp, forwards them to dispatcher, sends response message */
+/** Receives STUN message over udp, forwards them to dispatcher, sends response message.
+    \note Class methods are not thread-safe
+*/
 class NX_NETWORK_API UDPServer
 :
-    public nx::network::UnreliableMessagePipeline<
-        UDPServer,
-        Message,
-        MessageParser,
-        MessageSerializer>
+    public QnStoppableAsync
 {
     typedef nx::network::UnreliableMessagePipeline<
         UDPServer,
         Message,
         MessageParser,
-        MessageSerializer> base_type;
+        MessageSerializer> PipelineType;
 
 public:
     UDPServer(const MessageDispatcher& dispatcher);
     virtual ~UDPServer();
 
+    virtual void pleaseStop(std::function<void()> handler) override;
+
+    bool bind(const SocketAddress& localAddress);
+    /** Start receiving messages.
+        If \a UDPServer::bind has not been called, random local address is occupied
+    */
     bool listen();
+
+    /** Returns local address occupied by server */
+    SocketAddress address() const;
+
+    void sendMessage(
+        SocketAddress destinationEndpoint,
+        const Message& message,
+        std::function<void(SystemError::ErrorCode)> completionHandler);
 
     void messageReceived(SocketAddress sourceAddress, Message mesage);
     void ioFailure(SystemError::ErrorCode);
 
 private:
+    PipelineType m_messagePipeline;
+    bool m_boundToLocalAddress;
     const MessageDispatcher& m_dispatcher;
 };
 

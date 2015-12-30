@@ -30,7 +30,6 @@ public:
         m_messageDispatcher.registerDefaultRequestProcessor(
             std::bind(&StunUDP::onMessage, this, _1, _2));
 
-        assert(m_udpServer.bind(SocketAddress(HostAddress::localhost, 0)));
         assert(m_udpServer.listen());
     }
 
