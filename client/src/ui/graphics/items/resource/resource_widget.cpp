@@ -351,8 +351,6 @@ void QnResourceWidget::createButtons() {
 
     QnImageButtonWidget *fullscreenButton= new QnImageButtonWidget();
     fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
-    fullscreenButton->setCheckable(true);
-    fullscreenButton->setChecked(options().testFlag(FullScreenMode));
     fullscreenButton->setProperty(Qn::NoBlockMotionSelection, true);
     fullscreenButton->setToolTip(tr("Fullscreen mode"));
     connect(fullscreenButton, &QnImageButtonWidget::clicked, this, [this]()
