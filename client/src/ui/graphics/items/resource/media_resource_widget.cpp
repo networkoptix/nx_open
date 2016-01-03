@@ -222,7 +222,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
 
 
     m_compositeTextOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-    addOverlayWidget(m_compositeTextOverlay, UserVisible, true, true);
+    addOverlayWidget(m_compositeTextOverlay
+        , detail::OverlayParams(UserVisible, true, true));
 
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
@@ -231,7 +232,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         m_ioModuleOverlayWidget = new QnIoModuleOverlayWidget();
         m_ioModuleOverlayWidget->setCamera(m_camera);
         m_ioModuleOverlayWidget->setAcceptedMouseButtons(0);
-        addOverlayWidget(m_ioModuleOverlayWidget, Visible, true, true);
+        addOverlayWidget(m_ioModuleOverlayWidget
+            , detail::OverlayParams(Visible, true, true));
 
         connect(m_ioLicenceStatusHelper, &QnSingleCamLicenceStatusHelper::licenceStatusChanged, this
             , [this]() { updateIoModuleVisibility(true); });

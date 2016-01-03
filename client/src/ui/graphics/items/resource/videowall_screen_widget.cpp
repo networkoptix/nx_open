@@ -125,7 +125,7 @@ void QnVideowallScreenWidget::updateLayout(bool force) {
         m_mainOverlayWidget->setLayout(m_mainLayout);
         m_mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
         m_mainOverlayWidget->setOpacity(1.0);
-        addOverlayWidget(m_mainOverlayWidget, UserVisible, true);
+        addOverlayWidget(m_mainOverlayWidget, detail::OverlayParams(UserVisible, true));
     }
 
     while (m_mainLayout->count() > 0) {

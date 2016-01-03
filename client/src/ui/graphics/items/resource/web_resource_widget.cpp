@@ -7,6 +7,7 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
 
 namespace
 {
@@ -61,6 +62,7 @@ namespace
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
 {
+    setOption(AlwaysShowName, true);
 
     QGraphicsWebView *webView = new QGraphicsWebView(this);
     webView->setUrl(QUrl(resource()->getUrl()));
@@ -75,7 +77,10 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 //     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
 //         this, &::at_proxyAuthenticationRequired, Qt::DirectConnection);
 
-    addOverlayWidget(webView, detail::OverlayedBase::Visible, false, true, BaseLayer);
+    const auto contentMargins = detail::OverlayMargins(0, iconButton()->preferredHeight());
+    const auto webParams = detail::OverlayParams(Visible
+        , false, true, BaseLayer, contentMargins);
+    addOverlayWidget(webView, webParams);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     updateTitleText();
@@ -84,7 +89,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateButtonsVisibility();
 
     addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench())
-        , Visible, true, true, TopControlsLayer);
+        , detail::OverlayParams(Visible, true, true, TopControlsLayer, contentMargins));
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()

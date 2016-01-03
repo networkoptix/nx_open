@@ -189,7 +189,8 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Status overlay. */
     m_statusOverlayWidget = new QnStatusOverlayWidget(m_resource, this);
-    addOverlayWidget(m_statusOverlayWidget, UserVisible, true, false, StatusLayer);
+    addOverlayWidget(m_statusOverlayWidget
+        , detail::OverlayParams(UserVisible, true, false, StatusLayer));
 
 
     /* Initialize resource. */
@@ -228,7 +229,7 @@ void QnResourceWidget::addInfoOverlay() {
         titleLayout->setSpacing(2.0);
         titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
         titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
-
+        titleLayout->setMinimumHeight(iconButton()->preferredHeight());
         auto titleWidget = createGraphicsWidget(titleLayout);
         auto overlayLayout = createGraphicsLayout(Qt::Vertical);
         overlayLayout->addItem(titleWidget);
@@ -239,7 +240,8 @@ void QnResourceWidget::addInfoOverlay() {
         cameraNameOnlyOverlay->setAcceptedMouseButtons(0);
         m_overlayWidgets.cameraNameOnlyOverlay = cameraNameOnlyOverlay;
 
-        addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
+        addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay
+            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
         setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
 
         insertIconButtonCopy(titleLayout);
@@ -260,7 +262,8 @@ void QnResourceWidget::addInfoOverlay() {
         detailsOverlay->setContentsMargins(kMargin, 0, 0, kMargin);
         detailsOverlay->addItem(m_overlayWidgets.detailsItem);
         detailsOverlay->setMaxFillCoeff(QSizeF(0.3, 0.8));
-        addOverlayWidget(detailsOverlay, UserVisible, true, true, InfoLayer);
+        addOverlayWidget(detailsOverlay
+            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
         m_overlayWidgets.detailsOverlay = detailsOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.detailsOverlay, false, false);
 
@@ -272,7 +275,8 @@ void QnResourceWidget::addInfoOverlay() {
         positionOverlay->setContentsMargins(0, 0, kMargin, kMargin);
         positionOverlay->addItem(m_overlayWidgets.positionItem);
         positionOverlay->setMaxFillCoeff(QSizeF(0.7, 0.8));
-        addOverlayWidget(positionOverlay, UserVisible, true, true, InfoLayer);
+        addOverlayWidget(positionOverlay
+            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
         m_overlayWidgets.positionOverlay = positionOverlay;
         setOverlayWidgetVisible(m_overlayWidgets.positionOverlay, false, false);
     }
@@ -282,7 +286,6 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
     , QnImageButtonWidget *button)
 {
     enum { kItemButtonIndex = 0};
-    layout->insertItem(kItemButtonIndex, button);
     connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this
         , [this, layout, button]()
     {
@@ -303,7 +306,7 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
 void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
 {
     auto iconButtonCopy = new QnImageButtonWidget(this);
-    iconButtonCopy->setPreferredSize(24.0, 24.0);
+    iconButtonCopy->setPreferredSize(iconButton()->preferredSize());
 
     setupIconButton(layout, iconButtonCopy);
 }
@@ -329,7 +332,8 @@ void QnResourceWidget::addMainOverlay() {
     cameraNameWithButtonsOverlay->setAcceptedMouseButtons(0);
     m_overlayWidgets.cameraNameWithButtonsOverlay = cameraNameWithButtonsOverlay;
 
-    addOverlayWidget(m_overlayWidgets.cameraNameWithButtonsOverlay, UserVisible, true, true, InfoLayer);
+    addOverlayWidget(m_overlayWidgets.cameraNameWithButtonsOverlay
+        , detail::OverlayParams(UserVisible, true, true, InfoLayer));
     setOverlayWidgetVisible(m_overlayWidgets.cameraNameWithButtonsOverlay, false, false);
 }
 
@@ -850,7 +854,9 @@ void QnResourceWidget::updateHud(bool animate) {
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
         infoButton->setChecked(detailsVisible);
 
-    bool showOnlyCameraName         = overlaysCanBeVisible && detailsVisible && !m_mouseInWidget;
+    bool alwaysShowName = m_options.testFlag(AlwaysShowName);
+
+    bool showOnlyCameraName         = ((overlaysCanBeVisible && detailsVisible) || alwaysShowName) && !m_mouseInWidget;
     bool showCameraNameWithButtons  = overlaysCanBeVisible && m_mouseInWidget;
     bool showPosition               = overlaysCanBeVisible && (detailsVisible || m_mouseInWidget);
     bool showDetailedInfo           = overlaysCanBeVisible && detailsVisible && (m_mouseInWidget || qnRuntime->showFullInfo());

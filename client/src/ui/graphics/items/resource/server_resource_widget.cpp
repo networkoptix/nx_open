@@ -626,7 +626,8 @@ void QnServerResourceWidget::addOverlays() {
     mainOverlayWidget->setLayout(mainOverlayLayout);
     mainOverlayWidget->setAcceptedMouseButtons(Qt::NoButton);
     mainOverlayWidget->setOpacity(1.0);
-    addOverlayWidget(mainOverlayWidget, UserVisible, true);
+    addOverlayWidget(mainOverlayWidget
+        , detail::OverlayParams(UserVisible, true));
 }
 
 QnServerResourceWidget::LegendButtonBar QnServerResourceWidget::buttonBarByDeviceType(const Qn::StatisticsDeviceType deviceType) const {

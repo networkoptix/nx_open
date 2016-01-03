@@ -13,17 +13,23 @@ class Overlayed;
 class QnViewportBoundWidget;
 
 namespace detail {
-    class OverlayedBase {
+
+    struct OverlayParams;
+
+    class OverlayedBase
+    {
     public:
         // TODO: #Elric Refactoring needed.
-        enum OverlayVisibility {
+        enum OverlayVisibility
+        {
             Invisible,
             Visible,
             AutoVisible,
             UserVisible,
         };
 
-        enum OverlayLayer {
+        enum OverlayLayer
+        {
             BaseLayer = 0,
             StatusLayer,
             InfoLayer,
@@ -34,13 +40,9 @@ namespace detail {
         bool isOverlayVisible() const;
         void setOverlayVisible(bool visible = true, bool animate = true);
 
-        void addOverlayWidget(
-            QGraphicsWidget *widget,
-            OverlayVisibility visibility = UserVisible,
-            bool autoRotate = false,
-            bool bindToViewport = false,
-            qreal z = BaseLayer
-        );
+        void addOverlayWidget(QGraphicsWidget *widget
+            , const OverlayParams &params);
+
         void removeOverlayWidget(QGraphicsWidget *widget);
 
         OverlayVisibility overlayWidgetVisibility(QGraphicsWidget *widget) const;
@@ -79,6 +81,34 @@ namespace detail {
 
         /** Fixed rotation angle in degrees. Used to rotate static text and images. */
         Qn::FixedRotation m_overlayRotation;
+    };
+
+    struct OverlayMargins
+    {
+        qreal left;
+        qreal top;
+        qreal right;
+        qreal bottom;
+
+        OverlayMargins(qreal initLeft = 0
+            , qreal initTop = 0
+            , qreal initRight = 0
+            , qreal initBottom = 0);
+    };
+
+    struct OverlayParams
+    {
+        OverlayedBase::OverlayVisibility visibility;
+        bool autoRotate;
+        bool bindToViewport;
+        qreal z;
+        OverlayMargins margins;
+
+        OverlayParams(OverlayedBase::OverlayVisibility visibility = OverlayedBase::UserVisible
+            , bool autoRotate = false
+            , bool bindToViewport = false
+            , qreal z = OverlayedBase::BaseLayer
+            , OverlayMargins initMargins = OverlayMargins());
     };
 
 } // namespace detail

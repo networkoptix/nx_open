@@ -66,7 +66,9 @@ public:
         InfoOverlaysForbidden       = 0x04000,
 
         FullScreenMode              = 0x08000,
-        ActivityPresence            = 0x10000
+        ActivityPresence            = 0x10000,
+
+        AlwaysShowName              = 0x20000
     };
     Q_DECLARE_FLAGS(Options, Option)
 
