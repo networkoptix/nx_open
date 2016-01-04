@@ -78,7 +78,10 @@ bool QnScrollBarProxy::event(QEvent *event)
         break;
     case QEvent::ParentChange:
         if (parentWidget())
+        {
             parentWidget()->installEventFilter(this);
+            setScrollBarVisible(isVisible() && parentWidget()->isVisible());
+        }
         break;
     default:
         break;
