@@ -607,13 +607,34 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             {
             case QFrame::HLine:
                 {
-                    painter->setPen(frame->palette.color(QPalette::Dark));
+                    QPalette::ColorRole topRole = QPalette::Dark;
+                    QPalette::ColorRole bottomRole = QPalette::NoRole;
+
+                    if (frame->state.testFlag(State_Sunken))
+                    {
+                        bottomRole = QPalette::Mid;
+                    }
+                    else if (frame->state.testFlag(State_Raised))
+                    {
+                        topRole = QPalette::Mid;
+                        bottomRole = QPalette::Dark;
+                    }
+
+                    painter->save();
+
+                    painter->setPen(frame->palette.color(topRole));
                     painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
-                    painter->setPen(frame->palette.color(QPalette::Mid));
-                    painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
-                                      frame->rect.right(), frame->rect.top() + 1);
+
+                    if (bottomRole != QPalette::NoRole)
+                    {
+                        painter->setPen(frame->palette.color(bottomRole));
+                        painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
+                                          frame->rect.right(), frame->rect.top() + 1);
+                    }
+
+                    painter->restore();
+                    return;
                 }
-                return;
             default:
                 break;
             }
