@@ -3,6 +3,7 @@
 
 #include <ui/models/license_list_model.h>
 #include "utils/common/synctime.h"
+#include <ui/widgets/scroll_bar_proxy.h>
 
 
 QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::WindowFlags windowFlags):
@@ -17,6 +18,8 @@ QnLicenseNotificationDialog::QnLicenseNotificationDialog(QWidget *parent, Qt::Wi
     m_model = new QnLicenseListModel(this);
     m_model->setColumns(columns);
     ui->treeView->setModel(m_model);
+
+    QnScrollBarProxy::makeProxy(ui->verticalScrollBar, ui->treeView);
 }
 
 QnLicenseNotificationDialog::~QnLicenseNotificationDialog() {
