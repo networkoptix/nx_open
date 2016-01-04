@@ -16,6 +16,7 @@
 #include <ui/actions/action_manager.h>
 #include <ui/dialogs/ldap_settings_dialog.h>
 #include <ui/dialogs/ldap_users_dialog.h>
+#include <ui/widgets/scroll_bar_proxy.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/user_list_model.h>
@@ -49,6 +50,8 @@ QnUserManagementWidget::QnUserManagementWidget(QWidget *parent)
     connect(m_header, &QnCheckBoxedHeaderView::checkStateChanged, this, &QnUserManagementWidget::at_headerCheckStateChanged);
 
     ui->usersTable->sortByColumn(QnUserListModel::NameColumn, Qt::AscendingOrder);
+
+    QnScrollBarProxy::makeProxy(ui->verticalScrollBar, ui->usersTable);
 
     auto updateFetchButton = [this] {
         ui->fetchButton->setEnabled(QnGlobalSettings::instance()->ldapSettings().isValid());
