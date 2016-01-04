@@ -741,12 +741,14 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             return;
         }
     case CE_HeaderSection:
-        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader*>(option)) {
+        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader*>(option))
+        {
             painter->fillRect(header->rect, header->palette.window());
 
-            if (header->orientation == Qt::Horizontal && !header->text.isEmpty()) {
+            if (header->orientation == Qt::Horizontal)
+            {
                 painter->save();
-                painter->setPen(header->palette.color(QPalette::Midlight).darker(150));
+                painter->setPen(header->palette.color(QPalette::Dark));
                 painter->drawLine(header->rect.bottomLeft(), header->rect.bottomRight());
                 painter->restore();
             }
