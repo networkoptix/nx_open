@@ -566,44 +566,27 @@ void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionCom
         break;
     case CC_ScrollBar:
         if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option)) {
-            painter->save();
-
-            QRect scrollBarSubLine = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSubLine, widget);
-            QRect scrollBarAddLine = proxy()->subControlRect(control, scrollBar, SC_ScrollBarAddLine, widget);
             QRect scrollBarSlider = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
             QRect scrollBarGroove = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
 
+            QBrush sliderBrush = scrollBar->palette.button();
+            QBrush grooveBrush = scrollBar->palette.base();
+
+            if (scrollBar->state.testFlag(State_Sunken))
+            {
+                sliderBrush = scrollBar->palette.mid();
+            }
+            else if (scrollBar->state.testFlag(State_MouseOver))
+            {
+                sliderBrush = scrollBar->palette.midlight();
+            }
+
             if (scrollBar->subControls & SC_ScrollBarGroove)
-                painter->fillRect(scrollBarGroove, scrollBar->palette.button());
+                painter->fillRect(scrollBarGroove, grooveBrush);
 
             if (scrollBar->subControls & SC_ScrollBarSlider)
-                painter->fillRect(scrollBarSlider, scrollBar->palette.midlight());
+                painter->fillRect(scrollBarSlider, sliderBrush);
 
-            painter->setPen(scrollBar->palette.color(QPalette::Button));
-
-            if (scrollBar->subControls & SC_ScrollBarAddLine) {
-                painter->fillRect(scrollBarAddLine, scrollBar->palette.midlight());
-                if (scrollBar->orientation == Qt::Vertical) {
-                    painter->drawLine(scrollBarAddLine.topLeft(), scrollBarAddLine.topRight());
-                    drawArrow(Down, painter, scrollBarAddLine, scrollBar->palette.color(QPalette::Text));
-                } else {
-                    painter->drawLine(scrollBarAddLine.topLeft(), scrollBarAddLine.bottomLeft());
-                    drawArrow(Right, painter, scrollBarAddLine, scrollBar->palette.color(QPalette::Text));
-                }
-            }
-
-            if (scrollBar->subControls & SC_ScrollBarSubLine) {
-                painter->fillRect(scrollBarSubLine, scrollBar->palette.midlight());
-                if (scrollBar->orientation == Qt::Vertical) {
-                    painter->drawLine(scrollBarSubLine.bottomLeft(), scrollBarSubLine.bottomRight());
-                    drawArrow(Up, painter, scrollBarSubLine, scrollBar->palette.color(QPalette::Text));
-                } else {
-                    painter->drawLine(scrollBarSubLine.topRight(), scrollBarSubLine.bottomRight());
-                    drawArrow(Left, painter, scrollBarSubLine, scrollBar->palette.color(QPalette::Text));
-                }
-            }
-
-            painter->restore();
             return;
         }
         break;
@@ -743,8 +726,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             if (header->orientation == Qt::Horizontal && !header->text.isEmpty()) {
                 painter->save();
                 painter->setPen(header->palette.color(QPalette::Midlight).darker(150));
-                QRect rect = header->rect;
-                painter->drawLine(rect.left(), rect.bottom(), rect.right() - dp(16), rect.bottom());
+                painter->drawLine(header->rect.bottomLeft(), header->rect.bottomRight());
                 painter->restore();
             }
             return;
@@ -941,6 +923,51 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
             }
         }
         break;
+    case CC_ScrollBar:
+        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
+        {
+            const int w = pixelMetric(PM_ScrollBarExtent, option, widget);
+
+            switch (subControl)
+            {
+            case SC_ScrollBarAddLine:
+                if (scrollBar->orientation == Qt::Vertical)
+                    rect.setTop(rect.bottom());
+                else
+                    rect.setLeft(rect.right());
+                break;
+            case SC_ScrollBarSubLine:
+                if (scrollBar->orientation == Qt::Vertical)
+                    rect.setBottom(rect.top());
+                else
+                    rect.setRight(rect.left());
+                break;
+            case SC_ScrollBarGroove:
+                rect = widget->rect();
+                break;
+            case SC_ScrollBarSlider:
+                if (scrollBar->orientation == Qt::Vertical)
+                    rect.adjust(0, -w, 0, w);
+                else
+                    rect.adjust(-w, 0, w, 0);
+                break;
+            case SC_ScrollBarAddPage:
+                if (scrollBar->orientation == Qt::Vertical)
+                    rect.adjust(0, w, 0, 0);
+                else
+                    rect.adjust(w, 0, 0, 0);
+                break;
+            case SC_ScrollBarSubPage:
+                if (scrollBar->orientation == Qt::Vertical)
+                    rect.adjust(0, 0, 0, -w);
+                else
+                    rect.adjust(0, 0, -w, 0);
+                break;
+            default:
+                break;
+            }
+        }
+        break;
     default:
         break;
     }
@@ -997,6 +1024,10 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
         return 2;
     case PM_TabBarBaseHeight:
         return 36;
+    case PM_ScrollBarExtent:
+        return 8;
+    case PM_ScrollBarSliderMin:
+        return 8;
     default:
         break;
     }
@@ -1069,7 +1100,8 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
-        qobject_cast<QTabBar*>(widget))
+        qobject_cast<QTabBar*>(widget) ||
+        qobject_cast<QScrollBar*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
     }
