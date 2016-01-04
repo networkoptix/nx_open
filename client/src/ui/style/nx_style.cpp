@@ -216,8 +216,9 @@ void QnNxStyle::drawPrimitive(
                 brush = option->palette.shadow();
 
             painter->setBrush(brush);
+            painter->setRenderHint(QPainter::Antialiasing);
 
-            painter->drawRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5));
+            painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
 
             if (option->state & State_HasFocus)
             {
