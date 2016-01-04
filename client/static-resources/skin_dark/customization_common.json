@@ -222,6 +222,14 @@
         }
     },
 
+    "QnPanel": {
+        "palette": {
+            "default": {
+                "window": "dark7"
+            }
+        }
+    },
+
     "QnMainWindow": {
         "palette": { "default": {
             "window": "#000000"
