@@ -7,6 +7,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QLineEdit>
+#include <QComboBox>
 #include <QSpinBox>
 #include <QCheckBox>
 #include <QRadioButton>
@@ -200,9 +201,10 @@ void QnNxStyle::drawPrimitive(
     case PE_PanelLineEdit:
     case PE_FrameLineEdit:
         {
-            if (widget && qobject_cast<const QSpinBox*>(widget->parentWidget()))
+            if (widget && (qobject_cast<const QSpinBox *>(widget->parentWidget()) ||
+                           qobject_cast<const QComboBox *>(widget->parentWidget())))
             {
-                // Do not draw panel for the internal line edit of spin box.
+                // Do not draw panel for the internal line edit of certain widgets.
                 return;
             }
 
@@ -347,35 +349,61 @@ void QnNxStyle::drawPrimitive(
     base_type::drawPrimitive(element, option, painter, widget);
 }
 
-void QnNxStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
-    switch (control) {
+void QnNxStyle::drawComplexControl(
+        ComplexControl control,
+        const QStyleOptionComplex *option,
+        QPainter *painter,
+        const QWidget *widget) const
+{
+    switch (control)
+    {
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
-            bool hasFocus = comboBox->state & State_HasFocus && comboBox->state & State_KeyboardFocusChange;
-            bool sunken = comboBox->state & State_On;
-            bool isEnabled = comboBox->state & State_Enabled;
-
+        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
+        {
             painter->save();
 
-            QRect buttonRect = comboBox->rect;
-
-            if (comboBox->editable) {
+            if (comboBox->editable)
+            {
                 proxy()->drawPrimitive(PE_FrameLineEdit, comboBox, painter, widget);
-            } else {
+
+                QRect buttonRect = subControlRect(control, option, SC_ComboBoxArrow, widget);
+
+                QPalette::ColorRole buttonColorRole = QPalette::NoRole;
+
+                if (comboBox->state.testFlag(State_On))
+                {
+                    buttonColorRole = QPalette::Mid;
+                }
+                else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
+                {
+                    buttonColorRole = QPalette::Midlight;
+                }
+
+                if (buttonColorRole != QPalette::NoRole)
+                {
+                    painter->setBrush(comboBox->palette.brush(buttonColorRole));
+                    painter->setPen(Qt::NoPen);
+                    painter->setRenderHint(QPainter::Antialiasing);
+                    painter->drawRoundedRect(buttonRect, 2, 2);
+                    painter->drawRect(buttonRect.adjusted(0, 0, -buttonRect.width() / 2, 0));
+                    painter->setRenderHint(QPainter::Antialiasing, false);
+                }
+            }
+            else
+            {
                 QStyleOptionButton buttonOption;
                 buttonOption.QStyleOption::operator=(*comboBox);
-                buttonOption.rect = buttonRect;
+                buttonOption.rect = comboBox->rect;
                 buttonOption.state = comboBox->state & (State_Enabled | State_MouseOver | State_HasFocus | State_KeyboardFocusChange);
-                if (sunken) {
+                if (comboBox->state & State_On)
                     buttonOption.state |= State_Sunken;
-                    buttonOption.state &= ~State_MouseOver;
-                }
                 proxy()->drawPrimitive(PE_PanelButtonCommand, &buttonOption, painter, widget);
             }
 
-            if (comboBox->subControls & SC_ComboBoxArrow) {
+            if (comboBox->subControls & SC_ComboBoxArrow)
+            {
                 QRectF rect = subControlRect(CC_ComboBox, comboBox, SC_ComboBoxArrow, widget);
-                drawArrow(Down, painter, rect.translated(0, -dp(2)), option->palette.color(QPalette::Text));
+                drawArrow(Down, painter, rect.translated(0, -1), option->palette.color(QPalette::Text));
             }
 
             painter->restore();
@@ -889,8 +917,9 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
         if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
             switch (subControl) {
             case SC_ComboBoxArrow: {
-                rect.setSize(QSize(comboBox->rect.height(), comboBox->rect.height()));
-                rect.moveRight(comboBox->rect.right());
+                rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
+                             comboBox->rect.height(), comboBox->rect.height());
+                rect.adjust(0, 1, 0, -1);
                 break;
             }
             case SC_ComboBoxEditField: {
@@ -1121,6 +1150,7 @@ void QnNxStyle::polish(QWidget *widget)
     }
 
     if (qobject_cast<QLineEdit*>(widget) ||
+        qobject_cast<QComboBox*>(widget) ||
         qobject_cast<QSpinBox*>(widget) ||
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||

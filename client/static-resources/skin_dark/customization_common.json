@@ -157,6 +157,23 @@
         }
     },
 
+    "QComboBox": {
+        "palette": {
+            "default": {
+                "midlight": "dark11",
+                "dark": "dark8",
+                "mid": "dark9",
+                "base": "dark4",
+                "shadow": "dark3"
+            },
+            "disabled" : {
+                "midlight": "dark11.setAlpha(75)",
+                "dark": "dark8.setAlpha(75)",
+                "mid": "dark9.setAlpha(75)"
+            }
+        }
+    },
+
     "QSpinBox": {
         "palette": {
             "default": {
