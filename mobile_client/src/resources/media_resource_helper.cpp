@@ -506,8 +506,7 @@ QnMediaServerResourcePtr QnMediaResourceHelper::serverAtCurrentPosition() const
     if (position != -1)
         position = m_chunkProvider->closestChunkStartMs(position, true);
 
-    QnTimePeriod period;
-    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position, &period);
+    return qnCameraHistoryPool->getMediaServerOnTime(m_camera, position);
 }
 
 QnMediaResourceHelper::Protocol QnMediaResourceHelper::protocol() const
