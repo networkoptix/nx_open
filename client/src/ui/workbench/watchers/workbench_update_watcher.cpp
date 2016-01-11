@@ -103,7 +103,7 @@ void QnWorkbenchUpdateWatcher::at_checker_updateAvailable(const QnSoftwareVersio
 
 #ifdef Q_OS_MAC
     bool hasOutdatedServer = false;
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
+    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers(Qn::AnyStatus)) {
         if (server->getVersion() < updateVersion) {
             hasOutdatedServer = true;
             break;
