@@ -440,7 +440,9 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+
+    auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
+    storage->setSpaceLimit(spaceLimit);
     storage->setUsedForWriting(storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -536,11 +538,10 @@ static QStringList listRecordFolders()
 QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 {
     QnStorageResourceList result;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for (const auto& storage: storages)
     {
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
     return result;
@@ -552,14 +553,13 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for(const QString& folderPath: listRecordFolders())
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < storage->getSpaceLimit())
             continue; // if storage size isn't known do not add it by default
 
 
@@ -1662,7 +1662,6 @@ void MediaServerProcess::run()
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
 
-    // TODO: #akulikov #backup storages. Check if it is right.
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
