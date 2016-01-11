@@ -1,8 +1,9 @@
 <div ng-controller="LoginCtrl">
+
+    <form name="loginForm" novalidate>
     <div class="modal-body" >
         <process-alert process="login" ></process-alert>
 
-        <form name="loginForm" novalidate>
             <div class="form-group" validate-field>
                 <label for="email">Email address</label>
                 <input type="email" class="form-control" ng-model="email" id="email" name="email"
@@ -18,7 +19,6 @@
                 <label ><input type="checkbox" ng-model="remember" name="remember" id="remember"
                                disabled> Remember me</label>
             </div>
-        </form>
     </div>
     <div class="modal-footer">
         <a href="#/restore_password">I forgot my password </a>
@@ -27,4 +27,6 @@
                         button-disabled="!loginForm.$valid"
                         button-text="'Login'"></process-button>
     </div>
+
+    </form>
 </div>
