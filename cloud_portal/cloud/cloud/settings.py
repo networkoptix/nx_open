@@ -165,7 +165,7 @@ CLOUD_CONNECT = {
 IP_WHITELISTS = {
     'local': (
         '127.0.0.1',  # localhost
-        '95.3,1.136.2'  # moscow office
+        '95.3.1.136.2'  # moscow office
         )
 }
 

@@ -8,11 +8,9 @@ def check_ip(ip, list_name):
     ip_match = ip in white_list
 
     if not ip_match:
-        for mask in white_list:
-            network = ipaddress.ip_network(mask)
-            if ipaddress.ip_address(ip) in network:
-                ip_match = True
-                break
+        ipa = ipaddress.ip_address(ip)
+        ip_match = next(filter(lambda mask: ipa in ipaddress.ip_network(mask), white_list), None) is not None
+    
     return ip_match
 
 
