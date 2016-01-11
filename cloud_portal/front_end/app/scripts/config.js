@@ -4,6 +4,7 @@ var Config = {
     apiBase: '/api',
     clientProtocol: 'vms://',
 
+    emailRegex:'.+@.+\\..+', // Check only @ and . in the email
     passwordRequirements:
     {
         minLength: 6,

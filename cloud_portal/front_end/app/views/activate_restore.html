@@ -15,7 +15,7 @@
             <div class="form-group" validate-field>
                 <label for="emailReactivate"  class="col-sm-3 control-label">Email address</label>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"
+                    <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="emailReactivate"
                            name="email"
@@ -23,6 +23,7 @@
                 </div>
                 <div class="col-sm-5">
                     <span class="help-block" ng-if="reactivateAccount.email.$dirty && reactivateAccount.email.$error.required">Email is required.</span>
+                    <span class="help-block" ng-if="reactivateAccount.email.$dirty && reactivateAccount.email.$error.email || reactivateAccount.email.$error.pattern">Please, enter a valid email.</span>
                 </div>
             </div>
             <div class="form-group">
@@ -45,7 +46,7 @@
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-3 control-label">Email address</label>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control"
+                    <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="email"
                            name="email"
@@ -53,6 +54,7 @@
                 </div>
                 <div class="col-sm-5">
                     <span class="help-block" ng-if="restorePassword.email.$dirty && restorePassword.email.$error.required">Email is required.</span>
+                    <span class="help-block" ng-if="restorePassword.email.$dirty && restorePassword.email.$error.email || restorePassword.email.$error.pattern">Please, enter a valid email.</span>
                 </div>
             </div>
             <div class="form-group">

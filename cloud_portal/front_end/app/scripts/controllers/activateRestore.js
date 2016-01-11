@@ -6,6 +6,8 @@ angular.module('cloudApp')
 
         $scope.session = $sessionStorage;
 
+        $scope.Config = Config;
+
         $scope.data = {
             newPassword: '',
             email: $sessionStorage.email,

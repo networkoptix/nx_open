@@ -6,6 +6,7 @@
             <div class="form-group" validate-field>
                 <label for="email">Email address</label>
                 <input type="email" class="form-control" ng-model="email" id="email" name="email"
+                       ng-pattern="Config.emailRegex"
                        required autofocus>
             </div>
             <div class="form-group" validate-field>

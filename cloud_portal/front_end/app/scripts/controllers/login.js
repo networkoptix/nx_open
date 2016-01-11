@@ -9,6 +9,7 @@ angular.module('cloudApp')
             }
         });
 
+        $scope.Config = Config;
         $scope.session = $sessionStorage;
         $scope.email = '';
         $scope.password = '';

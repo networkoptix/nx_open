@@ -10,7 +10,8 @@
         <div class="form-group">
             <label for="email"  class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-9">
-                <input type="email" class="form-control" ng-model="account.email" id="email" readonly >
+                <input type="email" class="form-control" ng-model="account.email" id="email"
+                       ng-pattern="Config.emailRegex" readonly >
             </div>
         </div>
 
