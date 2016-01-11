@@ -16,7 +16,7 @@
 
 namespace {
     const int serverTimeUpdatePeriodMs = 1000 * 60 * 2; /* 2 minutes. */
-};  
+};
 
 
 QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent)
@@ -27,13 +27,15 @@ QnWorkbenchServerTimeWatcher::QnWorkbenchServerTimeWatcher(QObject *parent)
     connect(qnResPool, &QnResourcePool::resourceRemoved, this,   &QnWorkbenchServerTimeWatcher::at_resourcePool_resourceRemoved);
 
     /* We need to process only servers. */
-    foreach(const QnResourcePtr &resource, qnResPool->getAllServers())
+    for(const QnResourcePtr &resource: qnResPool->getAllServers(Qn::AnyStatus))
         at_resourcePool_resourceAdded(resource);
 
     m_timer->setInterval(serverTimeUpdatePeriodMs);
     m_timer->setSingleShot(false);
-    connect(m_timer, &QTimer::timeout, this, [this] {
-        for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+    connect(m_timer, &QTimer::timeout, this, [this]
+    {
+        const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+        for (const QnMediaServerResourcePtr &server: onlineServers)
             sendRequest(server);
     });
     m_timer->start();
@@ -57,20 +59,20 @@ qint64 QnWorkbenchServerTimeWatcher::utcOffset(const QnMediaResourcePtr &resourc
         qint64 result = fileResource->timeZoneOffset();
         if (result != Qn::InvalidUtcOffset)
             Q_ASSERT_X(fileResource->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
-        return result == Qn::InvalidUtcOffset 
-            ? defaultValue 
+        return result == Qn::InvalidUtcOffset
+            ? defaultValue
             : result;
-    } 
-    
+    }
+
     if (QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(resource->toResource()->getParentId())) {
         Q_ASSERT_X(resource->toResourcePtr()->hasFlags(Qn::utc), Q_FUNC_INFO, "Only utc resources should have offset.");
         return utcOffset(server, defaultValue);
     }
-        
-    return defaultValue;    
+
+    return defaultValue;
 }
 
-qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &resource) const { 
+qint64 QnWorkbenchServerTimeWatcher::displayOffset(const QnMediaResourcePtr &resource) const {
     return qnSettings->timeMode() == Qn::ClientTimeMode
          ? 0
          : localOffset(resource, 0);

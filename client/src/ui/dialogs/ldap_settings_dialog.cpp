@@ -69,10 +69,9 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr server: onlineServers)
+    {
         if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
             continue;
 

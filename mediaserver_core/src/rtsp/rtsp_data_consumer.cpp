@@ -15,7 +15,11 @@
 #include "recorder/recording_manager.h"
 #include "plugins/resource/archive/archive_stream_reader.h"
 
-static_assert(AV_NOPTS_VALUE == DATETIME_INVALID, "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
+const auto checkConstantsEquality = []()
+{
+    assert((AV_NOPTS_VALUE == DATETIME_INVALID) && "DATETIME_INVALID must be equal to AV_NOPTS_VALUE.");
+    return true;
+}();
 
 static const int MAX_QUEUE_SIZE = 12;
 static const qint64 TO_LOWQ_SWITCH_MIN_QUEUE_DURATION = 2000ll * 1000ll; // 2 seconds
@@ -89,35 +93,35 @@ void QnRtspDataConsumer::resumeNetwork()
 }
 
 //qint64 lastSendTime() const { return m_lastSendTime; }
-void QnRtspDataConsumer::setLastSendTime(qint64 time) 
-{ 
-    m_lastMediaTime = m_lastSendTime = time; 
+void QnRtspDataConsumer::setLastSendTime(qint64 time)
+{
+    m_lastMediaTime = m_lastSendTime = time;
 }
 void QnRtspDataConsumer::setWaitCSeq(qint64 newTime, int sceq)
-{ 
+{
     QnMutexLocker lock( &m_mutex );
-    m_waitSCeq = sceq; 
+    m_waitSCeq = sceq;
     m_lastMediaTime = m_lastSendTime = newTime;
 }
 
 qint64 QnRtspDataConsumer::getCurrentTime() const
 {
-    return m_lastSendTime; 
+    return m_lastSendTime;
 }
 
 qint64 QnRtspDataConsumer::getNextTime() const
 {
-    return m_lastSendTime; 
+    return m_lastSendTime;
 }
 
-qint64 QnRtspDataConsumer::getDisplayedTime() const 
-{ 
-    return m_lastSendTime; 
+qint64 QnRtspDataConsumer::getDisplayedTime() const
+{
+    return m_lastSendTime;
 }
 
 qint64 QnRtspDataConsumer::getExternalTime() const
 {
-    return m_lastSendTime; 
+    return m_lastSendTime;
 }
 
 bool removeItemsCondition(const QnAbstractDataPacketPtr& data)
@@ -198,7 +202,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
         for (int i = m_dataQueue.size()-1; i >=0; --i)
         {
             const QnAbstractMediaData* media = dynamic_cast<const QnAbstractMediaData*>( m_dataQueue.atUnsafe(i).get() );
-            if (media->flags & AV_PKT_FLAG_KEY) 
+            if (media->flags & AV_PKT_FLAG_KEY)
             {
                 bool isHiQ = !(media->flags & QnAbstractMediaData::MediaFlags_LowQuality);
                 if (isHiQ == clearHiQ)
@@ -224,7 +228,7 @@ void QnRtspDataConsumer::putData(const QnAbstractDataPacketPtr& nonConstData)
                 }
             }
         }
-        if (somethingDeleted) 
+        if (somethingDeleted)
         {
             // clone packet. Put to queue new copy because data is modified
             QnAbstractMediaDataPtr media = QnAbstractMediaDataPtr(std::dynamic_pointer_cast<const QnAbstractMediaData>(m_dataQueue.front())->clone());
@@ -248,7 +252,7 @@ bool QnRtspDataConsumer::canAcceptData() const
         return true;
     else if (m_singleShotMode)
         return m_dataQueue.size() == 0;
-    else 
+    else
         return QnAbstractDataConsumer::canAcceptData();
 }
 
@@ -354,7 +358,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
         buildRtspTcpHeader(rtpTcpChannel, ssrc, sendLen + ffHeaderSize, sendLen >= dataRest ? 1 : 0, media->timestamp, RTP_FFMPEG_GENERIC_CODE);
         //QnMutexLocker lock( &m_owner->getSockMutex() );
         m_owner->bufferData(m_rtspTcpHeader, sizeof(m_rtspTcpHeader));
-        if (ffHeaderSize) 
+        if (ffHeaderSize)
         {
             quint8 packetType = media->dataType;
             m_owner->bufferData((const char*) &packetType, 1);
@@ -364,7 +368,7 @@ void QnRtspDataConsumer::createDataPacketTCP(QnByteArray& sendBuffer, QnAbstract
             m_owner->bufferData((const char*) &cseq8, 1);
             flags = htons(flags);
             m_owner->bufferData((const char*) &flags, 2);
-            if (video) 
+            if (video)
             {
                 quint32 videoHeader = htonl(video->data.size() & 0x00ffffff);
                 m_owner->bufferData(((const char*) &videoHeader)+1, 3);
@@ -542,7 +546,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (!isLive) )
         doRealtimeDelay(media);
 
-    if (isLive && media->dataType == QnAbstractMediaData::VIDEO) 
+    if (isLive && media->dataType == QnAbstractMediaData::VIDEO)
     {
         QnMutexLocker lock( &m_liveTimingControlMtx );
         if (m_firstLiveTime == (qint64)AV_NOPTS_VALUE) {
@@ -581,11 +585,11 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
             break;
 
         bool isRtcp = false;
-        if (codecEncoder->isRtpHeaderExists()) 
+        if (codecEncoder->isRtpHeaderExists())
         {
             RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
-            if (isRtcp && m_owner->getTracksCount() == 1) 
+            if (isRtcp && m_owner->getTracksCount() == 1)
             {
                 // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
                 m_sendBuffer.resize(4);
@@ -594,9 +598,9 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-            QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++); 
+            QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++);
         }
-        
+
         if (m_owner->isTcpMode()) {
             m_sendBuffer.data()[0] = '$';
             m_sendBuffer.data()[1] = isRtcp ? trackInfo->clientRtcpPort : trackInfo->clientPort;

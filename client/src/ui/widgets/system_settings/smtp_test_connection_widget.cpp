@@ -23,7 +23,7 @@ QnSmtpTestConnectionWidget::QnSmtpTestConnectionWidget( QWidget* parent /*= null
 
     m_timeoutTimer->setSingleShot(false);
 
-    connect(ui->cancelTestButton,           &QPushButton::clicked,              this,   [this] { 
+    connect(ui->cancelTestButton,           &QPushButton::clicked,              this,   [this] {
         stopTesting();
         emit finished();
     });
@@ -68,10 +68,9 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for(const QnMediaServerResourcePtr &server: qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr &server: onlineServers)
+    {
         if (!server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             continue;
 
@@ -105,7 +104,7 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     m_timeoutTimer->setInterval(testSmtpTimeoutMSec / ui->testProgressBar->maximum());
     m_timeoutTimer->start();
 
-    m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));   
+    m_testHandle = serverConnection->testEmailSettingsAsync(result, this, SLOT(at_testEmailSettingsFinished(int, const QnTestEmailSettingsReply& , int)));
     return m_testHandle > 0;
 }
 
