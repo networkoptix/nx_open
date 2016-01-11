@@ -14,14 +14,17 @@ angular.module('cloudApp')
         $scope.passwordMode =  $routeParams.passwordMode;
 
         $scope.session = $sessionStorage;
-        $scope.password = '';
-        $scope.newPassword = '';
+
+        $scope.pass = {
+            password: '',
+            newPassword: ''
+        };
 
         $scope.save = process.init(function() {
             return cloudApi.accountPost($scope.account.first_name,$scope.account.last_name,$scope.account.subscribe);
         });
         $scope.changePassword = process.init(function() {
-            return cloudApi.changePassword($scope.newPassword,$scope.password);
+            return cloudApi.changePassword($scope.pass.newPassword,$scope.pass.password);
         },{
             notAuthorized: Config.errorCodes.oldPasswordMistmatch
         }).then(function(){
