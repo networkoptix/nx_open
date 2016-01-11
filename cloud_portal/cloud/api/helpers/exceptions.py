@@ -167,7 +167,7 @@ def validate_response(func):
             raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
 
         # Check error_code status - raise APILogicException
-        if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok:
+        if 'resultCode' in response_data and response_data['resultCode'] != ErrorCodes.ok.value:
             validate_error(response_data)
             raise APILogicException(response_data['errorText'], response_data['resultCode'])
 
