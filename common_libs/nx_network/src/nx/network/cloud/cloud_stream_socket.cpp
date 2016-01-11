@@ -331,6 +331,16 @@ void CloudStreamSocket::connectAsync(
         true, this);
 }
 
+void CloudStreamSocket::readSomeAsync(
+    nx::Buffer* const buf,
+    std::function<void(SystemError::ErrorCode, size_t)> handler)
+{
+    if (m_socketDelegate)
+        m_socketDelegate->readSomeAsync(buf, std::move(handler));
+    else
+        handler(SystemError::notConnected, 0);
+}
+
 void CloudStreamSocket::sendAsync(
     const nx::Buffer& buf,
     std::function<void(SystemError::ErrorCode, size_t)> handler)
