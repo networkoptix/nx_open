@@ -29,7 +29,8 @@ namespace network {
         void ioFailure(SystemError::ErrorCode);
     \endcode
     All these methods are invoked within socket thread
-    \note This is helper class for implementing various UDP server/client
+    \note This is a helper class for implementing UDP server/client of 
+        message-orientied protocol
  */
 template<
     class CustomPipeline,

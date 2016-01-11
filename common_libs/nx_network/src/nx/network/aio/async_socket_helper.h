@@ -111,7 +111,7 @@ public:
 
     void terminate()
     {
-        //this method is to cancel all asynchronous operations when called socket's within aio thread
+        //this method is to cancel all asynchronous operations when called within socket's aio thread
 
         this->terminateAsyncIO();
         //TODO #ak what's the difference of this method from cancelAsyncIO( aio::etNone ) ?
