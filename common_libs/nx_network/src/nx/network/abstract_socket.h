@@ -403,7 +403,7 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
         \note due to some OS limitations some values might be = 0 (meaning system defaults)
     */
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const = 0;
 };
 
 //!Stream socket with encryption
@@ -578,5 +578,54 @@ public:
     virtual bool leaveGroup( const QString &multicastGroup ) = 0;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
+
+#ifdef SocketOptions_setOrFalse
+    #error SocketOptions_setOrFalse macro is already defined.
+#endif
+
+#define SocketOptions_setOrFalse(setter, param) \
+    if( param )                                 \
+        if( !socket->setter( *param ) )         \
+            return false;
+
+//!Socket configuration options ready to apply to any \class AbstractSocket
+struct NX_NETWORK_API SocketOptions
+{
+    boost::optional< SocketAddress > boundAddress;
+    boost::optional< bool > reuseAddrFlag;
+    boost::optional< unsigned int > sendBufferSize, recvBufferSize;
+    boost::optional< unsigned int > sendTimeout, recvTimeout;
+
+    inline bool apply( AbstractSocket* socket )
+    {
+        SocketOptions_setOrFalse(bind,              boundAddress);
+        SocketOptions_setOrFalse(setReuseAddrFlag,  reuseAddrFlag);
+        SocketOptions_setOrFalse(setSendBufferSize, sendBufferSize);
+        SocketOptions_setOrFalse(setRecvBufferSize, recvBufferSize);
+        SocketOptions_setOrFalse(setSendTimeout,    sendTimeout);
+        SocketOptions_setOrFalse(setRecvTimeout,    recvTimeout);
+        return true;
+    }
+};
+
+//!Socket configuration options ready to apply to any \class AbstractStreamSocket
+struct NX_NETWORK_API StreamSocketOptions : SocketOptions
+{
+    boost::optional< bool > noDelay, statCollect;
+    boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
+
+    inline bool apply( AbstractStreamSocket* socket )
+    {
+        if( !SocketOptions::apply( socket ) )
+            return false;
+
+        SocketOptions_setOrFalse(setNoDelay,                    noDelay);
+        SocketOptions_setOrFalse(toggleStatisticsCollection,    statCollect);
+        SocketOptions_setOrFalse(setKeepAlive,                  keepAliveOptions);
+        return true;
+    }
+};
+
+#undef SocketOptions_setOrFalse
 
 #endif  //ABSTRACT_SOCKET_H

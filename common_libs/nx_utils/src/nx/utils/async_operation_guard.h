@@ -75,7 +75,7 @@ public:
     SharedGuard* operator->() const;
 
 private:
-    std::shared_ptr<AsyncOperationGuard::SharedGuard> m_sharedGuard;
+    std::shared_ptr<SharedGuard> m_sharedGuard;
 };
 
 } // namespace utils

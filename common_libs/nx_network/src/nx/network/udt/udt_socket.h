@@ -120,7 +120,7 @@ public:
         Q_UNUSED(info);
         return false; // not implemented yet
     }
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override {
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override {
         Q_UNUSED(result);
         return false; // not implemented yet
     }

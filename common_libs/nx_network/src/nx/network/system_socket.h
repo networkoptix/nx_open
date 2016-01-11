@@ -253,7 +253,7 @@ public:
     //!Implementation of AbstractStreamSocket::setKeepAlive
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
     //!Implementation of AbstractStreamSocket::getKeepAlive
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
 private:
     // Access for TCPServerSocket::accept() connection creation

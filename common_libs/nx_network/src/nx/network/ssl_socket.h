@@ -53,7 +53,7 @@ public:
     //!Implementation of \a AbstractStreamSocket::setKeepAlive
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
     //!Implementation of \a AbstractStreamSocket::getKeepAlive
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
     //!Implementation of \a AbstractEncryptedStreamSocket::connectWithoutEncryption
     virtual bool connectWithoutEncryption(

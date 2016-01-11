@@ -1010,7 +1010,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
     return true;
 }
 
-bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) const
 {
     int isEnabled = 0;
     socklen_t length = sizeof(isEnabled);

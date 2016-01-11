@@ -27,8 +27,18 @@ QString toString( const AddressType& type );
 
 enum class AddressAttributeType
 {
+    unknown,
     peerFoundPassively, //!< NX peer reported its address and name by itself
     nxApiPort,          //!< NX peer (mediaserver) port
+    cloudConnect,       //!< NX cloud connect required
+};
+
+enum class CloudConnectType
+{
+    unknown,
+    udtHp,      // UDT over UDP hole punching
+    tcpHp,      // TCP hole punching
+    proxy,      // Proxy server address
 };
 
 struct NX_NETWORK_API AddressAttribute
@@ -38,6 +48,7 @@ struct NX_NETWORK_API AddressAttribute
 
     AddressAttribute( AddressAttributeType type_, quint64 value_ );
     bool operator ==( const AddressAttribute& rhs ) const;
+    bool operator <( const AddressAttribute& rhs ) const;
     QString toString() const;
 };
 
@@ -50,6 +61,7 @@ struct NX_NETWORK_API AddressEntry
     AddressEntry( AddressType type_ = AddressType::unknown,
                   HostAddress host_ = HostAddress() );
     bool operator ==( const AddressEntry& rhs ) const;
+    bool operator <( const AddressEntry& rhs ) const;
     QString toString() const;
 };
 
@@ -90,7 +102,7 @@ public:
         \a natTraversal defines if mediator should be used for address resolution
     */
     void resolveAsync( const HostAddress& hostName, ResolveHandler handler,
-                       bool natTraversal, void* requestId = nullptr );
+                       bool natTraversal = true, void* requestId = nullptr );
 
     std::vector< AddressEntry > resolveSync( const HostAddress& hostName, bool natTraversal );
 

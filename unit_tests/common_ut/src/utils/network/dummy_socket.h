@@ -49,7 +49,7 @@ public:
     virtual bool toggleStatisticsCollection( bool val ) override;
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) override;
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
     virtual void post( std::function<void()> handler ) override;
     virtual void dispatch( std::function<void()> handler ) override;

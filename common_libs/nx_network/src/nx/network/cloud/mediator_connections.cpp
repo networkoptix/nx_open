@@ -158,6 +158,20 @@ void MediatorSystemConnection::bind(
     });
 }
 
+void MediatorSystemConnection::monitorConnectionRequest(
+        std::function<void(ConnectionRequest)> handler)
+{
+    // TODO: #mux
+    static_cast<void>(handler);
+}
+
+void MediatorSystemConnection::monitorConnectionUpdate(
+        std::function<void(ConnectionUpdate)> handler)
+{
+    // TODO: #mux
+    static_cast<void>(handler);
+}
+
 void MediatorSystemConnection::sendAuthRequest(
         stun::Message request, stun::AsyncClient::RequestHandler handler)
 {

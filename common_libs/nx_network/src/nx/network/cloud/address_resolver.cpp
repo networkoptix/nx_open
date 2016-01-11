@@ -37,6 +37,11 @@ bool AddressAttribute::operator ==( const AddressAttribute& rhs ) const
     return type == rhs.type && value == rhs.value;
 }
 
+bool AddressAttribute::operator <( const AddressAttribute& rhs ) const
+{
+    return type < rhs.type && value < rhs.value;
+}
+
 QString AddressAttribute::toString() const
 {
     switch( type )
@@ -62,6 +67,11 @@ bool AddressEntry::operator ==( const AddressEntry& rhs ) const
 {
     return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
 
+}
+
+bool AddressEntry::operator <( const AddressEntry& rhs ) const
+{
+    return type < rhs.type && host < rhs.host && attributes < rhs.attributes;
 }
 
 QString AddressEntry::toString() const
