@@ -52,7 +52,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallItem | Offline, qnSkin->icon("tree/screen_offline.png"));
     m_cache.insert(IOModule | Offline,      qnSkin->icon("tree/io_offline.png"));
     m_cache.insert(IOModule | Unauthorized, qnSkin->icon("tree/io_unauthorized.png"));
-    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage.png"));
+    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage_offline.png"));
 
     /* Read-only server that is auto-discovered. */
     m_cache.insert(Server | Incompatible | ReadOnly,    qnSkin->icon("tree/server_incompatible_readonly.png"));
