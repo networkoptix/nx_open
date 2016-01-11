@@ -315,7 +315,7 @@ bool QnResourceActionCondition::checkOne(QnResourceWidget *widget) {
 
 
 Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceList &resources) {
-    foreach(const QnResourcePtr &resource, resources) {
+    for(const QnResourcePtr &resource: resources) {
         if(!resource)
             continue; /* OK to remove. */
 
@@ -331,6 +331,9 @@ Qn::ActionVisibility QnResourceRemovalActionCondition::check(const QnResourceLis
         if(resource->hasFlags(Qn::remote_server)) // TODO: #Elric move this to permissions.
             if(resource->getStatus() == Qn::Offline)
                 continue; /* Can remove only if offline. */
+
+        if (resource->hasFlags(Qn::web_page))
+            continue;
 
         return Qn::InvisibleAction;
     }
