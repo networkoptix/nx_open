@@ -66,6 +66,13 @@ class APIException(Exception):
                  status_code=status.HTTP_500_INTERNAL_SERVER_ERROR):
         if error_code is None:
             error_code = status_code
+
+        if isinstance(error_code, basestring):
+            try:
+                error_code = ErrorCodes(error_code)
+            except ValueError:
+                logger.error('Unexpected error code {0}'.format(error_code))
+
         self.error_data = error_data
         self.error_code = error_code
         self.error_text = error_text
@@ -233,7 +240,7 @@ def handle_exceptions(func):
             return data
         except APIException as error:
             # Do not log not_authorized errors
-            if error.error_code != ErrorCodes.not_authorized and error.error_code != ErrorCodes.not_authorized.value:
+            if error.error_code != ErrorCodes.not_authorized:
                 log_error(args[0], error)
 
             return error.response()
