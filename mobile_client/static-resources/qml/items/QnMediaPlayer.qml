@@ -22,8 +22,8 @@ QnObject {
     readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
 
     readonly property var mediaPlayer: d.mediaPlayer
-    readonly property var chunkProvider: chunkProvider
-    readonly property var resourceHelper: resourceHelper
+    readonly property alias chunkProvider: resourceHelper.chunkProvider
+    readonly property alias resourceHelper: resourceHelper
 
     readonly property alias resourceName: resourceHelper.resourceName
 
@@ -216,11 +216,6 @@ QnObject {
             d.firstPlay = true
             console.log("Media URL changed: " + mediaUrl)
         }
-    }
-
-    QnCameraChunkProvider {
-        id: chunkProvider
-        resourceId: player.resourceId
     }
 
     Timer {
