@@ -27,6 +27,9 @@ class StunUDP
 {
 public:
     StunUDP()
+    :
+        m_messagesToIgnore(0),
+        m_totalMessagesReceived(0)
     {
         using namespace std::placeholders;
         m_messageDispatcher.registerDefaultRequestProcessor(
@@ -69,14 +72,35 @@ public:
         return endpoints;
     }
 
+    void ignoreNextMessage(size_t messagesToIgnore = 1)
+    {
+        m_messagesToIgnore += messagesToIgnore;
+    }
+
+    size_t totalMessagesReceived() const
+    {
+        return m_totalMessagesReceived;
+    }
+
 private:
     MessageDispatcher m_messageDispatcher;
     std::vector<std::unique_ptr<UDPServer>> m_udpServers;
+    size_t m_messagesToIgnore;
+    size_t m_totalMessagesReceived;
 
     void onMessage(
         std::shared_ptr< AbstractServerConnection > connection,
         stun::Message message)
     {
+        ++m_totalMessagesReceived;
+
+        if (m_messagesToIgnore > 0)
+        {
+            //ignoring message
+            --m_messagesToIgnore;
+            return;
+        }
+
         nx::stun::Message response(
             stun::Header(
                 nx::stun::MessageClass::successResponse,
@@ -187,6 +211,28 @@ TEST_F(StunUDP, client_test_async)
 */
 TEST_F(StunUDP, client_retransmits_general)
 {
+    ignoreNextMessage();
+
+    UDPClient client;
+    nx::stun::Message requestMessage(
+        stun::Header(
+            nx::stun::MessageClass::request,
+            nx::stun::bindingMethod));
+
+    SystemError::ErrorCode errorCode = SystemError::noError;
+    nx::stun::Message response;
+    std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
+        std::bind(
+            &UDPClient::sendRequest,
+            &client,
+            anyServerEndpoint(),
+            requestMessage,
+            std::placeholders::_1));
+    ASSERT_EQ(SystemError::noError, errorCode);
+    ASSERT_EQ(requestMessage.header.transactionId, response.header.transactionId);
+    ASSERT_EQ(2, totalMessagesReceived());
+
+    client.pleaseStopSync();
 }
 
 /** Checking that client reports failure after sending maximum retransmissions allowed.
@@ -197,11 +243,69 @@ TEST_F(StunUDP, client_retransmits_general)
 */
 TEST_F(StunUDP, client_retransmits_max_retransmits)
 {
+    const int MAX_RETRANSMISSIONS = 5;
+
+    ignoreNextMessage(MAX_RETRANSMISSIONS+1);
+
+    UDPClient client;
+    client.setRetransmissionTimeOut(std::chrono::milliseconds(100));
+    client.setMaxRetransmissions(MAX_RETRANSMISSIONS);
+    nx::stun::Message requestMessage(
+        stun::Header(
+            nx::stun::MessageClass::request,
+            nx::stun::bindingMethod));
+
+    SystemError::ErrorCode errorCode = SystemError::noError;
+    nx::stun::Message response;
+    std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
+        std::bind(
+            &UDPClient::sendRequest,
+            &client,
+            anyServerEndpoint(),
+            requestMessage,
+            std::placeholders::_1));
+    ASSERT_EQ(SystemError::timedOut, errorCode);
+    ASSERT_EQ(MAX_RETRANSMISSIONS+1, totalMessagesReceived());
+
+    client.pleaseStopSync();
 }
 
 /** Checking that client reports error to waiters if removed before receiving response */
 TEST_F(StunUDP, client_cancellation)
 {
+    const int REQUESTS_TO_SEND = 3;
+
+    UDPClient client;
+    client.setRetransmissionTimeOut(std::chrono::seconds(100));
+    nx::stun::Message requestMessage(
+        stun::Header(
+            nx::stun::MessageClass::request,
+            nx::stun::bindingMethod));
+
+    ignoreNextMessage(REQUESTS_TO_SEND);
+
+    int errorsReported = 0;
+    auto completionHandler = 
+        [&errorsReported](
+            SystemError::ErrorCode errorCode,
+            nx::stun::Message /*response*/)
+        {
+            assert(errorCode == SystemError::interrupted);
+            ++errorsReported;
+        };
+
+    for (int i = 0; i < REQUESTS_TO_SEND; ++i)
+    {
+        requestMessage.header.transactionId = Header::makeTransactionId();
+        client.sendRequest(
+            anyServerEndpoint(),
+            requestMessage,
+            completionHandler);
+    }
+
+    client.pleaseStopSync();
+
+    ASSERT_EQ(REQUESTS_TO_SEND, errorsReported);
 }
 
 }   //test

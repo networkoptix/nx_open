@@ -67,6 +67,11 @@ void UDPClient::pleaseStop(std::function<void()> handler)
         });
 }
 
+const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket() const
+{
+    return m_messagePipeline.socket();
+}
+
 void UDPClient::sendRequest(
     SocketAddress serverAddress,
     Message request,
