@@ -36,7 +36,7 @@ angular.module('cloudApp')
             $scope.registerForm = scope;
         };
         $scope.hideAlreadyExists = function(){
-            $scope.registerForm.registerForm.email.$setValidity('alreadyExists',true);
+            $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',true);
         };
 
         $scope.register = process.init(function() {
@@ -48,7 +48,7 @@ angular.module('cloudApp')
                 $scope.account.subscribe);
         },{
             alreadyExists: function(error){
-                $scope.registerForm.registerForm.email.$setValidity('alreadyExists',false);
+                $scope.registerForm.registerForm.registerEmail.$setValidity('alreadyExists',false);
                 return false;
             }
         });

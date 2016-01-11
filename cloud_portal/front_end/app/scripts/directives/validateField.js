@@ -6,7 +6,8 @@ angular.module('cloudApp')
             restrict:'A',
             link:function(scope, element, attrs) {
 
-                var formName = element.parents('form').attr('name');
+
+                var formName = element.attr("ng-form") || element.closest('form').attr('name');
                 var fieldName = element.find('input,textarea').attr('name');
 
                 var scopeName = formName + '.' + fieldName;

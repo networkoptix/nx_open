@@ -3,6 +3,17 @@
 var Config = {
     apiBase: '/api',
     clientProtocol: 'vms://',
+
+    passwordRequirements:
+    {
+        minLength: 6,
+        minLengthMessage:'Password must contain at least 6 characters',
+        requiredRegex: '[\\w\\!\\*\\(\\)\\-\\$@#%&]{6,}',
+        requiredMessage: 'Use only letters, numbers and symbols like _!*()-@#$%&',
+        strongRegex: '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[\\w]{6,}',
+        strongMessage: 'Use numbers and different case symbols to make your password stronger'
+    },
+
     errorCodes:{
         ok: 'ok',
 

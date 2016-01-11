@@ -65,17 +65,7 @@
             </div>
         </div>
 
-        <div class="form-group" validate-field>
-            <label for="newPassword"  class="col-sm-3 control-label">New password</label>
-            <div class="col-sm-4">
-                <input type="password" class="form-control" ng-model="newPassword"
-                       name="newPassword"
-                       id="newPassword" required="">
-            </div>
-            <div class="col-sm-5">
-                <span class="help-block" ng-if="passwordForm.newPassword.$dirty && passwordForm.newPassword.$error.required">New password is required.</span>
-            </div>
-        </div>
+        <password-input ng-model="newPassword" id="'newPassword'" label="'New password'"></password-input>
 
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">

@@ -42,23 +42,14 @@
                        ng-change="hideAlreadyExists()">
             </div>
             <div class="col-sm-5">
-                <span class="help-block" ng-if="registerForm.email.$dirty && registerForm.email.$error.required">Email is required.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$dirty && registerForm.registerEmail.$error.required">Email is required.</span>
 
-                <span class="help-block" ng-if="registerForm.email.$dirty && registerForm.email.$error.email">Not a valid email</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$dirty && registerForm.registerEmail.$error.email">Not a valid email</span>
 
-                <span class="help-block" ng-if="registerForm.email.$error.alreadyExists">Email is already registered in portal</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email is already registered in portal</span>
             </div>
         </div>
-        <div class="form-group" validate-field>
-            <label for="registerPassword"  class="col-sm-3 control-label">Password</label>
-            <div class="col-sm-4">
-                <input type="password" class="form-control" ng-model="account.password" id="registerPassword"
-                       name="registerPassword" required autocomplete="off">
-            </div>
-            <div class="col-sm-5">
-                <span class="help-block" ng-if="registerForm.password.$dirty && registerForm.password.$error.required">Password is required.</span>
-            </div>
-        </div>
+        <password-input ng-model="account.password" id="'registerPassword'" label="'Password'"></password-input>
         <div class="form-group" >
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="checkbox">

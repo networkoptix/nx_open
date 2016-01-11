@@ -72,19 +72,9 @@
                        error-prefix="'Couldn\'t save new password:'"></process-alert>
 
         <form name="restorePasswordWithCode" class="form-horizontal" ng-if="!change.success" novalidate>
-            <div class="form-group" validate-field>
-                <label for="newPassword" class="col-sm-3 control-label">New password</label>
-                <div class="col-sm-4">
-                    <input type="password" class="form-control"
-                           ng-model="data.newPassword"
-                           id="newPassword"
-                           name="newPassword"
-                           required>
-                </div>
-                <div class="col-sm-5">
-                    <span class="help-block" ng-if="restorePasswordWithCode.newPassword.$dirty && restorePasswordWithCode.newPassword.$error.required">Email is required.</span>
-                </div>
-            </div>
+
+            <password-input ng-model="data.newPassword" id="'newPassword'" label="'New password'"></password-input>
+
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
                     <process-button process="change"
