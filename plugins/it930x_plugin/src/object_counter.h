@@ -1,11 +1,12 @@
 #ifndef OBJECT_COUNTER
 #define OBJECT_COUNTER
 
-#if 0
-#include <time.h>
-#define debug_printf(...) fprintf(stdout, "<%.1f> ", clock()/100000.0), fprintf(stdout, __VA_ARGS__)
+#if 1
+#  include <time.h>
+#  define debug_printf(...) fprintf(stdout, "<%.1f> ", clock()/100000.0), fprintf(stdout, __VA_ARGS__)
 #else
-inline void debug_printf(const char * , ...) {}
+#  define debug_printf(...)
+//inline void debug_printf(const char * , ...) {}
 #endif
 
 #ifdef COUNT_OBJECTS

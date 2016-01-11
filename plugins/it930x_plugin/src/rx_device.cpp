@@ -6,9 +6,13 @@
 #include "mpeg_ts_packet.h"
 #include "rx_device.h"
 #include "camera_manager.h"
+#include "discovery_manager.h"
 
 namespace ite
 {
+    RxSyncManager rxSyncManager;
+    RxHintManager rxHintManager;
+
     std::mutex It930x::m_rcMutex;
 
     unsigned str2num(std::string& s)
@@ -47,6 +51,9 @@ namespace ite
     void RxDevice::shutdown()
     {
         std::lock_guard<std::mutex> lock(m_mutex);
+        if (m_txDev) {
+            rxSyncManager.unlock(m_txDev->txID());
+        }
         if (!m_cam)
             debug_printf("[RxDevice::shutdown] Rx %d. No related camera found\n!", m_rxID);
         else
@@ -281,82 +288,62 @@ namespace ite
         return false;
     }
 
+    bool RxDevice::lockAndStart(int chan, int txId)
+    {
+        if (!m_it930x->lockFrequency(TxDevice::freq4chan(chan))) {
+            debug_printf("[RxDevice::lockAndStart] lock failed. RxId: %d\n",
+                         m_rxID);
+            return false;
+        }
+        m_txDev.reset(new TxDevice(txId, TxDevice::freq4chan(chan)));
+        printf("[search] Rx %d; Found camera %d FINAL\n", m_rxID, txId);
+        for (int i = 0; i < 2; ++i) {
+            subscribe(i);
+        }
+        startReader();
+        m_deviceReady.store(true);
+        return true;
+    }
+
     bool RxDevice::findBestTx()
     {
         int bestStrength = 0;
         int bestChan = 0;
         int txID = 0;
-
         std::lock_guard<std::mutex> lock(m_mutex);
-
-//        bool readyToStart = false;
-//        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
-//        {
-//            if (m_it930x->lockFrequency(TxDevice::freq4chan(i)))
-//            {
-//                stats();
-//                if (good())
-//                {
-//                    readyToStart = true;
-//                    m_it930x->unlockFrequency();
-//                    break;
-//                }
-//                else
-//                    m_it930x->unlockFrequency();
-//            }
-//        }
-
-//        if (!readyToStart)
-//            return false;
-
-//        printf(
-//            "[search] Rx %d. Detected some signal. Ready to start search\n",
-//            m_rxID
-//        );
-
-        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
-        {
-            if (testChannel(i, bestChan, bestStrength, txID))
-            {
-                debug_printf(
-                    "[search] Rx: %d. Test channel %d succeeded. Strength is %d, camera is %d\n",
-                    m_rxID,
-                    i,
-                    bestStrength,
-                    txID
-                );
-                break;
+        // trying hints first
+        auto hints = rxHintManager.getHintsByRx(m_rxID);
+        for (const auto &hint: hints) {
+            if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan)) {
+                if (testChannel(hint.chan, bestChan, bestStrength, txID) &&
+                        txID == hint.txId) {
+                    return lockAndStart(hint.chan, hint.txId);
+                } else {
+                    debug_printf("[search] Hint testChannel failed; \
+                                  txID: %d, hint.txID: %d, hint.chan: %d\n",
+                                 txID, hint.txId, hint.chan);
+                    return false;
+                }
             }
-            if (bestStrength == 100)
-                break;
-//            else
-//            {
-//                debug_printf("[search] Rx: %d; \n", m_rxID);
-//                m_it930x->unlockFrequency();
-//            }
         }
-
-        if (bestStrength != 0)
-        {
-            m_it930x->lockFrequency(TxDevice::freq4chan(bestChan));
-            m_txDev.reset(
-                new TxDevice(
-                    txID,
-                    TxDevice::freq4chan(bestChan)
-                )
-            );
-            printf(
-                "[search] Rx %d; Found camera %d FINAL\n",
-                m_rxID,
-                txID
-            );
-            for (int i = 0; i < 2; ++i)
-                subscribe(i);
-//            m_devReader->subscribe(It930x::PID_RETURN_CHANNEL);
-
-            startReader();
-            m_deviceReady.store(true);
-            return true;
+        // hints didn't help, starting normal discovery routine
+        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i) {
+            if (testChannel(i, bestChan, bestStrength, txID)) {
+                debug_printf("[search] Rx: %d. Test channel %d succeeded. \
+                              Strength is %d, camera is %d\n",
+                             m_rxID, i, bestStrength, txID);
+                if (rxSyncManager.lock(m_rxID, txID)) {
+                    break;
+                } else {
+                    debug_printf("[search] Rx: %d. This channel (%d) seems already locked. \
+                                  Need to continue.\n", m_rxID, i);
+                }
+            }
+//            if (bestStrength == 100)
+//                break;
+        }
+        if (bestStrength != 0) {
+            return lockAndStart(bestChan, txID);
         }
         else
             printf("[search] Rx: %d; Search failed\n", m_rxID);
@@ -390,7 +377,7 @@ namespace ite
         strncpy( info.uid, strTxID.c_str(), std::min(strTxID.size(), sizeof(nxcip::CameraInfo::uid)-1) );
 
         std::stringstream ss;
-        ss << m_rxID << ' ' <<  m_txDev->txID() << ' ' << TxDevice::freq4chan(m_channel);
+        ss << m_rxID << ',' <<  m_txDev->txID() << ',' << TxDevice::freq4chan(m_channel);
 
         unsigned len = std::min(ss.str().size(), sizeof(nxcip::CameraInfo::auxiliaryData)-1);
         strncpy(info.auxiliaryData, ss.str().c_str(), len);

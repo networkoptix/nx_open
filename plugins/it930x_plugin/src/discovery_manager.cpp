@@ -3,6 +3,7 @@
 #include <future>
 #include <string>
 #include <sstream>
+#include <algorithm>
 
 #include <dirent.h>
 
@@ -18,6 +19,101 @@ extern "C"
     {
         return new ite::DiscoveryManager();
     }
+}
+
+namespace ite
+{
+extern RxHintManager rxHintManager;
+
+// Sync Manager
+bool RxSyncManager::lock(int rxId, int txId)
+{
+    return helper<bool>([](SyncInfoContainerIterator){return false;},
+                        [this, rxId, txId](){
+                            m_syncInfo.emplace_back(rxId, txId);
+                            return true;
+                        },
+                        txId);
+}
+
+bool RxSyncManager::unlock(int txId)
+{
+    return helper<bool>([this](SyncInfoContainerIterator it){
+                            m_syncInfo.erase(it);
+                            return true;
+                        },
+                        [](){return false;},
+                        txId);
+}
+
+int RxSyncManager::isLocked(int txId)
+{
+    return helper<int>([this](SyncInfoContainerIterator it){
+                            return it->rxId;
+                        },
+                        [](){return -1;},
+                        txId);
+}
+
+// Hint Manager
+void RxHintManager::addHint(int rxId, int txId, int chan)
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    auto &rxHints = m_hints[rxId];
+    auto hintIt = std::find_if(rxHints.begin(), rxHints.end(),
+                               [txId](const HintInfo &hinfo) {
+                                   return hinfo.txId == txId;
+                               });
+    if (hintIt != rxHints.end()) {
+        hintIt->chan = chan;
+    } else {
+        rxHints.emplace_back(txId, chan);
+    }
+}
+
+bool RxHintManager::useHint(int rxId, int txId, int chan)
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    auto &rxHints = m_hints[rxId];
+    auto hintIt = std::find_if(rxHints.begin(), rxHints.end(),
+                               [txId](const HintInfo &hinfo) {
+                                   return hinfo.txId == txId;
+                               });
+    if (hintIt != rxHints.end()) {
+        if (hintIt->chan != chan) {
+            debug_printf("[RxHintManager::lockHint] hint channel (%d) \
+                          and requested channel (%d) don't match\n",
+                         hintIt->chan, chan);
+            return false;
+        } else if (hintIt->used) {
+            debug_printf("[RxHintManager::lockHint] hint for txId (%d) \
+                          channel (%d) already used\n",
+                         txId, chan);
+            return false;
+        } else {
+            hintIt->used = true;
+            return true;
+        }
+    } else {
+        debug_printf("[RxHintManager::lockHint] txId (%d) \
+                      channel (%d) not found\n",
+                     txId, chan);
+        return false;
+    }
+}
+
+RxHintManager::HintInfoVector RxHintManager::getHintsByRx(int rxId) const
+{
+    std::lock_guard<std::mutex> lk(m_mutex);
+    auto rxHintsIt = m_hints.find(rxId);
+    if (rxHintsIt == m_hints.end()) {
+        debug_printf("[RxHintManager::getHintsByRx] no hints for this Rx (%d)\n",
+                     rxId);
+        return HintInfoVector();
+    } else {
+        return rxHintsIt->second;
+    }
+}
 }
 
 namespace ite
@@ -141,17 +237,23 @@ namespace ite
         cam1->rxDeviceRef().swap(cam2->rxDeviceRef());
     }
 
-    RxDevicePtr DiscoveryManager::findCameraByInfo(const nxcip::CameraInfo &info)
+    void DiscoveryManager::makeHint(const nxcip::CameraInfo &info)
     {	// We can find camera by (rxId, txId, channel) unique key.
         // This information is stored in CameraInfo::auxillary data string.
-        // Format is 'rxId txId chan'.
-
+        // Format is 'rxId,txId,chan'.
         std::stringstream ss(info.auxiliaryData);
-
-        auto extractInt = [&ss]()
-        {
+        auto extractInt = [&ss]() {
             int tmp;
             try {
+                while (1) {
+                    int c = ss.get();
+                    if (std::isdigit(c)) {
+                        ss.unget();
+                        break;
+                    } else if (ss.fail()) {
+                        return -1;
+                    }
+                }
                 ss >> tmp;
             } catch (const std::exception &) {
                 return -1;
@@ -163,32 +265,18 @@ namespace ite
 
         int rxId = extractInt();
         int txId = extractInt();
-        int chan = extractInt();
+        int freq = extractInt();
 
-        if (rxId == -1 || txId == -1 || chan == -1)
+        if (rxId == -1 || txId == -1 || freq == -1)
         {	// Bailing out if any of the key data is absent
             debug_printf(
                 "[DiscoveryManager::findCameraByInfo] failed to extract auxillary camera data, original string is %s\n",
                 info.auxiliaryData
             );
-            return RxDevicePtr();
+            return;
         }
-
-        // When this function is called m_mutex is already locked.
-        // So no locks here.
-        for (auto &rxDev : m_rxDevices)
-        {
-            if (rxDev->rxID() == rxId)
-            {	// Blocks for some time here
-//                rxDev->stopWatchDog();
-//                bool searchResult = rxDev->findTxExact(txId, chan);
-//                rxDev->startWatchDog();
-
-//                if (searchResult)
-//                    return rxDev;
-            }
-        }
-        return RxDevicePtr();
+        rxHintManager.addHint(rxId, txId, TxDevice::chan4freq(freq));
+        return;
     }
 
     nxcip::BaseCameraManager * DiscoveryManager::createCameraManager( const nxcip::CameraInfo& info )
@@ -229,23 +317,17 @@ namespace ite
 
         if (rxIt == m_rxDevices.end())
         { 	// No camera found in already present cameras. But we have one option left.
-            // Let's try to find a camera by caminfo. Maybe we've already
+            // Let's make a hint for rx watchdogs with caminfo. Maybe we've already
             // dicovered this camera earlier (on the previous mediaserver run).
-            if ((bool)(foundRxDev = findCameraByInfo(info)))
-            {	// success!
-                debug_printf("[Discovery manager::createCameraManager] found camera by camera info.");
+            makeHint(info);
+            debug_printf("[DiscoveryManager::createCameraManager] no camera found\n");
+            if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
+            {	// Notify camera that its rx device is no longer operational
+                debug_printf("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
+                std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
+                (*cameraIt)->rxDeviceRef().reset();
             }
-            else
-            {	// No luck. Maybe this camera will be discovered later
-                debug_printf("[DiscoveryManager::createCameraManager] no camera found\n");
-                if (cameraIt != m_cameras.end() && (*cameraIt)->rxDeviceRef())
-                {	// Notify camera that its rx device is no longer operational
-                    debug_printf("[DiscoveryManager::createCameraManager] releasing cameraManager rx\n");
-                    std::lock_guard<std::mutex> lock((*cameraIt)->get_mutex());
-                    (*cameraIt)->rxDeviceRef().reset();
-                }
-                return nullptr;
-            }
+            return nullptr;
         }
         else
         {

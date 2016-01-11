@@ -180,6 +180,7 @@ namespace ite
         bool wantedByCamera() const;
         void resetFrozen();
         bool open();
+        bool lockAndStart(int chan, int txId);
 
         bool sendRC(RcCommand * cmd);
         bool sendRC(RcCommand * cmd, unsigned attempts);
