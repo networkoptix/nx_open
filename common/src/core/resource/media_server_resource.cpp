@@ -125,7 +125,7 @@ QString QnMediaServerResource::getName() const
         if (m_firstCamera)
             return m_firstCamera->getName();
     }
-    
+
     {
         QnMediaServerUserAttributesPool::ScopedLock lk( QnMediaServerUserAttributesPool::instance(), getId() );
         if( !(*lk)->name.isEmpty() )
@@ -225,7 +225,7 @@ QnMediaServerConnectionPtr QnMediaServerResource::apiConnection()
 {
     QnMutexLocker lock( &m_mutex );
 
-    /* We want the video server connection to be deleted in its associated thread, 
+    /* We want the video server connection to be deleted in its associated thread,
      * no matter where the reference count reached zero. Hence the custom deleter. */
     if (!m_apiConnection && !m_apiUrl.isEmpty())
         m_apiConnection = QnMediaServerConnectionPtr(new QnMediaServerConnection(this, QnAppServerConnectionFactory::videowallGuid()), &qnDeleteLater);
@@ -239,7 +239,7 @@ rest::QnConnectionPtr QnMediaServerResource::restConnection()
 
     if (!m_restConnection)
         m_restConnection = rest::QnConnectionPtr(new rest::ServerConnection(getId()));
-    
+
     return m_restConnection;
 }
 
@@ -266,12 +266,12 @@ void QnMediaServerResource::setPrimaryAddress(const SocketAddress& primaryAddres
     setUrl(lit("%1://%2").arg(urlScheme).arg(primaryAddress.toString()));
 }
 
-Qn::PanicMode QnMediaServerResource::getPanicMode() const 
+Qn::PanicMode QnMediaServerResource::getPanicMode() const
 {
     return m_panicModeCache.get();
 }
 
-Qn::PanicMode QnMediaServerResource::calculatePanicMode() const 
+Qn::PanicMode QnMediaServerResource::calculatePanicMode() const
 {
     QString strVal = getProperty(QnMediaResource::panicRecordingKey());
     Qn::PanicMode result = Qn::PM_None;
@@ -332,7 +332,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
         /*
         QnAbstractStorageResourceList otherStorages = localOther->getStorages();
-        
+
         // Keep indices unchanged (Server does not provide this info).
         for(const QnAbstractStorageResourcePtr &storage: m_storages)
         {
@@ -351,7 +351,7 @@ void QnMediaServerResource::updateInner(const QnResourcePtr &other, QSet<QByteAr
 
 
     const bool currentPortChanged = (portFromUrl(m_apiUrl) != localOther->getPort());
-    if (netAddrListChanged || currentPortChanged ) 
+    if (netAddrListChanged || currentPortChanged )
     {
         m_apiUrl = localOther->m_apiUrl;    // do not update autodetected value with side changes
         if (m_apiConnection)
@@ -467,7 +467,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
 
     if (hasProperty(safeModePropertyName))
         moduleInformation.ecDbReadOnly = QnLexical::deserialized(getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
-    
+
     QnMutexLocker lock( &m_mutex );
 
     moduleInformation.version = m_version;
@@ -480,7 +480,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     return moduleInformation;
 }
 
-void QnMediaServerResource::setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
+void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
     Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
     QList<QHostAddress> addressList;
@@ -539,7 +539,7 @@ bool QnMediaServerResource::isFakeServer(const QnResourcePtr &resource) {
 
 void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silenceMode)
 {
-    if (getStatus() != newStatus) 
+    if (getStatus() != newStatus)
     {
         {
             QnMutexLocker lock( &m_mutex );
@@ -550,10 +550,10 @@ void QnMediaServerResource::setStatus(Qn::ResourceStatus newStatus, bool silence
         }
 
         QnResource::setStatus(newStatus, silenceMode);
-        if (!silenceMode) 
+        if (!silenceMode)
         {
             QnResourceList childList = qnResPool->getResourcesByParentId(getId());
-            for(const QnResourcePtr& res: childList) 
+            for(const QnResourcePtr& res: childList)
             {
                 if (res->hasFlags(Qn::depend_on_parent_status))
                     emit res->statusChanged(res);

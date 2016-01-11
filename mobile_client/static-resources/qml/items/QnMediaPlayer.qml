@@ -113,7 +113,7 @@ QnObject {
                 d.prevPlayerPosition = d.mediaPlayer.position
 
                 if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
@@ -177,7 +177,7 @@ QnObject {
                     return
 
                 if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
