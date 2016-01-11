@@ -201,7 +201,7 @@ void ListeningPeerPool::connect(const ConnectionStrongRef& connection,
                 .arg( QString::fromUtf8( hostName ) )
                 .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
 
-        connection->sendMessage( std::move( response ) );
+        connection->sendMessage(std::move(response));
     }
     else
     {

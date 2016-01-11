@@ -15,8 +15,10 @@ protected:
     MultipleServerSocket();
 
 public:
-    template<typename S1, typename S2, typename = typename std::enable_if<
-        !(std::is_base_of<S1, S2>::value && std::is_base_of<S2, S1>::value)>::type>
+    //TODO #muskov does not compile on msvc2012
+    //template<typename S1, typename S2, typename = typename std::enable_if<
+    //    !(std::is_base_of<S1, S2>::value && std::is_base_of<S2, S1>::value)>::type>
+    template<typename S1, typename S2>
     std::unique_ptr<AbstractStreamServerSocket> make();
 
     //!Implementation of AbstractSocket::*
@@ -85,7 +87,7 @@ protected:
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
 };
 
-template<typename S1, typename S2, typename>
+template<typename S1, typename S2/*, typename*/>
 std::unique_ptr<AbstractStreamServerSocket> MultipleServerSocket::make()
 {
     std::unique_ptr<MultipleServerSocket> self(new MultipleServerSocket);

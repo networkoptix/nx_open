@@ -50,14 +50,19 @@ void UDPClient::pleaseStop(std::function<void()> handler)
     m_messagePipeline.pleaseStop(
         [/*std::move*/ handler, this](){  //TODO #ak #msvc2015
             //reporting failure for all ongoing requests
+            std::vector<RequestCompletionHandler> completionHandlers;
             for (const auto& requestData: m_ongoingRequests)
             {
-                requestData.second.completionHandler(
-                    SystemError::interrupted,
-                    Message());
+                completionHandlers.emplace_back(
+                    std::move(requestData.second.completionHandler));
             }
             //timers can be safely removed since we are in aio thread
             m_ongoingRequests.clear();
+            
+            for (auto& completionHandler: completionHandlers)
+                completionHandler(
+                    SystemError::interrupted,
+                    Message());
             handler();
         });
 }

@@ -51,6 +51,17 @@ Header::Header( MessageClass messageClass_ , int method_,
 {
 }
 
+Header& Header::operator=(Header&& rhs)
+{
+    if (this != &rhs)
+    {
+        messageClass = std::move(rhs.messageClass);
+        method = std::move(rhs.method);
+        transactionId = std::move(rhs.transactionId);
+    }
+    return *this;
+}
+
 static Buffer randomBuffer( int size )
 {
     Buffer id( size, 0 );

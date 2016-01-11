@@ -6,6 +6,8 @@
 
 #include <functional>
 
+#include <utils/common/systemerror.h>
+
 #include "message.h"
 #include "nx/network/socket_common.h"
 
@@ -19,7 +21,12 @@ public:
     AbstractServerConnection() {}
     virtual ~AbstractServerConnection() {}
 
-    virtual void sendMessage(nx::stun::Message message) = 0;
+    /**
+        \param handler Triggered to report send result. Can be \a NULL
+    */
+    virtual void sendMessage(
+        nx::stun::Message message,
+        std::function<void(SystemError::ErrorCode)> handler = nullptr) = 0;
     virtual nx::network::TransportProtocol transportProtocol() const = 0;
     virtual SocketAddress getSourceAddress() const = 0;
     /**
