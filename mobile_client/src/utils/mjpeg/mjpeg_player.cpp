@@ -146,10 +146,10 @@ void QnMjpegPlayerPrivate::processFrame() {
         processFrame();
     } else {
         waitingForFrame = false;
-        executeDelayed([this](){
+        executeDelayedParented([this](){
             waitingForFrame = true;
             processFrame();
-        }, presentationTime);
+        }, presentationTime, this);
     }
 }
 
