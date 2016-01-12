@@ -6,7 +6,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/webpage_resource.h>
 
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
@@ -45,9 +44,8 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
     const bool isStorage = dynamic_cast<const QnStorageResource*>(resource.data()) != nullptr;
     const bool isLayout = !resource.dynamicCast<QnLayoutResource>().isNull();
-    const bool isWebPage = !resource.dynamicCast<QnWebPageResource>().isNull();
 
-    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout && !isWebPage)
+    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout)
         return;
 
     //storing all servers' cameras too
