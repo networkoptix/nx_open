@@ -16,10 +16,8 @@ angular.module('cloudApp')
             },
             link:function(scope,element,attrs){
                 //Complex - check password complexity
-
+                scope.Config = Config;
                 scope.weakPassword = true;
-                scope.passwordRequirements = Config.passwordRequirements;
-
                 scope.$watch('ngModel',function(val){
 
                     if(!scope.passwordInput.password.$dirty || scope.passwordInput.password.$invalid){
@@ -30,6 +28,8 @@ angular.module('cloudApp')
                     var strongRegex = new RegExp('^' + Config.passwordRequirements.strongRegex + '$');
                     scope.weakPassword = !strongRegex.test(scope.ngModel);
                 });
+
+
             }
         };
     });

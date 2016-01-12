@@ -9,10 +9,11 @@ var Config = {
     {
         minLength: 6,
         minLengthMessage:'Password must contain at least 6 characters',
-        requiredRegex: '[\\w\\!\\*\\(\\)\\-\\$@#%&]{6,}',
+        requiredRegex: '[a-zA-Z0-9\\!\\*\\(\\)\\-\\$@#%&]{6,}',
         requiredMessage: 'Use only letters, numbers and symbols like _!*()-@#$%&',
-        strongRegex: '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[\\w]{6,}',
-        strongMessage: 'Use numbers and different case symbols to make your password stronger'
+        strongRegex: '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z0-9\\!\\*\\(\\)\\-\\$@#%&]{6,}',
+        weakMessage: 'Use numbers and different case symbols to make your password stronger',
+        strongMessage: 'Strong password!'
     },
 
     errorCodes:{
