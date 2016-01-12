@@ -188,12 +188,7 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
 
 int QnWebResourceWidget::calculateButtonsVisibility()
 {
-    auto result = base_type::calculateButtonsVisibility();
-
-    if (resource()->flags().testFlag(Qn::web_page))
-        result |= Qn::kFullscreenButton;
-
-    return result;
+    return (base_type::calculateButtonsVisibility() | Qn::kFullscreenButton);
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )
