@@ -40,7 +40,7 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
-                test: function ($route) { $route.current.params.reactivating = true; }
+                test: ['$route',function ($route) { $route.current.params.reactivating = true; }]
             }
         })
         .when('/activate/:activateCode', {
