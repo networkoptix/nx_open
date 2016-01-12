@@ -9,7 +9,7 @@ def check_ip(ip, list_name):
 
     if not ip_match:
         ipa = ipaddress.ip_address(ip)
-        ip_match = next(filter(lambda mask: ipa in ipaddress.ip_network(mask), white_list), None) is not None
+        ip_match = any(ipa in ipaddress.ip_network(mask) for mask in white_list)
     
     return ip_match
 
