@@ -69,10 +69,12 @@ namespace
 
     void SelectByClickOverlay::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
     {
+        /*  // Just blocks context menus anyway now
         if (m_menu)
             m_menu->exec(event->screenPos());
         else
             event->ignore();
+        */
     }
 
 }
@@ -130,8 +132,8 @@ void QnWebResourceWidget::setupOverlays()
         buttonsBar->addButton(Qn::kBackButton, backButton);
 
         auto reloadButton = new QnImageButtonWidget(this);
-        reloadButton->setIcon(qnSkin->icon("item/reload.png"));
-        connect(reloadButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::reloadPage);
+        reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
+        connect(reloadButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::reload);
         buttonsBar->addButton(Qn::kReloadPageButton, reloadButton);
     }
 

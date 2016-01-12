@@ -5,10 +5,10 @@
 
 enum WebViewPageStatus
 {
-    kPageLoadFailed
-    , kPageInitialLoadInProgress
+    kPageInitialLoadInProgress
     , kPageLoading
     , kPageLoaded
+    , kPageLoadFailed
 };
 
 class QnWebView : public QGraphicsWebView
@@ -26,11 +26,6 @@ public:
     WebViewPageStatus status() const;
 
     void setStatus(WebViewPageStatus value);
-
-public:
-    void loadPage(const QUrl &url);
-
-    void reloadPage();
 
 signals:
     void statusChanged();
