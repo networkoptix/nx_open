@@ -74,12 +74,12 @@ void QnClientMessageProcessor::onResourceStatusChanged(const QnResourcePtr &reso
     resource->setStatus(status);
 }
 
-void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource) 
+void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
 {
-    /* 
+    /*
      * In rare cases we can receive updateResource call when the client is
-     * in the reconnect process (it starts an event loop inside the main 
-     * thread). Populating the resource pool or changing resources is highly 
+     * in the reconnect process (it starts an event loop inside the main
+     * thread). Populating the resource pool or changing resources is highly
      * inappropriate at that time.
      * */
     if (!m_connection)
@@ -94,7 +94,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource)
     else
         ownResource->update(resource);
 
-    // TODO: #Elric #2.3 don't update layout if we're re-reading resources, 
+    // TODO: #Elric #2.3 don't update layout if we're re-reading resources,
     // this leads to unsaved layouts spontaneously rolling back to last saved state.
 
     if (QnLayoutResourcePtr layout = ownResource.dynamicCast<QnLayoutResource>())
@@ -136,7 +136,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
     if (data.peer.id != qnCommon->remoteGUID())
         return;
 
-    /* 
+    /*
         RemotePeerLost signal during connect is perfectly OK. We are receiving old notifications
         that were not sent as TransactionMessageBus was stopped. Peer id is the same if we are
         connecting to the same server we are already connected to (and just disconnected).

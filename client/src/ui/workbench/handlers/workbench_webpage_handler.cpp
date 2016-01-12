@@ -1,5 +1,7 @@
 #include "workbench_webpage_handler.h"
 
+#include <client/client_message_processor.h>
+
 #include <core/resource/webpage_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/resource_pool.h>
@@ -26,6 +28,14 @@ QnWorkbenchWebPageHandler::QnWorkbenchWebPageHandler(QObject *parent /*= 0*/)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 {
+
+    connect(qnClientMessageProcessor, &QnClientMessageProcessor::initialResourcesReceived, this, []()
+    {
+        /* Online status is set by default, page will go offline if will be unreachable on opening. */
+        for (const QnWebPageResourcePtr &webPage: qnResPool->getResources<QnWebPageResource>())
+            webPage->setStatus(Qn::Online);
+    });
+
     connect(action(Qn::NewWebPageAction),   &QAction::triggered,        this,   &QnWorkbenchWebPageHandler::at_newWebPageAction_triggered);
 }
 
@@ -67,7 +77,7 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
 
         qnResourcesChangesManager->saveWebPage(webPage, [](const QnWebPageResourcePtr &webPage)
         {
-            webPage->setStatus(Qn::Online);
+            Q_UNUSED(webPage);
         });
 
         break;

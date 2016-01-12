@@ -45,8 +45,6 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
         <p><b>192.168.1.15</b></p>\
         <p><b>www.example.com:8080</b></p>\
         <p><b>rtsp://example.com:554/video</b></p>\
-        <p><b>http://example.com/custom_page</b></p>\
-        <p><b>https://example.com/secure_page</b></p>\
         </body></html>")
         .arg(tr("Examples:"));
 
@@ -428,15 +426,11 @@ void QnCameraAdditionDialog::at_camerasTable_cellClicked(int row, int column) {
         return;
 
     QnManualResourceSearchEntry info = ui->camerasTable->item(row, CheckBoxColumn)->data(Qt::UserRole).value<QnManualResourceSearchEntry>();
-    QString urlText = info.url;
-    if (!urlText.contains(QLatin1String("://")))
-        urlText = QLatin1String("http://") + urlText;
 
-    QUrl url(urlText);
-    if (url.isEmpty())
+    QUrl url = QUrl::fromUserInput(info.url);
+    if (!url.isValid())
         return;
 
-    //TODO: #GDM handle for web pages
     url.setPath(QString());
     QDesktopServices::openUrl(url);
 }
