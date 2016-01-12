@@ -1,7 +1,5 @@
 #include "h264_utils.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
@@ -175,5 +173,3 @@ void extractSpsPps(
             customStreamParams->emplace(Qn::SPROP_PARAMETER_SETS_PARAM_NAME, QLatin1String(spropParameterSets));
     }
 }
-
-#endif

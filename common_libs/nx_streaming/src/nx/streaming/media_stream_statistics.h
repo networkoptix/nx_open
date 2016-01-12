@@ -1,8 +1,6 @@
 #ifndef MEDIA_STREAM_STATISTICS_H
 #define MEDIA_STREAM_STATISTICS_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QDateTime>
 #include <utils/thread/mutex.h>
 
@@ -90,7 +88,5 @@ private:
 
     bool m_runing;
 };
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif // MEDIA_STREAM_STATISTICS_H

@@ -1,7 +1,5 @@
 #include "media_stream_statistics.h"
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 QnMediaStreamStatistics::QnMediaStreamStatistics()
 {
     resetStatistics();
@@ -231,6 +229,3 @@ int QnMediaStreamStatistics::connectionLostSec() const
     QDateTime current = QDateTime::currentDateTime();
     return m_connectionLostTime.secsTo(current); 
 }
-
-#endif // ENABLE_DATA_PROVIDERS
-

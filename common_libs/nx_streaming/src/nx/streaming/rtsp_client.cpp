@@ -1,5 +1,3 @@
-#ifdef ENABLE_DATA_PROVIDERS
-
 #if defined(Q_OS_WIN)
 #  include <winsock2.h>
 #endif
@@ -1921,5 +1919,3 @@ QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const
 {
     return m_sdpTracks;
 }
-
-#endif // ENABLE_DATA_PROVIDERS

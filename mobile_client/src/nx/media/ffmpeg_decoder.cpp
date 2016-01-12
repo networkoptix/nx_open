@@ -1,3 +1,5 @@
+#ifdef ENABLE_FFMPEG
+
 #include "ffmpeg_decoder.h"
 
 extern "C"
@@ -212,3 +214,5 @@ void FfmpegDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
 
 } // namespace media
 } // namespace nx
+
+#endif // ENABLE_FFMPEG

@@ -135,7 +135,9 @@ void initLog() {
 void initDecoders()
 {
 	using namespace nx::media;
+#ifdef ENABLE_FFMPEG
 	VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
+#endif
 }
 
 int main(int argc, char *argv[]) {

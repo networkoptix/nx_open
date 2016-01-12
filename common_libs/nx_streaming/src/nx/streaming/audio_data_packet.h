@@ -6,8 +6,6 @@
 #ifndef AUDIO_DATA_PACKET_H
 #define AUDIO_DATA_PACKET_H
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <memory>
 
 #include "media_data_packet.h"
@@ -79,7 +77,5 @@ private:
 
 typedef std::shared_ptr<QnWritableCompressedAudioData> QnWritableCompressedAudioDataPtr;
 typedef std::shared_ptr<const QnWritableCompressedAudioData> QnConstWritableCompressedAudioDataPtr;
-
-#endif // ENABLE_DATA_PROVIDERS
 
 #endif  //AUDIO_DATA_PACKET_H

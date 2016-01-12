@@ -16,14 +16,6 @@ static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
-namespace {
-    const int CODEC_ID_H264 = 25;
-    const int CODEC_ID_MPEG4 = 13;
-    const int CODEC_ID_MJPEG = 8;
-}
-#endif
-
 QnVirtualCameraResource::QnVirtualCameraResource():
     m_dtsFactory(0),
     m_issueCounter(0),

@@ -1,3 +1,5 @@
+#ifdef ENABLE_FFMPEG
+
 #include "av_codec_media_context.h"
 
 #include <utils/media/ffmpeg_helper.h>
@@ -187,3 +189,5 @@ int QnAvCodecMediaContext::getBlockAlign() const
 {
     return m_context->block_align;
 }
+
+#endif // ENABLE_FFMPEG
