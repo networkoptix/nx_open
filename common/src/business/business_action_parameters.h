@@ -25,6 +25,7 @@ struct QnBusinessActionParameters {
     int fps;
     Qn::StreamQuality streamQuality;
     int recordingDuration;
+    // for bookmarks this represents epsilon, bookmark end time extended by
     int recordAfter;
 
     // Camera Output
@@ -56,6 +57,9 @@ struct QnBusinessActionParameters {
     // Alarm Layout - if the source resource should also be used
     bool useSource;
 
+    // Bookmark start time adjusted to the left by this value
+    int epsBeforeMs;
+
     /**
      * \returns                        Whether all parameters have default values.
      */
@@ -63,7 +67,7 @@ struct QnBusinessActionParameters {
 };
 
 #define QnBusinessActionParameters_Fields (actionResourceId)(soundUrl)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)
+    (relayOutputId)(relayAutoResetTimeout)(inputPortId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(epsBeforeMs)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
