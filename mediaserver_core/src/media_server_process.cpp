@@ -2321,10 +2321,19 @@ void MediaServerProcess::run()
 
             nx::network::SocketGlobals::mediatorConnector()
                     .setSystemCredentials(std::move(credentials));
-            return;
+        }
+        else
+        {
+            nx::network::SocketGlobals::mediatorConnector()
+                    .setSystemCredentials(boost::none);
         }
 
-        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
+        QnModuleInformation info = qnCommon->moduleInformation();
+        if (info.cloudSystemId != cloudSystemId)
+        {
+            info.cloudSystemId = cloudSystemId;
+            qnCommon->setModuleInformation(info);
+        }
     };
 
     loadResourcesFromECS(messageProcessor.data());

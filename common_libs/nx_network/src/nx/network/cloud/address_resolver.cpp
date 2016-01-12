@@ -63,10 +63,17 @@ AddressEntry::AddressEntry( AddressType type_, HostAddress host_ )
 {
 }
 
+AddressEntry::AddressEntry( const SocketAddress& address )
+    : type(AddressType::regular)
+    , host(address.address)
+{
+    attributes.push_back(AddressAttribute(
+        AddressAttributeType::nxApiPort, address.port));
+}
+
 bool AddressEntry::operator ==( const AddressEntry& rhs ) const
 {
     return type == rhs.type && host == rhs.host && attributes == rhs.attributes;
-
 }
 
 bool AddressEntry::operator <( const AddressEntry& rhs ) const
@@ -88,21 +95,63 @@ AddressResolver::AddressResolver(
 {
 }
 
-void AddressResolver::addPeerAddress( const HostAddress& hostName,
-                                      HostAddress hostAddress,
-                                      std::vector< AddressAttribute > attributes )
+void AddressResolver::addFixedAddress( const HostAddress& hostName,
+                                       const SocketAddress& hostAddress )
 {
-    Q_ASSERT_X( !hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved" );
-    Q_ASSERT_X( hostAddress.isResolved(), Q_FUNC_INFO, "Address should be resolved" );
+    Q_ASSERT_X(!hostName.isResolved(), Q_FUNC_INFO, "Hostname should be unresolved");
 
-    AddressEntry address( AddressType::regular, std::move( hostAddress ) );
-    address.attributes = std::move( attributes );
+    QnMutexLocker lk(&m_mutex);
+    AddressEntry entry(hostAddress);
+    auto& entries = m_info[hostName].fixedEntries;
+    const auto it = std::find(entries.begin(), entries.end(), entry);
+    if (it == entries.end())
+    {
+        NX_LOGX(lit("New fixed address for %1: %2" )
+                .arg(hostName.toString())
+                .arg(hostAddress.toString()), cl_logDEBUG1);
 
-    QnMutexLocker lk( &m_mutex );
-    auto& hostAdresses = m_info[ hostName ].peers;
-    const auto it = std::find( hostAdresses.begin(), hostAdresses.end(), address );
-    if( it == hostAdresses.end() )
-        hostAdresses.push_back( std::move( address ) );
+        entries.push_back(std::move(entry));
+
+        // we possibly could also grabHandlers to bring the result before DNS is
+        // resolved (if in progress), but it does not cause a serious delay so far
+    }
+}
+
+void AddressResolver::removeFixedAddress( const HostAddress& hostName,
+                                          const SocketAddress& hostAddress )
+{
+    QnMutexLocker lk(&m_mutex);
+    AddressEntry entry(hostAddress);
+    auto& entries = m_info[hostName].fixedEntries;
+    const auto it = std::find(entries.begin(), entries.end(), entry);
+    if (it != entries.end())
+    {
+        NX_LOGX(lit("Removed fixed address for %1: %2" )
+                .arg(hostName.toString())
+                .arg(hostAddress.toString()), cl_logDEBUG1);
+
+        entries.erase(it);
+    }
+}
+
+void AddressResolver::resolveDomain(
+    const HostAddress& domain, std::function<void(std::vector<HostAddress>)> handler )
+{
+    std::vector<HostAddress> subdomains;
+    const auto suffix = lit(".") + domain.toString();
+    {
+        // TODO: #mux Think about better representation to increase performance
+        QnMutexLocker lk( &m_mutex );
+        for (const auto& info : m_info)
+            if (info.first.toString().endsWith(suffix) &&
+                !info.second.getAll().empty())
+            {
+                subdomains.push_back(info.first);
+            }
+    }
+
+    // TODO: #mux We also should resolve these in mediator and fire handler later
+    handler(std::move(subdomains));
 }
 
 template< typename T >
@@ -265,6 +314,9 @@ void AddressResolver::HostAddressInfo::checkExpirations()
 
 bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
 {
+    if( !fixedEntries.empty() )
+        return true; // fixed entries are in priority
+
     if( m_dnsState != State::resolved )
         return false; // DNS is required
 
@@ -276,7 +328,7 @@ bool AddressResolver::HostAddressInfo::isResolved( bool natTraversal ) const
 
 std::vector< AddressEntry > AddressResolver::HostAddressInfo::getAll() const
 {
-    std::vector< AddressEntry > entries( peers );
+    std::vector< AddressEntry > entries( fixedEntries );
     entries.insert( entries.end(), m_dnsEntries.begin(), m_dnsEntries.end() );
     entries.insert( entries.end(), m_mediatorEntries.begin(), m_mediatorEntries.end() );
     return entries;
