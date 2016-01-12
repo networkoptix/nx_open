@@ -448,7 +448,9 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+
+    auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
+    storage->setSpaceLimit(spaceLimit);
     storage->setUsedForWriting(storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -544,11 +546,10 @@ static QStringList listRecordFolders()
 QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 {
     QnStorageResourceList result;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for (const auto& storage: storages)
     {
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
     return result;
@@ -560,14 +561,13 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for(const QString& folderPath: listRecordFolders())
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < storage->getSpaceLimit())
             continue; // if storage size isn't known do not add it by default
 
 
@@ -1742,8 +1742,6 @@ void MediaServerProcess::run()
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
 
-    // TODO: #akulikov #backup storages. Check if it is right.
-    connect(qnBackupStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
@@ -2097,6 +2095,19 @@ void MediaServerProcess::run()
             propertyDictionary->saveParams(server->getId());
         });
 
+        QFile hddList(Qn::HDD_LIST_FILE);
+        if (hddList.open(QFile::ReadOnly))
+        {
+            const auto content = QString::fromUtf8(hddList.readAll());
+            if (content.size())
+            {
+                auto hhds = content.split(lit("\n"), QString::SkipEmptyParts);
+                for (auto& hdd : hhds) hdd = hdd.trimmed();
+                server->setProperty(Qn::HDD_LIST, hhds.join(", "),
+                                    QnResource::NO_ALLOW_EMPTY);
+            }
+        }
+
         propertyDictionary->saveParams(server->getId());
 
         if (m_mediaServer.isNull())
@@ -2310,10 +2321,19 @@ void MediaServerProcess::run()
 
             nx::network::SocketGlobals::mediatorConnector()
                     .setSystemCredentials(std::move(credentials));
-            return;
+        }
+        else
+        {
+            nx::network::SocketGlobals::mediatorConnector()
+                    .setSystemCredentials(boost::none);
         }
 
-        nx::network::SocketGlobals::mediatorConnector().setSystemCredentials(boost::none);
+        QnModuleInformation info = qnCommon->moduleInformation();
+        if (info.cloudSystemId != cloudSystemId)
+        {
+            info.cloudSystemId = cloudSystemId;
+            qnCommon->setModuleInformation(info);
+        }
     };
 
     loadResourcesFromECS(messageProcessor.data());

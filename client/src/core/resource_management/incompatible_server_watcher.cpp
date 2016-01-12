@@ -14,7 +14,7 @@ namespace {
         server->setId(QnUuid::createUuid());
         server->setStatus(initialStatus, true);
         server->setOriginalGuid(moduleInformation.id);
-        server->setModuleInformation(moduleInformation);
+        server->setFakeServerModuleInformation(moduleInformation);
         return server;
     }
 
@@ -175,7 +175,7 @@ void QnIncompatibleServerWatcher::addResource(const QnModuleInformationWithAddre
         Q_ASSERT_X(server, "There must be a resource in the resource pool.", Q_FUNC_INFO);
         if (!server)
             return;
-        server->setModuleInformation(moduleInformation);
+        server->setFakeServerModuleInformation(moduleInformation);
         server->setStatus((compatible && !authorized) ? Qn::Unauthorized : Qn::Incompatible);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Update incompatible server %1 at %2 [%3]")

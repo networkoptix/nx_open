@@ -8,7 +8,7 @@
 namespace nx {
 namespace network {
 
-class MultipleServerSocket
+class NX_NETWORK_API MultipleServerSocket
     : public AbstractStreamServerSocket
 {
 protected:
@@ -61,7 +61,7 @@ public:
                            AbstractStreamSocket*)> handler) override;
 
 protected:
-    struct ServerSocketHandle
+    struct NX_NETWORK_API ServerSocketHandle
     {
         std::unique_ptr<AbstractStreamServerSocket> socket;
         bool isAccepting;

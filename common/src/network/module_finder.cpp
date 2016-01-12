@@ -4,6 +4,7 @@
 
 #include <api/global_settings.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/socket_global.h>
 #include "multicast_module_finder.h"
 #include "direct_module_finder.h"
 #include "direct_module_finder_helper.h"
@@ -337,6 +338,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     int count = item.addresses.size();
     item.addresses.insert(address);
     m_idByAddress[address] = moduleInformation.id;
+    const auto cloudModuleId = moduleInformation.cloudId();
     if (count < item.addresses.size()) {
         if (!ignoredAddress && isBetterAddress(address.address, item.primaryAddress.address)) {
             item.primaryAddress = address;
@@ -353,6 +355,10 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
                .arg(moduleInformation.id.toString()).arg(address.toString()), cl_logDEBUG1);
 
         emit moduleAddressFound(moduleInformation, address);
+
+        if (!cloudModuleId.isEmpty())
+            nx::network::SocketGlobals::addressResolver().addFixedAddress(
+               cloudModuleId, address);
     }
 }
 
@@ -427,7 +433,10 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     NX_LOGX(lit("Module URL lost: %1 %2:%3")
            .arg(moduleInformation.id.toString()).arg(address.address.toString()).arg(moduleInformation.port), cl_logDEBUG1);
+
     emit moduleAddressLost(moduleInformation, address);
+    nx::network::SocketGlobals::addressResolver().removeFixedAddress(
+        moduleInformation.cloudId(), address);
 
     if (!it->addresses.isEmpty())
         return;

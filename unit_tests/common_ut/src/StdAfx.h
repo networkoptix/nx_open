@@ -9,3 +9,4 @@
 
 #endif
 
+#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.

@@ -1149,12 +1149,13 @@ void QnWorkbenchActionHandler::at_userManagementAction_triggered() {
 
 qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
 {
-    enum { kOneWeekOffsetMs = 1000 * 60 * 60 * 24 * 7 } ;
+    static const qint64 kOneDayOffsetMs = 60 * 60 * 24 * 1000;
+    static const qint64 kOneYearOffsetMs = kOneDayOffsetMs *  365;
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
     const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
-    return (firstTimeIsNotKnown ? nowMs - kOneWeekOffsetMs : firstBookmarkUtcTimeMs);
+    return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
 }
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()

@@ -46,7 +46,7 @@ struct NX_NETWORK_API AddressAttribute
     AddressAttributeType type;
     quint64 value; // TODO: boost::variant ?
 
-    AddressAttribute( AddressAttributeType type_, quint64 value_ );
+    AddressAttribute( AddressAttributeType type_, quint64 value_ = 0 );
     bool operator ==( const AddressAttribute& rhs ) const;
     bool operator <( const AddressAttribute& rhs ) const;
     QString toString() const;
@@ -60,6 +60,9 @@ struct NX_NETWORK_API AddressEntry
 
     AddressEntry( AddressType type_ = AddressType::unknown,
                   HostAddress host_ = HostAddress() );
+
+    AddressEntry( const SocketAddress& address );
+
     bool operator ==( const AddressEntry& rhs ) const;
     bool operator <( const AddressEntry& rhs ) const;
     QString toString() const;
@@ -83,8 +86,22 @@ public:
 
         \note Peer can have multiple addresses
     */
-    void addPeerAddress( const HostAddress& peerName, HostAddress hostAddress,
-                         std::vector< AddressAttribute > attributes );
+    void addFixedAddress( const HostAddress& hostName,
+                          const SocketAddress& hostAddress );
+
+    //!Removes added address
+    void removeFixedAddress( const HostAddress& hostName,
+                             const SocketAddress& hostAddress );
+
+    //!Resolves domain address to the list of subdomains
+    /*!
+        \example resolveDomain( domain ) = { sub1.domain, sub2.domain, ... }
+
+        \note \a handler might be called within this function in case if
+            values are avaliable from cache
+     */
+    void resolveDomain( const HostAddress& domain,
+                        std::function<void(std::vector<HostAddress>)> handler );
 
     typedef std::function< void( SystemError::ErrorCode,
                                  std::vector< AddressEntry > ) > ResolveHandler;
@@ -121,7 +138,7 @@ private:
     {
         enum class State { unresolved, resolved, inProgress };
 
-        std::vector< AddressEntry > peers;
+        std::vector< AddressEntry > fixedEntries;
         std::set< void* > pendingRequests;
 
         HostAddressInfo();
@@ -137,7 +154,7 @@ private:
                                     = std::vector< AddressEntry >() );
 
         void checkExpirations();
-        bool isResolved( bool natTraversal ) const;
+        bool isResolved( bool natTraversal = false ) const;
         std::vector< AddressEntry > getAll() const;
 
     private:

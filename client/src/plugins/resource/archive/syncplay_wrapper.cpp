@@ -771,8 +771,11 @@ void QnArchiveSyncPlayWrapper::disableSync()
     foreach(const ReaderInfo& info, d->readers) {
         info.reader->setNavDelegate(0);
         // check if reader stay in EOF position, but position is not LIVE because waiting other items. At this case seek to live
-        if (info.isEOF)
+        if (info.isEOF) {
+            info.reader->setSpeed(1.0);
             info.reader->jumpTo(DATETIME_NOW, 0);
+            info.reader->resumeMedia();
+        }
     }
 }
 

@@ -25,6 +25,7 @@
 #include "utils/common/sleep.h"
 #include "utils/common/util.h"
 #include <nx/network/http/asynchttpclient.h>
+#include <nx/network/socket_global.h>
 #include "network/networkoptixmodulerevealcommon.h"
 #include "utils/serialization/lexical.h"
 #include "api/server_rest_connection.h"
@@ -477,10 +478,13 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     moduleInformation.id = getId();
     moduleInformation.serverFlags = getServerFlags();
 
+    if (const auto credentials = nx::network::SocketGlobals::mediatorConnector().getSystemCredentials())
+        moduleInformation.cloudSystemId = QString::fromUtf8(credentials->systemId);
+
     return moduleInformation;
 }
 
-void QnMediaServerResource::setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
+void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
     Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
     QList<SocketAddress> addressList;

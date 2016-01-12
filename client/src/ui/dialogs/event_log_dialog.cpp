@@ -248,19 +248,16 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
     m_allEvents.clear();
 
 
-    auto mediaServerList = qnResPool->getAllServers();
-    for (const QnMediaServerResourcePtr& mserver: mediaServerList)
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        if (mserver->getStatus() == Qn::Online)
-        {
-            m_requests << mserver->apiConnection()->getEventLogAsync(
-                fromMsec, toMsec,
-                m_filterCameraList,
-                eventType,
-                actionType,
-                QnUuid(),
-                this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
-        }
+        m_requests << mserver->apiConnection()->getEventLogAsync(
+            fromMsec, toMsec,
+            m_filterCameraList,
+            eventType,
+            actionType,
+            QnUuid(),
+            this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
     }
 }
 

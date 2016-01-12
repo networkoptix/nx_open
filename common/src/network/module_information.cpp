@@ -44,6 +44,14 @@ void QnModuleInformation::fixRuntimeId()
     runtimeId = QnUuid::fromRfc4122(hash);
 }
 
+QString QnModuleInformation::cloudId() const
+{
+    if (!cloudSystemId.isNull())
+        return id.toSimpleString() + lit(".") + cloudSystemId.toSimpleString();
+
+    return QString();
+}
+
 QString QnModuleInformation::nxMediaServerId() {
     return ::nxMediaServerId;
 }
