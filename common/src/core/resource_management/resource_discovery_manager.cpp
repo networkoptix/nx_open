@@ -649,7 +649,7 @@ QnResourceDiscoveryManager::State QnResourceDiscoveryManager::state() const
 
 bool QnResourceDiscoveryManager::isRedundancyUsing() const
 {
-    auto servers = qnResPool->getAllServers();
+    auto servers = qnResPool->getAllServers(Qn::AnyStatus);
     if (servers.size() < 2)
         return false;
     for (const auto& server: servers)

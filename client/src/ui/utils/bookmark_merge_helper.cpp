@@ -57,9 +57,9 @@ struct DetailLevel
     QList<BookmarkItemPtr> items;
 
     DetailLevel(
-            int msecsInDpix,
-            int mergeDistanceDpix = kDefaultMergeDistanseDpix,
-            int mergeSpacingDpix = kDefaultMergeSpacingDpix)
+            qint64 msecsInDpix,
+            qint64 mergeDistanceDpix = kDefaultMergeDistanseDpix,
+            qint64 mergeSpacingDpix = kDefaultMergeSpacingDpix)
         : msecsPerDpix(msecsInDpix)
         , mergeDistance(mergeDistanceDpix * msecsInDpix)
         , mergeSpacing(mergeSpacingDpix * msecsPerDpix)

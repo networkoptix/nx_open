@@ -129,8 +129,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
 {
     ui->setupUi(this);
 
-    ui->spacerLabel->setText(lit("\n"));    /// Creates two-line spacer for wraning text.
-
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
     ui->comboBoxBackupType->addItem(tr("In Real-Time"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
@@ -925,6 +923,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
     if (!m_backupCancelled)
         QMessageBox::information(this,
             tr("Finished"),
-            tr("Your archive has been successfully backed up."));
+            tr("Backup is finished"));
     m_backupCancelled = false;
 }

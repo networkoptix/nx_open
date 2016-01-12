@@ -6,6 +6,8 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/connective.h>
 
+class QnCameraChunkProvider;
+
 class QnMediaResourceHelper : public Connective<QObject>
 {
     Q_OBJECT
@@ -23,6 +25,7 @@ class QnMediaResourceHelper : public Connective<QObject>
     Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
     Q_PROPERTY(qint64 finalTimestamp READ finalTimestamp NOTIFY finalTimestampChanged)
+    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider NOTIFY chunkProviderChanged)
 
     Q_ENUMS(Protocol)
     Q_ENUMS(Qn::ResourceStatus)
@@ -48,6 +51,8 @@ public:
     QUrl mediaUrl() const;
 
     QString resourceName() const;
+
+    QnCameraChunkProvider *chunkProvider() const;
 
     qint64 position() const;
     void setPosition(qint64 position);
@@ -76,6 +81,7 @@ signals:
     void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
+    void chunkProviderChanged();
     void positionChanged();
     void resolutionsChanged();
     void resolutionChanged();
@@ -90,8 +96,6 @@ private:
     void updateMediaStreams();
     void updateCurrentStream();
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
-
-private:
     void updateStardardResolutions();
     void setUrl(const QUrl &url);
     int nativeStreamIndex(const QString &resolution) const;
@@ -101,6 +105,7 @@ private:
     int maximumResolution() const;
     void updateFinalTimestamp();
     void setFinalTimestamp(qint64 finalTimestamp);
+    QnMediaServerResourcePtr serverAtCurrentPosition() const;
 
 private:
     QnVirtualCameraResourcePtr m_camera;
@@ -118,4 +123,5 @@ private:
     Protocol m_nativeProtocol;
     int m_maxTextureSize;
     int m_maxNativeResolution;
+    QnCameraChunkProvider *m_chunkProvider;
 };
