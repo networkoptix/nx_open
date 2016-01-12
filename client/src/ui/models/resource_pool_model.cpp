@@ -693,9 +693,8 @@ void QnResourcePoolModel::at_resPool_resourceAdded(const QnResourcePtr &resource
     }
 
     if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
-    {
         m_rootNodes[Qn::WebPagesNode]->update();
-    }
+
 
 }
 
@@ -720,6 +719,9 @@ void QnResourcePoolModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
     m_itemNodesByResource.remove(resource);
     m_recorderHashByResource.remove(resource);
     Q_ASSERT(!m_resourceNodeByResource.contains(resource));
+
+    if (QnWebPageResourcePtr webPage = resource.dynamicCast<QnWebPageResource>())
+        m_rootNodes[Qn::WebPagesNode]->update();
 }
 
 
