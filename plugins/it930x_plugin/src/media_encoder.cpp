@@ -156,6 +156,7 @@ namespace ite
         if (!rxDev || !rxDev->deviceReady())
             return nxcip::NX_OTHER_ERROR;
 
+#if 0 // Open the stream any case (non-configured).
         // config in first arrived stream, another is locked
         if (rxDev->configureTx()) // delay inside
         {
@@ -185,7 +186,6 @@ namespace ite
                     return nxcip::NX_INVALID_PARAM_VALUE;
             }
         }
-#if 0 // Open the stream any case (non-configured).
         else
             return nxcip::NX_TRY_AGAIN;
 #endif

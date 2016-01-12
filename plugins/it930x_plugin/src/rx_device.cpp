@@ -209,6 +209,7 @@ namespace ite
             chan
         );
 
+        m_it930x->unlockFrequency();
         if (m_it930x->lockFrequency(TxDevice::freq4chan(chan)))
         {
             stats();
@@ -274,7 +275,6 @@ namespace ite
                             m_channel = chan;
                             txID = pkt.txID();
                         }
-                        m_it930x->unlockFrequency();
                         m_devReader->unsubscribe(It930x::PID_RETURN_CHANNEL);
                         return true;
                     }
@@ -290,11 +290,6 @@ namespace ite
 
     bool RxDevice::lockAndStart(int chan, int txId)
     {
-        if (!m_it930x->lockFrequency(TxDevice::freq4chan(chan))) {
-            debug_printf("[RxDevice::lockAndStart] lock failed. RxId: %d\n",
-                         m_rxID);
-            return false;
-        }
         m_txDev.reset(new TxDevice(txId, TxDevice::freq4chan(chan)));
         printf("[search] Rx %d; Found camera %d FINAL\n", m_rxID, txId);
         for (int i = 0; i < 2; ++i) {
@@ -316,7 +311,7 @@ namespace ite
         for (const auto &hint: hints) {
             if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan)) {
                 if (testChannel(hint.chan, bestChan, bestStrength, txID) &&
-                        txID == hint.txId) {
+                        txID == hint.txId && rxSyncManager.lock(m_rxID, hint.txId)) {
                     return lockAndStart(hint.chan, hint.txId);
                 } else {
                     debug_printf("[search] Hint testChannel failed; \
@@ -333,20 +328,14 @@ namespace ite
                               Strength is %d, camera is %d\n",
                              m_rxID, i, bestStrength, txID);
                 if (rxSyncManager.lock(m_rxID, txID)) {
-                    break;
+                    return lockAndStart(bestChan, txID);
                 } else {
                     debug_printf("[search] Rx: %d. This channel (%d) seems already locked. \
                                   Need to continue.\n", m_rxID, i);
                 }
             }
-//            if (bestStrength == 100)
-//                break;
         }
-        if (bestStrength != 0) {
-            return lockAndStart(bestChan, txID);
-        }
-        else
-            printf("[search] Rx: %d; Search failed\n", m_rxID);
+        printf("[search] Rx: %d; Search failed\n", m_rxID);
         return false;
     }
 
@@ -514,7 +503,9 @@ namespace ite
         bool ok = cmd && cmd->isValid() && txDev && m_it930x;
         if (!ok)
         {
-            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d\n", rxID(), (txDev ? txDev->txID() : 0));
+            debug_printf("[RC send] bad command or device. RxID: %d TxID: %d \
+                          cmd: %p cmd->isValid(): %d m_it930x: %d\n",
+                         rxID(), (txDev ? txDev->txID() : 0), cmd, (cmd ? cmd->isValid() : 0), (bool)m_it930x);
             Timer::sleep(RC_DELAY_MS());
             return false;
         }
