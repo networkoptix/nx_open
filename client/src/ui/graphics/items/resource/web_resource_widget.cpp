@@ -130,6 +130,12 @@ void QnWebResourceWidget::setupOverlays()
         backButton->setIcon(qnSkin->icon("item/back.png"));
         connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::back);
         buttonsBar->addButton(Qn::kBackButton, backButton);
+        buttonsBar->setButtonsEnabled(Qn::kBackButton, false);
+
+        connect(m_webView, &QnWebView::canGoBackChanged, this, [this, buttonsBar, backButton]()
+        {
+            buttonsBar->setButtonsEnabled(Qn::kBackButton, m_webView->canGoBack());
+        });
 
         auto reloadButton = new QnImageButtonWidget(this);
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));

@@ -2,6 +2,7 @@
 #include "web_view.h"
 
 #include <QtNetwork/QNetworkReply>
+#include <QtWebKit/QWebHistory>
 
 namespace
 {
@@ -32,6 +33,7 @@ QnWebView::QnWebView(const QUrl &url
     , QGraphicsItem *item)
     : QGraphicsWebView(item)
     , m_status(kPageLoadFailed)
+    , m_canGoBack(false)
 {
     setRenderHints(0);
     settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
@@ -62,9 +64,15 @@ QnWebView::QnWebView(const QUrl &url
         qDebug() << "----------------------- load finished: " << successful;
     };
 
+    const auto onUrlChangedHandler = [this]()
+    {
+        setCanGoBack(history()->canGoBack());
+    };
+
     connect(this, &QGraphicsWebView::loadStarted, this, loadStartedHander);
     connect(this, &QGraphicsWebView::loadFinished, this, loadFinishedHandler);
     connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);
+    connect(this, &QGraphicsWebView::urlChanged, this, onUrlChangedHandler);
 
     setUrl(url);
 }
@@ -76,6 +84,20 @@ QnWebView::~QnWebView()
 WebViewPageStatus QnWebView::status() const
 {
     return m_status;
+}
+
+bool QnWebView::canGoBack() const
+{
+    return m_canGoBack;
+}
+
+void QnWebView::setCanGoBack(bool value)
+{
+    if (m_canGoBack == value)
+        return;
+
+    m_canGoBack = value;
+    emit canGoBackChanged();
 }
 
 void QnWebView::setStatus(WebViewPageStatus value)
