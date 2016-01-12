@@ -598,7 +598,7 @@ namespace nx_http
             StringType toString() const;
         };
 
-        class KeepAlive
+        class NX_NETWORK_API KeepAlive
         {
         public:
             std::chrono::seconds timeout;
