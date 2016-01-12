@@ -52,7 +52,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-#include <core/resource/webpage_resource.h>
 
 #include <events/mserver_business_rule_processor.h>
 
@@ -90,7 +89,6 @@
 #include <plugins/resource/stardot/stardot_resource_searcher.h>
 #include <plugins/resource/test_camera/testcamera_resource_searcher.h>
 #include <plugins/resource/third_party/third_party_resource_searcher.h>
-#include <plugins/resource/web_page/web_page_resource_searcher.h>
 #include <plugins/storage/dts/vmax480/vmax480_resource_searcher.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <plugins/storage/third_party_storage_resource/third_party_storage_resource.h>
@@ -1165,21 +1163,6 @@ void MediaServerProcess::loadResourcesFromECS(QnCommonMessageProcessor* messageP
     }
 
     {
-        //loading webpages
-        QnWebPageResourceList webPages;
-        while(( rez = ec2Connection->getWebPageManager()->getWebPagesSync(&webPages))  != ec2::ErrorCode::ok)
-        {
-            qDebug() << "QnMain::run(): Can't get webPages. Reason: " << ec2::toString(rez);
-            QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
-            if (m_needStop)
-                return;
-        }
-
-        for(const QnWebPageResourcePtr &webPage: webPages)
-            messageProcessor->updateResource(webPage);
-    }
-
-    {
         //loading layouts
         QnLayoutResourceList layouts;
         while(( rez = ec2Connection->getLayoutManager()->getLayoutsSync(&layouts))  != ec2::ErrorCode::ok)
@@ -2137,9 +2120,6 @@ void MediaServerProcess::run()
     //NOTE plugins have higher priority than built-in drivers
     ThirdPartyResourceSearcher thirdPartyResourceSearcher;
     QnResourceDiscoveryManager::instance()->addDeviceServer( &thirdPartyResourceSearcher );
-
-    QnWebPageResourceSearcher webPageResourceSearcher;
-    QnResourceDiscoveryManager::instance()->addDeviceServer( &webPageResourceSearcher );
 
 #ifdef ENABLE_DESKTOP_CAMERA
     QnDesktopCameraResourceSearcher desktopCameraResourceSearcher;
