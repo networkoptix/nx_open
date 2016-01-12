@@ -28,10 +28,11 @@ namespace aio { class AbstractAioThread; }
 /** Base interface for sockets. Provides methods to set different socket configuration parameters.
 
     \par Removing socket:
-    Socket can be safely removed while inside socket's aio thread 
+        Socket can be safely removed while inside socket's aio thread 
     (e.g., inside completion handler of any asynchronous operation).
-    If removing socket in different thread, then caller MUST 
-    cancel all ongoing asynchronous I/O on socket first using \a QnStoppableAsync::pleaseStop
+        If removing socket in different thread, then caller MUST 
+    cancel all ongoing asynchronous operations (including timers, posts etc)
+    on socket first using \a QnStoppableAsync::pleaseStop
 */
 class NX_NETWORK_API AbstractSocket
     : public QnStoppableAsync

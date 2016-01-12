@@ -26,7 +26,8 @@ namespace stun {
  */
 class NX_NETWORK_API UDPClient
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
 public:
     typedef std::function<void(
@@ -61,14 +62,8 @@ public:
     /** By default, \a UDPClient::kDefaultMaxRetransmissions (7) */
     void setMaxRetransmissions(int maxRetransmissions);
 
-    //Received message from remote host
-    void messageReceived(SocketAddress sourceAddress, Message mesage);
-    //Unrecoverable error with socket
-    void ioFailure(SystemError::ErrorCode);
-
 private:
     typedef nx::network::UnreliableMessagePipeline<
-        UDPClient,
         Message,
         MessageParser,
         MessageSerializer> PipelineType;
@@ -94,6 +89,9 @@ private:
     int m_maxRetransmissions;
     //map<transaction id, request data>
     std::map<nx::Buffer, RequestContext> m_ongoingRequests;
+
+    virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
+    virtual void ioFailure(SystemError::ErrorCode) override;
 
     void sendRequestInternal(
         SocketAddress serverAddress,

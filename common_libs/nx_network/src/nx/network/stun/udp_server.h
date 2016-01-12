@@ -25,10 +25,10 @@ class MessageDispatcher;
 */
 class NX_NETWORK_API UDPServer
 :
-    public QnStoppableAsync
+    public QnStoppableAsync,
+    private nx::network::UnreliableMessagePipelineEventHandler<Message>
 {
     typedef nx::network::UnreliableMessagePipeline<
-        UDPServer,
         Message,
         MessageParser,
         MessageSerializer> PipelineType;
@@ -53,13 +53,13 @@ public:
         const Message& message,
         std::function<void(SystemError::ErrorCode)> completionHandler);
 
-    void messageReceived(SocketAddress sourceAddress, Message mesage);
-    void ioFailure(SystemError::ErrorCode);
-
 private:
     PipelineType m_messagePipeline;
     bool m_boundToLocalAddress;
     const MessageDispatcher& m_dispatcher;
+
+    virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
+    virtual void ioFailure(SystemError::ErrorCode) override;
 };
 
 }   //stun

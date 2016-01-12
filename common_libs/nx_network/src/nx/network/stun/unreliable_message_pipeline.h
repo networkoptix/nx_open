@@ -20,20 +20,28 @@
 namespace nx {
 namespace network {
 
+/** Implement this interface to receive messages and events from \a UnreliableMessagePipeline */
+template<class MessageType>
+class UnreliableMessagePipelineEventHandler
+{
+public:
+    virtual ~UnreliableMessagePipelineEventHandler() {}
+
+    /** Received message from remote host */
+    virtual void messageReceived(
+        SocketAddress sourceAddress,
+        MessageType msg) = 0;
+    /** Unrecoverable error with socket */
+    virtual void ioFailure(SystemError::ErrorCode errorCode) = 0;
+};
+
 /** Pipeline for transferring messages over unreliable transport (datagram socket).
-    \a CustomPipeline MUST implement following methods:
-    \code {*.cpp}
-        //Received message from remote host
-        void messageReceived(SocketAddress sourceAddress, MessageType mesage);
-        //Unrecoverable error with socket
-        void ioFailure(SystemError::ErrorCode);
-    \endcode
-    All these methods are invoked within socket thread
-    \note This is a helper class for implementing UDP server/client of 
+        Deliveres received messages to \a UnreliableMessagePipelineEventHandler<\a MessageType> instance
+    \note All events are delivered within internal socket's aio thread
+    \note This is a helper class for implementing UDP server/client of
         message-orientied protocol
  */
 template<
-    class CustomPipeline,
     class MessageType,
     class ParserType,
     class SerializerType>
@@ -42,13 +50,14 @@ class UnreliableMessagePipeline
     public QnStoppableAsync
 {
     typedef UnreliableMessagePipeline<
-        CustomPipeline,
         MessageType,
         ParserType,
         SerializerType
     > self_type;
 
 public:
+    typedef UnreliableMessagePipelineEventHandler<MessageType> CustomPipeline;
+
     UnreliableMessagePipeline(CustomPipeline* customPipeline)
     :
         m_customPipeline(customPipeline),
