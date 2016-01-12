@@ -330,18 +330,6 @@ void QnResourceWidget::createButtons() {
     infoButton->setToolTip(tr("Information"));
     connect(infoButton, &QnImageButtonWidget::toggled, this, &QnResourceWidget::at_infoButton_toggled);
 
-
-    QnImageButtonWidget *fullscreenButton= new QnImageButtonWidget();
-    fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
-    fullscreenButton->setProperty(Qn::NoBlockMotionSelection, true);
-    fullscreenButton->setToolTip(tr("Fullscreen mode"));
-    connect(fullscreenButton, &QnImageButtonWidget::clicked, this, [this]()
-    {
-        // Toggles fullscreen item mode
-        const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
-        workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
-    });
-
     QnImageButtonWidget *rotateButton = new QnImageButtonWidget();
     rotateButton->setIcon(qnSkin->icon("item/rotate.png"));
     rotateButton->setProperty(Qn::NoBlockMotionSelection, true);
@@ -354,7 +342,6 @@ void QnResourceWidget::createButtons() {
     buttonsBar->addButton(Qn::kCloseButton, closeButton);
     buttonsBar->addButton(Qn::kInfoButton, infoButton);
     buttonsBar->addButton(Qn::kRotateButton, rotateButton);
-    buttonsBar->addButton(Qn::kFullscreenButton, fullscreenButton);
 
     connect(buttonsBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
@@ -687,9 +674,6 @@ int QnResourceWidget::visibleButtons() const
 int QnResourceWidget::calculateButtonsVisibility() const {
     int result = Qn::kInfoButton;
 
-    if (resource()->flags().testFlag(Qn::web_page))
-        result |= Qn::kFullscreenButton;
-
     if (!(m_options & WindowRotationForbidden))
         result |= Qn::kRotateButton;
 
@@ -1020,19 +1004,8 @@ void QnResourceWidget::optionsChangedNotify(Options changedFlags)
         return;
     }
 
-    const bool fullscreenModeChanged = changedFlags.testFlag(FullScreenMode);
-    if (fullscreenModeChanged || changedFlags.testFlag(ActivityPresence))
+    if (changedFlags.testFlag(ActivityPresence))
         updateHud(true);
-
-    if (fullscreenModeChanged)
-    {
-        const bool fullscreenMode = options().testFlag(FullScreenMode);
-        const auto newIcon = fullscreenMode
-            ? qnSkin->icon("item/exit_fullscreen.png")
-            : qnSkin->icon("item/fullscreen.png");
-
-        buttonsOverlay()->rightButtonsBar()->button(Qn::kFullscreenButton)->setIcon(newIcon);
-    }
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {

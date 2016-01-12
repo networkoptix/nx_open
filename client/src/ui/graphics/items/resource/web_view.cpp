@@ -90,6 +90,12 @@ void QnWebView::loadPage(const QUrl &url)
     connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);
 }
 
+void QnWebView::reloadPage()
+{
+    const auto currentUrl = url();
+    loadPage(currentUrl);
+}
+
 void QnWebView::updatePageLoadProgress(int progress)
 {
     setStatus(statusFromProgress(progress));

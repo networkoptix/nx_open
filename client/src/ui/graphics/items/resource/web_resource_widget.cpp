@@ -10,6 +10,7 @@
 #include <ui/graphics/items/resource/web_view.h>
 #include <ui/graphics/items/generic/image_button_bar.h>
 #include <ui/graphics/items/overlays/buttons_overlay.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 
 namespace
 {
@@ -119,18 +120,35 @@ QnWebResourceWidget::~QnWebResourceWidget()
 
 void QnWebResourceWidget::setupOverlays()
 {
-    enum
     {
-        kBackButton     = 0x1
-        , kReloadButton = 0x2
-    };
+        // Left buttons bar setup
+        auto buttonsBar = buttonsOverlay()->leftButtonsBar();
 
+        auto backButton = new QnImageButtonWidget(this);
+        backButton->setIcon(qnSkin->icon("item/back.png"));
+        connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::back);
+        buttonsBar->addButton(Qn::kBackButton, backButton);
 
-    /*
-    auto backButton = new QnImageButtonWidget(this);
-    backButton->setIcon(qnSkin->icon("item/back.png"));
-    */
-    //buttonsOverlay()->leftButtonsPanel()->addButton(backButton);
+        auto reloadButton = new QnImageButtonWidget(this);
+        reloadButton->setIcon(qnSkin->icon("item/reload.png"));
+        connect(reloadButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::reloadPage);
+        buttonsBar->addButton(Qn::kReloadPageButton, reloadButton);
+    }
+
+    {
+        // Right buttons bar setup
+        QnImageButtonWidget *fullscreenButton= new QnImageButtonWidget();
+        fullscreenButton->setIcon(qnSkin->icon("item/fullscreen.png"));
+        fullscreenButton->setProperty(Qn::NoBlockMotionSelection, true);
+        fullscreenButton->setToolTip(tr("Fullscreen mode"));
+        connect(fullscreenButton, &QnImageButtonWidget::clicked, this, [this]()
+        {
+            // Toggles fullscreen item mode
+            const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
+            workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
+        });
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::kFullscreenButton, fullscreenButton);
+    }
 }
 
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
@@ -146,6 +164,34 @@ Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
     default:
         return Qn::EmptyOverlay;
     }
+}
+
+void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
+{
+    const bool fullscreenModeChanged = changedFlags.testFlag(FullScreenMode);
+    if (fullscreenModeChanged)
+    {
+        updateHud(true);
+
+        const bool fullscreenMode = options().testFlag(FullScreenMode);
+        const auto newIcon = fullscreenMode
+            ? qnSkin->icon("item/exit_fullscreen.png")
+            : qnSkin->icon("item/fullscreen.png");
+
+        buttonsOverlay()->rightButtonsBar()->button(Qn::kFullscreenButton)->setIcon(newIcon);
+    }
+
+    return base_type::optionsChangedNotify(changedFlags);
+}
+
+int QnWebResourceWidget::calculateButtonsVisibility()
+{
+    auto result = base_type::calculateButtonsVisibility();
+
+    if (resource()->flags().testFlag(Qn::web_page))
+        result |= Qn::kFullscreenButton;
+
+    return result;
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )

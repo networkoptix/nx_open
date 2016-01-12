@@ -23,6 +23,10 @@ protected:
 private:
     void setupOverlays();
 
+    int calculateButtonsVisibility();
+
+    void optionsChangedNotify(Options changedFlags);
+
 private:
     QnWebView * const m_webView;
 };
