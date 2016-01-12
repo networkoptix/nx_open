@@ -5,7 +5,7 @@ FULL_COMPANY_NAME="${company.name}"
 FULL_PRODUCT_NAME="${company.name} ${product.name} Client.conf"
 FULL_APPLAUNCHER_NAME="${company.name} Launcher.conf"
 
-PACKAGENAME=$COMPANY_NAME-client
+PACKAGENAME=${installer.name}-client
 VERSION=${release.version}
 FULLVERSION=${release.version}.${buildNumber}
 MINORVERSION=${parsedVersion.majorVersion}.${parsedVersion.minorVersion}

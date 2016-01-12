@@ -1,5 +1,7 @@
 #include "workbench_alarm_layout_handler.h"
 
+#include <utils/aspect_ratio.h>
+
 #include <business/actions/abstract_business_action.h>
 
 #include <camera/resource_display.h>
@@ -24,6 +26,10 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+
+#include <ui/graphics/items/resource/resource_widget.h>
+
+#include <plugins/resource/archive/archive_stream_reader.h>
 
 namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
@@ -99,6 +105,8 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     if (!layout)
         return;
 
+    const bool wasEmptyLayout = layout->items().isEmpty();
+
     /* Disable Sync on layout before adding cameras */
     layout->setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState()));
 
@@ -108,13 +116,16 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
         return camera1->getId() < camera2->getId();
     });
 
-    for (const QnVirtualCameraResourcePtr &camera: sortedCameras) {
+    for (const QnVirtualCameraResourcePtr &camera: sortedCameras)
+    {
         auto existingItems = layout->items(camera->getUniqueId());
 
         /* If the camera is already on layout, just take it to LIVE */
-        if (!existingItems.isEmpty()) {
+        if (!existingItems.isEmpty())
+        {
             for (auto item: existingItems)
                 jumpToLive(layout, item);
+
             continue;
         }
 
@@ -134,6 +145,17 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
 
     if (switchToLayout)
         workbench()->setCurrentLayout(layout);
+
+
+    if (!wasEmptyLayout || sortedCameras.empty())
+        return;
+
+    for(auto widget: display()->widgets(sortedCameras.first()))
+    {
+        const auto aspect = widget->visualChannelAspectRatio();
+        layout->setCellAspectRatio(QnAspectRatio::closestStandardRatio(aspect).toFloat());
+        break;  // Break after first camera aspect set
+    }
 }
 
 QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
@@ -187,9 +209,11 @@ void QnWorkbenchAlarmLayoutHandler::jumpToLive(QnWorkbenchLayout *layout, QnWork
         return;
 
     if (auto resourceDisplay = display()->display(item)) {
-        if (resourceDisplay->camDisplay())
-            resourceDisplay->camDisplay()->setSpeed(1.0);
-        resourceDisplay->setCurrentTimeUSec(DATETIME_NOW);
+        if (resourceDisplay->archiveReader()) {
+            resourceDisplay->archiveReader()->setSpeed(1.0);
+            resourceDisplay->archiveReader()->jumpTo(DATETIME_NOW, 0);
+            resourceDisplay->archiveReader()->resumeMedia();
+        }
         resourceDisplay->start();
     }
 

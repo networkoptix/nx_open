@@ -480,7 +480,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const {
     return moduleInformation;
 }
 
-void QnMediaServerResource::setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
+void QnMediaServerResource::setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation) {
     Q_ASSERT_X(isFakeServer(toSharedPointer()), Q_FUNC_INFO, "Only fake servers should be set this way");
 
     QList<QHostAddress> addressList;

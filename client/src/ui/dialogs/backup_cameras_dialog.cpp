@@ -40,6 +40,11 @@ namespace {
             || isValidServer(camera->getParentServer());
     }
 
+    bool isDtsCamera(const QnVirtualCameraResourcePtr &camera)
+    {
+        return (camera && camera->isDtsBased());
+    }
+
     class BackupCamerasDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
 
@@ -56,10 +61,6 @@ namespace {
                 ));
 
             setWarningStyle(m_warningLabel);
-            m_warningLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("Cannot add new devices while backup process is running."),
-                tr("Cannot add new cameras while backup process is running.")
-                ));
         }
 
         ~BackupCamerasDialogDelegate()
@@ -80,10 +81,34 @@ namespace {
 
         virtual bool validate(const QnResourceList &selectedResources) override
         {
-            QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
-            bool valid = boost::algorithm::all_of(cameras, isValidCamera);
-            m_warningLabel->setVisible(!valid);
-            return valid;
+            static const auto kBackupInProgressWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Cannot add new devices while backup process is running."),
+                tr("Cannot add new cameras while backup process is running."));
+
+            static const auto kDtsWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Cannot add new devices because they store archive on external storage."),
+                tr("Cannot add new cameras because they store archive on external storage."));
+
+            const QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
+            if (boost::algorithm::any_of(cameras, isDtsCamera))
+            {
+                // If has dts-based cameras then change massage accordingly
+                m_warningLabel->setText(kDtsWarning);
+            }
+            else if (!boost::algorithm::all_of(cameras, isValidCamera))
+            {
+                // If has non-valid cameras then change massage accordingly
+                m_warningLabel->setText(kBackupInProgressWarning);
+            }
+            else
+            {
+                // Otherwise hide warning
+                m_warningLabel->setVisible(false);
+                return true;
+            }
+
+            m_warningLabel->setVisible(true);
+            return false;
         }
 
         virtual bool isValid(const QnResourcePtr &resource) const override
@@ -92,9 +117,9 @@ namespace {
                 return isValidServer(server);
 
             if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-                return isValidCamera(camera);
+                return (isValidCamera(camera) && !isDtsCamera(camera));
 
-            return false;
+            return true;    // In case of groups for encoders
         }
 
         bool backupNewCameras() const

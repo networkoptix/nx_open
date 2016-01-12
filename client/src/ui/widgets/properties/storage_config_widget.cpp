@@ -126,7 +126,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     , m_updating(false)
     , m_quality(qnGlobalSettings->backupQualities())
     , m_camerasToBackup()
-    , m_currentServerCamerasToBackup()
 {
     ui->setupUi(this);
 
@@ -261,7 +260,7 @@ void QnStorageConfigWidget::initQualitiesCombo()
 
     resetQualities();
 
-    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this, [this](int index)
+    connect(ui->qualityComboBox, QnComboboxCurrentIndexChanged, this, [this](int /* index */)
     {
         m_quality = extractQuality(ui->qualityComboBox);
         emit hasChangesChanged();
@@ -475,7 +474,7 @@ void QnStorageConfigWidget::updateRebuildInfo() {
 
 void QnStorageConfigWidget::updateBackupInfo() {
     updateBackupUi(qnServerStorageManager->backupStatus(m_server)
-        , m_camerasToBackup.size(), m_currentServerCamerasToBackup.size());
+        , m_camerasToBackup.size());
 }
 
 void QnStorageConfigWidget::applyStoragesChanges(QnStorageResourceList& result, const QnStorageModelInfoList &storages) const {
@@ -709,23 +708,33 @@ QString QnStorageConfigWidget::backupPositionToString( qint64 backupTimeMs ) {
 void QnStorageConfigWidget::updateBackupWidgetsVisibility() {
     using boost::algorithm::any_of;
 
-    bool backupIsActive = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
+    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info) {
         return info.isBackup;
     });
 
     /* Notify about backup possibility if there are less than two valid storages in the system. */
-    bool backupIsPossible = !isReadOnly()
-        && !backupIsActive
-        && boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info) { return info.isWritable; }) <= 1;
 
-    ui->backupStoragesGroupBox->setVisible(backupIsActive);
-    ui->backupControls->setVisible(backupIsActive);
-    ui->backupOptionLabel->setVisible(backupIsPossible);
+    const auto writableDevices = boost::count_if(m_model->storages(), [this](const QnStorageModelInfo &info)
+    {
+        return info.isWritable;
+    });
+
+
+    ui->backupStoragesGroupBox->setVisible(backupStoragesExist);
+    ui->backupControls->setVisible(backupStoragesExist);
+
+    // Show warning when:
+    // 1. Not read only
+    // 2. No storages where isBackup == true
+    // 3. Writable storages count is less than 2
+    const bool lessThanTwoStorages = (writableDevices < 2);
+    const bool showWarning = (!isReadOnly() &&
+        !backupStoragesExist && lessThanTwoStorages);
+    ui->backupOptionLabel->setVisible(showWarning);
 }
 
 void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
-    , int overallSelectedCameras
-    , int currentServerSelectedCameras)
+    , int overallSelectedCameras)
 {
     QString status;
 
@@ -737,7 +746,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
 
     QString backupInfo;
     bool canStartBackup = this->canStartBackup(
-        reply, currentServerSelectedCameras, &backupInfo);
+        reply, overallSelectedCameras, &backupInfo);
     ui->backupWarningLabel->setText(backupInfo);
 
     bool realtime = m_backupSchedule.backupType == Qn::Backup_RealTime;
@@ -800,13 +809,6 @@ void QnStorageConfigWidget::updateCamerasForBackup(const QnVirtualCameraResource
         return;
 
     m_camerasToBackup = cameras;
-
-    const auto isCurrentServerFilter = [this](const QnVirtualCameraResourcePtr &resource)
-    {
-        return (resource->getParentServer() == m_server);
-    };
-
-    m_currentServerCamerasToBackup = m_camerasToBackup.filtered(isCurrentServerFilter);
 
     updateBackupInfo();
     emit hasChangesChanged();
@@ -891,7 +893,7 @@ void QnStorageConfigWidget::at_serverBackupStatusChanged( const QnMediaServerRes
     if (server != m_server)
         return;
 
-    updateBackupUi(status, m_camerasToBackup.size(), m_currentServerCamerasToBackup.size());
+    updateBackupUi(status, m_camerasToBackup.size());
     updateRebuildInfo();
 }
 
@@ -921,6 +923,6 @@ void QnStorageConfigWidget::at_serverBackupFinished( const QnMediaServerResource
     if (!m_backupCancelled)
         QMessageBox::information(this,
             tr("Finished"),
-            tr("Your archive has been successfully backed up."));
+            tr("Backup is finished"));
     m_backupCancelled = false;
 }

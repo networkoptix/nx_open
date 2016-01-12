@@ -11,6 +11,7 @@
 #include <QtOpenGL/QGLContext>
 
 #include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/style/globals.h>
 #include <ui/style/icon.h>
@@ -134,12 +135,13 @@ void QnImageButtonWidget::setPixmap(StateFlags flags, const QPixmap &pixmap) {
     update();
 }
 
-QIcon QnImageButtonWidget::icon() const {
-    static const QIcon emptyIcon;
-    return emptyIcon; // TODO: #Elric #ec2: change to anything appropriate
+QIcon QnImageButtonWidget::icon() const
+{
+    return m_icon;
 }
 
-void QnImageButtonWidget::setIcon(const QIcon &icon) {
+void QnImageButtonWidget::setIcon(const QIcon &icon)
+{
     for(int i = 0; i <= MaxState; i++)
         m_pixmaps[i] = QPixmap();
 
@@ -154,6 +156,9 @@ void QnImageButtonWidget::setIcon(const QIcon &icon) {
     setPixmap(Checked | Pressed,            bestPixmap(icon, QnIcon::Pressed, QnIcon::On));
 
     m_actionIconOverridden = true;
+
+    m_icon = icon;
+    emit iconChanged();
 }
 
 void QnImageButtonWidget::setCheckable(bool checkable) {
@@ -239,16 +244,28 @@ void QnImageButtonWidget::click() {
 void QnImageButtonWidget::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *widget) {
     StateFlags hoverState = m_state | Hovered;
     StateFlags normalState = m_state & ~Hovered;
-    paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+
+    bool corrected = false;
+    QTransform roundedTransform = sharpTransform(painter->transform(), &corrected);
+
+    if (corrected)
+    {
+        QnScopedPainterTransformRollback rollback(painter, roundedTransform);
+        paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+    }
+    else
+    {
+        paint(painter, normalState, hoverState, m_hoverProgress, checked_cast<QGLWidget *>(widget), rect());
+    }
 }
 
 void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateFlags endState, qreal progress, QGLWidget *widget, const QRectF &rect) {
-    
+
     QRectF imageRect(rect);
     if (!m_imageMargins.isNull())
         imageRect = QnGeometry::eroded(imageRect, m_imageMargins);
-        
-    if (!m_initialized) 
+
+    if (!m_initialized)
         initializeVao(imageRect);
     else if (m_dynamic)
         updateVao(imageRect);
@@ -285,7 +302,7 @@ void QnImageButtonWidget::paint(QPainter *painter, StateFlags startState, StateF
         auto shader = renderer->getTextureShader();
         shader->bind();
         shader->setColor(shaderColor);
-        shader->setTexture(0);          
+        shader->setTexture(0);
         renderer->drawBindedTextureOnQuadVao(&m_verticesStatic, shader);
         shader->release();
     } else {
@@ -578,7 +595,7 @@ void QnImageButtonWidget::ensurePixmapCache() const {
         } else {
             QSize size = this->size().toSize();
             QString key = lit("ibw_%1_%2x%3").arg(m_pixmaps[i].cacheKey()).arg(size.width()).arg(size.height());
-            
+
             QPixmap pixmap;
             if (!QPixmapCache::find(key, &pixmap)) {
                 pixmap = QPixmap::fromImage(m_pixmaps[i].toImage().scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
@@ -682,7 +699,7 @@ void QnImageButtonWidget::initializeVao(const QRectF &rect) {
             shader->bindAttributeLocation("aPosition",VERTEX_POS_INDX);
             shader->bindAttributeLocation("aTexcoord",VERTEX_TEXCOORD0_INDX);
             shader->markInitialized();
-        };    
+        };
 
         m_textureBufferTransition.release();
         m_positionBufferTransition.release();

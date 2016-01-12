@@ -133,7 +133,10 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
-    QnMediaServerResourceList getAllServers() const;
+
+    // @note Never returns fake servers
+    QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag

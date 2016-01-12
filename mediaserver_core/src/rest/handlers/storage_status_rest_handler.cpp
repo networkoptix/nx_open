@@ -7,6 +7,7 @@
 #include "core/resource_management/resource_pool.h"
 #include <core/resource/storage_resource.h>
 #include <core/resource/storage_plugin_factory.h>
+#include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <platform/platform_abstraction.h>
 
@@ -31,8 +32,12 @@ int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParam
         if (!storage)
             return CODE_INVALID_PARAMETER;
 
+        qint64 spaceLimit = QnFileStorageResource::isLocal(storageUrl) ?
+                            nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE :
+                            QnFileStorageResource::kNasStorageLimit;
+
         storage->setUrl(storageUrl);
-        storage->setSpaceLimit(nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE);           
+        storage->setSpaceLimit(spaceLimit);           
     }
     
     Q_ASSERT_X(storage, Q_FUNC_INFO, "Storage must exist here");

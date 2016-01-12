@@ -150,13 +150,17 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 
             if (success)
             {
-                thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
-                m_pixmaps.remove(thumbnailData.thumbnailId);
-                m_pixmaps.insert(thumbnailId, QPixmap::fromImage(QImage::fromData(imageData, "JPG")));
-                thumbnailData.thumbnailId = thumbnailId;
+                QPixmap pixmap = QPixmap::fromImage(QImage::fromData(imageData, "JPG"));
+                if (!pixmap.isNull())
+                {
+                    thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
+                    m_pixmaps.remove(thumbnailData.thumbnailId);
+                    m_pixmaps.insert(thumbnailId, pixmap);
+                    thumbnailData.thumbnailId = thumbnailId;
+                }
+                thumbnailData.time = m_elapsedTimer.elapsed();
             }
 
-            thumbnailData.time = m_elapsedTimer.elapsed();
             thumbnailData.loading = false;
         }
 

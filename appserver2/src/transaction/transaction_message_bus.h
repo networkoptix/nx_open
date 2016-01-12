@@ -74,7 +74,6 @@ namespace ec2
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
         void connectionFailure( const QnUuid& connectionGuid );
-        void dropConnections();
         
         ApiPeerData localPeer() const;
 
@@ -159,6 +158,11 @@ namespace ec2
         void gotLockResponse(ApiLockData);
 
         void remotePeerUnauthorized(const QnUuid& id);
+
+    public slots:
+        void dropConnections();
+        void reconnectAllPeers();
+
     private:
         friend class QnTransactionTransport;
         friend struct GotTransactionFuction;
@@ -251,6 +255,8 @@ namespace ec2
         int distanceToPeer(const QnUuid& dstPeer) const;
         void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
         void sendDelayedAliveTran();
+        void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
+    
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
