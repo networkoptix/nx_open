@@ -22,7 +22,10 @@ angular.module('cloudApp')
                 $scope.session.password = $scope.password;
             }
             $location.path('/systems');
-            document.location.reload();
+
+            setTimeout(function(){
+                document.location.reload();
+            });
         });
 
         $scope.account = {
