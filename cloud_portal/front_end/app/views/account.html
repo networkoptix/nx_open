@@ -40,7 +40,7 @@
             <div class="col-sm-offset-3 col-sm-9">
 
                 <process-button process="save"
-                                button-disabled="!accountForm.$valid"
+                                form="accountForm"
                                 button-text="'Save'"></process-button>
             </div>
         </div>
@@ -62,7 +62,7 @@
                        id="password" required>
             </div>
             <div class="col-sm-5">
-                <span class="help-block" ng-if="passwordForm.password.$dirty && passwordForm.password.$error.required">Current password is required.</span>
+                <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Current password is required.</span>
             </div>
         </div>
 
@@ -71,7 +71,7 @@
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
                 <process-button process="changePassword"
-                                button-disabled="!passwordForm.$valid"
+                                form="passwordForm"
                                 button-text="'Change password'"></process-button>
             </div>
         </div>

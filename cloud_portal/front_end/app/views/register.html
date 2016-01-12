@@ -42,9 +42,9 @@
                        ng-change="hideAlreadyExists()">
             </div>
             <div class="col-sm-5">
-                <span class="help-block" ng-if="registerForm.registerEmail.$dirty && registerForm.registerEmail.$error.required">Email is required.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$dirty && registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern">Please, enter a valid email.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern">Please, enter a valid email.</span>
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email is already registered in portal</span>
             </div>
@@ -69,7 +69,7 @@
         <div class="form-group">
             <div class="col-sm-offset-3 col-sm-9">
                 <process-button process="register"
-                                button-disabled="!registerForm.$valid"
+                                form="registerForm"
                                 button-text="'Register'"></process-button>
             </div>
         </div>

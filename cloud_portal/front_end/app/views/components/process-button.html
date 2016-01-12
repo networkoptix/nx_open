@@ -1,6 +1,6 @@
 <div class="process-button">
     <div class="progress progress-striped" ng-if="process.processing">
-        <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%" ng-bind-html="processingText||buttonText">
+        <div class="progress-bar progress-bar-info" role="progressbar" style="width: 100%" ng-bind-html="buttonText">
         </div>
     </div>
 
@@ -8,6 +8,6 @@
             ng-bind-html="buttonText"
             ng-class="{processing:process.processing}"
             ng-disabled="buttonDisabled"
-            ng-click="process.run()">
+            ng-click="checkForm()">
     </button>
 </div>

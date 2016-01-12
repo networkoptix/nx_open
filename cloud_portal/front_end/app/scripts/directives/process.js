@@ -24,10 +24,32 @@ angular.module('cloudApp')
                 process:'=',
                 buttonDisabled:'=',
                 buttonText:'=',
-                processingText:'='
+                form:'='
             },
             link:function(scope,element,attrs){
+
+                function touchForm(form){
+                    angular.forEach(form.$error, function (field) {
+                        angular.forEach(field, function(errorField){
+                            if(typeof(errorField.$touched) != 'undefined'){
+                                errorField.$setTouched();
+                            }else{
+                                touchForm(errorField); // Embedded form - go recursive
+                            }
+                        })
+                    });
+                }
                 scope.attrs = attrs;
+                scope.checkForm = function(){
+                    if(scope.form && !scope.form.$valid){
+                        //Set the forum touched
+                        touchForm(scope.form);
+                        return false;
+                    }else{
+                        scope.process.run();
+                    }
+                }
+
             }
         };
     });
