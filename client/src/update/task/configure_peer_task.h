@@ -1,5 +1,4 @@
-#ifndef CONFIGURE_PEER_TASK_H
-#define CONFIGURE_PEER_TASK_H
+#pragma once
 
 #include <update/task/network_peer_task.h>
 
@@ -18,11 +17,8 @@ public:
 
     explicit QnConfigurePeerTask(QObject *parent = 0);
 
-    QString user() const;
-    void setUser(const QString &user);
-
-    QString password() const;
-    void setPassword(const QString &password);
+    QString adminPassword() const;
+    void setAdminPassword(const QString &adminPassword);
 
 protected:
     virtual void doStart() override;
@@ -33,12 +29,9 @@ private slots:
 private:
     QnMergeSystemsTool *m_mergeTool;
     int m_error;
-    QString m_user;
-    QString m_password;
+    QString m_adminPassword;
 
     QSet<QnUuid> m_pendingPeers;
     QSet<QnUuid> m_failedPeers;
     QHash<int, QnUuid> m_peerIdByHandle;
 };
-
-#endif // CONFIGURE_PEER_TASK_H

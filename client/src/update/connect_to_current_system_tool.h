@@ -1,5 +1,4 @@
-#ifndef CONNECT_TO_CURRENT_SYSTEM_TOOL_H
-#define CONNECT_TO_CURRENT_SYSTEM_TOOL_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -13,11 +12,14 @@ class QnNetworkPeerTask;
 class QnMediaServerUpdateTool;
 struct QnUpdateResult;
 
-class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware {
+class QnConnectToCurrentSystemTool : public Connective<QObject>, public QnWorkbenchContextAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
+
 public:
-    enum ErrorCode {
+    enum ErrorCode
+    {
         NoError,
         AuthentificationFailed,
         ConfigurationFailed,
@@ -31,11 +33,10 @@ public:
     bool tryClose(bool force);
     void forcedUpdate();
 
-    void start(const QSet<QnUuid> &targets, const QString &adminUser, const QString &password);
+    void start(const QSet<QnUuid> &targets, const QString &adminPassword);
 
     QSet<QnUuid> targets() const;
-    QString user() const;
-    QString password() const;
+    QString adminPassword() const;
 
 public slots:
     void cancel();
@@ -59,7 +60,7 @@ private slots:
 private:
     QSet<QnUuid> m_targets;
     QString m_user;
-    QString m_password;
+    QString m_adminPassword;
 
     QSet<QnUuid> m_restartTargets;
     QSet<QnUuid> m_updateTargets;
@@ -70,5 +71,3 @@ private:
 
     QScopedPointer<QnWorkbenchStateDelegate> m_workbenchStateDelegate;
 };
-
-#endif // CONNECT_TO_CURRENT_SYSTEM_TOOL_H

@@ -58,6 +58,7 @@
 #define QN_HELP_URL                     "${helpUrl}/${customization}/${parsedVersion.majorVersion}/${parsedVersion.minorVersion}/url"
 #define QN_ARM_BOX                      "${box}"
 #define QN_IOS_PLAYBUTTON_TINT          "${ios.playButton.tint}"
+#define QN_IOS_SHARED_GROUP_ID          "${ios.group_identifier}"
 #define NX_EC_EC2_PROTO_VERSION         ${nxec.ec2ProtoVersion}
 
 #define QN_AX_CLASS_ID                  "${ax.classId}"

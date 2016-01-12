@@ -12,22 +12,51 @@ namespace {
     enum {
         msecPerSecond = 1000
     };
-
 }
 
-QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent) :
-    base_type(parent),
-    ui(new Ui::ShowTextOverlayActionWidget)
+QString QnShowTextOverlayActionWidget::getPlaceholderText()
+{
+    static const auto kPlaceholderText = tr("Html tags could be used within custom text:\n<h4>Headers (h1-h6)</h4>Also different <font color=\"red\">colors</font> and <font size=\"18\">sizes</font> could be applied. Text could be <s>stricken</s>, <u>underlined</u>, <b>bold</b> or <i>italic</i>"
+        , "Do not translate tags (text between '<' and '>' symbols. Do not remove '\n' sequence");
+
+    return kPlaceholderText;
+}
+
+QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
+    : base_type(parent)
+    , ui(new Ui::ShowTextOverlayActionWidget)
+    , m_lastCustomText()
 {
     ui->setupUi(this);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, ui->durationWidget, &QWidget::setEnabled);
     connect(ui->customTextCheckBox,     &QCheckBox::toggled, ui->customTextEdit, &QWidget::setEnabled);
 
-    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
-    connect(ui->customTextCheckBox,     &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
+    connect(ui->useSourceCheckBox,      &QCheckBox::clicked,            this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->durationSpinBox,        QnSpinboxIntValueChanged,       this, &QnShowTextOverlayActionWidget::paramsChanged);
     connect(ui->customTextEdit,         &QPlainTextEdit::textChanged,   this, &QnShowTextOverlayActionWidget::paramsChanged);
+
+    connect(ui->fixedDurationCheckBox,  &QCheckBox::clicked, this, [this]()
+    {
+        const bool isFixedDuration = ui->fixedDurationCheckBox->isChecked();
+        ui->ruleWarning->setVisible(!isFixedDuration);
+        paramsChanged();
+    });
+
+    connect(ui->customTextCheckBox,     &QCheckBox::clicked, this, [this]()
+    {
+        const bool useCustomText = ui->customTextCheckBox->isChecked();
+
+        if (!useCustomText)
+        {
+            /// Previous state is "use custom text", so update temporary holder
+            m_lastCustomText = ui->customTextEdit->toPlainText();
+        }
+
+        ui->customTextEdit->setPlainText(useCustomText
+            ? m_lastCustomText : getPlaceholderText());
+        paramsChanged();
+    });
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {
@@ -42,7 +71,8 @@ QnShowTextOverlayActionWidget::~QnShowTextOverlayActionWidget()
 {}
 
 void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before, ui->fixedDurationCheckBox);
+    setTabOrder(before, ui->useSourceCheckBox);
+    setTabOrder(ui->useSourceCheckBox, ui->fixedDurationCheckBox);
     setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
     setTabOrder(ui->durationSpinBox, ui->customTextCheckBox);
     setTabOrder(ui->customTextCheckBox, ui->customTextEdit);
@@ -55,24 +85,38 @@ void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField)) {
+    if (fields.testFlag(QnBusiness::EventTypeField))
+    {
         bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
+
+        const bool canUseSource = ((model()->eventType() >= QnBusiness::UserDefinedEvent)
+            || (requiresCameraResource(model()->eventType())));
+        ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 
     if (fields.testFlag(QnBusiness::ActionParamsField)) {
         const auto params = model()->actionParams();
 
-        ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
+        const bool isFixedFuration = (params.durationMs > 0);
+        ui->fixedDurationCheckBox->setChecked(isFixedFuration);
+        ui->ruleWarning->setVisible(!isFixedFuration);
         if (ui->fixedDurationCheckBox->isChecked())
             ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
 
-        ui->customTextCheckBox->setChecked(!params.text.isEmpty());
-        ui->customTextEdit->setPlainText(params.text);
+
+        const bool useCustomText = !params.text.isEmpty();
+        m_lastCustomText = params.text;
+        ui->customTextCheckBox->setChecked(useCustomText);
+        ui->customTextEdit->setPlainText(useCustomText ? params.text : getPlaceholderText());
+
+        ui->useSourceCheckBox->setChecked(params.useSource);
     }
 }
+
+
 
 void QnShowTextOverlayActionWidget::paramsChanged() {
     if (!model() || m_updating)
@@ -84,6 +128,6 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
     params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();
-
+    params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);
 }

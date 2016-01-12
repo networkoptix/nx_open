@@ -95,10 +95,13 @@ void QnActiveCameraThumbnailLoaderPrivate::refresh(bool force)
             refresh();
         }
 
-        if (!success)
+        if (!success || imageData.isEmpty())
             return;
 
-        thumbnailPixmap = QPixmap::fromImage(QImage::fromData(imageData, "JPG"));
+        {
+            QMutexLocker lk(&thumbnailMutex);
+            thumbnailPixmap = QPixmap::fromImage(QImage::fromData(imageData, "JPG"));
+        }
 
         Q_Q(QnActiveCameraThumbnailLoader);
         if (camera)

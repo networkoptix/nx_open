@@ -1,9 +1,12 @@
 
 #include "transaction_message_bus.h"
 
+#include <chrono>
+
 #include <QtCore/QTimer>
 #include <QTextStream>
 
+#include <api/global_settings.h>
 #include "api/app_server_connection.h"
 #include "api/runtime_info_manager.h"
 
@@ -38,11 +41,12 @@ namespace ec2
 {
 
     static const int RECONNECT_TIMEOUT = 1000 * 5;
-    static const int ALIVE_UPDATE_INTERVAL = 1000 * 60;
-    static const int ALIVE_UPDATE_TIMEOUT = ALIVE_UPDATE_INTERVAL*2 + 10*1000;
-    static const int DISCOVERED_PEER_TIMEOUT = 1000 * 60 * 3;
-static const int ALIVE_RESEND_TIMEOUT_MAX = 1000 * 5; // resend alive data after a random delay in range min..max
-static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
+    static const std::chrono::seconds ALIVE_UPDATE_INTERVAL_OVERHEAD(10);
+    static const int ALIVE_UPDATE_PROBE_COUNT = 2;
+    static const int ALIVE_RESEND_TIMEOUT_MAX = 1000 * 5; // resend alive data after a random delay in range min..max
+    static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
+    //!introduced to make discovery interval dependent of peer alive update interval
+    static const int PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR = 3;
 
     QString printTransaction(const char* prefix, const QnAbstractTransaction& tran, const QnTransactionTransportHeader &transportHeader, QnTransactionTransport* sender)
     {
@@ -294,6 +298,10 @@ static const int ALIVE_RESEND_TIMEOUT_MIN = 100;
         m_globalInstance = this;
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
     m_relativeTimer.restart();
+
+    connect(
+        QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
+        this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
     }
 
     void QnTransactionMessageBus::start()
@@ -1320,12 +1328,18 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             {
                 if (!connectInfo.discoveredPeer.isNull() ) 
                 {
-                    if (connectInfo.discoveredTimeout.elapsed() > DISCOVERED_PEER_TIMEOUT) {
+                    if (connectInfo.discoveredTimeout.elapsed() > 
+                            std::chrono::milliseconds(
+                                PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
+                                QnGlobalSettings::instance()->aliveUpdateInterval()).count())
+                    {
                         connectInfo.discoveredPeer = QnUuid();
                         connectInfo.discoveredTimeout.restart();
                     }
                     else if (m_connections.contains(connectInfo.discoveredPeer))
+                    {
                         continue;
+                    }
                 }
 
                 itr.value().lastConnectedTime.restart();
@@ -1342,17 +1356,18 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
         // send keep-alive if we connected to cloud
         if( !m_aliveSendTimer.isValid() )
             m_aliveSendTimer.restart();
-        if (m_aliveSendTimer.elapsed() > ALIVE_UPDATE_INTERVAL) {
+        if (m_aliveSendTimer.elapsed() > std::chrono::milliseconds(QnGlobalSettings::instance()->aliveUpdateInterval()).count())
+        {
             m_aliveSendTimer.restart();
             handlePeerAliveChanged(m_localPeer, true, true);
-    NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
-    if (transactionLog)
-        printTranState(transactionLog->getTransactionsState());
+            NX_LOG( QnLog::EC2_TRAN_LOG, "Current transaction state:", cl_logDEBUG1 );
+            if (transactionLog)
+                printTranState(transactionLog->getTransactionsState());
         }
 
         QSet<QnUuid> lostPeers = checkAlivePeerRouteTimeout(); // check if some routs to a server not accessible any more
         removePeersWithTimeout(lostPeers); // removeLostPeers
-    sendDelayedAliveTran();
+        sendDelayedAliveTran();
     }
 
     QSet<QnUuid> QnTransactionMessageBus::checkAlivePeerRouteTimeout()
@@ -1363,10 +1378,18 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             AlivePeerInfo& peerInfo = itr.value();
             for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
                 const RoutingRecord& routingRecord = itr.value();
-                if (routingRecord.distance > 0 && m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > ALIVE_UPDATE_TIMEOUT)
+                if ((routingRecord.distance > 0) && 
+                    (m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > 
+                        std::chrono::milliseconds(QnGlobalSettings::instance()->aliveUpdateInterval()*ALIVE_UPDATE_PROBE_COUNT + ALIVE_UPDATE_INTERVAL_OVERHEAD).count()))
+                {
                     itr = peerInfo.routingInfo.erase(itr);
+                }
                 else
+                {
                     ++itr;
+                }
+            }
+            {
             }
             if (peerInfo.routingInfo.isEmpty())
                 lostPeers << peerInfo.peer.id;
@@ -1629,15 +1652,26 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
 
     void QnTransactionMessageBus::dropConnections()
     {
-        QnMutexLocker lock( &m_mutex );
+        QnMutexLocker lock(&m_mutex);
         m_remoteUrls.clear();
-        for( QnTransactionTransport* transport : m_connections )
+        reconnectAllPeers(&lock);
+    }
+
+    void QnTransactionMessageBus::reconnectAllPeers()
+    {
+        QnMutexLocker lock(&m_mutex);
+        reconnectAllPeers(&lock);
+    }
+
+    void QnTransactionMessageBus::reconnectAllPeers(QnMutexLockerBase* const /*lock*/)
+    {
+        for (QnTransactionTransport* transport : m_connections)
         {
             qWarning() << "Disconnected from peer" << transport->remoteAddr();
-            transport->setState( QnTransactionTransport::Error );
+            transport->setState(QnTransactionTransport::Error);
         }
-        for( auto transport : m_connectingConnections )
-            transport->setState( ec2::QnTransactionTransport::Error );
+        for (auto transport : m_connectingConnections)
+            transport->setState(ec2::QnTransactionTransport::Error);
     }
 
     QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::alivePeers() const

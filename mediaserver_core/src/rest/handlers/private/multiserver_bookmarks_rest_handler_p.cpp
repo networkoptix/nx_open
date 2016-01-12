@@ -192,7 +192,7 @@ QnCameraBookmarkTagList QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTag
     }
     else
     {
-        for (const auto& server: qnResPool->getAllServers())
+        for (const auto& server: qnResPool->getAllServers(Qn::Online))
         {
             if (server->getId() == qnCommon->moduleGUID())
                 getBookmarkTagsLocal(outputData, &context);
@@ -218,7 +218,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(QnUpdateBookmarkRe
     }
     else
     {
-        for (const auto& server: qnResPool->getAllServers())
+        for (const auto& server: qnResPool->getAllServers(Qn::Online))
         {
             if (server->getId() == qnCommon->moduleGUID())
                 qnServerDb->updateBookmark(request.bookmark);
@@ -238,7 +238,7 @@ bool QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(QnDeleteBookmarkRe
     }
     else
     {
-        for (const auto& server: qnResPool->getAllServers())
+        for (const auto& server: qnResPool->getAllServers(Qn::Online))
         {
             if (server->getId() == qnCommon->moduleGUID())
                 qnServerDb->deleteBookmark(request.bookmarkId);

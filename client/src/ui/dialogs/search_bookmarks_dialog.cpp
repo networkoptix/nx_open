@@ -151,12 +151,18 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     m_ui->setupUi(m_owner);
     m_ui->gridBookmarks->setModel(m_model);
 
-    connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this
-        , [this]()
+    const auto updateFilterText = [this]()
     {
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
         applyModelChanges();
-    });
+    };
+
+    enum { kUpdateFilterDelayMs = 200 };
+    m_ui->filterLineEdit->setTextChangedSignalFilterMs(kUpdateFilterDelayMs);
+
+    connect(m_ui->filterLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(m_ui->filterLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
+
     connect(m_ui->filterLineEdit, &QnSearchLineEdit::escKeyPressed, this, [this]()
     {
         m_ui->filterLineEdit->lineEdit()->setText(QString());
@@ -208,6 +214,8 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
         if (m_allCamerasChoosen)
             resetToAllAvailableCameras();
     });
+
+    m_ui->filterLineEdit->lineEdit()->setPlaceholderText(tr("Search bookmarks by name, tag or description"));
 }
 
 QnSearchBookmarksDialog::Impl::~Impl()
@@ -454,7 +462,7 @@ void QnSearchBookmarksDialog::Impl::customContextMenuRequested()
 ///
 
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(QWidget *parent)
-    : QnButtonBoxDialog(parent)
+    : QnWorkbenchStateDependentButtonBoxDialog(parent)
     , m_impl(new Impl(this))
 {
 }

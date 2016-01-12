@@ -68,7 +68,6 @@ public:
     bool doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed);
     bool isAudioBuffering() const;
     void playAudio(bool play);
-    void setSpeed(float speed);
     float getSpeed() const;
 
     // schedule to clean up buffers all; 
@@ -136,6 +135,7 @@ signals:
 
 protected:
     void setSingleShotMode(bool single);
+    virtual void setSpeed(float speed) override;
 
     bool haveAudio(float speed) const;
 

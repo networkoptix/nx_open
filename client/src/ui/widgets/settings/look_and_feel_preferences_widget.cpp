@@ -47,7 +47,7 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
     setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
-    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);   
+    setHelpTopic(ui->showIpInTreeLabel,       ui->showIpInTreeCheckBox,       Qn::SystemSettings_General_ShowIpInTree_Help);
 
     setupLanguageUi();
     setupSkinUi();
@@ -156,7 +156,11 @@ bool QnLookAndFeelPreferencesWidget::canDiscardChanges() {
     //TODO: #GDM restoring changes does not belongs here
     bool backgroundAllowed = !(qnSettings->lightMode() & Qn::LightModeNoSceneBackground);
     if (backgroundAllowed)
+    {
         qnSettings->setBackground(m_oldBackground);
+        action(Qn::ToggleBackgroundAnimationAction)->setChecked(
+            m_oldBackground.animationEnabled);
+    }
     return true;
 }
 
@@ -237,7 +241,7 @@ void QnLookAndFeelPreferencesWidget::selectBackgroundImage() {
         progressDialog->hide();
         progressDialog->deleteLater();
     });
- 
+
     imgCache->storeImage(originalFileName);
     progressDialog->exec();
 }

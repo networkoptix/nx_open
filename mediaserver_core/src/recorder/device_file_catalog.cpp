@@ -840,7 +840,7 @@ int DeviceFileCatalog::findFileIndex(qint64 startTimeMs, FindMethod method) cons
                  return -1;
          }
     }
-    else if (method == OnRecordHole_PrevChunk)
+    else if (method == OnRecordHole_PrevChunk && startTimeMs <= itr->startTimeMs)
     {
         return -1;
     }

@@ -809,10 +809,9 @@ int QnMediaServerConnection::configureAsync(bool wholeSystem, const QString &sys
     return sendAsyncGetRequest(ConfigureObject, params, QN_STRINGIZE_TYPE(QnConfigureReply), target, slot);
 }
 
-int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &user, const QString &password, QObject *target, const char *slot) {
+int QnMediaServerConnection::pingSystemAsync(const QUrl &url, const QString &password, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("user", user);
     params << QnRequestParam("password", password);
 
     return sendAsyncGetRequest(PingSystemObject, params, QN_STRINGIZE_TYPE(QnModuleInformation), target, slot);
@@ -832,10 +831,9 @@ int QnMediaServerConnection::getAuditLogAsync(qint64 startTimeMs, qint64 endTime
     return sendAsyncGetRequest(AuditLogObject, params, QN_STRINGIZE_TYPE(QnAuditRecordList), target, slot);
 }
 
-int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &user, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
+int QnMediaServerConnection::mergeSystemAsync(const QUrl &url, const QString &password, const QString &currentPassword, bool ownSettings, bool oneServer, bool ignoreIncompatible, QObject *target, const char *slot) {
     QnRequestParamList params;
     params << QnRequestParam("url", url.toString());
-    params << QnRequestParam("user", user);
     params << QnRequestParam("password", password);
     params << QnRequestParam("currentPassword", currentPassword);
     params << QnRequestParam("takeRemoteSettings", !ownSettings ? lit("true") : lit("false"));

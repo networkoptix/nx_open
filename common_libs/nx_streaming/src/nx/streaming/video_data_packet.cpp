@@ -6,7 +6,7 @@
 #include "video_data_packet.h"
 
 #include <utils/memory/cyclic_allocator.h>
-
+#include <network/h264_rtp_parser.h>
 
 QnCompressedVideoData::QnCompressedVideoData( QnConstMediaContextPtr ctx )
 :
@@ -30,9 +30,6 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
     pts = other->pts;
 }
 
-
-static const unsigned int MAX_VIDEO_PACKET_SIZE = 10*1024*1024;
-
 //static CyclicAllocator videoPacketCyclicAllocator;
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -41,8 +38,9 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnConstMediaContextPtr ctx )
 :   //TODO #ak delegate constructor (requires msvc2013)
     QnCompressedVideoData( ctx ),
-    m_data(/*&videoPacketCyclicAllocator,*/ alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
+    m_data(/*&videoPacketCyclicAllocator,*/ alignment, capacity)
 {
+    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
@@ -52,8 +50,9 @@ QnWritableCompressedVideoData::QnWritableCompressedVideoData(
     QnConstMediaContextPtr ctx )
 :
     QnCompressedVideoData( ctx ),
-    m_data(allocator, alignment, qMin(capacity, MAX_VIDEO_PACKET_SIZE))
+    m_data(allocator, alignment, capacity)
 {
+    Q_ASSERT(capacity <= MAX_ALLOWED_FRAME_SIZE);
 }
 
 //!Implementation of QnAbstractMediaData::clone

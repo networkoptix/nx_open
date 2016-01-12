@@ -36,7 +36,6 @@ class QnCalendarWidget;
 class QnDayTimeWidget;
 class QnWorkbenchStreamSynchronizer;
 class QnResourceDisplay;
-class QnSearchLineEdit;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
 class QnPendingOperation;
@@ -133,7 +132,7 @@ protected:
 
     void addSyncedWidget(QnMediaResourceWidget *widget);
     void removeSyncedWidget(QnMediaResourceWidget *widget);
-    
+
     void updateItemDataFromSlider(QnResourceWidget *widget) const;
     void updateSliderFromItemData(QnResourceWidget *widget, bool preferToPreserveWindow = false);
 
@@ -172,9 +171,9 @@ protected:
     void updateSpeedRange();
 
     void updateLocalOffset();
-   
+
     Q_SLOT void updateThumbnailsLoader();
-    
+
     void updateCurrentWidgetFlags();
 
     void setAutoPaused(bool autoPaused);
@@ -191,7 +190,7 @@ protected slots:
 
     void at_resource_flagsChanged(const QnResourcePtr &resource);
 
-    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);   
+    void updateLoaderPeriods(const QnMediaResourcePtr &resource, Qn::TimePeriodContent type, qint64 startTimeMs);
 
     void at_timeSlider_valueChanged(qint64 value);
     void at_timeSlider_sliderPressed();
@@ -207,7 +206,7 @@ protected slots:
 
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
-    
+
     void at_calendar_dateClicked(const QDate &date);
 
     void at_dayTimeWidget_timeClicked(const QTime &time);
@@ -270,11 +269,11 @@ private:
     qreal m_lastMaximalSpeed;
 
     QAction *m_startSelectionAction, *m_endSelectionAction, *m_clearSelectionAction;
-   
+
     QHash<QnMediaResourcePtr, QnThumbnailsLoader *> m_thumbnailLoaderByResource;
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
-    
+
     QnBookmarkQueriesCache m_bookmarkQueries;
     QnCameraBookmarksQueryPtr m_currentQuery;
 

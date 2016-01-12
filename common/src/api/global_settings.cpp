@@ -56,6 +56,15 @@ namespace {
     const QString ldapAdminPassword(lit("ldapAdminPassword"));
     const QString ldapSearchBase(lit("ldapSearchBase"));
     const QString ldapSearchFilter(lit("ldapSearchFilter"));
+
+    const QString kEc2ConnectionKeepAliveTimeout(lit("ec2ConnectionKeepAliveTimeoutSec"));
+    const int kEc2ConnectionKeepAliveTimeoutDefault = 5;
+    const QString kEc2KeepAliveProbeCount(lit("ec2KeepAliveProbeCount"));
+    const int kEc2KeepAliveProbeCountDefault = 3;
+    const QString kEc2AliveUpdateInterval(lit("ec2AliveUpdateIntervalSec"));
+    const int kEc2AliveUpdateIntervalDefault = 60;
+    const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
+    const int kServerDiscoveryPingTimeoutDefault = 60;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -150,6 +159,34 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
     m_backupNewCamerasByDefaultAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameBackupNewCamerasByDefault, false, this);
     m_statisticsAllowedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(nameStatisticsAllowed, QnOptionalBool(), this);
 
+    QList<QnAbstractResourcePropertyAdaptor*> ec2Adaptors;
+    m_ec2ConnectionKeepAliveTimeoutAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2ConnectionKeepAliveTimeout,
+        kEc2ConnectionKeepAliveTimeoutDefault,
+        this);
+    ec2Adaptors << m_ec2ConnectionKeepAliveTimeoutAdaptor;
+    m_ec2KeepAliveProbeCountAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2KeepAliveProbeCount,
+        kEc2KeepAliveProbeCountDefault,
+        this);
+    ec2Adaptors << m_ec2KeepAliveProbeCountAdaptor;
+    m_ec2AliveUpdateIntervalAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        kEc2AliveUpdateInterval,
+        kEc2AliveUpdateIntervalDefault,
+        this);
+    ec2Adaptors << m_ec2AliveUpdateIntervalAdaptor;
+    m_serverDiscoveryPingTimeout = new QnLexicalResourcePropertyAdaptor<int>(
+        kServerDiscoveryPingTimeout,
+        kServerDiscoveryPingTimeoutDefault,
+        this);
+    ec2Adaptors << m_serverDiscoveryPingTimeout;
+
+    for(auto adaptor: ec2Adaptors)
+        connect(
+            adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+            this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
+            Qt::QueuedConnection);
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -167,6 +204,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_backupQualitiesAdaptor
         << m_backupNewCamerasByDefaultAdaptor
         << m_statisticsAllowedAdaptor
+        << ec2Adaptors
         ;
 
     return result;
@@ -335,4 +373,54 @@ bool QnGlobalSettings::isStatisticsAllowed() const {
 
 void QnGlobalSettings::setStatisticsAllowed( bool value ) {
     m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
+}
+
+std::chrono::seconds QnGlobalSettings::connectionKeepAliveTimeout() const
+{
+    return std::chrono::seconds(m_ec2ConnectionKeepAliveTimeoutAdaptor->value());
+}
+
+void QnGlobalSettings::setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout)
+{
+    m_ec2ConnectionKeepAliveTimeoutAdaptor->setValue(newTimeout.count());
+}
+
+int QnGlobalSettings::keepAliveProbeCount() const
+{
+    return m_ec2KeepAliveProbeCountAdaptor->value();
+}
+
+void QnGlobalSettings::setKeepAliveProbeCount(int newProbeCount)
+{
+    m_ec2KeepAliveProbeCountAdaptor->setValue(newProbeCount);
+}
+
+std::chrono::seconds QnGlobalSettings::aliveUpdateInterval() const
+{
+    return std::chrono::seconds(m_ec2AliveUpdateIntervalAdaptor->value());
+}
+
+void QnGlobalSettings::setAliveUpdateInterval(std::chrono::seconds newInterval) const
+{
+    m_ec2AliveUpdateIntervalAdaptor->setValue(newInterval.count());
+}
+
+std::chrono::seconds QnGlobalSettings::serverDiscoveryPingTimeout() const
+{
+    return std::chrono::seconds(m_serverDiscoveryPingTimeout->value());
+}
+
+void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const
+{
+    m_serverDiscoveryPingTimeout->setValue(newInterval.count());
+}
+
+std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
+{
+    return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
+}
+
+const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
+{
+    return m_allAdaptors;
 }

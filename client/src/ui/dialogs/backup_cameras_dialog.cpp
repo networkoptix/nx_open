@@ -40,6 +40,11 @@ namespace {
             || isValidServer(camera->getParentServer());
     }
 
+    bool isDtsCamera(const QnVirtualCameraResourcePtr &camera)
+    {
+        return (camera && camera->isDtsBased());
+    }
+
     class BackupCamerasDialogDelegate: public QnResourceSelectionDialogDelegate {
         typedef QnResourceSelectionDialogDelegate base_type;
 
@@ -47,30 +52,15 @@ namespace {
     public:
         BackupCamerasDialogDelegate(QWidget* parent)
             : base_type(parent)
-            , m_qualityComboBox(new QComboBox(parent))
             , m_backupNewCamerasCheckBox(new QCheckBox(parent))
             , m_warningLabel(new QLabel(parent))
         {
-            QList<Qn::CameraBackupQualities> possibleQualities;
-            possibleQualities
-                << Qn::CameraBackup_HighQuality
-                << Qn::CameraBackup_LowQuality
-                << Qn::CameraBackup_Both
-                ;
-
-            for (Qn::CameraBackupQualities value: possibleQualities)
-                m_qualityComboBox->addItem(QnBackupCamerasDialog::qualitiesToString(value), static_cast<int>(value));
-
             m_backupNewCamerasCheckBox->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
                 tr("Backup newly added devices"),
                 tr("Backup newly added cameras")
                 ));
 
             setWarningStyle(m_warningLabel);
-            m_warningLabel->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("Cannot add new devices while backup process is running."),
-                tr("Cannot add new cameras while backup process is running.")
-                ));
         }
 
         ~BackupCamerasDialogDelegate()
@@ -87,16 +77,38 @@ namespace {
 
             layout->addWidget(m_backupNewCamerasCheckBox);
             layout->addStretch();
-            layout->addWidget(new QLabel(tr("Backup Quality:"), placeholder));
-            layout->addWidget(m_qualityComboBox);
         }
 
         virtual bool validate(const QnResourceList &selectedResources) override
         {
-            QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
-            bool valid = boost::algorithm::all_of(cameras, isValidCamera);
-            m_warningLabel->setVisible(!valid);
-            return valid;
+            static const auto kBackupInProgressWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Cannot add new devices while backup process is running."),
+                tr("Cannot add new cameras while backup process is running."));
+
+            static const auto kDtsWarning = QnDeviceDependentStrings::getDefaultNameFromSet(
+                tr("Cannot add new devices because they store archive on external storage."),
+                tr("Cannot add new cameras because they store archive on external storage."));
+
+            const QnVirtualCameraResourceList cameras = selectedResources.filtered<QnVirtualCameraResource>();
+            if (boost::algorithm::any_of(cameras, isDtsCamera))
+            {
+                // If has dts-based cameras then change massage accordingly
+                m_warningLabel->setText(kDtsWarning);
+            }
+            else if (!boost::algorithm::all_of(cameras, isValidCamera))
+            {
+                // If has non-valid cameras then change massage accordingly
+                m_warningLabel->setText(kBackupInProgressWarning);
+            }
+            else
+            {
+                // Otherwise hide warning
+                m_warningLabel->setVisible(false);
+                return true;
+            }
+
+            m_warningLabel->setVisible(true);
+            return false;
         }
 
         virtual bool isValid(const QnResourcePtr &resource) const override
@@ -105,21 +117,9 @@ namespace {
                 return isValidServer(server);
 
             if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
-                return isValidCamera(camera);
+                return (isValidCamera(camera) && !isDtsCamera(camera));
 
-            return false;
-        }
-
-        Qn::CameraBackupQualities quality() const
-        {
-            return static_cast<Qn::CameraBackupQualities>(m_qualityComboBox->currentData().toInt());
-        }
-
-        void setQuality(Qn::CameraBackupQualities value)
-        {
-            int index = m_qualityComboBox->findData(static_cast<int>(value));
-            if (index >= 0)
-                m_qualityComboBox->setCurrentIndex(index);
+            return true;    // In case of groups for encoders
         }
 
         bool backupNewCameras() const
@@ -145,7 +145,6 @@ namespace {
         }
 
     private:
-        QComboBox *m_qualityComboBox;
         QCheckBox *m_backupNewCamerasCheckBox;
         QLabel *m_warningLabel;
     };
@@ -166,63 +165,15 @@ QnBackupCamerasDialog::QnBackupCamerasDialog(QWidget* parent /*= nullptr*/)
     bool backupNewCameras = qnGlobalSettings->backupNewCamerasByDefault();
 
     auto dialogDelegate = new BackupCamerasDialogDelegate(this);
-    dialogDelegate->setQuality(qnGlobalSettings->backupQualities());
     dialogDelegate->setBackupNewCameras(backupNewCameras);
     setDelegate(dialogDelegate);
-
-    QnVirtualCameraResourceList selectedCameras = qnResPool->getAllCameras(QnResourcePtr(), true).filtered([](const QnVirtualCameraResourcePtr &camera) {
-        return camera->getActualBackupQualities() != Qn::CameraBackup_Disabled;
-    });
-
-    setSelectedResources(selectedCameras);
 }
 
-QString QnBackupCamerasDialog::qualitiesToString(Qn::CameraBackupQualities qualities) {
-    switch (qualities) {
-    case Qn::CameraBackup_LowQuality:
-        return tr("Low", "Cameras Backup");
-    case Qn::CameraBackup_HighQuality:
-        return tr("High", "Cameras Backup");
-    case Qn::CameraBackup_Both:
-        return tr("High + Low", "Cameras Backup");
-    default:
-        Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
-        break;
-    }
-
-    return QString();
-}
-
-
-void QnBackupCamerasDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button ) {
+void QnBackupCamerasDialog::buttonBoxClicked( QDialogButtonBox::StandardButton button )
+{
     if (button != QDialogButtonBox::Ok)
         return;
 
-    auto dialogDelegate = dynamic_cast<BackupCamerasDialogDelegate*>(this->delegate());
-    bool backupNewCameras = dialogDelegate->backupNewCameras();
-    Qn::CameraBackupQualities quality = dialogDelegate->quality();
-
-    qnGlobalSettings->setBackupNewCamerasByDefault(backupNewCameras);
-    qnGlobalSettings->setBackupQualities(quality);
-
-    QnVirtualCameraResourceList selected = selectedResources().filtered<QnVirtualCameraResource>();
-
-    auto qualityForCamera = [selected, quality](const QnVirtualCameraResourcePtr &camera) {
-        return selected.contains(camera)
-            ? quality
-            : Qn::CameraBackup_Disabled;
-    };
-
-    /* Update all default cameras and all cameras that we have changed. */
-    auto modified = qnResPool->getAllCameras(QnResourcePtr(), true).filtered([qualityForCamera](const QnVirtualCameraResourcePtr &camera) {
-        return camera->getBackupQualities() != qualityForCamera(camera);
-    });
-
-    if (modified.isEmpty())
-        return;
-
-    qnResourcesChangesManager->saveCameras(modified, [qualityForCamera](const QnVirtualCameraResourcePtr &camera) {
-        camera->setBackupQualities(qualityForCamera(camera));
-    });
-
+    const auto dialogDelegate = dynamic_cast<BackupCamerasDialogDelegate*>(this->delegate());
+    qnGlobalSettings->setBackupNewCamerasByDefault(dialogDelegate->backupNewCameras());
 }
