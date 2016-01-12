@@ -1,5 +1,5 @@
 
-<div class="row" ng-if="accountMode">
+<div ng-if="accountMode">
     <process-alert process="save"
                    success-message="'Your account was successfully saved.'"
                    error-prefix="'Couldn\'t save your data:'"></process-alert>
@@ -46,7 +46,7 @@
     </form>
 </div>
 
-<div class="row" ng-if="passwordMode" >
+<div ng-if="passwordMode" >
 
     <process-alert process="changePassword"
                    success-message="'Your password was successfully changed.'"
