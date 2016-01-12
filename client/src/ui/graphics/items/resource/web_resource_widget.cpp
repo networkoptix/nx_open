@@ -113,6 +113,8 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 
 QnWebResourceWidget::~QnWebResourceWidget()
 {
+    /* statusChanged will be emitted during the destruction process. */
+    disconnect(m_webView, nullptr, this, nullptr);
 }
 
 void QnWebResourceWidget::setupOverlays()
