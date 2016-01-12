@@ -272,9 +272,12 @@ QnObject {
             return
         }
 
+        if (!pos)
+            pos = d.position
+
         var live = (new Date()).getTime()
         var aligned = -1
-        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
+        if (pos > 0 && live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
             if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
