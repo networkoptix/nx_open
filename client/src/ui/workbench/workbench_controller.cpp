@@ -76,6 +76,7 @@
 #include <ui/graphics/instruments/grid_adjustment_instrument.h>
 #include <ui/graphics/instruments/ptz_instrument.h>
 #include <ui/graphics/instruments/zoom_window_instrument.h>
+#include <ui/graphics/items/resource/button_ids.h>
 
 #include <ui/graphics/items/grid/grid_item.h>
 #include <ui/graphics/items/generic/graphics_message_box.h>
@@ -741,14 +742,14 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
     case Qt::Key_PageDown:
         break; /* Don't let the view handle these and scroll. */
     case Qt::Key_Menu: {
-        QGraphicsView *view = display()->view();        
+        QGraphicsView *view = display()->view();
         QList<QGraphicsItem *> items = display()->scene()->selectedItems();
         QPoint offset = view->mapToGlobal(QPoint(0, 0));
         if (items.count() == 0) {
             showContextMenuAt(offset);
         } else {
             QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */ 
+            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */
             showContextMenuAt(offset + testRect.bottomRight());
         }
         break;
@@ -822,7 +823,7 @@ void QnWorkbenchController::at_resizing(QGraphicsView *, QGraphicsWidget *item, 
         return;
 
     QRectF widgetGeometry = rotated(m_resizedWidget->geometry(), m_resizedWidget->rotation());
-    
+
     /* Calculate integer size. */
     QSize gridSize = mapper()->mapToGrid(widgetGeometry).size();
     if (gridSize.isEmpty())
@@ -1087,7 +1088,7 @@ void QnWorkbenchController::at_zoomRectChanged(QnMediaResourceWidget *widget, co
 
 void QnWorkbenchController::at_zoomRectCreated(QnMediaResourceWidget *widget, const QColor &color, const QRectF &zoomRect) {
     menu()->trigger(Qn::CreateZoomWindowAction, QnActionParameters(widget).withArgument(Qn::ItemZoomRectRole, zoomRect).withArgument(Qn::ItemFrameDistinctionColorRole, color));
-    widget->setCheckedButtons(widget->checkedButtons() & ~QnMediaResourceWidget::ZoomWindowButton);
+    widget->setCheckedButtons(widget->checkedButtons() & Qn::kZoomWindowButton);
 }
 
 void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, const QRectF &zoomRect, QnMediaResourceWidget *zoomTargetWidget) {
@@ -1189,7 +1190,7 @@ void QnWorkbenchController::at_item_middleClicked(QGraphicsView *, QGraphicsItem
 
     int rotation = 0;
     if (widget->resource() && widget->resource()->hasProperty(QnMediaResource::rotationKey())) {
-        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();        
+        rotation = widget->resource()->getProperty(QnMediaResource::rotationKey()).toInt();
     }
 
     widget->item()->setRotation(rotation);
@@ -1352,7 +1353,7 @@ void QnWorkbenchController::at_startSmartSearchAction_triggered() {
     displayMotionGrid(menu()->currentParameters(sender()).widgets(), true);
 }
 
-void QnWorkbenchController::at_checkFileSignatureAction_triggered() 
+void QnWorkbenchController::at_checkFileSignatureAction_triggered()
 {
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
     if (widgets.isEmpty())

@@ -31,6 +31,7 @@
 
 #include <recording/time_period.h>
 
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
@@ -208,7 +209,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!(widget->visibleButtons() & QnResourceWidget::InfoButton))
+        if (!(widget->visibleButtons() & Qn::kInfoButton))
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {

@@ -1051,6 +1051,10 @@ namespace Qn {
          */
         OpenAuditLogAction,
 
+        ReloadWebPageAction,
+
+        GoBackAction,
+
         ActionCount,
 
         NoAction = -1

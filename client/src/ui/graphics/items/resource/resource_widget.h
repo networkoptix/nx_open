@@ -33,7 +33,7 @@ class QnImageButtonWidget;
 class QnImageButtonBar;
 class QnProxyLabel;
 class QnHtmlTextItem;
-
+class QnButtonsOverlay;
 class GraphicsLabel;
 
 class QnResourceWidget: public Overlayed<Animated<Instrumented<Connective<GraphicsWidget>>>>, public QnWorkbenchContextAware, public ConstrainedResizable, public HelpTopicQueryable, protected QnGeometry {
@@ -71,14 +71,6 @@ public:
         AlwaysShowName              = 0x20000
     };
     Q_DECLARE_FLAGS(Options, Option)
-
-    enum Button {
-        CloseButton                 = 0x1,
-        FullscreenButton            = 0x2,
-        InfoButton                  = 0x4,
-        RotateButton                = 0x8
-    };
-    Q_DECLARE_FLAGS(Buttons, Button)
 
     /**
      * Constructor.
@@ -253,13 +245,17 @@ public:
     bool isInfoVisible() const;
     Q_SLOT void setInfoVisible(bool visible, bool animate = true);
 
-    Buttons checkedButtons() const;
-    void setCheckedButtons(Buttons checkedButtons);
-
-    Buttons visibleButtons() const;
-
     bool isLocalActive() const;
     void setLocalActive(bool localActive);
+
+    QnButtonsOverlay *buttonsOverlay() const;
+
+    void setCheckedButtons(int buttons);
+
+    int checkedButtons() const;
+
+    int visibleButtons() const;
+
 
     using base_type::mapRectToScene;
 
@@ -322,19 +318,11 @@ protected:
     virtual QCursor calculateCursor() const;
     Q_SLOT void updateCursor();
 
-    QnImageButtonBar *buttonBar() const {
-        return m_buttonBar;
-    }
-
-    QnImageButtonWidget *iconButton() const {
-        return m_iconButton;
-    }
-
     QnStatusOverlayWidget *statusOverlayWidget() const {
         return m_statusOverlayWidget;
     }
 
-    virtual Buttons calculateButtonsVisibility() const;
+    virtual int calculateButtonsVisibility() const;
     Q_SLOT void updateButtonsVisibility();
 
     void setChannelLayout(QnConstResourceVideoLayoutPtr channelLayout);
@@ -361,11 +349,10 @@ private:
     void addInfoOverlay();
     void addMainOverlay();
 
+    /*
     void setupIconButton(QGraphicsLinearLayout *layout
         , QnImageButtonWidget *button);
-
-    void insertIconButtonCopy(QGraphicsLinearLayout *layout);
-
+        */
     Q_SLOT void updateCheckedButtons();
 
     Q_SLOT void at_infoButton_toggled(bool toggled);
@@ -414,30 +401,12 @@ private:
 
     /* Widgets for overlaid stuff. */
 
-    QnImageButtonBar *m_buttonBar;
-    QnImageButtonWidget *m_iconButton;
-
-
     QnStatusOverlayWidget *m_statusOverlayWidget;
 
-    struct OverlayWidgets {
-        GraphicsWidget *cameraNameOnlyOverlay;
-        GraphicsLabel  *cameraNameOnlyLabel;
+    struct OverlayWidgets;
+    typedef QScopedPointer<OverlayWidgets> OverlayWidgetsPtr;
 
-        GraphicsWidget *cameraNameWithButtonsOverlay;
-        GraphicsLabel  *mainNameLabel;
-        GraphicsLabel  *mainExtrasLabel;
-
-        GraphicsWidget *detailsOverlay;     /**< Overlay containing info item. */
-        QnHtmlTextItem *detailsItem;        /**< Detailed camera info (resolution, stream, etc). */
-
-        GraphicsWidget *positionOverlay;    /**< Overlay containing position item. */
-        QnHtmlTextItem *positionItem;       /**< Current camera position. */
-
-        OverlayWidgets();
-    };
-
-    OverlayWidgets m_overlayWidgets;
+    const OverlayWidgetsPtr m_overlayWidgets;
 
     /** Whether aboutToBeDestroyed signal has already been emitted. */
     bool m_aboutToBeDestroyedEmitted;
@@ -458,7 +427,6 @@ private:
 typedef QList<QnResourceWidget *> QnResourceWidgetList;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Options)
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnResourceWidget::Buttons)
 Q_DECLARE_METATYPE(QnResourceWidget::Options)
 Q_DECLARE_METATYPE(QnResourceWidget *)
 Q_DECLARE_METATYPE(QnResourceWidgetList);

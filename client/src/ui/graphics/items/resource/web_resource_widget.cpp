@@ -2,12 +2,14 @@
 
 #include <core/resource/resource.h>
 
-#include <QtNetwork/QNetworkReply>
-#include <QtWebKitWidgets/QGraphicsWebView>
-
+#include <ui/style/skin.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/graphics/items/resource/button_ids.h>
+#include <ui/graphics/items/resource/web_view.h>
+#include <ui/graphics/items/generic/image_button_bar.h>
+#include <ui/graphics/items/overlays/buttons_overlay.h>
 
 namespace
 {
@@ -16,24 +18,30 @@ namespace
     public:
         SelectByClickOverlay(QnWebResourceWidget *parent
             , QnWorkbenchItem *item
-            , QnWorkbench *workbench);
+            , QnWorkbench *workbench
+            , QMenu *menu);
 
     private:
         void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+        void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
 
     private:
         QnWebResourceWidget * const m_widget;
         QnWorkbenchItem * const m_item;
         QnWorkbench * const m_workbench;
+        QMenu * const m_menu;
     };
 
     SelectByClickOverlay::SelectByClickOverlay(QnWebResourceWidget *parent
         , QnWorkbenchItem *item
-        , QnWorkbench *workbench)
+        , QnWorkbench *workbench
+        , QMenu *menu)
         : QGraphicsWidget(parent)
         , m_widget(parent)
         , m_item(item)
         , m_workbench(workbench)
+        , m_menu(menu)
     {}
 
     void SelectByClickOverlay::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -57,33 +65,28 @@ namespace
         event->ignore();
     }
 
+
+    void SelectByClickOverlay::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
+    {
+        if (m_menu)
+            m_menu->exec(event->screenPos());
+        else
+            event->ignore();
+    }
+
 }
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
+    , m_webView(new QnWebView(resource()->getUrl(), this))
 {
     setOption(AlwaysShowName, true);
 
-//    QStyle* webStyle = QStyleFactory::create(lit("Fusion"));
-
-    QGraphicsWebView *webView = new QGraphicsWebView(this);
-//    webView->setStyle(webStyle);
-    webView->setUrl(QUrl(resource()->getUrl()));
-    webView->setRenderHints(0);
-    webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
-    webView->settings()->setAttribute(QWebSettings::FrameFlatteningEnabled, true);
-
-    connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::sslErrors,
-        this, [](QNetworkReply* reply, const QList<QSslError> &){ reply->ignoreSslErrors();} );
-//     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::authenticationRequired,
-//         this, &::at_authenticationRequired, Qt::DirectConnection );
-//     connect(webView->page()->networkAccessManager(), &QNetworkAccessManager::proxyAuthenticationRequired,
-//         this, &::at_proxyAuthenticationRequired, Qt::DirectConnection);
-
-    const auto contentMargins = detail::OverlayMargins(0, iconButton()->preferredHeight());
+    const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::kRecordingStatusIconButton);
+    const auto contentMargins = detail::OverlayMargins(0, iconButton->preferredHeight());
     const auto webParams = detail::OverlayParams(Visible
         , false, true, BaseLayer, contentMargins);
-    addOverlayWidget(webView, webParams);
+    addOverlayWidget(m_webView, webParams);
 
     setOption(QnResourceWidget::WindowRotationForbidden, true);
     updateTitleText();
@@ -91,18 +94,56 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateDetailsText();
     updateButtonsVisibility();
 
-    addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench())
+    addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench(), nullptr)
         , detail::OverlayParams(Visible, true, true, TopControlsLayer, contentMargins));
+
+    const auto updateStatusesHandler = [this]()
+    {
+        const auto status = m_webView->status();
+        const auto resourceStatus = (status == kPageLoadFailed ? Qn::Offline : Qn::Online);
+        resource()->setStatus(resourceStatus);
+
+        updateStatusOverlay();
+    };
+
+    connect(m_webView, &QnWebView::statusChanged, this, updateStatusesHandler);
+
+    setupOverlays();
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()
 {
+}
 
+void QnWebResourceWidget::setupOverlays()
+{
+    enum
+    {
+        kBackButton     = 0x1
+        , kReloadButton = 0x2
+    };
+
+
+    /*
+    auto backButton = new QnImageButtonWidget(this);
+    backButton->setIcon(qnSkin->icon("item/back.png"));
+    */
+    //buttonsOverlay()->leftButtonsPanel()->addButton(backButton);
 }
 
 Qn::ResourceStatusOverlay QnWebResourceWidget::calculateStatusOverlay() const
 {
-    return Qn::EmptyOverlay;
+    switch(m_webView->status())
+    {
+    case kPageLoadFailed:
+        return Qn::OfflineOverlay;
+    case kPageInitialLoadInProgress:
+        return Qn::LoadingOverlay;
+    //case kPageLoading:
+    //case kPageLoaded:
+    default:
+        return Qn::EmptyOverlay;
+    }
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )
