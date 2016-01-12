@@ -55,12 +55,12 @@
     <form name="passwordForm" class="form-horizontal" novalidate>
         <div class="form-group" validate-field>
             <label for="password"  class="col-sm-3 control-label">Current password</label>
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <input type="password" class="form-control" ng-model="pass.password"
                        name="password"
                        id="password" required>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <span class="help-block" ng-if="passwordForm.password.$touched && passwordForm.password.$error.required">Current password is required.</span>
             </div>
         </div>

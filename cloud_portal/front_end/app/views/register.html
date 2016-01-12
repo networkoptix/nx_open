@@ -16,32 +16,32 @@
 
         <div class="form-group">
             <label for="firstName" class="col-sm-3 control-label">First name</label>
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <input type="text" class="form-control" ng-model="account.firstName" id="firstName"
                        name="firstName" autocomplete="off" autofocus>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
 
             </div>
         </div>
         <div class="form-group">
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <input type="text" class="form-control" ng-model="account.lastName" id="lastName"
                        name="lastName" autocomplete="off">
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
 
             </div>
         </div>
         <div class="form-group" validate-field>
             <label for="registerEmail"  class="col-sm-3 control-label">Email address</label>
-            <div class="col-sm-4">
+            <div class="col-sm-5">
                 <input type="email" class="form-control" ng-model="account.email" id="registerEmail"
                        name="registerEmail" required autocomplete="off"  ng-pattern="Config.emailRegex"
                        ng-change="hideAlreadyExists()">
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern">Please, enter a valid email.</span>
@@ -53,16 +53,19 @@
         <div class="form-group" >
             <div class="col-sm-offset-3 col-sm-9">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="subscribe" name="account.subscribe" id="subscribe"> Subscribe to email newsletters</label>
+                    <label ><input type="checkbox" ng-model="account.subscribe" name="subscribe" id="subscribe"> Subscribe to email newsletters</label>
                 </div>
             </div>
         </div>
         <div class="form-group" validate-field>
-            <div class="col-sm-offset-3 col-sm-9">
+            <div class="col-sm-offset-3 col-sm-5">
                 <div class="checkbox">
-                    <label ><input type="checkbox" ng-model="agree" name="account.agree" id="agree"
-                                   disabled> I agree with <a href="#/eula" onclick="eula()">Terms and Conditions</a></label>
+                    <label ><input type="checkbox" ng-model="account.agree" name="agree" id="agree"
+                                   required> I agree with <a href="#/static/eula" target="_blank">Terms and Conditions</a></label>
                 </div>
+            </div>
+            <div class="col-sm-4">
+                <span class="help-block" ng-if="registerForm.agree.$touched && registerForm.agree.$error.required">You must comply.</span>
             </div>
         </div>
         <div class="form-group">

@@ -33,11 +33,11 @@ angular.module('cloudApp')
         });
 
         $scope.account = {
-            email:'',
-            password:'',
-            firstName:'',
-            lastName:'',
-            subscribe:true
+            email: '',
+            password: '',
+            firstName: '',
+            lastName: '',
+            subscribe: true
         };
 
         $scope.setRegisterForm = function(scope){

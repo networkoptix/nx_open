@@ -58,6 +58,10 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
+        .when('/static/:page', {
+            templateUrl: 'views/static.html',
+            controller: 'StaticCtrl'
+        })
 
         .when('/debug', {
             templateUrl: 'views/debug.html',

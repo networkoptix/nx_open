@@ -14,14 +14,14 @@
         <form name="reactivateAccount" class="form-horizontal" ng-if="!reactivate.success" novalidate>
             <div class="form-group" validate-field>
                 <label for="emailReactivate"  class="col-sm-3 control-label">Email address</label>
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                     <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="emailReactivate"
                            name="email"
                            required>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-4">
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.required">Email is required.</span>
                     <span class="help-block" ng-if="reactivateAccount.email.$touched && reactivateAccount.email.$error.email || reactivateAccount.email.$error.pattern">Please, enter a valid email.</span>
                 </div>
@@ -44,14 +44,14 @@
         <form name="restorePassword" class="form-horizontal" ng-if="!restore.success" novalidate>
             <div class="form-group" validate-field>
                 <label for="email"  class="col-sm-3 control-label">Email address</label>
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                     <input type="email" class="form-control"  ng-pattern="Config.emailRegex"
                            ng-model="data.email"
                            id="email"
                            name="email"
                            required>
                 </div>
-                <div class="col-sm-5">
+                <div class="col-sm-4">
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.required">Email is required.</span>
                     <span class="help-block" ng-if="restorePassword.email.$touched && restorePassword.email.$error.email || restorePassword.email.$error.pattern">Please, enter a valid email.</span>
                 </div>
