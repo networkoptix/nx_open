@@ -64,7 +64,10 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 {
     setOption(AlwaysShowName, true);
 
+//    QStyle* webStyle = QStyleFactory::create(lit("Fusion"));
+
     QGraphicsWebView *webView = new QGraphicsWebView(this);
+//    webView->setStyle(webStyle);
     webView->setUrl(QUrl(resource()->getUrl()));
     webView->setRenderHints(0);
     webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, true);
