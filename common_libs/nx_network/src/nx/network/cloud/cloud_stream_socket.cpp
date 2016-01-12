@@ -216,7 +216,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
         if (lastRead <= 0)
             return lastRead;
 
-        memcpy(buffer + totalyRead, tmpBuffer.data(), lastRead);
+        memcpy(static_cast<char*>(buffer) + totalyRead, tmpBuffer.data(), lastRead);
         totalyRead += lastRead;
     }
     while ((flags & MSG_WAITALL) && (totalyRead < bufferLen));
