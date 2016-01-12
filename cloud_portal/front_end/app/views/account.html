@@ -8,10 +8,9 @@
     <form name="accountForm" class="form-horizontal" novalidate>
 
         <div class="form-group">
-            <label for="email"  class="col-sm-3 control-label">Email address</label>
+            <label class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-9">
-                <input type="email" class="form-control" ng-model="account.email" id="email"
-                       ng-pattern="Config.emailRegex" readonly >
+                <p class="form-control-static">{{account.email}}</p>
             </div>
         </div>
 
