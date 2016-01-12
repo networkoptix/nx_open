@@ -23,10 +23,11 @@ angular.module('cloudApp')
                 return defer.promise;
             },
 
-            login:function(email,password){
+            login:function(email, password, remember){
                 return $http.post(apiBase + '/account/login',{
-                    email:email,
-                    password:password
+                    email: email,
+                    password: password,
+                    remember: remember
                 });
             },
             logout:function(){

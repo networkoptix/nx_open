@@ -6,18 +6,17 @@
 
             <div class="form-group" validate-field>
                 <label for="email">Email address</label>
-                <input type="email" class="form-control" ng-model="email" id="email" name="email"
+                <input type="email" class="form-control" ng-model="auth.email" id="email" name="email"
                        ng-pattern="Config.emailRegex"
                        required autofocus>
             </div>
             <div class="form-group" validate-field>
                 <label for="password">Password</label>
-                <input type="password" class="form-control" ng-model="password" name="password" id="password"
+                <input type="password" class="form-control" ng-model="auth.password" name="password" id="password"
                        required>
             </div>
             <div class="checkbox">
-                <label ><input type="checkbox" ng-model="remember" name="remember" id="remember"
-                               disabled> Remember me</label>
+                <label ><input type="checkbox" ng-model="auth.remember" name="remember" id="remember"> Remember me</label>
             </div>
     </div>
     <div class="modal-footer">
