@@ -67,7 +67,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
         break;
     case Qn::WebPagesNode:
         m_displayName = m_name = tr("Web Pages");
-        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPage);
+        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPages);
         m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::BastardNode:

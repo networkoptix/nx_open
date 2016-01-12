@@ -37,6 +37,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(OtherSystem,             qnSkin->icon("tree/system.png"));
     m_cache.insert(OtherSystems,            qnSkin->icon("tree/other_systems.png"));
     m_cache.insert(WebPage,                 qnSkin->icon("tree/webpage.png"));
+    m_cache.insert(WebPages,                qnSkin->icon("tree/webpages.png"));
 
     m_cache.insert(Media | Offline,         qnSkin->icon("tree/media_offline.png"));
     m_cache.insert(Image | Offline,         qnSkin->icon("tree/snapshot_offline.png"));
