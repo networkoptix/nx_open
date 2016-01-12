@@ -13,10 +13,10 @@
                 </ul>
             </li>
 
-            <li role="presentation" class="active pull-right" ng-if="!account && loginChecked"><a href="#/register">Register</a></li>
-            <li role="presentation" class="pull-right" ng-if="!account && loginChecked"><a href="#/login" ng-click="login();$event.preventDefault();">Login</a></li>
+            <li role="presentation" class="active pull-right auth-hidden" ><a href="#/register">Register</a></li>
+            <li role="presentation" class="pull-right auth-hidden" ><a href="#/login" ng-click="login();$event.preventDefault();">Login</a></li>
 
-            <li role="presentation" class="dropdown pull-right" ng-if="account">
+            <li role="presentation" class="dropdown pull-right auth-visible" >
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">{{account.email}} <span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a href="#/account/">Account Settings</a></li>

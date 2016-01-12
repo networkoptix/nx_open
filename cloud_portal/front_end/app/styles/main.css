@@ -92,3 +92,20 @@ body {
 .alert-danger{
     white-space: pre-wrap;
 }
+
+
+
+.loading .auth-visible,
+.loading .auth-hidden{
+    display: none;
+}
+
+.authorized .auth-hidden,
+.authorized .loading-visible{
+    display: none;
+}
+
+.anonymous .auth-visible,
+.anonymous .loading-visible{
+    display: none;
+}
