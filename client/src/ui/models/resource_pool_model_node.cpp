@@ -38,6 +38,7 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
            type == Qn::ServersNode ||
            type == Qn::OtherSystemsNode ||
            type == Qn::UsersNode ||
+           type == Qn::WebPagesNode ||
            type == Qn::RootNode ||
            type == Qn::BastardNode ||
            type == Qn::SystemNode ||
@@ -63,6 +64,11 @@ QnResourcePoolModelNode::QnResourcePoolModelNode(QnResourcePoolModel *model, Qn:
     case Qn::UsersNode:
         m_displayName = m_name = tr("Users");
         m_icon = qnResIconCache->icon(QnResourceIconCache::Users);
+        break;
+    case Qn::WebPagesNode:
+        m_displayName = m_name = tr("Web Pages");
+        m_icon = qnResIconCache->icon(QnResourceIconCache::WebPage);
+        m_bastard = true; /* Invisible by default until has children. */
         break;
     case Qn::BastardNode:
         m_displayName = m_name = QLatin1String("_HIDDEN_"); /* This node is always hidden. */
@@ -301,6 +307,9 @@ bool QnResourcePoolModelNode::calculateBastard() const {
 
     case Qn::OtherSystemsNode:
         return !QnGlobalSettings::instance()->isServerAutoDiscoveryEnabled() || m_children.isEmpty();
+
+    case Qn::WebPagesNode:
+        return m_children.isEmpty();
 
     case Qn::RecorderNode:
     case Qn::SystemNode:

@@ -17,6 +17,7 @@ namespace Qn {
         ServersNode,            /**< Root node for remote resources. */
         OtherSystemsNode,       /**< Root node for remote resources which are incompatible with current system and cannot be used. */
         UsersNode,              /**< Root node for user resources. */
+        WebPagesNode,           /**> Root node for webpages. */
 
         BastardNode,            /**< Root node for hidden resources. */
 
