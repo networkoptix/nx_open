@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef LISTENING_PEER_POOL_H
-#define LISTENING_PEER_POOL_H
+#pragma once
 
 #include <functional>
 
@@ -90,5 +89,3 @@ protected:
 
 } // namespace hpm
 } // namespace nx
-
-#endif  //LISTENING_PEER_POOL_H

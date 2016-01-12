@@ -22,7 +22,7 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/systemerror.h>
 
-#include "listening_peer_pool.h"
+#include "listening_peer_registrator.h"
 #include "mediaserver_api.h"
 #include "settings.h"
 #include "version.h"

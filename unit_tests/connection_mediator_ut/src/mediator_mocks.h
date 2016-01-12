@@ -3,7 +3,7 @@
 
 #include <gmock.h>
 
-#include <listening_peer_pool.h>
+#include <listening_peer_registrator.h>
 #include <mediaserver_api.h>
 
 #include "custom_printers.h"
