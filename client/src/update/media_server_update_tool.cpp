@@ -27,9 +27,12 @@ namespace {
     const bool defaultEnableClientUpdates = true;
     #endif
 
-    QnSoftwareVersion getCurrentVersion() {
+    QnSoftwareVersion getCurrentVersion()
+    {
         QnSoftwareVersion minimalVersion = qnCommon->engineVersion();
-        foreach (const QnMediaServerResourcePtr &server, qnResPool->getAllServers()) {
+        const auto allServers = qnResPool->getAllServers(Qn::AnyStatus);
+        for(const QnMediaServerResourcePtr &server: allServers)
+        {
             if (server->getVersion() < minimalVersion)
                 minimalVersion = server->getVersion();
         }
@@ -90,7 +93,7 @@ void QnMediaServerUpdateTool::setStage(QnFullUpdateStage stage) {
 }
 
 void QnMediaServerUpdateTool::setStageProgress(int progress) {
-    emit stageProgressChanged(m_stage, progress);    
+    emit stageProgressChanged(m_stage, progress);
 }
 
 
@@ -145,7 +148,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 }
 
 QSet<QnUuid> QnMediaServerUpdateTool::actualTargetIds() const {
-    QSet<QnUuid> targets;        
+    QSet<QnUuid> targets;
     foreach (const QnMediaServerResourcePtr &server, actualTargets())
         targets.insert(server->getId());
     return targets;

@@ -10,7 +10,6 @@
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 //static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
-static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
@@ -156,13 +155,26 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const QnRtspStatistic& statistics)
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
+    const quint8            *rtpBuffer,
+    quint32                 rtpTime,
+    const QnRtspStatistic   &statistics
+)
 {
-    int addheaderSize = 0;
+    int addHeaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
-        addheaderSize = getSpsPpsSize();
+        addHeaderSize = getSpsPpsSize();
 
-    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
+    int totalSize = m_videoFrameSize + addHeaderSize;
+    if (totalSize > MAX_ALLOWED_FRAME_SIZE)
+        return QnCompressedVideoDataPtr();
+
+    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(
+        new QnWritableCompressedVideoData(
+            CL_MEDIA_ALIGNMENT,
+            totalSize
+        )
+    );
     result->compressionType = CODEC_ID_H264;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
@@ -271,7 +283,8 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         isPacketLost = true;
     }
 
-    if (isPacketLost) {
+    auto processPacketLost = [this, sequenceNum]()
+    {
         if (m_timeHelper) {
             NX_LOG(QString(lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
                 .arg(m_timeHelper->getResID()).arg(m_prevSequenceNum).arg(sequenceNum), cl_logWARNING);
@@ -281,7 +294,11 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         }
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
-    }
+    };
+
+    if (isPacketLost)
+        processPacketLost();
+
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
@@ -382,7 +399,16 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return clearInternalBuffer();
 
     if (rtpHeader->marker && m_frameExists) {
-        m_mediaData = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
+        m_mediaData = createVideoData(
+            rtpBufferBase,
+            ntohl(rtpHeader->timestamp),
+            statistics
+        ); // last packet
+        if (!m_mediaData)
+        {
+            processPacketLost();
+            return false;
+        }
         gotData = true;
     }
     return true;

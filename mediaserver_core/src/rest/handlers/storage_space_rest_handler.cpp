@@ -48,16 +48,23 @@ QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor())
 {}
 
-int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnStorageSpaceRestHandler::executeGet(
+    const QString                   &,
+    const QnRequestParams           &params,
+    QnJsonRestResult                &result,
+    const QnRestConnectionProcessor *
+)
 {
     QnStorageSpaceReply reply;
 
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
-    auto enoughSpace = [defaultStorageSpaceLimit](qint64 totalSpace) {
-        /* We should always display invalid storages. */
+    auto enoughSpace = [](const QnStorageResourcePtr& storage) 
+    {   /* We should always display invalid storages. */
+        qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::UnknownSize)
             return true;
-        return totalSpace >= defaultStorageSpaceLimit;
+        return totalSpace >= QnFileStorageResource::calcSpaceLimit(
+            storage->getUrl()
+        );
     };
 
     auto filterDeprecated = [] (const QnStorageResourcePtr &storage){
@@ -69,25 +76,40 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
 #endif
 
     /* Enumerate normal storages. */
-    for (const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages().filtered(filterDeprecated)) {
+    for (const QnStorageResourcePtr &storage : 
+         qnNormalStorageMan->getStorages().filtered(filterDeprecated)) 
+    {
         QnStorageSpaceData data(storage);
-        if (!enoughSpace(data.totalSpace))
+        if (!enoughSpace(storage))
             data.isWritable = false;
         reply.storages.push_back(data);
     }
 
     /* Enumerate backup storages. */
-    for (const QnStorageResourcePtr &storage: qnBackupStorageMan->getStorages().filtered(filterDeprecated)) {
+    for (const QnStorageResourcePtr &storage : 
+         qnBackupStorageMan->getStorages().filtered(filterDeprecated)) 
+    {
         QnStorageSpaceData data(storage);
-            if (!enoughSpace(data.totalSpace))
+            if (!enoughSpace(storage))
                 data.isWritable = false;
         reply.storages.push_back(data);
     }
 
+    auto partitionEnoughSpace = [](
+        QnPlatformMonitor::PartitionType    ptype,
+        qint64                              size
+    ) 
+    {   
+        if (size == QnStorageResource::UnknownSize)
+            return true;
+        return size >= QnFileStorageResource::calcSpaceLimit(ptype);
+    };
 
     /* Enumerate auto-generated storages on all possible partitions. */
     QList<QnPlatformMonitor::PartitionSpace> partitions =
-        m_monitor->totalPartitionSpaceInfo( QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition );
+        m_monitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
+        );
 
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
@@ -97,12 +119,17 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         if (partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
             continue;
 
-        if (!enoughSpace(partition.sizeBytes))
+        if (!partitionEnoughSpace(partition.type, partition.sizeBytes))
             continue;
 
-        bool hasStorage = std::any_of(storagePaths.cbegin(), storagePaths.cend(), [&partition](const QString &storagePath) {
-            return closeDirPath(storagePath).startsWith(partition.path);
-        });
+        bool hasStorage = std::any_of(
+            storagePaths.cbegin(),
+            storagePaths.cend(),
+            [&partition](const QString &storagePath) 
+            {
+                return closeDirPath(storagePath).startsWith(partition.path);
+            }
+        );
 
         if(hasStorage)
             continue;
@@ -111,14 +138,19 @@ int QnStorageSpaceRestHandler::executeGet(const QString &, const QnRequestParams
         data.url = partition.path + QnAppInfo::mediaFolderName();
         data.totalSpace = partition.sizeBytes;
         data.freeSpace = partition.freeBytes;
-        data.reservedSpace = defaultStorageSpaceLimit;
+        data.reservedSpace = QnFileStorageResource::calcSpaceLimit(partition.type);
         data.isExternal = partition.type == QnPlatformMonitor::NetworkPartition;
         data.storageType = QnLexical::serialized(partition.type);
 
-        QnStorageResourcePtr storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(data.url, false));
+        QnStorageResourcePtr storage = QnStorageResourcePtr(
+            QnStoragePluginFactory::instance()->createStorage(data.url, false)
+        );
+        
         if (storage) {
             storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(defaultStorageSpaceLimit);
+            storage->setSpaceLimit(
+                QnFileStorageResource::calcSpaceLimit(partition.type)
+            );
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->isWritable();
