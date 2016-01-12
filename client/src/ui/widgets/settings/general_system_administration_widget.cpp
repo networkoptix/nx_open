@@ -67,14 +67,14 @@ void QnGeneralSystemAdministrationWidget::retranslateUi() {
             .arg(shortcut.toString(QKeySequence::NativeText));
     };
 
-    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management...")));
-    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log...")));
-
+    ui->eventRulesLabel->setText(shortcutString(Qn::BusinessEventsAction, tr("Open Alarm/Event Rules Management")));
+    ui->eventLogLabel->setText(shortcutString(Qn::OpenBusinessLogAction, tr("Open Event Log")));
+    ui->bookmarksLabel->setText(shortcutString(Qn::OpenBookmarksSearchAction, tr("Open Bookmarks List")));
     ui->cameraListLabel->setText(shortcutString(Qn::CameraListAction, QnDeviceDependentStrings::getDefaultNameFromSet(
-        tr("Open Devices List..."),
-        tr("Open Cameras List...")
+        tr("Open Devices List"),
+        tr("Open Cameras List")
         )));
-        
+
 
     ui->cameraListButton->setText(QnDeviceDependentStrings::getDefaultNameFromSet(
         tr("Devices List..."),

@@ -947,7 +947,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MergeSystems).
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalOwnerPermissions).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ServersNode, this),
             new QnForbiddenInSafeModeCondition(this),
@@ -1560,6 +1560,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalOwnerPermissions).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),

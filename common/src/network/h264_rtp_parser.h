@@ -13,6 +13,8 @@
 #include "utils/media/nalUnits.h"
 #include "rtpsession.h"
 
+const unsigned int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
+
 class CLH264RtpParser: public QnRtpVideoStreamParser
 {
 public:
@@ -43,7 +45,13 @@ private:
 private:
     void serializeSpsPps(QnByteArray& dst);
     void decodeSpsInfo(const QByteArray& data);
-    QnCompressedVideoDataPtr createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics);
+
+    QnCompressedVideoDataPtr createVideoData(
+        const quint8            *rtpBuffer,
+        quint32                 rtpTime,
+        const RtspStatistic     &statistics
+    );
+
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
     void updateNalFlags(int nalUnitType);
     int getSpsPpsSize() const;

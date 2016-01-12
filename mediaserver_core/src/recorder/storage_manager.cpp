@@ -1788,13 +1788,15 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     if (!result) {
         if (!m_warnSended && m_firstStorageTestDone) {
-            qWarning() << "No storage available for recording";
-            bool doEmit = m_role == QnServer::StoragePool::Normal ||
-                          (m_role == QnServer::StoragePool::Backup &&
-                           scheduleSync()->getStatus().state !=
-                                    Qn::BackupState::BackupState_InProgress);
-            if (doEmit)
+            if (m_role == QnServer::StoragePool::Normal)
+            {   // 'noStorageAvailbale' signal results in client notification.
+                // For backup storages No Available Storage error is translated to
+                // specific backup error by the calling code and this error 
+                // is reported to the client (and also logged).
+                // Hence these below seem redundant for Backup storage manager.
                 emit noStoragesAvailable();
+                qWarning() << "No storage available for recording";
+            }
             m_warnSended = true;
         }
     }

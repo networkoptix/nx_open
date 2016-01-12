@@ -97,11 +97,11 @@ MultiServerPeriodDataList QnMultiserverChunksRestHandler::loadDataSync(const QnC
     }
     else
     {
-        QSet<QnMediaServerResourcePtr> servers;
+        QSet<QnMediaServerResourcePtr> onlineServers;
         for (const auto& camera: ctx.request().resList)
-            servers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
+            onlineServers += qnCameraHistoryPool->getCameraFootageData(camera, true).toSet();
 
-        for (const auto& server: servers)
+        for (const auto& server: onlineServers)
         {
             if (server->getId() == qnCommon->moduleGUID())
                 loadLocalData(outputData, &ctx);

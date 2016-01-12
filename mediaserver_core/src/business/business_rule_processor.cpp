@@ -68,9 +68,11 @@ QnMediaServerResourcePtr QnBusinessRuleProcessor::getDestMServer(const QnAbstrac
             const QnMediaServerResourcePtr mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
             if (!mServer || (mServer->getServerFlags() & Qn::SF_HasPublicIP))
                 return QnMediaServerResourcePtr(); // do not proxy
-            for (const QnMediaServerResourcePtr& mServer: qnResPool->getAllServers())
+
+            const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+            for (const QnMediaServerResourcePtr& mServer: onlineServers)
             {
-                if ((mServer->getServerFlags() & Qn::SF_HasPublicIP) && mServer->getStatus() == Qn::Online)
+                if (mServer->getServerFlags() & Qn::SF_HasPublicIP)
                     return mServer;
             }
             return QnMediaServerResourcePtr();
