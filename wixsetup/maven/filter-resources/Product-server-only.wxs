@@ -48,7 +48,7 @@
         <SetProperty Id="REBOOT" Value="reallysuppress" After="FindRelatedProducts">Installed AND REMOVE&lt;&gt;"ALL"</SetProperty>
         <SetProperty Id="PREVIOUSVERSIONSINSTALLED" Value="[MIGRATE]" After="FindRelatedProducts"/>
 
-        <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" Before="SetServerPort1">NOT STATISTICS_REPORT_ALLOWED</SetProperty>
+        <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" Before="SetServerPort1" Sequence="first">NOT STATISTICS_REPORT_ALLOWED</SetProperty>
         <SetProperty Action="SetServerPort1" Id="SERVER_PORT" Value="[SERVER_PORT_EC]" Before="SetServerPort2">NOT SERVER_PORT</SetProperty>
         <SetProperty Action="SetServerPort2" Id="SERVER_PORT" Value="7001" Before="CostInitialize">NOT SERVER_PORT</SetProperty>
 
