@@ -9,7 +9,7 @@
 #include <ui/actions/action.h>
 #include <ui/actions/action_manager.h>
 
-#include <ui/dialogs/layout_name_dialog.h>
+#include <ui/dialogs/generic/input_dialog.h>
 
 namespace
 {
@@ -46,23 +46,19 @@ QnWorkbenchWebPageHandler::~QnWorkbenchWebPageHandler()
 
 void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
 {
-    QScopedPointer<QnLayoutNameDialog> dialog(new QnLayoutNameDialog(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, mainWindow()));
+    QScopedPointer<QnInputDialog> dialog(new QnInputDialog(mainWindow()));
     dialog->setWindowTitle(tr("New Web Page..."));
-    dialog->setText(tr("Enter the url of the Web Page to add:"));
+    dialog->setCaption(tr("Enter the url of the Web Page to add:"));
+    dialog->setPlaceholderText(lit("example.org"));
     dialog->setWindowModality(Qt::ApplicationModal);
 
     while (true) {
-        if(!dialog->exec())
-            return;
+         if(!dialog->exec())
+             return;
 
-        //TODO: #GDM create dialog with correct validation support
-        QUrl url = QUrl::fromUserInput(dialog->name().trimmed());
-
+        QUrl url = QUrl::fromUserInput(dialog->value());
         if (!isValidUrl(url))
-        {
             continue;
-        }
-
 
         QnWebPageResourcePtr webPage(new QnWebPageResource(url));
         if (qnResPool->getResourceById(webPage->getId()))
