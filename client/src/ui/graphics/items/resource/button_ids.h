@@ -6,37 +6,37 @@ namespace Qn
     enum RightPanelButtonId
     {
         // QnResourceWidget
-        kCloseButton                = 0x0001
-        , kInfoButton               = 0x0004
-        , kRotateButton             = 0x0008
+        kCloseButton                = 0x00001
+        , kInfoButton               = 0x00004
+        , kRotateButton             = 0x00008
 
         // QnWebResourceWidget
-        , kFullscreenButton         = 0x0002
+        , kFullscreenButton         = 0x00002
 
         // QnMediaResourceWidget
-        , kScreenshotButton         = 0x0010
-        , kMotionSearchButton       = 0x0020
-        , kPtzButton                = 0x0040
-        , kFishEyeButton            = 0x0080
-        , kZoomWindowButton         = 0x0100
-        , kEnhancementButton        = 0x0200
-        , kDbgScreenshotButton      = 0x0400
-        , kIoModuleButton           = 0x0800
+        , kScreenshotButton         = 0x00010
+        , kMotionSearchButton       = 0x00020
+        , kPtzButton                = 0x00040
+        , kFishEyeButton            = 0x00080
+        , kZoomWindowButton         = 0x00100
+        , kEnhancementButton        = 0x00200
+        , kDbgScreenshotButton      = 0x00400
+        , kIoModuleButton           = 0x00800
 
         // QnServerResourceWidget
-        , kPingButton               = 0x1000
-        , kShowLogButton            = 0x2000
-        , kCheckIssuesButton        = 0x4000
+        , kPingButton               = 0x01000
+        , kShowLogButton            = 0x02000
+        , kCheckIssuesButton        = 0x04000
 
     };
 
     enum LeftPanelButtonId
     {
         // QnResourceWidget
-        kRecordingStatusIconButton  = 0x0001
+        kRecordingStatusIconButton  = 0x08000
 
         // QnWebResourceWidget
-        , kReloadPageButton         = 0x0002
-        , kBackButton               = 0x0004
+        , kReloadPageButton         = 0x10000
+        , kBackButton               = 0x20000
     };
 }

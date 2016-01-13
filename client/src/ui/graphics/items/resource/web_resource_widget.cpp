@@ -95,7 +95,6 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateTitleText();
     updateInfoText();
     updateDetailsText();
-    updateButtonsVisibility();
 
     addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench(), nullptr)
         , detail::OverlayParams(Visible, true, true, TopControlsLayer, contentMargins));
@@ -112,6 +111,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     connect(m_webView, &QnWebView::statusChanged, this, updateStatusesHandler);
 
     setupOverlays();
+    updateButtonsVisibility();
 }
 
 QnWebResourceWidget::~QnWebResourceWidget()
@@ -198,9 +198,10 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
     return base_type::optionsChangedNotify(changedFlags);
 }
 
-int QnWebResourceWidget::calculateButtonsVisibility()
+int QnWebResourceWidget::calculateButtonsVisibility() const
 {
-    return (base_type::calculateButtonsVisibility() | Qn::kFullscreenButton);
+    return (base_type::calculateButtonsVisibility()
+        | Qn::kFullscreenButton | Qn::kBackButton | Qn::kReloadPageButton);
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )

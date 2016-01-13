@@ -591,19 +591,19 @@ QnButtonsOverlay *QnResourceWidget::buttonsOverlay() const
 void QnResourceWidget::setCheckedButtons(int buttons)
 {
     buttonsOverlay()->rightButtonsBar()->setCheckedButtons(buttons);
-    buttonsOverlay()->rightButtonsBar()->setCheckedButtons(buttons);
+    buttonsOverlay()->leftButtonsBar()->setCheckedButtons(buttons);
 }
 
 int QnResourceWidget::checkedButtons() const
 {
     return (buttonsOverlay()->rightButtonsBar()->checkedButtons()
-        | buttonsOverlay()->rightButtonsBar()->checkedButtons());
+        | buttonsOverlay()->leftButtonsBar()->checkedButtons());
 }
 
 int QnResourceWidget::visibleButtons() const
 {
     return (buttonsOverlay()->rightButtonsBar()->visibleButtons()
-        | buttonsOverlay()->rightButtonsBar()->visibleButtons());
+        | buttonsOverlay()->leftButtonsBar()->visibleButtons());
 }
 
 int QnResourceWidget::calculateButtonsVisibility() const {
@@ -628,7 +628,7 @@ void QnResourceWidget::updateButtonsVisibility() {
         & ~(item()->data<int>(Qn::ItemDisabledButtonsRole, 0));
 
     buttonsOverlay()->rightButtonsBar()->setVisibleButtons(visibleButtons);
-    buttonsOverlay()->rightButtonsBar()->setVisibleButtons(visibleButtons);
+    buttonsOverlay()->leftButtonsBar()->setVisibleButtons(visibleButtons);
 }
 
 QCursor QnResourceWidget::windowCursorAt(Qn::WindowFrameSection section) const {

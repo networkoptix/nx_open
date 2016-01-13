@@ -23,9 +23,9 @@ protected:
 private:
     void setupOverlays();
 
-    int calculateButtonsVisibility();
+    virtual int calculateButtonsVisibility() const override;
 
-    void optionsChangedNotify(Options changedFlags);
+    virtual void optionsChangedNotify(Options changedFlags) override;
 
 private:
     QnWebView * const m_webView;
