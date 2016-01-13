@@ -5,6 +5,7 @@
 #include <core/resource/media_server_resource.h>
 #include <api/server_rest_connection.h>
 #include <common/common_module.h>
+#include <utils/jpeg.h>
 
 namespace {
 
@@ -25,12 +26,16 @@ namespace {
 
 QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
     : QObject(parent)
+    , m_decompressThread(new QThread(this))
 {
     m_request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+    m_decompressThread->setObjectName(lit("QnCameraThumbnailCache_decompressThread"));
+    m_decompressThread->start();
 }
 
 QnCameraThumbnailCache::~QnCameraThumbnailCache()
 {
+    m_decompressThread->quit();
 }
 
 void QnCameraThumbnailCache::start()
@@ -66,29 +71,13 @@ QString QnCameraThumbnailCache::thumbnailId(const QnUuid &resourceId)
     if (it == m_thumbnailByResourceId.end())
         return QString();
 
-    QString thumbnailId = it->thumbnailId;
-
-    lock.unlock();
-
-    refreshThumbnail(resourceId);
-
-    return thumbnailId;
+    return it->thumbnailId;
 }
 
 void QnCameraThumbnailCache::refreshThumbnails(const QList<QnUuid> &resourceIds)
 {
-    QSet<QnUuid> ids;
-    {
-        QnMutexLocker lock(&m_mutex);
-        ids = QSet<QnUuid>::fromList(m_thumbnailByResourceId.keys());
-    }
-
     for (const QnUuid &id: resourceIds)
-    {
-        if (!ids.contains(id))
-            continue;
         refreshThumbnail(id);
-    }
 }
 
 void QnCameraThumbnailCache::at_resourcePool_resourceAdded(const QnResourcePtr &resource)
@@ -142,6 +131,8 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
     {
         Q_UNUSED(handleId)
 
+        bool thumbnailLoaded = false;
+
         QString thumbnailId;
         {
             QnMutexLocker lock(&m_mutex);
@@ -150,25 +141,26 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 
             if (success)
             {
-                QPixmap pixmap = QPixmap::fromImage(QImage::fromData(imageData, "JPG"));
+                QPixmap pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
                 if (!pixmap.isNull())
                 {
                     thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
                     m_pixmaps.remove(thumbnailData.thumbnailId);
                     m_pixmaps.insert(thumbnailId, pixmap);
-                    thumbnailData.thumbnailId = thumbnailId;
+                    thumbnailLoaded = true;
                 }
+                thumbnailData.thumbnailId = thumbnailId;
                 thumbnailData.time = m_elapsedTimer.elapsed();
             }
 
             thumbnailData.loading = false;
         }
 
-        if (success)
+        if (thumbnailLoaded)
             emit thumbnailUpdated(id, thumbnailId);
     };
 
-    int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, QThread::currentThread());
+    int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, m_decompressThread);
 
     if (handle == -1) {
         thumbnailData.loading = false;
