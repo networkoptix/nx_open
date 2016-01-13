@@ -2,13 +2,24 @@
 
 #include <boost/optional.hpp>
 
+#include "nx/utils/log/log.h"
+#include "nx/utils/log/log_message.h"
+
 namespace nx {
 namespace network {
 
 MultipleServerSocket::MultipleServerSocket()
     : m_nonBlockingMode(false)
+    , m_recvTmeout(0)
+    , m_terminated(nullptr)
     , m_timerSocket(SocketFactory::createStreamSocket())
 {
+}
+
+MultipleServerSocket::~MultipleServerSocket()
+{
+    if (m_terminated)
+        *m_terminated = true;
 }
 
 // deliver option to every socket
@@ -120,9 +131,6 @@ CloudServerSocket_FORWARD_GET(getSendTimeout, unsigned int);
 
 bool MultipleServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
-    if (m_lastError == SystemError::noError)
-        return false;
-
     *errorCode = m_lastError;
     m_lastError = SystemError::noError;
     return true;
@@ -188,22 +196,27 @@ void MultipleServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode,
                        AbstractStreamSocket*)> handler)
 {
-    QnMutexLocker lk(&m_mutex);
-    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
-    m_acceptHandler = std::move(handler);
+    dispatch([this, handler]()
+    {
+        Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
+        m_acceptHandler = std::move(handler);
 
-    m_timerSocket->registerTimer(m_recvTmeout, std::bind(
-        &MultipleServerSocket::accepted, this,
-        nullptr, SystemError::timedOut, nullptr));
+        if (m_recvTmeout)
+            m_timerSocket->registerTimer(m_recvTmeout, std::bind(
+                &MultipleServerSocket::accepted, this,
+                nullptr, SystemError::timedOut, nullptr));
 
-    for (auto& socket : m_serverSockets)
-        if (!socket.isAccepting)
-        {
-            socket.isAccepting = true;
-            using namespace std::placeholders;
-            socket->acceptAsync(std::bind(
-                &MultipleServerSocket::accepted, this, &socket, _1, _2));
-        }
+        for (auto& socket : m_serverSockets)
+            if (!socket.isAccepting)
+            {
+                socket.isAccepting = true;
+                NX_LOGX(lm("accept on %1").arg(&socket), cl_logDEBUG2);
+
+                using namespace std::placeholders;
+                socket->acceptAsync(std::bind(
+                    &MultipleServerSocket::accepted, this, &socket, _1, _2));
+            }
+    });
 }
 
 MultipleServerSocket::ServerSocketHandle::ServerSocketHandle(
@@ -226,6 +239,15 @@ AbstractStreamServerSocket*
     return socket.get();
 }
 
+void MultipleServerSocket::ServerSocketHandle::stopAccepting()
+{
+    if (!isAccepting)
+        return;
+
+    isAccepting = false;
+    socket->pleaseStopSync();
+}
+
 bool MultipleServerSocket::addSocket(
         std::unique_ptr<AbstractStreamServerSocket> socket)
 {
@@ -244,33 +266,54 @@ void MultipleServerSocket::accepted(
         AbstractStreamSocket* rawSocket)
 {
     std::unique_ptr<AbstractStreamSocket> socket(rawSocket);
-    if (socket && !m_nonBlockingMode)
-        socket->setNonBlockingMode(false);
+    if (socket)
+        socket->setNonBlockingMode(m_nonBlockingMode);
 
-    QnMutexLocker lk(&m_mutex);
+    NX_LOGX(lm("accepted %1 (%2) from %3")
+            .arg(rawSocket).arg(SystemError::toString(code)).arg(source),
+            cl_logDEBUG2);
+
     if (source)
     {
         source->isAccepting = false;
         m_timerSocket->pleaseStopSync(); // will not block, we are in IO thread
     }
 
-    Q_ASSERT_X(m_acceptHandler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
-    const auto handler = std::move(m_acceptHandler);
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> handler;
+    std::swap(handler, m_acceptHandler);
+    Q_ASSERT_X(handler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
 
-    lk.unlock();
+    if (!m_nonBlockingMode)
+    {
+        NX_LOGX(lm("cancel other accepts because of blocking mode"), cl_logDEBUG2);
+
+        // cancel all other accepts
+        for (auto& socket : m_serverSockets)
+            socket.stopAccepting();
+
+        return handler(code, socket.release());
+    }
+
+    bool terminated = false;
+    m_terminated = &terminated;
+
     handler(code, socket.release());
-    lk.relock();
+    if (terminated)
+        return; // this is already dead
 
+    m_terminated = nullptr;
     if (!m_acceptHandler)
     {
         // accept handler did not call accept again, so we don't need any
         // other accepts to be in progress
 
+        NX_LOGX(lm("cancel all accepts because last handler did not "
+                   "call accept again"), cl_logDEBUG2);
+
         for (auto& socket : m_serverSockets)
-            if (socket.isAccepting)
-                socket->pleaseStopSync(); // will not block, we are in IO thread
+            socket.stopAccepting();
     }
 }
 
-} // namespace cloud
 } // namespace network
+} // namespace nx
