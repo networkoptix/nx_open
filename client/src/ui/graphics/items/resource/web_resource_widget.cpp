@@ -12,72 +12,6 @@
 #include <ui/graphics/items/overlays/buttons_overlay.h>
 #include <ui/graphics/instruments/motion_selection_instrument.h>
 
-namespace
-{
-    class SelectByClickOverlay : public QGraphicsWidget
-    {
-    public:
-        SelectByClickOverlay(QnWebResourceWidget *parent
-            , QnWorkbenchItem *item
-            , QnWorkbench *workbench
-            , QMenu *menu);
-
-    private:
-        void mousePressEvent(QGraphicsSceneMouseEvent *event);
-
-        void contextMenuEvent(QGraphicsSceneContextMenuEvent * event);
-
-    private:
-        QnWebResourceWidget * const m_widget;
-        QnWorkbenchItem * const m_item;
-        QnWorkbench * const m_workbench;
-        QMenu * const m_menu;
-    };
-
-    SelectByClickOverlay::SelectByClickOverlay(QnWebResourceWidget *parent
-        , QnWorkbenchItem *item
-        , QnWorkbench *workbench
-        , QMenu *menu)
-        : QGraphicsWidget(parent)
-        , m_widget(parent)
-        , m_item(item)
-        , m_workbench(workbench)
-        , m_menu(menu)
-    {}
-
-    void SelectByClickOverlay::mousePressEvent(QGraphicsSceneMouseEvent *event)
-    {
-        if((event->button() == Qt::LeftButton) && (m_widget->flags() & ItemIsSelectable))
-        {
-            m_workbench->setItem(Qn::RaisedRole, nullptr);
-
-            const bool multiSelect = ((event->modifiers() & Qt::ControlModifier) != 0);
-            if (multiSelect)
-            {
-                if (!m_widget->isSelected())
-                    m_widget->selectThisWidget(false);
-                else
-                    m_widget->setSelected(false);
-            }
-            else
-                m_widget->selectThisWidget(true);
-
-        }
-        event->ignore();
-    }
-
-
-    void SelectByClickOverlay::contextMenuEvent(QGraphicsSceneContextMenuEvent * event)
-    {
-        /*  // Just blocks context menus anyway now
-        if (m_menu)
-            m_menu->exec(event->screenPos());
-        else
-            event->ignore();
-        */
-    }
-
-}
 
 QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkbenchItem *item, QGraphicsItem *parent /*= NULL*/ )
     : base_type(context, item, parent)
@@ -85,6 +19,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
 {
     setOption(AlwaysShowName, true);
 
+    m_webView->installEventFilter(this);
     const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::kRecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
     const auto webParams = detail::OverlayParams(Visible
@@ -95,9 +30,6 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     updateTitleText();
     updateInfoText();
     updateDetailsText();
-
-    addOverlayWidget(new SelectByClickOverlay(this, item, context->workbench(), nullptr)
-        , detail::OverlayParams(Visible, true, true, TopControlsLayer, contentMargins));
 
     const auto updateStatusesHandler = [this]()
     {
@@ -196,6 +128,20 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
     }
 
     return base_type::optionsChangedNotify(changedFlags);
+}
+
+bool QnWebResourceWidget::eventFilter(QObject *object
+    , QEvent *event)
+{
+    if (object == m_webView )
+    {
+        if (event->type() == QEvent::GraphicsSceneMousePress)
+            mousePressEvent(static_cast<QGraphicsSceneMouseEvent *>(event));
+        else if (event->type() == QEvent::GraphicsSceneContextMenu)
+            return true;
+    }
+
+    return base_type::eventFilter(object, event);
 }
 
 int QnWebResourceWidget::calculateButtonsVisibility() const

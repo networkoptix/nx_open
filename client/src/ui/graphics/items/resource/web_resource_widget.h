@@ -28,5 +28,9 @@ private:
     virtual void optionsChangedNotify(Options changedFlags) override;
 
 private:
+    virtual bool eventFilter(QObject *object
+        , QEvent *event) override;
+
+private:
     QnWebView * const m_webView;
 };

@@ -470,7 +470,8 @@ Qn::ActionVisibility QnAdjustVideoActionCondition::check(const QnResourceWidgetL
         return Qn::InvisibleAction;
 
     QnResourceWidget *widget = widgets[0];
-    if(widget->resource()->flags() & (Qn::server | Qn::videowall))
+    if((widget->resource()->flags() & (Qn::server | Qn::videowall))
+        || (widget->resource()->flags().testFlag(Qn::web_page)))
         return Qn::InvisibleAction;
 
     QString url = widget->resource()->getUrl().toLower();

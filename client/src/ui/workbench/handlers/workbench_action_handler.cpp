@@ -741,7 +741,7 @@ void QnWorkbenchActionHandler::at_openInNewWindowAction_triggered() {
 
     QnResourceList filtered;
     foreach (const QnResourcePtr &resource, parameters.resources()) {
-        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server))
+        if (resource->hasFlags(Qn::media) || resource->hasFlags(Qn::server) || resource->hasFlags(Qn::web_page))
             filtered << resource;
     }
     if (filtered.isEmpty())
