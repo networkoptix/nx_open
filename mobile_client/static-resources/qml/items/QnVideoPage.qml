@@ -88,6 +88,7 @@ QnPage {
                         d.resumeOnActivate = true
                         d.videoNavigation.paused = true
                     }
+                    showUi()
                 } else if (Qt.application.state == Qt.ApplicationActive) {
                     if (d.resumeOnActivate) {
                         if (d.resumeAtLive)
