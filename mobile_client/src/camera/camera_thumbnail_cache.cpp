@@ -135,7 +135,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 
         {
             QPixmap pixmap;
-            if (success)
+            if (success && !imageData.isEmpty())
                 pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
 
             QnMutexLocker lock(&m_mutex);
