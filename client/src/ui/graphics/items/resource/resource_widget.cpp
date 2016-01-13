@@ -205,30 +205,6 @@ QnResourceWidget::~QnResourceWidget() {
 
 void QnResourceWidget::addInfoOverlay()
 {
-    /*
-    {
-        auto titleLayout = createGraphicsLayout(Qt::Horizontal);
-        titleLayout->setSpacing(2.0);
-        titleLayout->addItem(m_overlayWidgets->cameraNameOnlyLabel);
-        titleLayout->addStretch();
-        titleLayout->setMinimumHeight(iconButton()->preferredHeight());
-        auto titleWidget = createGraphicsWidget(titleLayout);
-        auto overlayLayout = createGraphicsLayout(Qt::Horizontal);
-        overlayLayout->addItem(titleWidget);
-        overlayLayout->addStretch();
-
-        QnViewportBoundWidget *cameraNameOnlyOverlay = new QnViewportBoundWidget(this);
-        cameraNameOnlyOverlay->setLayout(overlayLayout);
-        cameraNameOnlyOverlay->setAcceptedMouseButtons(0);
-        m_overlayWidgets->cameraNameOnlyOverlay = cameraNameOnlyOverlay;
-
-        addOverlayWidget(m_overlayWidgets->cameraNameOnlyOverlay
-            , detail::OverlayParams(UserVisible, true, true, InfoLayer));
-        setOverlayWidgetVisible(m_overlayWidgets->cameraNameOnlyOverlay, false, false);
-
-        insertIconButtonCopy(titleLayout);
-    }
-*/
     {
         QnHtmlTextItemOptions infoOptions;
         infoOptions.backgroundColor = infoBackgroundColor;
@@ -263,52 +239,11 @@ void QnResourceWidget::addInfoOverlay()
         setOverlayWidgetVisible(m_overlayWidgets->positionOverlay, false, false);
     }
 }
-/*
-void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
-    , QnImageButtonWidget *button)
-{
-    enum { kItemButtonIndex = 0};
-    connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this
-        , [this, layout, button]()
-    {
-        if(m_iconButton->isVisible())
-            layout->insertItem(kItemButtonIndex, button);
-        else
-            layout->removeItem(button);
-    });
 
-    connect(m_iconButton, &QnImageButtonWidget::iconChanged, this, [this, button]()
-    {
-        if (button != m_iconButton)
-            button->setIcon(m_iconButton->icon());
-    });
-
-}
-*/
 void QnResourceWidget::addMainOverlay()
 {
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
-/*
-    auto headerLayout = createGraphicsLayout(Qt::Horizontal);
-    headerLayout->setSpacing(2.0);
-    headerLayout->addItem(m_overlayWidgets->mainNameLabel);
-    headerLayout->addStretch();
-    headerLayout->addItem(m_overlayWidgets->mainExtrasLabel);
-    headerLayout->addItem(m_buttonBar);
 
-    setupIconButton(headerLayout, m_iconButton);
-
-    auto headerWidget = createGraphicsWidget(headerLayout);
-
-    QGraphicsLinearLayout *overlayLayout = createGraphicsLayout(Qt::Vertical);
-    overlayLayout->addItem(headerWidget);
-    overlayLayout->addStretch();
-
-    QnViewportBoundWidget *cameraNameWithButtonsOverlay = new QnViewportBoundWidget(this);
-    cameraNameWithButtonsOverlay->setLayout(overlayLayout);
-    cameraNameWithButtonsOverlay->setAcceptedMouseButtons(0);
-    m_overlayWidgets->cameraNameWithButtonsOverlay = cameraNameWithButtonsOverlay;
-    */
     m_overlayWidgets->buttonsOverlay = new QnButtonsOverlay(this);
     addOverlayWidget(m_overlayWidgets->buttonsOverlay
         , detail::OverlayParams(UserVisible, true, true, InfoLayer));
