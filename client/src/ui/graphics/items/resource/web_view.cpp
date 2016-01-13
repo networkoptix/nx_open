@@ -108,8 +108,3 @@ void QnWebView::setStatus(WebViewPageStatus value)
     m_status = value;
     emit statusChanged();
 }
-
-void QnWebView::updatePageLoadProgress(int progress)
-{
-    setStatus(statusFromProgress(progress));
-}

@@ -37,9 +37,6 @@ signals:
     void canGoBackChanged();
 
 private:
-    void updatePageLoadProgress(int progress);
-
-private:
     WebViewPageStatus m_status;
     bool m_canGoBack;
 };

@@ -139,7 +139,13 @@ void QnWebResourceWidget::setupOverlays()
 
         auto reloadButton = new QnImageButtonWidget(this);
         reloadButton->setIcon(qnSkin->icon("item/refresh.png"));
-        connect(reloadButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::reload);
+        connect(reloadButton, &QnImageButtonWidget::clicked, this, [this]()
+        {
+            // We can't use QnWebView::reload because if it was an
+            // error previously, reload does not work
+            m_webView->stop();
+            m_webView->setUrl(m_webView->url());
+        });
         buttonsBar->addButton(Qn::kReloadPageButton, reloadButton);
     }
 
