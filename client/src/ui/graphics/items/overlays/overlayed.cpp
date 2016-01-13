@@ -51,8 +51,8 @@ void detail::OverlayedBase::addOverlayWidget(QGraphicsWidget *widget
     if(params.bindToViewport && !boundWidget)
     {
         QGraphicsLinearLayout *boundLayout = new QGraphicsLinearLayout();
-        boundLayout->setContentsMargins(params.margins.left
-            , params.margins.top, params.margins.right, params.margins.bottom);
+        boundLayout->setContentsMargins(params.margins.left()
+            , params.margins.top(), params.margins.right(), params.margins.bottom());
         boundLayout->addItem(widget);
 
         boundWidget = new QnViewportBoundWidget();
@@ -173,27 +173,15 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     }
 }
 
-
-detail::OverlayMargins::OverlayMargins(qreal initLeft
-    , qreal initTop
-    , qreal initRight
-    , qreal initBottom)
-
-    : left(initLeft)
-    , top(initTop)
-    , right(initRight)
-    , bottom(initBottom)
-{}
-
 detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility initVisibility
-    , bool initAutoRotate
-    , bool initBindToViewport
-    , qreal initZ
-    , OverlayMargins initMargins)
+    , bool autoRotate
+    , bool bindToViewport
+    , qreal z
+    , const QMarginsF &margins)
 
-    : visibility(initVisibility)
-    , autoRotate(initAutoRotate)
-    , bindToViewport(initBindToViewport)
-    , z(initZ)
-    , margins(initMargins)
+    : visibility(visibility)
+    , autoRotate(autoRotate)
+    , bindToViewport(bindToViewport)
+    , z(z)
+    , margins(margins)
 {}

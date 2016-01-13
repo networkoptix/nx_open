@@ -86,7 +86,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     setOption(AlwaysShowName, true);
 
     const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::kRecordingStatusIconButton);
-    const auto contentMargins = detail::OverlayMargins(0, iconButton->preferredHeight());
+    const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
     const auto webParams = detail::OverlayParams(Visible
         , false, true, BaseLayer, contentMargins);
     addOverlayWidget(m_webView, webParams);

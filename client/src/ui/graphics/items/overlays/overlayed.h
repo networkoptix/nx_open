@@ -83,32 +83,19 @@ namespace detail {
         Qn::FixedRotation m_overlayRotation;
     };
 
-    struct OverlayMargins
-    {
-        qreal left;
-        qreal top;
-        qreal right;
-        qreal bottom;
-
-        OverlayMargins(qreal initLeft = 0
-            , qreal initTop = 0
-            , qreal initRight = 0
-            , qreal initBottom = 0);
-    };
-
     struct OverlayParams
     {
         OverlayedBase::OverlayVisibility visibility;
         bool autoRotate;
         bool bindToViewport;
         qreal z;
-        OverlayMargins margins;
+        QMarginsF margins;
 
         OverlayParams(OverlayedBase::OverlayVisibility visibility = OverlayedBase::UserVisible
             , bool autoRotate = false
             , bool bindToViewport = false
             , qreal z = OverlayedBase::BaseLayer
-            , OverlayMargins initMargins = OverlayMargins());
+            , const QMarginsF &margins = QMarginsF());
     };
 
 } // namespace detail
