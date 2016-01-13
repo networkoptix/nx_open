@@ -15,6 +15,7 @@ namespace /* anonimous */ {
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
 const size_t kClientCount(3);
+const std::chrono::milliseconds kTestTimeout(500);
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
@@ -253,6 +254,57 @@ void socketSingleAioThread(
     for (auto& each : sockets)
         each->pleaseStopSync();
 }
+
+template<typename ServerSocketMaker>
+void socketAcceptTimeoutSync(
+    const ServerSocketMaker& serverMaker,
+    const SocketAddress& serverAddress = kServerAddress,
+    std::chrono::milliseconds timeout = kTestTimeout)
+{
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
+    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->listen(5));
+
+    const auto start = std::chrono::system_clock::now();
+    EXPECT_EQ(server->accept(), nullptr);
+    EXPECT_EQ(SystemError::getLastOSErrorCode(), SystemError::timedOut);
+    EXPECT_TRUE(std::chrono::system_clock::now() - start < timeout * 2);
+}
+
+template<typename ServerSocketMaker>
+void socketAcceptTimeoutAsync(
+    const ServerSocketMaker& serverMaker,
+    const SocketAddress& serverAddress = kServerAddress,
+    std::chrono::milliseconds timeout = kTestTimeout)
+{
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setNonBlockingMode(true));
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->setRecvTimeout(timeout.count()));
+    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->listen(5));
+
+    nx::SyncQueue< SystemError::ErrorCode > serverResults;
+    const auto start = std::chrono::system_clock::now();
+    server->acceptAsync([&](SystemError::ErrorCode code,
+                            AbstractStreamSocket* socket)
+    {
+        serverResults.push(SystemError::timedOut);
+    });
+
+    EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
+    EXPECT_TRUE(std::chrono::system_clock::now() - start < timeout * 2);
+}
+
+#define NX_SIMPLE_SOCKET_TESTS(test, mkServer, mkClient)                            \
+    TEST(test, SimpleSync)          { socketSimpleSync(mkServer, mkClient); }       \
+    TEST(test, SimpleAsync)         { socketSimpleAsync(mkServer, mkClient); }      \
+    TEST(test, SimpleTrueAsync)     { socketSimpleTrueAsync(mkServer, mkClient); }  \
+    TEST(test, SingleAioThread)     { socketSingleAioThread(mkClient); }            \
+    TEST(test, AcceptTimeoutSync)   { socketAcceptTimeoutSync(mkServer); }          \
+    TEST(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }
 
 } // namespace /* anonimous */
 

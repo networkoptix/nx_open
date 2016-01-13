@@ -73,23 +73,9 @@ private:
     SocketAddress m_address;
 };
 
-TEST(MultipleServerSocket, TcpSimpleSync)
-{
-    socketSimpleSync(&std::make_unique<MultipleServerSocketTester>,
-                     &std::make_unique<MultipleClientSocketTester>);
-}
-
-TEST(MultipleServerSocket, TcpSimpleAsync)
-{
-    socketSimpleAsync(&std::make_unique<MultipleServerSocketTester>,
-                      &std::make_unique<MultipleClientSocketTester>);
-}
-
-TEST(MultipleServerSocket, TcpSimpleTrueAsync)
-{
-    socketSimpleTrueAsync(&std::make_unique<MultipleServerSocketTester>,
-                          &std::make_unique<MultipleClientSocketTester>);
-}
+NX_SIMPLE_SOCKET_TESTS(MultipleServerSocket,
+                       &std::make_unique<MultipleServerSocketTester>,
+                       &std::make_unique<MultipleClientSocketTester>)
 
 } // namespace test
 } // namespace network

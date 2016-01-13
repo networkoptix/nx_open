@@ -51,25 +51,6 @@ TEST(TcpSocket, DISABLED_KeepAliveOptionsDefaults)
     ASSERT_FALSE( static_cast< bool >( result ) );
 }
 
-TEST(TcpSocket, SimpleSync)
-{
-    socketSimpleSync(&std::make_unique<TCPServerSocket>,
-                     &std::make_unique<TCPSocket>);
-}
-
-TEST(TcpSocket, SimpleAsync)
-{
-    socketSimpleAsync(&std::make_unique<TCPServerSocket>,
-                      &std::make_unique<TCPSocket>);
-}
-
-TEST(TcpSocket, SimpleTrueAsync)
-{
-    socketSimpleTrueAsync(&std::make_unique<TCPServerSocket>,
-                          &std::make_unique<TCPSocket>);
-}
-
-TEST(TcpSocket, SingleAioThread)
-{
-    socketSingleAioThread(&std::make_unique<TCPSocket>);
-}
+NX_SIMPLE_SOCKET_TESTS(TcpSocket,
+                       &std::make_unique<TCPServerSocket>,
+                       &std::make_unique<TCPSocket>)

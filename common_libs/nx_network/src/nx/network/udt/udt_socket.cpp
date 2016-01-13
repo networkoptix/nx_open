@@ -375,7 +375,7 @@ bool UdtSocketImpl::GetRecvBufferSize( unsigned int* buffSize ) const{
 bool UdtSocketImpl::SetRecvTimeout( unsigned int millis ) {
     Q_ASSERT(!IsClosed());
     Q_ASSERT( millis < static_cast<unsigned int>(std::numeric_limits<int>::max()) );
-    int time = millis ? static_cast<int>(millis) : 0;
+    int time = millis ? static_cast<int>(millis) : -1;
     int ret = UDT::setsockopt(
         udtHandle,0,UDT_RCVTIMEO,&time,sizeof(time));
     VERIFY_(OK_(ret),"UDT::setsockopt",udtHandle);

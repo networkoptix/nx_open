@@ -54,8 +54,8 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post( std::function<void()> handler ) override;
-    void dispatch( std::function<void()> handler ) override;
+    void post(std::function<void()> handler) override;
+    void dispatch(std::function<void()> handler) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     void acceptAsync(

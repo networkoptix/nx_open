@@ -12,7 +12,7 @@ MultipleServerSocket::MultipleServerSocket()
     : m_nonBlockingMode(false)
     , m_recvTmeout(0)
     , m_terminated(nullptr)
-    , m_timerSocket(SocketFactory::createStreamSocket())
+    , m_timerSocket(new TCPSocket())
 {
 }
 
@@ -182,14 +182,14 @@ void MultipleServerSocket::pleaseStop(std::function<void()> handler)
         socket->pleaseStop(barrier.fork());
 }
 
-void MultipleServerSocket::post( std::function<void()> handler )
+void MultipleServerSocket::post( std::function<void()> handler)
 {
-    m_serverSockets.front()->post(std::move(handler));
+    m_timerSocket->post(std::move(handler));
 }
 
-void MultipleServerSocket::dispatch( std::function<void()> handler )
+void MultipleServerSocket::dispatch(std::function<void()> handler)
 {
-    m_serverSockets.front()->dispatch(std::move(handler));
+    m_timerSocket->dispatch(std::move(handler));
 }
 
 void MultipleServerSocket::acceptAsync(
@@ -283,36 +283,17 @@ void MultipleServerSocket::accepted(
     std::swap(handler, m_acceptHandler);
     Q_ASSERT_X(handler, Q_FUNC_INFO, "acceptAsync was not canceled in time");
 
-    if (!m_nonBlockingMode)
-    {
-        NX_LOGX(lm("cancel other accepts because of blocking mode"), cl_logDEBUG2);
+    // TODO: #mux This is not efficient to cancel accepts on every accepted event
+    //            (in most cases handler will call accept again).
+    //            Hovewer this socket she'll be deletable right after a handler
+    //            is handled, so we can not take any decisions afterhand.
+    //            Consider using condition variables!
 
-        // cancel all other accepts
-        for (auto& socket : m_serverSockets)
-            socket.stopAccepting();
-
-        return handler(code, socket.release());
-    }
-
-    bool terminated = false;
-    m_terminated = &terminated;
+    NX_LOGX(lm("cancel all other accepts"), cl_logDEBUG2);
+    for (auto& socket : m_serverSockets)
+        socket.stopAccepting();
 
     handler(code, socket.release());
-    if (terminated)
-        return; // this is already dead
-
-    m_terminated = nullptr;
-    if (!m_acceptHandler)
-    {
-        // accept handler did not call accept again, so we don't need any
-        // other accepts to be in progress
-
-        NX_LOGX(lm("cancel all accepts because last handler did not "
-                   "call accept again"), cl_logDEBUG2);
-
-        for (auto& socket : m_serverSockets)
-            socket.stopAccepting();
-    }
 }
 
 } // namespace network
