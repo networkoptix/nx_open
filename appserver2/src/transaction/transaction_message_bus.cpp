@@ -34,7 +34,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"
-
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 
 namespace ec2
@@ -315,6 +315,10 @@ namespace ec2
     {
         Q_ASSERT(m_thread->isRunning());
         dropConnections();
+
+        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( m_thread, 7 );
+        waitingForObjectsToBeFreed.join();
 
         m_thread->exit();
         m_thread->wait();
