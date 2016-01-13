@@ -173,7 +173,7 @@ void detail::OverlayedBase::setOverlayWidgetVisible(QGraphicsWidget* widget, boo
     }
 }
 
-detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility initVisibility
+detail::OverlayParams::OverlayParams(OverlayedBase::OverlayVisibility visibility
     , bool autoRotate
     , bool bindToViewport
     , qreal z
