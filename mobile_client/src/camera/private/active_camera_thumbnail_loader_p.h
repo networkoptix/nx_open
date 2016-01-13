@@ -35,6 +35,8 @@ public:
     bool requestNextAfterReply;
     QElapsedTimer fetchTimer;
 
+    QThread *decompressThread;
+
     QPixmap thumbnail() const;
     void clear();
     void refresh(bool force = false);

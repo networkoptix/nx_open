@@ -3,6 +3,7 @@ import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
 import "../controls"
+import "../icons"
 
 Item {
     id: cameraItem
@@ -56,51 +57,19 @@ Item {
                 height: parent.width * 3 / 4
                 color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
 
-                Column {
-                    id: thumbnailDummyContent
-
-                    x: dp(8)
-                    width: parent.width - 2 * x
-                    anchors.centerIn: parent
-
-                    visible: d.offline
-
-                    Image {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
-                        width: dp(64)
-                        height: dp(64)
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: parent.width
-                        height: dp(32)
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 2
-                        font.pixelSize: sp(14)
-                        font.weight: Font.Normal
-                        color: QnTheme.cameraText
-                    }
-                }
-
                 Loader {
-                    id: preloader
-                    anchors.centerIn: parent
-                    source: (!d.offline && thumbnail.status != Image.Ready) ? Qt.resolvedUrl("qrc:///qml/icons/QnThreeDotPreloader.qml") : ""
-                }
+                    id: thumbnailContentLoader
 
-                Image {
-                    id: thumbnail
-                    source: d.offline ? "" : cameraItem.thumbnail
-                    anchors.fill: parent
-                    fillMode: Qt.KeepAspectRatio
-                    visible: !d.offline && status == Image.Ready
-                    asynchronous: true
+                    anchors.centerIn: parent
+
+                    sourceComponent: {
+                        if (d.offline || d.unauthorized)
+                            return thumbnailDummyComponent
+                        else if (!cameraItem.thumbnail)
+                            return thumbnailPreloaderComponent
+                        else
+                            return thumbnailComponent
+                    }
                 }
             }
 
@@ -129,6 +98,54 @@ Item {
         }
 
         Behavior on x { NumberAnimation { duration: 200 } }
+    }
+
+    Component {
+        id: thumbnailDummyComponent
+
+        Column {
+            x: dp(8)
+            width: thumbnailContainer.width - 2 * x
+
+            Image {
+                anchors.horizontalCenter: parent.horizontalCenter
+                source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+                width: dp(64)
+                height: dp(64)
+            }
+
+            Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width
+                height: dp(32)
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+
+                text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
+                wrapMode: Text.WordWrap
+                maximumLineCount: 2
+                font.pixelSize: sp(14)
+                font.weight: Font.Normal
+                color: QnTheme.cameraText
+            }
+        }
+    }
+
+    Component {
+        id: thumbnailPreloaderComponent
+
+        QnThreeDotPreloader {}
+    }
+
+    Component {
+        id: thumbnailComponent
+
+        Image {
+            source: cameraItem.thumbnail
+            width: thumbnailContainer.width
+            height: thumbnailContainer.height
+            fillMode: Qt.KeepAspectRatio
+        }
     }
 
     Rectangle {
