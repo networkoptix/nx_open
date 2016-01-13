@@ -53,7 +53,5 @@ QImage decompressJpegImage(const char *data, size_t size)
 
 QImage decompressJpegImage(const QByteArray &data)
 {
-    static int n = 0;
-    qDebug() << "decompress" << n++;
     return decompressJpegImage(data.data(), data.size());
 }
