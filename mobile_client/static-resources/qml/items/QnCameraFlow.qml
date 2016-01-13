@@ -84,7 +84,7 @@ Item {
             Timer {
                 id: refreshTimer
 
-                readonly property int initialLoadDelay: 1000
+                readonly property int initialLoadDelay: 400
                 readonly property int reloadDelay: 60 * 1000
 
                 interval: initialLoadDelay
