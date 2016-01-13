@@ -241,9 +241,15 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
         return true;
 
 
+    QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+
     QSet<QnUuid> connectedInstances;
-    for (const QnPeerRuntimeInfo &info: QnRuntimeInfoManager::instance()->items()->getItems())
+    for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+    {
+        if (info.data.userId != localUserId)
+            continue;
         connectedInstances.insert(info.uuid);
+    }
 
     /* Main instance is the one that has the smallest index between all instances
        connected to current server with the same credentials. */
@@ -251,8 +257,6 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     {
         if (index == clientInstanceManager->instanceIndex())
             return true;
-
-        //TODO: #GDM check credentials
 
         /* Check if other instance connected to the same server. */
         QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);

@@ -1,5 +1,4 @@
-#ifndef __RUNTIME_INFO_MANAGER_H_
-#define __RUNTIME_INFO_MANAGER_H_
+#pragma once
 
 #include <QtCore/QMap>
 #include <QtCore/QList>
@@ -40,7 +39,7 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoList)
 Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 
-class QnRuntimeInfoManager: public QObject, 
+class QnRuntimeInfoManager: public QObject,
     public Singleton<QnRuntimeInfoManager>,
     private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
 {
@@ -71,4 +70,4 @@ private:
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo> > m_items;
 };
 
-#endif
+#define qnRuntimeInfoManager QnRuntimeInfoManager::instance()

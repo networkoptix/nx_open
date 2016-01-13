@@ -106,6 +106,12 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject *parent /* = 0*/):
 
     QnWorkbenchUserWatcher* userWatcher = context()->instance<QnWorkbenchUserWatcher>();
     connect(userWatcher, &QnWorkbenchUserWatcher::reconnectRequired, this, &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
+    connect(userWatcher, &QnWorkbenchUserWatcher::userChanged, this, [this](const QnUserResourcePtr &user)
+    {
+        QnPeerRuntimeInfo localInfo = qnRuntimeInfoManager->localInfo();
+        localInfo.data.userId = user ? user->getId() : QnUuid();
+        qnRuntimeInfoManager->updateLocalItem(localInfo);
+    });
 
     connect(action(Qn::ConnectAction),              &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_connectAction_triggered);
     connect(action(Qn::ReconnectAction),            &QAction::triggered,                            this,   &QnWorkbenchConnectHandler::at_reconnectAction_triggered);
@@ -136,7 +142,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
 
     hideMessageBox();
 
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info)
+    connect(qnRuntimeInfoManager,   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info)
     {
         if (info.uuid != qnCommon->moduleGUID())
             return;
@@ -160,7 +166,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
         disconnect( QnAppServerConnectionFactory::getConnection2().get(), nullptr, QnSyncTime::instance(), nullptr );
     }
 
-    disconnect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
+    disconnect(qnRuntimeInfoManager,   &QnRuntimeInfoManager::runtimeInfoChanged,  this, NULL);
 
     /* Don't do anything if we are closing client. */
     if (!mainWindow())
