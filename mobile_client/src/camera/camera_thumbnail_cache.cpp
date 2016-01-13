@@ -29,6 +29,7 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
     , m_decompressThread(new QThread(this))
 {
     m_request.roundMethod = QnThumbnailRequestData::KeyFrameAfterMethod;
+    m_request.size = defaultSize;
     m_decompressThread->setObjectName(lit("QnCameraThumbnailCache_decompressThread"));
     m_decompressThread->start();
 }
@@ -107,6 +108,14 @@ void QnCameraThumbnailCache::at_resourcePool_resourceRemoved(const QnResourcePtr
 
 void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
 {
+    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    if (!camera)
+        return;
+
+    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    if (!server)
+        return;
+
     QnMutexLocker lock(&m_mutex);
 
     ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
@@ -117,31 +126,24 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
     if (thumbnailData.time > 0 && thumbnailData.time + refreshInterval > m_elapsedTimer.elapsed())
         return;
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
-    if (!camera)
-        return;
-
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
-    if (!server)
-        return;
-
-    m_request.camera = camera;
-
     auto handleReply = [this, id] (bool success, rest::Handle handleId, const QByteArray &imageData)
     {
         Q_UNUSED(handleId)
 
         bool thumbnailLoaded = false;
-
         QString thumbnailId;
+
         {
+            QPixmap pixmap;
+            if (success)
+                pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
+
             QnMutexLocker lock(&m_mutex);
 
             ThumbnailData &thumbnailData = m_thumbnailByResourceId[id];
 
             if (success)
             {
-                QPixmap pixmap = QPixmap::fromImage(decompressJpegImage(imageData));
                 if (!pixmap.isNull())
                 {
                     thumbnailId = getThumbnailId(id.toString(), thumbnailData.time);
@@ -160,6 +162,7 @@ void QnCameraThumbnailCache::refreshThumbnail(const QnUuid &id)
             emit thumbnailUpdated(id, thumbnailId);
     };
 
+    m_request.camera = camera;
     int handle = server->restConnection()->cameraThumbnailAsync(m_request, handleReply, m_decompressThread);
 
     if (handle == -1) {
