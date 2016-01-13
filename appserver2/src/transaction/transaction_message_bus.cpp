@@ -297,7 +297,7 @@ namespace ec2
         assert( m_globalInstance == nullptr );
         m_globalInstance = this;
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
-    m_relativeTimer.restart();
+        m_relativeTimer.restart();
 
     connect(
         QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,

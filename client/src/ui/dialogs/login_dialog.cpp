@@ -73,16 +73,16 @@ namespace {
 /* QnEcData                                                             */
 /************************************************************************/
 
-QnLoginDialog::QnEcData::QnEcData() : 
+QnLoginDialog::QnEcData::QnEcData() :
     protoVersion(0)
 {
 }
 
 bool QnLoginDialog::QnEcData::operator==(const QnEcData& other) const {
-    return 
-           id == other.id 
-        && url == other.url 
-        && version == other.version 
+    return
+           id == other.id
+        && url == other.url
+        && version == other.version
         && protoVersion == other.protoVersion
         && systemName == other.systemName
         ;
@@ -352,7 +352,7 @@ void QnLoginDialog::resetAutoFoundConnectionsModel() {
 }
 
 void QnLoginDialog::updateAcceptibility() {
-    bool acceptable = 
+    bool acceptable =
         !ui->passwordLineEdit->text().isEmpty() &&
         !ui->loginLineEdit->text().trimmed().isEmpty() &&
         !ui->hostnameLineEdit->text().trimmed().isEmpty() &&
@@ -414,7 +414,7 @@ void QnLoginDialog::at_connectionsComboBox_currentIndexChanged(const QModelIndex
     QUrl url = item == NULL ? QUrl() : item->data(Qn::UrlRole).toUrl();
     ui->hostnameLineEdit->setText(url.host());
     ui->portSpinBox->setValue(url.port());
-    ui->loginLineEdit->setText(url.userName().isEmpty() 
+    ui->loginLineEdit->setText(url.userName().isEmpty()
         ? lit("admin")  // 99% of users have only one login - admin
         : url.userName());
     ui->passwordLineEdit->setText(url.password());
@@ -443,7 +443,7 @@ void QnLoginDialog::at_testButton_clicked() {
 
     updateFocus();
     if (connectRequested)
-        accept();   
+        accept();
 }
 
 void QnLoginDialog::at_saveButton_clicked() {
@@ -530,7 +530,7 @@ void QnLoginDialog::at_deleteButton_clicked() {
                              QMessageBox::Yes, QMessageBox::No) == QMessageBox::No)
         return;
 
-    
+
     connections.removeOne(name);
     qnSettings->setCustomConnections(connections);
     resetConnectionsModel();

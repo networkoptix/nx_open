@@ -136,7 +136,7 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
 
     hideMessageBox();
 
-    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info) 
+    connect(QnRuntimeInfoManager::instance(),   &QnRuntimeInfoManager::runtimeInfoChanged,  this, [this](const QnPeerRuntimeInfo &info)
     {
         if (info.uuid != qnCommon->moduleGUID())
             return;
@@ -170,11 +170,11 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionClosed() {
     if (connected()) {
         if (tryToRestoreConnection())
             return;
-        /* Otherwise, disconnect fully. */    
+        /* Otherwise, disconnect fully. */
         disconnectFromServer(true);
         showLoginDialog();
     }
-        
+
     clearConnection();
 }
 
@@ -182,7 +182,7 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
     // ask user if he wants to save changes
     bool force = qnRuntime->isActiveXMode() || qnRuntime->isVideoWallMode();
     if (connected() && !disconnectFromServer(force))
-        return; 
+        return;
 
     QnActionParameters parameters = menu()->currentParameters(sender());
     QUrl url = parameters.argument(Qn::UrlRole, QUrl());
@@ -202,10 +202,10 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
                 QnGraphicsMessageBox* incompatibleMessageBox = QnGraphicsMessageBox::informationTicking(tr("Could not connect to server. Closing in %1..."), videowallCloseTimeoutMSec);
                 connect(incompatibleMessageBox, &QnGraphicsMessageBox::finished, action(Qn::ExitAction), &QAction::trigger);
             }
-        } 
+        }
         else
         /* Login Dialog or 'Open in new window' with url */
-        { 
+        {
             //try connect; if not - show login dialog
             if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
@@ -217,32 +217,32 @@ void QnWorkbenchConnectHandler::at_connectAction_triggered() {
             url = qnSettings->defaultConnection().url;
 
         /* Try to connect with saved password. */
-        if (qnSettings->autoLogin() 
-            && url.isValid() 
-            && !url.password().isEmpty()) 
+        if (qnSettings->autoLogin()
+            && url.isValid()
+            && !url.password().isEmpty())
         {
             if (connectToServer(url) != ec2::ErrorCode::ok)
                 showLoginDialog();
-        } else 
-        /* No saved password, just open Login Dialog. */ 
+        } else
+        /* No saved password, just open Login Dialog. */
         {
             showLoginDialog();
         }
     }
-}    
+}
 
 void QnWorkbenchConnectHandler::at_reconnectAction_triggered() {
     /* Reconnect call should not be executed while we are disconnected. */
     if (!context()->user())
         return;
 
-    QUrl currentUrl = QnAppServerConnectionFactory::url(); 
+    QUrl currentUrl = QnAppServerConnectionFactory::url();
     if (connected())
         disconnectFromServer(true);
     if (connectToServer(currentUrl) != ec2::ErrorCode::ok)
         showLoginDialog();
 }
- 
+
 void QnWorkbenchConnectHandler::at_disconnectAction_triggered() {
     QnActionParameters parameters = menu()->currentParameters(sender());
     bool force = parameters.hasArgument(Qn::ForceRole)
@@ -322,7 +322,7 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         menu()->trigger(Qn::DelayedForcedExitAction);
         return ec2::ErrorCode::ok; // to avoid cycle
     default:    //error
-        return errCode == ec2::ErrorCode::ok 
+        return errCode == ec2::ErrorCode::ok
             ? ec2::ErrorCode::incompatiblePeer  /* Substitute value for incompatible peers. */
             : errCode;
     }
@@ -371,7 +371,7 @@ bool QnWorkbenchConnectHandler::disconnectFromServer(bool force) {
 void QnWorkbenchConnectHandler::hideMessageBox() {
     if (!m_connectingMessageBox)
         return;
-    
+
     m_connectingMessageBox->disconnect(this);
     m_connectingMessageBox->hideImmideately();
     m_connectingMessageBox = NULL;
@@ -490,7 +490,7 @@ bool QnWorkbenchConnectHandler::tryToRestoreConnection() {
         } while (!found && !allServers.isEmpty());
 
         /* Break cycle if we cannot find any valid server. */
-        if (!found) 
+        if (!found)
             break;
     }
 
