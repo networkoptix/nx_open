@@ -5,26 +5,156 @@
 
 #include "listening_peer_pool.h"
 
+#include <nx/utils/log/log.h>
+
 
 namespace nx {
 namespace hpm {
 
-void ListeningPeerPool::add(
-    nx::String hostname,
-    std::weak_ptr<stun::AbstractServerConnection> peerConnection)
+
+////////////////////////////////////////////////////////////
+//// class ConstDataLocker
+////////////////////////////////////////////////////////////
+
+ListeningPeerPool::ConstDataLocker::ConstDataLocker(
+    QnMutexLockerBase locker,
+    PeerContainer::const_iterator peerIter)
+:
+    m_locker(std::move(locker)),
+    m_peerIter(std::move(peerIter))
 {
-    //TODO #ak
 }
 
-void ListeningPeerPool::remove(const nx::String& hostname)
+ListeningPeerPool::ConstDataLocker::ConstDataLocker(ConstDataLocker&& rhs)
+:
+    m_locker(std::move(rhs.m_locker)),
+    m_peerIter(std::move(rhs.m_peerIter))
 {
-    //TODO #ak
 }
 
-boost::optional<ListeningPeerData> ListeningPeerPool::find(const nx::String& hostname) const
+ListeningPeerPool::ConstDataLocker& ListeningPeerPool::ConstDataLocker::operator=(
+    ListeningPeerPool::ConstDataLocker&& rhs)
 {
-    //TODO #ak
-    return boost::optional<ListeningPeerData>();
+    if (this != &rhs)
+    {
+        m_locker = std::move(rhs.m_locker);
+        m_peerIter = std::move(rhs.m_peerIter);
+    }
+
+    return *this;
+}
+
+const MediaserverData& ListeningPeerPool::ConstDataLocker::key() const
+{
+    return m_peerIter->first;
+}
+
+const ListeningPeerData& ListeningPeerPool::ConstDataLocker::value() const
+{
+    return m_peerIter->second;
+}
+
+
+////////////////////////////////////////////////////////////
+//// class DataLocker
+////////////////////////////////////////////////////////////
+
+ListeningPeerPool::DataLocker::DataLocker(
+    QnMutexLockerBase locker,
+    PeerContainer::iterator peerIter)
+:
+    ConstDataLocker(
+        std::move(locker),
+        peerIter),
+    m_peerIter(std::move(peerIter))
+{
+}
+
+ListeningPeerPool::DataLocker::DataLocker(ListeningPeerPool::DataLocker&& rhs)
+:
+    ConstDataLocker(std::move(rhs)),
+    m_peerIter(std::move(rhs.m_peerIter))
+{
+}
+
+ListeningPeerPool::DataLocker& ListeningPeerPool::DataLocker::operator=(
+    ListeningPeerPool::DataLocker&& rhs)
+{
+    if (this != &rhs)
+    {
+        this->ListeningPeerPool::ConstDataLocker::operator=(
+            std::move(static_cast<ListeningPeerPool::ConstDataLocker&>(rhs)));
+        m_peerIter = std::move(rhs.m_peerIter);
+    }
+
+    return *this;
+}
+
+ListeningPeerData& ListeningPeerPool::DataLocker::value()
+{
+    return m_peerIter->second;
+}
+
+
+////////////////////////////////////////////////////////////
+//// class ListeningPeerPool
+////////////////////////////////////////////////////////////
+
+ListeningPeerPool::DataLocker ListeningPeerPool::findAndLockPeerData(
+    const ConnectionStrongRef& connection,
+    const MediaserverData& peerData)
+{
+    QnMutexLocker lk(&m_mutex);
+
+    const auto peerIterAndInsertionFlag = m_peers.emplace(peerData, ListeningPeerData());
+    const auto peerIter = peerIterAndInsertionFlag.first;
+    if (peerIterAndInsertionFlag.second)
+    {
+        peerIter->second.isLocal = true;
+        peerIter->second.isListening = false;
+        peerIter->second.peerConnection = connection;
+        peerIter->second.hostName = peerIter->first.hostName();
+
+        connection->addOnConnectionCloseHandler([this, peerIter]()
+        {
+            NX_LOGX(lit("Peer %1 has disconnected").
+                arg(QString::fromUtf8(peerIter->first.hostName())),
+                cl_logDEBUG1);
+
+            QnMutexLocker lk(&m_mutex);
+            m_peers.erase(peerIter);
+        });
+    }
+    else if (peerIter->second.peerConnection.lock() != connection)
+    {
+        //TODO #ak binding to another connection 
+    }
+
+    return DataLocker(
+        std::move(lk),
+        peerIter);
+}
+
+boost::optional<ListeningPeerPool::ConstDataLocker> 
+    ListeningPeerPool::findAndLockPeerDataByHostName(const nx::String& hostName) const
+{
+    QnMutexLocker lk(&m_mutex);
+
+    // TODO: hostName alias resolution in cloud_db
+
+    const auto ids = hostName.split('.');
+    if (ids.size() != 2)
+        return boost::none;
+
+    //auto-server resolve by system name is forbidden for now to avoid auto-reconnection to another server
+
+    const auto peerIter = m_peers.find(MediaserverData(ids[1], ids[0]));  //serverID.systemID
+    if (peerIter == m_peers.end())
+        return boost::none;
+
+    return ListeningPeerPool::ConstDataLocker(
+        std::move(lk),
+        std::move(peerIter));
 }
 
 }   //hpm

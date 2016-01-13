@@ -14,7 +14,7 @@ RequestProcessor::~RequestProcessor()
 {
 }
 
-boost::optional< RequestProcessor::MediaserverData >
+boost::optional< MediaserverData >
     RequestProcessor::getMediaserverData(
         ConnectionStrongRef connection, stun::Message& request)
 {
@@ -34,7 +34,9 @@ boost::optional< RequestProcessor::MediaserverData >
         return boost::none;
     }
 
-    MediaserverData data = { systemAttr->getString(), serverAttr->getString() };
+    MediaserverData data(
+        systemAttr->getString(),
+        serverAttr->getString());
     if( !m_cloudData ) // debug mode
         return data;
 

@@ -23,11 +23,11 @@ class NX_NETWORK_API MediatorClientConnection
     friend class MediatorConnector;
 
 public:
-    void connect(
-        nx::hpm::api::ConnectRequest connectData,
-        std::function<void(
-            nx::hpm::api::ResultCode,
-            nx::hpm::api::ConnectResponse)> completionHandler);
+    //void connect(
+    //    nx::hpm::api::ConnectRequest connectData,
+    //    std::function<void(
+    //        nx::hpm::api::ResultCode,
+    //        nx::hpm::api::ConnectResponse)> completionHandler);
     void resolve(
         nx::hpm::api::ResolveRequest resolveData,
         std::function<void(

@@ -23,17 +23,18 @@ class MessageDispatcher;
 
 namespace hpm {
 
-//!This class instance keeps information about all currently listening peers, processes STUN requests \a bind, \a connect and sends \a connection_requested indication
-/*!
-    All methods are reentrant and non-blocking (may be implemented with async fsm)
-    \note Is a single-tone
-*/
-class ListeningPeerPool
+class ListeningPeerPool;
+
+/** Registers peers which desire to accept cloud connections, resolves such peers address.
+ */
+class ListeningPeerRegistrator
         : protected RequestProcessor
 {
 public:
-    ListeningPeerPool( AbstractCloudDataProvider* cloudData,
-                       nx::stun::MessageDispatcher* dispatcher );
+    ListeningPeerRegistrator(
+        AbstractCloudDataProvider* cloudData,
+        nx::stun::MessageDispatcher* dispatcher,
+        ListeningPeerPool* const listeningPeerPool);
 
     void bind(
         const ConnectionStrongRef& connection,
@@ -45,46 +46,17 @@ public:
         const ConnectionStrongRef& connection,
         api::ResolveRequest request,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
-    void connect(
-        const ConnectionStrongRef& connection,
-        stun::Message message);
+    //void connect(
+    //    const ConnectionStrongRef& connection,
+    //    stun::Message message);
 
-    void connectionResult(
-        const ConnectionStrongRef& connection,
-        api::ConnectionResultRequest request,
-        std::function<void(api::ResultCode)> completionHandler);
+    //void connectionResult(
+    //    const ConnectionStrongRef& connection,
+    //    api::ConnectionResultRequest request,
+    //    std::function<void(api::ResultCode)> completionHandler);
 
-protected:
-    struct MediaserverPeer
-    {
-        ConnectionWeakRef connection;
-        std::list< SocketAddress > endpoints;
-        bool isListening;
-
-        MediaserverPeer( ConnectionWeakRef connection_ );
-        MediaserverPeer( MediaserverPeer&& peer );
-    };
-
-    struct SystemPeers
-    {
-    public:
-        boost::optional< MediaserverPeer& > peer(
-                ConnectionWeakRef connection,
-                const RequestProcessor::MediaserverData& mediaserver,
-                QnMutex* mutex );
-
-        boost::optional< MediaserverPeer& > search( const String& hostName );
-
-        void clear() { m_peers.clear(); }
-
-    private:
-        std::map< String,              // System Id
-            std::map< String,          // Server Id
-                      MediaserverPeer > > m_peers;
-    };
-
-    QnMutex m_mutex;
-    SystemPeers m_peers;
+private:
+    ListeningPeerPool* const m_listeningPeerPool;
 };
 
 } // namespace hpm

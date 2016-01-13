@@ -23,17 +23,17 @@ MediatorClientConnection::MediatorClientConnection(
 {
 }
 
-void MediatorClientConnection::connect(
-    api::ConnectRequest connectData,
-    std::function<void(
-        api::ResultCode,
-        api::ConnectResponse)> completionHandler)
-{
-    doRequest(
-        stun::cc::methods::connect,
-        std::move(connectData),
-        std::move(completionHandler));
-}
+//void MediatorClientConnection::connect(
+//    api::ConnectRequest connectData,
+//    std::function<void(
+//        api::ResultCode,
+//        api::ConnectResponse)> completionHandler)
+//{
+//    doRequest(
+//        stun::cc::methods::connect,
+//        std::move(connectData),
+//        std::move(completionHandler));
+//}
 
 void MediatorClientConnection::resolve(
     api::ResolveRequest resolveData,

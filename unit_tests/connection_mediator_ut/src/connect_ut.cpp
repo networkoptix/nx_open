@@ -19,6 +19,9 @@
 #include <utils/crypt/linux_passwd_crypt.h>
 #include <utils/common/cpp14.h>
 
+#include <listening_peer_pool.h>
+#include <listening_peer_registrator.h>
+
 #include "mediator_mocks.h"
 #include "socket_globals_holder.h"
 
@@ -35,9 +38,10 @@ protected:
         SocketGlobalsHolder::instance()->reinitialize();
 
         m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
-        listeningPeerPool = std::make_unique<ListeningPeerPool>(
+        listeningPeerRegistrator = std::make_unique<ListeningPeerRegistrator>(
             &cloud,
-            &stunMessageDispatcher);
+            &stunMessageDispatcher,
+            &listeningPeerPool);
         server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
             stunMessageDispatcher,
             false,
@@ -51,7 +55,8 @@ protected:
     nx::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
-    std::unique_ptr<ListeningPeerPool> listeningPeerPool;
+    ListeningPeerPool listeningPeerPool;
+    std::unique_ptr<ListeningPeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
 
     SocketAddress address() const
