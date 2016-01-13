@@ -418,7 +418,7 @@ QnPage {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (Main.backPressed()) {
                 event.accepted = true
             }

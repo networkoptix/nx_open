@@ -80,7 +80,7 @@ FocusScope {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (visible) {
                 hide()
                 event.accepted = true
