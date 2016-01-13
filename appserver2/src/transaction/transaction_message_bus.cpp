@@ -299,9 +299,15 @@ namespace ec2
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
         m_relativeTimer.restart();
 
-    connect(
-        QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-        this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+        connect(
+            QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
+            this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+
+        /* Client updates running instance guid on each connect to server */
+        connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+        {
+            m_localPeer.instanceId = qnCommon->runningInstanceGUID();
+        }, Qt::QueuedConnection);
     }
 
     void QnTransactionMessageBus::start()

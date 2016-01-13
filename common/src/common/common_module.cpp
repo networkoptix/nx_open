@@ -223,8 +223,11 @@ QnUuid QnCommonModule::runningInstanceGUID() const
 
 void QnCommonModule::updateRunningInstanceGuid()
 {
-    QnMutexLocker lock(&m_mutex);
-    m_runUuid = QnUuid::createUuid();
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_runUuid = QnUuid::createUuid();
+    }
+    emit runningInstanceGUIDChanged();
 }
 
 void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)

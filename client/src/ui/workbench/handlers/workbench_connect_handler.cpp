@@ -261,7 +261,9 @@ ec2::ErrorCode QnWorkbenchConnectHandler::connectToServer(const QUrl &appServerU
         if (connected())
             return ec2::ErrorCode::ok;
     }
-    
+
+    qnCommon->updateRunningInstanceGuid();
+
     /* Hiding message box from previous connect. */
     hideMessageBox();
 

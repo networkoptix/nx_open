@@ -271,7 +271,7 @@ namespace ec2
         void emitRemotePeerUnauthorized(const QnUuid& id);
     private:
         /** Info about us. */
-        const ApiPeerData m_localPeer;
+        ApiPeerData m_localPeer;
 
         //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
