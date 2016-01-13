@@ -31,6 +31,8 @@ public:
 
     void setCanGoBack(bool value);
 
+    void setPageUrl(const QUrl &newUrl);
+
 signals:
     void statusChanged();
 

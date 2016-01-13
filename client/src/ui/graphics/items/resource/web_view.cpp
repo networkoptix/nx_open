@@ -46,22 +46,18 @@ QnWebView::QnWebView(const QUrl &url
     const auto progressHandler = [this](int progress)
     {
         setStatus(statusFromProgress(progress));
-        qDebug() << "-- progress: " << progress;
     };
 
     const auto loadStartedHander = [this, progressHandler]()
     {
         connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);
         setStatus(statusFromProgress(kProgressValueStarted));
-        qDebug() << "****************** loadPage: " << this->url();
     };
 
     const auto loadFinishedHandler = [this](bool successful)
     {
         disconnect(this, &QGraphicsWebView::loadProgress, this, nullptr);
         setStatus(statusFromProgress(successful? kProgressValueLoaded : kProgressValueFailed));
-
-        qDebug() << "----------------------- load finished: " << successful;
     };
 
     const auto onUrlChangedHandler = [this]()
@@ -69,12 +65,19 @@ QnWebView::QnWebView(const QUrl &url
         setCanGoBack(history()->canGoBack());
     };
 
+    const auto linkClickedHandler = [this](const QUrl &linkUrl)
+    {
+        setPageUrl(linkUrl);
+    };
+
+    connect(this, &QGraphicsWebView::linkClicked, this, &QnWebView::setPageUrl);
     connect(this, &QGraphicsWebView::loadStarted, this, loadStartedHander);
     connect(this, &QGraphicsWebView::loadFinished, this, loadFinishedHandler);
     connect(this, &QGraphicsWebView::loadProgress, this, progressHandler);
     connect(this, &QGraphicsWebView::urlChanged, this, onUrlChangedHandler);
 
-    setUrl(url);
+    page()->setLinkDelegationPolicy(QWebPage::DelegateExternalLinks);
+    setPageUrl(url);
 }
 
 QnWebView::~QnWebView()
@@ -99,6 +102,15 @@ void QnWebView::setCanGoBack(bool value)
     m_canGoBack = value;
     emit canGoBackChanged();
 }
+
+void QnWebView::setPageUrl(const QUrl &newUrl)
+{
+    stop();
+
+    QWebSettings::clearMemoryCaches();
+    setUrl(newUrl);
+}
+
 
 void QnWebView::setStatus(WebViewPageStatus value)
 {

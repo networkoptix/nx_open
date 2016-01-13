@@ -143,8 +143,8 @@ void QnWebResourceWidget::setupOverlays()
         {
             // We can't use QnWebView::reload because if it was an
             // error previously, reload does not work
-            m_webView->stop();
-            m_webView->setUrl(m_webView->url());
+
+            m_webView->setPageUrl(m_webView->url());
         });
         buttonsBar->addButton(Qn::kReloadPageButton, reloadButton);
     }
