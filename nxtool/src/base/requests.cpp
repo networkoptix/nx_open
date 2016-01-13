@@ -1,18 +1,16 @@
 
 #include "requests.h"
 
+#include <cassert>
 #include <QUrl>
 #include <QUrlQuery>
-
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
 
-#include <base/server_info.h>
-#include <helpers/rest_client.h>
-#include <helpers/time_helper.h>
 #include <helpers/version_holder.h>
+#include <helpers/rest_client.h>
 
 #include <QDebug>
 
@@ -117,31 +115,46 @@ namespace
         return QStringLiteral("Unknown OS");
     }
 
+    rtu::RequestError convertRestClientRequestResult(
+        rtu::RestClient::RequestResult restResult)
+    {
+        switch (restResult)
+        {
+            case rtu::RestClient::RequestResult::kSuccess: return rtu::RequestError::kSuccess;
+            case rtu::RestClient::RequestResult::kRequestTimeout: return rtu::RequestError::kRequestTimeout;
+            case rtu::RestClient::RequestResult::kUnauthorized: return rtu::RequestError::kUnauthorized;
+            case rtu::RestClient::RequestResult::kUnspecified: return rtu::RequestError::kUnspecified;
+            default:
+                assert(false);
+                return rtu::RequestError::kUnspecified;
+        }
+    }
+
     typedef QHash<QString, std::function<void (const QJsonObject &object
-        , rtu::BaseServerInfo &info)> > KeyParserContainer;
+        , rtu::BaseServerInfo *info)> > KeyParserContainer;
     const KeyParserContainer parser = []() -> KeyParserContainer
     {
         KeyParserContainer result;
-        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kIDTag).toString()); });
-        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.id = QUuid(object.value(kSeedTag).toString()); });
-        result.insert(kRuntimeIdTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.runtimeId = QUuid(object.value(kRuntimeIdTag).toString()); });
-        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.name = object.value(kNameTag).toString(); });
-        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.systemName = object.value(kSystemNameTag).toString(); });
-        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.port = object.value(kPortTag).toInt(); });
-        result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.version = rtu::VersionHolder(object.value(kVersionTag).toString()); });
-        result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.safeMode = object.value(kSafeModeTag).toBool(); });        
-        result.insert(kCustomizationTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
-            { info.customization = object.value(kCustomizationTag).toString(); });
+        result.insert(kIDTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->id = QUuid(object.value(kIDTag).toString()); });
+        result.insert(kSeedTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->id = QUuid(object.value(kSeedTag).toString()); });
+        result.insert(kRuntimeIdTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->runtimeId = QUuid(object.value(kRuntimeIdTag).toString()); });
+        result.insert(kNameTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->name = object.value(kNameTag).toString(); });
+        result.insert(kSystemNameTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->systemName = object.value(kSystemNameTag).toString(); });
+        result.insert(kPortTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->port = object.value(kPortTag).toInt(); });
+        result.insert(kVersionTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->version = rtu::VersionHolder(object.value(kVersionTag).toString()); });
+        result.insert(kSafeModeTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->safeMode = object.value(kSafeModeTag).toBool(); });        
+        result.insert(kCustomizationTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
+            { info->customization = object.value(kCustomizationTag).toString(); });
 
-        result.insert(kSysInfoTag, [](const QJsonObject& object, rtu::BaseServerInfo &info)
+        result.insert(kSysInfoTag, [](const QJsonObject& object, rtu::BaseServerInfo *info)
         {
             const auto val = object.value(kSysInfoTag);
             const auto sysInfo = val.toObject();
@@ -149,7 +162,7 @@ namespace
             /// We use info.os to temporary store OS caps.
             if (sysInfo.isEmpty())
             {
-                info.os = val.toString();
+                info->os = val.toString();
             }
             else
             {
@@ -164,11 +177,11 @@ namespace
                 const QString arch = (sysInfo.keys().contains(kArchKey) 
                     ? sysInfo.value(kArchKey).toString() : QString());
 
-                info.os = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
+                info->os = QStringLiteral("%1 %2 %3").arg(platform, arch, modification);
             }
         });
 
-        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo &info, const QString &tagName)
+        const auto parseFlags = [](const QJsonObject& object, rtu::BaseServerInfo *info, const QString &tagName)
         {
                 typedef QPair<QString, rtu::Constants::ServerFlag> TextFlagsInfo;
                 static const TextFlagsInfo kKnownFlags[] =
@@ -179,20 +192,20 @@ namespace
                     , TextFlagsInfo("SF_Has_HDD", rtu::Constants::ServerFlag::HasHdd)
                 };
 
-                info.flags = rtu::Constants::ServerFlag::NoFlags;
+                info->flags = rtu::Constants::ServerFlag::NoFlags;
                 const QString textFlags = object.value(tagName).toString();
                 for (const TextFlagsInfo &flagInfo: kKnownFlags)
                 {
                     if (textFlags.contains(flagInfo.first))
-                        info.flags |= flagInfo.second;
+                        info->flags |= flagInfo.second;
                 }
         };
 
-        result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+        result.insert(kServerFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo *info)
             { parseFlags(object, info, kServerFlagsTag); });
 
         /// Supports old versions of server where serverFlags field was "flags"
-        result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo &info)
+        result.insert(kFlagsTag, [parseFlags](const QJsonObject& object, rtu::BaseServerInfo *info)
             { parseFlags(object, info, kFlagsTag); });
         return result;
     }();
@@ -214,6 +227,7 @@ namespace /// Parsers stuff
     typedef std::function<bool (const QJsonObject &object
         , rtu::ExtraServerInfo &extraInfo)> ParseFunction;
 
+    // TODO mike: Add param: const rtu::BaseServerInfoPtr &baseServerInfo.
     rtu::RestClient::SuccessCallback makeReplyCallbackEx(
         const rtu::ExtraServerInfoSuccessCallback &successful
         , const rtu::OperationCallback &failed
@@ -222,8 +236,17 @@ namespace /// Parsers stuff
         , rtu::Constants::AffectedEntities affected
         , const ParseFunction &parser)
     {
-        const auto &result = [successful, failed, id, password, affected, parser](const QByteArray &data)
+        return [successful, failed, id, password, affected, parser](
+            const QByteArray &data)
         {
+// TODO mike: Add params: bool changedAccessibleByHttp, bool accessibleByHttp = false.
+#if 0
+            if (changedAccessibleByHttp)
+            {
+                baseServerInfo->accessibleByHttp = accessibleByHttp;
+                emit accessMethodChanged(id, accessibleByHttp);
+            }
+#endif // 0
             rtu::ExtraServerInfo extraInfo;
             const bool parsed = parser(QJsonDocument::fromJson(data.data()).object(), extraInfo);
                 
@@ -240,8 +263,6 @@ namespace /// Parsers stuff
                 failed(rtu::RequestError::kUnspecified, affected);
             }
         };
-
-        return result;
     }
 
     ///
@@ -380,21 +401,24 @@ namespace /// Parsers stuff
     rtu::RestClient::ErrorCallback makeErrorCallbackEx(const rtu::OperationCallbackEx &callback
         , rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](rtu::RequestError error)
-        {
-            if (callback)
-                callback(error, affected, false);
-        };
+        return
+            [callback, affected](rtu::RestClient::RequestResult restResult)
+            {
+                if (callback)
+                    callback(convertRestClientRequestResult(restResult), affected, false);
+            };
     }
 
-    rtu::RestClient::ErrorCallback makeErrorCallback(const rtu::OperationCallback &callback
-        , rtu::Constants::AffectedEntities affected)
+    rtu::RestClient::ErrorCallback makeErrorCallback(
+        const rtu::OperationCallback &callback,
+        rtu::Constants::AffectedEntities affected)
     {
-        return [callback, affected](rtu::RequestError error)
-        {
-            if (callback)
-                callback(error, affected);
-        };
+        return
+            [callback, affected](rtu::RestClient::RequestResult restResult)
+            {
+                if (callback)
+                    callback(convertRestClientRequestResult(restResult), affected);
+            };
     }
 
     ///
@@ -402,12 +426,12 @@ namespace /// Parsers stuff
     void checkAuth(const rtu::BaseServerInfoPtr &baseInfo
         , const QString &password
         , const rtu::OperationCallback &callback
-        , int timeout = rtu::RestClient::kUseStandardTimeout)
+        , qint64 timeoutMs)
     {
         static const rtu::Constants::AffectedEntities affected = rtu::Constants::kNoEntitiesAffected;
 
         const rtu::RestClient::Request request(baseInfo
-            , password, kModuleInfoAuthCommand, QUrlQuery(), timeout
+            , password, kModuleInfoAuthCommand, QUrlQuery(), timeoutMs
             , makeSuccessCallback(callback, affected), makeErrorCallback(callback, affected));
         rtu::RestClient::sendGet(request);
     }
@@ -455,39 +479,50 @@ namespace /// Parsers stuff
         , const QString &password
         , const rtu::ExtraServerInfoSuccessCallback &successCallback
         , const rtu::OperationCallback &failedCallback
-        , const qint64 timeout)
+        , qint64 timeoutMs)
     {
-        const auto failed = [failedCallback](rtu::RequestError /* error */)
+        const rtu::RestClient::ErrorCallback failed = 
+            [failedCallback](rtu::RestClient::RequestResult)
+            {
+                if (failedCallback)
+                {
+                    failedCallback(rtu::RequestError::kInternalAppError
+                        , rtu::Constants::kNoEntitiesAffected);
+                }
+            };
+
+        if (baseInfo->version < kExtraAbilitiesMinVersion)
         {
             if (failedCallback)
             {
                 failedCallback(rtu::RequestError::kInternalAppError
                     , rtu::Constants::kNoEntitiesAffected);
             }
-        };
-
-        if (baseInfo->version < kExtraAbilitiesMinVersion)
-        {
-            failed(rtu::RequestError::kRequestTimeout);
             return;
         }
 
         const auto id = baseInfo->id;
-        const auto success = [id, successCallback, failed](const QByteArray &data)
-        {
-            const QJsonObject &object = QJsonDocument::fromJson(data).object();
-            if (isErrorReply(object))
+        const auto success =
+            [id, successCallback, failedCallback](const QByteArray &data)
             {
-                failed(rtu::RequestError::kInternalAppError);
-                return;
-            }
+                const QJsonObject &object = QJsonDocument::fromJson(data).object();
+                if (isErrorReply(object))
+                {
+                    if (failedCallback)
+                    {
+                        failedCallback(rtu::RequestError::kInternalAppError
+                            , rtu::Constants::kNoEntitiesAffected);
+                    }
+                    return;
+                }
 
-            if (successCallback)
-                successCallback(id, extractScriptInfoFromAnswer(object));
-        };
+                if (successCallback)
+                    successCallback(id, extractScriptInfoFromAnswer(object));
+                // TODO mike: CURRENT byHttp
+            };
 
         const rtu::RestClient::Request request(baseInfo, password
-            , kScriptsList, QUrlQuery(), timeout, success, failed);
+            , kScriptsList, QUrlQuery(), timeoutMs, success, failed);
         rtu::RestClient::sendGet(request);
     }
 }
@@ -495,8 +530,10 @@ namespace /// Parsers stuff
 ///
 
 bool rtu::parseModuleInformationReply(const QJsonObject &reply
-    , rtu::BaseServerInfo &baseInfo)
+    , BaseServerInfo *baseInfo)
 {
+    assert(baseInfo);
+
     const QStringList &keys = reply.keys();
     for (const auto &key: keys)
     {
@@ -505,11 +542,11 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
             (*itHandler)(reply, baseInfo);
     }
 
-    if (baseInfo.version < kExtraAbilitiesMinVersion)
+    if (baseInfo->version < kExtraAbilitiesMinVersion)
     {
         /// Assume all versions less than kExtraAbilitiesMinVersion have hdd due
         /// to we can't discover state through the rest api
-        baseInfo.flags |= Constants::HasHdd;
+        baseInfo->flags |= Constants::HasHdd;
     }
     /*
     else
@@ -517,31 +554,36 @@ bool rtu::parseModuleInformationReply(const QJsonObject &reply
     */
 
     /// Before conversion baseInfo.os contains OS caps but not finalizaed OS/Type name
-    baseInfo.os = convertCapsToReadable(baseInfo.customization, baseInfo.os);
+    baseInfo->os = convertCapsToReadable(baseInfo->customization, baseInfo->os);
 
     return true;
 }
 
 ///
 
+const QStringList &rtu::defaultAdminPasswords()
+{
+    return RestClient::defaultAdminPasswords();
+}
+
 void rtu::multicastModuleInformation(const QUuid &id
     , const BaseServerInfoCallback &successCallback
     , const OperationCallback &failedCallback
-    , int timeout)
+    , qint64 timeoutMs)
 {
     static const Constants::AffectedEntities affected = Constants::AffectedEntities(
             Constants::kAllEntitiesAffected & ~Constants::kAllAddressFlagsAffected);
 
     static const QString kReplyTag = "reply";
     
-    const auto &successfull = [id, successCallback, failedCallback](const QByteArray &data)
+    const auto successful = [id, successCallback, failedCallback](const QByteArray &data)
     {
         BaseServerInfo resultInfo;
         resultInfo.id = id;
 
         const QJsonObject object = QJsonDocument::fromJson(data.data()).object();
         if (object.isEmpty() || isErrorReply(object) || !object.keys().contains(kReplyTag)
-            || !parseModuleInformationReply(object.value(kReplyTag).toObject(), resultInfo))
+            || !parseModuleInformationReply(object.value(kReplyTag).toObject(), &resultInfo))
         {
             if (failedCallback)
                 failedCallback(RequestError::kUnspecified, affected);
@@ -549,16 +591,17 @@ void rtu::multicastModuleInformation(const QUuid &id
         }
 
         if (successCallback)
-            successCallback(resultInfo);
+            successCallback(&resultInfo);
+        // TODO mike: CURRENT byHttp
     };
 
     BaseServerInfoPtr info = std::make_shared<BaseServerInfo>();
     info->id = id;
-    info->accessibleByHttp = false;  /// force multicast usage
+    info->accessibleByHttp = false; //< Force multicast usage.
 
     const QString &kModuleInformationCommand = kApiNamespaceTag + "moduleInformation";
     RestClient::Request request(info, QString(), kModuleInformationCommand, QUrlQuery()
-        , timeout, successfull, makeErrorCallback(failedCallback, affected));
+        , timeoutMs, successful, makeErrorCallback(failedCallback, affected));
     RestClient::sendGet(request);
 }
 
@@ -568,7 +611,7 @@ void rtu::getTime(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
-    , int timeout)
+    , qint64 timeoutMs)
 {
     static const Constants::AffectedEntities affected = 
         (Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
@@ -584,7 +627,7 @@ void rtu::getTime(const BaseServerInfoPtr &baseInfo
         successful, failed, baseInfo->id, password, affected, parser);
 
     const RestClient::Request request(baseInfo
-        , password, kGetTimeCommand, query,  timeout
+        , password, kGetTimeCommand, query,  timeoutMs
         , localSuccessful, makeErrorCallback(failed, affected));
 
     RestClient::sendGet(request);
@@ -596,19 +639,19 @@ void rtu::getIfList(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
-    , int timeout)
+    , qint64 timeoutMs)
 {
     static const Constants::AffectedEntities affected = Constants::kAllAddressFlagsAffected;
 
     const auto &parser = [](const QJsonObject &object, ExtraServerInfo &extraInfo)
         { return parseIfListCmd(object, extraInfo); };
 
-    const auto &ifListSuccessfull = makeReplyCallbackEx(
+    const auto &ifListSuccessful = makeReplyCallbackEx(
         successful, failed, baseInfo->id, password, affected, parser);
 
     const RestClient::Request request(baseInfo
-        , password, kIfListCommand, QUrlQuery(),  timeout
-        , ifListSuccessfull, makeErrorCallback(failed, affected));
+        , password, kIfListCommand, QUrlQuery(),  timeoutMs
+        , ifListSuccessful, makeErrorCallback(failed, affected));
     RestClient::sendGet(request);
 }
 
@@ -618,7 +661,7 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
-    , int timeout)
+    , qint64 timeoutMs)
 {
     static const Constants::AffectedEntities affected = (Constants::kAllAddressFlagsAffected 
         | Constants::kTimeZoneAffected | Constants::kDateTimeAffected);
@@ -632,7 +675,7 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
             failed(errorCode, affected);
     };
 
-    const auto &getTimeSuccessfull = [extraInfoStorage, baseInfo, password, successful, timeout]
+    const auto &getTimeSuccessful = [extraInfoStorage, baseInfo, password, successful, timeoutMs]
         (const QUuid &id, const rtu::ExtraServerInfo &extraInfo) 
     {
         /// getTime command is successfully executed up to now
@@ -644,41 +687,41 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         enum { kParallelCommandsCount = 2 };
         const IntPointer commandsLeft(new int(kParallelCommandsCount));
 
-        const auto condCallSuccessfull = [commandsLeft, successful]
+        const auto condCallSuccessful = [commandsLeft, successful]
             (const QUuid &id, const ExtraServerInfo &info)
         {
             if ((--(*commandsLeft) == 0) && successful)
                 successful(id, info);
         };
 
-        const auto &extraCommandsFailed = [extraInfoStorage, condCallSuccessfull, id]
+        const auto &extraCommandsFailed = [extraInfoStorage, condCallSuccessful, id]
             (const RequestError /* errorCode */, Constants::AffectedEntities /* affectedEntities */)
         {
-            /// Calls successfull, anyway, for old servers not supporting ifList
-            condCallSuccessfull(id, *extraInfoStorage);
+            /// Calls successful, anyway, for old servers not supporting ifList
+            condCallSuccessful(id, *extraInfoStorage);
         };
 
-        const auto &ifListSuccessful = [extraInfoStorage, condCallSuccessfull]
+        const auto &ifListSuccessful = [extraInfoStorage, condCallSuccessful]
             (const QUuid &id, const rtu::ExtraServerInfo &extraInfo)
         {
             extraInfoStorage->interfaces = extraInfo.interfaces;
-            condCallSuccessfull(id, *extraInfoStorage);
+            condCallSuccessful(id, *extraInfoStorage);
         };
 
-        const auto &extraFlagsSuccessful = [extraInfoStorage, condCallSuccessfull]
+        const auto &extraFlagsSuccessful = [extraInfoStorage, condCallSuccessful]
             (const QUuid &id, const ExtraServerInfo &extraInfo)
         {
             extraInfoStorage->sysCommands = extraInfo.sysCommands;
             extraInfoStorage->scriptNames = extraInfo.scriptNames;
-            condCallSuccessfull(id, *extraInfoStorage);
+            condCallSuccessful(id, *extraInfoStorage);
         };
 
-        getIfList(baseInfo, password, ifListSuccessful, extraCommandsFailed, timeout);
-        getScriptInfos(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeout);
+        getIfList(baseInfo, password, ifListSuccessful, extraCommandsFailed, timeoutMs);
+        getScriptInfos(baseInfo, password, extraFlagsSuccessful, extraCommandsFailed, timeoutMs);
     };
 
     const auto &callback = [extraInfoStorage, failed, baseInfo, password
-        , getTimeSuccessfull, getTimeFailed, timeout]
+        , getTimeSuccessful, getTimeFailed, timeoutMs]
         (const RequestError errorCode, Constants::AffectedEntities /* affectedEntities */)
     {
         if (errorCode != RequestError::kSuccess)
@@ -689,10 +732,10 @@ void rtu::getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         }
 
         extraInfoStorage->password = password;
-        getTime(baseInfo, password, getTimeSuccessfull, getTimeFailed, timeout);
+        getTime(baseInfo, password, getTimeSuccessful, getTimeFailed, timeoutMs);
     };
 
-    return checkAuth(baseInfo, password, callback, timeout);
+    return checkAuth(baseInfo, password, callback, timeoutMs);
 }
 
 ///
@@ -701,7 +744,7 @@ void rtu::sendIfListRequest(const BaseServerInfoPtr &info
     , const QString &password
     , const ExtraServerInfoSuccessCallback &successful
     , const OperationCallback &failed
-    , int timeout)
+    , qint64 timeoutMs)
 {
     if (!(info->flags & Constants::AllowIfConfigFlag))
     {
@@ -714,7 +757,7 @@ void rtu::sendIfListRequest(const BaseServerInfoPtr &info
         { return parseIfListCmd(object, extraInfo); };
     const auto &localSuccessful = makeReplyCallbackEx(successful, failed, info->id
         , password, Constants::kAllAddressFlagsAffected, parser);
-    const RestClient::Request request(info, password, kIfListCommand, QUrlQuery(), timeout
+    const RestClient::Request request(info, password, kIfListCommand, QUrlQuery(), timeoutMs
         , localSuccessful, makeErrorCallback(failed, Constants::kAllAddressFlagsAffected));
     RestClient::sendGet(request);
 }
@@ -726,7 +769,7 @@ void rtu::sendRestartRequest(const BaseServerInfoPtr &info
     , const OperationCallback &callback)
 { 
     const RestClient::Request request(info, password, kRestartCommand
-        , QUrlQuery(), RestClient::kUseStandardTimeout
+        , QUrlQuery(), kDefaultTimeoutMs
         , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
         , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
 
@@ -766,7 +809,7 @@ void rtu::sendSystemCommand(const BaseServerInfoPtr &info
     static const auto kExecutePathTemplate = QStringLiteral("%1/%2").arg(kExecuteCommand);
     
     const auto path = kExecutePathTemplate.arg(cmd);
-    const RestClient::Request request(info, password, path, QUrlQuery(), RestClient::kUseStandardTimeout
+    const RestClient::Request request(info, password, path, QUrlQuery(), kDefaultTimeoutMs
         , makeSuccessCallback(callback, Constants::kNoEntitiesAffected)
         , makeErrorCallback(callback, Constants::kNoEntitiesAffected));
 
@@ -796,9 +839,9 @@ void rtu::sendSetTimeRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(kDateTimeTag, QString::number(utcDateTimeMs));
     query.addQueryItem(kTimeZoneTag, timeZoneId);
     
-    enum { kSpecialTimeout = 30 * 1000 }; /// Due to server could apply time changes too long in some cases (Nx1 for example)
+    enum { kSpecialTimeoutMs = 30 * 1000 }; /// Due to server could apply time changes too long in some cases (Nx1 for example)
     const RestClient::Request request(baseInfo
-        , password, kSetTimeCommand, query, kSpecialTimeout
+        , password, kSetTimeCommand, query, kSpecialTimeoutMs
         , makeSuccessCallbackEx(callback, affected)
         , makeErrorCallbackEx(callback, affected)); 
     RestClient::sendGet(request);
@@ -825,7 +868,7 @@ void rtu::sendSetSystemNameRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
+        , password, kConfigureCommand, query, kDefaultTimeoutMs
         , makeSuccessCallbackEx(callback, Constants::kSystemNameAffected)
         , makeErrorCallbackEx(callback, Constants::kSystemNameAffected)); 
     RestClient::sendGet(request);
@@ -856,7 +899,7 @@ void rtu::sendSetPasswordRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, authPass);
     
     const RestClient::Request request(baseInfo
-        , authPass, kConfigureCommand, query, RestClient::kUseStandardTimeout
+        , authPass, kConfigureCommand, query, kDefaultTimeoutMs
         , makeSuccessCallbackEx(callback, Constants::kPasswordAffected)
         , makeErrorCallbackEx(callback, Constants::kPasswordAffected)); 
     RestClient::sendGet(request);
@@ -883,7 +926,7 @@ void rtu::sendSetPortRequest(const BaseServerInfoPtr &baseInfo
     query.addQueryItem(oldPasswordTag, password);
 
     const RestClient::Request request(baseInfo
-        , password, kConfigureCommand, query, RestClient::kUseStandardTimeout
+        , password, kConfigureCommand, query, kDefaultTimeoutMs
         , makeSuccessCallbackEx(callback, Constants::kPortAffected)
         , makeErrorCallbackEx(callback, Constants::kPortAffected)); 
     RestClient::sendGet(request);
@@ -943,7 +986,7 @@ void rtu::sendChangeItfRequest(const BaseServerInfoPtr &baseInfo
     }
 
     const RestClient::Request request(baseInfo, password, kIfConfigCommand, QUrlQuery()
-        , RestClient::kUseStandardTimeout, makeSuccessCallbackEx(callback, affected)
+        , kDefaultTimeoutMs, makeSuccessCallbackEx(callback, affected)
         , makeErrorCallbackEx(callback, affected));
     RestClient::sendPost(request, QJsonDocument(jsonInfoChanges).toJson());
 }

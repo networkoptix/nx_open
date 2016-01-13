@@ -7,7 +7,6 @@
 #include <QElapsedTimer>
 #include <QHostAddress>
 
-#include <base/types.h>
 #include <base/requests.h>
 #include <base/changeset.h>
 #include <base/selection.h>
@@ -665,7 +664,7 @@ void rtu::ApplyChangesTask::Impl::checkReachability(const ThisWeakPtr &weak
             shared->removeAwatingOp(weakOp, RequestError::kSuccess, affectedEntities);
         };
 
-        getServerExtraInfo(item.first, item.second.password, success, failed);
+        getServerExtraInfo(item.first, item.second.password, success, failed, kDefaultTimeoutMs);
     });
 }
 

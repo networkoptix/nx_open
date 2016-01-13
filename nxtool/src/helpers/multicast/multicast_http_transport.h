@@ -11,35 +11,6 @@
 
 namespace QnMulticast
 {
-    enum class MessageType
-    {
-        request,
-        response
-    };
-
-
-    struct Packet
-    {
-        Packet();
-
-        static const int MAX_DATAGRAM_SIZE;
-        static const int MAX_PAYLOAD_SIZE;
-
-        QUuid magic;
-        int version;
-        QUuid requestId;
-        QUuid clientId;
-        QUuid serverId;
-        MessageType messageType;
-        int messageSize;
-        int offset;
-        QByteArray payloadData;
-
-        QByteArray serialize() const;
-        static Packet deserialize(const QByteArray& deserialize, bool* ok);
-    };
-
-
     class Transport: public QObject
     {
         Q_OBJECT
@@ -93,6 +64,33 @@ namespace QnMulticast
         QElapsedTimer m_checkInterfacesTimer;
         QSet<QString> m_localAddressList;
     private:
+        enum class MessageType
+        {
+            request,
+            response
+        };
+
+        struct Packet
+        {
+            Packet();
+
+            static const int MAX_DATAGRAM_SIZE;
+            static const int MAX_PAYLOAD_SIZE;
+
+            QUuid magic;
+            int version;
+            QUuid requestId;
+            QUuid clientId;
+            QUuid serverId;
+            MessageType messageType;
+            int messageSize;
+            int offset;
+            QByteArray payloadData;
+
+            QByteArray serialize() const;
+            static Packet deserialize(const QByteArray& deserialize, bool* ok);
+        };
+
         QByteArray serializeMessage(const Request& request) const;
         TransportConnection serializeRequest(const Request& request);
         TransportConnection serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse);

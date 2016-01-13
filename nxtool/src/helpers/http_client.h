@@ -1,10 +1,10 @@
 
 #pragma once
 
+#include <memory>
 #include <functional>
-
-#include <base/types.h>
-#include <helpers/rest_client.h>
+#include <QtGlobal>
+#include <QByteArray>
 
 class QUrl;
 class QByteArray;
@@ -14,8 +14,9 @@ namespace rtu
     class HttpClient
     {
     public:
+        enum class RequestResult;
         typedef std::function<void (const QByteArray &data)> ReplyCallback;
-        typedef std::function<void (RequestError errorCode)> ErrorCallback;
+        typedef std::function<void (RequestResult errorCode)> ErrorCallback;
         
         enum
         {
@@ -24,42 +25,47 @@ namespace rtu
             , kHttpUnauthorized = 401
         };
 
-        HttpClient(int defaultTimeoutMs);
-        
+        HttpClient();
         virtual ~HttpClient();
         
-        /** Send get request to the given url.
+        /**
+         * Send get request to the given url.
+         * @param timeoutMs             Timeout. Should be greater than zero.
          * @param url                   Target url.
-         * @param sucessfullCallback    Callback that should be used in case of success.
+         * @param successfulCallback    Callback that should be used in case of success.
          * @param errorCallback         Callback that should be used in case of error.
-         * @param timeoutMs             Optional timeout value. 
-         *                              Negative value means wait forever.
-         *                              Zero means default value (defined in the implementation).
          */
         void sendGet(const QUrl &url
-            , const ReplyCallback &sucessfullCallback = ReplyCallback()
-            , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = RestClient::kUseStandardTimeout);
+            , qint64 timeoutMs
+            , const ReplyCallback &successfulCallback = ReplyCallback()
+            , const ErrorCallback &errorCallback = ErrorCallback()          );
         
-        /** Send post request to the given url.
+        /**
+         * Send post request to the given url.
+         * @param timeoutMs             Timeout. Should be greater than zero.
          * @param url                   Target url.
          * @param data                  Post data.
-         * @param sucessfullCallback    Callback that should be used in case of success.
+         * @param sucessfulCallback    Callback that should be used in case of success.
          * @param errorCallback         Callback that should be used in case of error.
-         * @param timeoutMs             Optional timeout value. 
-         *                              Negative value means wait forever.
-         *                              Zero means default value (defined in the implementation).
          */
         void sendPost(const QUrl &url
+            , qint64 timeoutMs
             , const QByteArray &data = QByteArray()
-            , const ReplyCallback &successfullCallback = ReplyCallback()
-            , const ErrorCallback &errorCallback = ErrorCallback()
-            , qint64 timeoutMs = RestClient::kUseStandardTimeout);
+            , const ReplyCallback &successfulCallback = ReplyCallback()
+            , const ErrorCallback &errorCallback = ErrorCallback());
         
     private:
         class Impl;
         typedef std::unique_ptr<Impl> ImplPtr;
 
         const ImplPtr m_impl;
+    };
+
+    enum class HttpClient::RequestResult
+    {              
+        kSuccess,
+        kRequestTimeout,
+        kUnauthorized,
+        kUnspecified,
     };
 }

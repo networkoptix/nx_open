@@ -1,7 +1,6 @@
 
 #include "changes_summary_model.h"
 
-#include <base/server_info.h>
 #include <helpers/model_change_helper.h>
 
 namespace

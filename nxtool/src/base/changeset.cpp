@@ -3,8 +3,6 @@
 
 #include <QHostAddress>
 
-#include <base/requests.h>
-
 #include <helpers/qml_helpers.h>
 #include <helpers/time_helper.h>
 

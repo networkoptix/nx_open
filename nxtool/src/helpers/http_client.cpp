@@ -51,21 +51,21 @@ namespace
 class rtu::HttpClient::Impl : public QObject
 {
 public:
-    Impl(int defaultTimeoutMs);
+    Impl();
     
     virtual ~Impl();
     
     void sendGet(const QUrl &url
-        , const ReplyCallback &successfullCallback
-        , const ErrorCallback &errorCallback
         , qint64 timeoutMs
+        , const ReplyCallback &successfulCallback
+        , const ErrorCallback &errorCallback
         );
 
     void sendPost(const QUrl &url
+        , qint64 timeoutMs
         , const QByteArray &data
         , const ReplyCallback &sucessfullCallback
         , const ErrorCallback &errorCallback
-        , qint64 timeoutMs
         );
     
 private:
@@ -83,14 +83,12 @@ private:
     };
     typedef QMap<QNetworkReply *, ReplyInfo> RepliesMap;
     
-    const int m_defaultTimeoutMs;
     QNetworkAccessManager * const m_manager;
     RepliesMap m_replies;
 };
 
-rtu::HttpClient::Impl::Impl(int defaultTimeoutMs)
+rtu::HttpClient::Impl::Impl()
     : QObject()
-    , m_defaultTimeoutMs(defaultTimeoutMs)
     , m_manager(new QNetworkAccessManager(this))
     , m_replies()
 {
@@ -102,37 +100,35 @@ rtu::HttpClient::Impl::~Impl()
 }
 
 void rtu::HttpClient::Impl::sendGet(const QUrl &url
-    , const ReplyCallback &successfullCallback
-    , const ErrorCallback &errorCallback
-    , qint64 timeoutMs)
+    , qint64 timeoutMs
+    , const ReplyCallback &successfulCallback
+    , const ErrorCallback &errorCallback)
 {
     QNetworkReply *reply = m_manager->get(QNetworkRequest(url));
     logReply(reply, "sending get command");
     setupTimeout(reply, timeoutMs);
     m_replies.insert(reply
-        , ReplyInfo(successfullCallback, errorCallback));
+        , ReplyInfo(successfulCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::sendPost(const QUrl &url
+    , qint64 timeoutMs
     , const QByteArray &data
-    , const ReplyCallback &successfullCallback
-    , const ErrorCallback &errorCallback
-    , qint64 timeoutMs)
+    , const ReplyCallback &successfulCallback
+    , const ErrorCallback &errorCallback)
 {
     QNetworkReply *reply = m_manager->post(preparePostJsonRequestRequest(url), data);
     logReply(reply, "sending post command");
     setupTimeout(reply, timeoutMs);
     m_replies.insert(reply
-        , ReplyInfo(successfullCallback, errorCallback));
+        , ReplyInfo(successfulCallback, errorCallback));
 }
 
 void rtu::HttpClient::Impl::setupTimeout(QNetworkReply *reply, qint64 timeoutMs) 
 {
-    if ((timeoutMs < 0) && (timeoutMs != RestClient::kUseStandardTimeout))
-        return;
-
-    if (timeoutMs == RestClient::kUseStandardTimeout)
-        timeoutMs = m_defaultTimeoutMs;
+    Q_ASSERT(timeoutMs > 0);
+    if (timeoutMs <= 0)
+        return; //< No timeout - wait forever.
 
     QPointer<QNetworkReply> replyPtr(reply);
     QTimer::singleShot(timeoutMs, [replyPtr] {
@@ -168,25 +164,25 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
             switch(errorCode)
             {
             case QNetworkReply::AuthenticationRequiredError:
-                errorCallback(RequestError::kUnauthorized);
+                errorCallback(RequestResult::kUnauthorized);
                 break;
             case QNetworkReply::OperationCanceledError:
             case QNetworkReply::TimeoutError:
-                errorCallback(RequestError::kRequestTimeout);
+                errorCallback(RequestResult::kRequestTimeout);
                 break;
             case QNetworkReply::NoError:
             {
                 if (!isHttpError)
-                    errorCallback(RequestError::kSuccess);
+                    errorCallback(RequestResult::kSuccess);
                 else if (httpCode == kHttpUnauthorized)
-                    errorCallback(RequestError::kUnauthorized);
+                    errorCallback(RequestResult::kUnauthorized);
                 else
-                    errorCallback(RequestError::kUnspecified);
+                    errorCallback(RequestResult::kUnspecified);
 
                 break;
             }
             default:
-                errorCallback(RequestError::kUnspecified);
+                errorCallback(RequestResult::kUnspecified);
             }
         }
     }
@@ -199,30 +195,32 @@ void rtu::HttpClient::Impl::onReply(QNetworkReply *reply)
 
 ///
 
-rtu::HttpClient::HttpClient(int defaultTimeoutMs)
-    : m_impl(new Impl(defaultTimeoutMs))
+rtu::HttpClient::HttpClient()
+    : m_impl(new Impl())
 {
+    // Do nothing.
 }
 
 rtu::HttpClient::~HttpClient()
 {
+    // Do nothing.
 }
 
 void rtu::HttpClient::sendGet(const QUrl &url
+    , qint64 timeoutMs
     , const ReplyCallback &sucessfullCallback
-    , const ErrorCallback &errorCallback
-    , qint64 timeoutMs)
+    , const ErrorCallback &errorCallback)
 {
-    m_impl->sendGet(url, sucessfullCallback, errorCallback, timeoutMs);    
+    m_impl->sendGet(url, timeoutMs, sucessfullCallback, errorCallback);    
 }
 
 void rtu::HttpClient::sendPost(const QUrl &url
+    , qint64 timeoutMs
     , const QByteArray &data
-    , const ReplyCallback &successfullCallback
-    , const ErrorCallback &errorCallback
-    , qint64 timeoutMs)
+    , const ReplyCallback &successfulCallback
+    , const ErrorCallback &errorCallback)
 {
-    m_impl->sendPost(url, data, successfullCallback, errorCallback, timeoutMs);
+    m_impl->sendPost(url, timeoutMs, data, successfulCallback, errorCallback);
 }
 
 

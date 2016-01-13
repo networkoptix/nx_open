@@ -1,6 +1,10 @@
 
 #pragma once
 
+#include <memory>
+
+#include <QVector>
+#include <QList>
 #include <QUuid>
 #include <QFlag>
 #include <QString>
@@ -14,6 +18,16 @@
 
 namespace rtu
 {
+    struct InterfaceInfo;
+    struct BaseServerInfo;
+    struct ExtraServerInfo;
+    class ServerInfo;
+
+    typedef QList<InterfaceInfo> InterfaceInfoList;
+    typedef QVector<ServerInfo *> ServerInfoPtrContainer;
+    typedef QVector<ServerInfo> ServerInfoContainer;
+    typedef std::shared_ptr<ServerInfo> ServerInfoPtr;
+    typedef std::shared_ptr<BaseServerInfo> BaseServerInfoPtr;
 
     struct InterfaceInfo
     {
@@ -44,8 +58,6 @@ namespace rtu
     bool operator != (const InterfaceInfo &first
         , const InterfaceInfo &second);
 
-    typedef QList<InterfaceInfo> InterfaceInfoList;
-    
     struct BaseServerInfo
     {
         QUuid id;

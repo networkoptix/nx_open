@@ -8,6 +8,7 @@
 
 namespace QnMulticast
 {
+    // TODO mike: Rename to RequestResult.
     enum class ErrCode
     {
         ok           = 0,
@@ -51,6 +52,5 @@ namespace QnMulticast
         int httpResult;
     };
     typedef std::function<void(const QUuid& requestId, ErrCode errCode, const Response& response)> ResponseCallback;
-    //typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpData)> RequestCallback;
     typedef std::function<void(const QUuid& requestId, const QUuid& clientId, const Request& request)> RequestCallback;
 }

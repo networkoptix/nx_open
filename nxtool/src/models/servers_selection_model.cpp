@@ -1,13 +1,12 @@
 
 #include "servers_selection_model.h"
 
+#include <cassert>
 #include <functional>
 
 #include <QUuid>
 
-#include <base/server_info.h>
 #include <base/requests.h>
-#include <helpers/rest_client.h>
 #include <helpers/server_info_manager.h>
 #include <helpers/model_change_helper.h>
 
@@ -429,7 +428,7 @@ public:
         , RequestError errorCode);
 
     bool findServer(const QUuid &id
-        , ItemSearchInfo &searchInfo);
+        , ItemSearchInfo *searchInfo);
 
     void setLockedState(const IDsVector &ids
         , bool locked
@@ -572,7 +571,7 @@ QVariant rtu::ServersSelectionModel::Impl::knownEntitiesData(int row
         case kPortRoleId:
             return info.baseInfo().port;
         case kDefaultPassword:
-            return (info.hasExtraInfo() && rtu::RestClient::defaultAdminPasswords().contains(info.extraInfo().password));
+            return (info.hasExtraInfo() && defaultAdminPasswords().contains(info.extraInfo().password));
         }
     }
     else
@@ -932,7 +931,7 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfo(const QUuid &id
     /// server is discovered and logged in
 
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
 
     updatePasswordInfo(searchInfo, extraInfo.password);
@@ -949,7 +948,7 @@ void rtu::ServersSelectionModel::Impl::updateExtraInfoFailed(const QUuid &id
 {
     /// Server is not available or can't be logged in
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
 
     const ServerLoggedState newLoggedState = (errorCode == RequestError::kUnauthorized 
@@ -1109,7 +1108,7 @@ void rtu::ServersSelectionModel::Impl::updateSystemNameInfo(const QUuid &id
     , const QString &systemName)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
     
     BaseServerInfo base =
@@ -1123,7 +1122,7 @@ void rtu::ServersSelectionModel::Impl::updatePortInfo(const QUuid &id
     , int port)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
     
     BaseServerInfo base =
@@ -1144,10 +1143,11 @@ void rtu::ServersSelectionModel::Impl::blinkForItem(int row)
 void rtu::ServersSelectionModel::Impl::serverDiscovered(const BaseServerInfo &baseInfo)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(baseInfo.id, searchInfo))
+    if (!findServer(baseInfo.id, &searchInfo))
         return;
     
-    enum { kUpdatePeriod = RestClient::kDefaultTimeoutMs * 3 };  /// At least x3 because there is http and multicast timeouts can be occured
+    // At least x3 because http and multicast timeouts can occur.
+    enum { kUpdatePeriod = kDefaultTimeoutMs * 3 };
 
     /// TODO: #ynikitenkov change for QElapsedTimer implementation
     const qint64 now = QDateTime::currentMSecsSinceEpoch();
@@ -1233,7 +1233,7 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
     , bool outdate)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(baseInfo.id, searchInfo))
+    if (!findServer(baseInfo.id, &searchInfo))
         return;
     
     unknownRemoved(baseInfo.hostAddress);
@@ -1287,8 +1287,10 @@ void rtu::ServersSelectionModel::Impl::changeServer(const BaseServerInfo &baseIn
 }
 
 bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
-    , ItemSearchInfo &searchInfo)
+    , ItemSearchInfo *searchInfo)
 {
+    assert(searchInfo != nullptr);
+
     int rowIndex = 0;
     for(auto itSystem = m_systems.begin(); itSystem != m_systems.end(); ++itSystem)
     {
@@ -1296,7 +1298,7 @@ bool rtu::ServersSelectionModel::Impl::findServer(const QUuid &id
         {
             if (itServer->serverInfo.baseInfo().id == id)
             {
-                searchInfo = ItemSearchInfo(itSystem, itServer, rowIndex
+                *searchInfo = ItemSearchInfo(itSystem, itServer, rowIndex
                     , rowIndex + kSystemItemCapacity + (itServer - itSystem->servers.begin()));
                 return true;
             }
@@ -1314,7 +1316,7 @@ void rtu::ServersSelectionModel::Impl::setLockedState(const IDsVector &ids
     for (const QUuid &id: ids)
     {
         ItemSearchInfo searchInfo;
-        if (!findServer(id, searchInfo))
+        if (!findServer(id, &searchInfo))
             continue;
 
         enum { kItemNotFoundIndex = -1 };
@@ -1359,7 +1361,7 @@ void rtu::ServersSelectionModel::Impl::changeAccessMethod(const QUuid &id
     , bool byHttp)
 {
     ItemSearchInfo searchInfo;
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
 
     searchInfo.serverInfoIterator->serverInfo.writableBaseInfo().accessibleByHttp = byHttp;
@@ -1452,7 +1454,7 @@ void rtu::ServersSelectionModel::Impl::removeServerImpl(const QUuid &id
 {
     ItemSearchInfo searchInfo;
     
-    if (!findServer(id, searchInfo))
+    if (!findServer(id, &searchInfo))
         return;
     
     if (searchInfo.serverInfoIterator->locked && !forceRemove)
@@ -1547,7 +1549,7 @@ void rtu::ServersSelectionModel::serverDiscovered(const BaseServerInfo &baseInfo
 void rtu::ServersSelectionModel::addServer(const BaseServerInfo &baseInfo)
 {
     ItemSearchInfo searchInfo;
-    if (m_impl->findServer(baseInfo.id, searchInfo))
+    if (m_impl->findServer(baseInfo.id, &searchInfo))
     {
         Q_ASSERT_X(searchInfo.serverInfoIterator->locked
             , Q_FUNC_INFO, "Server should be locked in this situation");
@@ -1594,7 +1596,7 @@ void rtu::ServersSelectionModel::updateTimeDateInfo(const QUuid &id
     , qint64 timestampMs)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findServer(id, searchInfo))
+    if (!m_impl->findServer(id, &searchInfo))
         return;
 
     m_impl->updateTimeDateInfo(searchInfo, utcDateTimeMs, timeZoneId, timestampMs);
@@ -1605,7 +1607,7 @@ void rtu::ServersSelectionModel::updateInterfacesInfo(const QUuid &id
     , const InterfaceInfoList &interfaces)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findServer(id, searchInfo))
+    if (!m_impl->findServer(id, &searchInfo))
         return;
 
     m_impl->updateInterfacesInfo(searchInfo, interfaces, host);
@@ -1627,7 +1629,7 @@ void rtu::ServersSelectionModel::updatePasswordInfo(const QUuid &id
     , const QString &password)
 {
     ItemSearchInfo searchInfo;
-    if (!m_impl->findServer(id, searchInfo))
+    if (!m_impl->findServer(id, &searchInfo))
         return;
 
     m_impl->updatePasswordInfo(searchInfo, password);

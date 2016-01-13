@@ -13,9 +13,9 @@ static const int HTTP_NOT_AUTHORIZED = 401;
 
 HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
     m_transport(localGuid.isNull() ? QUuid::createUuid() : localGuid),
-    m_defaultTimeoutMs(NO_TIMEOUT),
     m_userAgent(userAgent)
 {
+    // Do nothing.
 }
 
 QByteArray HTTPClient::createUserPasswordDigest(
@@ -107,8 +107,6 @@ void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& respons
 
 QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback, int timeoutMs)
 {
-    if (timeoutMs == NO_TIMEOUT)
-        timeoutMs = m_defaultTimeoutMs;
     auto requestId = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId, ErrCode errCode, const Response& response) 
     {
         if (response.httpResult == HTTP_NOT_AUTHORIZED) {
@@ -137,12 +135,6 @@ void HTTPClient::cancelRequest(const QUuid& requestId)
     m_transport.cancelRequest(requestId);
     m_transport.cancelRequest(m_requestsPairs.value(requestId));
     m_requestsPairs.remove(requestId);
-}
-
-void HTTPClient::setDefaultTimeout(int timeoutMs)
-{
-    Q_ASSERT(timeoutMs > 0);
-    m_defaultTimeoutMs = timeoutMs;
 }
 
 }

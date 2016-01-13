@@ -1,6 +1,7 @@
 
 #include "selection.h"
 
+#include <base/constants.h>
 #include <base/server_info.h>
 #include <helpers/time_helper.h>
 #include <helpers/qml_helpers.h>

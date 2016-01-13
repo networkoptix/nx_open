@@ -7,8 +7,6 @@
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
 #include <base/apply_changes_task.h>
-#include <models/time_zones_model.h>
-#include <models/ip_settings_model.h>
 #include <models/changes_progress_model.h>
 #include <models/servers_selection_model.h>
 

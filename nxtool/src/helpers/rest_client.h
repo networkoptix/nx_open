@@ -6,22 +6,22 @@
 
 #include <QUrlQuery>
 
-#include <base/types.h>
 #include <base/server_info.h>
 
 namespace rtu
 {
+    // TODO mike: Convert to a singleton.
     /// @brief Sends REST requests to the specified server according to it availability 
     /// through the HTTP or multicast
     class RestClient : public QObject
     {
         Q_OBJECT
     public:
-        enum { kUseStandardTimeout = -1 };
-        enum { kDefaultTimeoutMs = 10 * 1000 };
-
+        enum class RequestResult;
         struct Request;
-        typedef std::function<void (RequestError errorCode)> ErrorCallback;
+
+        // TODO mike: Add params: enum class HttpAccessType {tcp, udp, noChange}.
+        typedef std::function<void (RequestResult errorCode)> ErrorCallback;
         typedef std::function<void (const QByteArray &data)> SuccessCallback;
 
     public:
@@ -39,7 +39,7 @@ namespace rtu
     signals:
         /// Emits when command has failed by http, but successfully executed by multicast
         void accessMethodChanged(const QUuid &id    
-            , bool byHttp); /// TODO: change "byHttp" to enum later
+            , bool byHttp); /// TODO mike: change "byHttp" to enum with 2 values.
 
     private:
         RestClient();
@@ -50,9 +50,17 @@ namespace rtu
         class Impl;
         typedef std::unique_ptr<Impl> ImplPtr;
 
-        static RestClient::Impl& implInstance();
+        static Impl& implInstance();
 
         const ImplPtr m_impl;
+    };
+
+    enum class RestClient::RequestResult
+    {
+        kSuccess,
+        kRequestTimeout,
+        kUnauthorized,
+        kUnspecified,
     };
 
     struct RestClient::Request
@@ -62,7 +70,7 @@ namespace rtu
 
         QString path;
         QUrlQuery params;
-        qint64 timeout;
+        qint64 timeoutMs;
 
         SuccessCallback replyCallback;
         ErrorCallback errorCallback;

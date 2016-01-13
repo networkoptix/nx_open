@@ -4,7 +4,6 @@
 #include <functional>
 
 #include <base/types.h>
-#include <base/selection.h>
 #include <helpers/model_change_helper.h>
 
 namespace

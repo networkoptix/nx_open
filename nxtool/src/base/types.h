@@ -15,15 +15,6 @@ namespace rtu
 {
     typedef QHash<int, QByteArray> Roles;
 
-    class ServerInfo;
-    typedef QVector<ServerInfo *> ServerInfoPtrContainer;
-    typedef QVector<ServerInfo> ServerInfoContainer;
-    typedef std::shared_ptr<ServerInfo> ServerInfoPtr;
-
-    struct BaseServerInfo;
-    typedef std::shared_ptr<BaseServerInfo> BaseServerInfoPtr;
-
-
     typedef QVector<QUuid> IDsVector;
 
     class Changeset;
@@ -43,15 +34,4 @@ namespace rtu
 
     class ChangesProgressModel;
     typedef std::unique_ptr<ChangesProgressModel> ChangesProgressModelPtr;
-
-    enum class RequestError
-    {
-        kSuccess
-        , kRequestTimeout
-        , kUnauthorized
-        , kInternalAppError
-        , kInvalidParam
-        , kUnspecified
-    };
-
 }

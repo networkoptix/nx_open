@@ -56,7 +56,7 @@ rtu::VersionHolder::VersionHolder(const QString &str)
         { m_data[index] = value; };
 
     const std::size_t count = (versionParts.size() > m_data.size() ? m_data.size() : versionParts.size());
-    for (std::size_t i = 0; i != count; ++i)
+    for (int i = 0; i != count; ++i)
         setData(i, versionParts.at(i).toInt());
 }
 

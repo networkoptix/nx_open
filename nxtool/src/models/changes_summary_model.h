@@ -3,6 +3,7 @@
 
 #include <QAbstractListModel>
 
+#include <base/server_info.h>
 #include <base/types.h>
 
 namespace rtu

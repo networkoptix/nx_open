@@ -3,7 +3,7 @@
 
 #include <QStringListModel>
 
-#include <base/types.h>
+#include <base/server_info.h>
 
 namespace rtu
 {

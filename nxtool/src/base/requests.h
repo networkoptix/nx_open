@@ -7,16 +7,33 @@
 
 #include <base/types.h>
 #include <base/server_info.h>
-#include <helpers/http_client.h>
 
 class QDateTime;
 class QTimeZone;
 class QString;
 
+// TODO mike: RENAME
 namespace rtu
 {
+    // TODO mike: Convert to QObject.
+
+    // TODO mike: Rename to RequestResult.
+    enum class RequestError
+    {
+        kSuccess
+        , kRequestTimeout
+        , kUnauthorized
+        , kInternalAppError
+        , kInvalidParam
+        , kUnspecified
+    };
+
     bool parseModuleInformationReply(const QJsonObject &reply
-        , rtu::BaseServerInfo &baseInfo);
+        , BaseServerInfo *baseInfo);
+
+    const QStringList &defaultAdminPasswords();
+
+    const qint64 kDefaultTimeoutMs = 10 * 1000;
 
     ///
 
@@ -54,7 +71,7 @@ namespace rtu
         , const QTimeZone &timeZone
         , const QDateTime &timestamp)> DateTimeCallbackType;
     
-    typedef std::function<void (BaseServerInfo &info)> BaseServerInfoCallback;
+    typedef std::function<void (BaseServerInfo *info)> BaseServerInfoCallback;
 
     typedef std::function<void (const QUuid &id
         , const ExtraServerInfo &extraInfo)> ExtraServerInfoSuccessCallback;
@@ -62,33 +79,33 @@ namespace rtu
     void multicastModuleInformation(const QUuid &id
         , const BaseServerInfoCallback &successCallback
         , const OperationCallback &failedCallback
-        , int timeout);
+        , qint64 timeoutMs);
 
     void getTime(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = RestClient::kUseStandardTimeout);
+        , qint64 timeoutMs);
 
     void getIfList(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = RestClient::kUseStandardTimeout);
+        , qint64 timeoutMs);
 
     /// Checks authorization and sends getTime and getIfList consequentially. 
-    /// If authorized and getTime is successful, calls successfull callback anyway
+    /// If authorized and getTime is successful, calls successful callback anyway.
     void getServerExtraInfo(const BaseServerInfoPtr &baseInfo
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = RestClient::kUseStandardTimeout);
+        , qint64 timeoutMs);
 
     void sendIfListRequest(const BaseServerInfoPtr &info
         , const QString &password
         , const ExtraServerInfoSuccessCallback &successful
         , const OperationCallback &failed
-        , int timeout = RestClient::kUseStandardTimeout);
+        , qint64 timeoutMs);
 
     void sendRestartRequest(const BaseServerInfoPtr &info
         , const QString &password

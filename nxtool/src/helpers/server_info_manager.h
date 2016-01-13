@@ -5,13 +5,11 @@
 
 #include <QObject>
 
-#include <base/types.h>
+#include <base/server_info.h>
+#include <base/requests.h>
 
 namespace rtu
 {
-    struct BaseServerInfo;
-    struct ExtraServerInfo;
-    
     class ServerInfoManager : public QObject
     {
         Q_OBJECT

@@ -17,8 +17,8 @@
 namespace QnMulticast
 {
 
-const int Packet::MAX_DATAGRAM_SIZE = 1412;
-const int Packet::MAX_PAYLOAD_SIZE = Packet::MAX_DATAGRAM_SIZE - 167;
+const int Transport::Packet::MAX_DATAGRAM_SIZE = 1412;
+const int Transport::Packet::MAX_PAYLOAD_SIZE = Transport::Packet::MAX_DATAGRAM_SIZE - 167;
 
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
@@ -35,8 +35,8 @@ static const int DELAY_IF_OVERFLOW_MS = 100;           // delay if send buffer o
 
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to ignore UDP duplicates
 static const int CSV_COLUMNS = 9;
-static char CSV_DELIMITER = ';';
-static char EMPTY_DATA_FILLER = '\x0';
+static const char CSV_DELIMITER = ';';
+static const char EMPTY_DATA_FILLER = '\x0';
 
 static const int INTERFACE_LIST_CHECK_INTERVAL = 1000 * 15;
 
@@ -130,7 +130,7 @@ bool setMulticastIF(int fd, const QString& multicastIF)
 
 // ----------- Packet ------------------
 
-Packet::Packet():
+Transport::Packet::Packet():
     magic(PROTO_MAGIC), 
     version(PROTO_VERSION), 
     messageSize(0), 
@@ -139,7 +139,7 @@ Packet::Packet():
 
 }
 
-QByteArray Packet::serialize() const
+QByteArray Transport::Packet::serialize() const
 {
     QByteArray result;
     result.append(magic.toString()).append(CSV_DELIMITER);             // magic
@@ -155,24 +155,29 @@ QByteArray Packet::serialize() const
     return result;
 }
 
-Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
+Transport::Packet Transport::Packet::deserialize(const QByteArray& str, bool* success)
 {
     Packet result;
-    QList<QByteArray> fields = deserialize.split(CSV_DELIMITER);
-    *ok = false;
+    QList<QByteArray> fields = str.split(CSV_DELIMITER);
+    *success = false;
     if (fields.size() != CSV_COLUMNS)
-        return result; // error
+        return result; //< error
 
     result.magic     = QUuid(fields[0]);
     result.version   = fields[1].toInt();
 
     if (result.magic != PROTO_MAGIC || result.version != PROTO_VERSION)
-        return result; // error
+        return result; //< error
 
     result.requestId   = QUuid(fields[2]);
     result.clientId    = QUuid(fields[3]);
     result.serverId    = QUuid(fields[4]);
-    result.messageType = (MessageType) fields[5].toInt();
+
+    if (fields[5].toInt() == 0)
+        result.messageType = MessageType::request;
+    else
+        result.messageType = MessageType::response;
+
     result.messageSize = fields[6].toInt();
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
@@ -180,7 +185,7 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     if (result.offset + result.payloadData.size() > result.messageSize)
         return result; // error
 
-    *ok = true;
+    *success = true;
     return result;
 }
 
@@ -477,9 +482,9 @@ void Transport::at_socketReadyRead()
         int gotBytes = m_recvSocket->readDatagram(datagram.data(), datagram.size());
         if (gotBytes <= 0)
             continue;
-        bool ok;
-        Packet packet = Packet::deserialize(datagram, &ok);
-        if (!ok)
+        bool success;
+        Packet packet = Packet::deserialize(datagram, &success);
+        if (!success)
             continue;
 
         auto itr = std::find_if(m_requests.begin(), m_requests.end(), [packet](const TransportConnection& conn) {
