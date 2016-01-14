@@ -3,12 +3,15 @@
 * a.kolesnikov
 ***********************************************************/
 
+#include "custom_printers.h"
+
 #include <iostream>
 #include <string>
 
 #include <QByteArray>
 #include <QString>
 #include <cdb/system_data.h>
+
 
 void PrintTo(const QByteArray& val, ::std::ostream* os) {
     *os << std::string(val.constData(), val.size());
@@ -23,4 +26,9 @@ void PrintTo(const boost::optional<nx::cdb::api::SystemData>& val, ::std::ostrea
         *os << "SystemData" << &val.get();
     else
         *os << "boost::none";
+}
+
+void PrintTo(const SocketAddress& val, ::std::ostream* os)
+{
+    *os << val.toString().toStdString();
 }

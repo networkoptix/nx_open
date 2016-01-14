@@ -23,7 +23,9 @@
 #include <utils/common/systemerror.h>
 
 #include "listening_peer_pool.h"
+#include "listening_peer_registrator.h"
 #include "mediaserver_api.h"
+#include "server/cloud_connect_processor.h"
 #include "settings.h"
 #include "version.h"
 
@@ -87,7 +89,15 @@ int MediatorProcess::executeApplication()
     //STUN handlers
     nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
-    ListeningPeerPool listeningPeerPool(cloudDataProvider.get(), &stunMessageDispatcher);
+    ListeningPeerPool listeningPeerPool;
+    ListeningPeerRegistrator listeningPeerRegistrator(
+        cloudDataProvider.get(),
+        &stunMessageDispatcher,
+        &listeningPeerPool);
+    CloudConnectProcessor cloudConnectProcessor(
+        cloudDataProvider.get(),
+        &stunMessageDispatcher,
+        &listeningPeerPool);
 
     //accepting STUN requests by both tcp and udt
     MultiAddressServer<stun::SocketServer> tcpStunServer(

@@ -14,6 +14,9 @@ class NX_NETWORK_API AsyncClientUser
 public:
     ~AsyncClientUser();
 
+    /** Returns local connection address in case if client is connected to STUN server */
+    SocketAddress localAddress() const;
+
     /** Shell be called before the last shared_pointer is gone */
     virtual void pleaseStop(std::function<void()> handler) override;
 
