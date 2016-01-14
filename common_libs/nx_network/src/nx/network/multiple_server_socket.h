@@ -15,6 +15,8 @@ protected:
     MultipleServerSocket();
 
 public:
+    ~MultipleServerSocket();
+
     //TODO #muskov does not compile on msvc2012
     //template<typename S1, typename S2, typename = typename std::enable_if<
     //    !(std::is_base_of<S1, S2>::value && std::is_base_of<S2, S1>::value)>::type>
@@ -52,8 +54,8 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post( std::function<void()> handler ) override;
-    void dispatch( std::function<void()> handler ) override;
+    void post(std::function<void()> handler) override;
+    void dispatch(std::function<void()> handler) override;
 
     //!Implementation of AbstractStreamServerSocket::acceptAsync
     void acceptAsync(
@@ -70,6 +72,7 @@ protected:
         ServerSocketHandle(ServerSocketHandle&&);
 
         AbstractStreamServerSocket* operator->() const;
+        void stopAccepting();
     };
 
     bool addSocket(std::unique_ptr<AbstractStreamServerSocket> socket);
@@ -80,10 +83,9 @@ protected:
     bool m_nonBlockingMode;
     unsigned int m_recvTmeout;
     mutable SystemError::ErrorCode m_lastError;
+    bool* m_terminated;
     std::unique_ptr<AbstractCommunicatingSocket> m_timerSocket;
     std::vector<ServerSocketHandle> m_serverSockets;
-
-    mutable QnMutex m_mutex;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
 };
 

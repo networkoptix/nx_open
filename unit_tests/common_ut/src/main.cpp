@@ -11,7 +11,7 @@
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
 #if 0
     cl_log.create(
@@ -22,16 +22,19 @@ int main( int argc, char **argv )
 #endif
 	
 	nx::network::SocketGlobals::InitGuard sgGuard;
-    ::testing::InitGoogleTest( &argc, argv );
+    ::testing::InitGoogleTest(&argc, argv);
 
-    for( int i = 0; i < argc; ++i )
+    for (int i = 0; i < argc; ++i)
     {
-        std::string arg( argv[ i ] );
-        if( arg == "--enforce-socket=tcp" )
-            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Tcp );
+        std::string arg(argv[i]);
+        if (arg == "--enforce-socket=tcp")
+            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Tcp);
         else
-        if( arg == "--enforce-socket=udt" )
-            SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
+        if (arg == "--enforce-socket=udt")
+            SocketFactory::enforceStreamSocketType(SocketFactory::SocketType::Udt);
+        else
+        if (arg.find("--log=") == 0)
+            QnLog::initLog(QString::fromStdString(arg.substr(6)));
     }
 
     return RUN_ALL_TESTS();

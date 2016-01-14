@@ -117,25 +117,6 @@ TEST(SocketUdt_UdtPollSet, general)
     ASSERT_EQ(0, result);
 }
 
-TEST(SocketUdt, SimpleSync)
-{
-    socketSimpleSync(&std::make_unique<UdtStreamServerSocket>,
-                     &std::make_unique<UdtStreamSocket>);
-}
-
-TEST(SocketUdt, SimpleAsync)
-{
-    socketSimpleAsync(&std::make_unique<UdtStreamServerSocket>,
-                      &std::make_unique<UdtStreamSocket>);
-}
-
-TEST(SocketUdt, SimpleTrueAsync)
-{
-    socketSimpleTrueAsync(&std::make_unique<UdtStreamServerSocket>,
-                          &std::make_unique<UdtStreamSocket>);
-}
-
-TEST(SocketUdt, SingleAioThread)
-{
-    socketSingleAioThread(&std::make_unique<UdtStreamSocket>);
-}
+NX_SIMPLE_SOCKET_TESTS(SocketUdt,
+                       &std::make_unique<UdtStreamServerSocket>,
+                       &std::make_unique<UdtStreamSocket>)
