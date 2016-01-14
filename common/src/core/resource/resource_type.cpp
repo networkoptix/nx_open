@@ -87,20 +87,26 @@ void QnResourceType::addParamType(const QString& name, const QString& defaultVal
 
 bool QnResourceType::hasParam(const QString& name) const
 {
-    return paramTypeList().contains(name);
+    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().contains(name);
 }
 
 QString QnResourceType::defaultValue(const QString& key) const
 {
-    return paramTypeList().value(key);
+    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe().value(key);
 }
 
-const ParamTypeMap& QnResourceType::paramTypeList() const
+const ParamTypeMap QnResourceType::paramTypeList() const
+{
+    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    return paramTypeListUnsafe();
+}
+
+const ParamTypeMap& QnResourceType::paramTypeListUnsafe() const
 {
     if (m_allParamTypeListCache.isNull())
     {
-        QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
-
         if (!m_allParamTypeListCache.isNull())
             return *(m_allParamTypeListCache.data());
 
@@ -113,7 +119,7 @@ const ParamTypeMap& QnResourceType::paramTypeList() const
             }
 
             if (QnResourceTypePtr parent = qnResTypePool->getResourceType(parentId)) 
-            {
+            {   // Note. Copy below, should be thread safe.
                 ParamTypeMap parentData = parent->paramTypeList();
                 for(auto itr = parentData.begin(); itr != parentData.end(); ++itr) {
                     if (!allParamTypeListCache->contains(itr.key()))
