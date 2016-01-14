@@ -1234,10 +1234,10 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        if (confStats.toString() != lit("N/A")) {
+        if (confStats.toString() != lit("")) {
             setValue(confStats.toBool());
             /* Cleanup installer value. */
-            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit("N/A"));
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
             MSSettings::roSettings()->sync();
         }
     } else

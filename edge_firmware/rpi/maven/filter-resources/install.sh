@@ -18,8 +18,6 @@ update () {
   # TODO: add errorlevel handling
   cat /tmp/mediaserver.conf >> /opt/${deb.customization.company.name}/mediaserver/etc/mediaserver.conf  
   /etc/init.d/nx1boot upgrade  
-  /etc/init.d/$COMPANY_NAME-mediaserver start
-  /etc/init.d/cron start
   rm /tmp/$DISTRIB.tar.gz
 }
 
@@ -28,4 +26,13 @@ then
   update >> $1 2>&1
 else
   update 2>&1
+fi
+
+/etc/init.d/$COMPANY_NAME-mediaserver start
+/etc/init.d/cron start
+SERVER_PROCESS=`ps aux | grep $COMPANY_NAME | grep -v grep`
+sleep 3
+if [ ! -z $SERVER_PROCESS ]; then
+  /etc/init.d/cron restart
+  /etc/init.d/$COMPANY_NAME-mediaserver start
 fi
