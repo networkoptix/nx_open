@@ -25,10 +25,8 @@ angular.module('cloudApp')
                         return;
                     }
 
-                    var strongRegex = new RegExp('^' + Config.passwordRequirements.strongRegex + '$');
-                    scope.weakPassword = !strongRegex.test(scope.ngModel);
+                    scope.weakPassword = !Config.passwordRequirements.strongPasswordCheck(scope.ngModel);
                 });
-
 
             }
         };

@@ -9,10 +9,28 @@ var Config = {
     {
         minLength: 6,
         minLengthMessage:'Password must contain at least 6 characters',
-        requiredRegex: '[a-zA-Z0-9\\!\\*\\(\\)\\-\\$@#%&]{6,}',
-        requiredMessage: 'Use only letters, numbers and symbols like _!*()-@#$%&',
-        strongRegex: '(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z0-9\\!\\*\\(\\)\\-\\$@#%&]{6,}',
-        weakMessage: 'Use numbers and different case symbols to make your password stronger',
+        requiredRegex: '[\x21-\x7E]+',
+        requiredMessage: 'Use only latin letters, numbers and keyboard symbols',
+        strongPasswordCheck: function(password){
+
+            var classes = [
+                '[0-9]+',
+                '[a-z]+',
+                '[A-Z]+',
+                '[\\W_]+'
+            ];
+
+            var classesCount = 0;
+
+            for (var i = 0; i < classes.length; i++) {
+                var classRegex = classes[i];
+                if(new RegExp(classRegex).test(password)){
+                    classesCount ++;
+                }
+            }
+            return classesCount >= 3;
+        },
+        weakMessage: 'Use numbers, symbols in different case and special symbols to make your password stronger',
         strongMessage: 'Strong password!'
     },
 
