@@ -28,6 +28,14 @@ public:
     void updateFromResource();
 
     void reloadData();
+
+    bool hasChanges() const;
+
+    void submitToResource();
+
+signals:
+    void hasChangesChanged();
+
 private:
     void initWebView();
 
