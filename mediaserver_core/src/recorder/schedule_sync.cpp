@@ -396,6 +396,7 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
             if (err != CopyError::NoError) {
+                m_lastError = err;
                 NX_LOG(
                     lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
                     cl_logWARNING
@@ -611,10 +612,10 @@ void QnScheduleSync::run()
             m_syncing = false;
 
             if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(m_syncEndTimePoint, result, copyErrorString(m_lastError));
                 m_failReported = true;
             } else if (result != QnServer::BackupResultCode::Failed) {
-                emit backupFinished(m_syncEndTimePoint, result);
+                emit backupFinished(m_syncEndTimePoint, result, copyErrorString(m_lastError));
                 m_failReported = false; 
             }
         }

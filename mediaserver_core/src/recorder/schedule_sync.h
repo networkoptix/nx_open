@@ -60,7 +60,12 @@ public:
     QnScheduleSync();
     ~QnScheduleSync();
 signals:
-    void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
+    void backupFinished(
+        qint64                      timestampMs,
+        QnServer::BackupResultCode  status,
+        const QString               &description
+    );
+
 public:
     int forceStart(); 
     virtual void stop() override;
@@ -74,22 +79,22 @@ private:
     DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
-    APPLY(GetCatalogError) \
-    APPLY(NoBackupStorageError) \
-    APPLY(FromStorageError) \
-    APPLY(SourceFileError) \
-    APPLY(TargetFileError) \
-    APPLY(ChunkError) \
-    APPLY(NoError) \
-    APPLY(Interrupted)
+    APPLY(GetCatalogError, "Chunks catalog error") \
+    APPLY(NoBackupStorageError, "No available backup storages with sufficient free space") \
+    APPLY(FromStorageError, "Source storage error") \
+    APPLY(SourceFileError, "Source file error") \
+    APPLY(TargetFileError, "Target file error") \
+    APPLY(ChunkError, "Chunk error") \
+    APPLY(NoError, "No error") \
+    APPLY(Interrupted, "Interrupted")
 
-#define ENUM_APPLY(value) value,
+#define ENUM_APPLY(value, _) value,
 
     enum class CopyError {
         COPY_ERROR_LIST(ENUM_APPLY)
     };
 
-#define TO_STRING_APPLY(value) case CopyError::value: return lit(#value);
+#define TO_STRING_APPLY(value, desc) case CopyError::value: return lit(desc);
 
     QString copyErrorString(CopyError error) {
         switch (error) {
@@ -148,6 +153,7 @@ private:
 
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
+    CopyError             m_lastError;
 };
 
 #endif

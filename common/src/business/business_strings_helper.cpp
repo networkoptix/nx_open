@@ -378,7 +378,8 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     }
 
     case BackupFailed: {
-        result = tr("Archive backup failed because of no backup storage available");
+        QString reason = reasonParamsEncoded;
+        result = tr("Archive backup failed: %1").arg(reason);
         break;
     }
     case BackupEndOfPeriod: {

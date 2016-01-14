@@ -1375,14 +1375,23 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
 }
 
-void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
+void MediaServerProcess::at_archiveBackupFinished(
+    qint64                      backupedToMs,
+    QnServer::BackupResultCode  code,
+    const QString               &description
+) 
+{
     if (isStopping())
         return;
+
     QnBusiness::EventReason reason = QnBusiness::NoReason;
-    switch(code)
+    QString reasonText = QString::number(backupedToMs);
+
+    switch(code) 
     {
         case QnServer::BackupResultCode::Failed:
             reason = QnBusiness::BackupFailed;
+            reasonText = description;
             break;
         case QnServer::BackupResultCode::EndOfPeriod:
             reason = QnBusiness::BackupEndOfPeriod;
@@ -1397,7 +1406,12 @@ void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer:
             break;
     }
 
-    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, QString::number(backupedToMs));
+    qnBusinessRuleConnector->at_archiveBackupFinished(
+        m_mediaServer,
+        qnSyncTime->currentUSecsSinceEpoch(),
+        reason,
+        reasonText
+    );
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)

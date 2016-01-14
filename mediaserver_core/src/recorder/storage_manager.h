@@ -144,7 +144,7 @@ signals:
     void noStoragesAvailable();
     void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode);
+    void backupFinished(qint64 backupedToMs, QnServer::BackupResultCode, const QString &description);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);
