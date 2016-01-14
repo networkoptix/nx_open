@@ -21,9 +21,6 @@ FocusScope {
                 parent.hide()
 
             popup.hidden()
-
-            if (Window.activeFocusItem == popup)
-                d.lastFocusedItem.forceActiveFocus()
         }
     }
 
@@ -64,6 +61,9 @@ FocusScope {
     function hide() {
         if (!parent || !visible)
             return
+
+        if (Window.activeFocusItem == popup)
+            d.lastFocusedItem.forceActiveFocus()
 
         if (hideAnimation)
             hideAnimation.start()
