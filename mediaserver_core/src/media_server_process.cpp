@@ -1377,40 +1377,17 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
 
 void MediaServerProcess::at_archiveBackupFinished(
     qint64                      backupedToMs,
-    QnServer::BackupResultCode  code,
-    const QString               &description
+    QnBusiness::EventReason     code
 ) 
 {
     if (isStopping())
         return;
 
-    QnBusiness::EventReason reason = QnBusiness::NoReason;
-    QString reasonText = QString::number(backupedToMs);
-
-    switch(code) 
-    {
-        case QnServer::BackupResultCode::Failed:
-            reason = QnBusiness::BackupFailed;
-            reasonText = description;
-            break;
-        case QnServer::BackupResultCode::EndOfPeriod:
-            reason = QnBusiness::BackupEndOfPeriod;
-            break;
-        case QnServer::BackupResultCode::Done:
-            reason = QnBusiness::BackupDone;
-            break;
-        case QnServer::BackupResultCode::Cancelled:
-            reason = QnBusiness::BackupCancelled;
-            break;
-        default:
-            break;
-    }
-
     qnBusinessRuleConnector->at_archiveBackupFinished(
         m_mediaServer,
         qnSyncTime->currentUSecsSinceEpoch(),
-        reason,
-        reasonText
+        code,
+        QString::number(backupedToMs) 
     );
 }
 

@@ -62,8 +62,7 @@ public:
 signals:
     void backupFinished(
         qint64                      timestampMs,
-        QnServer::BackupResultCode  status,
-        const QString               &description
+        QnBusiness::EventReason     status
     );
 
 public:
@@ -116,7 +115,7 @@ private:
 
 private:
     template<typename NeedMoveOnCB>
-    QnServer::BackupResultCode synchronize(NeedMoveOnCB needMoveOn);
+    QnBusiness::EventReason synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
