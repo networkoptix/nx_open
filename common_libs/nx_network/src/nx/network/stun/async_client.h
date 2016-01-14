@@ -81,6 +81,9 @@ public:
     */
     void sendRequest( Message request, RequestHandler handler );
 
+    //!Returns local address if client is connected to be server
+    SocketAddress localAddress() const;
+
     //! \note Required by \a nx_api::BaseServerConnection
     virtual void closeConnection(
             SystemError::ErrorCode errorCode,
@@ -109,7 +112,7 @@ private:
 private:
     const Timeouts m_timeouts;
 
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     bool m_useSsl;
     State m_state;

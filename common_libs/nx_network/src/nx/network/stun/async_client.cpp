@@ -86,6 +86,14 @@ void AsyncClient::sendRequest( Message request, RequestHandler handler )
     };
 }
 
+SocketAddress AsyncClient::localAddress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_baseConnection
+        ? m_baseConnection->socket()->getLocalAddress()
+        : SocketAddress();
+}
+
 void AsyncClient::closeConnection(
     SystemError::ErrorCode errorCode,
     BaseConnectionType* connection )

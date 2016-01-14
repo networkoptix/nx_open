@@ -20,7 +20,7 @@ namespace hpm {
 class MediaServerEmulator
 {
 public:
-    /*!
+    /**
         \param serverName If empty, name is generated
     */
     MediaServerEmulator(
@@ -29,10 +29,16 @@ public:
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
 
-    //!Attaches to a local port and registers on mediator
+    /** Attaches to a local port and registers on mediator */
     bool start();
     nx::String serverID() const;
+    /** Server endpoint */
     SocketAddress endpoint() const;
+
+    nx::hpm::api::ResultCode listen() const;
+
+    /** Address of connection to mediator */
+    SocketAddress mediatorConnectionLocalAddress() const;
 
 private:
     MediatorConnector m_mediatorConnector;

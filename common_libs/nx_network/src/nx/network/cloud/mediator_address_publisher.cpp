@@ -91,10 +91,10 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
     lk->unlock();
     m_mediatorConnection->bind(
         std::move(addresses),
-        [this](nx::hpm::api::ResultCode /*resultCode*/, bool success)
+        [this](nx::hpm::api::ResultCode resultCode)
         {
             QnMutexLocker lk( &m_mutex );
-            if( !success )
+            if (resultCode != nx::hpm::api::ResultCode::ok)
             {
                 m_pingedAddresses.clear();
                 m_publishedAddresses.clear();

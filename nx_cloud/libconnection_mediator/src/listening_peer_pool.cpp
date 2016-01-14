@@ -112,22 +112,31 @@ ListeningPeerPool::DataLocker ListeningPeerPool::findAndLockPeerData(
     {
         peerIter->second.isLocal = true;
         peerIter->second.isListening = false;
-        peerIter->second.peerConnection = connection;
         peerIter->second.hostName = peerIter->first.hostName();
+    }
+    
+    const auto curConnectionStrongRef = peerIter->second.peerConnection.lock();
+    if (curConnectionStrongRef != connection)
+    {
+        //detaching from old connection
 
-        connection->addOnConnectionCloseHandler([this, peerIter]()
+        //binding to a new connection 
+        peerIter->second.peerConnection = connection;
+        connection->addOnConnectionCloseHandler([this, peerData, connection]()
         {
+            QnMutexLocker lk(&m_mutex);
+            const auto peerIter = m_peers.find(peerData);
+            if (peerIter == m_peers.end())
+                return;
+
+            const auto peerConnectionStrongRef = peerIter->second.peerConnection.lock();
+            if (peerConnectionStrongRef != connection)
+                return; //peer has been bound to another connection
             NX_LOGX(lit("Peer %1 has disconnected").
                 arg(QString::fromUtf8(peerIter->first.hostName())),
                 cl_logDEBUG1);
-
-            QnMutexLocker lk(&m_mutex);
             m_peers.erase(peerIter);
         });
-    }
-    else if (peerIter->second.peerConnection.lock() != connection)
-    {
-        //TODO #ak binding to another connection 
     }
 
     return DataLocker(

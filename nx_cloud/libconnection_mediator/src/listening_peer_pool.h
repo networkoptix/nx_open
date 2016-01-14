@@ -11,6 +11,7 @@
 
 #include <nx/network/stun/abstract_server_connection.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/singleton.h>
 
 #include "request_processor.h"
 #include "server/stun_request_processing_helper.h"
@@ -44,6 +45,8 @@ struct ListeningPeerData
     \note class is thread-safe
  */
 class ListeningPeerPool
+:
+    public Singleton<ListeningPeerPool> //needed for unit tests only
 {
     typedef std::map< MediaserverData, ListeningPeerData > PeerContainer;
 
@@ -99,18 +102,6 @@ public:
         const nx::String& hostName) const;
 
 private:
-    struct ListeningPeerContext
-    {
-        ListeningPeerData data;
-        int lockCounter;
-
-        ListeningPeerContext()
-        :
-            lockCounter(0)
-        {
-        }
-    };
-
     mutable QnMutex m_mutex;
     PeerContainer m_peers;
 };

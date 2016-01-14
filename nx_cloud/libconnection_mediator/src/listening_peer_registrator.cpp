@@ -107,8 +107,6 @@ void ListeningPeerRegistrator::listen(const ConnectionStrongRef& connection,
     auto peerDataLocker = m_listeningPeerPool->findAndLockPeerData(
         connection,
         *mediaserverData);
-    //if peer has already been bound with another connection, overwriting it...
-    peerDataLocker.value().peerConnection = connection;
     peerDataLocker.value().isListening = true;
 
     NX_LOGX(lit("Peer %1.%2 started to listen")

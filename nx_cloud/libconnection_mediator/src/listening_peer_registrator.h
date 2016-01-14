@@ -8,6 +8,7 @@
 #include <functional>
 
 #include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/cloud/data/listen_data.h>
 #include <nx/network/cloud/data/resolve_data.h>
 #include <nx/network/cloud/data/result_code.h>
 #include <utils/serialization/lexical.h>

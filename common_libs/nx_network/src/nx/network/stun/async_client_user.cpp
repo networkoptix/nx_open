@@ -9,6 +9,11 @@ AsyncClientUser::~AsyncClientUser()
     Q_ASSERT_X(m_stopHandler, Q_FUNC_INFO, "pleaseStop was not called");
 }
 
+SocketAddress AsyncClientUser::localAddress() const
+{
+    return m_client->localAddress();
+}
+
 AsyncClientUser::AsyncClientUser(std::shared_ptr<AsyncClient> client)
     : m_operationsInProgress(0)
     , m_client(std::move(client))

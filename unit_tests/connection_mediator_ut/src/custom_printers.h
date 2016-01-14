@@ -10,11 +10,15 @@
 
 #include <QByteArray>
 #include <QString>
+
 #include <cdb/system_data.h>
+#include <nx/network/socket_common.h>
+
 
 //!Used by google test to print QByteArray as text
 void PrintTo(const QByteArray& val, ::std::ostream* os);
 void PrintTo(const QString& val, ::std::ostream* os);
 void PrintTo(const boost::optional<nx::cdb::api::SystemData>& val, ::std::ostream* os);
+void PrintTo(const SocketAddress& val, ::std::ostream* os);
 
 #endif  //COMMON_PRINTERS_H
