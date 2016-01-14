@@ -1,14 +1,39 @@
 from api.models import Account
 from rest_framework import serializers
 import django
-
+from cloud import settings
+import re
+import json
 
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
-    password = serializers.CharField(required=True, allow_blank=False, max_length=255)
+    password = serializers.CharField(required=True, allow_blank=False, max_length=255, min_length=settings.PASSWORD_REQUIREMENTS['minLength'])
     email = serializers.CharField(required=True, allow_blank=False, max_length=255)
     first_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     subscribe = serializers.BooleanField(required=False)
+
+    @staticmethod
+    def validate_password(value):
+
+        if len(value) < settings.PASSWORD_REQUIREMENTS['minLength']:
+            raise serializers.ValidationError("Too short password")
+
+        if len(value) > 255:
+            raise serializers.ValidationError("Too long password")
+
+        # Correct characters
+        pattern = re.compile("^" + settings.PASSWORD_REQUIREMENTS['requiredRegex'] + "$")
+        if not pattern.match(value):
+            raise serializers.ValidationError("Incorrect password")
+
+        # popular passwords list
+        with open(settings.PASSWORD_REQUIREMENTS['commonList']) as data_file:
+            common_passwords = json.load(data_file)
+
+        if value in common_passwords or (value.upper() == value and value.lower() in common_passwords):
+            raise serializers.ValidationError("Too common password")
+
+        return value
 
     @staticmethod
     def validate_email(value):

@@ -187,3 +187,9 @@ EMAIL_HOST_USER = 'service@networkoptix.com'
 EMAIL_HOST_PASSWORD = 'kbnUk06boqBkwU'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+PASSWORD_REQUIREMENTS = {
+    'minLength': 6,
+    'requiredRegex': '[\x21-\x7E]+',
+    'commonList': 'static/scripts/commonPasswordsList.json'
+}

@@ -388,6 +388,7 @@ module.exports = function (grunt) {
                             '*.html',
                             '*.xml',
                             '*.xsl',
+                            'scripts/{,*/}*.json',
                             'views/{,*/}*.html',
                             'customization/*',
                             //'bower_components/**/*',

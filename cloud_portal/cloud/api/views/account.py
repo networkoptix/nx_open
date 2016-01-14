@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from account_serializers import AccountSerializer, CreateAccountSerializer, AccountUpdateSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.serializers import ValidationError
 import django
 import base64
 from django.utils import timezone
@@ -104,6 +105,12 @@ def change_password(request):
     old_password = request.data['old_password']
     new_password = request.data['new_password']
 
+    try:
+        CreateAccountSerializer.validate_password(new_password)
+    except ValidationError as error:
+        raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
+                              error_data={'new_password': error.detail})
+
     Account.change_password(request.user.email, old_password, new_password)
     request.session['password'] = new_password
     return api_success()
@@ -157,6 +164,12 @@ def restore_password(request):
         require_params(request, ('new_password',))
 
         new_password = request.data['new_password']
+        try:
+            CreateAccountSerializer.validate_password(new_password)
+        except ValidationError as error:
+            raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
+                                  error_data={'new_password': error.detail})
+
 
         Account.change_password(user_email, temp_password, new_password)
     elif 'user_email' in request.data:
