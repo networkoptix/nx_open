@@ -88,6 +88,10 @@ angular.module('cloudApp')
 
             systems:function(){
                 return $http.get(apiBase + '/systems');
+            },
+
+            getCommonPasswords:function(){
+                return $http.get('/scripts/commonPasswordsList.json');
             }
         }
 
