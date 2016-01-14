@@ -23,21 +23,21 @@ MultipleServerSocket::~MultipleServerSocket()
 }
 
 // deliver option to every socket
-#define CloudServerSocket_FORWARD_SET(NAME, TYPE)   \
-    bool MultipleServerSocket::NAME(TYPE value)     \
-    {                                               \
-        for (auto& socket : m_serverSockets)        \
-            if (!socket->NAME(value))               \
-            {                                       \
-                socket->getLastError(&m_lastError); \
-                return false;                       \
-            }                                       \
-                                                    \
-        return true;                                \
-    }                                               \
+#define MultipleServerSocket_FORWARD_SET(NAME, TYPE)    \
+    bool MultipleServerSocket::NAME(TYPE value)         \
+    {                                                   \
+        for (auto& socket : m_serverSockets)            \
+            if (!socket->NAME(value))                   \
+            {                                           \
+                socket->getLastError(&m_lastError);     \
+                return false;                           \
+            }                                           \
+                                                        \
+        return true;                                    \
+    }                                                   \
 
 // assume all sockets are configured the same way
-#define CloudServerSocket_FORWARD_GET(NAME, TYPE)       \
+#define MultipleServerSocket_FORWARD_GET(NAME, TYPE)    \
     bool MultipleServerSocket::NAME(TYPE* value) const  \
     {                                                   \
         boost::optional<TYPE> first;                    \
@@ -61,7 +61,7 @@ MultipleServerSocket::~MultipleServerSocket()
         return true;                                    \
     }
 
-CloudServerSocket_FORWARD_SET(bind, const SocketAddress&)
+MultipleServerSocket_FORWARD_SET(bind, const SocketAddress&)
 
 SocketAddress MultipleServerSocket::getLocalAddress() const
 {
@@ -93,8 +93,8 @@ bool MultipleServerSocket::isClosed() const
     return true;
 }
 
-CloudServerSocket_FORWARD_SET(setReuseAddrFlag, bool);
-CloudServerSocket_FORWARD_GET(getReuseAddrFlag, bool);
+MultipleServerSocket_FORWARD_SET(setReuseAddrFlag, bool);
+MultipleServerSocket_FORWARD_GET(getReuseAddrFlag, bool);
 
 bool MultipleServerSocket::setNonBlockingMode(bool value)
 {
@@ -108,11 +108,11 @@ bool MultipleServerSocket::getNonBlockingMode(bool* value) const
     return true;
 }
 
-CloudServerSocket_FORWARD_GET(getMtu, unsigned int);
-CloudServerSocket_FORWARD_SET(setSendBufferSize, unsigned int);
-CloudServerSocket_FORWARD_GET(getSendBufferSize, unsigned int);
-CloudServerSocket_FORWARD_SET(setRecvBufferSize, unsigned int);
-CloudServerSocket_FORWARD_GET(getRecvBufferSize, unsigned int);
+MultipleServerSocket_FORWARD_GET(getMtu, unsigned int);
+MultipleServerSocket_FORWARD_SET(setSendBufferSize, unsigned int);
+MultipleServerSocket_FORWARD_GET(getSendBufferSize, unsigned int);
+MultipleServerSocket_FORWARD_SET(setRecvBufferSize, unsigned int);
+MultipleServerSocket_FORWARD_GET(getRecvBufferSize, unsigned int);
 
 bool MultipleServerSocket::setRecvTimeout(unsigned int millis)
 {
@@ -126,8 +126,8 @@ bool MultipleServerSocket::getRecvTimeout(unsigned int* millis) const
     return true;
 }
 
-CloudServerSocket_FORWARD_SET(setSendTimeout, unsigned int);
-CloudServerSocket_FORWARD_GET(getSendTimeout, unsigned int);
+MultipleServerSocket_FORWARD_SET(setSendTimeout, unsigned int);
+MultipleServerSocket_FORWARD_GET(getSendTimeout, unsigned int);
 
 bool MultipleServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
@@ -154,7 +154,7 @@ void MultipleServerSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
         socket->bindToAioThread(aioThread);
 }
 
-CloudServerSocket_FORWARD_SET(listen, int);
+MultipleServerSocket_FORWARD_SET(listen, int);
 
 AbstractStreamSocket* MultipleServerSocket::accept()
 {
