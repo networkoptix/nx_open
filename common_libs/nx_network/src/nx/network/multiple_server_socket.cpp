@@ -158,6 +158,15 @@ CloudServerSocket_FORWARD_SET(listen, int);
 
 AbstractStreamSocket* MultipleServerSocket::accept()
 {
+    if (m_nonBlockingMode)
+    {
+        for (auto& server : m_serverSockets)
+            if (auto socket = server->accept())
+                return socket;
+
+        return nullptr;
+    }
+
     std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
     acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
     {

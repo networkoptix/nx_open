@@ -210,6 +210,34 @@ void socketSimpleTrueAsync(
     ASSERT_TRUE(stopQueue.isEmpty());
 }
 
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void socketSimpleAcceptMixed(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& serverAddress = kServerAddress)
+{
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setNonBlockingMode(true));
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->bind(serverAddress));
+    ASSERT_TRUE(server->listen(5));
+
+    // no clients yet
+    ASSERT_EQ(server->accept(), nullptr);
+    ASSERT_EQ(SystemError::getLastOSErrorCode(), SystemError::wouldBlock);
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setNonBlockingMode(true));
+    client->connectAsync(kServerAddress, [&](SystemError::ErrorCode code){});
+
+    // let the client get in the server listen queue
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    ASSERT_NE(server->accept(), nullptr);
+
+    pleaseStopSync(std::move(client));
+    pleaseStopSync(std::move(server));
+}
+
 template<typename ClientSocketMaker>
 void socketSingleAioThread(
     const ClientSocketMaker& clientMaker,
@@ -296,6 +324,7 @@ void socketAcceptTimeoutAsync(
 
     EXPECT_EQ(serverResults.pop(), SystemError::timedOut);
     EXPECT_TRUE(std::chrono::system_clock::now() - start < timeout * 2);
+    pleaseStopSync(std::move(server));
 }
 
 #define NX_SIMPLE_SOCKET_TESTS(test, mkServer, mkClient)                            \
@@ -303,8 +332,10 @@ void socketAcceptTimeoutAsync(
     TEST(test, SimpleAsync)         { socketSimpleAsync(mkServer, mkClient); }      \
     TEST(test, SimpleTrueAsync)     { socketSimpleTrueAsync(mkServer, mkClient); }  \
     TEST(test, SingleAioThread)     { socketSingleAioThread(mkClient); }            \
+    TEST(test, SimpleAcceptMixed)   { socketSimpleAcceptMixed(mkServer, mkClient); }\
     TEST(test, AcceptTimeoutSync)   { socketAcceptTimeoutSync(mkServer); }          \
-    TEST(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }
+    TEST(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }         \
+
 
 } // namespace /* anonimous */
 

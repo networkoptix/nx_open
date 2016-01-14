@@ -1058,8 +1058,13 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
 /*!
     \return fd (>=0) on success, <0 on error (-2 if timed out)
 */
-static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
+static int acceptWithTimeout( int m_fd,
+                              int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
+                              bool nonBlockingMode = false )
 {
+    if (nonBlockingMode)
+        return ::accept( m_fd, NULL, NULL );
+
     int result = 0;
     if (timeoutMillis == 0)
         timeoutMillis = -1; // poll expects -1 as an infinity
@@ -1145,9 +1150,9 @@ public:
     {
     }
 
-    AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
+    AbstractStreamSocket* accept( unsigned int recvTimeoutMs, bool nonBlockingMode )
     {
-        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs );
+        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs, nonBlockingMode );
         if( newConnSD >= 0 )
         {
             return new TCPSocket(newConnSD);
@@ -1235,7 +1240,11 @@ AbstractStreamSocket* TCPServerSocket::accept()
     if( !getRecvTimeout( &recvTimeoutMs ) )
         return nullptr;
 
-    return d->accept( recvTimeoutMs );
+    bool nonBlockingMode = false;
+    if( !getNonBlockingMode(&nonBlockingMode) )
+        return nullptr;
+
+    return d->accept( recvTimeoutMs, nonBlockingMode );
 }
 
 bool TCPServerSocket::setListen(int queueLen)
