@@ -81,25 +81,25 @@ QList<QnUuid> QnResourceType::allParentList() const
 
 void QnResourceType::addParamType(const QString& name, const QString& defaultValue)
 {
-    QnMutexLocker _lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex ); // in case of connect to anther app server 
     m_paramTypeList.insert(name, defaultValue);
 }
 
 bool QnResourceType::hasParam(const QString& name) const
 {
-    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
     return paramTypeListUnsafe().contains(name);
 }
 
 QString QnResourceType::defaultValue(const QString& key) const
 {
-    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
     return paramTypeListUnsafe().value(key);
 }
 
 const ParamTypeMap QnResourceType::paramTypeList() const
 {
-    QnMutexLocker _lock( &m_allParamTypeListCacheMutex );
+    QnMutexLocker lock( &m_allParamTypeListCacheMutex );
     return paramTypeListUnsafe();
 }
 
