@@ -9,6 +9,7 @@ var Config = {
     {
         minLength: 6,
         minLengthMessage:'Password must contain at least 6 characters',
+        maxLength: 255,
         requiredRegex: '[\x21-\x7E]+',
         requiredMessage: 'Use only latin letters, numbers and keyboard symbols',
         strongPasswordCheck: function(password){

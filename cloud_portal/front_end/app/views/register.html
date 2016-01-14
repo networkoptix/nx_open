@@ -27,7 +27,7 @@
         <div class="form-group">
             <label for="lastName"  class="col-sm-3 control-label">Last name</label>
             <div class="col-sm-5">
-                <input type="text" class="form-control" ng-model="account.lastName" id="lastName"
+                <input type="text" class="form-control" ng-model="account.lastName" id="lastName" maxlength="255"
                        name="lastName" autocomplete="off">
             </div>
             <div class="col-sm-4">
@@ -37,7 +37,7 @@
         <div class="form-group" validate-field>
             <label for="registerEmail"  class="col-sm-3 control-label">Email address</label>
             <div class="col-sm-5">
-                <input type="email" class="form-control" ng-model="account.email" id="registerEmail"
+                <input type="email" class="form-control" ng-model="account.email" id="registerEmail" maxlength="255"
                        name="registerEmail" required autocomplete="off"  ng-pattern="Config.emailRegex"
                        ng-change="hideAlreadyExists()">
             </div>
