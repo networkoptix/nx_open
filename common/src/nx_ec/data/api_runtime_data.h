@@ -19,13 +19,14 @@ namespace ec2
         static const quint64 tpfPeerHasMonotonicClock                   = 0x0002LL << 32;
         static const quint64 tpfPeerIsNotEdgeServer                     = 0x0001LL << 32;
 
-        ApiRuntimeData(): 
-            ApiDataWithVersion(), 
+        ApiRuntimeData():
+            ApiDataWithVersion(),
             prematureLicenseExperationDate(0),
             serverTimePriority(0),
             updateStarted(false)
         {}
 
+        /* This operator must not be replaced with fusion implementation as is skips brand checking */
         bool operator==(const ApiRuntimeData& other) const {
             return version == other.version &&
                    peer == other.peer &&
@@ -40,7 +41,8 @@ namespace ec2
                    compatibleHardwareIds == other.compatibleHardwareIds &&
                    updateStarted == other.updateStarted &&
                    nx1mac == other.nx1mac &&
-                   nx1serial == other.nx1serial;
+                   nx1serial == other.nx1serial &&
+                   userId == other.userId;
         }
 
         ApiPeerData peer;
@@ -67,11 +69,15 @@ namespace ec2
         QString nx1serial;
 
         bool updateStarted;
+
+        /** Id of the user, under which peer is logged in (for client peers only) */
+        QnUuid userId;
     };
 
 #define ApiRuntimeData_Fields ApiDataWithVersion_Fields (peer)(platform)(box)(brand)(publicIP)(prematureLicenseExperationDate)\
                                                         (videoWallInstanceGuid)(videoWallControlSession)(serverTimePriority)\
-                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)(nx1mac)(nx1serial)
+                                                        (mainHardwareIds)(compatibleHardwareIds)(updateStarted)(nx1mac)(nx1serial)\
+                                                        (userId)
 
 
 } // namespace ec2

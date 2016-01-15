@@ -144,6 +144,10 @@ QnPage {
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
                     KeyNavigation.tab: hostField
                     onAccepted: connect()
+                    Component.onCompleted: {
+                        if (Qt.platform.os == "android")
+                            passwordCharacter = "\u2022"
+                    }
                 }
             }
 
@@ -333,7 +337,7 @@ QnPage {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (Main.backPressed())
                 event.accepted = true
         }
