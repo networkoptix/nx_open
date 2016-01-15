@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "cloud_connect_processor.h"
+#include "hole_punching_processor.h"
 
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/utils/log/log.h>

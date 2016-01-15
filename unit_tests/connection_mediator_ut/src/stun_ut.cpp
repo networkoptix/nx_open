@@ -10,7 +10,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/cc/custom_stun.h>
 #include <listening_peer_pool.h>
-#include <listening_peer_registrator.h>
+#include <peer_registrator.h>
 #include <mediaserver_api.h>
 
 #include "mediator_mocks.h"

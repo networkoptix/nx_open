@@ -20,7 +20,7 @@
 #include <utils/common/cpp14.h>
 
 #include <listening_peer_pool.h>
-#include <listening_peer_registrator.h>
+#include <peer_registrator.h>
 
 #include "mediator_mocks.h"
 #include "socket_globals_holder.h"

@@ -23,9 +23,9 @@
 #include <utils/common/systemerror.h>
 
 #include "listening_peer_pool.h"
-#include "listening_peer_registrator.h"
+#include "peer_registrator.h"
 #include "mediaserver_api.h"
-#include "server/cloud_connect_processor.h"
+#include "server/hole_punching_processor.h"
 #include "settings.h"
 #include "version.h"
 

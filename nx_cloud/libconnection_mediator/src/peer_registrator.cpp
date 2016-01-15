@@ -1,5 +1,5 @@
 
-#include "listening_peer_registrator.h"
+#include "peer_registrator.h"
 
 #include <functional>
 #include <iostream>
