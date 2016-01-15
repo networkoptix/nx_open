@@ -282,8 +282,9 @@ Qt::ItemFlags QnTimeServerSelectionModel::flags(const QModelIndex &index) const 
 
     if (column == Columns::CheckboxColumn)
     {
-        static const auto kBaseCheckboxFlags = (Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
-        const auto anotherFlags = (m_items.size() == 1 ? 0 : Qt::ItemIsEnabled);
+        static const Qt::ItemFlags kBaseCheckboxFlags =
+            (Qt::ItemIsSelectable | Qt::ItemIsUserCheckable | Qt::ItemIsEditable);
+        const Qt::ItemFlag anotherFlags = (m_items.size() == 1 ? Qt::NoItemFlags : Qt::ItemIsEnabled);
         return kBaseCheckboxFlags | anotherFlags;
     }
 
