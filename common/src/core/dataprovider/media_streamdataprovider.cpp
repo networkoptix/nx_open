@@ -181,11 +181,12 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
+                //most likely, timestamp reported by camera are not that good
                 NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
                     arg(timeDiff).
                     arg(m_mediaResource ? m_mediaResource->getName() : QString()).
                     arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
-                    cl_logWARNING);
+                    cl_logDEBUG1);
 
                 media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
             }
