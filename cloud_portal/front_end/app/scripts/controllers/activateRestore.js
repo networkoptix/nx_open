@@ -21,7 +21,8 @@ angular.module('cloudApp')
         $scope.change = process.init(function(){
             return cloudApi.restorePassword($scope.data.restoreCode, $scope.data.newPassword);
         },{
-            notFound: Config.errorCodes.wrongCode
+            notFound: Config.errorCodes.wrongCode,
+            notAuthorized: Config.errorCodes.wrongCode
         });
 
         $scope.directChange = function(){
@@ -37,7 +38,8 @@ angular.module('cloudApp')
         $scope.activate = process.init(function(){
             return cloudApi.activate($scope.data.activateCode);
         },{
-            notFound: Config.errorCodes.wrongCode
+            notFound: Config.errorCodes.wrongCode,
+            notAuthorized: Config.errorCodes.wrongCode
         });
 
 

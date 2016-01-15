@@ -34,6 +34,8 @@ angular.module('cloudApp')
                     },
                     run:function(){
                         this.processing = true;
+                        this.error = false;
+                        this.success = false;
                         var self = this;
 
                         var deferred = $q.defer();

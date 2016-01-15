@@ -4,12 +4,11 @@ angular.module('cloudApp')
     .factory('dialogs', function ($http, $modal, $q) {
         function openDialog(title, template, content, hasFooter, cancellable){
             // Check 401 against offline
-
             return $modal.open({
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
                 keyboard:false,
-                backdrop:'static',
+                backdrop:cancellable?true:'static',
                 resolve: {
                     settings:function(){
                         return {

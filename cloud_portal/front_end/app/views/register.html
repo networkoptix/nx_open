@@ -44,7 +44,7 @@
             <div class="col-sm-4">
                 <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.required">Email is required.</span>
 
-                <span class="help-block" ng-if="registerForm.registerEmail.$touched && registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern">Please, enter a valid email.</span>
+                <span class="help-block" ng-if="registerForm.registerEmail.$touched && (registerForm.registerEmail.$error.email || registerForm.registerEmail.$error.pattern)">Please, enter a valid email.</span>
 
                 <span class="help-block" ng-if="registerForm.registerEmail.$error.alreadyExists">Email is already registered in portal</span>
             </div>
