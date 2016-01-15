@@ -36,7 +36,7 @@
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04",
+                "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32",
                 "BOSCH|VIP-X1600-XFM4"
