@@ -78,22 +78,22 @@ private:
     DeviceFileCatalog::Chunk findLastSyncChunkUnsafe() const;
 
 #define COPY_ERROR_LIST(APPLY) \
-    APPLY(GetCatalogError, "Chunks catalog error") \
-    APPLY(NoBackupStorageError, "No available backup storages with sufficient free space") \
-    APPLY(FromStorageError, "Source storage error") \
-    APPLY(SourceFileError, "Source file error") \
-    APPLY(TargetFileError, "Target file error") \
-    APPLY(ChunkError, "Chunk error") \
-    APPLY(NoError, "No error") \
-    APPLY(Interrupted, "Interrupted")
+    APPLY(GetCatalogError) \
+    APPLY(NoBackupStorageError) \
+    APPLY(FromStorageError) \
+    APPLY(SourceFileError) \
+    APPLY(TargetFileError) \
+    APPLY(ChunkError) \
+    APPLY(NoError) \
+    APPLY(Interrupted)
 
-#define ENUM_APPLY(value, _) value,
+#define ENUM_APPLY(value) value,
 
     enum class CopyError {
         COPY_ERROR_LIST(ENUM_APPLY)
     };
 
-#define TO_STRING_APPLY(value, desc) case CopyError::value: return lit(desc);
+#define TO_STRING_APPLY(value) case CopyError::value: return lit(#value);
 
     QString copyErrorString(CopyError error) {
         switch (error) {
