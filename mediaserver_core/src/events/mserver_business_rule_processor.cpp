@@ -285,7 +285,7 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
     int recordAfterMs = action->getParams().recordAfter;
 
     const auto key = action->getExternalUniqKey();
-    auto runningKey = guidFromArbitraryData(key.toLatin1());
+    auto runningKey = guidFromArbitraryData(key);
     qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
     qint64 endTimeMs = startTimeMs;
 

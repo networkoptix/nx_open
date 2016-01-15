@@ -5,6 +5,7 @@
 
 class QnBookmarkBusinessAction : public QnCommonBusinessAction
 {
+    typedef QnCommonBusinessAction base_type;
 public:
     QnBookmarkBusinessAction(const QnBusinessEventParameters &runtimeParams);
 
