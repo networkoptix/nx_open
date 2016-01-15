@@ -22,7 +22,7 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
             raise serializers.ValidationError("Too long password")
 
         # Correct characters
-        pattern = re.compile("^" + settings.PASSWORD_REQUIREMENTS['requiredRegex'] + "$")
+        pattern =  settings.PASSWORD_REQUIREMENTS['requiredRegex']
         if not pattern.match(value):
             raise serializers.ValidationError("Incorrect password")
 
