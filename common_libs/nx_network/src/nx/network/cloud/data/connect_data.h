@@ -26,7 +26,7 @@ class NX_NETWORK_API ConnectRequest
 public:
     nx::String destinationHostName;
     nx::String originatingPeerID;
-    QnUuid connectSessionGuid;
+    nx::String connectSessionGuid;
     ConnectionMethods connectionMethods;
 
     ConnectRequest();

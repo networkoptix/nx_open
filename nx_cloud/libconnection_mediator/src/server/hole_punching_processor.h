@@ -5,10 +5,14 @@
 
 #pragma once
 
+#include <functional>
+
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/result_code.h>
+#include <nx/utils/thread/mutex.h>
 
+#include "udp_hole_punching_connection_initiation_fsm.h"
 #include "../request_processor.h"
 
 
@@ -22,7 +26,8 @@ namespace hpm {
 
 class ListeningPeerPool;
 
-/** Implements hole punching connection mediation techniques
+/** Handles requests used to establish hole punching connection. 
+    Implements hole punching connection mediation techniques
 */
 class HolePunchingProcessor
 :
@@ -44,7 +49,22 @@ public:
         std::function<void(api::ResultCode)> completionHandler);
 
 private:
+    typedef std::map<
+        nx::String,
+        std::unique_ptr<UDPHolePunchingConnectionInitiationFsm >
+    > ConnectSessionsDictionary;
+
     ListeningPeerPool* const m_listeningPeerPool;
+    QnMutex m_mutex;
+    //map<id, connection initiation>
+    ConnectSessionsDictionary m_ongoingConnections;
+
+    api::ResultCode validateConnectRequest(
+        const ConnectionStrongRef& connection,
+        const api::ConnectRequest& request);
+
+
+    void connectSessionFinished(ConnectSessionsDictionary::iterator);
 };
 
 } // namespace hpm

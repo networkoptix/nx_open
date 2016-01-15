@@ -22,7 +22,7 @@ void ConnectRequest::serialize(nx::stun::Message* const message)
 {
     message->newAttribute<stun::cc::attrs::HostName>(std::move(destinationHostName));
     message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
-    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionGuid.toByteArray());
+    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionGuid);
     message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
 }
 
@@ -31,7 +31,7 @@ bool ConnectRequest::parse(const nx::stun::Message& message)
     return
         readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
         readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
-        readUuidAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionGuid) &&
+        readStringAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionGuid) &&
         readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods);
 }
 
