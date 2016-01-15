@@ -79,7 +79,7 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     }
 
     if (!serverConnection) {
-        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers is connected to the Internet."));
+        QMessageBox::warning(this, tr("Network Error"), tr("Could not perform a test. None of your servers are connected to the Internet."));
         return false;
     }
 

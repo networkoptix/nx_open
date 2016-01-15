@@ -55,7 +55,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
     }
 
     if (!serverConnection) {
-        stopTesting(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not load users."));
+        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not load users."));
         return;
     }
 
