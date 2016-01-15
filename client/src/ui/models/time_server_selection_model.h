@@ -50,7 +50,7 @@ private:
     bool calculateSameTimezone() const;
     void resetData(qint64 currentSyncTime);
 
-    void updateFirtstItemCheckedox();
+    void updateFirtstItemCheckbox();
 private:
     struct Item {
         QnUuid peerId;
