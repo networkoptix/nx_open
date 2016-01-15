@@ -146,7 +146,10 @@ void QnWorkbenchConnectHandler::at_messageProcessor_connectionOpened() {
     {
         if (info.uuid != qnCommon->moduleGUID())
             return;
-        connection2()->sendRuntimeData(info.data);
+
+        /* We can get here during disconnect process */
+        if (connection2())
+            connection2()->sendRuntimeData(info.data);
     });
 
 
