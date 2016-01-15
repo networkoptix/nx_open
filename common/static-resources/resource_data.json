@@ -102,7 +102,7 @@
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04",
+                "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96"
             ],
             "ptzTraits": "EightWayPtz"
