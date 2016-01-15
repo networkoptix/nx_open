@@ -55,11 +55,11 @@ namespace ec2
 
         ErrorCode getTransactionsAfter(const QnTranState& state, QList<QByteArray>& result);
         QnTranState getTransactionsState();
-        
+
         bool contains(const QnTranState& state) const;
 
         template <class T>
-        ErrorCode saveTransaction(const QnTransaction<T>& tran) 
+        ErrorCode saveTransaction(const QnTransaction<T>& tran)
         {
             QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
             return saveToDB(tran, transactionHash(tran.params), serializedTran);
@@ -140,7 +140,7 @@ namespace ec2
 
         int getLatestSequence(const QnTranStateKey& key) const;
         QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray()) const;
-        QnUuid makeHash(const QString &extraData, const ApiDiscoveryData &data) const;
+        QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data) const;
 
          /**
          *  Semantics of the transactionHash() function is following:
@@ -167,7 +167,7 @@ namespace ec2
         QnUuid transactionHash(const ApiLicenseData& params) const                { return makeHash(params.key, "ApiLicense"); }    //TODO
         QnUuid transactionHash(const ApiResetBusinessRuleData& /*tran*/) const    { return makeHash("reset_brule", ADD_HASH_DATA); }
         QnUuid transactionHash(const ApiDiscoveryData &params) const              { return makeHash("discovery_data", params); }
-        
+
         QnUuid transactionHash(const ApiIdDataList& /*tran*/) const             { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiResourceParamDataList& /*tran*/) const  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
         QnUuid transactionHash(const ApiResourceParamWithRefDataList& /*tran*/) const  { Q_ASSERT_X(0, Q_FUNC_INFO, "Invalid transaction for hash!"); return QnUuid(); }
@@ -248,7 +248,7 @@ namespace ec2
         QnDbManager* m_dbManager;
         QnTranState m_state;
         QMap<QnUuid, UpdateHistoryData> m_updateHistory;
-        
+
         mutable QnMutex m_timeMutex;
         QElapsedTimer m_relativeTimer;
         qint64 m_baseTime;
