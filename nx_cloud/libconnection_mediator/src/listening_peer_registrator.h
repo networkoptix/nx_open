@@ -7,7 +7,6 @@
 
 #include <functional>
 
-#include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/listen_data.h>
 #include <nx/network/cloud/data/resolve_data.h>
 #include <nx/network/cloud/data/result_code.h>
@@ -28,11 +27,11 @@ class ListeningPeerPool;
 
 /** Registers peers which desire to accept cloud connections, resolves such peers address.
  */
-class ListeningPeerRegistrator
+class PeerRegistrator
         : protected RequestProcessor
 {
 public:
-    ListeningPeerRegistrator(
+    PeerRegistrator(
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);

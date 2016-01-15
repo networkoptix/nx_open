@@ -9,6 +9,7 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/cloud/data/connection_method.h>
 #include <nx/network/stun/abstract_server_connection.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/singleton.h>
@@ -29,11 +30,13 @@ struct ListeningPeerData
     /** valid for locally-registered peer only */
     ConnectionWeakRef peerConnection;
     std::list< SocketAddress > endpoints;
+    api::ConnectionMethods connectionMethods;
 
     ListeningPeerData()
     :
         isLocal(true),
-        isListening(false)
+        isListening(false),
+        connectionMethods(0)
     {
     }
 };

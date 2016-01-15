@@ -6,6 +6,7 @@
 #include "cloud_connect_processor.h"
 
 #include <nx/network/stun/message_dispatcher.h>
+#include <nx/utils/log/log.h>
 
 #include "listening_peer_pool.h"
 
@@ -13,7 +14,7 @@
 namespace nx {
 namespace hpm {
 
-CloudConnectProcessor::CloudConnectProcessor(
+HolePunchingProcessor::HolePunchingProcessor(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool)
@@ -24,76 +25,35 @@ CloudConnectProcessor::CloudConnectProcessor(
     dispatcher->registerRequestProcessor(
         stun::cc::methods::connect,
         [this](const ConnectionStrongRef& connection, stun::Message message)
-            { connect( std::move(connection), std::move( message ) ); } );
+        {
+            processRequestWithOutput(
+                &HolePunchingProcessor::connect,
+                this,
+                std::move(connection),
+                std::move(message));
+        });
 
     dispatcher->registerRequestProcessor(
         stun::cc::methods::connectionResult,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
-                &CloudConnectProcessor::connectionResult,
+                &HolePunchingProcessor::connectionResult,
                 this,
                 std::move(connection),
                 std::move(message));
         });
 }
 
-void CloudConnectProcessor::connect(
+void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
-    stun::Message message )
+    api::ConnectRequest request,
+    std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
-    //TODO #ak
-    sendErrorResponse(
-        connection,
-        message.header, stun::cc::error::notFound,
-        "Not implemented");
-
-    
-//    const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
-//    if( !userNameAttr )
-//        return sendErrorResponse( connection, message.header, stun::error::badRequest,
-//            "Attribute ClientId is required" );
-//
-//    const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
-//    if( !hostNameAttr )
-//        return sendErrorResponse( connection, message.header, stun::error::badRequest,
-//            "Attribute HostName is required" );
-//
-//    const auto userName = userNameAttr->getString();
-//    const auto hostName = hostNameAttr->getString();
-//
-//    QnMutexLocker lk( &m_mutex );
-//    if (const auto peer = m_peers.search(hostName))
-//    {
-//        stun::Message response( stun::Header(
-//            stun::MessageClass::successResponse, message.header.method,
-//            std::move( message.header.transactionId ) ) );
-//
-//        if( !peer->endpoints.empty() )
-//            response.newAttribute< stun::cc::attrs::PublicEndpointList >( peer->endpoints );
-//
-//        if( !peer->isListening )
-//            { /* TODO: StunEndpointList */ }
-//
-//        NX_LOGX( lit("Client %1 connects to %2, endpoints=%3")
-//                .arg( QString::fromUtf8( userName ) )
-//                .arg( QString::fromUtf8( hostName ) )
-//                .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
-//
-//        connection->sendMessage(std::move(response));
-//    }
-//    else
-//    {
-//        NX_LOGX( lit("Client %1 connects to %2, error: unknown host")
-//                .arg( QString::fromUtf8( userName ) )
-//                .arg( QString::fromUtf8( hostName ) ), cl_logDEBUG1 );
-//
-//        sendErrorResponse( connection, message.header, stun::cc::error::notFound,
-//            "Unknown host: " + hostName );
-//    }
+    completionHandler(api::ResultCode::notImplemented, api::ConnectResponse());
 }
 
-void CloudConnectProcessor::connectionResult(
+void HolePunchingProcessor::connectionResult(
     const ConnectionStrongRef& /*connection*/,
     api::ConnectionResultRequest /*request*/,
     std::function<void(api::ResultCode)> completionHandler)

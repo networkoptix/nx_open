@@ -12,25 +12,13 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>
 
+#include "connection_method.h"
 #include "stun_message_data.h"
 
 
 namespace nx {
 namespace hpm {
 namespace api {
-
-namespace ConnectionMethod
-{
-    enum Value
-    {
-        udpHolePunching = 1,
-        tcpHolePunching = 2,
-        proxy = 4,
-        reverseConnect = 8,
-    };
-}
-
-typedef std::size_t ConnectionMethods;
 
 class NX_NETWORK_API ResolveRequest
 :

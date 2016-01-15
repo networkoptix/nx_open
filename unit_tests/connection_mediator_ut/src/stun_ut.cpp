@@ -42,7 +42,7 @@ protected:
     CloudDataProviderMock cloudData;
     MediaserverApiMock mediaserverApi;
     ListeningPeerPool listeningPeerPool;
-    ListeningPeerRegistrator listeningPeerRegistrator;
+    PeerRegistrator listeningPeerRegistrator;
     MultiAddressServer<SocketServer> server;
 };
 

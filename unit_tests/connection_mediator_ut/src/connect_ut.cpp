@@ -38,7 +38,7 @@ protected:
         SocketGlobalsHolder::instance()->reinitialize();
 
         m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
-        listeningPeerRegistrator = std::make_unique<ListeningPeerRegistrator>(
+        listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
@@ -56,7 +56,7 @@ protected:
 
     CloudDataProviderMock cloud;
     ListeningPeerPool listeningPeerPool;
-    std::unique_ptr<ListeningPeerRegistrator> listeningPeerRegistrator;
+    std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
     std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
 
     SocketAddress address() const

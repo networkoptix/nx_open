@@ -14,7 +14,7 @@
 namespace nx {
 namespace hpm {
 
-ListeningPeerRegistrator::ListeningPeerRegistrator(
+PeerRegistrator::PeerRegistrator(
     AbstractCloudDataProvider* cloudData,
     nx::stun::MessageDispatcher* dispatcher,
     ListeningPeerPool* const listeningPeerPool)
@@ -39,7 +39,7 @@ ListeningPeerRegistrator::ListeningPeerRegistrator(
             [this](const ConnectionStrongRef& connection, stun::Message message)
             {
                 processRequestWithOutput(
-                    &ListeningPeerRegistrator::resolve,
+                    &PeerRegistrator::resolve,
                     this,
                     std::move(connection),
                     std::move(message));
@@ -49,7 +49,7 @@ ListeningPeerRegistrator::ListeningPeerRegistrator(
     Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
-void ListeningPeerRegistrator::bind(const ConnectionStrongRef& connection,
+void PeerRegistrator::bind(const ConnectionStrongRef& connection,
                              stun::Message message)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
@@ -86,7 +86,7 @@ void ListeningPeerRegistrator::bind(const ConnectionStrongRef& connection,
 
 }
 
-void ListeningPeerRegistrator::listen(const ConnectionStrongRef& connection,
+void PeerRegistrator::listen(const ConnectionStrongRef& connection,
                                stun::Message message)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
@@ -118,7 +118,7 @@ void ListeningPeerRegistrator::listen(const ConnectionStrongRef& connection,
 
 }
 
-void ListeningPeerRegistrator::resolve(
+void PeerRegistrator::resolve(
     const ConnectionStrongRef& connection,
     api::ResolveRequest requestData,
     std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
@@ -154,7 +154,7 @@ void ListeningPeerRegistrator::resolve(
 
 }
 
-//void ListeningPeerRegistrator::connect(const ConnectionStrongRef& connection,
+//void PeerRegistrator::connect(const ConnectionStrongRef& connection,
 //                                stun::Message message )
 //{
 //    const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
@@ -201,7 +201,7 @@ void ListeningPeerRegistrator::resolve(
 //    }
 //}
 
-//void ListeningPeerRegistrator::connectionResult(
+//void PeerRegistrator::connectionResult(
 //    const ConnectionStrongRef& /*connection*/,
 //    api::ConnectionResultRequest /*request*/,
 //    std::function<void(api::ResultCode)> completionHandler)

@@ -23,10 +23,10 @@ public:
 protected:
     void setErrorText(nx::String text);
 
-    template<typename AttributeType, typename AttributeValue>
+    template<typename AttributeType, typename AttributeValueType>
     bool readAttributeValue(
         const nx::stun::Message& message,
-        AttributeValue* const value)
+        AttributeValueType* const value)
     {
         const auto attribute = message.getAttribute< AttributeType >();
         if (!attribute)
@@ -52,6 +52,38 @@ protected:
             return false;
         }
         *value = attribute->getString();
+        return true;
+    }
+
+    template<typename AttributeType>
+    bool readIntAttributeValue(
+        const nx::stun::Message& message,
+        int* const value)
+    {
+        const auto attribute = message.getAttribute< AttributeType >();
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(AttributeType::TYPE));
+            return false;
+        }
+        *value = attribute->getString().toInt();
+        return true;
+    }
+
+    template<typename AttributeType>
+    bool readUuidAttributeValue(
+        const nx::stun::Message& message,
+        QnUuid* const value)
+    {
+        const auto attribute = message.getAttribute< AttributeType >();
+        if (!attribute)
+        {
+            setErrorText(nx::String("Missing required attribute ") +
+                stun::cc::attrs::toString(AttributeType::TYPE));
+            return false;
+        }
+        *value = QnUuid::fromStringSafe(attribute->getString());
         return true;
     }
 

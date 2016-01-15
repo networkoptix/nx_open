@@ -90,11 +90,11 @@ int MediatorProcess::executeApplication()
     nx::stun::MessageDispatcher stunMessageDispatcher;
     MediaserverApi mediaserverApi(cloudDataProvider.get(), &stunMessageDispatcher);
     ListeningPeerPool listeningPeerPool;
-    ListeningPeerRegistrator listeningPeerRegistrator(
+    PeerRegistrator listeningPeerRegistrator(
         cloudDataProvider.get(),
         &stunMessageDispatcher,
         &listeningPeerPool);
-    CloudConnectProcessor cloudConnectProcessor(
+    HolePunchingProcessor cloudConnectProcessor(
         cloudDataProvider.get(),
         &stunMessageDispatcher,
         &listeningPeerPool);

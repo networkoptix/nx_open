@@ -5,7 +5,9 @@
 
 #pragma once
 
+#include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
+#include <nx/network/cloud/data/result_code.h>
 
 #include "../request_processor.h"
 
@@ -20,21 +22,22 @@ namespace hpm {
 
 class ListeningPeerPool;
 
-/** Implements cross-nat connection mediation techniques
+/** Implements hole punching connection mediation techniques
 */
-class CloudConnectProcessor
+class HolePunchingProcessor
 :
     protected RequestProcessor
 {
 public:
-    CloudConnectProcessor(
+    HolePunchingProcessor(
         AbstractCloudDataProvider* cloudData,
         nx::stun::MessageDispatcher* dispatcher,
         ListeningPeerPool* const listeningPeerPool);
 
     void connect(
         const ConnectionStrongRef& connection,
-        stun::Message message);
+        api::ConnectRequest request,
+        std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,

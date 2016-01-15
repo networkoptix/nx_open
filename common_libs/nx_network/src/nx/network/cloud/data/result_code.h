@@ -19,8 +19,10 @@ enum class ResultCode
     ok = 0,
     networkError,
     responseParseError,
+    badRequest,
     notFound,
-    otherLogicError
+    otherLogicError,
+    notImplemented
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)

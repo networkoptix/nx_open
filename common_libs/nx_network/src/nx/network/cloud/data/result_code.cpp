@@ -8,6 +8,7 @@
 #include <nx/network/stun/cc/custom_stun.h>
 #include <utils/common/model_functions.h>
 
+
 namespace nx {
 namespace hpm {
 namespace api {
@@ -16,8 +17,10 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::networkError, "networkError")
     (ResultCode::responseParseError, "responseParseError")
+    (ResultCode::badRequest, "badRequest")
     (ResultCode::notFound, "notFound")
     (ResultCode::otherLogicError, "otherLogicError")
+    (ResultCode::notImplemented, "notImplemented")
     )
 
 
