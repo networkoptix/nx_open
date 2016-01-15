@@ -88,6 +88,7 @@ QnPage {
                         d.resumeOnActivate = true
                         d.videoNavigation.paused = true
                     }
+                    showUi()
                 } else if (Qt.application.state == Qt.ApplicationActive) {
                     if (d.resumeOnActivate) {
                         if (d.resumeAtLive)
@@ -417,7 +418,7 @@ QnPage {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (Main.backPressed()) {
                 event.accepted = true
             }

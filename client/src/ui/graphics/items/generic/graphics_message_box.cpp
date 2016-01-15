@@ -79,7 +79,7 @@ QnGraphicsMessageBox::QnGraphicsMessageBox(QGraphicsItem *parent, const QString 
     font.setPixelSize(fontSize == 0 ? defaultFontSize : fontSize);
     setFont(font);
 
-   // setColors(QnGraphicsMessageBoxColors());
+    setColors(QnGraphicsMessageBoxColors());
 
     setAcceptedMouseButtons(Qt::NoButton);
 

@@ -157,6 +157,7 @@ protected slots:
     void at_motionRegionCleared(QGraphicsView *view, QnMediaResourceWidget *widget);
     void at_motionRegionSelected(QGraphicsView *view, QnMediaResourceWidget *widget, const QRect &region);
 
+    void at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_leftClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);
     void at_item_middleClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info);

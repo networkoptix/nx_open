@@ -198,3 +198,13 @@ function backPressed() {
 
     return false
 }
+
+function keyIsBack(key) {
+    if (key === Qt.Key_Back)
+        return true
+
+//    if (key === Qt.Key_Backspace)
+//        return true
+
+    return false
+}
