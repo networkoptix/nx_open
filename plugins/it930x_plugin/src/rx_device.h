@@ -151,7 +151,7 @@ namespace ite
         bool isLocked() const;
 
     private:
-        std::atomic_bool m_deviceReady;
+        std::atomic_bool 	m_deviceReady;
         // </refactor>
 
     private:

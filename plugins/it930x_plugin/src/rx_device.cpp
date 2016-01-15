@@ -65,6 +65,7 @@ namespace ite
         stopReader();
         m_txDev.reset();
         open();
+        fprintf(stderr, "[shutdown] reopen %d done!\n", m_rxID);
         m_deviceReady = false;
     }
 
@@ -90,7 +91,7 @@ namespace ite
 
                     if (!good() || !m_deviceReady)
                     {
-                        printf("[Rx watchdog] Rx %d became bad. shutting down.\n", m_rxID);
+                        debug_printf("[Rx watchdog] Rx %d became bad. shutting down.\n", m_rxID);
                         shutdown();
 
                         if(findBestTx())
@@ -203,11 +204,7 @@ namespace ite
         // We need to read from channel for some time
         static const int SEARCH_READ_TIME = 4000; // ms
 
-        debug_printf(
-            "[search] Rx: %d; trying channel %d ...\n",
-            m_rxID,
-            chan
-        );
+        debug_printf(stderr, "[search] Rx: %d; trying channel %d ...\n", m_rxID, chan);
 
         m_it930x->unlockFrequency();
         if (m_it930x->lockFrequency(TxDevice::freq4chan(chan)))
@@ -308,12 +305,19 @@ namespace ite
         std::lock_guard<std::mutex> lock(m_mutex);
         // trying hints first
         auto hints = rxHintManager.getHintsByRx(m_rxID);
-        for (const auto &hint: hints) {
-            if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan)) {
+
+        for (const auto &hint: hints)
+        {
+            if (rxHintManager.useHint(m_rxID, hint.txId, hint.chan))
+            {
                 if (testChannel(hint.chan, bestChan, bestStrength, txID) &&
-                        txID == hint.txId && rxSyncManager.lock(m_rxID, hint.txId)) {
+                    txID == hint.txId &&
+                    rxSyncManager.lock(m_rxID, hint.txId))
+                {
                     return lockAndStart(hint.chan, hint.txId);
-                } else {
+                }
+                else
+                {
                     debug_printf("[search] Hint testChannel failed; \
                                   txID: %d, hint.txID: %d, hint.chan: %d\n",
                                  txID, hint.txId, hint.chan);
@@ -321,18 +325,24 @@ namespace ite
                 }
             }
         }
+
         // hints didn't help, starting normal discovery routine
-        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i) {
-            if (testChannel(i, bestChan, bestStrength, txID)) {
+        for (int i = 0; i < TxDevice::CHANNELS_NUM; ++i)
+        {
+            if (testChannel(i, bestChan, bestStrength, txID))
+            {
                 debug_printf("[search] Rx: %d. Test channel %d succeeded. \
                               Strength is %d, camera is %d\n",
                              m_rxID, i, bestStrength, txID);
-                if (rxSyncManager.lock(m_rxID, txID)) {
+
+                if (rxSyncManager.lock(m_rxID, txID))
                     return lockAndStart(bestChan, txID);
-                } else {
+                else
+                {
                     debug_printf("[search] Rx: %d. This channel (%d) seems already locked. \
                                   Need to continue.\n", m_rxID, i);
                 }
+
             }
         }
         printf("[search] Rx: %d; Search failed\n", m_rxID);

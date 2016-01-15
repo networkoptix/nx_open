@@ -119,18 +119,23 @@ namespace ite
         //
 
         It930x(uint16_t rxID)
-        :   m_rxID(rxID)
+            : m_rxID(rxID),
+              m_opened(false)
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
 
             m_handle = DTV_DeviceOpen(ENDEAVOUR, rxID);
             if (m_handle < 0)
                 throw DtvException("DTV_DeviceOpen", rxID);
+            m_opened = true;
         }
 
         ~It930x()
         {
             std::lock_guard<std::mutex> lock(m_rcMutex); // LOCK
+
+            if (!m_opened)
+                return;
 
             m_devStream.reset();
             DTV_DeviceClose(m_handle);
@@ -273,6 +278,7 @@ namespace ite
         int m_handle;
         uint16_t m_rxID;
         std::unique_ptr<It930Stream> m_devStream;
+        bool m_opened;
 
 #if 0
         void getDeviceID() const

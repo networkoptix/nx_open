@@ -208,10 +208,10 @@ namespace ite
         for (auto it = m_rxDevices.begin(); it != m_rxDevices.end(); ++it)
         {
             debug_printf("[DiscoveryManager::findCameras] trying RX %d\n", (*it)->rxID());
-            if ((*it)->deviceReady())
+            if (it->second->deviceReady())
             {
                 debug_printf("[DiscoveryManager::findCameras] RX %d is good!\n", (*it)->rxID());
-                nxcip::CameraInfo info = (*it)->getCameraInfo();
+                nxcip::CameraInfo info = it->second->getCameraInfo();
                 debug_printf(
                     "[DiscoveryManager::findCameras] Rx: %d; cam uid: %s cam url: %s\n",
                     (*it)->rxID(),
@@ -276,6 +276,15 @@ namespace ite
             return;
         }
         rxHintManager.addHint(rxId, txId, TxDevice::chan4freq(freq));
+
+        auto rxIt = m_rxDevices.find(rxId);
+        if (rxIt == m_rxDevices.end())
+        {
+            RxDevicePtr newRxDevice(new RxDevice(rxId));
+            newRxDevice->startWatchDog();
+            m_rxDevices.emplace(rxId, newRxDevice);
+        }
+
         return;
     }
 
@@ -306,9 +315,9 @@ namespace ite
         auto rxIt = std::find_if(
             m_rxDevices.begin(),
             m_rxDevices.end(),
-            [txID](RxDevicePtr p)
+            [txID](const std::pair<int, RxDevicePtr> &p)
             {
-                return p->getTxDevice() && p->getTxDevice()->txID() == txID;
+                return p.second->getTxDevice() && p.second->getTxDevice()->txID() == txID;
             }
         );
 
@@ -331,7 +340,7 @@ namespace ite
         }
         else
         {
-            foundRxDev = *rxIt;
+            foundRxDev = rxIt->second;
         }
 
         // Now we know if rx is operational. Let's deal with related cameraManager.
@@ -435,9 +444,15 @@ namespace ite
         for (size_t i = 0; i < names.size(); ++i)
         {
             unsigned rxID = RxDevice::dev2id(names[i]);
-            RxDevicePtr newRxDevice(new RxDevice(rxID));
-            newRxDevice->startWatchDog();
-            m_rxDevices.push_back(newRxDevice);
+            std::lock_guard<std::mutex> lk(m_mutex);
+
+            auto rxIt = m_rxDevices.find(rxID);
+            if (rxIt == m_rxDevices.end())
+            {
+                RxDevicePtr newRxDevice(new RxDevice(rxID));
+                newRxDevice->startWatchDog();
+                m_rxDevices.emplace(rxID, newRxDevice);
+            }
         }
     }
 }

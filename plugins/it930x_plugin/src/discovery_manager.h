@@ -157,7 +157,7 @@ namespace ite
         std::atomic_bool 			m_blockAutoScan;
         std::vector<CameraPtr> 		m_cameras;
         Timer 						m_rescanTimer;
-        std::vector<RxDevicePtr>  	m_rxDevices;
+        std::map<int, RxDevicePtr>	m_rxDevices;
     };
 }
 
