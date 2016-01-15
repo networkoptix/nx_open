@@ -10,6 +10,7 @@
 
 #include <nx/network/socket_common.h>
 
+#include "connection_method.h"
 #include "stun_message_data.h"
 
 
@@ -22,9 +23,10 @@ class NX_NETWORK_API ConnectRequest
     public StunMessageData
 {
 public:
-    nx::String hostName;
-    nx::String peerID;
-    nx::String connectionID;
+    nx::String destinationHostName;
+    nx::String originatingPeerID;
+    QnUuid connectSessionGuid;
+    ConnectionMethods connectionMethods;
 
     ConnectRequest();
 
@@ -37,11 +39,12 @@ class NX_NETWORK_API ConnectResponse
     public StunMessageData
 {
 public:
-    std::list<SocketAddress> endpoints;
+    std::list<SocketAddress> publicTcpEndpointList;
+    std::list<SocketAddress> udpEndpointList;
 
     ConnectResponse();
 
-    /*!
+    /**
         \note after this method call object contents are undefined
     */
     void serialize(nx::stun::Message* const message);

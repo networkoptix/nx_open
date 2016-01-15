@@ -13,19 +13,26 @@ namespace hpm {
 namespace api {
 
 ConnectRequest::ConnectRequest()
+:
+    connectionMethods(0)
 {
 }
 
 void ConnectRequest::serialize(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::HostName>(hostName);
-    message->newAttribute<stun::cc::attrs::PeerId>("SomeClientId"); //TODO #ak
+    message->newAttribute<stun::cc::attrs::HostName>(std::move(destinationHostName));
+    message->newAttribute<stun::cc::attrs::PeerId>(std::move(originatingPeerID));
+    message->newAttribute<stun::cc::attrs::ConnectionId>(connectSessionGuid.toByteArray());
+    message->newAttribute<stun::cc::attrs::ConnectionMethods>(nx::String::number(connectionMethods));
 }
 
 bool ConnectRequest::parse(const nx::stun::Message& message)
 {
-    return readStringAttributeValue<stun::cc::attrs::HostName>(message, &hostName)
-        && readStringAttributeValue<stun::cc::attrs::PeerId>(message, &peerID);
+    return
+        readStringAttributeValue<stun::cc::attrs::HostName>(message, &destinationHostName) &&
+        readStringAttributeValue<stun::cc::attrs::PeerId>(message, &originatingPeerID) &&
+        readUuidAttributeValue<stun::cc::attrs::ConnectionId>(message, &connectSessionGuid) &&
+        readIntAttributeValue<stun::cc::attrs::ConnectionMethods>(message, &connectionMethods);
 }
 
 
@@ -36,12 +43,19 @@ ConnectResponse::ConnectResponse()
 
 void ConnectResponse::serialize(nx::stun::Message* const message)
 {
-    message->newAttribute< stun::cc::attrs::PublicEndpointList >(std::move(endpoints));
+    message->newAttribute< stun::cc::attrs::PublicEndpointList >(
+        std::move(publicTcpEndpointList));
+    message->newAttribute< stun::cc::attrs::UdtHpEndpointList >(
+        std::move(udpEndpointList));
 }
 
 bool ConnectResponse::parse(const nx::stun::Message& message)
 {
-    return readAttributeValue<stun::cc::attrs::PublicEndpointList>(message, &endpoints);
+    return 
+        readAttributeValue<stun::cc::attrs::PublicEndpointList>(
+            message, &publicTcpEndpointList) &&
+        readAttributeValue<stun::cc::attrs::UdtHpEndpointList>(
+            message, &udpEndpointList);
 }
 
 }   //api
