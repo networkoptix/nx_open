@@ -9,6 +9,7 @@
 #include <list>
 
 #include <nx/network/socket_common.h>
+#include <nx/utils/uuid.h>
 
 #include "connection_method.h"
 #include "stun_message_data.h"
