@@ -10,7 +10,7 @@ namespace
     {
         kProgressValueFailed = -1
         , kProgressValueStarted = 0
-        , kProgressValueLoading = 85    // Up to 30% value of progress
+        , kProgressValueLoading = 85    // Up to 85% value of progress
                                         // we assume that page is in loading status
         , kProgressValueLoaded = 100
     };

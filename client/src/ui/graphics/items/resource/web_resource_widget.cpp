@@ -20,7 +20,7 @@ QnWebResourceWidget::QnWebResourceWidget( QnWorkbenchContext *context, QnWorkben
     setOption(AlwaysShowName, true);
 
     m_webView->installEventFilter(this);
-    const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::kRecordingStatusIconButton);
+    const auto iconButton = buttonsOverlay()->leftButtonsBar()->button(Qn::RecordingStatusIconButton);
     const auto contentMargins = QMarginsF(0, iconButton->preferredHeight(), 0, 0);
     const auto webParams = detail::OverlayParams(Visible
         , false, true, BaseLayer, contentMargins);
@@ -61,12 +61,12 @@ void QnWebResourceWidget::setupOverlays()
         auto backButton = new QnImageButtonWidget(this);
         backButton->setIcon(qnSkin->icon("item/back.png"));
         connect(backButton, &QnImageButtonWidget::clicked, m_webView, &QnWebView::back);
-        buttonsBar->addButton(Qn::kBackButton, backButton);
-        buttonsBar->setButtonsEnabled(Qn::kBackButton, false);
+        buttonsBar->addButton(Qn::BackButton, backButton);
+        buttonsBar->setButtonsEnabled(Qn::BackButton, false);
 
         connect(m_webView, &QnWebView::canGoBackChanged, this, [this, buttonsBar, backButton]()
         {
-            buttonsBar->setButtonsEnabled(Qn::kBackButton, m_webView->canGoBack());
+            buttonsBar->setButtonsEnabled(Qn::BackButton, m_webView->canGoBack());
         });
 
         auto reloadButton = new QnImageButtonWidget(this);
@@ -78,7 +78,7 @@ void QnWebResourceWidget::setupOverlays()
 
             m_webView->setPageUrl(m_webView->url());
         });
-        buttonsBar->addButton(Qn::kReloadPageButton, reloadButton);
+        buttonsBar->addButton(Qn::ReloadPageButton, reloadButton);
     }
 
     {
@@ -93,7 +93,7 @@ void QnWebResourceWidget::setupOverlays()
             const auto newFullscreenItem = (options().testFlag(FullScreenMode) ? nullptr : item());
             workbench()->setItem(Qn::ZoomedRole, newFullscreenItem);
         });
-        buttonsOverlay()->rightButtonsBar()->addButton(Qn::kFullscreenButton, fullscreenButton);
+        buttonsOverlay()->rightButtonsBar()->addButton(Qn::FullscreenButton, fullscreenButton);
     }
 }
 
@@ -124,7 +124,7 @@ void QnWebResourceWidget::optionsChangedNotify(Options changedFlags)
             ? qnSkin->icon("item/exit_fullscreen.png")
             : qnSkin->icon("item/fullscreen.png");
 
-        buttonsOverlay()->rightButtonsBar()->button(Qn::kFullscreenButton)->setIcon(newIcon);
+        buttonsOverlay()->rightButtonsBar()->button(Qn::FullscreenButton)->setIcon(newIcon);
     }
 
     return base_type::optionsChangedNotify(changedFlags);
@@ -147,7 +147,7 @@ bool QnWebResourceWidget::eventFilter(QObject *object
 int QnWebResourceWidget::calculateButtonsVisibility() const
 {
     return (base_type::calculateButtonsVisibility()
-        | Qn::kFullscreenButton | Qn::kBackButton | Qn::kReloadPageButton);
+        | Qn::FullscreenButton | Qn::BackButton | Qn::ReloadPageButton);
 }
 
 Qn::RenderStatus QnWebResourceWidget::paintChannelBackground( QPainter *painter, int channel, const QRectF &channelRect, const QRectF &paintRect )

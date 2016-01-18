@@ -508,7 +508,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     showLogButton->setToolTip(tr("Show Log"));
     setHelpTopic(showLogButton, Qn::MainWindow_MonitoringItem_Log_Help);
     connect(showLogButton, SIGNAL(clicked()), this, SLOT(at_showLogButton_clicked()));
-    buttonsOverlay()->rightButtonsBar()->addButton(Qn::kShowLogButton, showLogButton);
+    buttonsOverlay()->rightButtonsBar()->addButton(Qn::ShowLogButton, showLogButton);
 
     QnImageButtonWidget *checkIssuesButton = new QnImageButtonWidget();
     checkIssuesButton->setIcon(qnSkin->icon("item/issues.png"));
@@ -516,7 +516,7 @@ QnServerResourceWidget::QnServerResourceWidget(QnWorkbenchContext *context, QnWo
     checkIssuesButton->setProperty(Qn::NoBlockMotionSelection, true);
     checkIssuesButton->setToolTip(tr("Check Issues"));
     connect(checkIssuesButton, SIGNAL(clicked()), this, SLOT(at_checkIssuesButton_clicked()));
-    buttonsOverlay()->rightButtonsBar()->addButton(Qn::kCheckIssuesButton, checkIssuesButton);
+    buttonsOverlay()->rightButtonsBar()->addButton(Qn::CheckIssuesButton, checkIssuesButton);
 
 //    connect(headerOverlayWidget(), SIGNAL(opacityChanged()), this, SLOT(updateInfoOpacity()));
 
@@ -795,9 +795,9 @@ QString QnServerResourceWidget::calculateTitleText() const {
 int QnServerResourceWidget::calculateButtonsVisibility() const
 {
     int result = base_type::calculateButtonsVisibility();
-    result &= (Qn::kCloseButton | Qn::kRotateButton | Qn::kInfoButton);
+    result &= (Qn::CloseButton | Qn::RotateButton | Qn::InfoButton);
     if (!qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode())
-        result |= (Qn::kPingButton | Qn::kShowLogButton | Qn::kCheckIssuesButton);
+        result |= (Qn::PingButton | Qn::ShowLogButton | Qn::CheckIssuesButton);
     return result;
 }
 

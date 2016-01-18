@@ -1811,7 +1811,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged() {
         }
 
         if(thumbnailed)
-            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(Qn::kPtzButton));
+            widget->item()->setData(Qn::ItemDisabledButtonsRole, static_cast<int>(Qn::PtzButton));
     }
 
     QVector<QnUuid> selectedUuids = layout->data(Qn::LayoutSelectionRole).value<QVector<QnUuid> >();

@@ -187,7 +187,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     connect(videowallLicenseHelper, &QnLicenseUsageWatcher::licenseUsageChanged, this, &QnResourceWidget::updateStatusOverlay);
 
     /* Run handlers. */
-    setInfoVisible(buttonsOverlay()->rightButtonsBar()->button(Qn::kInfoButton)->isChecked(), false);
+    setInfoVisible(buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton)->isChecked(), false);
     updateTitleText();
     updateButtonsVisibility();
     updateCursor();
@@ -274,9 +274,9 @@ void QnResourceWidget::createButtons() {
     connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
 
     auto buttonsBar = buttonsOverlay()->rightButtonsBar();
-    buttonsBar->addButton(Qn::kCloseButton, closeButton);
-    buttonsBar->addButton(Qn::kInfoButton, infoButton);
-    buttonsBar->addButton(Qn::kRotateButton, rotateButton);
+    buttonsBar->addButton(Qn::CloseButton, closeButton);
+    buttonsBar->addButton(Qn::InfoButton, infoButton);
+    buttonsBar->addButton(Qn::RotateButton, rotateButton);
 
     connect(buttonsBar, SIGNAL(checkedButtonsChanged()), this, SLOT(at_buttonBar_checkedButtonsChanged()));
 
@@ -285,7 +285,7 @@ void QnResourceWidget::createButtons() {
     icontButton->setPreferredSize(24.0, 24.0);
     icontButton->setVisible(false);
     buttonsOverlay()->leftButtonsBar()->addButton(
-        Qn::kRecordingStatusIconButton, icontButton);
+        Qn::RecordingStatusIconButton, icontButton);
 }
 
 const QnResourcePtr &QnResourceWidget::resource() const {
@@ -607,14 +607,14 @@ int QnResourceWidget::visibleButtons() const
 }
 
 int QnResourceWidget::calculateButtonsVisibility() const {
-    int result = Qn::kInfoButton;
+    int result = Qn::InfoButton;
 
     if (!(m_options & WindowRotationForbidden))
-        result |= Qn::kRotateButton;
+        result |= Qn::RotateButton;
 
     Qn::Permissions requiredPermissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
     if((accessController()->permissions(item()->layout()->resource()) & requiredPermissions) == requiredPermissions)
-        result |= Qn::kCloseButton;
+        result |= Qn::CloseButton;
 
     return result;
 }
@@ -767,7 +767,7 @@ void QnResourceWidget::updateHud(bool animate) {
         && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
 
     bool detailsVisible = m_options.testFlag(DisplayInfo);
-    if(QnImageButtonWidget *infoButton = buttonsOverlay()->rightButtonsBar()->button(Qn::kInfoButton))
+    if(QnImageButtonWidget *infoButton = buttonsOverlay()->rightButtonsBar()->button(Qn::InfoButton))
         infoButton->setChecked(detailsVisible);
 
     bool alwaysShowName = m_options.testFlag(AlwaysShowName);
@@ -928,7 +928,7 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
 void QnResourceWidget::optionsChangedNotify(Options changedFlags)
 {
     const auto visibleButtons = buttonsOverlay()->rightButtonsBar()->visibleButtons();
-    const bool infoButtonVisible = (visibleButtons & Qn::kInfoButton);
+    const bool infoButtonVisible = (visibleButtons & Qn::InfoButton);
     const bool updateHudWoAnimation =
         (changedFlags.testFlag(DisplayInfo) && infoButtonVisible)
         || (changedFlags.testFlag(InfoOverlaysForbidden));

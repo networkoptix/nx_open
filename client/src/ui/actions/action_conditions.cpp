@@ -209,7 +209,7 @@ Qn::ActionVisibility QnDisplayInfoActionCondition::check(const QnResourceWidgetL
         if(!widget)
             continue;
 
-        if (!(widget->visibleButtons() & Qn::kInfoButton))
+        if (!(widget->visibleButtons() & Qn::InfoButton))
             continue;
 
         if(m_hasRequiredDisplayInfoValue) {
