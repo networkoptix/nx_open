@@ -184,7 +184,9 @@ public:
 
     bool skipValue() {
         QnUbjson::Marker marker = peekMarker();
-        m_peeked = false;
+
+        if (marker != QnUbjson::ArrayStartMarker && marker != QnUbjson::ObjectStartMarker)
+            m_peeked = false;
 
         switch (marker) {
         case QnUbjson::NullMarker:

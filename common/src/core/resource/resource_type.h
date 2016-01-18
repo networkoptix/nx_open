@@ -39,7 +39,8 @@ public:
     void addParamType(const QString& name, const QString& defaultValue);
     bool hasParam(const QString& name) const;
 
-    const ParamTypeMap& paramTypeList() const;
+    const ParamTypeMap& paramTypeListUnsafe() const;
+    const ParamTypeMap paramTypeList() const;
 
     QString defaultValue(const QString& key) const;
 private:

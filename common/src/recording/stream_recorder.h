@@ -51,6 +51,7 @@ public:
         AudioStreamAllocationError,
         InvalidAudioCodecError,
         IncompatibleCodecError,
+        FileWriteError,
 
         LastError
     };

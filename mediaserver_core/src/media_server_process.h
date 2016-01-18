@@ -64,7 +64,7 @@ private slots:
     void at_storageManager_noStoragesAvailable();
     void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
-    void at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code);
+    void at_archiveBackupFinished(qint64 backupedToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
     void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
