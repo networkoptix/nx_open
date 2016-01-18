@@ -60,7 +60,7 @@ QString QnStreamRecorder::errorString(int errCode) {
     case AudioStreamAllocationError:    return tr("Could not allocate output audio stream.");
     case InvalidAudioCodecError:        return tr("Invalid audio codec information.");
     case IncompatibleCodecError:        return tr("Video or audio codec is incompatible with the selected format.");
-    case FileWriteError:                return tr("File write error. Storage failure or not enough free space left.");
+    case FileWriteError:                return tr("File write error. Not enough free space.");
     default:                            return QString();
     }
 }
@@ -478,7 +478,8 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
             // that in order means that disk write operation failed.
             m_recordingFinished = true;
             m_lastError = FileWriteError;
-            return close();
+            m_needStop = true;
+            return; 
         }
 
         if (ret < 0)  
