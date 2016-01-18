@@ -20,6 +20,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
+        m_idrFound(false),
         m_frameExists(false),
         m_firstSeqNum(0),
         m_packetPerNal(0),
@@ -229,7 +230,39 @@ bool CLH264RtpParser::clearInternalBuffer()
     return false;
 }
 
-void CLH264RtpParser::updateNalFlags(int nalUnitType)
+bool isIFrame(const quint8* data, int dataLen)
+{
+    if (dataLen < 2)
+        return false;
+
+    quint8 nalType = *data & 0x1f;
+    bool isSlice = nalType >= nuSliceNonIDR && nalType <= nuSliceIDR;
+    if (!isSlice)
+        return false;
+
+    if (nalType == nuSliceIDR)
+        return true;
+    quint8 nal_ref_idc = (*data >> 5) & 3;
+    if (nal_ref_idc)
+        return false;
+
+    BitStreamReader bitReader;
+    bitReader.setBuffer(data+1, data + dataLen);
+    try {
+        /*int first_mb_in_slice =*/ NALUnit::extractUEGolombCode(bitReader);
+
+        int slice_type = NALUnit::extractUEGolombCode(bitReader);
+        if (slice_type >= 5)
+            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+        return (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE);
+    }
+    catch (...) {
+        return false;
+    }
+}
+
+void CLH264RtpParser::updateNalFlags(int nalUnitType, const quint8* data, int dataLen)
 {
     if (nalUnitType == nuSPS)
         m_builtinSpsFound = true;
@@ -238,8 +271,13 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     else if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
     {
         m_frameExists = true;
-        if (nalUnitType == nuSliceIDR)
+        if (nalUnitType == nuSliceIDR) {
             m_keyDataExists = true;
+            m_idrFound = true;
+        }
+        else if (!m_idrFound && isIFrame(data, dataLen)) {
+            m_keyDataExists = true;
+        }
     }
 }
 
@@ -333,7 +371,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
                 m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
                 m_videoFrameSize += nalUnitLen + 4;
-                updateNalFlags(nalUnitType);
+                updateNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
             }
             break;
@@ -342,7 +380,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             if (bufferEnd-curPtr < 1)
                 return clearInternalBuffer();
             nalUnitType = *curPtr & 0x1f;
-            updateNalFlags(nalUnitType);
+            updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
             if (*curPtr  & 0x80) // FU_A first packet
             {
                 m_firstSeqNum = sequenceNum;
@@ -391,7 +429,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
             m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
             m_videoFrameSize += bufferEnd - curPtr + 4;
-            updateNalFlags(nalUnitType);
+            updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
             break; // ignore unknown data
     }
 
