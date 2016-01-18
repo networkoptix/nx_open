@@ -80,7 +80,10 @@ class QnSearchBookmarksDialog::Impl : public QObject
     Q_DECLARE_TR_FUNCTIONS(Impl)
 
 public:
-    Impl(QDialog *owner);
+    Impl(const QString &filterText
+        , qint64 utcStartTimeMs
+        , qint64 utcFinishTimeMs
+        , QDialog *owner);
 
     ~Impl();
 
@@ -134,7 +137,10 @@ private:
 
 ///
 
-QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
+QnSearchBookmarksDialog::Impl::Impl(const QString &filterText
+    , qint64 utcStartTimeMs
+    , qint64 utcFinishTimeMs
+    , QDialog *owner)
 
     : QObject(owner)
     , QnWorkbenchContextAware(owner)
@@ -198,9 +204,7 @@ QnSearchBookmarksDialog::Impl::Impl(QDialog *owner)
     connect(m_openInNewTabAction, &QAction::triggered, this, &Impl::openInNewLayoutHandler);
     connect(m_exportBookmarkAction, &QAction::triggered, this, &Impl::exportBookmarkHandler);
 
-    static const QString kEmptyFilter;
-    const auto now = qnSyncTime->currentMSecsSinceEpoch();
-    setParameters(kEmptyFilter, getStartOfTheDayMs(now), getEndOfTheDayMs(now));
+    setParameters(filterText, getStartOfTheDayMs(utcStartTimeMs), getEndOfTheDayMs(utcFinishTimeMs));
 
     const auto camerasWatcher = context()->instance<QnCurrentUserAvailableCamerasWatcher>();
     connect(camerasWatcher, &QnCurrentUserAvailableCamerasWatcher::userChanged, this, [this]()
@@ -461,9 +465,12 @@ void QnSearchBookmarksDialog::Impl::customContextMenuRequested()
 
 ///
 
-QnSearchBookmarksDialog::QnSearchBookmarksDialog(QWidget *parent)
+QnSearchBookmarksDialog::QnSearchBookmarksDialog(const QString &filterText
+    , qint64 utcStartTimGeMs
+    , qint64 utcFinishTimeMs
+    , QWidget *parent)
     : QnWorkbenchStateDependentButtonBoxDialog(parent)
-    , m_impl(new Impl(this))
+    , m_impl(new Impl(filterText, utcStartTimGeMs, utcFinishTimeMs, this))
 {
 }
 

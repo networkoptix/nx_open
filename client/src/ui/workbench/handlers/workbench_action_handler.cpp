@@ -1152,8 +1152,6 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
 
 void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
 {
-    QnNonModalDialogConstructor<QnSearchBookmarksDialog> dialogConstructor(m_searchBookmarksDialog, mainWindow());
-
     const auto parameters = menu()->currentParameters(sender());
 
     // If time window is specified then set it
@@ -1169,7 +1167,17 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
     const auto startTimeMs(timelineWindow.isValid()
         ? timelineWindow.startTimeMs : getFirstBookmarkTimeMs());
 
-    m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
+    const auto dialogCreationFunction = [this, startTimeMs, endTimeMs, filterText]()
+    {
+        return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindow());
+    };
+
+    const bool firstTime = m_searchBookmarksDialog;
+    const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog
+        , mainWindow(), dialogCreationFunction);
+
+    if (!firstTime)
+        m_searchBookmarksDialog->setParameters(startTimeMs, endTimeMs, filterText);
 }
 
 void QnWorkbenchActionHandler::at_openBusinessLogAction_triggered() {
