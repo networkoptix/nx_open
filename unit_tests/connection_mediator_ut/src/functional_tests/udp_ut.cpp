@@ -40,7 +40,7 @@ TEST_F(MediatorFunctionalTest, udp_transport)
     for (int i = 0; i < system1Servers.size(); ++i)
     {
         //sending resolve request
-        api::ResolveRequest request(system1Servers[i]->serverID() + "." + system1.id);
+        api::ResolveRequest request(system1Servers[i]->serverId() + "." + system1.id);
         nx::stun::Message requestMessage(
             stun::Header(
                 nx::stun::MessageClass::request,

@@ -25,14 +25,14 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverID(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName))
+    m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName))
 {
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
     m_mediatorConnector.setSystemCredentials(
         nx::hpm::MediatorConnector::SystemCredentials(
             m_systemData.id,
-            m_serverID,
+            m_serverId,
             m_systemData.authKey));
 }
 
@@ -66,9 +66,9 @@ bool MediaServerEmulator::start()
     return resultCode == nx::hpm::api::ResultCode::ok;
 }
 
-nx::String MediaServerEmulator::serverID() const
+nx::String MediaServerEmulator::serverId() const
 {
-    return m_serverID;
+    return m_serverId;
 }
 
 SocketAddress MediaServerEmulator::endpoint() const
@@ -79,8 +79,8 @@ SocketAddress MediaServerEmulator::endpoint() const
 nx::hpm::api::ResultCode MediaServerEmulator::listen() const
 {
     api::ListenRequest requestData;
-    requestData.systemID = m_systemData.id;
-    requestData.serverID = m_serverID;
+    requestData.systemId = m_systemData.id;
+    requestData.serverId = m_serverId;
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
