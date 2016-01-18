@@ -60,6 +60,7 @@ QString QnStreamRecorder::errorString(int errCode) {
     case AudioStreamAllocationError:    return tr("Could not allocate output audio stream.");
     case InvalidAudioCodecError:        return tr("Invalid audio codec information.");
     case IncompatibleCodecError:        return tr("Video or audio codec is incompatible with the selected format.");
+    case FileWriteError:                return tr("File write error. Storage failure or not enough free space left.");
     default:                            return QString();
     }
 }
@@ -467,7 +468,21 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
             NX_LOG(QLatin1String("Timestamp error: PTS < DTS. Fixed."), cl_logWARNING);
         }
 
-        if (av_write_frame(m_recordingContextVector[i].formatCtx, &avPkt) < 0) 
+        int ret = av_write_frame(m_recordingContextVector[i].formatCtx, &avPkt);
+
+        if (m_recordingContextVector[i].formatCtx->pb->error == -1)
+        {   // pb->error == -1 means that pb->write_data returned -1
+            // (see libavformat::aviobuf.c writeout() function)
+            // that in order means that ffmpegHelper::ffmpegWritePacket returned -1
+            // that in order means that QIOdevice::writeData() implementation for example
+            // in QnBufferedFile or QnLayoutFile returned -1
+            // that in order means that disk write operation failed.
+            m_recordingFinished = true;
+            m_lastError = FileWriteError;
+            return close();
+        }
+
+        if (ret < 0)  
         {
             NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
         }

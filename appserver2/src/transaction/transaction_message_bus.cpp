@@ -34,7 +34,7 @@
 #include "utils/common/synctime.h"
 #include "utils/common/systemerror.h"
 #include "utils/common/warnings.h"
-
+#include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
 
 namespace ec2
@@ -299,11 +299,17 @@ namespace ec2
         assert( m_globalInstance == nullptr );
         m_globalInstance = this;
         connect(m_runtimeTransactionLog.get(), &QnRuntimeTransactionLog::runtimeDataUpdated, this, &QnTransactionMessageBus::at_runtimeDataUpdated);
-    m_relativeTimer.restart();
+        m_relativeTimer.restart();
 
-    connect(
-        QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
-        this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+        connect(
+            QnGlobalSettings::instance(), &QnGlobalSettings::ec2ConnectionSettingsChanged,
+            this, static_cast<void (QnTransactionMessageBus::*)()>(&QnTransactionMessageBus::reconnectAllPeers));
+
+        /* Client updates running instance guid on each connect to server */
+        connect(qnCommon, &QnCommonModule::runningInstanceGUIDChanged, this, [this]()
+        {
+            m_localPeer.instanceId = qnCommon->runningInstanceGUID();
+        }, Qt::QueuedConnection);
     }
 
     void QnTransactionMessageBus::start()
@@ -317,6 +323,10 @@ namespace ec2
     {
         Q_ASSERT(m_thread->isRunning());
         dropConnections();
+
+        /* Connections in the 'Error' state will be closed via queued connection and after that removed via deleteLater() */
+        WaitingForQThreadToEmptyEventQueue waitingForObjectsToBeFreed( m_thread, 7 );
+        waitingForObjectsToBeFreed.join();
 
         m_thread->exit();
         m_thread->wait();
@@ -1330,7 +1340,7 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             {
                 if (!connectInfo.discoveredPeer.isNull() )
                 {
-                    if (connectInfo.discoveredTimeout.elapsed() > 
+                    if (connectInfo.discoveredTimeout.elapsed() >
                             std::chrono::milliseconds(
                                 PEER_DISCOVERY_BY_ALIVE_UPDATE_INTERVAL_FACTOR *
                                 QnGlobalSettings::instance()->aliveUpdateInterval()).count())
@@ -1380,8 +1390,8 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             AlivePeerInfo& peerInfo = itr.value();
             for (auto itr = peerInfo.routingInfo.begin(); itr != peerInfo.routingInfo.end();) {
                 const RoutingRecord& routingRecord = itr.value();
-                if ((routingRecord.distance > 0) && 
-                    (m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime > 
+                if ((routingRecord.distance > 0) &&
+                    (m_currentTimeTimer.elapsed() - routingRecord.lastRecvTime >
                         std::chrono::milliseconds(QnGlobalSettings::instance()->aliveUpdateInterval()*ALIVE_UPDATE_PROBE_COUNT + ALIVE_UPDATE_INTERVAL_OVERHEAD).count()))
                 {
                     itr = peerInfo.routingInfo.erase(itr);

@@ -192,7 +192,8 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         switch(action->actionType())
         {
         case QnBusiness::SendMailAction:
-            return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
+            result = sendMail(action.dynamicCast<QnSendMailBusinessAction>());
+            break;
         case QnBusiness::BookmarkAction:
             result = executeBookmarkAction(action);
             break;
@@ -280,6 +281,8 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         return false;
 
     int fixedDurationMs = action->getParams().durationMs;
+    int recordBeforeMs = action->getParams().recordBeforeMs;
+    int recordAfterMs = action->getParams().recordAfter;
 
     auto runningKey = guidFromArbitraryData(action->getBusinessRuleId().toRfc4122() + camera->getId().toRfc4122());
 
@@ -302,8 +305,9 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
 
     QnCameraBookmark bookmark;
     bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTimeMs;
+    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
+    bookmark.durationMs += recordBeforeMs + recordAfterMs;
     bookmark.cameraId = camera->getUniqueId();
     bookmark.name = QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), true);
     bookmark.description = QnBusinessStringsHelper::eventDetails(action->getRuntimeParams(), lit("\n"));

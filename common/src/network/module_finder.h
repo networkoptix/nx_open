@@ -105,9 +105,6 @@ private:
     QHash<SocketAddress, QnUuid> m_idByAddress;
     QHash<SocketAddress, qint64> m_lastResponse;
 
-    QnMutex m_connectedPeersMutex;
-    QSet<QnUuid> m_connectedPeers;
-
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;
 };

@@ -61,7 +61,11 @@ public:
         StorageFullReason,
         LicenseRemoved,
 
-        BackupFailed,
+        BackupFailedNoBackupStorageError,
+        BackupFailedSourceStorageError,
+        BackupFailedSourceFileError,
+        BackupFailedTargetFileError,
+        BackupFailedChunkError,
         BackupEndOfPeriod,
         BackupDone,
         BackupCancelled
