@@ -3,7 +3,7 @@ SET DUMPFILE=%1
 
 IF EXIST temp.txt DEL temp.txt
 
-REM This needs to be invoked to be able to pass FOR tokens to external outside-of-the-loop variables (bucking bat) to retrieve buildnumber
+REM This needs to be invoked to be able to pass FOR tokens to external outside-of-the-loop variables (fecking bat) to retrieve buildnumber, branch etc.
 SETLOCAL ENABLEDELAYEDEXPANSION
 
 IF NOT "%DUMPFILE%" == "" (
@@ -58,7 +58,6 @@ IF NOT "%DUMPFILE%" == "" (
         REM SET /p MEDIASERVER_DIR=<temp.txt
         REM FOR /f %%i in ('DIR /s /b mediaserver.exe') do set MEDIASERVER_DIR=%%i
         FOR /r %%a in (.) DO @IF EXIST "%%~fa\mediaserver.exe" set MEDIASERVER_DIR=%%~fa
-        FOR /r %%a in (.) DO @IF EXIST "%%~fa\mediaserver.exe" ECHO %%~fa
         ECHO Media Server folder is "!MEDIASERVER_DIR!"
         
         ECHO Copying and extracting Files...
