@@ -3,6 +3,8 @@
 
 #include "address_resolver.h"
 
+#include <queue>
+
 namespace nx {
 namespace network {
 namespace cloud {
@@ -26,7 +28,7 @@ public:
 
     /** Creates new connection to peer or returns current with false in case if real
      *  tunneling is notsupported by used method */
-    virtual void connect(std::shared_ptr<StreamSocketOptions> options,
+    virtual void connect(std::chrono::milliseconds timeout,
                          SocketHandler handler) = 0;
 
     /** Accepts new connection from peer (like socket)
@@ -43,9 +45,8 @@ public:
     /** Helps to decide which method shell be used first */
     virtual uint32_t getPriority() = 0;
 
-    /** Creates connecting AbstractTunnelConnection */
+    /** Creates connected AbstractTunnelConnection */
     virtual void connect(
-        std::shared_ptr<StreamSocketOptions> options,
         std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
 };
 
@@ -81,8 +82,19 @@ class Tunnel
     public QnStoppableAsync
 {
 public:
-    /** Creates suitable AbstractTunnelConnection (if not created yet) */
-    Tunnel(String peerId, std::vector<CloudConnectType> type);
+    Tunnel(String peerId);
+
+    enum class State { kInit, kConnecting, kConnected, kClosed };
+    static QString stateToString(State state);
+
+    /** Creates resposable \class AbstractTunnelConnector if not connected yet */
+    void addConnectionTypes(std::vector<CloudConnectType> type);
+
+    /** Addopts external connection */
+    void adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection);
+
+    /** Indicates tonnel state */
+    void setStateHandler(std::function<void(State)> handler);
 
     typedef std::function<void(SystemError::ErrorCode,
                                std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
@@ -90,7 +102,8 @@ public:
     /** Establish new connection
      *  \note This method is re-enterable. So, it can be called in
      *        different threads simultaneously */
-    void connect(std::shared_ptr<StreamSocketOptions> options, SocketHandler handler);
+    void connect(std::chrono::milliseconds timeout,
+                 SocketHandler handler);
 
     /** Accept new incoming connection on the tunnel */
     void accept(SocketHandler handler);
@@ -98,22 +111,19 @@ public:
     /** Implementation of QnStoppableAsync::pleaseStop */
     void pleaseStop(std::function<void()> handler) override;
 
-    const String& getPeerId() const { return m_peerId; }
-
 private:
+    void startConnectors(QnMutexLockerBase* lock);
+    void changeState(State state, QnMutexLockerBase* lock);
+
     const String m_peerId;
-
-    friend class TunnelPool;
-    typedef std::unique_ptr<AbstractTunnelConnector> ConnectorPtr;
-
-    void adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection);
+    typedef std::chrono::system_clock Clock;
 
     QnMutex m_mutex;
-    SocketHandler m_acceptHandler;
-
+    State m_state;
+    std::function<void(State)> m_stateHandler;
     std::unique_ptr<AbstractTunnelConnection> m_connection;
-    std::multimap<uint32_t, ConnectorPtr> m_connectors;
-    std::multimap<uint32_t, ConnectorPtr>::iterator m_connectorsItreator;
+    std::map<CloudConnectType, std::unique_ptr<AbstractTunnelConnector>> m_connectors;
+    std::multimap<Clock::time_point, SocketHandler> m_connectHandlers;
 };
 
 //!Stores cloud tunnels
@@ -123,26 +133,39 @@ class TunnelPool
 public:
     TunnelPool();
 
-    //! Get tunnel to \a targetHost
-    /*!
-        Always returns not null tunnel.
-        If tunnel does not exist, allocates new tunnel object and returns tunnel object
-    */
-    std::shared_ptr<Tunnel> get(const String& peerId,
-                                std::vector<CloudConnectType> connectTypes =
-                                    std::vector<CloudConnectType>());
+    void connect(const String& peerId,
+                 std::vector<CloudConnectType> connectTypes,
+                 std::shared_ptr<StreamSocketOptions> options,
+                 Tunnel::SocketHandler handler);
 
-    //! Set handler to watch newly created tunnels
-    void setNewHandler(std::function<void(std::shared_ptr<Tunnel>)> handler);
+    void accept(std::shared_ptr<StreamSocketOptions> options,
+                Tunnel::SocketHandler handler);
 
     //! QnStoppableAsync::pleaseStop
     void pleaseStop(std::function<void()> handler) override;
 
 private:
+    std::shared_ptr<Tunnel> getTunnel(const String& peerId);
+    void acceptTunnel(const String& peerId);
+    void removeTunnel(const String& peerId);
+
+    struct SocketRequest
+    {
+        std::shared_ptr<StreamSocketOptions> options;
+        Tunnel::SocketHandler handler;
+    };
+
+    void waitConnectingSocket(std::unique_ptr<AbstractStreamSocket> socket,
+                              SocketRequest request);
+
+    void indicateAcceptedSocket(std::unique_ptr<AbstractStreamSocket> socket,
+                                SocketRequest request);
+
     QnMutex m_mutex;
-    std::function<void(std::shared_ptr<Tunnel>)> m_monitor;
     std::map<String, std::shared_ptr<Tunnel>> m_pool;
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> m_acceptors;
+    boost::optional<SocketRequest> m_acceptRequest;
+    std::queue<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
 };
 
 } // namespace cloud

@@ -1,10 +1,10 @@
 #ifndef nx_cc_cloud_server_socket_h
 #define nx_cc_cloud_server_socket_h
 
-#include <nx/utils/thread/wait_condition.h>
-#include <nx/network/system_socket.h>
+#include <nx/utils/async_operation_guard.h>
+#include <nx/network/abstract_socket.h>
 
-#include <queue>
+#include "cloud_tunnel.h"
 
 namespace nx {
 namespace network {
@@ -51,28 +51,24 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
     //!Implementation of AbstractSocket::*
-    void post( std::function<void()> handler ) override;
-    void dispatch( std::function<void()> handler ) override;
+    void post(std::function<void()> handler) override;
+    void dispatch(std::function<void()> handler) override;
 
-    //!Implementation of AbstractStreamServerSocket::acceptAsyncImpl
+    //!Implementation of AbstractStreamServerSocket::acceptAsync
     void acceptAsync(
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
 private:
-    void acceptTcpSockets();
-    void acceptTunnelSockets();
-    void acceptedSocket(std::unique_ptr<AbstractStreamSocket> socket);
+    void postAcceptImpl();
 
-    std::unique_ptr<AbstractStreamServerSocket> m_tcpSocket;
-
-    QnMutex m_mutex;
-    size_t m_acceptedSocketsMaxCount;
-    std::queue<std::unique_ptr<AbstractStreamSocket>> m_acceptedSocketsQueue;
-
-    QnWaitCondition m_acceptSyncCondition;
-    std::queue<std::function<void(SystemError::ErrorCode,
-                                  AbstractStreamSocket*)>> m_acceptHandlerQueue;
+    bool m_isAcceptingTunnelPool;
+    mutable SystemError::ErrorCode m_lastError;
+    std::shared_ptr<StreamSocketOptions> m_socketOptions;
+    std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
+    std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
+    std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
+    nx::utils::AsyncOperationGuard m_asyncGuard;
 };
 
 } // namespace cloud

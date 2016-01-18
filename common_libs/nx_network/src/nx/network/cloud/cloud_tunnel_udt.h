@@ -22,7 +22,6 @@ public:
     }
 
     void connect(
-        std::shared_ptr<StreamSocketOptions> options,
         std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
     {
         // TODO: initiate UDP hole punching to resolve SocketAddress by peerId_
@@ -70,7 +69,7 @@ public:
         // TODO: create m_tunnelSocket and open randevous connection
     }
 
-    void connect(std::shared_ptr<StreamSocketOptions> options,
+    void connect(std::chrono::milliseconds timeout,
                  SocketHandler handler) override
     {
         QnMutexLocker lk(&m_mutex);

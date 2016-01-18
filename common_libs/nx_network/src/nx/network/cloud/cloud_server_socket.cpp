@@ -7,237 +7,144 @@ namespace network {
 namespace cloud {
 
 CloudServerSocket::CloudServerSocket()
-    : m_tcpSocket(new TCPServerSocket)
-    , m_acceptedSocketsMaxCount(0)
+    : m_isAcceptingTunnelPool(false)
+    , m_socketOptions(new StreamSocketOptions())
+    , m_ioThreadSocket(SocketFactory::createStreamSocket())
 {
+    // TODO: #mu default values for m_socketOptions shell match default
+    //           system vales: think how to implement this...
+    m_socketOptions->recvTimeout = 0;
 }
 
-bool CloudServerSocket::bind(const SocketAddress& localAddress)
-{
-    return m_tcpSocket->bind(localAddress);
-}
+#ifdef CloudServerSocket_setSocketOption
+    #error CloudStreamSocket_setSocketOption macro is already defined.
+#endif
 
-SocketAddress CloudServerSocket::getLocalAddress() const
-{
-    return m_tcpSocket->getLocalAddress();
-}
+#define CloudServerSocket_setSocketOption(SETTER, TYPE, NAME)   \
+    bool CloudServerSocket::SETTER(TYPE NAME)                   \
+    {                                                           \
+        m_socketOptions->NAME = NAME;                           \
+        return true;                                            \
+    }
 
-void CloudServerSocket::close()
-{
-    return m_tcpSocket->close();
-}
+#ifdef CloudServerSocket_getSocketOption
+    #error CloudStreamSocket_getSocketOption macro is already defined.
+#endif
 
-bool CloudServerSocket::isClosed() const
-{
-    return m_tcpSocket->isClosed();
-}
+#define CloudServerSocket_getSocketOption(GETTER, TYPE, NAME)   \
+    bool CloudServerSocket::GETTER(TYPE* NAME) const            \
+    {                                                           \
+        if (!m_socketOptions->NAME)                             \
+            return false;                                       \
+                                                                \
+        *NAME = *m_socketOptions->NAME;                         \
+        return true;                                            \
+    }
 
-bool CloudServerSocket::setReuseAddrFlag(bool reuseAddr)
-{
-    return m_tcpSocket->setReuseAddrFlag(reuseAddr);
-}
+CloudServerSocket_setSocketOption(bind, const SocketAddress&, boundAddress)
 
-bool CloudServerSocket::getReuseAddrFlag(bool* val) const
-{
-    return m_tcpSocket->getReuseAddrFlag(val);
-}
+CloudServerSocket_setSocketOption(setReuseAddrFlag, bool, reuseAddrFlag)
+CloudServerSocket_getSocketOption(getReuseAddrFlag, bool, reuseAddrFlag)
 
-bool CloudServerSocket::setNonBlockingMode(bool val)
-{
-    return m_tcpSocket->setNonBlockingMode(val);
-}
+CloudServerSocket_setSocketOption(setSendBufferSize, unsigned int, sendBufferSize)
+CloudServerSocket_getSocketOption(getSendBufferSize, unsigned int, sendBufferSize)
 
-bool CloudServerSocket::getNonBlockingMode(bool* val) const
-{
-    return m_tcpSocket->getNonBlockingMode(val);
-}
+CloudServerSocket_setSocketOption(setRecvBufferSize, unsigned int, recvBufferSize)
+CloudServerSocket_getSocketOption(getRecvBufferSize, unsigned int, recvBufferSize)
 
-bool CloudServerSocket::getMtu(unsigned int* mtuValue) const
-{
-    return m_tcpSocket->getMtu(mtuValue);
-}
+CloudServerSocket_setSocketOption(setRecvTimeout, unsigned int, recvTimeout)
+CloudServerSocket_getSocketOption(getRecvTimeout, unsigned int, recvTimeout)
 
-bool CloudServerSocket::setSendBufferSize(unsigned int buffSize)
-{
-    return m_tcpSocket->setSendBufferSize(buffSize);
-}
+CloudServerSocket_setSocketOption(setSendTimeout, unsigned int, sendTimeout)
+CloudServerSocket_getSocketOption(getSendTimeout, unsigned int, sendTimeout)
 
-bool CloudServerSocket::getSendBufferSize(unsigned int* buffSize) const
-{
-    return m_tcpSocket->getSendBufferSize(buffSize);
-}
+CloudServerSocket_setSocketOption(setNonBlockingMode, bool, nonBlockingMode)
+CloudServerSocket_getSocketOption(getNonBlockingMode, bool, nonBlockingMode)
 
-bool CloudServerSocket::setRecvBufferSize(unsigned int buffSize)
-{
-    return m_tcpSocket->setRecvBufferSize(buffSize);
-}
-
-bool CloudServerSocket::getRecvBufferSize(unsigned int* buffSize) const
-{
-    return m_tcpSocket->getRecvBufferSize(buffSize);
-}
-
-bool CloudServerSocket::setRecvTimeout(unsigned int millis)
-{
-    return m_tcpSocket->setRecvTimeout(millis);
-}
-
-bool CloudServerSocket::getRecvTimeout(unsigned int* millis) const
-{
-    return m_tcpSocket->getRecvTimeout(millis);
-}
-
-bool CloudServerSocket::setSendTimeout(unsigned int ms)
-{
-    return m_tcpSocket->setSendTimeout(ms);
-}
-
-bool CloudServerSocket::getSendTimeout(unsigned int* millis) const
-{
-    return m_tcpSocket->getSendTimeout(millis);
-}
+#undef CloudServerSocket_setSocketOption
+#undef CloudServerSocket_getSocketOption
 
 bool CloudServerSocket::getLastError(SystemError::ErrorCode* errorCode) const
 {
-    // TODO: #mux probabbly we also have to take care of TunnelPool errors
-    return m_tcpSocket->getLastError(errorCode);
+    if (m_lastError == SystemError::noError)
+        return false;
+
+    *errorCode = m_lastError;
+    m_lastError = SystemError::noError;
+    return true;
 }
 
 AbstractSocket::SOCKET_HANDLE CloudServerSocket::handle() const
 {
-    // TODO: #mux fugure out what to do with TunnelPool
-    return m_tcpSocket->handle();
+    Q_ASSERT(false);
+    return (AbstractSocket::SOCKET_HANDLE)(-1);
 }
 
 bool CloudServerSocket::listen(int queueLen)
 {
-    {
-        QnMutex m_mutex;
-        m_acceptedSocketsMaxCount = queueLen;
-    }
-
-    if (!m_tcpSocket->listen(queueLen))
-        return false;
-
-    acceptTcpSockets();
-    acceptTunnelSockets();
+    // TODO: #mux Shell queueLen imply any effect on TunnelPool?
+    static_cast<void>(queueLen);
     return true;
 }
 
 AbstractStreamSocket* CloudServerSocket::accept()
 {
-    QnMutexLocker lk(&m_mutex);
-    while(m_acceptedSocketsQueue.empty())
-        m_acceptSyncCondition.wait(&m_mutex);
+    std::promise<std::pair<SystemError::ErrorCode, AbstractStreamSocket*>> promise;
+    acceptAsync([&](SystemError::ErrorCode code, AbstractStreamSocket* socket)
+    {
+        promise.set_value(std::make_pair(code, socket));
+    });
 
-    auto socket = std::move(m_acceptedSocketsQueue.front());
-    m_acceptedSocketsQueue.pop();
-    return socket.release();
+    const auto result = promise.get_future().get();
+    if (result.first != SystemError::noError)
+    {
+        m_lastError = result.first;
+        SystemError::setLastErrorCode(result.first);
+    }
+
+    return result.second;
 }
 
 void CloudServerSocket::pleaseStop(std::function<void()> handler)
 {
-    BarrierHandler barrier(std::move(handler));
-    m_tcpSocket->pleaseStop(barrier.fork());
-
-    // TODO: #mux use AsyncOperationGuard instead?
-    SocketGlobals::tunnelPool().pleaseStop(barrier.fork());
+    m_asyncGuard.reset();
+    m_ioThreadSocket->pleaseStop(std::move(handler));
 }
 
-void CloudServerSocket::post( std::function<void()> handler )
+void CloudServerSocket::post(std::function<void()> handler)
 {
-    m_tcpSocket->post(std::move(handler));
+    m_ioThreadSocket->post(std::move(handler));
 }
 
-void CloudServerSocket::dispatch( std::function<void()> handler )
+void CloudServerSocket::dispatch(std::function<void()> handler)
 {
-    m_tcpSocket->dispatch(std::move(handler));
+    m_ioThreadSocket->dispatch(std::move(handler));
 }
 
 void CloudServerSocket::acceptAsync(
     std::function<void(SystemError::ErrorCode code,
                        AbstractStreamSocket*)> handler )
 {
-    QnMutexLocker lk(&m_mutex);
-    if (!m_acceptedSocketsQueue.empty())
+    Q_ASSERT_X(!m_acceptHandler, Q_FUNC_INFO, "concurent accept call");
+    m_acceptHandler = std::move(handler);
+
+    auto sharedGuard = m_asyncGuard.sharedGuard();
+    SocketGlobals::tunnelPool().accept(m_socketOptions, [this, sharedGuard]
+        (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
     {
-        auto socket = std::move(m_acceptedSocketsQueue.front());
-        m_acceptedSocketsQueue.pop();
-
-        lk.unlock();
-        return handler(SystemError::noError, socket.release());
-    }
-
-    m_acceptHandlerQueue.push(std::move(handler));
-}
-
-void CloudServerSocket::acceptTcpSockets()
-{
-    m_tcpSocket->acceptAsync([this](SystemError::ErrorCode code,
-                                    AbstractStreamSocket* socket)
-    {
-        if (code != SystemError::noError)
+        if (auto lock = sharedGuard->lock())
         {
-            NX_LOGX(lm("accepted from TCP socket error: %1")
-                    .arg(SystemError::toString(code)), cl_logERROR);
-
-            // TODO: #mux will not be able to accept from this m_tcpSocket any
-            //       more, shell we do smth about it?
-            return;
-        }
-
-        NX_LOGX(lm("accepted from TCP socket: %1").arg(socket), cl_logDEBUG1);
-        acceptedSocket(std::unique_ptr<AbstractStreamSocket>(socket));
-        acceptTcpSockets();
-    });
-}
-
-void CloudServerSocket::acceptTunnelSockets()
-{
-    SocketGlobals::tunnelPool().setNewHandler(
-                [this](std::shared_ptr<Tunnel> tunnel)
-    {
-        const String& peerId = tunnel->getPeerId();
-        NX_LOGX(lm("handle new tunnel from peer: %1").arg(peerId), cl_logALWAYS);
-
-        tunnel->accept([&](SystemError::ErrorCode code,
-                           std::unique_ptr<AbstractStreamSocket> socket)
-        {
-            if (code != SystemError::noError)
+            Q_ASSERT_X(!m_acceptedSocket, Q_FUNC_INFO, "concurently accepted socket");
+            m_lastError = code;
+            m_acceptedSocket = std::move(socket);
+            post([this, code]()
             {
-                NX_LOGX(lm("accepted from Tunnel error: %1")
-                        .arg(SystemError::toString(code)), cl_logERROR);
-
-                return;
-            }
-
-            NX_LOGX(lm("accepted from Tunnel socket: %1")
-                    .arg(socket.get()), cl_logDEBUG1);
-
-            acceptedSocket(std::move(socket));
-        });
+                const auto acceptHandler = std::move(m_acceptHandler);
+                m_acceptHandler = nullptr;
+                acceptHandler(m_lastError, m_acceptedSocket.release());
+            });
+        }
     });
-}
-
-void CloudServerSocket::acceptedSocket(std::unique_ptr<AbstractStreamSocket> socket)
-{
-    QnMutexLocker lk(&m_mutex);
-    if (!m_acceptHandlerQueue.empty())
-    {
-        auto handler = std::move(m_acceptHandlerQueue.front());
-        m_acceptHandlerQueue.pop();
-        NX_LOGX(lm("deliver accepted socket: %1").arg(socket.get()),
-                cl_logDEBUG1);
-
-        lk.unlock();
-        return handler(SystemError::noError, socket.release());
-    }
-
-    if (m_acceptedSocketsQueue.size() >= m_acceptedSocketsMaxCount)
-        return socket->close();
-
-    m_acceptedSocketsQueue.push(std::move(socket));
-    m_acceptSyncCondition.wakeOne();
 }
 
 } // namespace cloud

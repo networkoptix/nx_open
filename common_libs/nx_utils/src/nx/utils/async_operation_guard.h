@@ -71,6 +71,9 @@ public:
 
     const std::shared_ptr<SharedGuard>& sharedGuard();
 
+    /** Terminates current async guard and creates a new one */
+    void reset();
+
     /** Forward all of the sharedGuard public methods */
     SharedGuard* operator->() const;
 
