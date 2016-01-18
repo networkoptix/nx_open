@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
+#include <QOpenGLContext>
 
 #include <nx/streaming/video_data_packet.h>
 
@@ -18,8 +19,10 @@ namespace nx
 		{
 			Q_OBJECT
 		public:
-
+            AbstractVideoDecoder() {}
 			virtual ~AbstractVideoDecoder() {}
+            virtual void setAllocator(AbstractResourceAllocator* /*allocator */) {}
+            virtual void setSharedGlContext(QOpenGLContext* context ) {}
 
 			/*
 			* \param context	codec context.

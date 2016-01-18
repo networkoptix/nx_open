@@ -4,14 +4,16 @@
 
 #include <QtCore/QObject>
 #include <QtMultimedia/QVideoFrame>
+#include <QOpenGLContext>
 
 #include <nx/streaming/video_data_packet.h>
+#include "abstract_resource_allocator.h"
 
 namespace nx
 {
 	namespace media
 	{
-		class AbstractVideoDecoder;
+        class AbstractVideoDecoder;
 		typedef std::unique_ptr<AbstractVideoDecoder> VideoDecoderPtr;
 
         /* This class allows to register various implementation for video decoders. Exact list of decoders can be registered in runtime mode */
@@ -26,25 +28,31 @@ namespace nx
 
 			/** Register video decoder plugin */
 			template <class Decoder>
-			void addPlugin() { m_plugins << MetadataImpl<Decoder>(); }
+            void addPlugin(std::unique_ptr<AbstractResourceAllocator> allocator = std::unique_ptr<AbstractResourceAllocator>())
+            {
+                m_plugins.push_back(MetadataImpl<Decoder>(std::move(allocator)));
+            }
+
 		private:
 			struct Metadata
 			{
 				std::function<AbstractVideoDecoder* ()> instance;
 				std::function<bool(const QnConstCompressedVideoDataPtr& frame)> isCompatible;
+                std::unique_ptr<AbstractResourceAllocator> allocator;
 			};
 
 			template <class Decoder>
 			struct MetadataImpl : public Metadata
 			{
-				MetadataImpl()
+                MetadataImpl(std::unique_ptr<AbstractResourceAllocator> allocator)
 				{
 					instance = []() { return new Decoder(); };
 					isCompatible = &Decoder::isCompatible;
+                    this->allocator = std::move(allocator);
 				}
 			};
 
-			QVector<Metadata> m_plugins;
+            std::vector<Metadata> m_plugins;
 		};
 	}
 }

@@ -11,10 +11,14 @@ class QnTextureSizeHelper : public QObject, public Singleton<QnTextureSizeHelper
 
 public:
     explicit QnTextureSizeHelper(QQuickWindow *window, QObject *parent = 0);
+    ~QnTextureSizeHelper();
 
     int maxTextureSize() const;
+
+    static int createTexture();
 
 private:
     mutable QnMutex m_mutex;
     int m_maxTextureSize;
+    QQuickWindow *m_window;
 };

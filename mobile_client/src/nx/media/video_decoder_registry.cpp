@@ -14,8 +14,12 @@ std::unique_ptr<AbstractVideoDecoder> VideoDecoderRegistry::createCompatibleDeco
 {
 	for (const auto& plugin : m_plugins)
 	{
-		if (plugin.isCompatible(frame))
-			return VideoDecoderPtr(plugin.instance());
+        if (plugin.isCompatible(frame)) {
+            auto result = VideoDecoderPtr(plugin.instance());
+            if (plugin.allocator)
+                result->setAllocator(plugin.allocator.get());
+            return result;
+        }
 	}
 	return VideoDecoderPtr(); // no compatible decoder found
 }

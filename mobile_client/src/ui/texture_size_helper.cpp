@@ -7,6 +7,7 @@
 QnTextureSizeHelper::QnTextureSizeHelper(QQuickWindow *window, QObject *parent)
     : QObject(parent)
     , m_maxTextureSize(4096)
+    , m_window(window)
 {
     if (window) {
         connect(window, &QQuickWindow::beforeSynchronizing, this, [this, window]() {
@@ -20,6 +21,15 @@ QnTextureSizeHelper::QnTextureSizeHelper(QQuickWindow *window, QObject *parent)
             context->functions()->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &m_maxTextureSize);
         }, Qt::DirectConnection);
     }
+}
+
+QnTextureSizeHelper::~QnTextureSizeHelper()
+{
+}
+
+int QnTextureSizeHelper::createTexture()
+{
+    return 0;
 }
 
 int QnTextureSizeHelper::maxTextureSize() const {
