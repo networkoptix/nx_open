@@ -12,7 +12,6 @@
 #include "core/resource_management/resource_pool.h"
 #include "utils/common/app_info.h"
 #include "api/runtime_info_manager.h"
-#include "api/common_message_processor.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
 
@@ -120,20 +119,6 @@ QnModuleFinder::QnModuleFinder(bool clientMode, bool compatibilityMode) :
             return;
         disconnect(server.data(), &QnMediaServerResource::auxUrlsChanged, this, &QnModuleFinder::at_server_auxUrlsChanged);
     });
-
-    auto messageProcessor = QnCommonMessageProcessor::instance();
-    connect(messageProcessor, &QnCommonMessageProcessor::remotePeerFound,
-            this, [this](const ec2::ApiPeerAliveData &data)
-    {
-       QnMutexLocker lk(&m_connectedPeersMutex);
-       m_connectedPeers.insert(data.peer.id);
-    });
-    connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost,
-            this, [this](const ec2::ApiPeerAliveData &data)
-    {
-       QnMutexLocker lk(&m_connectedPeersMutex);
-       m_connectedPeers.remove(data.peer.id);
-    });
 }
 
 QnModuleFinder::~QnModuleFinder() {
@@ -157,7 +142,9 @@ QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 }
 
 std::chrono::milliseconds QnModuleFinder::pingTimeout() const {
-    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
+    // ModuleFinder uses amplified timeout to fix possible temporary problems
+    // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 min)
+    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout() * 2;
 }
 
 void QnModuleFinder::start() {
@@ -371,11 +358,6 @@ void QnModuleFinder::at_timer_timeout() {
     for (const SocketAddress &address: addressesToRemove) {
         QnUuid id = m_idByAddress.value(address);
         QSet<QUrl> ignoredUrls = ignoredUrlsForServer(id);
-        {
-            QnMutexLocker lk(&m_connectedPeersMutex);
-            if (m_connectedPeers.contains(id))
-                continue;
-        }
         removeAddress(address, false, ignoredUrls);
     }
 }
