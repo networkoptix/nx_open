@@ -8,8 +8,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-class QnIncompatibleServerWatcher;
-
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT

@@ -2202,7 +2202,6 @@ void MediaServerProcess::run()
     loadResourcesFromECS(messageProcessor.data());
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
-        qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
