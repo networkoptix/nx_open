@@ -21,13 +21,11 @@ class UDPHolePunchingConnectionInitiationFsm
 public:
     UDPHolePunchingConnectionInitiationFsm(
         nx::String connectionID,
+        const & serverPeerDataLocker,
         std::function<void()> onFsmFinishedEventHandler);
 
-    UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&);
-    UDPHolePunchingConnectionInitiationFsm&
-        operator=(UDPHolePunchingConnectionInitiationFsm&&);
-
     void onConnectRequest(
+        const ConnectionStrongRef& connection,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void onConnectionAckRequest(
@@ -51,6 +49,14 @@ private:
     State m_state;
     nx::String m_connectionID;
     std::function<void()> m_onFsmFinishedEventHandler;
+    std::unique_ptr<AbstractStreamSocket> m_timer;
+    
+    void sessionTimedout();
+    void onServerConnectionClosed();
+
+    UDPHolePunchingConnectionInitiationFsm(UDPHolePunchingConnectionInitiationFsm&&);
+    UDPHolePunchingConnectionInitiationFsm&
+        operator=(UDPHolePunchingConnectionInitiationFsm&&);
 };
 
 } // namespace hpm

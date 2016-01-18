@@ -83,9 +83,10 @@ void HolePunchingProcessor::connect(
                 &HolePunchingProcessor::connectSessionFinished,
                 this,
                 std::move(connectionFsmIterAndFlag.first)));
-
+                
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(
+        connection,
         std::move(request),
         std::move(completionHandler));
 }
