@@ -31,7 +31,7 @@ public:
 
     /** Attaches to a local port and registers on mediator */
     bool start();
-    nx::String serverID() const;
+    nx::String serverId() const;
     /** Server endpoint */
     SocketAddress endpoint() const;
 
@@ -45,7 +45,7 @@ private:
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
-    nx::String m_serverID;
+    nx::String m_serverId;
     std::shared_ptr<nx::network::cloud::MediatorSystemConnection> m_systemClient;
 
     MediaServerEmulator(const MediaServerEmulator&);

@@ -81,10 +81,12 @@ public:
     */
     void sendRequest( Message request, RequestHandler handler );
 
-    //!Returns local address if client is connected to be server
+    //!Returns local address if client is connected to the server
     SocketAddress localAddress() const;
 
-    //! \note Required by \a nx_api::BaseServerConnection
+    /*!
+        \note Required by \a nx_api::BaseServerConnection
+    */
     virtual void closeConnection(
             SystemError::ErrorCode errorCode,
             BaseConnectionType* connection = nullptr ) override;

@@ -40,7 +40,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
             std::bind(
                 &nx::network::cloud::MediatorClientConnection::resolve,
                 client.get(),
-                api::ResolveRequest(system1Servers[i]->serverID() + "." + system1.id),
+                api::ResolveRequest(system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
         ASSERT_TRUE(std::find(
@@ -63,7 +63,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, generateRandomName(16));
-    auto server2 = addServer(system1, server1->serverID());
+    auto server2 = addServer(system1, server1->serverId());
 
     //resolving, last added server is chosen
     api::ResolveResponse resolveResponse;
@@ -72,7 +72,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
         std::bind(
             &nx::network::cloud::MediatorClientConnection::resolve,
             client.get(),
-            api::ResolveRequest(server1->serverID() + "." + system1.id),
+            api::ResolveRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_TRUE(std::find(
@@ -135,7 +135,7 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
         std::bind(
             &nx::network::cloud::MediatorClientConnection::resolve,
             client.get(),
-            api::ResolveRequest(mserverEmulator.serverID() + "." + system1.id),
+            api::ResolveRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
     ASSERT_EQ(api::ResultCode::ok, resultCode);
     ASSERT_TRUE(std::find(

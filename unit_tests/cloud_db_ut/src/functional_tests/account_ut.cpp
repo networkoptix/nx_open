@@ -99,9 +99,12 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     ASSERT_TRUE(!activationCode.code.empty());
 
     //reactivating account (e.g. we lost activation code)
-    result = reactivateAccount(account1.email, &activationCode);
+    api::AccountConfirmationCode activationCode2;
+    result = reactivateAccount(account1.email, &activationCode2);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_TRUE(!activationCode.code.empty());
+    ASSERT_TRUE(!activationCode2.code.empty());
+
+    ASSERT_EQ(activationCode.code, activationCode2.code);
 
     std::string email;
     result = activateAccount(activationCode, &email);
@@ -112,6 +115,17 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+
+    //subsequent activation MUST fail
+    for (int i = 0; i < 2; ++i)
+    {
+        std::string email;
+        result = activateAccount(activationCode, &email);
+        ASSERT_EQ(api::ResultCode::notFound, result);
+
+        if (i == 0)
+            restart();
+    }
 }
 
 //reactivation of already activated account must fail

@@ -32,7 +32,7 @@ TEST_F(MediatorFunctionalTest, listen)
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, nx::String());
-    auto server2 = addServer(system1, server1->serverID());
+    auto server2 = addServer(system1, server1->serverId());
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server2->listen());
@@ -41,7 +41,7 @@ TEST_F(MediatorFunctionalTest, listen)
         //since both servers have same server id
 
     auto dataLocker = nx::hpm::ListeningPeerPool::instance()->
-        findAndLockPeerDataByHostName(server1->serverID()+"."+system1.id);
+        findAndLockPeerDataByHostName(server1->serverId()+"."+system1.id);
     ASSERT_TRUE(static_cast<bool>(dataLocker));
     auto strongConnectionRef = dataLocker->value().peerConnection.lock();
     ASSERT_NE(nullptr, strongConnectionRef);

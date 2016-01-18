@@ -12,15 +12,15 @@ namespace api {
 
 void ListenRequest::serialize(nx::stun::Message* const message)
 {
-    message->newAttribute<stun::cc::attrs::SystemId>(systemID);
-    message->newAttribute<stun::cc::attrs::ServerId>(serverID);
+    message->newAttribute<stun::cc::attrs::SystemId>(systemId);
+    message->newAttribute<stun::cc::attrs::ServerId>(serverId);
 }
 
 bool ListenRequest::parse(const nx::stun::Message& message)
 {
     return 
-        readStringAttributeValue<stun::cc::attrs::SystemId>(message, &systemID) &&
-        readStringAttributeValue<stun::cc::attrs::ServerId>(message, &serverID);
+        readStringAttributeValue<stun::cc::attrs::SystemId>(message, &systemId) &&
+        readStringAttributeValue<stun::cc::attrs::ServerId>(message, &serverId);
 }
 
 } // namespace api

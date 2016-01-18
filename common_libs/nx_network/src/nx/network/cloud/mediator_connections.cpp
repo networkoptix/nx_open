@@ -31,49 +31,53 @@ void BaseMediatorClient::doRequest(
     RequestData requestData,
     std::function<void(api::ResultCode, ResponseData)> completionHandler)
 {
-    stun::Message request(stun::Header(
-        stun::MessageClass::request,
-        method));
+    stun::Message request(
+        stun::Header(
+            stun::MessageClass::request,
+            method));
     requestData.serialize(&request);
 
     sendRequest(
         std::move(request),
-        [this, method, /*std::move*/ completionHandler](
+        [this, method, /*std::move*/ completionHandler](    //TODO #ak #msvc2015 move to lambda
             SystemError::ErrorCode code,
             stun::Message message)
-    {
-        if (code != SystemError::noError)
         {
-            NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                arg(stun::cc::methods::toString(method)).arg(SystemError::toString(code)),
-                cl_logDEBUG1);
-            return completionHandler(api::ResultCode::networkError, ResponseData());
-        }
+            if (code != SystemError::noError)
+            {
+                NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
+                    arg(stun::cc::methods::toString(method)).
+                    arg(SystemError::toString(code)),
+                    cl_logDEBUG1);
+                return completionHandler(api::ResultCode::networkError, ResponseData());
+            }
 
-        if (const auto error = stun::AsyncClient::hasError(code, message))
-        {
-            api::ResultCode resultCode = api::ResultCode::otherLogicError;
-            if (const auto err = message.getAttribute< nx::stun::attrs::ErrorDescription >())
-                resultCode = api::fromStunErrorToResultCode(*err);
+            if (const auto error = stun::AsyncClient::hasError(code, message))
+            {
+                api::ResultCode resultCode = api::ResultCode::otherLogicError;
+                if (const auto err = message.getAttribute<nx::stun::attrs::ErrorDescription>())
+                    resultCode = api::fromStunErrorToResultCode(*err);
 
-            NX_LOGX(*error, cl_logDEBUG1);
-            //TODO #ak get detailed error from response
-            return completionHandler(resultCode, ResponseData());
-        }
+                NX_LOGX(*error, cl_logDEBUG1);
+                //TODO #ak get detailed error from response
+                return completionHandler(resultCode, ResponseData());
+            }
 
-        ResponseData responseData;
-        if (!responseData.parse(message))
-        {
-            NX_LOGX(lm("Failed to parse %1 response: %2").
-                arg(stun::cc::methods::toString(method)).
-                arg(responseData.errorText()), cl_logDEBUG1);
-            return completionHandler(api::ResultCode::responseParseError, ResponseData());
-        }
+            ResponseData responseData;
+            if (!responseData.parse(message))
+            {
+                NX_LOGX(lm("Failed to parse %1 response: %2").
+                    arg(stun::cc::methods::toString(method)).
+                    arg(responseData.errorText()), cl_logDEBUG1);
+                return completionHandler(
+                    api::ResultCode::responseParseError,
+                    ResponseData());
+            }
 
-        completionHandler(
-            api::ResultCode::ok,
-            std::move(responseData));
-    });
+            completionHandler(
+                api::ResultCode::ok,
+                std::move(responseData));
+        });
 }
 
 template<typename RequestData>
@@ -92,28 +96,28 @@ void BaseMediatorClient::doRequest(
         [this, method, /*std::move*/ completionHandler](
             SystemError::ErrorCode code,
             stun::Message message)
-    {
-        if (code != SystemError::noError)
         {
-            NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
-                arg(stun::cc::methods::toString(method)).arg(SystemError::toString(code)),
-                cl_logDEBUG1);
-            return completionHandler(api::ResultCode::networkError);
-        }
+            if (code != SystemError::noError)
+            {
+                NX_LOGX(lm("Error performing %1 request to connection_mediator. %2").
+                    arg(stun::cc::methods::toString(method)).arg(SystemError::toString(code)),
+                    cl_logDEBUG1);
+                return completionHandler(api::ResultCode::networkError);
+            }
 
-        if (const auto error = stun::AsyncClient::hasError(code, message))
-        {
-            api::ResultCode resultCode = api::ResultCode::otherLogicError;
-            if (const auto err = message.getAttribute< nx::stun::attrs::ErrorDescription >())
-                resultCode = api::fromStunErrorToResultCode(*err);
+            if (const auto error = stun::AsyncClient::hasError(code, message))
+            {
+                api::ResultCode resultCode = api::ResultCode::otherLogicError;
+                if (const auto err = message.getAttribute< nx::stun::attrs::ErrorDescription >())
+                    resultCode = api::fromStunErrorToResultCode(*err);
 
-            NX_LOGX(*error, cl_logDEBUG1);
-            //TODO #ak get detailed error from response
-            return completionHandler(resultCode);
-        }
+                NX_LOGX(*error, cl_logDEBUG1);
+                //TODO #ak get detailed error from response
+                return completionHandler(resultCode);
+            }
 
-        completionHandler(api::ResultCode::ok);
-    });
+            completionHandler(api::ResultCode::ok);
+        });
 }
 
 
@@ -122,8 +126,9 @@ void BaseMediatorClient::doRequest(
 ////////////////////////////////////////////////////////////
 
 MediatorClientConnection::MediatorClientConnection(
-        std::shared_ptr<stun::AsyncClient> client)
-    : BaseMediatorClient(std::move(client))
+    std::shared_ptr<stun::AsyncClient> client)
+:
+    BaseMediatorClient(std::move(client))
 {
 }
 
@@ -157,59 +162,66 @@ void MediatorClientConnection::resolve(
 ////////////////////////////////////////////////////////////
 
 MediatorSystemConnection::MediatorSystemConnection(
-        std::shared_ptr<stun::AsyncClient> client,
-        MediatorConnector* connector)
-    : BaseMediatorClient(std::move(client))
-    , m_connector(connector)
+    std::shared_ptr<stun::AsyncClient> client,
+    MediatorConnector* connector)
+:
+    BaseMediatorClient(std::move(client)),
+    m_connector(connector)
 {
     // TODO subscribe for indications
 }
 
 void MediatorSystemConnection::ping(
-        std::list<SocketAddress> addresses,
-        std::function<void(bool, std::list<SocketAddress>)> handler)
+    std::list<SocketAddress> addresses,
+    std::function<void(bool, std::list<SocketAddress>)> handler)
 {
-    stun::Message request(stun::Header(stun::MessageClass::request,
-                                       stun::cc::methods::ping));
+    stun::Message request(
+        stun::Header(
+            stun::MessageClass::request,
+            stun::cc::methods::ping));
 
     request.newAttribute<PublicEndpointList>(addresses);
-    sendAuthRequest(std::move(request),
-                [=](SystemError::ErrorCode code, stun::Message message)
-    {
-        if(const auto error = stun::AsyncClient::hasError(code, message))
+    sendAuthRequest(
+        std::move(request),
+        [=](SystemError::ErrorCode code, stun::Message message)
         {
-            NX_LOGX(*error, cl_logDEBUG1);
-            return handler(false, std::list<SocketAddress>());
-        }
+            if (const auto error = stun::AsyncClient::hasError(code, message))
+            {
+                NX_LOGX(*error, cl_logDEBUG1);
+                return handler(false, std::list<SocketAddress>());
+            }
 
-        std::list< SocketAddress > endpoints;
-        if(auto eps = message.getAttribute<PublicEndpointList>())
-            endpoints = eps->get();
+            std::list< SocketAddress > endpoints;
+            if (auto eps = message.getAttribute<PublicEndpointList>())
+                endpoints = eps->get();
 
-        handler(true, std::move(endpoints));
-    });
+            handler(true, std::move(endpoints));
+        });
 }
 
 void MediatorSystemConnection::bind(
-        std::list<SocketAddress> addresses,
-        std::function<void(api::ResultCode)> handler)
+    std::list<SocketAddress> addresses,
+    std::function<void(api::ResultCode)> handler)
 {
-    stun::Message request(stun::Header(stun::MessageClass::request,
-                                       stun::cc::methods::bind));
+    stun::Message request(
+        stun::Header(
+            stun::MessageClass::request,
+            stun::cc::methods::bind));
 
     request.newAttribute<PublicEndpointList>(addresses);
-    sendAuthRequest(std::move(request),
-                [=](SystemError::ErrorCode code, stun::Message message)
-    {
-        if(const auto error = stun::AsyncClient::hasError(code, message))
+    sendAuthRequest(
+        std::move(request),
+        [=](SystemError::ErrorCode code, stun::Message message)
         {
-            NX_LOGX(*error, cl_logDEBUG1);
-            //TODO #ak translate error to result code
-            return handler(api::ResultCode::otherLogicError);
-        }
+            if (const auto error = stun::AsyncClient::hasError(code, message))
+            {
+                NX_LOGX(*error, cl_logDEBUG1);
+                //TODO #ak translate error to result code
+                return handler(api::ResultCode::otherLogicError);
+            }
 
-        handler(api::ResultCode::ok);
-    });
+            handler(api::ResultCode::ok);
+        });
 }
 
 void MediatorSystemConnection::listen(
@@ -223,21 +235,22 @@ void MediatorSystemConnection::listen(
 }
 
 void MediatorSystemConnection::monitorConnectionRequest(
-        std::function<void(ConnectionRequest)> handler)
+    std::function<void(ConnectionRequest)> handler)
 {
     // TODO: #mux
     static_cast<void>(handler);
 }
 
 void MediatorSystemConnection::monitorConnectionUpdate(
-        std::function<void(ConnectionUpdate)> handler)
+    std::function<void(ConnectionUpdate)> handler)
 {
     // TODO: #mux
     static_cast<void>(handler);
 }
 
 void MediatorSystemConnection::sendAuthRequest(
-        stun::Message request, stun::AsyncClient::RequestHandler handler)
+    stun::Message request,
+    stun::AsyncClient::RequestHandler handler)
 {
     if (auto credentials = m_connector->getSystemCredentials())
     {

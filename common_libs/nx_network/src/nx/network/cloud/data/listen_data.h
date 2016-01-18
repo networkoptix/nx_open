@@ -19,8 +19,8 @@ class NX_NETWORK_API ListenRequest
     public StunMessageData
 {
 public:
-    nx::String systemID;
-    nx::String serverID;
+    nx::String systemId;
+    nx::String serverId;
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
