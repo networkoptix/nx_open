@@ -242,9 +242,6 @@ bool isIFrame(const quint8* data, int dataLen)
 
     if (nalType == nuSliceIDR)
         return true;
-    quint8 nal_ref_idc = (*data >> 5) & 3;
-    if (nal_ref_idc)
-        return false;
 
     BitStreamReader bitReader;
     bitReader.setBuffer(data+1, data + dataLen);
