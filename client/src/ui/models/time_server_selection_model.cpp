@@ -82,7 +82,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
 
         beginInsertRows(QModelIndex(), m_items.size(), m_items.size());
         addItem(info);
-        updateFirtstItemCheckbox();
+        updateFirstItemCheckbox();
         endInsertRows();
     });
 
@@ -110,7 +110,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
         PRINT_DEBUG("peer " + info.uuid.toByteArray() + " is removed");
         beginRemoveRows(QModelIndex(), idx, idx);
         m_items.removeAt(idx);
-        updateFirtstItemCheckbox();
+        updateFirstItemCheckbox();
         endRemoveRows();
 
         if (m_selectedServer == info.uuid)
@@ -147,7 +147,7 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent /* = NULL
     resetData(qnSyncTime->currentMSecsSinceEpoch());
 }
 
-void QnTimeServerSelectionModel::updateFirtstItemCheckbox()
+void QnTimeServerSelectionModel::updateFirstItemCheckbox()
 {
     if (m_items.empty())
         return;
