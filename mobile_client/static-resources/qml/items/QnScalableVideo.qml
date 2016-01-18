@@ -6,15 +6,15 @@ import "../controls"
 QnZoomableFlickable {
     id: zf
 
-    property alias source: video.source
+    property var source
     property alias screenshotSource: screenshot.source
     property real aspectRatio: 0
     property int videoRotation: 0
 
     property real maxZoomFactor: 4
 
-    readonly property real sourceContentWidth: screenshot.visible ? screenshot.sourceSize.width : video.sourceRect.width
-    readonly property real sourceContentHeight: screenshot.visible ? screenshot.sourceSize.height : video.sourceRect.height
+    readonly property real sourceContentWidth: screenshot.visible || !content.video ? screenshot.sourceSize.width : content.video.sourceRect.width
+    readonly property real sourceContentHeight: screenshot.visible || !content.video ? screenshot.sourceSize.height : content.video.sourceRect.height
 
     minContentWidth: width
     minContentHeight: height
@@ -23,8 +23,16 @@ QnZoomableFlickable {
 
     clip: true
 
+    onSourceChanged: {
+        videoLoader.sourceComponent = undefined
+        if (source)
+            videoLoader.sourceComponent = videoComponent
+    }
+
     Item {
         id: content
+
+        property var video: videoLoader.item
 
         readonly property bool rotated90: zf.videoRotation % 90 == 0 && zf.videoRotation % 180 != 0
         onRotated90Changed: resetSize()
@@ -32,17 +40,26 @@ QnZoomableFlickable {
         width: contentWidth
         height: contentHeight
 
-        VideoOutput {
-            id: video
-
+        Loader {
+            id: videoLoader
             anchors.centerIn: parent
             width: content.rotated90 ? parent.height : parent.width
             height: content.rotated90 ? parent.width : parent.height
             rotation: zf.videoRotation
 
-            fillMode: VideoOutput.Stretch
+            onStatusChanged: {
+                if (status == Loader.Ready)
+                    item.source = zf.source
+            }
+        }
 
-            onSourceRectChanged: content.updateWithVideoSize(true)
+        Component {
+            id: videoComponent
+
+            VideoOutput {
+                fillMode: VideoOutput.Stretch
+                onSourceRectChanged: content.updateWithVideoSize(true)
+            }
         }
 
         Image {
@@ -67,7 +84,7 @@ QnZoomableFlickable {
         }
 
         function resetSize() {
-            var hasVideo = video.sourceRect.width > 0 && video.sourceRect.height > 0
+            var hasVideo = content.video && content.video.sourceRect.width > 0 && content.video.sourceRect.height > 0
             var hasScreenshot = screenshot.sourceSize.width > 0 && screenshot.sourceSize.height > 0
             var emptySize = width <= 0 || height <= 0
 
@@ -104,8 +121,8 @@ QnZoomableFlickable {
         }
 
         function updateWithVideoSize(saveZoom) {
-            var w = video.sourceRect.width
-            var h = video.sourceRect.height
+            var w = content.video.sourceRect.width
+            var h = content.video.sourceRect.height
 
             if (aspectRatio > 0)
                 w = h * aspectRatio
@@ -128,7 +145,7 @@ QnZoomableFlickable {
     onHeightChanged: fitToBounds()
 
     function fitToBounds() {
-        var hasVideo = video.sourceRect.width > 0 && video.sourceRect.height > 0
+        var hasVideo = content.video && content.video.sourceRect.width > 0 && content.video.sourceRect.height > 0
         var hasScreenshot = screenshot.sourceSize.width > 0 && screenshot.sourceSize.height > 0
         var emptySize = width <= 0 || height <= 0
 

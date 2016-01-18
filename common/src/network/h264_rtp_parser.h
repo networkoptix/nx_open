@@ -37,6 +37,7 @@ private:
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
     bool m_keyDataExists;
+    bool m_idrFound;
     bool m_frameExists;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
@@ -55,7 +56,7 @@ private:
     );
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
-    void updateNalFlags(int nalUnitType);
+    void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
     int getSpsPpsSize() const;
 };
 

@@ -18,7 +18,7 @@ class QnResourceDataPool;
 
 /**
  * Storage for common module's global state.
- * 
+ *
  * All singletons and initialization/deinitialization code goes here.
  */
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
@@ -115,6 +115,7 @@ signals:
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
+    void runningInstanceGUIDChanged();
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -135,7 +136,7 @@ private:
     QSet<QnUuid> m_allowedPeers;
     bool m_arecontRTSPEnabled;
     qint64 m_systemIdentityTime;
-    
+
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
     bool m_lowPriorityAdminPassword;

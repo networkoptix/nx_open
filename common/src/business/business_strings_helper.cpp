@@ -376,9 +376,24 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
     }
-
-    case BackupFailed: {
-        result = tr("Archive backup failed because of no backup storage available");
+    case BackupFailedNoBackupStorageError: {
+        result = tr("Archive backup failed: No available backup storages with sufficient free space");
+        break;
+    }
+    case BackupFailedSourceStorageError: {
+        result = tr("Archive backup failed: Target storage failure");
+        break;
+    }
+    case BackupFailedSourceFileError: {
+        result = tr("Archive backup failed: Source file open/read error");
+        break;
+    }
+    case BackupFailedTargetFileError: {
+        result = tr("Archive backup failed: Target file create/write error");
+        break;
+    }
+    case BackupFailedChunkError: {
+        result = tr("Archive backup failed: File catalog error");
         break;
     }
     case BackupEndOfPeriod: {

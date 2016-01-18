@@ -311,6 +311,7 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
 
     display()->setLayer(m_dropInstrument->surface(), Qn::BackLayer);
 
+    connect(m_itemLeftClickInstrument,  SIGNAL(pressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftPressed(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(clicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                       this,                           SLOT(at_item_leftClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(m_itemLeftClickInstrument,  SIGNAL(doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)),                 this,                           SLOT(at_item_doubleClicked(QGraphicsView *, QGraphicsItem *, const ClickInfo &)));
     connect(ptzInstrument,              SIGNAL(doubleClicked(QnMediaResourceWidget *)),                                             this,                           SLOT(at_item_doubleClicked(QnMediaResourceWidget *)));
@@ -1133,34 +1134,60 @@ void QnWorkbenchController::at_motionRegionSelected(QGraphicsView *, QnMediaReso
     widget->addToMotionSelection(region);
 }
 
-void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info) {
-    TRACE("ITEM LCLICKED");
+void QnWorkbenchController::at_item_leftPressed(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info)
+{
+    Q_UNUSED(view)
 
-    if(info.modifiers() != 0)
+    TRACE("ITEM LPRESSED");
+
+    if (info.modifiers() != 0)
         return;
 
-    if(workbench()->item(Qn::ZoomedRole) != NULL)
+    if (workbench()->item(Qn::ZoomedRole))
         return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
 
-    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : NULL;
-    if(widget == NULL)
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
+    if (!widget)
         return;
 
     QnWorkbenchItem *workbenchItem = widget->item();
 
-    if (workbench()->item(Qn::RaisedRole) != workbenchItem) {
+    if (workbench()->item(Qn::RaisedRole) != workbenchItem)
+        workbench()->setItem(Qn::RaisedRole, nullptr);
+
+    workbench()->setItem(Qn::ActiveRole, workbenchItem);
+}
+
+void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *item, const ClickInfo &info)
+{
+    TRACE("ITEM LCLICKED");
+
+    if (info.modifiers() != 0)
+        return;
+
+    if (workbench()->item(Qn::ZoomedRole))
+        return; /* Don't change currently raised item if we're zoomed. It is surprising for the user. */
+
+    QnResourceWidget *widget = item->isWidget() ? qobject_cast<QnResourceWidget *>(item->toGraphicsObject()) : nullptr;
+    if (!widget)
+        return;
+
+    QnWorkbenchItem *workbenchItem = widget->item();
+
+    if (workbench()->item(Qn::RaisedRole) != workbenchItem)
+    {
         /* Don't raise if there's only one item in the layout. */
         QRectF occupiedGeometry = widget->geometry();
         occupiedGeometry = dilated(occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
 
         if (occupiedGeometry.contains(display()->raisedGeometry(widget->geometry(), widget->rotation())))
-            workbenchItem = NULL;
+            workbenchItem = nullptr;
 
         workbench()->setItem(Qn::RaisedRole, workbenchItem);
         return;
     }
 
-    workbench()->setItem(Qn::RaisedRole, NULL);
+    workbench()->setItem(Qn::RaisedRole, nullptr);
 }
 
 void QnWorkbenchController::at_item_rightClicked(QGraphicsView *view, QGraphicsItem *item, const ClickInfo &info) {

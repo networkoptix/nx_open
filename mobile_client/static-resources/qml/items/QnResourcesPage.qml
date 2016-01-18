@@ -196,7 +196,7 @@ QnPage {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (searchItem.opened) {
                 searchItem.close()
                 event.accepted = true

@@ -245,13 +245,9 @@ public:
 
         assert( buf.size() > 0 );
 
-#ifdef _DEBUG
         //assert does not stop all threads immediately, so performing segmentation fault
-        if( m_asyncSendIssued )
+        if( m_asyncSendIssued.exchange(true) )
             *((int*)nullptr) = 12;
-        assert( !m_asyncSendIssued );
-        m_asyncSendIssued = true;
-#endif
 
         m_sendBuffer = &buf;
         m_sendHandler = std::move( handler );
@@ -333,10 +329,7 @@ private:
 
     std::atomic<Qt::HANDLE> m_threadHandlerIsRunningIn;
     const bool m_natTraversalEnabled;
-
-#ifdef _DEBUG
-    bool m_asyncSendIssued;
-#endif
+    std::atomic<bool> m_asyncSendIssued;
 
     virtual void eventTriggered( SocketType* sock, aio::EventType eventType ) throw() override
     {
@@ -362,9 +355,7 @@ private:
         auto connectHandlerLocal = [this, connectSendAsyncCallCounterBak, sock, &terminated]( SystemError::ErrorCode errorCode )
         {
             auto connectHandlerBak = std::move( m_connectHandler );
-#ifdef _DEBUG
             m_asyncSendIssued = false;
-#endif
             connectHandlerBak( errorCode );
 
             if( terminated )
@@ -407,9 +398,7 @@ private:
             m_sendBuffer = nullptr;
             m_sendBufPos = 0;
             auto sendHandlerBak = std::move( m_sendHandler );
-#ifdef _DEBUG
             m_asyncSendIssued = false;
-#endif
             sendHandlerBak( errorCode, bytesSent );
 
             if( terminated )
@@ -603,10 +592,7 @@ private:
         assert( isNonBlockingModeEnabled );
 #endif
 
-#ifdef _DEBUG
-        assert( !m_asyncSendIssued );
-        m_asyncSendIssued = true;
-#endif
+        assert( !m_asyncSendIssued.exchange( true ) );
 
         if( !m_abstractSocketPtr->getSendTimeout( &sendTimeout ) )
             return false;

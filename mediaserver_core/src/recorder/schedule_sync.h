@@ -63,7 +63,11 @@ public:
     QnScheduleSync();
     ~QnScheduleSync();
 signals:
-    void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
+    void backupFinished(
+        qint64                      timestampMs,
+        QnBusiness::EventReason     status
+    );
+
 public:
     int forceStart();
     virtual void stop() override;
@@ -114,7 +118,7 @@ private:
 
 private:
     template<typename NeedMoveOnCB>
-    QnServer::BackupResultCode synchronize(NeedMoveOnCB needMoveOn);
+    QnBusiness::EventReason synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
@@ -151,6 +155,7 @@ private:
 
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
+    CopyError             m_lastError;
 };
 
 #endif
