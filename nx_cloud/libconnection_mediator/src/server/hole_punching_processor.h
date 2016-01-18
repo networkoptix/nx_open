@@ -6,6 +6,7 @@
 #pragma once
 
 #include <functional>
+#include <tuple>
 
 #include <nx/network/cloud/data/connect_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
@@ -43,6 +44,10 @@ public:
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
+    void onConnectionAckRequest(
+        const ConnectionStrongRef& connection,
+        api::ConnectionAckRequest request,
+        std::function<void(api::ResultCode)> completionHandler);
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
@@ -51,20 +56,22 @@ public:
 private:
     typedef std::map<
         nx::String,
-        std::unique_ptr<UDPHolePunchingConnectionInitiationFsm >
+        std::unique_ptr<UDPHolePunchingConnectionInitiationFsm>
     > ConnectSessionsDictionary;
 
     ListeningPeerPool* const m_listeningPeerPool;
     QnMutex m_mutex;
     //map<id, connection initiation>
-    ConnectSessionsDictionary m_ongoingConnections;
+    ConnectSessionsDictionary m_activeConnectSessions;
 
-    api::ResultCode validateConnectRequest(
-        const ConnectionStrongRef& connection,
-        const api::ConnectRequest& request);
+    std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
+        validateConnectRequest(
+            const ConnectionStrongRef& connection,
+            const api::ConnectRequest& request);
 
-
-    void connectSessionFinished(ConnectSessionsDictionary::iterator);
+    void connectSessionFinished(
+        ConnectSessionsDictionary::iterator,
+        api::ResultCode connectionResult);
 };
 
 } // namespace hpm

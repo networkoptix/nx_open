@@ -71,6 +71,11 @@ void UDPServer::sendMessage(
         std::move(completionHandler));
 }
 
+const std::unique_ptr<AbstractDatagramSocket>& UDPServer::socket()
+{
+    return m_messagePipeline.socket();
+}
+
 void UDPServer::messageReceived(SocketAddress sourceAddress, Message mesage)
 {
     m_dispatcher.dispatchRequest(

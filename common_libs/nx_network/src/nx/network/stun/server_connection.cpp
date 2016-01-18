@@ -49,12 +49,17 @@ nx::network::TransportProtocol ServerConnection::transportProtocol() const
 
 SocketAddress ServerConnection::getSourceAddress() const
 {
-    return socket()->getForeignAddress();
+    return BaseType::socket()->getForeignAddress();
 }
 
 void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
 {
     registerCloseHandler(std::move(handler));
+}
+
+AbstractCommunicatingSocket* ServerConnection::socket()
+{
+    return BaseType::socket().get();
 }
 
 void ServerConnection::processMessage( Message message )

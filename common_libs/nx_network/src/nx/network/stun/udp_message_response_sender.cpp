@@ -50,5 +50,10 @@ void UDPMessageResponseSender::addOnConnectionCloseHandler(std::function<void()>
     assert(false);
 }
 
+AbstractCommunicatingSocket* UDPMessageResponseSender::socket()
+{
+    return m_udpServer->socket().get();
+}
+
 }   //stun
 }   //nx

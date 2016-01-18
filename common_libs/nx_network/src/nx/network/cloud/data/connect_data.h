@@ -19,6 +19,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+/** [connection_mediator, 4.3.5] */
 class NX_NETWORK_API ConnectRequest
 :
     public StunMessageData
@@ -26,7 +27,7 @@ class NX_NETWORK_API ConnectRequest
 public:
     nx::String destinationHostName;
     nx::String originatingPeerID;
-    nx::String connectSessionGuid;
+    nx::String connectSessionID;
     ConnectionMethods connectionMethods;
 
     ConnectRequest();

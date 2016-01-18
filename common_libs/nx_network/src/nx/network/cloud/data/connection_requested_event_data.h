@@ -1,11 +1,11 @@
 /**********************************************************
-* Dec 23, 2015
+* Jan 18, 2016
 * akolesnikov
 ***********************************************************/
 
-#ifndef NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H
-#define NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H
+#pragma once
 
+#include "connection_method.h"
 #include "stun_message_data.h"
 
 
@@ -13,17 +13,17 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-class NX_NETWORK_API ConnectionResultRequest
+class NX_NETWORK_API ConnectionRequestedEvent
 :
     public StunMessageData
 {
 public:
     nx::String connectSessionID;
-    //TODO #ak add some statistics useful for later analysis
-    bool connectionSucceeded;
+    nx::String originatingPeerID;
+    std::list<SocketAddress> udpEndpointList;
+    ConnectionMethods connectionMethods;
 
-    ConnectionResultRequest();
-    ConnectionResultRequest(bool _connectionSucceeded);
+    ConnectionRequestedEvent();
 
     void serialize(nx::stun::Message* const message);
     bool parse(const nx::stun::Message& message);
@@ -32,5 +32,3 @@ public:
 }   //api
 }   //hpm
 }   //nx
-
-#endif  //NX_MEDIATOR_API_CONNECTION_RESULT_DATA_H

@@ -22,7 +22,10 @@ enum class ResultCode
     badRequest,
     notFound,
     otherLogicError,
-    notImplemented
+    notImplemented,
+    noSuitableConnectionMethod,
+    timedout,
+    serverConnectionBroken
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)

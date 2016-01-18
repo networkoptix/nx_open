@@ -51,7 +51,7 @@ public:
         Message request,
         RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket() const;
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;

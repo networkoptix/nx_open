@@ -38,6 +38,17 @@ HolePunchingProcessor::HolePunchingProcessor(
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
+                &HolePunchingProcessor::onConnectionAckRequest,
+                this,
+                std::move(connection),
+                std::move(message));
+        });
+
+    dispatcher->registerRequestProcessor(
+        stun::cc::methods::connectionResult,
+        [this](const ConnectionStrongRef& connection, stun::Message message)
+        {
+            processRequestWithNoOutput(
                 &HolePunchingProcessor::connectionResult,
                 this,
                 std::move(connection),
@@ -52,25 +63,28 @@ void HolePunchingProcessor::connect(
 {
     NX_LOGX(lm("connect request. from %1 to host %2, connection id %2").
         arg(connection->getSourceAddress().toString()).
-        arg(request.destinationHostName).arg(request.connectSessionGuid),
+        arg(request.destinationHostName).arg(request.connectSessionID),
         cl_logDEBUG2);
 
-    const api::ResultCode validationResult = validateConnectRequest(
+    api::ResultCode validationResult = api::ResultCode::ok;
+    boost::optional<ListeningPeerPool::ConstDataLocker> targetPeerDataLocker;
+    std::tie(validationResult, targetPeerDataLocker) = validateConnectRequest(
         connection,
         request);
     if (validationResult != api::ResultCode::ok)
         return completionHandler(validationResult, api::ConnectResponse());
+    assert(static_cast<bool>(targetPeerDataLocker));
 
     //preparing and saving connection context
     QnMutexLocker lk(&m_mutex);
-    const auto connectionFsmIterAndFlag = m_ongoingConnections.emplace(
-        request.connectSessionGuid,
+    const auto connectionFsmIterAndFlag = m_activeConnectSessions.emplace(
+        request.connectSessionID,
         nullptr);
     if (!connectionFsmIterAndFlag.second)
     {
         NX_LOGX(lm("connect request retransmit: from %1, to %2, connection id %3").
             arg(connection->getSourceAddress().toString()).
-            arg(request.destinationHostName).arg(request.connectSessionGuid),
+            arg(request.destinationHostName).arg(request.connectSessionID),
             cl_logDEBUG1);
         //ignoring request, response will be sent by fsm
         return;
@@ -78,12 +92,14 @@ void HolePunchingProcessor::connect(
 
     connectionFsmIterAndFlag.first->second = 
         std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            std::move(request.connectSessionGuid),
+            std::move(request.connectSessionID),
+            targetPeerDataLocker.get(),
             std::bind(
                 &HolePunchingProcessor::connectSessionFinished,
                 this,
-                std::move(connectionFsmIterAndFlag.first)));
-                
+                std::move(connectionFsmIterAndFlag.first),
+                std::placeholders::_1));
+
     //launching connect FSM
     connectionFsmIterAndFlag.first->second->onConnectRequest(
         connection,
@@ -91,35 +107,61 @@ void HolePunchingProcessor::connect(
         std::move(completionHandler));
 }
 
-void HolePunchingProcessor::connectionResult(
+void HolePunchingProcessor::onConnectionAckRequest(
     const ConnectionStrongRef& /*connection*/,
-    api::ConnectionResultRequest /*request*/,
+    api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    //TODO #ak
-    completionHandler(api::ResultCode::ok);
+    QnMutexLocker lk(&m_mutex);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    if (connectionIter == m_activeConnectSessions.end())
+    {
+        completionHandler(api::ResultCode::notFound);
+        return;
+    }
+    connectionIter->second->onConnectionAckRequest(
+        std::move(request),
+        std::move(completionHandler));
 }
 
-api::ResultCode HolePunchingProcessor::validateConnectRequest(
-    const ConnectionStrongRef& connection,
-    const api::ConnectRequest& request)
+void HolePunchingProcessor::connectionResult(
+    const ConnectionStrongRef& /*connection*/,
+    api::ConnectionResultRequest request,
+    std::function<void(api::ResultCode)> completionHandler)
+{
+    QnMutexLocker lk(&m_mutex);
+    auto connectionIter = m_activeConnectSessions.find(request.connectSessionID);
+    if (connectionIter == m_activeConnectSessions.end())
+    {
+        completionHandler(api::ResultCode::notFound);
+        return;
+    }
+    connectionIter->second->onConnectionResultRequest(
+        std::move(request),
+        std::move(completionHandler));
+}
+
+std::tuple<api::ResultCode, boost::optional<ListeningPeerPool::ConstDataLocker>>
+    HolePunchingProcessor::validateConnectRequest(
+        const ConnectionStrongRef& connection,
+        const api::ConnectRequest& request)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::udp)
     {
         NX_LOGX(lm("connect request from %1: only UDP hole punching is supported for now").
             arg(connection->getSourceAddress().toString()),
             cl_logDEBUG1);
-        return api::ResultCode::badRequest;
+        return std::make_tuple(api::ResultCode::badRequest, boost::none);
     }
 
-    const auto targetPeerDataLocker = m_listeningPeerPool->
+    auto targetPeerDataLocker = m_listeningPeerPool->
         findAndLockPeerDataByHostName(request.destinationHostName);
     if (!targetPeerDataLocker)
     {
         NX_LOGX(lm("connect request from %1 to unknown host %2").
             arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
             cl_logDEBUG1);
-        return api::ResultCode::notFound;
+        return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
     const auto& targetPeerData = targetPeerDataLocker->value();
 
@@ -128,7 +170,7 @@ api::ResultCode HolePunchingProcessor::validateConnectRequest(
         NX_LOGX(lm("connect request from %1 to host %2 not listening for connections").
             arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
             cl_logDEBUG1);
-        return api::ResultCode::notFound;
+        return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
     if (((targetPeerData.connectionMethods & request.connectionMethods) &
@@ -139,7 +181,7 @@ api::ResultCode HolePunchingProcessor::validateConnectRequest(
             arg(connection->getSourceAddress().toString()).arg(request.connectionMethods).
             arg(request.destinationHostName).arg(targetPeerData.connectionMethods),
             cl_logDEBUG1);
-        return api::ResultCode::notFound;
+        return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
     const auto peerConnectionStrongRef = targetPeerData.peerConnection.lock();
@@ -148,16 +190,23 @@ api::ResultCode HolePunchingProcessor::validateConnectRequest(
         NX_LOGX(lm("connect request from %1 to host %2. No connection to the target peer...").
             arg(connection->getSourceAddress().toString()).arg(request.destinationHostName),
             cl_logDEBUG1);
-        return api::ResultCode::notFound;
+        return std::make_tuple(api::ResultCode::notFound, boost::none);
     }
 
-    return api::ResultCode::ok;
+    return std::make_tuple(api::ResultCode::ok, std::move(targetPeerDataLocker));
 }
 
 void HolePunchingProcessor::connectSessionFinished(
-    ConnectSessionsDictionary::iterator sessionIter)
+    ConnectSessionsDictionary::iterator sessionIter,
+    api::ResultCode connectionResult)
 {
-    //TODO #ak
+    QnMutexLocker lk(&m_mutex);
+
+    NX_LOGX(lm("connect session %1 finished with result %2").
+        arg(sessionIter->first).arg(QnLexical::serialized(connectionResult)),
+        cl_logDEBUG2);
+
+    m_activeConnectSessions.erase(sessionIter);
 }
 
 } // namespace hpm
