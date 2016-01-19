@@ -27,10 +27,14 @@ namespace methods
          *  Request: SystemId, ServerId, PublicEndpointList */
         bind,
 
-        // TODO: specify bahavior
+        /** Notifies mediator that server is ready to accept cloud connections */
         listen,
 
-        resolve,    //!< Returns host's public address list and suitable connections methods
+        /** server uses this request to confirm its willingness to proceed with cloud connection */
+        connectionAck,
+
+        /** Returns host's public address list and suitable connections methods */
+        resolve,
 
         /** Initiate connection to some mediaserver
          *  Request: \class PeerId, \class HostName, \class ConnectionId

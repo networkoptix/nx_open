@@ -25,12 +25,12 @@ public:
     std::shared_ptr<MediatorClientConnection> clientConnection();
 
     /** Provides system related functionality */
-    std::shared_ptr<MediatorSystemConnection> systemConnection();
+    std::shared_ptr<MediatorServerConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
     void mockupAddress( SocketAddress address );
 
-    /** Authorization credentials for \class MediatorSystemConnection */
+    /** Authorization credentials for \class MediatorServerConnection */
     struct NX_NETWORK_API SystemCredentials
     {
         String systemId, serverId, key;

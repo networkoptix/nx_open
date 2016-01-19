@@ -46,7 +46,7 @@ private:
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
-    std::shared_ptr<nx::network::cloud::MediatorSystemConnection> m_systemClient;
+    std::shared_ptr<nx::network::cloud::MediatorServerConnection> m_systemClient;
 
     MediaServerEmulator(const MediaServerEmulator&);
     MediaServerEmulator& operator=(const MediaServerEmulator&);

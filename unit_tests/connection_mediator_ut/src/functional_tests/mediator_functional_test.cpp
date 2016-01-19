@@ -131,7 +131,7 @@ std::shared_ptr<nx::network::cloud::MediatorClientConnection>
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::network::cloud::MediatorSystemConnection>
+std::shared_ptr<nx::network::cloud::MediatorServerConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();

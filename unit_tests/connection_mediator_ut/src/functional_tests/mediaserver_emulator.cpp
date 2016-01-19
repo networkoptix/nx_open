@@ -58,7 +58,7 @@ bool MediaServerEmulator::start()
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorSystemConnection::bind,
+            &nx::network::cloud::MediatorServerConnection::bind,
             m_systemClient.get(),
             std::move(localAddresses),
             std::placeholders::_1));
@@ -84,7 +84,7 @@ nx::hpm::api::ResultCode MediaServerEmulator::listen() const
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorSystemConnection::listen,
+            &nx::network::cloud::MediatorServerConnection::listen,
             m_systemClient.get(),
             std::move(requestData),
             std::placeholders::_1));

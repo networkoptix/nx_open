@@ -39,32 +39,7 @@ UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
     }
 
     m_timer->bindToAioThread(serverConnectionStrongRef->socket()->getAioThread());
-    //serverConnectionStrongRef->registerConnectionClosedHandler(
-    //    std::bind(&UDPHolePunchingConnectionInitiationFsm::onServerConnectionClosed, this));
 }
-
-//UDPHolePunchingConnectionInitiationFsm::UDPHolePunchingConnectionInitiationFsm(
-//    UDPHolePunchingConnectionInitiationFsm&& rhs)
-//:
-//    m_state(rhs.m_state),
-//    m_connectionID(std::move(rhs.m_connectionID)),
-//    m_onFsmFinishedEventHandler(std::move(rhs.m_onFsmFinishedEventHandler)),
-//    m_timer(std::move(rhs.m_timer))
-//{
-//}
-//
-//UDPHolePunchingConnectionInitiationFsm& UDPHolePunchingConnectionInitiationFsm::operator=(
-//    UDPHolePunchingConnectionInitiationFsm&& rhs)
-//{
-//    if (this == &rhs)
-//        return *this;
-//
-//    m_state = rhs.m_state;
-//    m_connectionID = std::move(rhs.m_connectionID);
-//    m_onFsmFinishedEventHandler = std::move(rhs.m_onFsmFinishedEventHandler);
-//    m_timer = std::move(m_timer);
-//    return *this;
-//}
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
     const ConnectionStrongRef& originatingPeerConnection,
@@ -154,10 +129,6 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectionResultRequest(
             api::ResultCode::ok));
     });
 }
-
-//void UDPHolePunchingConnectionInitiationFsm::onServerConnectionClosed()
-//{
-//}
 
 void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
 {

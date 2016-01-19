@@ -16,6 +16,8 @@ namespace methods {
                 return "bind";
             case listen:
                 return "listen";
+            case connectionAck:
+                return "connectionAck";
             case resolve:
                 return "resolve";
             case connect:

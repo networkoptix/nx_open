@@ -46,10 +46,10 @@ std::shared_ptr<MediatorClientConnection> MediatorConnector::clientConnection()
                 new MediatorClientConnection( m_stunClient ) );
 }
 
-std::shared_ptr<MediatorSystemConnection> MediatorConnector::systemConnection()
+std::shared_ptr<MediatorServerConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorSystemConnection>(
-                new MediatorSystemConnection( m_stunClient, this ) );
+    return std::shared_ptr<MediatorServerConnection>(
+                new MediatorServerConnection( m_stunClient, this ) );
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address )
