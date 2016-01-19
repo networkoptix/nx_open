@@ -386,11 +386,6 @@ void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
         updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::onCameraFootageChanged(const QnVirtualCameraResourcePtr &camera)
-{
-    updateHasArchiveState();
-}
-
 void QnWorkbenchNavigator::onCurrentLayoutChanged()
 {
     updateSliderOptions();
@@ -473,7 +468,11 @@ void QnWorkbenchNavigator::initialize() {
         , this, &QnWorkbenchNavigator::onCurrentLayoutChanged);
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
-        , this, &QnWorkbenchNavigator::onCameraFootageChanged);
+        , this, [this](const QnVirtualCameraResourcePtr & /* camera */)
+    {
+        updateHasArchiveState();
+    });
+
 
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -697,6 +696,9 @@ bool QnWorkbenchNavigator::layoutHasAchive()
     return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
     {
         const auto camera = extractCamera(item);
+        if (!camera)
+            return false;
+
         const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
         return camHasArchive;
     });

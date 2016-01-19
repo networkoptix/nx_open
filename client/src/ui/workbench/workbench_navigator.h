@@ -231,8 +231,6 @@ private:
 
     QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
-    void onCameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
-
     void onCurrentLayoutChanged();
 
     void onCurrentLayoutAboutToBeChanged();
