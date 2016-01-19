@@ -144,7 +144,7 @@ QnDirectModuleFinderHelper *QnModuleFinder::directModuleFinderHelper() const {
 
 std::chrono::milliseconds QnModuleFinder::pingTimeout() const {
     // ModuleFinder uses amplified timeout to fix possible temporary problems
-    // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 min)
+    // in QnMulticastModuleFinder (e.g. extend default timeouts 15 sec to 30 sec)
     return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout() * 2;
 }
 
