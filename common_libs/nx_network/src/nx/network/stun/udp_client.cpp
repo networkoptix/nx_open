@@ -45,6 +45,17 @@ UDPClient::UDPClient()
 {
 }
 
+//TODO #ak #msvc2015 delegating constructor
+UDPClient::UDPClient(SocketAddress serverAddress)
+:
+    m_receivingMessages(false),
+    m_messagePipeline(this),
+    m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
+    m_maxRetransmissions(kDefaultMaxRetransmissions),
+    m_serverAddress(std::move(serverAddress))
+{
+}
+
 void UDPClient::pleaseStop(std::function<void()> handler)
 {
     m_messagePipeline.pleaseStop(
@@ -83,6 +94,16 @@ void UDPClient::sendRequest(
         std::move(serverAddress),
         std::move(request),
         std::move(completionHandler)));
+}
+
+void UDPClient::sendRequest(
+    Message request,
+    RequestCompletionHandler completionHandler)
+{
+    sendRequest(
+        m_serverAddress,
+        std::move(request),
+        std::move(completionHandler));
 }
 
 bool UDPClient::bind(const SocketAddress& localAddress)

@@ -27,7 +27,7 @@ TEST_F(MediatorFunctionalTest, listen)
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+    const std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();

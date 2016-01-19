@@ -40,10 +40,10 @@ void MediatorConnector::enable( bool waitComplete )
         m_promise->get_future().wait();
 }
 
-std::shared_ptr<MediatorClientConnection> MediatorConnector::clientConnection()
+std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
-    return std::shared_ptr<MediatorClientConnection>(
-                new MediatorClientConnection( m_stunClient ) );
+    return std::shared_ptr<MediatorClientTcpConnection>(
+                new MediatorClientTcpConnection( m_stunClient ) );
 }
 
 std::shared_ptr<MediatorServerConnection> MediatorConnector::systemConnection()

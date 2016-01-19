@@ -1,18 +1,19 @@
 #ifndef NX_CC_MEDIATOR_CONNECTIONS_H
 #define NX_CC_MEDIATOR_CONNECTIONS_H
 
-#include <nx/network/cloud/data/connection_ack_data.h>
-#include <nx/network/cloud/data/connection_requested_event_data.h>
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/udp_client.h>
 
+#include "base_mediator_client.h"
 #include "data/bind_data.h"
 #include "data/connect_data.h"
+#include "data/connection_ack_data.h"
+#include "data/connection_requested_event_data.h"
 #include "data/connection_result_data.h"
 #include "data/listen_data.h"
 #include "data/ping_data.h"
 #include "data/resolve_data.h"
-#include "data/result_code.h"
 
 
 namespace nx {
@@ -22,66 +23,75 @@ namespace cloud {
 // Forward
 class MediatorConnector;
 
-/** Provides helper functions for easy adding requests to mediator */
-class NX_NETWORK_API BaseMediatorClient
-:
-    public stun::AsyncClientUser
-{
-public:
-    BaseMediatorClient(std::shared_ptr<stun::AsyncClient> client);
-
-protected:
-    template<typename RequestData, typename CompletionHandlerType>
-    void doRequest(
-        nx::stun::cc::methods::Value method,
-        RequestData requestData,
-        CompletionHandlerType completionHandler);
-
-    template<typename ResponseData>
-    void sendRequestAndReceiveResponse(
-        stun::Message request,
-        std::function<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler);
-
-    void sendRequestAndReceiveResponse(
-        stun::Message request,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler);
-};
-
 /** Provides client related STUN functionality.
     \note These requests DO NOT require authentication
  */
-class NX_NETWORK_API MediatorClientConnection
-    : public BaseMediatorClient
+template<class NetworkClientType>
+class MediatorClientConnection
+:
+    public BaseMediatorClient<NetworkClientType>
 {
-    MediatorClientConnection(std::shared_ptr<stun::AsyncClient> client);
     friend class MediatorConnector;
 
 public:
+    //TODO #ak #msvc2015 variadic template
+    template<typename Arg1Type>
+        MediatorClientConnection(Arg1Type arg1)
+    :
+        BaseMediatorClient<NetworkClientType>(std::move(arg1))
+    {
+    }
+
     void resolve(
         nx::hpm::api::ResolveRequest resolveData,
         std::function<void(
             nx::hpm::api::ResultCode,
-            nx::hpm::api::ResolveResponse)> completionHandler);
+            nx::hpm::api::ResolveResponse)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::resolve,
+            std::move(resolveData),
+            std::move(completionHandler));
+    }
 
     void connect(
         nx::hpm::api::ConnectRequest connectData,
         std::function<void(
             nx::hpm::api::ResultCode,
-            nx::hpm::api::ConnectResponse)> completionHandler);
+            nx::hpm::api::ConnectResponse)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::connect,
+            std::move(connectData),
+            std::move(completionHandler));
+    }
+
     void connectionResult(
         nx::hpm::api::ConnectionResultRequest resultData,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler);
+        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::connectionResult,
+            std::move(resultData),
+            std::move(completionHandler));
+    }
 };
+
+typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;
+typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
 
 /** Provides server-related STUN functionality.
     \note All server requests MUST be authorized by cloudId and cloudAuthenticationKey
 */
 class NX_NETWORK_API MediatorServerConnection
-    : public BaseMediatorClient
+:
+    public BaseMediatorClient<stun::AsyncClientUser>
 {
-    MediatorServerConnection(std::shared_ptr<stun::AsyncClient> client,
-                             MediatorConnector* connector);
     friend class MediatorConnector;
+
+    MediatorServerConnection(
+        std::shared_ptr<stun::AsyncClient> client,
+        MediatorConnector* connector);
 
 public:
     /** Ask mediator to test connection to addresses.
@@ -118,9 +128,6 @@ protected:
         CompletionHandlerType completionHandler);
 
 private:
-    void sendAuthRequest(stun::Message request,
-                         stun::AsyncClient::RequestHandler handler);
-
     MediatorConnector* m_connector;
 };
 

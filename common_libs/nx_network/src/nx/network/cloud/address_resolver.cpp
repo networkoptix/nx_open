@@ -90,7 +90,7 @@ QString AddressEntry::toString() const
 }
 
 AddressResolver::AddressResolver(
-        std::shared_ptr<MediatorClientConnection> mediatorConnection)
+        std::shared_ptr<MediatorClientTcpConnection> mediatorConnection)
     : m_mediatorConnection(std::move(mediatorConnection))
 {
 }

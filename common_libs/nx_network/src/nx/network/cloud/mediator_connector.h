@@ -22,7 +22,7 @@ public:
     void enable( bool waitComplete = false );
 
     /** Provides client related functionality */
-    std::shared_ptr<MediatorClientConnection> clientConnection();
+    std::shared_ptr<MediatorClientTcpConnection> clientConnection();
 
     /** Provides system related functionality */
     std::shared_ptr<MediatorServerConnection> systemConnection();

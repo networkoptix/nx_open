@@ -38,6 +38,7 @@ public:
     static const int kDefaultMaxRetransmissions;
 
     UDPClient();
+    UDPClient(SocketAddress serverAddress);
 
     virtual void pleaseStop(std::function<void()> handler) override;
 
@@ -48,6 +49,10 @@ public:
     */
     void sendRequest(
         SocketAddress serverAddress,
+        Message request,
+        RequestCompletionHandler completionHandler);
+    /** This overload can be used if target endpoint has been supplied through constructor */
+    void sendRequest(
         Message request,
         RequestCompletionHandler completionHandler);
 
@@ -89,6 +94,7 @@ private:
     int m_maxRetransmissions;
     //map<transaction id, request data>
     std::map<nx::Buffer, RequestContext> m_ongoingRequests;
+    const SocketAddress m_serverAddress;
 
     virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
     virtual void ioFailure(SystemError::ErrorCode) override;

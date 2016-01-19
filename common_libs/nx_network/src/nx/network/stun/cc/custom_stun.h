@@ -46,7 +46,7 @@ namespace methods
         connectionResult,
     };
 
-    nx::String toString(Value val);
+    NX_NETWORK_API nx::String toString(Value val);
 }
 
 namespace indications

@@ -47,7 +47,7 @@ public:
 
     SocketAddress endpoint() const;
 
-    std::shared_ptr<nx::network::cloud::MediatorClientConnection> clientConnection();
+    std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection> clientConnection();
     std::shared_ptr<nx::network::cloud::MediatorServerConnection> systemConnection();
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
@@ -56,6 +56,8 @@ public:
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
         nx::String name);
+    std::unique_ptr<MediaServerEmulator> addRandomServer(
+        const AbstractCloudDataProvider::System& system);
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count);

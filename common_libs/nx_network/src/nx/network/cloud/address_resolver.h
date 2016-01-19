@@ -73,7 +73,7 @@ class NX_NETWORK_API AddressResolver
         : public QnStoppableAsync
 {
 public:
-    AddressResolver(std::shared_ptr<MediatorClientConnection> mediatorConnection);
+    AddressResolver(std::shared_ptr<MediatorClientTcpConnection> mediatorConnection);
 
     //!Add new peer address
     /*!
@@ -198,7 +198,7 @@ private:
     std::multimap< void*, RequestInfo > m_requests;
 
     DnsResolver m_dnsResolver;
-    std::shared_ptr<MediatorClientConnection> m_mediatorConnection;
+    std::shared_ptr<MediatorClientTcpConnection> m_mediatorConnection;
 };
 
 } // namespace cloud
