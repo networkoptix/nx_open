@@ -544,12 +544,21 @@ void QnLiveStreamProvider::saveBitrateIfNotExists( const QnCompressedVideoDataPt
     std::map<QString, QString> customParams;
     extractMediaStreamParams( videoData, &resoulution, &customParams );
 
-    const auto actBitrate = getBitrateMbps();
-    const auto sugBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
-                liveParams.quality, resoulution, liveParams.fps )) / 1024;
+    CameraBitrateInfo info( encoderIndex() );
+    info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
+                liveParams.quality, resoulution, liveParams.fps ) / 1024;
+    info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
+        liveParams.quality, resoulution, liveParams.fps )) / 1024;
+    info.actualBitrate = getBitrateMbps();
 
-    CameraBitrateInfo bitrateInfo( encoderIndex(), sugBitrate, actBitrate, liveParams.fps, resoulution );
-    if( m_cameraRes->saveBitrateIfNotExists( bitrateInfo ) )
+    info.bitratePerGop = m_cameraRes->bitratePerGopType();
+    info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
+
+    info.fps = liveParams.fps;
+    info.actualFps = getFrameRate();
+    info.resolution = CameraMediaStreamInfo::resolutionToString( resoulution );
+
+    if( m_cameraRes->saveBitrateIfNotExists( info ) )
         m_cameraRes->saveParamsAsync();
 }
 

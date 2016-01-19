@@ -23,9 +23,9 @@ public:
     explicit QnAbstractMediaStreamDataProvider( const QnResourcePtr& res );
     virtual ~QnAbstractMediaStreamDataProvider();
 
-
     const QnStatistics* getStatistics(int channel) const;
     float getBitrateMbps() const;
+    float getFrameRate() const;
 
     virtual void setNeedKeyData();
     virtual bool needKeyData(int channel) const;

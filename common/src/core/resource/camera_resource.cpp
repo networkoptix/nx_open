@@ -49,7 +49,7 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
     setFlags(Qn::local_live_cam);
 }
 
-int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
 {
     float lowEnd = 0.1f;
     float hiEnd = 1.0f;
@@ -61,9 +61,17 @@ int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSiz
     float frameRateFactor = fps/1.0f;
 
     float result = qualityFactor*frameRateFactor * resolutionFactor;
-    result = qMax(192.0, result);
+
+    return qMax(192.0, result);
+}
+
+int QnPhysicalCameraResource::suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
+{
+    auto result = rawSuggestBitrateKbps(quality, resolution, fps);
+
     if (bitratePerGopType() != Qn::BPG_None)
         result = result * (30.0 / (qreal)fps);
+
     return (int) result;
 }
 
