@@ -14,7 +14,7 @@ namespace /* anonimous */ {
 
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
-const size_t kClientCount(3);
+const int kClientCount(3);
 const std::chrono::milliseconds kTestTimeout(500);
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
