@@ -190,7 +190,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
             this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
             Qt::QueuedConnection);
 
-    m_arecontRtspEnabled = new QnResourcePropertyAdaptor<bool>(
+    m_arecontRtspEnabled = new QnLexicalResourcePropertyAdaptor<bool>(
         kArecontRtspEnabled,
         kArecontRtspEnabledDefault,
         this);
