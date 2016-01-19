@@ -5,7 +5,7 @@
 
 #include "utils/common/log.h"
 
-const qint64 QnStorageResource::kNasStorageLimit = 50 * 1024 * 1024 * 1024; // 50 gb
+const qint64 QnStorageResource::kNasStorageLimit = 50LL * 1024 * 1024 * 1024; // 50 gb
 
 QnStorageResource::QnStorageResource():
     m_spaceLimit(0),

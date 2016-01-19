@@ -193,7 +193,8 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         switch(action->actionType())
         {
         case QnBusiness::SendMailAction:
-            return sendMail( action.dynamicCast<QnSendMailBusinessAction>() );
+            result = sendMail(action.dynamicCast<QnSendMailBusinessAction>());
+            break;
         case QnBusiness::BookmarkAction:
             result = executeBookmarkAction(action);
             break;

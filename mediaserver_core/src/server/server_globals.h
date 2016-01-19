@@ -44,14 +44,7 @@ public:
             (static_cast<int>(lhs) & static_cast<int>(rhs));
     }
 
-    enum BackupResultCode {
-        Failed,
-        EndOfPeriod,
-        Cancelled,
-        Done
-    };
 } // namespace QnServer
-Q_DECLARE_METATYPE(QnServer::BackupResultCode);
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES( (QnServer::ChunksCatalog), (metatype)(lexical) )
 
 #endif // QN_SERVER_GLOBALS_H
