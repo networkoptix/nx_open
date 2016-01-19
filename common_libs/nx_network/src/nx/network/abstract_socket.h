@@ -593,7 +593,7 @@ public:
 struct NX_NETWORK_API SocketOptions
 {
     boost::optional< SocketAddress > boundAddress;
-    boost::optional< bool > reuseAddrFlag;
+    boost::optional< bool > reuseAddrFlag, nonBlockingMode;
     boost::optional< unsigned int > sendBufferSize, recvBufferSize;
     boost::optional< unsigned int > sendTimeout, recvTimeout;
 
@@ -601,6 +601,7 @@ struct NX_NETWORK_API SocketOptions
     {
         SocketOptions_setOrFalse(bind,              boundAddress);
         SocketOptions_setOrFalse(setReuseAddrFlag,  reuseAddrFlag);
+        SocketOptions_setOrFalse(setReuseAddrFlag,  nonBlockingMode);
         SocketOptions_setOrFalse(setSendBufferSize, sendBufferSize);
         SocketOptions_setOrFalse(setRecvBufferSize, recvBufferSize);
         SocketOptions_setOrFalse(setSendTimeout,    sendTimeout);

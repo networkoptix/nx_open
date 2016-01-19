@@ -434,22 +434,19 @@ bool CloudStreamSocket::tunnelConnect(String peerId,
     if (ccTypes.empty())
         return false;
 
-    auto cloudTunnel = SocketGlobals::tunnelPool().get(
-        peerId, std::move(ccTypes));
-
     auto sharedGuard = m_asyncGuard.sharedGuard();
-    cloudTunnel->connect(m_socketOptions,
-                         [this, sharedGuard](
-        SystemError::ErrorCode errorCode,
-        std::unique_ptr<AbstractStreamSocket> socket)
+    SocketGlobals::tunnelPool().connect(
+        peerId, ccTypes, m_socketOptions, [this, sharedGuard]
+            (SystemError::ErrorCode errorCode,
+             std::unique_ptr<AbstractStreamSocket> socket)
     {
         if (auto lk = sharedGuard->lock())
         {
-            m_socketDelegate = std::move(socket);
-            const auto handler = std::move(m_connectHandler);
+           m_socketDelegate = std::move(socket);
+           const auto handler = std::move(m_connectHandler);
 
-            lk.unlock();
-            handler(errorCode);
+           lk.unlock();
+           handler(errorCode);
         }
     });
 

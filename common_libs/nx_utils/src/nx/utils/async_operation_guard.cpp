@@ -84,6 +84,12 @@ const std::shared_ptr<AsyncOperationGuard::SharedGuard>&
     return m_sharedGuard;
 }
 
+void AsyncOperationGuard::reset()
+{
+    m_sharedGuard->terminate();
+    m_sharedGuard.reset(new SharedGuard);
+}
+
 AsyncOperationGuard::SharedGuard* AsyncOperationGuard::operator->() const
 {
     return m_sharedGuard.get();
