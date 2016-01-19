@@ -16,7 +16,7 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
+TEST_F(MediatorFunctionalTest, DISABLED_HolePunchingProcessor_generic)
 {
     using namespace nx::hpm;
 

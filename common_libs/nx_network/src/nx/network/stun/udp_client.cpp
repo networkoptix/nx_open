@@ -83,7 +83,7 @@ const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket()
     return m_messagePipeline.socket();
 }
 
-void UDPClient::sendRequest(
+void UDPClient::sendRequestTo(
     SocketAddress serverAddress,
     Message request,
     RequestCompletionHandler completionHandler)
@@ -100,7 +100,7 @@ void UDPClient::sendRequest(
     Message request,
     RequestCompletionHandler completionHandler)
 {
-    sendRequest(
+    sendRequestTo(
         m_serverAddress,
         std::move(request),
         std::move(completionHandler));

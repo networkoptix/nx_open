@@ -13,7 +13,7 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST(UDPHolePunchingConnectionInitiationFsm, common)
+TEST(UDPHolePunchingConnectionInitiationFsm, DISABLED_common)
 {
     //UDPHolePunchingConnectionInitiationFsm hpFsm;
 }

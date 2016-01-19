@@ -59,6 +59,7 @@ void CloudServerSocket::close()
 bool CloudServerSocket::isClosed() const
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+    return false;
 }
 
 CloudServerSocket_setSocketOption(setReuseAddrFlag, bool, reuseAddrFlag)
@@ -82,6 +83,7 @@ CloudServerSocket_getSocketOption(getNonBlockingMode, bool, nonBlockingMode)
 bool CloudServerSocket::getMtu(unsigned int* mtuValue) const
 {
     Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+    return false;
 }
 
 #undef CloudServerSocket_setSocketOption

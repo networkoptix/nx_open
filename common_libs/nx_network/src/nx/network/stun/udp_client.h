@@ -47,7 +47,7 @@ public:
         \param completionHandler \a response is valid only if \a errorCode is 
             \a SystemError::noError. MUST not be NULL
     */
-    void sendRequest(
+    void sendRequestTo(
         SocketAddress serverAddress,
         Message request,
         RequestCompletionHandler completionHandler);
