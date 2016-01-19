@@ -15,6 +15,7 @@
 QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QWidget(parent),
     QnWorkbenchContextAware(parent, true),
+    QnUpdatable(),
     ui(new Ui::LicensesProposeWidget)
 {
     ui->setupUi(this);
@@ -22,9 +23,14 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     QnCheckbox::autoCleanTristate(ui->useLicenseCheckBox);
 
     connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::updateLicenseText);
-    connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::changed);
+    connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,  [this]
+    {
+        if (inUpdate())
+            return;
+        emit changed();
+    });
 
-    auto updateLicensesIfNeeded = [this] { 
+    auto updateLicensesIfNeeded = [this] {
         if (!isVisible())
             return;
         updateLicenseText();
@@ -47,6 +53,9 @@ void QnLicensesProposeWidget::afterContextInitialized() {
 }
 
 void QnLicensesProposeWidget::updateLicenseText() {
+    if (inUpdate())
+        return;
+
     QnCamLicenseUsageHelper helper;
 
     switch(ui->useLicenseCheckBox->checkState()) {
@@ -72,6 +81,11 @@ QnVirtualCameraResourceList QnLicensesProposeWidget::cameras() const {
 }
 
 void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &cameras) {
+    QnUpdatableGuard<QnLicensesProposeWidget> guard(this);
+
+    if (m_cameras == cameras)
+        return;
+
     m_cameras = cameras;
 
     int analogCameras = boost::count_if(m_cameras, [](const QnVirtualCameraResourcePtr &camera) {
@@ -86,7 +100,7 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
     QString title;
     if (analogCameras == m_cameras.size())
         title = tr("Use analog licenses to view these %n cameras", "", analogCameras);
-    else 
+    else
         title = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
                 tr("Use licenses for selected %n devices",      nullptr,    m_cameras.size()),
@@ -98,12 +112,10 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
 
     bool licenseUsed = m_cameras.isEmpty() ? false : m_cameras.front()->isLicenseUsed();
 
-    bool sameValue = boost::algorithm::all_of(m_cameras, [licenseUsed](const QnVirtualCameraResourcePtr &camera) { 
-        return camera->isLicenseUsed() == licenseUsed; 
+    bool sameValue = boost::algorithm::all_of(m_cameras, [licenseUsed](const QnVirtualCameraResourcePtr &camera) {
+        return camera->isLicenseUsed() == licenseUsed;
     });
     QnCheckbox::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
-
-    updateLicenseText();
 }
 
 Qt::CheckState QnLicensesProposeWidget::state() const {
@@ -118,5 +130,10 @@ void QnLicensesProposeWidget::setState(Qt::CheckState value) {
         ui->useLicenseCheckBox->setTristate(false);
         ui->useLicenseCheckBox->setChecked(value == Qt::Checked);
     }
+    updateLicenseText();
+}
+
+void QnLicensesProposeWidget::updateFinished()
+{
     updateLicenseText();
 }
