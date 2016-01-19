@@ -7,13 +7,9 @@
 int QnDiscoveredPeersRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) 
 {
     Q_UNUSED(path)
+    Q_UNUSED(params)
 
-    bool showAddresses = params.value(lit("showAddresses"), lit("false")) != lit("false");
-
-    if (showAddresses)
-        result.setReply(QnModuleFinder::instance()->foundModulesWithAddresses());
-    else
-        result.setReply(QnModuleFinder::instance()->foundModules());
+    result.setReply(QnModuleFinder::instance()->discoveredServers());
 
     return CODE_OK;
 }

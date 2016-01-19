@@ -16,8 +16,8 @@ QnDiscoveredSessionsModel::QnDiscoveredSessionsModel(QObject *parent)
     connect(m_moduleFinder, &QnModuleFinder::moduleAddressLost,  this, &QnDiscoveredSessionsModel::at_moduleFinder_moduleAddressLost);
     connect(m_moduleFinder, &QnModuleFinder::moduleChanged,      this, &QnDiscoveredSessionsModel::at_moduleFinder_moduleChanged);
 
-    for (const QnModuleInformationWithAddresses &moduleInformation: m_moduleFinder->foundModulesWithAddresses())
-        at_moduleFinder_moduleChanged(moduleInformation);
+    for (const ec2::ApiDiscoveredServerData &serverData: m_moduleFinder->discoveredServers())
+        at_moduleFinder_moduleChanged(serverData);
 }
 
 QnDiscoveredSessionsModel::~QnDiscoveredSessionsModel()
