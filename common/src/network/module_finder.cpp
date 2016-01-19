@@ -368,7 +368,7 @@ void QnModuleFinder::at_responseReceived(const QnModuleInformation &moduleInform
     m_lastResponse[address] = currentTime;
 
     if (item.moduleInformation != moduleInformation) {
-        NX_LOG(lit("QnModuleFinder. Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
+        NX_LOG(lit("QnModuleFinder: Module %1 is changed.").arg(moduleInformation.id.toString()), cl_logDEBUG1);
         emit moduleChanged(moduleInformation);
 
         if (item.moduleInformation.port != moduleInformation.port) {
@@ -490,6 +490,7 @@ void QnModuleFinder::removeAddress(const SocketAddress &address, bool holdItem, 
 
     if (it->primaryAddress == address) {
         it->primaryAddress = pickPrimaryAddress(it->addresses, ignoredUrls);
+        alreadyLost = it->primaryAddress.isNull();
 
         SocketAddress addressToSend = it->primaryAddress;
         Qn::ResourceStatus statusToSend = it->status;
@@ -565,6 +566,9 @@ void QnModuleFinder::sendModuleInformation(
     serverData.remoteAddresses.insert(address.address.toString());
     serverData.port = address.port;
     serverData.status = status;
+
+    NX_LOG(lit("QnModuleFinder: Send info for %1: %2 -> %3.")
+           .arg(moduleInformation.id.toString()).arg(address.toString()).arg(status), cl_logDEBUG2);
 
     QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager()->sendDiscoveredServer(
                 std::move(serverData),
