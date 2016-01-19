@@ -65,6 +65,9 @@ namespace {
     const int kEc2AliveUpdateIntervalDefault = 60;
     const QString kServerDiscoveryPingTimeout(lit("serverDiscoveryPingTimeoutSec"));
     const int kServerDiscoveryPingTimeoutDefault = 60;
+
+    const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
+    const bool kArecontRtspEnabledDefault = false;
 }
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
@@ -187,6 +190,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
             this, &QnGlobalSettings::ec2ConnectionSettingsChanged,
             Qt::QueuedConnection);
 
+    m_arecontRtspEnabled = new QnResourcePropertyAdaptor<bool>(
+        kArecontRtspEnabled,
+        kArecontRtspEnabledDefault,
+        this);
+
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
     connect(m_auditTrailEnabledAdaptor,             &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::auditTrailEnableChanged,             Qt::QueuedConnection);
     connect(m_cameraSettingsOptimizationAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::cameraSettingsOptimizationChanged,   Qt::QueuedConnection);
@@ -205,6 +213,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors() {
         << m_backupNewCamerasByDefaultAdaptor
         << m_statisticsAllowedAdaptor
         << ec2Adaptors
+        << m_arecontRtspEnabled
         ;
 
     return result;
@@ -418,6 +427,16 @@ void QnGlobalSettings::setServerDiscoveryPingTimeout(std::chrono::seconds newInt
 std::chrono::seconds QnGlobalSettings::serverDiscoveryAliveCheckTimeout() const
 {
     return connectionKeepAliveTimeout() * 3;   //3 is here to keep same values as before by default
+}
+
+bool QnGlobalSettings::arecontRtspEnabled() const
+{
+    return m_arecontRtspEnabled->value();
+}
+
+void QnGlobalSettings::setArecontRtspEnabled(bool newVal) const
+{
+    m_arecontRtspEnabled->setValue(newVal);
 }
 
 const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings() const
