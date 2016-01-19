@@ -43,6 +43,24 @@ CloudServerSocket::CloudServerSocket()
 
 CloudServerSocket_setSocketOption(bind, const SocketAddress&, boundAddress)
 
+SocketAddress CloudServerSocket::getLocalAddress() const
+{
+    if (!m_socketOptions->boundAddress)
+        return SocketAddress();
+
+    return *m_socketOptions->boundAddress;
+}
+
+void CloudServerSocket::close()
+{
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+}
+
+bool CloudServerSocket::isClosed() const
+{
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+}
+
 CloudServerSocket_setSocketOption(setReuseAddrFlag, bool, reuseAddrFlag)
 CloudServerSocket_getSocketOption(getReuseAddrFlag, bool, reuseAddrFlag)
 
@@ -60,6 +78,11 @@ CloudServerSocket_getSocketOption(getSendTimeout, unsigned int, sendTimeout)
 
 CloudServerSocket_setSocketOption(setNonBlockingMode, bool, nonBlockingMode)
 CloudServerSocket_getSocketOption(getNonBlockingMode, bool, nonBlockingMode)
+
+bool CloudServerSocket::getMtu(unsigned int* mtuValue) const
+{
+    Q_ASSERT_X(false, Q_FUNC_INFO, "Not implemented...");
+}
 
 #undef CloudServerSocket_setSocketOption
 #undef CloudServerSocket_getSocketOption
