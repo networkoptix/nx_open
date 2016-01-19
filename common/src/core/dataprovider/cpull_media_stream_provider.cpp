@@ -137,7 +137,7 @@ void QnClientPullMediaStreamProvider::run()
         {
             m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
             if (lp)
-                lp->onGotVideoFrame(videoData, getLiveParams(), false);
+                lp->onGotVideoFrame(videoData, getLiveParams(), isCameraControlRequired());
 
         }
 
