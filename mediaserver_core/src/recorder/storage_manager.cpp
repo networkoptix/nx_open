@@ -321,14 +321,19 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-                    if (fullscanProcessed) {
+                    if (fullscanProcessed) 
+                    {
+                        m_owner->m_firstStorageTestDone = true;
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
                         if (!m_fullScanCanceled)
                             emit m_owner->rebuildFinished(QnSystemHealth::ArchiveRebuildFinished);
                     }
                     else if (partialScanProcessed)
+                    {
+                        m_owner->m_firstStorageTestDone = true;
                         emit m_owner->rebuildFinished(QnSystemHealth::ArchiveFastScanFinished);
+                    }
 
                     fullscanProcessed = false;
                     partialScanProcessed = false;
@@ -1575,7 +1580,6 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::testStoragesDone()
 {
-    m_firstStorageTestDone = true;
     ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())

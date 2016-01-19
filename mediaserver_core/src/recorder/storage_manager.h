@@ -241,7 +241,7 @@ private:
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QnMutex m_csvMigrationMutex;
-    bool m_firstStorageTestDone;
+    std::atomic<bool> m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
