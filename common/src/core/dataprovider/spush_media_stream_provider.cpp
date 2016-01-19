@@ -55,6 +55,7 @@ bool CLServerPushStreamReader::isCameraControlRequired() const
 
 CameraDiagnostics::Result CLServerPushStreamReader::openStreamWithErrChecking(bool isControlRequired)
 {
+    onStreamReopen();
     m_FrameCnt = 0;
     bool isInitialized = m_resource->isInitialized();
     if (!isInitialized) {

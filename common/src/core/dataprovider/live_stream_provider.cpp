@@ -9,6 +9,7 @@
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
 #include "utils/common/safe_direct_connection.h"
+#include "utils/common/synctime.h"
 
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
@@ -288,6 +289,11 @@ bool QnLiveStreamProvider::needMetaData()
     return false; // not motion configured
 }
 
+void QnLiveStreamProvider::onStreamReopen()
+{
+    m_totalVideoFrames = 0;
+}
+
 void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
                                            const QnLiveStreamParams& currentLiveParams,
                                            bool isCameraControlRequired)
@@ -296,8 +302,9 @@ void QnLiveStreamProvider::onGotVideoFrame(const QnCompressedVideoDataPtr& video
     m_framesSinceLastMetaData++;
 
     saveMediaStreamParamsIfNeeded(videoData);
-    if (isCameraControlRequired && m_totalVideoFrames == SAVE_BITRATE_FRAME)
-        saveBitrateIfNotExists(videoData, currentLiveParams);
+    if (isCameraControlRequired && m_totalVideoFrames &&
+            (m_totalVideoFrames % SAVE_BITRATE_FRAME) == 0)
+        saveBitrateIfNeeded(videoData, currentLiveParams);
 
 #ifdef ENABLE_SOFTWARE_MOTION_DETECTION
 
@@ -537,18 +544,20 @@ void QnLiveStreamProvider::saveMediaStreamParamsIfNeeded( const QnCompressedVide
         m_cameraRes->saveParamsAsync();
 }
 
-void QnLiveStreamProvider::saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
-                                                   const QnLiveStreamParams& liveParams )
+void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
+                                                const QnLiveStreamParams& liveParams )
 {
     QSize resoulution;
     std::map<QString, QString> customParams;
-    extractMediaStreamParams( videoData, &resoulution, &customParams );
+    extractMediaStreamParams(videoData, &resoulution, &customParams);
 
-    CameraBitrateInfo info( encoderIndex() );
+    auto now = qnSyncTime->currentDateTime().toUTC().toString(Qt::ISODate);
+    CameraBitrateInfo info(encoderIndex(), std::move(now));
+
     info.rawSuggestedBitrate = m_cameraRes->rawSuggestBitrateKbps(
-                liveParams.quality, resoulution, liveParams.fps ) / 1024;
+                liveParams.quality, resoulution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
-        liveParams.quality, resoulution, liveParams.fps )) / 1024;
+        liveParams.quality, resoulution, liveParams.fps)) / 1024;
     info.actualBitrate = getBitrateMbps();
 
     info.bitratePerGop = m_cameraRes->bitratePerGopType();
@@ -556,9 +565,9 @@ void QnLiveStreamProvider::saveBitrateIfNotExists( const QnCompressedVideoDataPt
 
     info.fps = liveParams.fps;
     info.actualFps = getFrameRate();
-    info.resolution = CameraMediaStreamInfo::resolutionToString( resoulution );
+    info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
 
-    if( m_cameraRes->saveBitrateIfNotExists( info ) )
+    if (m_cameraRes->saveBitrateIfNeeded(info))
         m_cameraRes->saveParamsAsync();
 }
 

@@ -91,7 +91,7 @@ public:
     /*!
      *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
      */
-    bool saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo );
+    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
@@ -179,6 +179,7 @@ class CameraBitrateInfo
 {
 public:
     int encoderIndex;
+    QString timestamp;
 
     float rawSuggestedBitrate;
     float suggestedBitrate;
@@ -191,19 +192,20 @@ public:
     float actualFps;
     QString resolution;
 
-    CameraBitrateInfo( int index = -1 )
-        : encoderIndex( index )
-        , rawSuggestedBitrate( -1 )
-        , suggestedBitrate( -1 )
-        , actualBitrate( -1 )
-        , bitratePerGop( Qn::BPG_None )
-        , bitrateFactor( 1 )
-        , fps( -1 )
-        , actualFps( -1 )
+    CameraBitrateInfo(int index = -1, QString time = QString())
+        : encoderIndex(index)
+        , timestamp(time)
+        , rawSuggestedBitrate(-1)
+        , suggestedBitrate(-1)
+        , actualBitrate(-1)
+        , bitratePerGop(Qn::BPG_None)
+        , bitrateFactor(1)
+        , fps(-1)
+        , actualFps(-1)
     {
     }
 };
-#define CameraBitrateInfo_Fields (encoderIndex) \
+#define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
     (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
     (bitratePerGop)(bitrateFactor) \
     (fps)(actualFps)(resolution)

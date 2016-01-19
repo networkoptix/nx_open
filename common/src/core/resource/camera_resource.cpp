@@ -15,6 +15,7 @@
 static const float MAX_EPS = 0.01f;
 static const int MAX_ISSUE_CNT = 3; // max camera issues during a period.
 static const qint64 ISSUE_KEEP_TIMEOUT_MS = 1000 * 60;
+static const qint64 UPDATE_BITRATE_TIMEOUT_DAYS = 7;
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
 namespace {
@@ -163,23 +164,37 @@ bool QnPhysicalCameraResource::saveMediaStreamInfoIfNeeded( const CameraMediaStr
     return rez;
 }
 
-bool QnPhysicalCameraResource::saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo )
+bool QnPhysicalCameraResource::saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo )
 {
     auto bitrateInfos = QJson::deserialized<CameraBitrates>(
-        getProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME ).toLatin1() );
+        getProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME).toLatin1() );
 
-    if ( std::find_if( bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
-                       [ & ]( const CameraBitrateInfo& info )
-                       { return info.encoderIndex == bitrateInfo.encoderIndex; })
-          == bitrateInfos.streams.end() )
+    auto it = std::find_if(bitrateInfos.streams.begin(), bitrateInfos.streams.end(),
+                           [&](const CameraBitrateInfo& info)
+                           { return info.encoderIndex == bitrateInfo.encoderIndex; });
+
+    if (it != bitrateInfos.streams.end())
     {
-        bitrateInfos.streams.push_back( std::move( bitrateInfo ) );
-        setProperty( Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
-                     QString::fromUtf8( QJson::serialized( bitrateInfos ) ) );
-        return true;
+        const auto time = QDateTime::fromString(bitrateInfo.timestamp, Qt::ISODate);
+        const auto lastTime = QDateTime::fromString(it->timestamp, Qt::ISODate);
+
+        if (lastTime.isValid() && lastTime < time &&
+            lastTime.addDays(UPDATE_BITRATE_TIMEOUT_DAYS) > time)
+                return false;
+
+        // override old data
+        *it = bitrateInfo;
+    }
+    else
+    {
+        // add new record
+        bitrateInfos.streams.push_back(std::move(bitrateInfo));
     }
 
-    return false;
+    setProperty(Qn::CAMERA_BITRATE_INFO_LIST_PARAM_NAME,
+                QString::fromUtf8(QJson::serialized(bitrateInfos)));
+
+    return true;
 }
 
 bool isParamsCompatible(const CameraMediaStreamInfo& newParams, const CameraMediaStreamInfo& oldParams)
