@@ -1172,7 +1172,7 @@ void QnWorkbenchActionHandler::at_openBookmarksSearchAction_triggered()
         return new QnSearchBookmarksDialog(filterText, startTimeMs, endTimeMs, mainWindow());
     };
 
-    const bool firstTime = m_searchBookmarksDialog;
+    const bool firstTime = m_searchBookmarksDialog.isNull();
     const QnNonModalDialogConstructor<QnSearchBookmarksDialog> creator(m_searchBookmarksDialog
         , mainWindow(), dialogCreationFunction);
 

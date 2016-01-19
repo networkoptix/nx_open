@@ -466,11 +466,11 @@ void QnSearchBookmarksDialog::Impl::customContextMenuRequested()
 ///
 
 QnSearchBookmarksDialog::QnSearchBookmarksDialog(const QString &filterText
-    , qint64 utcStartTimGeMs
+    , qint64 utcStartTimeMs
     , qint64 utcFinishTimeMs
     , QWidget *parent)
     : QnWorkbenchStateDependentButtonBoxDialog(parent)
-    , m_impl(new Impl(filterText, utcStartTimGeMs, utcFinishTimeMs, this))
+    , m_impl(new Impl(filterText, utcStartTimeMs, utcFinishTimeMs, this))
 {
 }
 
