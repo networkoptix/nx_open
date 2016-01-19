@@ -317,11 +317,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-    if (mac.isEmpty())
-        resource->setPhysicalId(uniqId);
-    else
-        resource->setPhysicalId(mac);
-
+    resource->setPhysicalId(uniqId);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
