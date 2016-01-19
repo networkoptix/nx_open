@@ -21,7 +21,7 @@ namespace {
 
     Q_GLOBAL_STATIC_WITH_ARGS(QString, qn_resourcePropertyAdaptor_uniqueKey, createAdaptorKey())
 }
-#endif 
+#endif
 
 
 // -------------------------------------------------------------------------- //
@@ -59,8 +59,13 @@ void QnAbstractResourcePropertyAdaptor::setResource(const QnResourcePtr &resourc
     setResourceInternal(resource, true);
 }
 
-void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify) {
-    QString newSerializedValue = resource ? resource->getProperty(m_key) : defaultSerializedValue();
+void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr &resource, bool notify)
+{
+    QString newSerializedValue = resource
+        ? resource->getProperty(m_key)
+        : QString();
+    if (newSerializedValue.isEmpty())
+        newSerializedValue = defaultSerializedValue();
 
     bool changed;
     QnResourcePtr oldResource;
@@ -78,7 +83,7 @@ void QnAbstractResourcePropertyAdaptor::setResourceInternal(const QnResourcePtr 
         }
 
         m_resource = resource;
-        
+
         if(m_resource)
             connect(resource, &QnResource::propertyChanged, this, &QnAbstractResourcePropertyAdaptor::at_resource_propertyChanged);
 
@@ -99,10 +104,17 @@ QVariant QnAbstractResourcePropertyAdaptor::value() const {
 
 QString QnAbstractResourcePropertyAdaptor::serializedValue() const {
     QnMutexLocker locker( &m_mutex );
-    return m_serializedValue;
+    return m_serializedValue.isEmpty() ? defaultSerializedValueLocked() : m_serializedValue;
 }
 
-QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const {
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValue() const
+{
+    QnMutexLocker locker( &m_mutex );
+    return defaultSerializedValueLocked();
+}
+
+QString QnAbstractResourcePropertyAdaptor::defaultSerializedValueLocked() const
+{
     return QString();
 }
 
@@ -165,10 +177,18 @@ void QnAbstractResourcePropertyAdaptor::loadValue(const QString &serializedValue
 }
 
 bool QnAbstractResourcePropertyAdaptor::loadValueLocked(const QString &serializedValue) {
-    if(m_serializedValue == serializedValue)
+    QString newSerializedValue = serializedValue.isEmpty()
+        ? defaultSerializedValueLocked()
+        : serializedValue;
+
+    QString actualSerializedValue = m_serializedValue.isEmpty()
+        ? defaultSerializedValueLocked()
+        : m_serializedValue;
+
+    if (actualSerializedValue == newSerializedValue)
         return false;
 
-    m_serializedValue = serializedValue;
+    m_serializedValue = newSerializedValue;
     if(m_serializedValue.isEmpty() || !m_handler->deserialize(m_serializedValue, &m_value))
         m_value = QVariant();
 

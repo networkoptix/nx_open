@@ -32,7 +32,6 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleinformation(const QnMediaServerResourcePtr &server);
-    void bindModuleinformation(const QnUserResourcePtr &adminUser);
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;

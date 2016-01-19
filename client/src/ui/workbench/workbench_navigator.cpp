@@ -89,6 +89,14 @@ namespace {
     enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
     QAtomicInt qn_threadedMergeHandle(1);
+
+
+    QnVirtualCameraResourcePtr extractCamera(QnWorkbenchItem *item)
+    {
+        const auto layoutItemData = item->data();
+        const auto id = layoutItemData.resource.id;
+        return qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    };
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -126,7 +134,9 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_bookmarkAggregation(new QnCameraBookmarkAggregation()),
     m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
-    m_chunkMergingProcessHandle(0)
+    m_chunkMergingProcessHandle(0),
+    m_itemsWithArchive(),
+    m_hasArchive(false)
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -330,6 +340,85 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
     return m_timeSlider->isBookmarksVisible();
 }
 
+void QnWorkbenchNavigator::onCurrentLayoutAboutToBeChanged()
+{
+    const auto layout = workbench()->currentLayout();
+    if (!layout)
+        return;
+
+    disconnect(layout, nullptr, this, nullptr);
+
+    resetCurrentBookmarkQuery();
+    m_bookmarkQueries.clearQueries();
+
+    const auto items = layout->items();
+    for (const auto item: items)
+        onItemRemoved(layout, item);
+}
+
+void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchLayout *layout
+    , QnWorkbenchItem *item)
+{
+    const auto camera = extractCamera(item);
+    if (!camera)
+        return;
+
+    const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
+    const auto query = m_bookmarkQueries.getQuery(camera);
+    if ((query == m_currentQuery) && !hasSameCameras)
+        resetCurrentBookmarkQuery();
+
+    m_bookmarkQueries.removeQuery(camera);
+
+    // Updates archive availability for layout
+    const int removedCount = m_itemsWithArchive.remove(item->uuid());
+    if (removedCount && m_itemsWithArchive.empty())
+        setHasArchive(false);
+}
+
+void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
+    , QnWorkbenchItem *item)
+{
+    const auto camera = extractCamera(item);
+    if (!camera)
+        return;
+
+    refreshQueryFilter(camera); // Updates bookmarks filter
+
+    // Updates archive availability for layout
+    const auto cameraHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+    if (cameraHasArchive)
+    {
+        if (!m_itemsWithArchive.contains(camera->getId()))
+            setHasArchive(true);
+
+        m_itemsWithArchive.insert(item->uuid());
+    }
+}
+
+void QnWorkbenchNavigator::onCurrentLayoutChanged()
+{
+    updateSliderOptions();
+
+    const auto layout = workbench()->currentLayout();
+    if (!layout)
+        return;
+
+    const auto items = layout->items();
+    for (const auto item: items)
+        onItemAdded(layout, item);
+
+    connect(layout, &QnWorkbenchLayout::itemAdded, this, [this, layout](QnWorkbenchItem *item)
+    {
+        onItemAdded(layout, item);
+    });
+
+    connect(layout, &QnWorkbenchLayout::itemRemoved, this, [this, layout](QnWorkbenchItem *item)
+    {
+        onItemRemoved(layout, item);
+    });
+}
+
 QnCameraBookmarksQueryPtr QnWorkbenchNavigator::refreshQueryFilter(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera)
@@ -384,62 +473,10 @@ void QnWorkbenchNavigator::initialize() {
         return;
 
     /// Clears bookmarks caches for current layout
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]()
-    {
-        const auto layout = workbench()->currentLayout();
-        if (!layout)
-            return;
-
-        disconnect(layout, nullptr, this, nullptr);
-
-        resetCurrentBookmarkQuery();
-        m_bookmarkQueries.clearQueries();
-    });
-
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]()
-    {
-        const auto layout = workbench()->currentLayout();
-        if (!layout)
-            return;
-
-        const auto extractCamera = [this](QnWorkbenchItem *item)
-        {
-            const auto layoutItemData = item->data();
-            const auto id = layoutItemData.resource.id;
-            return qnResPool->getResourceById<QnVirtualCameraResource>(id);
-        };
-
-        const auto processLayoutItem = [this, extractCamera](QnWorkbenchItem *item)
-        {
-            const auto camera = extractCamera(item);
-            if (camera)
-                refreshQueryFilter(camera);
-        };
-
-        const auto items = layout->items();
-        for (const auto item: items)
-            processLayoutItem(item);
-
-        connect(layout, &QnWorkbenchLayout::itemAdded, this, processLayoutItem);
-
-        connect(layout, &QnWorkbenchLayout::itemRemoved, this
-            , [this, layout, extractCamera](QnWorkbenchItem *item)
-        {
-            const auto camera = extractCamera(item);
-            if (!camera)
-                return;
-
-            const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
-            const auto query = m_bookmarkQueries.getQuery(camera);
-            if ((query == m_currentQuery) && !hasSameCameras)
-                resetCurrentBookmarkQuery();
-
-            m_bookmarkQueries.removeQuery(camera);
-        });
-
-    });
-
-    connect(workbench(),                        SIGNAL(currentLayoutChanged()),                     this,   SLOT(updateSliderOptions()));
+    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged
+        , this, &QnWorkbenchNavigator::onCurrentLayoutAboutToBeChanged);
+    connect(workbench(), &QnWorkbench::currentLayoutChanged
+        , this, &QnWorkbenchNavigator::onCurrentLayoutChanged);
 
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -646,6 +683,20 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
 
         updateSpeed();
     }
+}
+
+bool QnWorkbenchNavigator::hasArchive() const
+{
+    return m_hasArchive;
+}
+
+void QnWorkbenchNavigator::setHasArchive(bool value)
+{
+    if (m_hasArchive == value)
+        return;
+
+    m_hasArchive = value;
+    emit hasArchiveChanged();
 }
 
 bool QnWorkbenchNavigator::hasVideo() const {

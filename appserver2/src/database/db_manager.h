@@ -355,12 +355,12 @@ namespace ec2
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleData> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerData> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }
 
-        ErrorCode executeTransactionInternal(const QnTransaction<ApiModuleDataList> &) {
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiDiscoveredServerDataList> &) {
             Q_ASSERT_X(0, Q_FUNC_INFO, "This is a non persistent transaction!"); // we MUSTN'T be here
             return ErrorCode::notImplemented;
         }

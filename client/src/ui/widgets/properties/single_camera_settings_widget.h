@@ -41,9 +41,9 @@ public:
     void setScheduleEnabled(bool enabled);
     bool isScheduleEnabled() const;
 
-    bool hasDbChanges() const {
-        return m_hasDbChanges;
-    }
+    bool hasDbChanges() const;
+    bool hasAdvancedCameraChanges() const;
+    bool hasChanges() const;
 
     /** Checks if user changed schedule controls but not applied them */
     bool hasScheduleControlsChanges() const {
