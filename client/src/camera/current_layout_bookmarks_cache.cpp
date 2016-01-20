@@ -65,8 +65,7 @@ void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)
 
     m_filter.startTimeMs = window.startTimeMs;
     m_filter.endTimeMs = window.endTimeMs();
-
-    // TODO add set window
+    m_queriesCache->updateQueries(m_filter);
 }
 
 QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCameraResourcePtr &camera)
