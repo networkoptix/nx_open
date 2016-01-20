@@ -806,7 +806,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                     tr("Cannot move these %n devices to server %1. Server is unresponsive.", "", modifiedResources.size()),
                     tr("Cannot move these %n cameras to server %1. Server is unresponsive.", "", modifiedResources.size()),
-                    tr("Cannot move these %n IO modules to server %1. Server is unresponsive.", "", modifiedResources.size())
+                    tr("Cannot move these %n I/O modules to server %1. Server is unresponsive.", "", modifiedResources.size())
                 ),
                 modifiedResources
             ).arg(server->getName()),
@@ -836,7 +836,7 @@ void QnWorkbenchActionHandler::at_cameraListChecked(int status, const QnCameraLi
                 QnCameraDeviceStringSet(
                         tr("Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?", "", errorResources.size()),
                         tr("Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?", "", errorResources.size()),
-                        tr("Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?", "", errorResources.size())
+                        tr("Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?", "", errorResources.size())
                     ),
                     modifiedResources
                 ).arg(server->getName()),
@@ -1804,7 +1804,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
                         nullptr, onlineAutoDiscoveredCameras.size()),
                     tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
                         nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                    tr("These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
                         nullptr, onlineAutoDiscoveredCameras.size())
                 ),
                 onlineAutoDiscoveredCameras
@@ -1820,7 +1820,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
                         nullptr, onlineAutoDiscoveredCameras.size()),
                     tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
                         nullptr, onlineAutoDiscoveredCameras.size()),
-                    tr("%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
+                    tr("%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
                         nullptr, onlineAutoDiscoveredCameras.size())
                 ),
                 cameras
@@ -1836,7 +1836,7 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
                         nullptr, cameras.size()),
                     tr("Do you really want to delete the following %n cameras?",
                         nullptr, cameras.size()),
-                    tr("Do you really want to delete the following %n IO modules?",
+                    tr("Do you really want to delete the following %n I/O modules?",
                         nullptr, cameras.size())
                 ),
                 cameras

@@ -1453,7 +1453,7 @@ void QnWorkbenchNavigator::updateLines() {
             QnCameraDeviceStringSet(
                 tr("All Devices"),
                 tr("All Cameras"),
-                tr("All IO Modules")
+                tr("All I/O Modules")
                 ), syncedCameras
             ));
     } else {

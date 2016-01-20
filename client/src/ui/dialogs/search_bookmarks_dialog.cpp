@@ -389,9 +389,9 @@ void QnSearchBookmarksDialog::Impl::setCameras(const QnVirtualCameraResourceList
     if (cameras.empty())
     {
         static const auto kAnyDevicesStringsSet = QnCameraDeviceStringSet(
-            tr("<Any Device>"), tr("<Any Camera>"), tr("<Any IO Module>"));
+            tr("<Any Device>"), tr("<Any Camera>"), tr("<Any I/O Module>"));
         static const auto kAnyMyDevicesStringsSet = QnCameraDeviceStringSet(
-            tr("<All My Devices>"), tr("<All My Cameras>"), tr("<All My IO Modules>"));
+            tr("<All My Devices>"), tr("<All My Cameras>"), tr("<All My I/O Modules>"));
 
         const auto &devicesStringsSet = (isAdmin
             ? kAnyDevicesStringsSet : kAnyMyDevicesStringsSet);
@@ -404,7 +404,7 @@ void QnSearchBookmarksDialog::Impl::setCameras(const QnVirtualCameraResourceList
     const auto devicesStringSet = QnCameraDeviceStringSet(
         tr("<%n device(s)>", nullptr, cameras.size())
         , tr("<%n camera(s)>", nullptr, cameras.size())
-        , tr("<%n IO module(s)>", nullptr, cameras.size()));
+        , tr("<%n I/O module(s)>", nullptr, cameras.size()));
 
     const auto caption = QnDeviceDependentStrings::getNameFromSet(
         devicesStringSet, cameras);

@@ -437,7 +437,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
                 QnCameraDeviceStringSet(
                     tr("Could not export device %1."),
                     tr("Could not export camera %1."),
-                    tr("Could not export IO module %1.")
+                    tr("Could not export I/O module %1.")
                 ), camRes
             ).arg(getShortResourceName(camRes));
         finishExport(false);

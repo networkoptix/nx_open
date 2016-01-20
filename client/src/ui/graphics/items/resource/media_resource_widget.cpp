@@ -140,7 +140,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext *context, QnWork
         , [this](){ return getUtcCurrentTimeMs(); }, this))
     , m_ioModuleOverlayWidget(nullptr)
     , m_ioCouldBeShown(false)
-    , m_ioLicenceStatusHelper() /// Will be created only for IO modules
+    , m_ioLicenceStatusHelper() /// Will be created only for I/O modules
 {
     if(!m_resource)
         qnCritical("Media resource widget was created with a non-media resource.");
@@ -373,7 +373,7 @@ void QnMediaResourceWidget::createButtons() {
         ioModuleButton->setCheckable(true);
         ioModuleButton->setChecked(false);
         ioModuleButton->setProperty(Qn::NoBlockMotionSelection, true);
-        ioModuleButton->setToolTip(tr("IO Module"));
+        ioModuleButton->setToolTip(tr("I/O Module"));
         connect(ioModuleButton, &QnImageButtonWidget::toggled, this, &QnMediaResourceWidget::at_ioModuleButton_toggled);
         buttonBar()->addButton(IoModuleButton, ioModuleButton);
     }
@@ -1468,7 +1468,7 @@ QnMediaResourceWidget::ResourceStates QnMediaResourceWidget::getResourceStates()
 
 void QnMediaResourceWidget::updateIoModuleVisibility(bool animate) {
     Q_ASSERT_X(m_camera && m_camera->hasFlags(Qn::io_module) && m_ioLicenceStatusHelper
-        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for io modules");
+        , Q_FUNC_INFO, "updateIoModuleVisibility should be called only for I/O modules");
 
     if (!m_camera || !m_camera->hasFlags(Qn::io_module) || !m_ioLicenceStatusHelper)
         return;
@@ -1505,7 +1505,7 @@ void QnMediaResourceWidget::updateOverlayButton() {
             }
         } else if (overlay == Qn::IoModuleDisabledOverlay) {
 
-            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query IO status overlay for resource widget which is not containing IO module");
+            Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO, "Query I/O status overlay for resource widget which is not containing I/O module");
 
             if (!m_ioLicenceStatusHelper)
                 return;
@@ -1533,7 +1533,7 @@ void QnMediaResourceWidget::at_statusOverlayWidget_diagnosticsRequested() {
 
 void QnMediaResourceWidget::at_statusOverlayWidget_ioEnableRequested() {
     Q_ASSERT_X(m_ioLicenceStatusHelper, Q_FUNC_INFO
-        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-io modules");
+        , "at_statusOverlayWidget_ioEnableRequested could not be processed for non-I/O modules");
 
     if (!m_ioLicenceStatusHelper)
         return;

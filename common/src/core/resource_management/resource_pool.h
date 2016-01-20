@@ -184,7 +184,7 @@ public:
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
-    /** Check if there is at least one IO Module in the system. */
+    /** Check if there is at least one I/O Module in the system. */
     bool containsIoModules() const;
 
     /** Check if layout was created automatically, e.g. by 'Push my screen' action.
