@@ -25,7 +25,8 @@ enum class ResultCode
     notImplemented,
     noSuitableConnectionMethod,
     timedout,
-    serverConnectionBroken
+    serverConnectionBroken,
+    badTransport
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResultCode)

@@ -48,7 +48,7 @@ public:
     SocketAddress endpoint() const;
 
     std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection> clientConnection();
-    std::shared_ptr<nx::network::cloud::MediatorServerConnection> systemConnection();
+    std::shared_ptr<nx::network::cloud::MediatorServerTcpConnection> systemConnection();
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 

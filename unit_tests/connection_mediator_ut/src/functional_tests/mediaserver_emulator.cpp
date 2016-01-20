@@ -25,12 +25,13 @@ MediaServerEmulator::MediaServerEmulator(
         false,
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
-    m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName))
+    m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName)),
+    m_mediatorUdpClient(mediatorEndpoint, &m_mediatorConnector)
 {
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
     m_mediatorConnector.setSystemCredentials(
-        nx::hpm::MediatorConnector::SystemCredentials(
+        nx::network::cloud::SystemCredentials(
             m_systemData.id,
             m_serverId,
             m_systemData.authKey));
@@ -38,8 +39,8 @@ MediaServerEmulator::MediaServerEmulator(
 
 MediaServerEmulator::~MediaServerEmulator()
 {
-    if (m_systemClient)
-        m_systemClient->pleaseStopSync();
+    if (m_serverClient)
+        m_serverClient->pleaseStopSync();
 }
 
 bool MediaServerEmulator::start()
@@ -50,7 +51,10 @@ bool MediaServerEmulator::start()
         return false;
     }
 
-    m_systemClient = m_mediatorConnector.systemConnection();
+    using namespace std::placeholders;
+    m_serverClient = m_mediatorConnector.systemConnection();
+    m_serverClient->setOnConnectionRequestedHandler(
+        std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
 
     std::list<SocketAddress> localAddresses;
     localAddresses.push_back(m_httpServer.address());
@@ -58,8 +62,8 @@ bool MediaServerEmulator::start()
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorServerConnection::bind,
-            m_systemClient.get(),
+            &nx::network::cloud::MediatorServerTcpConnection::bind,
+            m_serverClient.get(),
             std::move(localAddresses),
             std::placeholders::_1));
 
@@ -84,8 +88,8 @@ nx::hpm::api::ResultCode MediaServerEmulator::listen() const
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorServerConnection::listen,
-            m_systemClient.get(),
+            &nx::network::cloud::MediatorServerTcpConnection::listen,
+            m_serverClient.get(),
             std::move(requestData),
             std::placeholders::_1));
 
@@ -94,7 +98,40 @@ nx::hpm::api::ResultCode MediaServerEmulator::listen() const
 
 SocketAddress MediaServerEmulator::mediatorConnectionLocalAddress() const
 {
-    return m_systemClient->localAddress();
+    return m_serverClient->localAddress();
+}
+
+SocketAddress MediaServerEmulator::udpHolePunchingEndpoint() const
+{
+    return m_mediatorUdpClient.localAddress();
+}
+
+void MediaServerEmulator::setOnConnectionRequestedHandler(
+    std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
+{
+    m_onConnectionRequestedHandler = std::move(handler);
+}
+
+void MediaServerEmulator::onConnectionRequested(
+    nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
+{
+    using namespace std::placeholders;
+
+    nx::hpm::api::ConnectionAckRequest connectionAckData;
+    connectionAckData.connectSessionID = connectionRequestedData.connectSessionID;
+    connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+    m_mediatorUdpClient.connectionAck(
+        std::move(connectionAckData),
+        std::bind(&MediaServerEmulator::onConnectionAckResponseReceived, this, _1));
+
+    if (m_onConnectionRequestedHandler)
+        m_onConnectionRequestedHandler(std::move(connectionRequestedData));
+}
+
+void MediaServerEmulator::onConnectionAckResponseReceived(
+    nx::hpm::api::ResultCode resultCode)
+{
+    //TODO
 }
 
 }   //hpm

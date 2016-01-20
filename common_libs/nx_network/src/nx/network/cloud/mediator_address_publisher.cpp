@@ -11,7 +11,7 @@ const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 10 );
 
 MediatorAddressPublisher::MediatorAddressPublisher(
-        std::shared_ptr< MediatorServerConnection > mediatorConnection)
+        std::shared_ptr< MediatorServerTcpConnection > mediatorConnection)
     : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
     , m_state( State::kInit )
     , m_timerSocket( SocketFactory::createStreamSocket() )

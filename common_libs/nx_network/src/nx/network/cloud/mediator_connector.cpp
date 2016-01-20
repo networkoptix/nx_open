@@ -46,10 +46,10 @@ std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection
                 new MediatorClientTcpConnection( m_stunClient ) );
 }
 
-std::shared_ptr<MediatorServerConnection> MediatorConnector::systemConnection()
+std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorServerConnection>(
-                new MediatorServerConnection( m_stunClient, this ) );
+    return std::shared_ptr<MediatorServerTcpConnection>(
+                new MediatorServerTcpConnection( m_stunClient, this ) );
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address )
@@ -70,30 +70,6 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     m_promise->set_value( true );
 }
 
-
-MediatorConnector::SystemCredentials::SystemCredentials()
-{
-}
-
-MediatorConnector::SystemCredentials::SystemCredentials(
-    nx::String _systemId,
-    nx::String _serverId,
-    nx::String _key)
-:
-    systemId(std::move(_systemId)),
-    serverId(std::move(_serverId)),
-    key(std::move(_key))
-{
-}
-
-bool MediatorConnector::SystemCredentials::operator ==( const SystemCredentials& rhs ) const
-{
-    return serverId == rhs.serverId &&
-           systemId == rhs.systemId &&
-           key      == rhs.key;
-}
-
-
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
 {
     bool needToReconnect = false;
@@ -110,8 +86,7 @@ void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials>
         m_stunClient->closeConnection( SystemError::connectionReset );
 }
 
-boost::optional<MediatorConnector::SystemCredentials>
-    MediatorConnector::getSystemCredentials()
+boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
 {
     QnMutexLocker lk( &m_mutex );
     return m_credentials;

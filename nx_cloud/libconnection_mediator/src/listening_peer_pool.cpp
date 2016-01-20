@@ -100,7 +100,7 @@ ListeningPeerData& ListeningPeerPool::DataLocker::value()
 //// class ListeningPeerPool
 ////////////////////////////////////////////////////////////
 
-ListeningPeerPool::DataLocker ListeningPeerPool::findAndLockPeerData(
+ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const ConnectionStrongRef& connection,
     const MediaserverData& peerData)
 {

@@ -14,7 +14,7 @@ class NX_NETWORK_API MediatorAddressPublisher
 {
 public:
     MediatorAddressPublisher(
-            std::shared_ptr< MediatorServerConnection > mediatorConnection );
+            std::shared_ptr< MediatorServerTcpConnection > mediatorConnection );
 
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;
 
@@ -39,7 +39,7 @@ private:
     std::list< SocketAddress > m_publishedAddresses;
 
     std::unique_ptr< AbstractStreamSocket > m_timerSocket;
-    std::shared_ptr< MediatorServerConnection > m_mediatorConnection;
+    std::shared_ptr< MediatorServerTcpConnection > m_mediatorConnection;
 };
 
 } // namespace cloud

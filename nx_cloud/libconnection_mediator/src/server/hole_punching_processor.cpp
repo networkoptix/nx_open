@@ -61,7 +61,7 @@ void HolePunchingProcessor::connect(
     api::ConnectRequest request,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
-    NX_LOGX(lm("connect request. from %1 to host %2, connection id %2").
+    NX_LOGX(lm("connect request. from %1 to host %2, connection id %3").
         arg(connection->getSourceAddress().toString()).
         arg(request.destinationHostName).arg(request.connectSessionID),
         cl_logDEBUG2);
@@ -108,7 +108,7 @@ void HolePunchingProcessor::connect(
 }
 
 void HolePunchingProcessor::onConnectionAckRequest(
-    const ConnectionStrongRef& /*connection*/,
+    const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
@@ -120,6 +120,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
         return;
     }
     connectionIter->second->onConnectionAckRequest(
+        connection,
         std::move(request),
         std::move(completionHandler));
 }

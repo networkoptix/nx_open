@@ -39,6 +39,11 @@ public:
 
     /** Address of connection to mediator */
     SocketAddress mediatorConnectionLocalAddress() const;
+    /** server's UDP address for hole punching */
+    SocketAddress udpHolePunchingEndpoint() const;
+
+    void setOnConnectionRequestedHandler(
+        std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler);
 
 private:
     MediatorConnector m_mediatorConnector;
@@ -46,7 +51,13 @@ private:
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
-    std::shared_ptr<nx::network::cloud::MediatorServerConnection> m_systemClient;
+    std::shared_ptr<nx::network::cloud::MediatorServerTcpConnection> m_serverClient;
+    nx::network::cloud::MediatorServerUdpConnection m_mediatorUdpClient;
+    std::function<void(nx::hpm::api::ConnectionRequestedEvent)> m_onConnectionRequestedHandler;
+
+    void onConnectionRequested(
+        nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);
+    void onConnectionAckResponseReceived(nx::hpm::api::ResultCode resultCode);
 
     MediaServerEmulator(const MediaServerEmulator&);
     MediaServerEmulator& operator=(const MediaServerEmulator&);

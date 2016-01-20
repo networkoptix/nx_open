@@ -54,7 +54,10 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
         connectionRequestedEvent.udpEndpointList.emplace_back(
             originatingPeerConnection->getSourceAddress());
         connectionRequestedEvent.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        nx::stun::Message indication;
+        nx::stun::Message indication(
+            stun::Header(
+                stun::MessageClass::indication,
+                stun::cc::indications::connectionRequested));
         connectionRequestedEvent.serialize(&indication);
 
         m_connectResponseSender = std::move(connectResponseSender);
@@ -79,12 +82,16 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
 }
 
 void UDPHolePunchingConnectionInitiationFsm::onConnectionAckRequest(
+    const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
     std::function<void(api::ResultCode)> completionHandler)
 {
-    m_timer->dispatch([this, request, completionHandler]()
+    m_timer->dispatch([this, connection, request, completionHandler]() mutable  //TODO #msvc2015 move to lambda
     {
         assert(m_connectResponseSender);
+
+        if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
+            request.udpEndpointList.push_front(connection->getSourceAddress());
 
         if (request.udpEndpointList.empty())
         {

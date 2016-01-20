@@ -25,6 +25,7 @@ class NX_NETWORK_API ConnectRequest
     public StunMessageData
 {
 public:
+    //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
     nx::String originatingPeerID;
     nx::String connectSessionID;

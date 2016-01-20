@@ -98,7 +98,7 @@ public:
         \note Another thread will block trying to lock \a peerData while
             \a DataLocker instance is still alive
      */
-    DataLocker findAndLockPeerData(
+    DataLocker insertAndLockPeerData(
         const ConnectionStrongRef& connection,
         const MediaserverData& peerData);
     boost::optional<ConstDataLocker> findAndLockPeerDataByHostName(

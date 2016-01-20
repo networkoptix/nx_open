@@ -36,6 +36,7 @@ public:
         api::ConnectRequest request,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void onConnectionAckRequest(
+        const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
         std::function<void(api::ResultCode)> completionHandler);
     void onConnectionResultRequest(

@@ -5,15 +5,19 @@
 
 #include <nx/network/stun/async_client.h>
 
+#include "abstract_cloud_system_credentials_provider.h"
 #include "cdb_endpoint_fetcher.h"
 #include "mediator_connections.h"
+
 
 namespace nx {
 namespace network {
 namespace cloud {
 
 class NX_NETWORK_API MediatorConnector
-    : public QnStoppableAsync
+:
+    public AbstractCloudSystemCredentialsProvider,
+    public QnStoppableAsync
 {
 public:
     MediatorConnector();
@@ -25,26 +29,13 @@ public:
     std::shared_ptr<MediatorClientTcpConnection> clientConnection();
 
     /** Provides system related functionality */
-    std::shared_ptr<MediatorServerConnection> systemConnection();
+    std::shared_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
     void mockupAddress( SocketAddress address );
 
-    /** Authorization credentials for \class MediatorServerConnection */
-    struct NX_NETWORK_API SystemCredentials
-    {
-        String systemId, serverId, key;
-        
-        SystemCredentials();
-        SystemCredentials(
-            nx::String _systemId,
-            nx::String _serverId,
-            nx::String _key);
-        bool operator ==( const SystemCredentials& rhs ) const;
-    };
-
     void setSystemCredentials( boost::optional<SystemCredentials> value );
-    boost::optional<SystemCredentials> getSystemCredentials();
+    virtual boost::optional<SystemCredentials> getSystemCredentials() const;
 
     void pleaseStop( std::function<void()> handler ) override;
 

@@ -10,7 +10,9 @@
 
 #include <QByteArray>
 #include <QString>
+
 #include <cdb/system_data.h>
+#include <utils/common/model_functions.h>
 
 
 void PrintTo(const QByteArray& val, ::std::ostream* os) {
@@ -31,4 +33,9 @@ void PrintTo(const boost::optional<nx::cdb::api::SystemData>& val, ::std::ostrea
 void PrintTo(const SocketAddress& val, ::std::ostream* os)
 {
     *os << val.toString().toStdString();
+}
+
+void PrintTo(const nx::hpm::api::ResultCode& val, ::std::ostream* os)
+{
+    *os << QnLexical::serialized(val).toStdString();
 }
