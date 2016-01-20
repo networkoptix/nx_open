@@ -2,7 +2,7 @@
 #include "timeline_bookmarks_watcher.h"
 
 #include <core/resource/camera_resource.h>
-#include <camera/bookmarks_cache.h>
+#include <camera/current_layout_bookmarks_cache.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/graphics/items/resource/resource_widget.h>

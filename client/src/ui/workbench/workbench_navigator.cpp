@@ -58,6 +58,7 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workbench/watchers/current_layout_items_watcher.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -343,23 +344,16 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
 
 void QnWorkbenchNavigator::onCurrentLayoutAboutToBeChanged()
 {
+    resetCurrentBookmarkQuery();
+    m_bookmarkQueries.clearQueries();
+}
+
+void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchItem *item)
+{
     const auto layout = workbench()->currentLayout();
     if (!layout)
         return;
 
-    disconnect(layout, nullptr, this, nullptr);
-
-    resetCurrentBookmarkQuery();
-    m_bookmarkQueries.clearQueries();
-
-    const auto items = layout->items();
-    for (const auto item: items)
-        onItemRemoved(layout, item);
-}
-
-void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchLayout *layout
-    , QnWorkbenchItem *item)
-{
     const auto camera = extractCamera(item);
     if (!camera)
         return;
@@ -375,8 +369,7 @@ void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchLayout *layout
         updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
-    , QnWorkbenchItem *item)
+void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
 {
     const auto camera = extractCamera(item);
     if (!camera)
@@ -391,24 +384,6 @@ void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
 void QnWorkbenchNavigator::onCurrentLayoutChanged()
 {
     updateSliderOptions();
-
-    const auto layout = workbench()->currentLayout();
-    if (!layout)
-        return;
-
-    const auto items = layout->items();
-    for (const auto item: items)
-        onItemAdded(layout, item);
-
-    connect(layout, &QnWorkbenchLayout::itemAdded, this, [this, layout](QnWorkbenchItem *item)
-    {
-        onItemAdded(layout, item);
-    });
-
-    connect(layout, &QnWorkbenchLayout::itemRemoved, this, [this, layout](QnWorkbenchItem *item)
-    {
-        onItemRemoved(layout, item);
-    });
 }
 
 QnCameraBookmarksQueryPtr QnWorkbenchNavigator::refreshQueryFilter(const QnVirtualCameraResourcePtr &camera)
@@ -464,10 +439,16 @@ void QnWorkbenchNavigator::initialize() {
     if (!isValid())
         return;
 
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged
+    const auto itemsWatcher = context()->instance<QnCurrentLayoutItemsWatcher>();
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
+        , this, &QnWorkbenchNavigator::onItemAdded);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
+        , this, &QnWorkbenchNavigator::onItemRemoved);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutAboutToBeChanged
         , this, &QnWorkbenchNavigator::onCurrentLayoutAboutToBeChanged);
+
     connect(workbench(), &QnWorkbench::currentLayoutChanged
-        , this, &QnWorkbenchNavigator::onCurrentLayoutChanged);
+        , this, &QnWorkbenchNavigator::updateSliderOptions);
 
     connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
         , this, [this](const QnVirtualCameraResourcePtr & /* camera */)

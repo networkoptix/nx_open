@@ -34,8 +34,6 @@ public:
     QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera);
 
 private:
-    void onLayoutAboutToBeChanged();
-
     void onItemAdded(QnWorkbenchItem *item);
 
     void onItemRemoved(QnWorkbenchItem *item);

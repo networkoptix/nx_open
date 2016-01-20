@@ -4,8 +4,8 @@
 #include <QtCore/QObject>
 
 #include <utils/common/connective.h>
-#include <ui/workbench/workbench_context_aware.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 class QnWorkbenchItem;
 

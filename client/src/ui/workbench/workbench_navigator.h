@@ -235,11 +235,9 @@ private:
 
     void onCurrentLayoutAboutToBeChanged();
 
-    void onItemAdded(QnWorkbenchLayout *layout
-        , QnWorkbenchItem *item);
+    void onItemAdded(QnWorkbenchItem *item);
 
-    void onItemRemoved(QnWorkbenchLayout *layout
-        , QnWorkbenchItem *item);
+    void onItemRemoved(QnWorkbenchItem *item);
 
     void updateHasArchiveState();
 

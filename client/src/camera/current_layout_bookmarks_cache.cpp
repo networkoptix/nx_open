@@ -44,10 +44,6 @@ QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCou
     , m_queriesCache(new QnBookmarkQueriesCache())
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
-//    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutChanged
-//        , this, &QnCurrentLayoutBookmarksCache::onLayoutChanged);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutAboutToBeChanged
-        , this, &QnCurrentLayoutBookmarksCache::onLayoutAboutToBeChanged);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
         , this, &QnCurrentLayoutBookmarksCache::onItemAdded);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
@@ -80,11 +76,6 @@ QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCam
 
     const auto query = m_queriesCache->getQuery(camera);
     return query->cachedBookmarks();
-}
-
-void QnCurrentLayoutBookmarksCache::onLayoutAboutToBeChanged()
-{
-    m_queriesCache->clearQueries();
 }
 
 void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)

@@ -4,8 +4,10 @@
 #include <QtCore/QObject>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource/camera_bookmark_fwd.h>
 #include <ui/utils/timeline_bookmark_item.h>
 #include <ui/workbench/workbench_context_aware.h>
+
 #include <utils/common/connective.h>
 
 class QnCurrentLayoutBookmarksCache;
@@ -13,7 +15,6 @@ class QnBookmarkMergeHelper;
 
 class QnTimelineBookmarksWatcher : public Connective<QObject>
     , public QnWorkbenchContextAware
-
 {
     Q_OBJECT
 
@@ -41,10 +42,10 @@ private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
-    typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCameraGroupBookmarksCachePtr;
+    typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
     typedef QScopedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
 
-    QnCameraGroupBookmarksCachePtr m_bookmarksCache;
+    QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
     QnBookmarkMergeHelperPtr m_mergeHelper;
     QnVirtualCameraResourcePtr m_currentCamera;
 };
