@@ -345,11 +345,6 @@ void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
         updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::onCurrentLayoutChanged()
-{
-    updateSliderOptions();
-}
-
 void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
 {
     if (bookmarksModeEnabled() == enabled)

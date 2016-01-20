@@ -218,8 +218,6 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
-    void onCurrentLayoutChanged();
-
     void onItemAdded(QnWorkbenchItem *item);
 
     void onItemRemoved(QnWorkbenchItem *item);
