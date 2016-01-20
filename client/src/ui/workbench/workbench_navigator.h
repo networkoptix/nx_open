@@ -23,6 +23,7 @@
 
 class QAction;
 
+class QnWorkbenchItem;
 class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnTimeScrollBar;
@@ -46,6 +47,7 @@ class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContex
 
     typedef Connective<QObject> base_type;
 
+    Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
     enum WidgetFlag {
         WidgetUsesUTC = 0x1,
@@ -84,6 +86,8 @@ public:
 
     bool hasVideo() const;
 
+    bool hasArchive() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
@@ -110,6 +114,7 @@ signals:
     void currentWidgetChanged();
     void liveChanged();
     void liveSupportedChanged();
+    void hasArchiveChanged();
     void playingChanged();
     void playingSupportedChanged();
     void speedChanged();
@@ -226,6 +231,18 @@ private:
 
     QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
+    void onCurrentLayoutChanged();
+
+    void onCurrentLayoutAboutToBeChanged();
+
+    void onItemAdded(QnWorkbenchLayout *layout
+        , QnWorkbenchItem *item);
+
+    void onItemRemoved(QnWorkbenchLayout *layout
+        , QnWorkbenchItem *item);
+
+    void setHasArchive(bool value);
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -286,6 +303,11 @@ private:
     std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
+
+
+    typedef QSet<QnUuid> IdsSet;
+    IdsSet m_itemsWithArchive;
+    bool m_hasArchive;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

@@ -36,4 +36,9 @@ bool QnPlAVClinetPullStreamReader::isH264() const
     return getResource()->getProperty(lit("Codec")) == lit("H.264");
 }
 
+bool QnPlAVClinetPullStreamReader::isCameraControlRequired() const
+{
+    return true;
+}
+
 #endif

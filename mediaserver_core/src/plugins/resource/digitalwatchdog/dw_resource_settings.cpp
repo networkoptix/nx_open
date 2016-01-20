@@ -311,6 +311,8 @@ bool QnPravisCameraProxy::setParams(const QVector<QPair<QnCameraAdvancedParamete
                     QnCameraAdvancedParamValue param;
                     param.value = value;
                     param.id = cameraAdvParam.id;
+                    if (result)
+                        result->push_back(param);
                 }
                 else {
                     resultOK = false;

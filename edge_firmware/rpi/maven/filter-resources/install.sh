@@ -44,6 +44,5 @@ while [ -z "${SERVER_PROCESS// }" ]; do
   /etc/init.d/$COMPANY_NAME-mediaserver start
   sleep 3
   PORT_PROCESS=`netstat -tpan | grep $SERVER_PORT | grep LISTEN | awk {'print $NF'} | grep -o '[0-9]\+'` 
-  SERVER_PROCESS=`ps $PORT_PROCESS | grep $COMPANY_NAME`  
+  SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`  
 done
-/etc/init.d/cron restart

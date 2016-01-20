@@ -112,6 +112,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceStatus>();
+    qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
 
     qRegisterMetaType<QnUserResourcePtr>();
@@ -248,9 +249,11 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
-    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
-    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
+    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
+    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
+    qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
+    qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
     qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
     qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" );
