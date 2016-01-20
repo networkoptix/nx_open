@@ -72,7 +72,6 @@ public:
         return context;
     }
 
-    /*
     virtual int newGlTexture() override
     {
         GLuint texture = GL_INVALID_VALUE;
@@ -99,7 +98,6 @@ public:
 
         return texture;
     }
-    */
 };
 
 void initDecoders(QQuickWindow *window)
