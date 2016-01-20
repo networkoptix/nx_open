@@ -8,6 +8,8 @@ angular.module('webadminApp')
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
+
+            $scope.canMerge = user.isOwner;
         });
 
         mediaserver.getSettings().then(function (r) {
