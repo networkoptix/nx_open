@@ -30,7 +30,7 @@ signals:
 
 protected:
     void afterContextInitialized() override;
-    virtual void updateFinished() override;
+    virtual void afterUpdate() override;
 
 private:
     void updateLicenseText();

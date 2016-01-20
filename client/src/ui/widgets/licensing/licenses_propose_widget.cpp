@@ -133,7 +133,7 @@ void QnLicensesProposeWidget::setState(Qt::CheckState value) {
     updateLicenseText();
 }
 
-void QnLicensesProposeWidget::updateFinished()
+void QnLicensesProposeWidget::afterUpdate()
 {
     updateLicenseText();
 }
