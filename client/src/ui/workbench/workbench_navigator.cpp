@@ -814,7 +814,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnVirtualCameraResource>());
 
-    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false)) {
+    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false))
+    {
         loader->setMotionRegions(QList<QRegion>());
         if (!m_syncedResources.contains(syncedResource))
             loader->setEnabled(false);
@@ -1941,6 +1942,8 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
     if(widget->options() & QnResourceWidget::DisplayMotion) {
         m_motionIgnoreWidgets.insert(widget);
+        if (widget == m_currentMediaWidget)
+            at_widget_motionSelectionChanged(m_currentMediaWidget);
     } else {
         m_motionIgnoreWidgets.remove(widget);
     }
