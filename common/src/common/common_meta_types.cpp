@@ -111,6 +111,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceStatus>();
+    qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
     
     qRegisterMetaType<QnUserResourcePtr>();

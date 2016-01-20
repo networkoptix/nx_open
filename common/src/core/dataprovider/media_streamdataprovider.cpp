@@ -159,6 +159,14 @@ float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
     return rez;
 }
 
+float QnAbstractMediaStreamDataProvider::getFrameRate() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getFrameRate();
+    return rez;
+}
+
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
 {
     for (int i = 0; i < CL_MAX_CHANNELS+1; ++i)
