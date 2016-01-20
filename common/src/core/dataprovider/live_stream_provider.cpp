@@ -10,7 +10,7 @@
 #include "utils/media/nalUnits.h"
 #include "utils/common/safe_direct_connection.h"
 #include "utils/common/synctime.h"
-
+#include "utils/common/log.h"
 
 static const int CHECK_MEDIA_STREAM_ONCE_PER_N_FRAMES = 1000;
 static const int PRIMARY_RESOLUTION_CHECK_TIMEOUT_MS = 10*1000;
@@ -568,7 +568,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
     info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
+    {
         m_cameraRes->saveParamsAsync();
+        NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
+                .arg(info.encoderIndex), cl_logINFO);
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS
