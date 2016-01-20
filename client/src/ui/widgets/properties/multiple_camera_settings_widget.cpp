@@ -447,7 +447,7 @@ void QnMultipleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab
 // -------------------------------------------------------------------------- //
 void QnMultipleCameraSettingsWidget::at_dbDataChanged()
 {
-    if (inUpisUpdatingdate())
+    if (isUpdating())
         return;
 
     setHasDbChanges(true);
