@@ -9,13 +9,17 @@
 
 #include <base/types.h>
 
+namespace nx { namespace mediaserver { namespace api {
+    struct BaseServerInfo;
+}}}
+
 namespace rtu
 {
-    struct BaseServerInfo;
-
     class AwaitingOp
     {
     public:
+        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+
         typedef std::shared_ptr<AwaitingOp> Holder;
         typedef std::weak_ptr<AwaitingOp> WeakPtr;
         typedef std::function<void (const WeakPtr op)> TimeoutHandler;

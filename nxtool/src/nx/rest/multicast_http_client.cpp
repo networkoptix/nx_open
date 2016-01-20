@@ -3,22 +3,25 @@
 #include <QUrlQuery>
 #include <QCryptographicHash>
 
-#include <helpers/multicast/authutil.h>
+#include <nx/rest/authutil.h>
+#include <nx/rest/multicast_http_transport.h>
 
-
-namespace QnMulticast
-{
+namespace nx {
+namespace rest {
 
 static const int HTTP_NOT_AUTHORIZED = 401;
 
-HTTPClient::HTTPClient(const QString& userAgent, const QUuid& localGuid):
-    m_transport(localGuid.isNull() ? QUuid::createUuid() : localGuid),
+MulticastHttpClient::MulticastHttpClient(const QString& userAgent, const QUuid& localGuid):
+    m_transport(new MulticastHttpTransport(localGuid.isNull() ? QUuid::createUuid() : localGuid)),
     m_userAgent(userAgent)
 {
-    // Do nothing.
 }
 
-QByteArray HTTPClient::createUserPasswordDigest(
+MulticastHttpClient::~MulticastHttpClient()
+{
+}
+
+QByteArray MulticastHttpClient::createUserPasswordDigest(
     const QString& userName,
     const QString& password,
     const QString& realm )
@@ -28,7 +31,7 @@ QByteArray HTTPClient::createUserPasswordDigest(
     return md5.result().toHex();
 }
 
-QByteArray HTTPClient::createHttpQueryAuthParam(
+QByteArray MulticastHttpClient::createHttpQueryAuthParam(
     const QString& userName,
     const QString& password,
     const QString& realm,
@@ -57,22 +60,22 @@ QByteArray HTTPClient::createHttpQueryAuthParam(
 }
 
 
-Request HTTPClient::updateRequest(const Request& srcRequest)
+multicastHttp::Request MulticastHttpClient::updateRequest(const multicastHttp::Request& srcRequest)
 {
-    Request request(srcRequest);
+    multicastHttp::Request request(srcRequest);
 
     // add user agent header
 
-    Header userAgent;
+    multicastHttp::Header userAgent;
     userAgent.first = QLatin1String("User-Agent");
     userAgent.second = m_userAgent;
     request.headers << userAgent;
 
     // add user IP info header
-    
-    Header localAddress;
+
+    multicastHttp::Header localAddress;
     localAddress.first = QLatin1String("X-User-Host");
-    localAddress.second = m_transport.localAddress();
+    localAddress.second = m_transport->localAddress();
     request.headers << localAddress;
 
     // add auth params to url query
@@ -90,7 +93,7 @@ Request HTTPClient::updateRequest(const Request& srcRequest)
     return request;
 }
 
-void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& response)
+void MulticastHttpClient::updateAuthParams(const QUuid& serverId, const multicastHttp::Response& response)
 {
     for (const auto& header: response.headers)
     {
@@ -105,36 +108,45 @@ void HTTPClient::updateAuthParams(const QUuid& serverId, const Response& respons
     }
 }
 
-QUuid HTTPClient::execRequest(const Request& request, ResponseCallback callback, int timeoutMs)
+QUuid MulticastHttpClient::execRequest(const multicastHttp::Request& request, multicastHttp::ResponseCallback callback, int timeoutMs)
 {
-    auto requestId = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId, ErrCode errCode, const Response& response) 
-    {
-        if (response.httpResult == HTTP_NOT_AUTHORIZED) {
-            updateAuthParams(request.serverId, response);
-            auto requestId2 = m_transport.addRequest(updateRequest(request), [request, callback, timeoutMs, this](const QUuid& requestId2, ErrCode errCode, const Response& response)
-            {
-                QUuid primaryRequestId = m_requestsPairs.key(requestId2, requestId2);
-                m_requestsPairs.remove(primaryRequestId);
+    auto requestId = m_transport->addRequest(updateRequest(request),
+        [request, callback, timeoutMs, this](
+            const QUuid& requestId,
+            multicastHttp::ResultCode errCode,
+            const multicastHttp::Response& response)
+        {
+            if (response.httpResult == HTTP_NOT_AUTHORIZED) {
+                updateAuthParams(request.serverId, response);
+                auto requestId2 = m_transport->addRequest(updateRequest(request),
+                    [request, callback, timeoutMs, this](
+                        const QUuid& requestId2,
+                        multicastHttp::ResultCode errCode,
+                        const multicastHttp::Response& response)
+                    {
+                        QUuid primaryRequestId = m_requestsPairs.key(requestId2, requestId2);
+                        m_requestsPairs.remove(primaryRequestId);
+                        if (callback)
+                            callback(primaryRequestId, errCode, response);
+                    },
+                    timeoutMs);
+                m_requestsPairs.insert(requestId, requestId2);
+            }
+            else {
                 if (callback)
-                    callback(primaryRequestId, errCode, response);
-            },
-            timeoutMs);
-            m_requestsPairs.insert(requestId, requestId2);
-        }
-        else {
-            if (callback)
-                callback(requestId, errCode, response);
-        }
-    }, 
-    timeoutMs);
+                    callback(requestId, errCode, response);
+            }
+        },
+        timeoutMs);
     return requestId;
 }
 
-void HTTPClient::cancelRequest(const QUuid& requestId)
+void MulticastHttpClient::cancelRequest(const QUuid& requestId)
 {
-    m_transport.cancelRequest(requestId);
-    m_transport.cancelRequest(m_requestsPairs.value(requestId));
+    m_transport->cancelRequest(requestId);
+    m_transport->cancelRequest(m_requestsPairs.value(requestId));
     m_requestsPairs.remove(requestId);
 }
 
-}
+} // namespace nx
+} // namespace rest

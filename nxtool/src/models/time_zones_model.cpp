@@ -6,6 +6,8 @@
 #include <helpers/time_helper.h>
 #include <helpers/model_change_helper.h>
 
+namespace api = nx::mediaserver::api;
+
 namespace
 {
     enum { kInvalidIndex = -1 };
@@ -41,13 +43,13 @@ namespace
     const QByteArray kUnknownTimeZoneId = "<Unknown>";
   
     
-    QByteArray selectionTimeZoneId(const rtu::ServerInfoPtrContainer &servers)
+    QByteArray selectionTimeZoneId(const api::ServerInfoPtrContainer &servers)
     {
         if (servers.empty() || !servers.first()->hasExtraInfo())
             return kDiffTimeZonesId;
 
         const QByteArray timeZoneId = servers.first()->extraInfo().timeZoneId;
-        for (rtu::ServerInfo *info: servers)
+        for (api::ServerInfo *info: servers)
         {
             if (!info->hasExtraInfo() || (timeZoneId != info->extraInfo().timeZoneId))
                 return kDiffTimeZonesId;
@@ -60,7 +62,7 @@ class rtu::TimeZonesModel::Impl
 {
 public:
     Impl(rtu::TimeZonesModel *owner
-        , const rtu::ServerInfoPtrContainer &selectedServers);
+        , const api::ServerInfoPtrContainer &selectedServers);
     
     Impl(rtu::TimeZonesModel *owner
         , const Impl &other);
@@ -111,7 +113,7 @@ private:
 };
 
 rtu::TimeZonesModel::Impl::Impl(rtu::TimeZonesModel *owner
-    , const rtu::ServerInfoPtrContainer &selectedServers)
+    , const api::ServerInfoPtrContainer &selectedServers)
     : m_owner(owner)
     , m_timeZones()
     , m_initTimeZoneId(selectionTimeZoneId(selectedServers))
@@ -271,7 +273,7 @@ QByteArray rtu::TimeZonesModel::Impl::timeZoneIdByIndex(int index) const {
 
 ///
 
-rtu::TimeZonesModel::TimeZonesModel(const ServerInfoPtrContainer &selectedServers
+rtu::TimeZonesModel::TimeZonesModel(const api::ServerInfoPtrContainer &selectedServers
     , QObject *parent)
     : QAbstractListModel(parent)
     , m_helper(CREATE_MODEL_CHANGE_HELPER(this))

@@ -20,14 +20,11 @@ namespace rtu
     class Changeset;
     typedef std::shared_ptr<Changeset> ChangesetPointer;
 
-    ///
-    struct DateTime;
-
-    typedef std::shared_ptr<DateTime> DateTimePointer;
     typedef std::shared_ptr<QString> StringPointer;
     typedef std::shared_ptr<int> IntPointer;
     typedef std::shared_ptr<bool> BoolPointer;
-    typedef std::function<void ()> Callback, Action;
+
+    typedef std::function<void ()> Callback;
 
     class ApplyChangesTask;
     typedef std::shared_ptr<ApplyChangesTask> ApplyChangesTaskPtr;

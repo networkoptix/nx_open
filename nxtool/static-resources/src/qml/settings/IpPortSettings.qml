@@ -103,7 +103,7 @@ Expandable.MaskedSettingsPanel
                 item: Rtu.IpSettingsList
                 {
                     visible: (rtuContext.selection.count !== 0);
-                    enabled: (Utils.Constants.AllowIfConfigFlag & rtuContext.selection.flags);
+                    enabled: (Utils.RestApiConstants.AllowIfConfigFlag & rtuContext.selection.flags);
                     KeyNavigation.tab: portNumber;
                 }
             }

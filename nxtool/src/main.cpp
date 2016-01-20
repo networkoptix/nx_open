@@ -7,10 +7,10 @@
 #include <models/buttons.h>
 #include <base/constants.h>
 #include <base/rtu_context.h>
+#include <nx/mediaserver/api/server_info.h>
 
 void registerTypes()
 {
-    
     const char kRtuDomainName[] = "networkoptix.rtu";
 
     enum 
@@ -19,9 +19,13 @@ void registerTypes()
         , kMajorVersion = 1 
     };
     
-    const char kServerFlagsQmlTypeName[] = "Constants";
+    const char kConstantsQmlTypeName[] = "Constants";
     qmlRegisterUncreatableType<rtu::Constants>(kRtuDomainName
-        , kMajorVersion, kMinorVersion, kServerFlagsQmlTypeName, kServerFlagsQmlTypeName);
+        , kMajorVersion, kMinorVersion, kConstantsQmlTypeName, kConstantsQmlTypeName);
+
+    const char kRestApiConstantsQmlTypeName[] = "RestApiConstants";
+    qmlRegisterUncreatableType<nx::mediaserver::api::Constants>(kRtuDomainName
+        , kMajorVersion, kMinorVersion, kRestApiConstantsQmlTypeName, kRestApiConstantsQmlTypeName);
 
     const char kButtonsModelQmlTypeName[] = "Buttons";
     qmlRegisterType<rtu::Buttons>(kRtuDomainName
