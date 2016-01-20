@@ -24,7 +24,7 @@
 #include "nx_ec/data/api_resource_type_data.h"
 #include "nx_ec/data/api_reverse_connection_data.h"
 #include "nx_ec/data/api_server_alive_data.h"
-#include "nx_ec/data/api_server_alive_data.h"
+#include "nx_ec/data/api_discovery_data.h"
 
 #include "transaction/runtime_transaction_log.h"
 #include <transaction/transaction_transport.h>
@@ -176,8 +176,8 @@ namespace ec2
         case ApiCommand::uploadUpdateResponce:  return handleTransactionParams<ApiUpdateUploadResponceData>(serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::installUpdate:         return handleTransactionParams<ApiUpdateInstallData>    (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
-        case ApiCommand::moduleInfo:            return handleTransactionParams<ApiModuleData>           (serializedTransaction, serializationSupport, transaction, function, fastFunction);
-        case ApiCommand::moduleInfoList:        return handleTransactionParams<ApiModuleDataList>       (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::discoveredServerChanged:      return handleTransactionParams<ApiDiscoveredServerData>          (serializedTransaction, serializationSupport, transaction, function, fastFunction);
+        case ApiCommand::discoveredServersList:        return handleTransactionParams<ApiDiscoveredServerDataList>      (serializedTransaction, serializationSupport, transaction, function, fastFunction);
 
         case ApiCommand::discoverPeer:          return handleTransactionParams<ApiDiscoverPeerData>     (serializedTransaction, serializationSupport, transaction, function, fastFunction);
         case ApiCommand::addDiscoveryInformation:
@@ -1170,18 +1170,28 @@ void QnTransactionMessageBus::sendDelayedAliveTran()
             emit peerLost(aliveData);
     }
 
-    QnTransaction<ApiModuleDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
-        QnTransaction<ApiModuleDataList> transaction(ApiCommand::moduleInfoList);
+    QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const {
+        QnTransaction<ApiDiscoveredServerDataList> transaction(ApiCommand::discoveredServersList);
 
         QnModuleFinder *moduleFinder = QnModuleFinder::instance();
         for (const QnModuleInformation &moduleInformation: moduleFinder->foundModules()) {
-            QnModuleInformationWithAddresses moduleInformationWithAddress(moduleInformation);
+            ApiDiscoveredServerData serverData(moduleInformation);
+
             SocketAddress primaryAddress = moduleFinder->primaryAddress(moduleInformation.id);
         	if (primaryAddress.isNull())
             	continue;
-            moduleInformationWithAddress.remoteAddresses.insert(primaryAddress.address.toString());
-            moduleInformationWithAddress.port = primaryAddress.port;
-            transaction.params.push_back(ApiModuleData(std::move(moduleInformationWithAddress), true));
+
+            serverData.status = moduleFinder->moduleStaus(moduleInformation.id);
+            if (serverData.status != Qn::Online &&
+                serverData.status != Qn::Unauthorized &&
+                serverData.status != Qn::Incompatible)
+            {
+                continue;
+            }
+
+            serverData.remoteAddresses.insert(primaryAddress.address.toString());
+            serverData.port = primaryAddress.port;
+            transaction.params.push_back(std::move(serverData));
         }
         transaction.peerID = m_localPeer.id;
         transaction.isLocal = true;

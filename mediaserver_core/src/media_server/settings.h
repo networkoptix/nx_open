@@ -88,8 +88,6 @@ namespace nx_ms_conf
     static const QLatin1String DEFAULT_EC_DB_READ_ONLY( "false" );
 
     static const QLatin1String CDB_ENDPOINT( "cdbEndpoint" );
-    static const QLatin1String ARECONT_RTSP_ENABLED("arecontRtspEnabled");
-    static const QLatin1String DEFAULT_ARECONT_RTSP_ENABLED("false");
 }
 
 /*!

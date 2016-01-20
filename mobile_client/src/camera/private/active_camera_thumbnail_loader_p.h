@@ -14,6 +14,7 @@ class QnActiveCameraThumbnailLoaderPrivate : public QObject {
     QnActiveCameraThumbnailLoader *q_ptr;
 public:
     QnActiveCameraThumbnailLoaderPrivate(QnActiveCameraThumbnailLoader *parent);
+    ~QnActiveCameraThumbnailLoaderPrivate();
 
     mutable QMutex thumbnailMutex;
 

@@ -119,8 +119,8 @@ namespace ec2
             REGISTER_COMMAND(uploadUpdateResponce),
             REGISTER_COMMAND(installUpdate),
 
-            REGISTER_COMMAND(moduleInfo),
-            REGISTER_COMMAND(moduleInfoList),
+            REGISTER_COMMAND(discoveredServerChanged),
+            REGISTER_COMMAND(discoveredServersList),
 
             REGISTER_COMMAND(discoverPeer),
             REGISTER_COMMAND(addDiscoveryInformation),

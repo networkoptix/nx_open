@@ -41,6 +41,16 @@ QnCameraAdvancedParamValueList QnCameraAdvancedParamValueMap::difference(const Q
     return result;
 }
 
+bool QnCameraAdvancedParamValueMap::differsFrom(const QnCameraAdvancedParamValueMap &other) const
+{
+    for (auto it = this->cbegin(); it != this->cend(); ++it)
+    {
+        if (!other.contains(it.key()) || other.value(it.key()) != it.value())
+            return true;
+    }
+    return false;
+}
+
 void QnCameraAdvancedParamValueMap::appendValueList(const QnCameraAdvancedParamValueList &list) 
 {
     for (const QnCameraAdvancedParamValue &value: list)

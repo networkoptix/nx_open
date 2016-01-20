@@ -241,13 +241,13 @@ private:
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;
     mutable QnMutex m_csvMigrationMutex;
-    bool m_firstStorageTestDone;
     QElapsedTimer m_clearMotionTimer;
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;
+    std::atomic<bool> m_firstTestStorageDone;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

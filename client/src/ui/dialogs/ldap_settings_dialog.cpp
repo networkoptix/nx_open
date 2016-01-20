@@ -80,7 +80,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     }
 
     if (!serverConnection) {
-        stopTesting(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
+        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
         return;
     }
 

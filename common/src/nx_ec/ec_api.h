@@ -967,15 +967,29 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
+        template<class TargetType, class HandlerType> int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, TargetType *target, HandlerType handler) {
+            return sendDiscoveredServer(discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType> int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, TargetType *target, HandlerType handler) {
+            return sendDiscoveredServersList(discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
+                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
     signals:
         void peerDiscoveryRequested(const QUrl &url);
         void discoveryInformationChanged(const ApiDiscoveryData &data, bool addInformation);
+        void discoveredServerChanged(const ApiDiscoveredServerData &discoveredServer);
+        void gotInitialDiscoveredServers(const ApiDiscoveredServerDataList &discoveredServers);
 
     protected:
         virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, impl::SimpleHandlerPtr handler) = 0;
+        virtual int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
@@ -1037,16 +1051,6 @@ namespace ec2
     class AbstractMiscManager : public QObject {
         Q_OBJECT
     public:
-        template<class TargetType, class HandlerType> int sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, TargetType *target, HandlerType handler) {
-            return sendModuleInformation(moduleInformation, isAlive, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, TargetType *target, HandlerType handler) {
-            return sendModuleInformation(moduleInformationList, std::static_pointer_cast<impl::SimpleHandler>(
-                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
         template<class TargetType, class HandlerType> int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, TargetType *target, HandlerType handler) {
             return changeSystemName(systemName, sysIdTime, tranLogTime, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
@@ -1072,13 +1076,9 @@ namespace ec2
 
 
     signals:
-        void moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
-        void gotInitialModules(const QList<QnModuleInformationWithAddresses> &modules);
         void systemNameChangeRequested(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime);
 
     protected:
-        virtual int sendModuleInformation(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendModuleInformationList(const QList<QnModuleInformationWithAddresses> &moduleInformationList, impl::SimpleHandlerPtr handler) = 0;
         virtual int changeSystemName(const QString &systemName, qint64 sysIdTime, qint64 tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
     };
