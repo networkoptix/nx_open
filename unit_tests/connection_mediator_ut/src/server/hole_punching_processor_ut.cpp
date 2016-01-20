@@ -40,7 +40,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     ASSERT_EQ(api::ResultCode::ok, server1->listen());
 
     //requesting connect to the server 
-    nx::network::cloud::MediatorClientUdpConnection udpClient(endpoint());
+    nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
 
     boost::optional<api::ResultCode> connectResult;
     QnMutex mtx;
@@ -96,7 +96,7 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     std::tie(resultCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::network::cloud::MediatorClientUdpConnection::connectionResult,
+                &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
                 &udpClient,
                 std::move(connectionResult),
                 std::placeholders::_1));

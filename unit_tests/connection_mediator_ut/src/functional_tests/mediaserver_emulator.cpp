@@ -31,7 +31,7 @@ MediaServerEmulator::MediaServerEmulator(
     m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
 
     m_mediatorConnector.setSystemCredentials(
-        nx::network::cloud::SystemCredentials(
+        api::SystemCredentials(
             m_systemData.id,
             m_serverId,
             m_systemData.authKey));
@@ -62,7 +62,7 @@ bool MediaServerEmulator::start()
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorServerTcpConnection::bind,
+            &nx::hpm::api::MediatorServerTcpConnection::bind,
             m_serverClient.get(),
             std::move(localAddresses),
             std::placeholders::_1));
@@ -88,7 +88,7 @@ nx::hpm::api::ResultCode MediaServerEmulator::listen() const
     nx::hpm::api::ResultCode resultCode = nx::hpm::api::ResultCode::ok;
     std::tie(resultCode) = makeSyncCall<nx::hpm::api::ResultCode>(
         std::bind(
-            &nx::network::cloud::MediatorServerTcpConnection::listen,
+            &nx::hpm::api::MediatorServerTcpConnection::listen,
             m_serverClient.get(),
             std::move(requestData),
             std::placeholders::_1));

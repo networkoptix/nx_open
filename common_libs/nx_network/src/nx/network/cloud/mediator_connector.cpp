@@ -8,15 +8,15 @@
 static const std::chrono::milliseconds RETRY_INTERVAL = std::chrono::minutes( 10 );
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
 MediatorConnector::MediatorConnector()
     : m_isTerminating( false )
     , m_stunClient(std::make_shared<stun::AsyncClient>())
     , m_endpointFetcher(
         lit( "hpm" ),
-        std::make_unique<RandomEndpointSelector>() )
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
     , m_timerSocket( SocketFactory::createStreamSocket() )
 {
 }
@@ -131,6 +131,6 @@ void MediatorConnector::fetchEndpoint()
     });
 }
 
-} // namespace cloud
-} // namespace network
+} // namespace api
+} // namespace hpm
 } // namespace nx

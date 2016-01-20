@@ -11,8 +11,8 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
 /** Authorization credentials for \class MediatorServerTcpConnection */
 struct SystemCredentials
@@ -48,6 +48,6 @@ public:
     virtual boost::optional<SystemCredentials> getSystemCredentials() const = 0;
 };
 
-} // namespace cloud
-} // namespace network
+} // namespace api
+} // namespace hpm
 } // namespace nx

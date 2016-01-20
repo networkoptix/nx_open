@@ -125,13 +125,13 @@ SocketAddress MediatorFunctionalTest::endpoint() const
     return SocketAddress(HostAddress::localhost, m_port);
 }
 
-std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection> 
+std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> 
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::network::cloud::MediatorServerTcpConnection>
+std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();

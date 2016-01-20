@@ -25,7 +25,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection>
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
@@ -38,7 +38,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
             std::bind(
-                &nx::network::cloud::MediatorClientTcpConnection::resolve,
+                &nx::hpm::api::MediatorClientTcpConnection::resolve,
                 client.get(),
                 api::ResolveRequest(system1Servers[i]->serverId() + "." + system1.id),
                 std::placeholders::_1));
@@ -58,7 +58,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection>
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
@@ -70,7 +70,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &nx::network::cloud::MediatorClientTcpConnection::resolve,
+            &nx::hpm::api::MediatorClientTcpConnection::resolve,
             client.get(),
             api::ResolveRequest(server1->serverId() + "." + system1.id),
             std::placeholders::_1));
@@ -93,7 +93,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection>
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
@@ -103,7 +103,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &nx::network::cloud::MediatorClientTcpConnection::resolve,
+            &nx::hpm::api::MediatorClientTcpConnection::resolve,
             client.get(),
             api::ResolveRequest(system1.id),
             std::placeholders::_1));
@@ -119,7 +119,7 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientTcpConnection>
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
@@ -133,7 +133,7 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
     api::ResultCode resultCode = api::ResultCode::ok;
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &nx::network::cloud::MediatorClientTcpConnection::resolve,
+            &nx::hpm::api::MediatorClientTcpConnection::resolve,
             client.get(),
             api::ResolveRequest(mserverEmulator.serverId() + "." + system1.id),
             std::placeholders::_1));
@@ -146,7 +146,7 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
     //resolve by system name is forbidden
     std::tie(resultCode, resolveResponse) = makeSyncCall<api::ResultCode, api::ResolveResponse>(
         std::bind(
-            &nx::network::cloud::MediatorClientTcpConnection::resolve,
+            &nx::hpm::api::MediatorClientTcpConnection::resolve,
             client.get(),
             api::ResolveRequest(system1.id),
             std::placeholders::_1));

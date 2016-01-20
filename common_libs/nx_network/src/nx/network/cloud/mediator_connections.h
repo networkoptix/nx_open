@@ -18,8 +18,8 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
 /** Provides client related STUN functionality.
     \note These requests DO NOT require authentication
@@ -183,8 +183,8 @@ private:
 typedef MediatorServerConnection<stun::AsyncClientUser> MediatorServerTcpConnection;
 typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
 
-} // namespace cloud
-} // namespace network
+} // namespace api
+} // namespace hpm
 } // namespace nx
 
 #endif // NX_CC_MEDIATOR_CONNECTIONS_H

@@ -11,7 +11,6 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/socket.h>
-#include "mediator_connector.h"
 
 
 namespace nx {
@@ -46,13 +45,13 @@ public:
         std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler);
 
 private:
-    MediatorConnector m_mediatorConnector;
+    hpm::api::MediatorConnector m_mediatorConnector;
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
-    std::shared_ptr<nx::network::cloud::MediatorServerTcpConnection> m_serverClient;
-    nx::network::cloud::MediatorServerUdpConnection m_mediatorUdpClient;
+    std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
+    nx::hpm::api::MediatorServerUdpConnection m_mediatorUdpClient;
     std::function<void(nx::hpm::api::ConnectionRequestedEvent)> m_onConnectionRequestedHandler;
 
     void onConnectionRequested(

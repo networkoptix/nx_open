@@ -12,8 +12,8 @@
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
 /** Provides helper functions for easy adding requests to mediator */
 template<class NetworkClientType>
@@ -144,6 +144,6 @@ protected:
     }
 };
 
-} // namespace cloud
-} // namespace network
+} // namespace api
+} // namespace hpm
 } // namespace nx
