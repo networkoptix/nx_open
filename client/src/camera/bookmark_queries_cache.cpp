@@ -40,13 +40,17 @@ void QnBookmarkQueriesCache::removeQuery(const QnVirtualCameraResourcePtr &camer
     if (!camera)
         return;
 
-    auto it = m_queries.find(camera);
-
+    m_queries.erase(camera);
 }
 
-void QnBookmarkQueriesCache::clearQueries()
+void QnBookmarkQueriesCache::updateQueries(const QnCameraBookmarkSearchFilter &filter)
 {
-    m_queries.clear();
+    std::for_each(m_queries.begin(), m_queries.end()
+        , [this, filter](const QueriesMap::value_type &value)
+    {
+        const auto camera = value.first;
+        updateQuery(camera, filter);
+    });
 }
 
 bool QnBookmarkQueriesCache::updateQuery(const QnVirtualCameraResourcePtr &camera

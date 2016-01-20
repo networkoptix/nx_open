@@ -10,6 +10,7 @@
 
 #include <utils/common/connective.h>
 
+class QnCameraBookmarkAggregation;
 class QnCurrentLayoutBookmarksCache;
 class QnBookmarkMergeHelper;
 
@@ -34,18 +35,23 @@ public:
 private:
     void onWorkbenchCurrentWidgetChanged();
     void onBookmarksModeEnabledChanged();
-    void onCameraBookmarksChanged();
+    void onBookmarkRemoved(const QnUuid &id);
     void onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkList &bookmarks);
+    void onTimelineWindowChanged(qint64 startTimeMs
+        , qint64 endTimeMs);
 
 private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
     typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
+    typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
     typedef QScopedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
 
-    QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
-    QnBookmarkMergeHelperPtr m_mergeHelper;
+    const QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
+    const QnBookmarkMergeHelperPtr m_mergeHelper;
+    const QnCameraBookmarkAggregationPtr m_aggregation;
+
     QnVirtualCameraResourcePtr m_currentCamera;
 };
