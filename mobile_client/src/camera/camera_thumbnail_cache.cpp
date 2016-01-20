@@ -37,6 +37,7 @@ QnCameraThumbnailCache::QnCameraThumbnailCache(QObject *parent)
 QnCameraThumbnailCache::~QnCameraThumbnailCache()
 {
     m_decompressThread->quit();
+    m_decompressThread->wait();
 }
 
 void QnCameraThumbnailCache::start()

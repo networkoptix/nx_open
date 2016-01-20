@@ -135,7 +135,7 @@ bool QnCameraSettingsWidget::isScheduleEnabled() const {
 
 bool QnCameraSettingsWidget::hasDbChanges() const {
     switch(mode()) {
-    case SingleMode: return m_singleWidget->hasDbChanges();
+    case SingleMode: return m_singleWidget->hasChanges();
     case MultiMode: return m_multiWidget->hasDbChanges();
     default: return false;
     }

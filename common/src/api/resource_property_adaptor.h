@@ -93,7 +93,7 @@ public:
 
 /**
  * Base class for accessing resource properties.
- * 
+ *
  * This class is thread-safe.
  */
 class QnAbstractResourcePropertyAdaptor: public Connective<QObject> {
@@ -124,13 +124,14 @@ signals:
     void valueChanged();
 
 protected:
-    virtual QString defaultSerializedValue() const;
+    QString defaultSerializedValue() const;
+    virtual QString defaultSerializedValueLocked() const;
     void setValueInternal(const QVariant& value);
 
 private:
     void loadValue(const QString &serializedValue);
     bool loadValueLocked(const QString &serializedValue);
-    
+
     void processSaveRequests();
     void processSaveRequestsNoLock(const QnResourcePtr &resource, const QString &serializedValue);
     void enqueueSaveRequest();
@@ -158,7 +159,7 @@ template<class T>
 class QnResourcePropertyAdaptor: public QnAbstractResourcePropertyAdaptor {
     typedef QnAbstractResourcePropertyAdaptor base_type;
 public:
-    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL): 
+    QnResourcePropertyAdaptor(const QString &key, QnResourcePropertyHandler<T> *handler, const T &defaultValue = T(), QObject *parent = NULL):
         QnAbstractResourcePropertyAdaptor(key, QVariant::fromValue(defaultValue), handler, parent),
         m_type(qMetaTypeId<T>()),
         m_defaultValue(defaultValue)
@@ -190,7 +191,7 @@ public:
     }
 
 protected:
-    virtual QString defaultSerializedValue() const override {
+    virtual QString defaultSerializedValueLocked() const override {
         return m_defaultSerializedValue;
     }
 

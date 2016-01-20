@@ -50,7 +50,6 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
-    m_arecontRTSPEnabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
@@ -64,12 +63,6 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
-}
-
-void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
-    connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
-    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
-    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
@@ -169,14 +162,6 @@ void QnCommonModule::updateModuleInformation() {
         moduleInformationCopy.port = moduleInformation.port;
         moduleInformationCopy.name = moduleInformation.name;
         moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
-    }
-
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin) {
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(admin->getDigest());
-        md5.addData(moduleInformationCopy.systemName.toUtf8());
-        moduleInformationCopy.authHash = md5.result();
     }
 
     setModuleInformation(moduleInformationCopy);

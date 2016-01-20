@@ -47,6 +47,12 @@ QnActiveCameraThumbnailLoaderPrivate::QnActiveCameraThumbnailLoaderPrivate(
     decompressThread->start();
 }
 
+QnActiveCameraThumbnailLoaderPrivate::~QnActiveCameraThumbnailLoaderPrivate()
+{
+    decompressThread->quit();
+    decompressThread->wait();
+}
+
 QPixmap QnActiveCameraThumbnailLoaderPrivate::thumbnail() const
 {
     QMutexLocker lk(&thumbnailMutex);

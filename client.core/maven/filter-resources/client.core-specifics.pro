@@ -1,7 +1,8 @@
 TEMPLATE = lib
 
 INCLUDEPATH +=  ${qt.dir}/include/QtGui/$$QT_VERSION/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/
+                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
+                ${root.dir}/appserver2/src/
 
 mac:!ios {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ \
@@ -15,4 +16,3 @@ mac:!ios {
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }
-
