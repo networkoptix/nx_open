@@ -36,16 +36,12 @@ static const GLfloat g_texture_data[] = {
 
 // --------------------------------------------------------------------------------------------------
 
+class AndroidDecoderPrivate;
+
 class TextureBuffer : public QAbstractVideoBuffer
 {
 public:
-    TextureBuffer (uint id):
-        QAbstractVideoBuffer(GLTextureHandle),
-        m_id(id),
-        //m_javaDecoder(javaDecoder),
-        m_updated(false)
-    {
-    }
+    TextureBuffer (AndroidDecoderPrivate* owner);
 
     ~TextureBuffer()
     {
@@ -62,16 +58,14 @@ public:
     {
     }
 
-    QVariant handle() const
-    {
-        return m_id;
-    }
+    QVariant handle() const;
 
 private:
-    GLuint m_id;
     //GLuint m_textId;
     //QAndroidJniObject m_javaDecoder;
+    mutable AndroidDecoderPrivate* m_owner;
     mutable bool m_updated;
+    mutable GLuint m_id;
 };
 
 
@@ -149,6 +143,7 @@ public:
         frameNumber(0),
         glSurfaceTexture(0),
         glExternalTexture(0),
+        glExternalTexture2(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
         m_fbo(nullptr),
@@ -180,6 +175,12 @@ public:
         return matrix;
     }
 
+    void attachToGLContext(GLuint texId)
+    {
+        QMutexLocker locker(&m_mutex);
+        javaDecoder.callMethod<void>("attachToGLContext", "(I)Z", texId);
+    }
+
     void registerNativeMethods()
     {
         using namespace std::placeholders;
@@ -202,6 +203,7 @@ public:
     qint64 frameNumber;
     GLuint glSurfaceTexture;
     GLuint glExternalTexture;
+    GLuint glExternalTexture2;
     std::unique_ptr<QOpenGLContext> glContext;
     std::unique_ptr<QOffscreenSurface> fakeSurface;
     bool initialized;
@@ -248,6 +250,7 @@ void AndroidDecoderPrivate::renderFrameToFbo()
     m_program->bind();
     m_program->enableAttributeArray(0);
     m_program->enableAttributeArray(1);
+    //m_program->setUniformValue("frameTexture", GLuint(glExternalTexture));
     m_program->setUniformValue("frameTexture", GLuint(0));
     m_program->setUniformValue("texMatrix", getTransformMatrix());
 
@@ -357,6 +360,7 @@ void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator )
             QOpenGLContext* context = QOpenGLContext::currentContext();
             d->glContext->functions()->glGenTextures(1, &d->glSurfaceTexture);
             d->glExternalTexture = d->allocator->newGlTexture();
+            d->glExternalTexture2 = d->allocator->newGlTexture();
         }
     }
 
@@ -409,20 +413,42 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     // got frame
 
-    d->renderFrameToFbo();
+    //d->updateTexImage();
+    //d->renderFrameToFbo();
 
-    //QAbstractVideoBuffer* buffer = new TextureBuffer (d->m_fbo->texture());
-    //QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
+    QAbstractVideoBuffer* buffer = new TextureBuffer (d);
+    QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
 
+    /*
     QImage image = d->m_fbo->toImage();
     QImage image2 = image.convertToFormat(QImage::Format_RGB32);
-    qDebug() << "fbo info: size=" << image.size() << "format=" << image.format();
     QVideoFrame* videoFrame = new QVideoFrame(image2);
-    result->reset(videoFrame);
+    */
 
+    result->reset(videoFrame);
     return (int) outFrameNum - 1;
 }
 
+
+TextureBuffer::TextureBuffer (AndroidDecoderPrivate* owner):
+    QAbstractVideoBuffer(GLTextureHandle),
+    m_owner(owner),
+    m_updated(false),
+    m_id(0)
+{
+}
+
+QVariant TextureBuffer::handle() const
+{
+    if (!m_updated)
+    {
+        m_updated = true;
+        //m_owner->attachToGLContext(m_owner->glExternalTexture2);
+        m_owner->renderFrameToFbo();
+        m_id = m_owner->m_fbo->texture();
+    }
+    return m_id;
+}
 
 } // namespace media
 } // namespace nx
