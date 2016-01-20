@@ -14,6 +14,11 @@ QnBookmarkQueriesCache::QnBookmarkQueriesCache(qint64 timeWindowMinChange
 QnBookmarkQueriesCache::~QnBookmarkQueriesCache()
 {}
 
+bool QnBookmarkQueriesCache::isQueryExists(const QnVirtualCameraResourcePtr &camera) const
+{
+    return (camera && (m_queries.find(camera) != m_queries.end()));
+}
+
 QnCameraBookmarksQueryPtr QnBookmarkQueriesCache::getQuery(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera)

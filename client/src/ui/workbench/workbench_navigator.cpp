@@ -57,6 +57,8 @@ extern "C"
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
@@ -437,7 +439,7 @@ void QnWorkbenchNavigator::updateBookmarksModeState()
         resetCurrentBookmarkQuery();
 
         m_bookmarkAggregation->clear();
-        m_timeSlider->setBookmarks(QnCameraBookmarkList());
+//        m_timeSlider->setBookmarks(QnCameraBookmarkList());
         m_timeSlider->bookmarksViewer()->resetBookmarks();
     }
 }
@@ -1149,6 +1151,8 @@ void QnWorkbenchNavigator::setCurrentBookmarkQuery(const QnCameraBookmarksQueryP
         at_bookmarkQuery_bookmarksChanged(bookmarks, false);
     };
 
+//    qDebug() << "----- clearing current aggregation";
+//    m_bookmarkAggregation->clear();
     connect(m_currentQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, updateBookmarks);
     at_bookmarkQuery_bookmarksChanged(qnCameraBookmarksManager->cachedBookmarks(m_currentQuery), true);
 }
@@ -1704,7 +1708,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
-    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
+
+    const auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
+    QnCameraBookmarkList bookmarks = watcher->bookmarksAtPosition(position);
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
@@ -2039,5 +2045,5 @@ void QnWorkbenchNavigator::updateSliderBookmarks() {
     if (!bookmarksModeEnabled())
         return;
 
-    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+//    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
 }
