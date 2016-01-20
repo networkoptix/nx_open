@@ -8,8 +8,6 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
-class QnIncompatibleServerWatcher;
-
 class QnClientMessageProcessor : public QnCommonMessageProcessor
 {
     Q_OBJECT
@@ -42,6 +40,7 @@ private:
     QnClientConnectionStatus m_status;
     bool m_connected;
     bool m_holdConnection;
+    bool m_waitingForPeerReconnect;
 };
 
 #define qnClientMessageProcessor static_cast<QnClientMessageProcessor*>(QnClientMessageProcessor::instance())

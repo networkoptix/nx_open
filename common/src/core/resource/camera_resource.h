@@ -76,6 +76,7 @@ public:
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
 
+    float rawSuggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
     virtual int suggestBitrateKbps(Qn::StreamQuality q, QSize resolution, int fps) const;
 
     virtual void setUrl(const QString &url) override;
@@ -90,7 +91,7 @@ public:
     /*!
      *  \return \a true if \param bitrateInfo.encoderIndex is not already saved
      */
-    bool saveBitrateIfNotExists( const CameraBitrateInfo& bitrateInfo );
+    bool saveBitrateIfNeeded( const CameraBitrateInfo& bitrateInfo );
 
     static float getResolutionAspectRatio(const QSize& resolution); // find resolution helper function
     static QSize getNearestResolution(const QSize& resolution, float aspectRatio, double maxResolutionSquare, const QList<QSize>& resolutionList, double* coeff = 0); // find resolution helper function
@@ -178,27 +179,36 @@ class CameraBitrateInfo
 {
 public:
     int encoderIndex;
+    QString timestamp;
+
+    float rawSuggestedBitrate;
     float suggestedBitrate;
     float actualBitrate;
+
+    Qn::BitratePerGopType bitratePerGop;
+    float bitrateFactor;
+
     int fps;
+    float actualFps;
     QString resolution;
 
-    CameraBitrateInfo(
-            int _encoderIndex = -1,
-            float _suggestedBitrate = 0,
-            float _actualBitrate = 0,
-            int _fps = 0,
-            const QSize& _resolution = QSize())
-    :
-        encoderIndex( _encoderIndex ),
-        suggestedBitrate( _suggestedBitrate ),
-        actualBitrate( _actualBitrate ),
-        fps( _fps ),
-        resolution( CameraMediaStreamInfo::resolutionToString( _resolution ) )
+    CameraBitrateInfo(int index = -1, QString time = QString())
+        : encoderIndex(index)
+        , timestamp(time)
+        , rawSuggestedBitrate(-1)
+        , suggestedBitrate(-1)
+        , actualBitrate(-1)
+        , bitratePerGop(Qn::BPG_None)
+        , bitrateFactor(1)
+        , fps(-1)
+        , actualFps(-1)
     {
     }
 };
-#define CameraBitrateInfo_Fields (encoderIndex)(suggestedBitrate)(actualBitrate)(fps)(resolution)
+#define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
+    (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
+    (bitratePerGop)(bitrateFactor) \
+    (fps)(actualFps)(resolution)
 
 class CameraBitrates
 {

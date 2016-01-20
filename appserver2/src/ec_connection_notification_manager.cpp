@@ -276,12 +276,12 @@ namespace ec2
         //#ak no notification needed in this case
     }
 
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleData> &tran) {
-        m_miscManager->triggerNotification(tran);
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran) {
+        m_discoveryManager->triggerNotification(tran);
     }
 
-    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiModuleDataList> &tran) {
-        m_miscManager->triggerNotification(tran);
+    void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran) {
+        m_discoveryManager->triggerNotification(tran);
     }
 
     void ECConnectionNotificationManager::triggerNotification(const QnTransaction<ApiDiscoveryData> &tran) {

@@ -37,7 +37,7 @@ namespace Qn
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
-            ConnectionRole ResourceStatus
+            ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -362,6 +362,7 @@ public:
         BPG_Predefined,
         BPG_User
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
@@ -880,7 +881,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
         (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)
+        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSearchStrategy)
         (Qn::RebuildAction)(Qn::BackupAction)

@@ -62,7 +62,8 @@ signals:
     void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
     void timeServerSelectionRequired();
 
-    void moduleChanged(const QnModuleInformationWithAddresses &moduleInformation, bool isAlive);
+    void discoveredServerChanged(const ec2::ApiDiscoveredServerData &discoveredServer);
+
 protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);

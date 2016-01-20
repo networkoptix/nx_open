@@ -26,13 +26,17 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     connect(ui->tagsLineEdit, &QLineEdit::textChanged,      this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->fixedDurationCheckBox, &QCheckBox::clicked, this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->durationSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
+    connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
+    connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked)
+        if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
             model()->setEventState(QnBusiness::UndefinedState);
+
+        ui->recordAfterWidget->setEnabled(!checked);
     });
 }
 
@@ -42,30 +46,41 @@ QnBookmarkBusinessActionWidget::~QnBookmarkBusinessActionWidget()
 void QnBookmarkBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
     setTabOrder(before, ui->fixedDurationCheckBox);
     setTabOrder(ui->fixedDurationCheckBox, ui->durationSpinBox);
-    setTabOrder(ui->durationSpinBox, ui->tagsLineEdit);
+    setTabOrder(ui->durationSpinBox, ui->recordBeforeSpinBox);
+    setTabOrder(ui->recordBeforeSpinBox, ui->recordAfterSpinBox);
+    setTabOrder(ui->recordAfterSpinBox, ui->tagsLineEdit);
     setTabOrder(ui->tagsLineEdit, after);
 }
 
-void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+{
     if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField)) {
+    if (fields.testFlag(QnBusiness::EventTypeField))
+    {
         bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
-    if (fields.testFlag(QnBusiness::ActionParamsField)) {
-        ui->tagsLineEdit->setText(model()->actionParams().tags);
+    if (fields.testFlag(QnBusiness::ActionParamsField))
+    {
+        const auto params = model()->actionParams();
+        ui->tagsLineEdit->setText(params.tags);
 
-        ui->fixedDurationCheckBox->setChecked(model()->actionParams().durationMs > 0);
+        ui->fixedDurationCheckBox->setChecked(params.durationMs > 0);
         if (ui->fixedDurationCheckBox->isChecked())
-            ui->durationSpinBox->setValue(model()->actionParams().durationMs / msecPerSecond);
+            ui->durationSpinBox->setValue(params.durationMs / msecPerSecond);
+
+        ui->recordBeforeSpinBox->setValue(params.recordBeforeMs / msecPerSecond);
+        ui->recordAfterSpinBox->setValue(params.recordAfter / msecPerSecond);
     }
+
+    ui->recordAfterWidget->setEnabled(!ui->fixedDurationCheckBox->isChecked());
 }
 
 void QnBookmarkBusinessActionWidget::paramsChanged() {
@@ -76,6 +91,8 @@ void QnBookmarkBusinessActionWidget::paramsChanged() {
 
     QnBusinessActionParameters params = model()->actionParams();
     params.tags = ui->tagsLineEdit->text();
-    params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
+    params.durationMs = (ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0);
+    params.recordBeforeMs = ui->recordBeforeSpinBox->value() * msecPerSecond;
+    params.recordAfter = (ui->fixedDurationCheckBox->isChecked() ? 0 : ui->recordAfterSpinBox->value() * msecPerSecond);
     model()->setActionParams(params);
 }

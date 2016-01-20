@@ -77,6 +77,9 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
 
+    bool arecontRtspEnabled() const;
+    void setArecontRtspEnabled(bool newVal) const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -138,6 +141,8 @@ private:
     QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
     QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
     QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+
+    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
 
     AdaptorList m_allAdaptors;
 

@@ -117,11 +117,9 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(timeManager, &ec2::AbstractTimeManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
     connect(timeManager, &ec2::AbstractTimeManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
 
-    connect( connection->getDiscoveryManager(), &ec2::AbstractDiscoveryManager::discoveryInformationChanged,
-        this, &QnCommonMessageProcessor::on_gotDiscoveryData );
-
-    auto miscManager = connection->getMiscManager();
-    connect(miscManager, &ec2::AbstractMiscManager::moduleChanged,                  this, &QnCommonMessageProcessor::moduleChanged);
+    auto discoveryManager = connection->getDiscoveryManager();
+    connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData );
+    connect(discoveryManager, &ec2::AbstractDiscoveryManager::discoveredServerChanged, this, &QnCommonMessageProcessor::discoveredServerChanged);
 }
 
 void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) {
