@@ -247,7 +247,7 @@ private:
     QMap<QString, qint64> m_lastCatalogTimes;
     QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;
-    std::atomic<bool> m_firstTestStorageDone;
+    std::atomic<bool> m_firstStoragesTestDone;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()
