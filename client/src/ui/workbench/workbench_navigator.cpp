@@ -135,7 +135,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
     m_chunkMergingProcessHandle(0),
-    m_itemsWithArchive(),
     m_hasArchive(false)
 {
     /* We'll be using this one, so make sure it's created. */
@@ -370,10 +369,8 @@ void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchLayout *layout
 
     m_bookmarkQueries.removeQuery(camera);
 
-    // Updates archive availability for layout
-    const int removedCount = m_itemsWithArchive.remove(item->uuid());
-    if (removedCount && m_itemsWithArchive.empty())
-        setHasArchive(false);
+    if (hasArchive())
+        updateHasArchiveState();
 }
 
 void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
@@ -385,15 +382,8 @@ void QnWorkbenchNavigator::onItemAdded(QnWorkbenchLayout *layout
 
     refreshQueryFilter(camera); // Updates bookmarks filter
 
-    // Updates archive availability for layout
-    const auto cameraHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
-    if (cameraHasArchive)
-    {
-        if (!m_itemsWithArchive.contains(camera->getId()))
-            setHasArchive(true);
-
-        m_itemsWithArchive.insert(item->uuid());
-    }
+    if (!hasArchive())
+        updateHasArchiveState();
 }
 
 void QnWorkbenchNavigator::onCurrentLayoutChanged()
@@ -472,11 +462,17 @@ void QnWorkbenchNavigator::initialize() {
     if (!isValid())
         return;
 
-    /// Clears bookmarks caches for current layout
     connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged
         , this, &QnWorkbenchNavigator::onCurrentLayoutAboutToBeChanged);
     connect(workbench(), &QnWorkbench::currentLayoutChanged
         , this, &QnWorkbenchNavigator::onCurrentLayoutChanged);
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
+        , this, [this](const QnVirtualCameraResourcePtr & /* camera */)
+    {
+        updateHasArchiveState();
+    });
+
 
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -690,12 +686,31 @@ bool QnWorkbenchNavigator::hasArchive() const
     return m_hasArchive;
 }
 
-void QnWorkbenchNavigator::setHasArchive(bool value)
+bool QnWorkbenchNavigator::layoutHasAchive()
 {
-    if (m_hasArchive == value)
+    const auto layout = workbench()->currentLayout();
+    if (!layout)
+        return false;
+
+    const auto items = layout->items();
+    return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
+    {
+        const auto camera = extractCamera(item);
+        if (!camera)
+            return false;
+
+        const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+        return camHasArchive;
+    });
+}
+
+void QnWorkbenchNavigator::updateHasArchiveState()
+{
+    const bool newValue = layoutHasAchive();
+    if (m_hasArchive == newValue)
         return;
 
-    m_hasArchive = value;
+    m_hasArchive = newValue;
     emit hasArchiveChanged();
 }
 
@@ -1438,7 +1453,7 @@ void QnWorkbenchNavigator::updateLines() {
             QnCameraDeviceStringSet(
                 tr("All Devices"),
                 tr("All Cameras"),
-                tr("All IO Modules")
+                tr("All I/O Modules")
                 ), syncedCameras
             ));
     } else {

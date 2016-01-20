@@ -310,6 +310,7 @@ void QnStorageConfigWidget::at_addExtStorage(bool addToMain) {
 
     QScopedPointer<QnStorageUrlDialog> dialog(new QnStorageUrlDialog(m_server, this));
     dialog->setProtocols(qnServerStorageManager->protocols(m_server));
+    dialog->setCurrentServerStorages(m_model->storages());
     if(!dialog->exec())
         return;
 

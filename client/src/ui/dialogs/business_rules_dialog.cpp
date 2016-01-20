@@ -313,10 +313,13 @@ void QnBusinessRulesDialog::at_message_ruleDeleted(const QnUuid &id) {
 }
 
 void QnBusinessRulesDialog::at_newRuleButton_clicked() {
+    const int kInvalidSortingColumn = -1;
+
     int row = m_rulesViewModel->createRule();
     //TODO: #GDM correct way will be return index and proxy it via sort model,
     //but without dynamic sorting it just works this way
     ui->tableView->selectRow(row);
+    ui->tableView->horizontalHeader()->setSortIndicator(kInvalidSortingColumn, Qt::AscendingOrder);
 }
 
 void QnBusinessRulesDialog::at_deleteButton_clicked() {
