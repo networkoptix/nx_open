@@ -109,7 +109,7 @@
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04",
-                "ACTI|I96"
+                "ACTI|I96","ACTI|I98"
             ],
             "ptzTraits": "EightWayPtz"
         },

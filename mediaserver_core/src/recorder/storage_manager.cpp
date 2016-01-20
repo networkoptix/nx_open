@@ -321,7 +321,8 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-                    if (fullscanProcessed) {
+                    if (fullscanProcessed) 
+                    {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
                         if (!m_fullScanCanceled)
@@ -389,7 +390,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
-    m_firstStorageTestDone(false)
+    m_firstTestStorageDone(false)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -1575,7 +1576,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::testStoragesDone()
 {
-    m_firstStorageTestDone = true;
+    m_firstTestStorageDone = true;
     ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
@@ -1786,15 +1787,28 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         result = storagesInfo[dis(gen)].storage;
     }
 
+    auto hasFastScanned = [this]
+    {
+        auto allStorages = getAllStorages();
+        for (auto it = allStorages.cbegin(); it != allStorages.cend(); ++it)
+        {
+            if (it.value()->hasFlags(Qn::storage_fastscan))
+                return true;
+        }
+        return false;
+    };
+
     if (!result) {
-        if (!m_warnSended && m_firstStorageTestDone) {
-            qWarning() << "No storage available for recording";
-            bool doEmit = m_role == QnServer::StoragePool::Normal ||
-                          (m_role == QnServer::StoragePool::Backup &&
-                           scheduleSync()->getStatus().state !=
-                                    Qn::BackupState::BackupState_InProgress);
-            if (doEmit)
+        if (!m_warnSended && !hasFastScanned() && m_firstTestStorageDone) {
+            if (m_role == QnServer::StoragePool::Normal)
+            {   // 'noStorageAvailbale' signal results in client notification.
+                // For backup storages No Available Storage error is translated to
+                // specific backup error by the calling code and this error 
+                // is reported to the client (and also logged).
+                // Hence these below seem redundant for Backup storage manager.
                 emit noStoragesAvailable();
+                qWarning() << "No storage available for recording";
+            }
             m_warnSended = true;
         }
     }

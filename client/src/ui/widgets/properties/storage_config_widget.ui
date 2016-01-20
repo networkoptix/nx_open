@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>570</height>
+    <width>794</width>
+    <height>551</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0">
@@ -284,27 +284,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="QLabel" name="backupWarningLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Backup Warning Label 
-</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2" colspan="3">
+           <item row="0" column="2" colspan="2">
             <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -343,7 +323,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="4">
+           <item row="1" column="3">
             <widget class="QPushButton" name="backupStartButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -357,15 +337,12 @@
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QLabel" name="spacerLabel">
-             <property name="text">
-              <string notr="true"/>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::PlainText</enum>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::NoTextInteraction</set>
+            <widget class="QnWordWrappedLabel" name="backupWarningLabel" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>26</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -377,7 +354,7 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="backupPreparePage">
          <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -450,6 +427,12 @@ It won't deny oldest footage removing from the drive.</string>
    <class>QnStorageRebuildWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -119,7 +119,7 @@ namespace {
             if (QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
                 return (isValidCamera(camera) && !isDtsCamera(camera));
 
-            return false;
+            return true;    // In case of groups for encoders
         }
 
         bool backupNewCameras() const

@@ -297,7 +297,7 @@ int QnFileStorageResource::mountTmpDrive() const
     uncString.replace(lit("/"), lit("\\"));
 
     QString cifsOptionsString =
-        lit("username=%1,password=%2,unc=\\\\%3")
+        lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
             .arg(url.password())
             .arg(uncString);
@@ -591,6 +591,48 @@ QnStorageResource* QnFileStorageResource::instance(const QString&)
         ).toLongLong()
     );
     return storage;
+}
+
+qint64 QnFileStorageResource::calcSpaceLimit(const QString &url)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    return QnFileStorageResource::isLocal(url) ?  defaultStorageSpaceLimit :
+                                                  QnStorageResource::kNasStorageLimit;
+}
+
+qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
+{
+    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+        nx_ms_conf::MIN_STORAGE_SPACE,
+        nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
+    ).toLongLong();
+
+    return ptype == QnPlatformMonitor::LocalDiskPartition ?
+           defaultStorageSpaceLimit :
+           QnStorageResource::kNasStorageLimit;
+}
+
+bool QnFileStorageResource::isLocal(const QString &url)
+{
+    if (url.contains(lit("://")))
+        return false;
+
+    auto platformMonitor = static_cast<QnPlatformMonitor*>(qnPlatform->monitor());
+
+    QList<QnPlatformMonitor::PartitionSpace> partitions =
+        platformMonitor->totalPartitionSpaceInfo(
+            QnPlatformMonitor::LocalDiskPartition 
+        );
+
+    for (const auto &partition : partitions)
+        if (url.startsWith(partition.path))
+            return true;
+
+    return false;
 }
 
 float QnFileStorageResource::getAvarageWritingUsage() const

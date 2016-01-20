@@ -1557,24 +1557,24 @@ namespace nx_http
 
 
 #if defined(_WIN32)
-#   define COMMON_SERVER "Apache/2.4.10 (MSWin)"
+#   define COMMON_SERVER "Apache/2.4.16 (MSWin)"
 #   if defined(_WIN64)
 #       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; WOW64)"
 #   else
 #       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; Win32)"
 #   endif
 #elif defined(__linux__)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   ifdef __LP64__
 #       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)"
 #   else
 #       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86; rv:36.0)"
 #   endif
 #elif defined(__APPLE__)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   define COMMON_USER_AGENT "Mozilla/5.0 (Macosx x86_64)"
 #else   //some other unix (e.g., FreeBSD)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   define COMMON_USER_AGENT "Mozilla/5.0"
 #endif
 

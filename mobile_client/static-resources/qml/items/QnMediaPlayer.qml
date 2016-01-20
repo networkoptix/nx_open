@@ -22,8 +22,8 @@ QnObject {
     readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
 
     readonly property var mediaPlayer: d.mediaPlayer
-    readonly property var chunkProvider: chunkProvider
-    readonly property var resourceHelper: resourceHelper
+    readonly property alias chunkProvider: resourceHelper.chunkProvider
+    readonly property alias resourceHelper: resourceHelper
 
     readonly property alias resourceName: resourceHelper.resourceName
 
@@ -63,14 +63,14 @@ QnObject {
         repeat: false
         running: false
         onTriggered: {
-            if (!d.paused && d.startPosition == d.mediaPlayer.position) {
+            if (d.mediaPlayer && !d.paused && d.startPosition == d.mediaPlayer.position) {
                 d.failed = true
                 d.mediaPlayer.stop()
             }
         }
 
         function updateTimer() {
-            if (d.paused) {
+            if (d.paused || !d.mediaPlayer) {
                 stop()
                 return
             }
@@ -91,7 +91,7 @@ QnObject {
         id: qtPlayer
 
         MediaPlayer {
-            source: resourceHelper.mediaUrl
+            source: resourceHelper.mediaUrl.toString().slice(0, 4) == "rtsp" ? resourceHelper.mediaUrl : ""
 
             autoPlay: !d.paused
 
@@ -101,19 +101,19 @@ QnObject {
                 if (d.position < 0)
                     return
 
-                if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
+                if (d.prevPlayerPosition == 0 && position > d.maximumInitialPosition) {
                     /* A workaround for Android issue 11590
                        Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
                        To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
                      */
                     d.position += 300
                 } else {
-                    d.position += d.mediaPlayer.position - d.prevPlayerPosition
+                    d.position += position - d.prevPlayerPosition
                 }
-                d.prevPlayerPosition = d.mediaPlayer.position
+                d.prevPlayerPosition = position
 
                 if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
@@ -157,7 +157,7 @@ QnObject {
         id: mjpegPlayer
 
         QnMjpegPlayer {
-            source: resourceHelper.mediaUrl
+            source: resourceHelper.mediaUrl.toString().slice(0, 4) == "http" ? resourceHelper.mediaUrl : ""
 
             readonly property bool hasTimestamp: true
             readonly property bool loading: playbackState == QnMjpegPlayer.PlayingState && mediaStatus != QnMjpegPlayer.BufferedMedia
@@ -177,12 +177,12 @@ QnObject {
                     return
 
                 if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
-                if (mediaPlayer.timestamp >= 0) {
-                    d.position = mediaPlayer.timestamp
+                if (timestamp >= 0) {
+                    d.position = timestamp
                     timelineCorrectionRequest(d.position)
                 }
             }
@@ -216,11 +216,6 @@ QnObject {
             d.firstPlay = true
             console.log("Media URL changed: " + mediaUrl)
         }
-    }
-
-    QnCameraChunkProvider {
-        id: chunkProvider
-        resourceId: player.resourceId
     }
 
     Timer {
@@ -259,6 +254,9 @@ QnObject {
     }
 
     function play(pos) {
+        if (!d.mediaPlayer)
+            return
+
         d.failed = false
 
         if (d.position == -1 || pos && (pos != d.position || pos == -1))
@@ -274,9 +272,12 @@ QnObject {
             return
         }
 
+        if (!pos)
+            pos = d.position
+
         var live = (new Date()).getTime()
         var aligned = -1
-        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
+        if (pos > 0 && live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
             if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
@@ -308,11 +309,17 @@ QnObject {
     }
 
     function pause() {
+        if (!d.mediaPlayer)
+            return
+
         d.paused = true
         d.mediaPlayer.pause()
     }
 
     function stop() {
+        if (!d.mediaPlayer)
+            return
+
         d.dirty = true
         d.mediaPlayer.stop()
     }

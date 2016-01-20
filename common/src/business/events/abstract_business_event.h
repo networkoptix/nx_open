@@ -21,7 +21,9 @@ namespace QnBusiness
 
     EventType parentEvent(EventType eventType);
 
+    /** Check if resource required to SETUP rule on this event. */
     bool isResourceRequired(EventType eventType);
+
 
     bool hasToggleState(EventType eventType);
 
@@ -30,6 +32,14 @@ namespace QnBusiness
     bool requiresCameraResource(EventType eventType);
 
     bool requiresServerResource(EventType eventType);
+
+    /** Check if camera required for this event to OCCUR. */
+    bool isSourceCameraRequired(EventType eventType);
+
+    /** Check if server required for this event to OCCUR. */
+    bool isSourceServerRequired(EventType eventType);
+
+
 }
 
 /**
