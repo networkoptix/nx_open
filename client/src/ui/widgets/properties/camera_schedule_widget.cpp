@@ -207,7 +207,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
     connect(ui->enableRecordingCheckBox,SIGNAL(stateChanged(int)),          this,   SLOT(updateLicensesLabelText()));
     connect(ui->enableRecordingCheckBox, &QCheckBox::stateChanged,          this,   [this](int state)
     {
-        if (!inUpdate())
+        if (!isUpdating())
             emit scheduleEnabledChanged(state);
     });
 
@@ -216,7 +216,7 @@ QnCameraScheduleWidget::QnCameraScheduleWidget(QWidget *parent):
 
     auto notifyAboutArchiveRangeChanged = [this]
     {
-        if (!inUpdate())
+        if (!isUpdating())
             emit archiveRangeChanged();
     };
 
@@ -303,11 +303,11 @@ void QnCameraScheduleWidget::disconnectFromGridWidget()
     disconnect(ui->gridWidget, SIGNAL(cellValueChanged(const QPoint &)), this, SIGNAL(scheduleTasksChanged()));
 }
 
-void QnCameraScheduleWidget::updateStarted() {
+void QnCameraScheduleWidget::beforeUpdate() {
     disconnectFromGridWidget();
 }
 
-void QnCameraScheduleWidget::updateFinished() {
+void QnCameraScheduleWidget::afterUpdate() {
     connectToGridWidget();
     updateGridParams(); // TODO: #GDM #Common does not belong here...
 }
@@ -551,7 +551,7 @@ void QnCameraScheduleWidget::setScheduleTasks(const QList<QnScheduleTask::Data> 
 
     connectToGridWidget();
 
-    if (!inUpdate())
+    if (!isUpdating())
         emit scheduleTasksChanged();
 }
 
@@ -567,7 +567,7 @@ int QnCameraScheduleWidget::qualityToComboIndex(const Qn::StreamQuality& q)
 
 void QnCameraScheduleWidget::updateGridParams(bool fromUserInput)
 {
-    if (inUpdate())
+    if (isUpdating())
         return;
 
     if (m_disableUpdateGridParams)

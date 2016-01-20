@@ -447,7 +447,7 @@ void QnMultipleCameraSettingsWidget::setTabEnabledSafe(Qn::CameraSettingsTab tab
 // -------------------------------------------------------------------------- //
 void QnMultipleCameraSettingsWidget::at_dbDataChanged()
 {
-    if (inUpdate())
+    if (inUpisUpdatingdate())
         return;
 
     setHasDbChanges(true);
@@ -455,7 +455,7 @@ void QnMultipleCameraSettingsWidget::at_dbDataChanged()
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChanged()
 {
-    if (inUpdate())
+    if (isUpdating())
         return;
 
     at_dbDataChanged();
@@ -466,7 +466,7 @@ void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleTasksChange
 
 void QnMultipleCameraSettingsWidget::at_cameraScheduleWidget_scheduleEnabledChanged(int state)
 {
-    if (inUpdate())
+    if (isUpdating())
         return;
 
     ui->licensingWidget->setState(static_cast<Qt::CheckState>(state));

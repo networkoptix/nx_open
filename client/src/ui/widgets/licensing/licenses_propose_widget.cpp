@@ -25,7 +25,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
     connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,   &QnLicensesProposeWidget::updateLicenseText);
     connect(ui->useLicenseCheckBox,     &QCheckBox::stateChanged,              this,  [this]
     {
-        if (inUpdate())
+        if (isUpdating())
             return;
         emit changed();
     });
@@ -53,7 +53,7 @@ void QnLicensesProposeWidget::afterContextInitialized() {
 }
 
 void QnLicensesProposeWidget::updateLicenseText() {
-    if (inUpdate())
+    if (isUpdating())
         return;
 
     QnCamLicenseUsageHelper helper;

@@ -80,8 +80,8 @@ signals:
     void controlsChangesApplied();
 
 protected:
-    virtual void updateStarted() override;
-    virtual void updateFinished() override;
+    virtual void beforeUpdate() override;
+    virtual void afterUpdate() override;
 
     virtual void afterContextInitialized() override;
 

@@ -9,13 +9,13 @@ public:
     void endUpdate();
 
 protected:
-    bool inUpdate() const;
+    bool isUpdating() const;
 
     virtual void beginUpdateInternal();
     virtual void endUpdateInternal();
 
-    virtual void updateStarted();
-    virtual void updateFinished();
+    virtual void beforeUpdate();
+    virtual void afterUpdate();
 private:
     int m_updateCount;
 };

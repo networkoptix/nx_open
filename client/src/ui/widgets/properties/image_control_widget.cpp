@@ -46,13 +46,13 @@ QnImageControlWidget::QnImageControlWidget(QWidget* parent /* = 0*/):
 
     auto notifyAboutChanges = [this]
     {
-        if (!inUpdate())
+        if (!isUpdating())
             emit changed();
     };
 
     auto notifyAboutFisheyeChanges = [this]
     {
-        if (!inUpdate())
+        if (!isUpdating())
             emit fisheyeChanged();
     };
 
