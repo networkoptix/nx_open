@@ -160,6 +160,10 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 
 bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
 {
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return false;
+
     if (isCameraHistoryValid(camera))
     {
         if (callback)
@@ -243,6 +247,10 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnUuid
 QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnVirtualCameraResourcePtr &camera
     , bool filterOnlineServers) const
 {
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourceList();
+
     QnMediaServerResourceList result;
     auto server = toMediaServer(camera->getParentId());
     if (server && (!filterOnlineServers || (server->getStatus() == Qn::Online)))
@@ -252,6 +260,10 @@ QnMediaServerResourceList QnCameraHistoryPool::dtsCamFootageData(const QnVirtual
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, bool filterOnlineServers) const
 {
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourceList();
+
     if (camera->isDtsBased())
         return dtsCamFootageData(camera, filterOnlineServers);
     else
@@ -260,6 +272,10 @@ QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirt
 
 QnMediaServerResourceList QnCameraHistoryPool::getCameraFootageData(const QnVirtualCameraResourcePtr &camera, const QnTimePeriod& timePeriod) const
 {
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourceList();
+
     if (camera->isDtsBased())
         return dtsCamFootageData(camera);
 
@@ -296,15 +312,22 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(const
     return result;
 }
 
-QnVirtualCameraResourcePtr QnCameraHistoryPool::toCamera(const QnUuid& guid) const {
+QnVirtualCameraResourcePtr QnCameraHistoryPool::toCamera(const QnUuid& guid) const
+{
     return qnResPool->getResourceById(guid).dynamicCast<QnVirtualCameraResource>();
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const QnUuid& guid) const {
+QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const QnUuid& guid) const
+{
     return qnResPool->getResourceById(guid).dynamicCast<QnMediaServerResource>();
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const {
+QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const
+{
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourcePtr();
+
     if (foundPeriod)
         foundPeriod->clear();
 
@@ -328,11 +351,20 @@ QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnVirtu
 
 QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTimeSync(const QnVirtualCameraResourcePtr &camera, qint64 timestampMs, QnTimePeriod* foundPeriod)
 {
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourcePtr();
+
     updateCameraHistorySync(camera);
     return getMediaServerOnTime(camera, timestampMs, foundPeriod);
 }
 
-QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const {
+QnMediaServerResourcePtr QnCameraHistoryPool::getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const
+{
+    Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
+    if (camera.isNull())
+        return QnMediaServerResourcePtr();
+
     Q_ASSERT_X(foundPeriod, Q_FUNC_INFO, "target period MUST be present");
     if (!foundPeriod)
         return getMediaServerOnTime(camera, timestamp);

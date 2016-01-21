@@ -126,7 +126,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
-                tr("IO Module %1 was disconnected")
+                tr("I/O Module %1 was disconnected")
             ), camera
         ).arg(resourceName);
 
@@ -400,7 +400,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
     }
     case BackupDone: {
         result = tr("Archive backup is successfully completed");
@@ -410,7 +410,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup is canceled by user. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
         break;
     }
 
@@ -425,7 +425,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 QnCameraDeviceStringSet(
                     tr("Recording on devices is disabled:"),
                     tr("Recording on cameras is disabled:"),
-                    tr("Recording on IO modules is disabled:")
+                    tr("Recording on I/O modules is disabled:")
                 ),
                 disabledCameras
             );

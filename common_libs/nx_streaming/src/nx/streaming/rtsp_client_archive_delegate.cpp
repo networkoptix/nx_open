@@ -242,6 +242,7 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     m_closing = false;
 
     m_customVideoLayout.reset();
+    m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
    
     if (!m_fixedServer) {
         m_server = getServerOnTime(m_position); // try to update server
@@ -259,7 +260,6 @@ bool QnRtspClientArchiveDelegate::openInternal() {
     const bool isOpened = m_rtspSession->open(getUrl(m_camera, m_server), m_lastSeekTime).errorCode == CameraDiagnostics::ErrorCode::noError;
     if (isOpened)
     {
-        m_globalMinArchiveTime = startTime(); // force current value to avoid flicker effect while current server is being changed
         if (m_isMultiserverAllowed)
             checkMinTimeFromOtherServer(m_camera);
 

@@ -241,29 +241,33 @@ bool QnWorkbenchAlarmLayoutHandler::currentInstanceIsMain() const
     if (runningInstances.isEmpty())
         return true;
 
+    return runningInstances.first() == clientInstanceManager->instanceIndex();
 
-    QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+    // Currently client only knows about instances that were connected to server only after than itself.
+    // This leads to undefined behavior and alarm layout duplicating.
 
-    QSet<QnUuid> connectedInstances;
-    for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
-    {
-        if (info.data.userId != localUserId)
-            continue;
-        connectedInstances.insert(info.uuid);
-    }
-
-    /* Main instance is the one that has the smallest index between all instances
-       connected to current server with the same credentials. */
-    for (int index: runningInstances)
-    {
-        if (index == clientInstanceManager->instanceIndex())
-            return true;
-
-        /* Check if other instance connected to the same server. */
-        QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);
-        if (connectedInstances.contains(otherInstanceUuid))
-            return false;
-    }
-
-    return true;
+//     QnUuid localUserId = qnRuntimeInfoManager->localInfo().data.userId;
+//
+//     QSet<QnUuid> connectedInstances;
+//     for (const QnPeerRuntimeInfo &info: qnRuntimeInfoManager->items()->getItems())
+//     {
+//         if (info.data.userId != localUserId)
+//             continue;
+//         connectedInstances.insert(info.uuid);
+//     }
+//
+//     /* Main instance is the one that has the smallest index between all instances
+//        connected to current server with the same credentials. */
+//     for (int index: runningInstances)
+//     {
+//         if (index == clientInstanceManager->instanceIndex())
+//             return true;
+//
+//         /* Check if other instance connected to the same server. */
+//         QnUuid otherInstanceUuid = clientInstanceManager->instanceGuidForIndex(index);
+//         if (connectedInstances.contains(otherInstanceUuid))
+//             return false;
+//     }
+//
+//     return true;
 }

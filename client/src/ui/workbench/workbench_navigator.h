@@ -241,7 +241,9 @@ private:
     void onItemRemoved(QnWorkbenchLayout *layout
         , QnWorkbenchItem *item);
 
-    void setHasArchive(bool value);
+    void updateHasArchiveState();
+
+    bool layoutHasAchive();
 
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
@@ -304,9 +306,6 @@ private:
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 
-
-    typedef QSet<QnUuid> IdsSet;
-    IdsSet m_itemsWithArchive;
     bool m_hasArchive;
 };
 

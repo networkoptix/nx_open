@@ -148,7 +148,7 @@ void QnSingleCameraSettingsWidget::retranslateUi() {
         QnCameraDeviceStringSet(
             tr("Device Settings"),
             tr("Camera Settings"),
-            tr("IO Module Settings")
+            tr("I/O Module Settings")
         ), m_camera
     ));
 }
