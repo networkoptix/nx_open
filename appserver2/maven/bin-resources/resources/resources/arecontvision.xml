@@ -67,7 +67,7 @@
         <resource name = "2215" public = "2115"/>
         <resource name = "2216" public = "2215"/>
         <resource name = "5215" public = "5115"/>
-        <resource name = "3556" public = "3100">
+        <resource name = "3556" public = "3100, ArecontVision_H264">
             <params>
                 <param name = "MaxFPS" default_value = "21"/>
             </params>
