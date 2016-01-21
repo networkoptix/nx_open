@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -95,12 +95,14 @@
     <message>
         <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
         <source>From</source>
+        <translatorcomment>Since?</translatorcomment>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>till</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>Since - Till, From - To</translatorcomment>
+        <translation type="unfinished">To</translation>
     </message>
     <message>
         <location/>
@@ -170,7 +172,7 @@
     <message>
         <location/>
         <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">All Servers are offline.  Audit data is not available.</translation>
     </message>
     <message>
         <location/>
@@ -1298,7 +1300,7 @@
     <message>
         <location/>
         <source>This license type requires higher software version.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">This license type requires a higher software version.</translation>
     </message>
 </context>
 <context>
@@ -1979,7 +1981,7 @@
     <message>
         <location/>
         <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Unable to check updates on the Internet.</translation>
     </message>
     <message>
         <location/>
@@ -2112,7 +2114,7 @@
     <message>
         <location/>
         <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Please wait while the connection is being restored...</translation>
     </message>
 </context>
 <context>
