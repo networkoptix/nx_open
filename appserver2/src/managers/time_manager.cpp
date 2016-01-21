@@ -116,7 +116,7 @@ namespace ec2
         {
             //taking into account sequence overflow. it should be same as "sequence < right.sequence" 
                 //but with respect to sequence overflow
-            return (right.sequence - sequence) <
+            return ((quint16)(right.sequence - sequence)) <
                    (std::numeric_limits<decltype(sequence)>::max() / 2);
         }
 
