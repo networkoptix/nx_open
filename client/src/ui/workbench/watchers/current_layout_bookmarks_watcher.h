@@ -8,6 +8,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <utils/common/connective.h>
 
+class QnUuid;
 class QnCurrentLayoutBookmarksCache;
 
 class QnCurrentLayoutBookmarksWatcher : public Connective<QObject>
@@ -22,16 +23,39 @@ public:
 
     virtual ~QnCurrentLayoutBookmarksWatcher();
 
+    class ListenerHolderPrivate;
+    typedef QSharedPointer<ListenerHolderPrivate> ListenerLifeHolder;
+    typedef std::function<void (const QnCameraBookmarkList &bookmarks)> Listener;
+
+    ListenerLifeHolder addListener(const QnVirtualCameraResourcePtr &camera
+        , const Listener &listenerCallback);
+
 private:
     void updatePosition();
 
-signals:
-    void onBookmarksChanged(const QnVirtualCameraResource &camera
+    void onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
+        , const QnCameraBookmarkList &bookmarks);
+
+private:
+    struct ListenerData
+    {
+        Listener listenerCallback;
+        QnCameraBookmarkList currentBookmarks;
+
+        explicit ListenerData(const Listener &listenerCallback);
+    };
+
+    typedef QMultiMap<QnVirtualCameraResourcePtr, ListenerData> Listeners;
+    void removeListener(const Listeners::iterator &it);
+
+    void updateListenerData(const Listeners::iterator &it
         , const QnCameraBookmarkList &bookmarks);
 
 private:
     typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
 
+    qint64 m_posMs;
     QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
+    Listeners m_listeners;
 };
 
