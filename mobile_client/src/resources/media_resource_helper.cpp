@@ -260,6 +260,7 @@ void QnMediaResourceHelper::updateUrl()
             url.setPath(lit("/media/%1.%2").arg(m_camera->getUniqueId()).arg(protocolName(protocol)));
             query.addQueryItem(lit("resolution"), currentResolutionString());
             query.addQueryItem(lit("rt"), lit("true"));
+            query.addQueryItem(lit("rotation"), lit("0"));
         }
         else if (protocol == Mjpeg)
         {
@@ -288,7 +289,6 @@ void QnMediaResourceHelper::updateUrl()
     query.addQueryItem(QLatin1String(Qn::EC2_RUNTIME_GUID_HEADER_NAME), qnCommon->runningInstanceGUID().toString());
     query.addQueryItem(QLatin1String(Qn::CUSTOM_USERNAME_HEADER_NAME), QnAppServerConnectionFactory::url().userName());
     query.addQueryItem(QLatin1String(Qn::USER_AGENT_HEADER_NAME), QLatin1String(nx_http::userAgentString()));
-    query.addQueryItem(lit("rotation"), lit("0"));
 
     url.setQuery(query);
 

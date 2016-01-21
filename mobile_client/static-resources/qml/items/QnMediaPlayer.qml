@@ -91,7 +91,7 @@ QnObject {
         id: qtPlayer
 
         MediaPlayer {
-            source: resourceHelper.mediaUrl.toString().slice(0, 4) == "rtsp" ? resourceHelper.mediaUrl : ""
+            source: resourceHelper.mediaUrl
 
             autoPlay: !d.paused
 
@@ -157,7 +157,7 @@ QnObject {
         id: mjpegPlayer
 
         QnMjpegPlayer {
-            source: resourceHelper.mediaUrl.toString().slice(0, 4) == "http" ? resourceHelper.mediaUrl : ""
+            source: resourceHelper.mediaUrl
 
             readonly property bool hasTimestamp: true
             readonly property bool loading: playbackState == QnMjpegPlayer.PlayingState && mediaStatus != QnMjpegPlayer.BufferedMedia

@@ -29,6 +29,14 @@ public:
     QSet<QString> protocols() const;
     void setProtocols(const QSet<QString> &protocols);
 
+    /**
+     * Current server storages can be modified but not saved,
+     * so we are passing current state right here to avoid
+     * invalid storageAlreadyUsed() results.
+     */
+    QnStorageModelInfoList currentServerStorages() const;
+    void setCurrentServerStorages(const QnStorageModelInfoList &storages);
+
     QnStorageModelInfo storage() const;
 
 protected:
@@ -61,6 +69,7 @@ private:
     QHash<QString, QString> m_urlByProtocol;
     QString m_lastProtocol;
     QnStorageModelInfo m_storage;
+    QnStorageModelInfoList m_currentServerStorages;
 };
 
 #endif // QN_STORAGE_URL_DIALOG_H

@@ -1376,9 +1376,9 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
 }
 
 void MediaServerProcess::at_archiveBackupFinished(
-    qint64                      backupedToMs,
+    qint64                      backedUpToMs,
     QnBusiness::EventReason     code
-) 
+)
 {
     if (isStopping())
         return;
@@ -1387,7 +1387,7 @@ void MediaServerProcess::at_archiveBackupFinished(
         m_mediaServer,
         qnSyncTime->currentUSecsSinceEpoch(),
         code,
-        QString::number(backupedToMs) 
+        QString::number(backedUpToMs)
     );
 }
 

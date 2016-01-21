@@ -311,7 +311,7 @@ public:
 
         depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
-        io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
+        io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */

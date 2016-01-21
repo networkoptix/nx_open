@@ -133,7 +133,14 @@ angular.module('webadminApp')
                 }
                 this.getCurrentUser().then(function(result){
                     var isAdmin = result.data.reply.isAdmin || (result.data.reply.permissions & Config.globalEditServersPermissions);
-                    deferred.resolve({isAdmin:isAdmin,name:result.data.reply.name});
+
+                    var isOwner = result.data.reply.isAdmin ;
+
+                    deferred.resolve({
+                        isAdmin:isAdmin,
+                        isOwner:isOwner,
+                        name:result.data.reply.name
+                    });
                 });
                 return deferred.promise;
             },

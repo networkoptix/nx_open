@@ -6,7 +6,10 @@
 class QnSearchBookmarksDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
 public:
-    QnSearchBookmarksDialog(QWidget *parent = nullptr);
+    QnSearchBookmarksDialog(const QString &filterText
+        , qint64 utcStartTimeMs
+        , qint64 utcFinishTimeMs
+        , QWidget *parent = nullptr);
 
     virtual ~QnSearchBookmarksDialog();
 
