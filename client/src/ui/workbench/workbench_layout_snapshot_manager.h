@@ -20,7 +20,7 @@ class QnWorkbenchLayoutReplyProcessor: public QnAbstractReplyProcessor {
     Q_OBJECT
 
 public:
-    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources): 
+    QnWorkbenchLayoutReplyProcessor(QnWorkbenchLayoutSnapshotManager *manager, const QnLayoutResourceList &resources):
         QnAbstractReplyProcessor(0),
         m_manager(manager),
         m_resources(resources)
@@ -43,7 +43,7 @@ private:
 /**
  * This class maintains a storage of layout snapshots and tracks the state of
  * each layout.
- * 
+ *
  * It also provides some functions for layout and snapshot manipulation.
  */
 class QnWorkbenchLayoutSnapshotManager: public Connective<QObject>, public QnWorkbenchContextAware {
@@ -110,6 +110,7 @@ protected slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
     void at_layout_changed(const QnLayoutResourcePtr &resource);
+    void at_layout_itemChanged(const QnLayoutResourcePtr &resource);
     void at_resource_changed(const QnResourcePtr &resource);
 
 private:
