@@ -35,13 +35,14 @@ namespace
 
 QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCount
     , Qn::BookmarkSearchStrategy strategy
+    , qint64 minWindowChangeMs
     , QObject *parent)
 
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
     , m_filter(createFilter(maxBookmarksCount, strategy))
-    , m_queriesCache(new QnBookmarkQueriesCache())
+    , m_queriesCache(new QnBookmarkQueriesCache(minWindowChangeMs))
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
@@ -53,6 +54,11 @@ QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCou
 
 QnCurrentLayoutBookmarksCache::~QnCurrentLayoutBookmarksCache()
 {
+}
+
+QnTimePeriod QnCurrentLayoutBookmarksCache::window() const
+{
+    return QnTimePeriod::createFromInterval(m_filter.startTimeMs, m_filter.endTimeMs);
 }
 
 void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)

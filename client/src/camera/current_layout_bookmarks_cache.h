@@ -24,11 +24,14 @@ class QnCurrentLayoutBookmarksCache : public Connective<QObject>
 public:
     QnCurrentLayoutBookmarksCache(int maxBookmarksCount
         , Qn::BookmarkSearchStrategy strategy
+        , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
 
     virtual ~QnCurrentLayoutBookmarksCache();
 
 public:
+    QnTimePeriod window() const;
+
     void setWindow(const QnTimePeriod &window);
 
     QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera);

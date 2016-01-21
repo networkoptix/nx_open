@@ -13,6 +13,8 @@
 namespace
 {
     enum { kMaxBookmarksOnTimeline = 10000 };
+
+    enum { kTimelineMinWindowChangeMs = 30000 };
 }
 
 // TODO: add switch on/off bookmarks mode helper
@@ -21,7 +23,8 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksOnTimeline, Qn::EarliestFirst, parent))
+    , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksOnTimeline
+        , Qn::EarliestFirst, kTimelineMinWindowChangeMs, parent))
     , m_mergeHelper(new QnBookmarkMergeHelper())
     , m_aggregation(new QnCameraBookmarkAggregation())
     , m_currentCamera()

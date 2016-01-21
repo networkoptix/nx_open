@@ -22,7 +22,8 @@ public:
 
     virtual ~QnCurrentLayoutBookmarksWatcher();
 
-    void setPosition(qint64 pos);
+private:
+    void updatePosition();
 
 signals:
     void onBookmarksChanged(const QnVirtualCameraResource &camera
