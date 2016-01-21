@@ -24,6 +24,7 @@ public:
     QMediaPlayer::MediaStatus mediaStatus;
 
     bool waitingForFrame;
+    bool frameAvailable;
     QElapsedTimer frameTimer;
     int framePresentationTime;
 
@@ -43,6 +44,7 @@ public:
     void setMediaStatus(QMediaPlayer::MediaStatus status);
     void updateMediaStatus();
     void processFrame();
+    void enqueueNextFrame();
     void at_session_frameAvailable();
 };
 
@@ -53,6 +55,7 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , session(new QnMjpegSession())
     , state(QMediaPlayer::StoppedState)
     , waitingForFrame(true)
+    , frameAvailable(false)
     , framePresentationTime(0)
     , videoSurface(0)
     , position(0)
@@ -115,6 +118,9 @@ void QnMjpegPlayerPrivate::processFrame() {
 
     QnMjpegSession::FrameData frameData = frameQueue.dequeue();
 
+    if (frameAvailable)
+        enqueueNextFrame();
+
     int presentationTime = frameData.presentationTime;
 
     position += presentationTime;
@@ -158,21 +164,29 @@ void QnMjpegPlayerPrivate::processFrame() {
     }
 }
 
-void QnMjpegPlayerPrivate::at_session_frameAvailable() {
+void QnMjpegPlayerPrivate::enqueueNextFrame() {
     if (state != QMediaPlayer::PlayingState)
         return;
 
     if (frameQueue.size() >= kMaxFrameQueueSize)
+    {
+        frameAvailable = true;
         return;
+    }
+
+    frameAvailable = false;
 
     QnMjpegSession::FrameData frameData = session->getFrame();
     if (frameData.isNull())
         return;
 
     frameQueue.enqueue(frameData);
+}
 
-    if (waitingForFrame)
-        processFrame();
+void QnMjpegPlayerPrivate::at_session_frameAvailable()
+{
+    enqueueNextFrame();
+    processFrame();
 }
 
 
@@ -311,6 +325,7 @@ void QnMjpegPlayer::stop() {
     Q_D(QnMjpegPlayer);
 
     d->session->stop();
+    d->frameAvailable = false;
     d->setState(QMediaPlayer::StoppedState);
     d->frameQueue.clear();
 
@@ -330,6 +345,7 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     d->waitingForFrame = true;
     d->session->setUrl(url);
     d->session->stop();
+    d->frameAvailable = false;
     d->frameQueue.clear();
 
     if (d->position != 0) {
