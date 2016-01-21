@@ -156,8 +156,8 @@ TEST_F( StunClientServerTest, Indications )
 
     SyncQueue< Message > recvWaiter;
     client->connect( address );
-    client->monitorIndications( 0xAB, recvWaiter.pusher() );
-    client->monitorIndications( 0xCD, recvWaiter.pusher() );
+    client->setIndicationHandler( 0xAB, recvWaiter.pusher() );
+    client->setIndicationHandler( 0xCD, recvWaiter.pusher() );
 
     EXPECT_EQ( sendTestRequestSync(), SystemError::noError );
     EXPECT_EQ( server->connections.size(), 1 );

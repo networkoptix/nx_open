@@ -113,6 +113,12 @@ void MediaServerEmulator::setOnConnectionRequestedHandler(
     m_onConnectionRequestedHandler = std::move(handler);
 }
 
+void MediaServerEmulator::setConnectionAckResponseHandler(
+    std::function<void(api::ResultCode)> handler)
+{
+    m_connectionAckResponseHandler = std::move(handler);
+}
+
 void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionRequestedEvent connectionRequestedData)
 {
@@ -132,7 +138,7 @@ void MediaServerEmulator::onConnectionRequested(
 void MediaServerEmulator::onConnectionAckResponseReceived(
     nx::hpm::api::ResultCode resultCode)
 {
-    //TODO
+    m_connectionAckResponseHandler(resultCode);
 }
 
 }   //hpm

@@ -42,7 +42,9 @@ public:
     SocketAddress udpHolePunchingEndpoint() const;
 
     void setOnConnectionRequestedHandler(
-        std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler);
+        std::function<void(api::ConnectionRequestedEvent)> handler);
+    void setConnectionAckResponseHandler(
+        std::function<void(api::ResultCode)> handler);
 
 private:
     hpm::api::MediatorConnector m_mediatorConnector;
@@ -53,6 +55,7 @@ private:
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
     nx::hpm::api::MediatorServerUdpConnection m_mediatorUdpClient;
     std::function<void(nx::hpm::api::ConnectionRequestedEvent)> m_onConnectionRequestedHandler;
+    std::function<void(api::ResultCode)> m_connectionAckResponseHandler;
 
     void onConnectionRequested(
         nx::hpm::api::ConnectionRequestedEvent connectionRequestedData);

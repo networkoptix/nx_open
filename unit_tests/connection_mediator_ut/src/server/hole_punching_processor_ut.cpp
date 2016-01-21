@@ -30,11 +30,24 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     const auto system1 = addRandomSystem();
     const auto server1 = addRandomServer(system1);
 
+    //TODO #ak #msvc2015 use future/promise
+    QnMutex mtx;
+    QnWaitCondition waitCond;
+
     boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
     server1->setOnConnectionRequestedHandler(
         [&connectionRequestedEventData](api::ConnectionRequestedEvent data)
         {
             connectionRequestedEventData = std::move(data);
+        });
+
+    boost::optional<api::ResultCode> connectionAckResult;
+    server1->setConnectionAckResponseHandler(
+        [&mtx, &waitCond, &connectionAckResult](api::ResultCode resultCode)
+        {
+            QnMutexLocker lk(&mtx);
+            connectionAckResult = resultCode;
+            waitCond.wakeAll();
         });
 
     ASSERT_EQ(api::ResultCode::ok, server1->listen());
@@ -43,8 +56,6 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
 
     boost::optional<api::ResultCode> connectResult;
-    QnMutex mtx;
-    QnWaitCondition waitCond;
 
     api::ConnectResponse connectResponseData;
     auto connectCompletionHandler =
@@ -101,7 +112,14 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
                 std::move(connectionResult),
                 std::placeholders::_1));
 
-    //TODO #ak waiting for connectionAck response to be received by server
+    //waiting for connectionAck response to be received by server
+    {
+        QnMutexLocker lk(&mtx);
+        while (!static_cast<bool>(connectionAckResult))
+            ASSERT_TRUE(waitCond.wait(lk.mutex(), kMaxConnectResponseWaitTimeout.count()));
+    }
+    ASSERT_TRUE(static_cast<bool>(connectionAckResult));
+    ASSERT_EQ(api::ResultCode::ok, connectionAckResult.get());
 
     udpClient.pleaseStopSync();
 }
