@@ -24,7 +24,7 @@ protected:
     AsyncClientUser(std::shared_ptr<AsyncClient> client);
 
     void sendRequest(Message request, AsyncClient::RequestHandler handler);
-    bool monitorIndications(int method, AsyncClient::IndicationHandler handler);
+    bool setIndicationHandler(int method, AsyncClient::IndicationHandler handler);
 
 private:
     bool startOperation();

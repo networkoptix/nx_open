@@ -41,6 +41,7 @@ MediaServerEmulator::~MediaServerEmulator()
 {
     if (m_serverClient)
         m_serverClient->pleaseStopSync();
+    m_mediatorUdpClient.pleaseStopSync();
 }
 
 bool MediaServerEmulator::start()

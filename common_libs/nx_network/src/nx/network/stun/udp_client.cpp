@@ -59,7 +59,7 @@ UDPClient::UDPClient(SocketAddress serverAddress)
 void UDPClient::pleaseStop(std::function<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [/*std::move*/ handler, this](){  //TODO #ak #msvc2015
+        [/*std::move*/ handler, this](){  //TODO #ak #msvc2015 move to lambda
             //reporting failure for all ongoing requests
             std::vector<RequestCompletionHandler> completionHandlers;
             for (const auto& requestData: m_ongoingRequests)

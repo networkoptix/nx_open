@@ -34,7 +34,7 @@ HolePunchingProcessor::HolePunchingProcessor(
         });
 
     dispatcher->registerRequestProcessor(
-        stun::cc::methods::connectionResult,
+        stun::cc::methods::connectionAck,
         [this](const ConnectionStrongRef& connection, stun::Message message)
         {
             processRequestWithNoOutput(
@@ -92,7 +92,7 @@ void HolePunchingProcessor::connect(
 
     connectionFsmIterAndFlag.first->second = 
         std::make_unique<UDPHolePunchingConnectionInitiationFsm>(
-            std::move(request.connectSessionID),
+            request.connectSessionID,
             targetPeerDataLocker.get(),
             std::bind(
                 &HolePunchingProcessor::connectSessionFinished,

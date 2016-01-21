@@ -76,8 +76,8 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     ASSERT_EQ(api::ResultCode::ok, connectResult.get());
     ASSERT_FALSE(connectResponseData.udpEndpointList.empty());
     ASSERT_EQ(
-        server1->udpHolePunchingEndpoint(),
-        connectResponseData.udpEndpointList.front());
+        server1->udpHolePunchingEndpoint().port,
+        connectResponseData.udpEndpointList.front().port);
 
     //checking server has received connectionRequested indication
     ASSERT_TRUE(static_cast<bool>(connectionRequestedEventData));
@@ -86,8 +86,8 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
         connectionRequestedEventData->originatingPeerID);
     ASSERT_EQ(1, connectionRequestedEventData->udpEndpointList.size());
     ASSERT_EQ(
-        udpClient.localAddress(),
-        connectionRequestedEventData->udpEndpointList.front());
+        udpClient.localAddress().port,
+        connectionRequestedEventData->udpEndpointList.front().port);    //not comparing interface since it may be 0.0.0.0 for server
 
     api::ResultCode resultCode = api::ResultCode::ok;
     api::ConnectionResultRequest connectionResult;

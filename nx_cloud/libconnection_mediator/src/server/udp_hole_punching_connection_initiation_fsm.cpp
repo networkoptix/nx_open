@@ -49,8 +49,8 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
     m_timer->dispatch([this, originatingPeerConnection, request, connectResponseSender]()  //TODO #ak msvc2015 move to lambda
     {
         api::ConnectionRequestedEvent connectionRequestedEvent;
-        connectionRequestedEvent.connectSessionID = request.connectSessionID;
-        connectionRequestedEvent.originatingPeerID = request.originatingPeerID;
+        connectionRequestedEvent.connectSessionID = std::move(request.connectSessionID);
+        connectionRequestedEvent.originatingPeerID = std::move(request.originatingPeerID);
         connectionRequestedEvent.udpEndpointList.emplace_back(
             originatingPeerConnection->getSourceAddress());
         connectionRequestedEvent.connectionMethods = api::ConnectionMethod::udpHolePunching;

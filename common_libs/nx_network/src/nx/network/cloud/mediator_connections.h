@@ -21,7 +21,7 @@ namespace nx {
 namespace hpm {
 namespace api {
 
-/** Provides client related STUN functionality.
+/** Provides access to mediator functions to be used by clients.
     \note These requests DO NOT require authentication
  */
 template<class NetworkClientType>
@@ -76,7 +76,7 @@ public:
 typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;
 typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
 
-/** Provides server-related STUN functionality.
+/** Provides access to mediator functions to be used by servers.
     \note All server requests MUST be authorized by cloudId and cloudAuthenticationKey
 */
 template<class NetworkClientType>
@@ -94,7 +94,6 @@ public:
         BaseMediatorClient<NetworkClientType>(std::move(arg1)),
         m_connector(connector)
     {
-        //TODO #ak subscribe for indications
     }
 
     /** Ask mediator to test connection to addresses.
@@ -145,12 +144,6 @@ public:
             std::move(completionHandler));
     }
 
-    void setOnConnectionRequestedHandler(
-        std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
-    {
-        //TODO #ak
-    }
-
 protected:
     template<typename RequestData, typename CompletionHandlerType>
     void doAuthRequest(
@@ -180,8 +173,37 @@ private:
     AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-typedef MediatorServerConnection<stun::AsyncClientUser> MediatorServerTcpConnection;
 typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
+
+
+class MediatorServerTcpConnection
+:
+    public MediatorServerConnection<stun::AsyncClientUser>
+{
+public:
+    MediatorServerTcpConnection(
+        std::shared_ptr<nx::stun::AsyncClient> stunClient,
+        AbstractCloudSystemCredentialsProvider* connector)
+    :
+        MediatorServerConnection<stun::AsyncClientUser>(
+            std::move(stunClient),
+            connector)
+    {
+    }
+
+    void setOnConnectionRequestedHandler(
+        std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
+    {
+        setIndicationHandler(
+            nx::stun::cc::indications::connectionRequested,
+            [handler](nx::stun::Message msg)    //TODO #ak #msvc2015 move to lambda
+            {
+                ConnectionRequestedEvent indicationData;
+                indicationData.parse(msg);
+                handler(std::move(indicationData));
+            });
+    }
+};
 
 } // namespace api
 } // namespace hpm

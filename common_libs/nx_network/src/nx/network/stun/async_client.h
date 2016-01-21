@@ -60,7 +60,7 @@ public:
         \param handler Will be called for each indication message
         \return true on success, false if this methed is already monitored
     */
-    bool monitorIndications( int method, IndicationHandler handler );
+    bool setIndicationHandler( int method, IndicationHandler handler );
 
     //!Stops monitoring for certain indications
     /*!
