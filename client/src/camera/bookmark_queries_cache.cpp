@@ -62,8 +62,6 @@ bool QnBookmarkQueriesCache::updateQuery(const QnVirtualCameraResourcePtr &camer
     {
         const bool textUpdated = updateFilterText(oldFilter, filter.text);
         const bool windowUpdated = updateFilterTimeWindow(oldFilter, filter.startTimeMs, filter.endTimeMs);
-        if (textUpdated || windowUpdated)
-            qDebug() << "---------------";
         return (textUpdated || windowUpdated);
     };
 
