@@ -14,6 +14,12 @@ class QnCameraBookmarkAggregation;
 class QnCurrentLayoutBookmarksCache;
 class QnBookmarkMergeHelper;
 
+// @brief Caches bookmarks for each item on current layout and constrains
+// count of them to reasonable (large) number. Gives access to merged bookmarks
+// for current selected item. Gives access to bookmarks of each layout item
+
+// TODO: #ynikitenkov TBD reasonable count of bookmarks for timeline
+
 class QnTimelineBookmarksWatcher : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
@@ -31,6 +37,10 @@ public:
 
     QnCameraBookmarkList bookmarksAtPosition(qint64 position
         , qint64 msecdsPerDp = 0);
+
+    QnCameraBookmarkList rawBookmarksAtPosition(
+        const QnVirtualCameraResourcePtr &camera
+        , qint64 positionMs);
 
 private:
     void onWorkbenchCurrentWidgetChanged();

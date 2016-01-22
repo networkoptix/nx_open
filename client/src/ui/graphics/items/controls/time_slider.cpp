@@ -778,13 +778,6 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
 }
 
-/*
-void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
-    m_bookmarkMergeHelper->setBookmarks(bookmarks);
-    update();
-}
-*/
-
 QnTimeSlider::Options QnTimeSlider::options() const {
     return m_options;
 }
@@ -1244,11 +1237,6 @@ void QnTimeSlider::clearThumbnails() {
     m_thumbnailData.clear();
 }
 
-/*
-QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
-    return m_bookmarkMergeHelper->bookmarksAtPosition(position, m_msecsPerPixel);
-}
-*/
 void QnTimeSlider::freezeThumbnails() {
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();

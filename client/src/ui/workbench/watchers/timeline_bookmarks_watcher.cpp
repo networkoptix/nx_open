@@ -1,6 +1,7 @@
 
 #include "timeline_bookmarks_watcher.h"
 
+#include <utils/camera/bookmark_helpers.h>
 #include <core/resource/camera_resource.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmark_aggregation.h>
@@ -56,6 +57,13 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(qint64 posi
     , qint64 msecdsPerDp)
 {
     return m_mergeHelper->bookmarksAtPosition(position, msecdsPerDp);
+}
+
+QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
+    const QnVirtualCameraResourcePtr &camera
+    , qint64 positionMs)
+{
+    return helpers::bookmarksAtPosition(m_bookmarksCache->bookmarks(camera), positionMs);
 }
 
 void QnTimelineBookmarksWatcher::onWorkbenchCurrentWidgetChanged()

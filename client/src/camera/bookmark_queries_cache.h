@@ -27,7 +27,7 @@ public:
 
     void removeQuery(const QnVirtualCameraResourcePtr &camera);
 
-    void updateQueries(const QnCameraBookmarkSearchFilter &filter);
+    bool updateQueries(const QnCameraBookmarkSearchFilter &filter);
 
     bool updateQuery(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkSearchFilter &filter);

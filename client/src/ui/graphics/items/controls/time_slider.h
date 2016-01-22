@@ -121,8 +121,6 @@ public:
     QnTimePeriodList timePeriods(int line, Qn::TimePeriodContent type) const;
     void setTimePeriods(int line, Qn::TimePeriodContent type, const QnTimePeriodList &timePeriods);
 
-//    void setBookmarks(const QnCameraBookmarkList &bookmarks);
-
     Options options() const;
     void setOptions(Options options);
     void setOption(Option option, bool value);
@@ -192,7 +190,6 @@ public:
 
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
-//    QnCameraBookmarkList bookmarksAtPosition(qint64 position) const;
 
 signals:
     void windowMoved();
@@ -389,7 +386,6 @@ private:
     int m_lineCount;
     qreal m_totalLineStretch;
     QVector<LineData> m_lineData;
-//    QScopedPointer<QnBookmarkMergeHelper> m_bookmarkMergeHelper;
 
     QVector<QnTimeStep> m_steps;
     QVector<TimeStepData> m_stepData;

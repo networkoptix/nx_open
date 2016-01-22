@@ -44,6 +44,11 @@ private:
 signals:
     void bookmarksChanged(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkList &bookmarks);
+
+    void itemAdded(QnWorkbenchItem *item);
+
+    void itemRemoved(QnWorkbenchItem *item);
+
 private:
     typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;
 

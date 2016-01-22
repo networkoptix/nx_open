@@ -6,13 +6,12 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/watchers/current_layout_items_watcher.h>
+#include <ui/utils/workbench_item_helper.h>
 #include <camera/bookmark_queries_cache.h>
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
 #include <utils/common/uuid.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/layout_item_data.h>
 
 namespace
 {
@@ -24,13 +23,6 @@ namespace
         filter.strategy = strategy;
         return filter;
     }
-
-    QnVirtualCameraResourcePtr extractCamera(QnWorkbenchItem *item)
-    {
-        const auto layoutItemData = item->data();
-        const auto id = layoutItemData.resource.id;
-        return qnResPool->getResourceById<QnVirtualCameraResource>(id);
-    };
 };
 
 QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCount
@@ -85,7 +77,9 @@ QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCam
 
 void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)
 {
-    const auto camera = extractCamera(item);
+    emit itemAdded(item);
+
+    const auto camera = helpers::extractCameraResource(item);
 
     if (!camera)
         return;
@@ -105,10 +99,11 @@ void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)
 
 void QnCurrentLayoutBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
 {
+    emit itemRemoved(item);
     const auto layout = workbench()->currentLayout();
     Q_ASSERT_X(layout, Q_FUNC_INFO, "Layout should exist");
 
-    const auto camera = extractCamera(item);
+    const auto camera = helpers::extractCameraResource(item);
     if (!camera)
         return;
 

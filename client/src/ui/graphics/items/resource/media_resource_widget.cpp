@@ -1601,3 +1601,9 @@ qint64 QnMediaResourceWidget::getDisplayTimeUsec() const
     return result;
 }
 
+QnCompositeTextOverlay *QnMediaResourceWidget::compositeTextOverlay()
+{
+    return m_compositeTextOverlay;
+}
+
+
