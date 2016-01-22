@@ -514,6 +514,7 @@ void QnStorageConfigWidget::setServer(const QnMediaServerResourcePtr &server)
         disconnect(m_server, &QnMediaServerResource::backupScheduleChanged, this, nullptr);
 
     m_server = server;
+    m_model->setServer(server);
     restoreCamerasToBackup();
 
     if (m_server)
@@ -915,10 +916,11 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
             m_server
         &&  reply.state == Qn::RebuildState_None
         &&  !hasChanges()
-        &&  any_of(m_model->storages(), [isMainPool](const QnStorageModelInfo &info) {
+        &&  any_of(m_model->storages(), [this, isMainPool](const QnStorageModelInfo &info) {
                 return info.isWritable
                     && info.isBackup != isMainPool
-                    && info.isOnline;
+                    && info.isOnline
+                    && !m_model->storageIsJustAdded(info);   /* Ignoring newly added external storages until Apply pressed. */
             })
         && !backupIsInProgress
     ;

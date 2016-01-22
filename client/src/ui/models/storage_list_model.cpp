@@ -1,6 +1,7 @@
 #include "storage_list_model.h"
 
 #include <core/resource/storage_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <utils/common/collection.h>
 
@@ -24,6 +25,7 @@ namespace {
 
 QnStorageListModel::QnStorageListModel(QObject *parent)
     : base_type(parent)
+    , m_server()
     , m_storages()
     , m_rebuildStatus()
     , m_readOnly(false)
@@ -73,6 +75,21 @@ void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {
 
     beginResetModel();
     m_storages.removeAt(idx);
+    endResetModel();
+}
+
+QnMediaServerResourcePtr QnStorageListModel::server() const
+{
+    return m_server;
+}
+
+void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
+{
+    if (m_server == server)
+        return;
+
+    beginResetModel();
+    m_server = server;
     endResetModel();
 }
 
@@ -150,7 +167,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case UrlColumn:
         {
             QString path = urlPath(storageData.url);
-            if (!storageData.isOnline && storageData.isWritable)
+            if (!storageData.isOnline && storageData.isWritable && !storageIsJustAdded(storageData))
                 return tr("%1 (Checking...)").arg(path);
 
             for (const auto &rebuildStatus: m_rebuildStatus)
@@ -334,7 +351,9 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
         if (isStoragePoolInRebuild(storageData))
             return false;
 
-        return (storageData.isOnline || index.column() == ChangeGroupActionColumn);
+        return (storageData.isOnline
+            || storageIsJustAdded(storageData)
+            ||  index.column() == ChangeGroupActionColumn);
     };
 
 
@@ -376,6 +395,9 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
     }))
         return false;
 
+    /* Newly added storage, still not applied */
+    if (storageIsJustAdded(data))
+        return true;
 
     if (!data.isOnline)
         return false;
@@ -418,6 +440,13 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     return data.isExternal || !data.isWritable;
 }
 
+bool QnStorageListModel::storageIsJustAdded(const QnStorageModelInfo &data) const
+{
+    if (!m_server)
+        return true;
+
+    return m_server->getStorageByUrl(data.url).isNull();
+}
 
 bool QnStorageListModel::isStoragePoolInRebuild( const QnStorageModelInfo& storage ) const
 {
@@ -442,3 +471,4 @@ bool QnStorageListModel::isStorageInRebuild( const QnStorageModelInfo& storage )
     }
     return false;
 }
+
