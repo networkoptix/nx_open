@@ -142,7 +142,7 @@ namespace {
             m_comboBox->addItem(tr("Day"),   3600 * 24);
             m_comboBox->addItem(tr("Week"),  3600 * 24 * 7);
             m_comboBox->addItem(tr("Month"), 3600 * 24 * 30);
-            m_comboBox->addItem(tr("All data"), 0);
+            m_comboBox->addItem(tr("All Data"), 0);
             m_comboBox->setCurrentIndex(m_comboBox->count()-1);
 
             connect(this, &QHeaderView::sectionResized, this, [this]() { updateComboBox();}, Qt::DirectConnection);
@@ -168,7 +168,7 @@ namespace {
                 int width = m_comboBox->minimumSizeHint().width();
                 QRect r(rect);
                 r.adjust(0, 0, -(width + SPACE_INTERVAL), 0);
-                painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the last recorded:"));
+                painter->drawText(r, Qt::AlignRight | Qt::AlignVCenter, tr("Bitrate for the Last Recorded"));
             }
         }
 
