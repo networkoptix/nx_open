@@ -689,7 +689,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
         uncString.replace(lit("/"), lit("\\"));
 
         QString cifsOptionsString =
-            lit("username=%1,password=%2,unc=\\\\%3")
+            lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
                 .arg(url.password())
                 .arg(uncString);
@@ -733,7 +733,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
         }
 
         mkdir(
-            tmpPath.toLatin1().constData(),
+            m_localPath.toLatin1().constData(),
             S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
         );
 
@@ -765,11 +765,11 @@ bool QnFileStorageResource::isStorageDirMounted() const
         else
         {
 #if __linux__
-            umount(tmpPath.toLatin1().constData());
+            umount(m_localPath.toLatin1().constData());
 #elif __APPLE__
-            unmount(tmpPath.toLatin1().constData(), 0);
+            unmount(m_localPath.toLatin1().constData(), 0);
 #endif
-            rmdir(tmpPath.toLatin1().constData());
+            rmdir(m_localPath.toLatin1().constData());
         }
         return true;
     }

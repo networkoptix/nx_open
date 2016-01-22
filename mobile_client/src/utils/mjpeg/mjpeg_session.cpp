@@ -441,7 +441,7 @@ QnMjpegSessionPrivate::ParseResult QnMjpegSessionPrivate::parseBody() {
     parserState = ParseBoundary;
     int framePresentationTimeMSec = previousFrameTimestampUSec > 0 ? (frameTimestampUSec - previousFrameTimestampUSec) / 1000 : 0;
     if (framePresentationTimeMSec > MAX_FRAME_DURATION)
-        framePresentationTimeMSec = 0;
+        framePresentationTimeMSec = MAX_FRAME_DURATION;
 
     if (!previousFrameData.isEmpty())
         decodeFrame(previousFrameData, previousFrameTimestampUSec / 1000, framePresentationTimeMSec);

@@ -42,14 +42,6 @@ static const int MAX_QUEUE_SIZE = 30;
 
 static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
 
-namespace
-{
-    bool isArchiveTimestamp(qint64 timestamp)
-    {
-        return timestamp != (qint64) AV_NOPTS_VALUE && timestamp != (qint64) DATETIME_NOW;
-    }
-}
-
 class QnProgressiveDownloadingDataConsumer: public QnAbstractDataConsumer
 {
 public:
@@ -175,6 +167,18 @@ protected:
         if (media && m_auditHandle)
             qnAuditManager->notifyPlaybackInProgress(m_auditHandle, media->timestamp);
 
+        if (media && !(media->flags & QnAbstractMediaData::MediaFlags_LIVE) && m_continuousTimestamps)
+        {
+            if (m_lastMediaTime != (qint64)AV_NOPTS_VALUE && 
+                media->timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000 &&
+                media->timestamp != (qint64)AV_NOPTS_VALUE && media->timestamp != DATETIME_NOW)
+            {
+                m_utcShift -= (media->timestamp - m_lastMediaTime) - 1000000/60;
+            }
+            m_lastMediaTime = media->timestamp;
+            media->timestamp += m_utcShift;
+        }
+
         QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
 
         QnByteArray* const resultPtr = (m_dataOutput.get() && m_dataOutput->packetsInQueue() > m_maxFramesToCacheBeforeDrop) ? NULL : &result;
@@ -189,7 +193,9 @@ protected:
         if( errCode == 0 )
         {
             if( resultPtr && result.size() > 0 )
+            {
                 sendFrame(media->timestamp, result);
+            }
         }
         else
         {
@@ -205,6 +211,7 @@ private:
     QnProgressiveDownloadingConsumer* m_owner;
     bool m_standFrameDuration;
     qint64 m_lastMediaTime;
+    qint64 m_lastSentTime;
     qint64 m_utcShift;
     std::auto_ptr<CachedOutputStream> m_dataOutput;
     const unsigned int m_maxFramesToCacheBeforeDrop;
@@ -221,16 +228,7 @@ private:
     {
         //Preparing output packet. Have to do everything right here to avoid additional frame copying
         //TODO shared chunked buffer and socket::writev is wanted very much here
-
-        if (isArchiveTimestamp(timestamp) && m_continuousTimestamps)
-        {
-            if (isArchiveTimestamp(m_lastMediaTime) && timestamp - m_lastMediaTime > MAX_FRAME_DURATION*1000)
-            {
-                m_utcShift -= (timestamp - m_lastMediaTime) - 1000000/60;
-            }
-            m_lastMediaTime = timestamp;
-            timestamp += m_utcShift;
-        }
+        Q_ASSERT(timestamp - m_lastSentTime < MAX_FRAME_DURATION * 1000);
 
         QByteArray outPacket;
         if (m_owner->getTranscoder()->getVideoCodecContext()->codec_id == CODEC_ID_MJPEG)

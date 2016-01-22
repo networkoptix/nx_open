@@ -17,6 +17,7 @@ public:
         CamerasAspectRatios,
         ShowOfflineCameras,
         LastUsedQuality,
+        IsSettingsMigrated,
         VariableCount
     };
 
@@ -43,6 +44,7 @@ private:
         QN_DECLARE_RW_PROPERTY(QnAspectRatioHash,           camerasAspectRatios,        setCamerasAspectRatios,     CamerasAspectRatios,        QnAspectRatioHash())
         QN_DECLARE_RW_PROPERTY(bool,                        showOfflineCameras,         setShowOfflineCameras,      ShowOfflineCameras,         true)
         QN_DECLARE_RW_PROPERTY(int,                         lastUsedQuality,            setLastUsedQuality,         LastUsedQuality,            0)
+        QN_DECLARE_RW_PROPERTY(bool,                        isSettingsMigrated,         setSettingsMigrated,        IsSettingsMigrated,         false)
     QN_END_PROPERTY_STORAGE()
 
 private:
