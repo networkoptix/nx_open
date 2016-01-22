@@ -20,7 +20,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>What to backup:</source>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -87,12 +91,12 @@ to view more bookmarks</source>
         <translation>Hónap</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>Minden adat</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>Utolsó felvétel bitrátája:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -169,20 +173,12 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;%n IO module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation type="unfinished">&lt;Minden eszköz&gt;</translation>
     </message>
     <message>
         <source>&lt;Any Camera&gt;</source>
         <translation type="unfinished">&lt;Minden kamera&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any IO Module&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>&lt;All My Devices&gt;</source>
@@ -193,7 +189,19 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&lt;All My IO Modules&gt;</source>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -233,10 +241,6 @@ to view more bookmarks</source>
     <message>
         <source>None</source>
         <translation>Semmi</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">Bezár</translation>
     </message>
 </context>
 <context>
@@ -1379,10 +1383,6 @@ to view more bookmarks</source>
         <translation>Kamera diagnosztika...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation>IO modul diagnosztika...</translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation>Eszközlista</translation>
     </message>
@@ -1407,14 +1407,6 @@ to view more bookmarks</source>
         <translation>Kamerák problémáinak ellenőrzése...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>IO modul problémák ellenőrzése...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>IO modulok problámáinak ellenőrzése...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>Eszköz szabályok...</translation>
     </message>
@@ -1429,14 +1421,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>Kamerák szabályai...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>IO modul szabályok...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>IO modulok szabályai...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1455,14 +1439,6 @@ to view more bookmarks</source>
         <translation>Kamerák beállításai...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>IO modul beállítások...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>IO modulok beállításai...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>Eszközlista szerver szerint...</translation>
     </message>
@@ -1476,10 +1452,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1499,11 +1471,47 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks Search...</source>
+        <source>Add a Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
+        <source>I/O Module Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1579,10 +1587,6 @@ to view more bookmarks</source>
         <translation>Audit napló visszajátszás</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>Ez a forrás már el lett távolítva a rendszerből</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>Kiválasztott felvételek exportálása fájlba</translation>
     </message>
@@ -1601,6 +1605,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>Kamera műveletek</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1752,10 +1760,6 @@ to view more bookmarks</source>
         <translation>Kattintson a kibontáshoz</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>A piros jelzés azt jelenti, hogy egy archívum éppen elérhető</translation>
-    </message>
-    <message>
         <source>Device updated</source>
         <translation>Eszköz frissítve</translation>
     </message>
@@ -1787,6 +1791,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>Kamera név</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1796,21 +1804,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hi-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All streams</source>
-        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1879,10 +1872,6 @@ to view more bookmarks</source>
         <translation>%1 a %n kamerából</translation>
     </message>
     <message>
-        <source>%1 of %n IO modules</source>
-        <translation>%1 a %n IO modulból</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;Minden eszköz&gt;</translation>
     </message>
@@ -1897,6 +1886,10 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">Válasszon legalább egy kamerát</translation>
+    </message>
+    <message>
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2217,10 +2210,6 @@ to view more bookmarks</source>
         <translation>Az IP tartomány több mint 255 címet tartalmaz.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>Keresés befejezése...</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation>Szerver offline lett, keresés megszakítva.</translation>
     </message>
@@ -2295,6 +2284,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation></translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2342,20 +2335,12 @@ to view more bookmarks</source>
         <translation>%1 kamera diagnosztika</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>%1 IO modul diagnosztika</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>Eszköz diagnosztika</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>Kamera diagnosztika</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO modul diagnosztika</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2366,10 +2351,6 @@ to view more bookmarks</source>
         <translation>Kamera hozzáférésének ellenőrzése.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>IO modul hozzáférésének ellenőrzése.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>Céleszköz biztosította  media adatfolyam  ellenőrzése.</translation>
     </message>
@@ -2378,8 +2359,20 @@ to view more bookmarks</source>
         <translation>Cél kamera biztosította  media adatfolyam  ellenőrzése.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>Cél IO modul biztosította  media adatfolyam  ellenőrzése.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2439,16 +2432,16 @@ to view more bookmarks</source>
         <translation>%n kamera megtalálva</translation>
     </message>
     <message>
-        <source>%n IO modules found</source>
-        <translation>%n IO modul megtalálva</translation>
-    </message>
-    <message>
         <source>Export selected devices to a file.</source>
         <translation>Kiválasztott eszközök exportálása fájlba.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>Kiválasztott kamerák exportálása fájlba.</translation>
+    </message>
+    <message>
+        <source>%n I/O modules found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2562,20 +2555,20 @@ to view more bookmarks</source>
         <translation>Figyelem! A magas minimum érték csökkentheti más kamerák rögzítési időtartamát.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Mozgásra rögzítés ki van kapcsolva vagy nem támogatott néhány kiválasztott kamerán. Kérem menjen a mozgás beállítás oldalra, hogy meggyőződjön, hogy támogatott és engedélyezett.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>Dupla adatfolyam nem támogatott a kamera által.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>Dupla adatfolyam és mozgás érzékelés nem elérhető ezen a kamerán.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>Mozgásra rögzítés ki van kapcsolva. Kérem menjen a mozgás beállítás oldalra, hogybeállítsa a kamera mozgás érzékelési területét és érzékenységét.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2621,14 +2614,6 @@ to view more bookmarks</source>
         <translation>Kamerák beállítása</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO modul beállítások</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>IO modulok beállítása</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>Eszköz diagnosztika</translation>
     </message>
@@ -2643,14 +2628,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>Kamerák diagnosztikája</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO modul diagnosztika</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>IO modulok diagnosztikája</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2669,14 +2646,6 @@ to view more bookmarks</source>
         <translation>Kamerák szabályai</translation>
     </message>
     <message>
-        <source>IO Module Rules</source>
-        <translation>IO modul szabályok</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>IO modulok szabályai</translation>
-    </message>
-    <message>
         <source>Apply changes to the following %n devices?</source>
         <translation>Változások alkalmazása a következő %n eszközre?</translation>
     </message>
@@ -2685,12 +2654,36 @@ to view more bookmarks</source>
         <translation>Változások alkalmazása a következő %n kamerára?</translation>
     </message>
     <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>Változások alkalmazása a következő %n IO modulra?</translation>
-    </message>
-    <message>
         <source>Changes are not saved</source>
         <translation>A változások nincsenek elmentve</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2889,15 +2882,15 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Actions will only work for Generic Events that pass all filters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Empty fields do not affect results.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Each filter will pass if any keyword in a field is matched.</source>
+        <source>Actions will only work for Generic Events that are not filtered out.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will not be filtered out if any keyword in a field is matched.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2976,8 +2969,8 @@ to view more bookmarks</source>
         <translation>Biztos benne, hogy szeretné visszaállítani az adatbázist? Minden meglévő adat el fog veszni.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>Biztonsági mentés készítéséhez előbb csatlakozzon a szerverhez.</translation>
+        <source>You need to connect to a server prior to start backup.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3296,27 +3289,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>Riasztás/Eseméy/Szabály kezelő megnyitása...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>Eseménylista megnyitása...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>Eszközlista megnyitása...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>Kamera lista megnyitása...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3335,8 +3332,8 @@ to view more bookmarks</source>
         <translation>Fontos teljesítményjavító tipp</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>Ez a kliens összeonlásához vezethet.</translation>
+        <source>This may result in issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3507,10 +3504,6 @@ to view more bookmarks</source>
         <translation>Exportálás &quot;%1&quot; fájlba...</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>&apos;%1.&apos; fájl létrehozása sikertelen.</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>%1 eszközt nem lehet exportálni.</translation>
@@ -3520,11 +3513,15 @@ to view more bookmarks</source>
         <translation>%1 kamerát nem lehet exportálni.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>%1 IO modult nem lehet exportálni.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error has occurred.</source>
+        <source>Could not create output file %1..</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3591,12 +3588,12 @@ to view more bookmarks</source>
         <translation>Nem lehet a tesztet végrehajtani.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>Egyik szerver sem csatlakozik az internetre.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>Lejárt az idő</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">Lejárt az idő</translation>
     </message>
 </context>
 <context>
@@ -3629,10 +3626,6 @@ to view more bookmarks</source>
         <translation>Nem lehet a tesztet végrehajtani.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>Egyik szerver sem csatlakozik az internetre.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>Nem lehet a felhasználókat betötlteni.</translation>
     </message>
@@ -3641,16 +3634,20 @@ to view more bookmarks</source>
         <translation>Felhasználók importálása</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>Lejárt az idő</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>Hiba a felhasználók importálása közben.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation>Nem található új felhasználó.</translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">Lejárt az idő</translation>
     </message>
 </context>
 <context>
@@ -3919,8 +3916,8 @@ to view more bookmarks</source>
         <translation>Licencek használata a kiválasztott %n kamerához</translation>
     </message>
     <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>Licencek használata a kiválasztott %n IO modulhoz</translation>
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4100,16 +4097,16 @@ to view more bookmarks</source>
         <translation>%1 (túra %2 aktív)</translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation>IO modul</translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation>Zoom ablak</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation>Alacsony felbontás</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4421,20 +4418,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kamera megnyitása</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>IO modul megnyitása</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>Eszköz beállítások...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>Kamera beállítások...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>IO modul beállítások...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
@@ -4445,15 +4434,23 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kamera weboldal megnyitása...</translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>IO modul weboldal megnyitása...</translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4468,8 +4465,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A teljes funkciós módhoz kérem használjon másik számítógépet.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>Figyelem</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">Figyelem!</translation>
     </message>
 </context>
 <context>
@@ -4521,16 +4518,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnPtzManageDialog</name>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Hiba történt a %1 kamera jelenlegi pozíciójának beolvasása közben.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Hiba történt a %1 kamera jelenlegi pozíciójának beállítása közben.</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
@@ -4557,16 +4546,24 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Preset eltávolítása</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>%1. PTZ kezelése.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>A PTZ konfiguráció nincs elmentve.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>A változások nincsenek elmentve. Szeretné menteni őket?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1..</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4814,10 +4811,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>kevesebb mint egy óra</translation>
     </message>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>Az archivált időszak naptári napokban az első felvétel és a jelenlegi pillanat között</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>Átlagos bitráta a felvett időszakhoz</translation>
     </message>
@@ -4854,10 +4847,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Összes %n kamera</translation>
     </message>
     <message>
-        <source>Total %n IO modules</source>
-        <translation>Összes %n IO modul</translation>
-    </message>
-    <message>
         <source>Devices with non-empty archive</source>
         <translation>Eszközök nem üres archívummal</translation>
     </message>
@@ -4883,6 +4872,14 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5053,6 +5050,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Camera</source>
         <translation type="unfinished">Kamera</translation>
     </message>
+    <message>
+        <source>&lt;Removed camera&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5118,11 +5119,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Szerver nincs mentve</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>Változások alkalmazása a szerverre - %1?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5157,12 +5158,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Ez a szerver már a maximumnál több kamerát tartalmaz</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>A hibás működés elkerülése végett állítsa be az eszközök maximális számát</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>A hibás működés elkerülése végett állítsa be az kamerák maximális számát</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5379,10 +5380,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kérem frissítse a kliens manuálisan a telepítő csomag használatával.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>Frissítés sikerült.</translation>
-    </message>
-    <message>
         <source>Launcher process not found.</source>
         <translation>Az indító folyamat nem található.</translation>
     </message>
@@ -5407,26 +5404,30 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem elérhető ilyen verzió a frissítés szerveren.</translation>
     </message>
     <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>Nem lehet elindítani a frissítést. Egy frissítés egy vagy több szerverhez nem található.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>Nem lehet elindítani a frissítést. Egy frissítés a klienshez nem található.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>Nem lehet kicsomagolni a frissítő fájét.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>Nem lehet elindítani a frissítést. Visszaállítás az előző kiadásra tiltott.</translation>
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
         <translation type="unfinished">
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5440,6 +5441,16 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished">
             <numerusform>%n Felhasználó(k)</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5463,10 +5474,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 </context>
 <context>
     <name>QnSingleCameraSettingsWidget</name>
-    <message>
-        <source>Invalid schedule</source>
-        <translation>Érvénytelen ütemzés</translation>
-    </message>
     <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>A másodlagos stream ki van kapcsolva a kamerában. Mozgás + Alacsony minőségű rögzítés nem működik. &quot;Igen&quot; a rögzítési típus megváltoztatásához vagy &quot;Nem&quot; a másodlagos stream engedélyezéséhez.</translation>
@@ -5512,8 +5519,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kamera beállítások</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO modul beállítások</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">Érvénytelen ütemzés</translation>
     </message>
 </context>
 <context>
@@ -5549,16 +5560,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished">Érvénytelen adat</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">A megadott paraméterek nem érvényesek. Nem lehet a tesztet végrehajtani.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">Hálózati hiba</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">Nem lehet a tesztet végrehajtani. Egyik szerver sem csatlakozik az Internethez.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5582,6 +5585,14 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Success</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provided parameters are not valid. Could not perform test.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5655,24 +5666,12 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kérem ellenőrizze a hitelesítési információkat a kamera beállításokban</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>Kérem ellenőrizze a hitelesítési információkat az IO modul beállításokban</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Figyelem</translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">Ön az archívum újra-szinkronizálását indítja.</translation>
@@ -5680,10 +5679,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">FIGYELEM! A merevlemez terheltsége az újra-szinkronizálási folyamat alatt meg fog növegedni! Az archívum teljes méretétől függően ez néhány órát is igénybe vehet.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">A folyamat csak akkor szükséges, ha az archív mappákat áthelyezte, átnevezte vagy felülírta. Az újraépítési folyamatot bármikor leállíthatja adatvesztés nélkül.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5730,32 +5725,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 are selected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>In Real-Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notice: Only data from this point forward will be backed up. Existing archives will be ignored.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive has been successfully backup until: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No devices selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5764,7 +5733,66 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your archive has been successfully backed up.</source>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Figyelem!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup complete until: %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5806,6 +5834,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>%1 (Rebuilding... %2%)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Beolvasás...</translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
@@ -5846,16 +5878,16 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A rendszerben más szerver is használja ezt a hálózati adattárolót. Adatok rögzítése több szerverről ugyan arra a helyre nem ajánlott.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>Figyelem</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>Adattároló hozzáadása</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation>A megadott tárhely útvonal egy nem érvényes külső adattárolóra mutat.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Figyelem!</translation>
     </message>
 </context>
 <context>
@@ -5976,14 +6008,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5997,6 +6021,14 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6657,12 +6689,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         </translation>
     </message>
     <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>Nem lehet ezt a %n IO modult áthelyezni a %1 szerverre. Szerver nem válaszol.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
         <translation>
             <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n eszközhöz. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
@@ -6672,12 +6698,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
         <translation>
             <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n kamerához. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>%1 szerever nem találja és nem fér hozzá ehhez a %n IO modulhoz. Biztos benne, hogy szeretné eltávolítani őket?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6701,20 +6721,12 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ez a %n IO modul automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
-    </message>
-    <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
-    </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ezekből az IO modulokból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
@@ -6724,15 +6736,35 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Do you really want to delete the following %n cameras?</source>
         <translation>Biztos benne, hogy törölni szeretné a következő %n kamerát?</translation>
     </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>Biztos benne, hogy törölni szeretné a következő %n IO modult?</translation>
-    </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation>
             <numerusform>Biztos benne, hogy törölni szeretné a következő %n elemet?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6861,10 +6893,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         </translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>Egy 30 percnél hosszabb videószekvencia exportálását választotta.</translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation>Több mint egy gigabájt HDD helyre is szükség lehet és a számítógép kapcsolati sebességétől függően a befejezésre akár több percet is szükség lehet.</translation>
     </message>
@@ -6931,10 +6959,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     <message>
         <source>%1 Media File (*.nov)</source>
         <translation>%1 media fájl (*.nov)</translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>Több 30 percet meghaladó video szekvencia exportálását választotta.</translation>
     </message>
     <message>
         <source>exported</source>
@@ -7016,6 +7040,14 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7060,10 +7092,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <translation>Nem lehet frissíteni a kiválasztott szervereket.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation>Megpróbálhatja újra frissíteni a szervereket a Rendszer Adminisztrációban.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
@@ -7072,10 +7100,6 @@ If you understand this and would like to proceed please click Merge to continue.
 Mivel rendszerenként 1 START licenc engedélyezett, az összevonás után 1 START licence fog maradni.
 Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra a folytatáshoz.
 </translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Figyelem</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -7088,6 +7112,14 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation>A választott szerverek sikeresen hozzáadva a rendszerhez!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Figyelem!</translation>
     </message>
 </context>
 <context>
@@ -7196,8 +7228,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Összes kamera</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>Összes IO modul</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7223,12 +7255,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Nem lehet a kamera pozíciót betölteni.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>Nem lehet pozíciót beállítani a kamerához.</translation>
-    </message>
-    <message>
-        <source>Unable to set position of camera.</source>
-        <translation>Nem lehet a kamera pozícióját beállítani.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7463,14 +7491,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Videofal bezárásának megerősítése</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>Biztos benne, hogy be szeretné zárni a videofalat?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>Manuálisan kell elindítani.</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>Új mátrix %1</translation>
     </message>
@@ -7500,10 +7520,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>A control session is already running.</source>
         <translation>A munkamenet már fut.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>Váratlan hiba történt. A változások nem lettek elmentve.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7536,6 +7552,18 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>%n items</source>
         <translation>%n elem</translation>
+    </message>
+    <message>
+        <source>Changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
