@@ -6,9 +6,11 @@
 #ifndef NX_CUSTOM_STUN_H
 #define NX_CUSTOM_STUN_H
 
+#include <nx/network/cloud/data/result_code.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/uuid.h>
+
 
 namespace nx {
 namespace stun {
@@ -27,10 +29,14 @@ namespace methods
          *  Request: SystemId, ServerId, PublicEndpointList */
         bind,
 
-        // TODO: specify bahavior
+        /** Notifies mediator that server is ready to accept cloud connections */
         listen,
 
-        resolve,    //!< Returns host's public address list and suitable connections methods
+        /** server uses this request to confirm its willingness to proceed with cloud connection */
+        connectionAck,
+
+        /** Returns host's public address list and suitable connections methods */
+        resolve,
 
         /** Initiate connection to some mediaserver
          *  Request: \class PeerId, \class HostName, \class ConnectionId
@@ -42,7 +48,7 @@ namespace methods
         connectionResult,
     };
 
-    nx::String toString(Value val);
+    NX_NETWORK_API nx::String toString(Value val);
 }
 
 namespace indications
@@ -78,7 +84,9 @@ namespace attrs
 {
     enum AttributeType
     {
-        systemId = stun::attrs::userDefined,
+        resultCode = stun::attrs::userDefined,
+
+        systemId,
         serverId,
         peerId,
         connectionId,
@@ -99,6 +107,20 @@ namespace attrs
     struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
     {
         StringAttribute( int userType, const String& value = String() );
+    };
+
+    struct NX_NETWORK_API ResultCode: stun::attrs::IntAttribute
+    {
+        static const AttributeType TYPE = resultCode;
+
+        ResultCode(const nx::hpm::api::ResultCode& value)
+            : stun::attrs::IntAttribute(TYPE, static_cast<int>(value)) {}
+
+        nx::hpm::api::ResultCode value() const
+        {
+            return static_cast<nx::hpm::api::ResultCode>(
+                stun::attrs::IntAttribute::value());
+        }
     };
 
     struct NX_NETWORK_API SystemId : StringAttribute

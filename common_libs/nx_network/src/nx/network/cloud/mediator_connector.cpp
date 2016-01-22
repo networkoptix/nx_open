@@ -8,15 +8,15 @@
 static const std::chrono::milliseconds RETRY_INTERVAL = std::chrono::minutes( 10 );
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
 MediatorConnector::MediatorConnector()
     : m_isTerminating( false )
     , m_stunClient(std::make_shared<stun::AsyncClient>())
     , m_endpointFetcher(
         lit( "hpm" ),
-        std::make_unique<RandomEndpointSelector>() )
+        std::make_unique<nx::network::cloud::RandomEndpointSelector>() )
     , m_timerSocket( SocketFactory::createStreamSocket() )
 {
 }
@@ -40,16 +40,16 @@ void MediatorConnector::enable( bool waitComplete )
         m_promise->get_future().wait();
 }
 
-std::shared_ptr<MediatorClientConnection> MediatorConnector::clientConnection()
+std::shared_ptr<MediatorClientTcpConnection> MediatorConnector::clientConnection()
 {
-    return std::shared_ptr<MediatorClientConnection>(
-                new MediatorClientConnection( m_stunClient ) );
+    return std::shared_ptr<MediatorClientTcpConnection>(
+                new MediatorClientTcpConnection( m_stunClient ) );
 }
 
-std::shared_ptr<MediatorSystemConnection> MediatorConnector::systemConnection()
+std::shared_ptr<MediatorServerTcpConnection> MediatorConnector::systemConnection()
 {
-    return std::shared_ptr<MediatorSystemConnection>(
-                new MediatorSystemConnection( m_stunClient, this ) );
+    return std::shared_ptr<MediatorServerTcpConnection>(
+                new MediatorServerTcpConnection( m_stunClient, this ) );
 }
 
 void MediatorConnector::mockupAddress( SocketAddress address )
@@ -70,30 +70,6 @@ void MediatorConnector::mockupAddress( SocketAddress address )
     m_promise->set_value( true );
 }
 
-
-MediatorConnector::SystemCredentials::SystemCredentials()
-{
-}
-
-MediatorConnector::SystemCredentials::SystemCredentials(
-    nx::String _systemId,
-    nx::String _serverId,
-    nx::String _key)
-:
-    systemId(std::move(_systemId)),
-    serverId(std::move(_serverId)),
-    key(std::move(_key))
-{
-}
-
-bool MediatorConnector::SystemCredentials::operator ==( const SystemCredentials& rhs ) const
-{
-    return serverId == rhs.serverId &&
-           systemId == rhs.systemId &&
-           key      == rhs.key;
-}
-
-
 void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials> value )
 {
     bool needToReconnect = false;
@@ -110,8 +86,7 @@ void MediatorConnector::setSystemCredentials( boost::optional<SystemCredentials>
         m_stunClient->closeConnection( SystemError::connectionReset );
 }
 
-boost::optional<MediatorConnector::SystemCredentials>
-    MediatorConnector::getSystemCredentials()
+boost::optional<SystemCredentials> MediatorConnector::getSystemCredentials() const
 {
     QnMutexLocker lk( &m_mutex );
     return m_credentials;
@@ -156,6 +131,6 @@ void MediatorConnector::fetchEndpoint()
     });
 }
 
-} // namespace cloud
-} // namespace network
+} // namespace api
+} // namespace hpm
 } // namespace nx

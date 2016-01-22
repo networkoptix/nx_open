@@ -54,6 +54,7 @@ public:
     virtual nx::network::TransportProtocol transportProtocol() const override;
     virtual SocketAddress getSourceAddress() const override;
     virtual void addOnConnectionCloseHandler(std::function<void()> handler) override;
+    virtual AbstractCommunicatingSocket* socket() override;
 
     void processMessage(Message message);
     void setDestructHandler(std::function< void() > handler = nullptr);

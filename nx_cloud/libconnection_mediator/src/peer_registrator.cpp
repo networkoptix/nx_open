@@ -32,7 +32,13 @@ PeerRegistrator::PeerRegistrator(
         dispatcher->registerRequestProcessor(
             stun::cc::methods::listen,
             [this](const ConnectionStrongRef& connection, stun::Message message)
-                { listen( std::move(connection), std::move( message ) ); } ) &&
+            {
+                processRequestWithNoOutput(
+                    &PeerRegistrator::listen,
+                    this,
+                    std::move(connection),
+                    std::move(message));
+            } ) &&
 
         dispatcher->registerRequestProcessor(
             stun::cc::methods::resolve,
@@ -49,25 +55,31 @@ PeerRegistrator::PeerRegistrator(
     Q_ASSERT_X(result, Q_FUNC_INFO, "Could not register one of processors");
 }
 
-void PeerRegistrator::bind(const ConnectionStrongRef& connection,
-                             stun::Message message)
+void PeerRegistrator::bind(
+    const ConnectionStrongRef& connection,
+    stun::Message message)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
             connection,
             message.header,
+            api::ResultCode::badTransport,
             stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
     const auto mediaserverData = getMediaserverData(connection, message);
     if (!static_cast<bool>(mediaserverData))
     {
-        sendErrorResponse(connection, message.header, stun::error::badRequest,
+        sendErrorResponse(
+            connection,
+            message.header,
+            api::ResultCode::notAuthorized,
+            stun::error::badRequest,
             "No mediaserver data in request");
         return;
     }
 
-    auto peerDataLocker = m_listeningPeerPool->findAndLockPeerData(
+    auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
         connection,
         *mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
@@ -83,44 +95,51 @@ void PeerRegistrator::bind(const ConnectionStrongRef& connection,
         .arg(containerString(peerDataLocker.value().endpoints)), cl_logDEBUG1);
 
     sendSuccessResponse(connection, message.header);
-
 }
 
-void PeerRegistrator::listen(const ConnectionStrongRef& connection,
-                               stun::Message message)
+void PeerRegistrator::listen(
+    const ConnectionStrongRef& connection,
+    api::ListenRequest requestData,
+    stun::Message message,
+    std::function<void(api::ResultCode)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
-        return sendErrorResponse(
-            connection,
-            message.header,
-            stun::error::badRequest,
-            "Only tcp is allowed for listen request");
+        return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
 
+    //TODO #ak make authentication centralized
     const auto mediaserverData = getMediaserverData(connection, message);
     if (!static_cast<bool>(mediaserverData))
     {
-        sendErrorResponse(connection, message.header, stun::error::badRequest,
-            "No mediaserver data in request");
+        sendErrorResponse(
+            connection,
+            message.header,
+            api::ResultCode::notAuthorized,
+            stun::error::badRequest,
+            "Bad system credentials supplied");
         return;
     }
 
-    auto peerDataLocker = m_listeningPeerPool->findAndLockPeerData(
+    auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
         connection,
-        *mediaserverData);
+        MediaserverData(
+            requestData.systemId,
+            requestData.serverId));
+
     peerDataLocker.value().isListening = true;
+    peerDataLocker.value().connectionMethods |= api::ConnectionMethod::udpHolePunching;
 
     NX_LOGX(lit("Peer %1.%2 started to listen")
-        .arg(QString::fromUtf8(mediaserverData->systemId))
-        .arg(QString::fromUtf8(mediaserverData->serverId)),
+        .arg(QString::fromUtf8(requestData.systemId))
+        .arg(QString::fromUtf8(requestData.serverId)),
         cl_logDEBUG1);
 
-    sendSuccessResponse(connection, message.header);
-
+    completionHandler(api::ResultCode::ok);
 }
 
 void PeerRegistrator::resolve(
     const ConnectionStrongRef& connection,
     api::ResolveRequest requestData,
+    stun::Message /*message*/,
     std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
     auto peerDataLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(
@@ -153,63 +172,6 @@ void PeerRegistrator::resolve(
     completionHandler(api::ResultCode::ok, std::move(responseData));
 
 }
-
-//void PeerRegistrator::connect(const ConnectionStrongRef& connection,
-//                                stun::Message message )
-//{
-//    const auto userNameAttr = message.getAttribute< stun::cc::attrs::PeerId >();
-//    if( !userNameAttr )
-//        return sendErrorResponse( connection, message.header, stun::error::badRequest,
-//            "Attribute ClientId is required" );
-//
-//    const auto hostNameAttr = message.getAttribute< stun::cc::attrs::HostName >();
-//    if( !hostNameAttr )
-//        return sendErrorResponse( connection, message.header, stun::error::badRequest,
-//            "Attribute HostName is required" );
-//
-//    const auto userName = userNameAttr->getString();
-//    const auto hostName = hostNameAttr->getString();
-//
-//    QnMutexLocker lk( &m_mutex );
-//    if (const auto peer = m_peers.search(hostName))
-//    {
-//        stun::Message response( stun::Header(
-//            stun::MessageClass::successResponse, message.header.method,
-//            std::move( message.header.transactionId ) ) );
-//
-//        if( !peer->endpoints.empty() )
-//            response.newAttribute< stun::cc::attrs::PublicEndpointList >( peer->endpoints );
-//
-//        if( !peer->isListening )
-//            { /* TODO: StunEndpointList */ }
-//
-//        NX_LOGX( lit("Client %1 connects to %2, endpoints=%3")
-//                .arg( QString::fromUtf8( userName ) )
-//                .arg( QString::fromUtf8( hostName ) )
-//                .arg( containerString( peer->endpoints ) ), cl_logDEBUG1 );
-//
-//        connection->sendMessage(std::move(response));
-//    }
-//    else
-//    {
-//        NX_LOGX( lit("Client %1 connects to %2, error: unknown host")
-//                .arg( QString::fromUtf8( userName ) )
-//                .arg( QString::fromUtf8( hostName ) ), cl_logDEBUG1 );
-//
-//        sendErrorResponse( connection, message.header, stun::cc::error::notFound,
-//            "Unknown host: " + hostName );
-//    }
-//}
-
-//void PeerRegistrator::connectionResult(
-//    const ConnectionStrongRef& /*connection*/,
-//    api::ConnectionResultRequest /*request*/,
-//    std::function<void(api::ResultCode)> completionHandler)
-//{
-//    //TODO #ak
-//    completionHandler(api::ResultCode::ok);
-//}
-//
 
 } // namespace hpm
 } // namespace nx

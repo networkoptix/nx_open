@@ -29,7 +29,7 @@ public:
     { return s_instance->m_addressPublisher; }
 
     inline static
-    cloud::MediatorConnector& mediatorConnector()
+    hpm::api::MediatorConnector& mediatorConnector()
     { return *s_instance->m_mediatorConnector; }
 
     inline static
@@ -65,7 +65,7 @@ private:
     std::shared_ptr< QnLog::Logs > m_log;
     aio::AIOService m_aioService;
 
-    std::unique_ptr<cloud::MediatorConnector> m_mediatorConnector;
+    std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
     cloud::TunnelPool m_cloudTunnelPool;

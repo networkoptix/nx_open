@@ -166,9 +166,9 @@ public:
     */
     virtual void dispatch(std::function<void()> handler) = 0;
 
-    //!Returns AIOThread pointer to which this socket is bound to
+    //!Returns pointer to AIOThread this socket is bound to
     /*!
-        \note if socket is not boud to any thread yet, binds it automaticly
+        \note if socket is not bound to any thread yet, binds it automatically
     */
     virtual aio::AbstractAioThread* getAioThread() = 0;
 

@@ -50,7 +50,7 @@ void AsyncClientUser::sendRequest(Message request,
         std::move(wrapper), shared_from_this(), std::move(handler), _1, _2));
 }
 
-bool AsyncClientUser::monitorIndications(int method,
+bool AsyncClientUser::setIndicationHandler(int method,
                                          AsyncClient::IndicationHandler handler)
 {
     auto wrapper = [method](const std::shared_ptr<AsyncClientUser>& self,
@@ -68,8 +68,10 @@ bool AsyncClientUser::monitorIndications(int method,
     };
 
     using namespace std::placeholders;
-    return m_client->monitorIndications(method,std::bind(
-        std::move(wrapper), shared_from_this(), std::move(handler), _1));
+    return m_client->setIndicationHandler(
+        method,
+        std::bind(
+            std::move(wrapper), shared_from_this(), std::move(handler), _1));
 }
 
 bool AsyncClientUser::startOperation()

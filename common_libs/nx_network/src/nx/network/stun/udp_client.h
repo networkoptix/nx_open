@@ -38,6 +38,7 @@ public:
     static const int kDefaultMaxRetransmissions;
 
     UDPClient();
+    UDPClient(SocketAddress serverAddress);
 
     virtual void pleaseStop(std::function<void()> handler) override;
 
@@ -46,12 +47,16 @@ public:
         \param completionHandler \a response is valid only if \a errorCode is 
             \a SystemError::noError. MUST not be NULL
     */
-    void sendRequest(
+    void sendRequestTo(
         SocketAddress serverAddress,
         Message request,
         RequestCompletionHandler completionHandler);
+    /** This overload can be used if target endpoint has been supplied through constructor */
+    void sendRequest(
+        Message request,
+        RequestCompletionHandler completionHandler);
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket() const;
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
     /** If not called, any vacant local port will be used */
     bool bind(const SocketAddress& localAddress);
     SocketAddress localAddress() const;
@@ -89,6 +94,7 @@ private:
     int m_maxRetransmissions;
     //map<transaction id, request data>
     std::map<nx::Buffer, RequestContext> m_ongoingRequests;
+    const SocketAddress m_serverAddress;
 
     virtual void messageReceived(SocketAddress sourceAddress, Message mesage) override;
     virtual void ioFailure(SystemError::ErrorCode) override;

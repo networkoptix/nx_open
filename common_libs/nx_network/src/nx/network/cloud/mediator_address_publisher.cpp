@@ -11,7 +11,7 @@ const TimerDuration MediatorAddressPublisher::DEFAULT_UPDATE_INTERVAL
     = std::chrono::minutes( 10 );
 
 MediatorAddressPublisher::MediatorAddressPublisher(
-        std::shared_ptr< MediatorSystemConnection > mediatorConnection)
+        std::shared_ptr< hpm::api::MediatorServerTcpConnection > mediatorConnection)
     : m_updateInterval( DEFAULT_UPDATE_INTERVAL )
     , m_state( State::kInit )
     , m_timerSocket( SocketFactory::createStreamSocket() )
@@ -63,23 +63,27 @@ void MediatorAddressPublisher::pingReportedAddresses( QnMutexLockerBase* lk )
 
     auto addresses = m_reportedAddresses;
     lk->unlock();
-    m_mediatorConnection->ping( std::move(addresses),
-                                [this](bool success, std::list<SocketAddress> addrs)
-    {
-        QnMutexLocker lk( &m_mutex );
-        if( !success )
+    m_mediatorConnection->ping(
+        nx::hpm::api::PingRequest(std::move(addresses)),
+        [this](
+            nx::hpm::api::ResultCode resultCode,
+            nx::hpm::api::PingResponse responseData)
         {
-            m_pingedAddresses.clear();
-            m_publishedAddresses.clear();
-            return setupUpdateTimer( &lk );
-        }
+            QnMutexLocker lk( &m_mutex );
 
-        m_pingedAddresses = std::move(addrs);
-        NX_LOGX( lm( "Pinged addresses: %1" )
-                 .container( m_publishedAddresses ), cl_logDEBUG1 );
+            if (resultCode != nx::hpm::api::ResultCode::ok)
+            {
+                m_pingedAddresses.clear();
+                m_publishedAddresses.clear();
+                return setupUpdateTimer( &lk );
+            }
 
-        publishPingedAddresses( &lk );
-    } );
+            m_pingedAddresses = std::move(responseData.endpoints);
+            NX_LOGX( lm( "Pinged addresses: %1" )
+                     .container( m_publishedAddresses ), cl_logDEBUG1 );
+
+            publishPingedAddresses( &lk );
+        });
 }
 
 void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
@@ -90,7 +94,7 @@ void MediatorAddressPublisher::publishPingedAddresses( QnMutexLockerBase* lk )
     auto addresses = m_pingedAddresses;
     lk->unlock();
     m_mediatorConnection->bind(
-        std::move(addresses),
+        nx::hpm::api::BindRequest(std::move(addresses)),
         [this](nx::hpm::api::ResultCode resultCode)
         {
             QnMutexLocker lk( &m_mutex );

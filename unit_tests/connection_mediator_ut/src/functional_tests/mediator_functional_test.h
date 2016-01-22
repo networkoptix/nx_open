@@ -14,6 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/socket_common.h>
 
 #include <cloud_data_provider.h>
@@ -21,7 +22,6 @@
 
 #include "local_cloud_data_provider.h"
 #include "mediaserver_emulator.h"
-#include "mediator_connector.h"
 
 
 namespace nx {
@@ -47,8 +47,8 @@ public:
 
     SocketAddress endpoint() const;
 
-    std::shared_ptr<nx::network::cloud::MediatorClientConnection> clientConnection();
-    std::shared_ptr<nx::network::cloud::MediatorSystemConnection> systemConnection();
+    std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> clientConnection();
+    std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> systemConnection();
 
     void registerCloudDataProvider(AbstractCloudDataProvider* cloudDataProvider);
 
@@ -56,6 +56,8 @@ public:
     std::unique_ptr<MediaServerEmulator> addServer(
         const AbstractCloudDataProvider::System& system,
         nx::String name);
+    std::unique_ptr<MediaServerEmulator> addRandomServer(
+        const AbstractCloudDataProvider::System& system);
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count);

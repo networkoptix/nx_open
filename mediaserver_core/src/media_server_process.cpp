@@ -2301,7 +2301,7 @@ void MediaServerProcess::run()
         auto cloudAuthKey = admin->getProperty(Qn::CLOUD_SYSTEM_AUTH_KEY);
         if (!cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty())
         {
-            nx::network::cloud::MediatorConnector::SystemCredentials credentials(
+            nx::hpm::api::SystemCredentials credentials(
                 QnUuid(cloudSystemId).toSimpleString().toUtf8(),
                 qnCommon->moduleGUID().toSimpleString().toUtf8(),
                 cloudAuthKey.toUtf8());

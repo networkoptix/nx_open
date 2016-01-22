@@ -28,7 +28,8 @@ class ListeningPeerPool;
 /** Registers peers which desire to accept cloud connections, resolves such peers address.
  */
 class PeerRegistrator
-        : protected RequestProcessor
+:
+    protected RequestProcessor
 {
 public:
     PeerRegistrator(
@@ -41,19 +42,14 @@ public:
         stun::Message message);
     void listen(
         const ConnectionStrongRef& connection,
-        stun::Message message);
+        api::ListenRequest requestData,
+        stun::Message message,
+        std::function<void(api::ResultCode)> completionHandler);
     void resolve(
         const ConnectionStrongRef& connection,
         api::ResolveRequest request,
+        stun::Message message,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
-    //void connect(
-    //    const ConnectionStrongRef& connection,
-    //    stun::Message message);
-
-    //void connectionResult(
-    //    const ConnectionStrongRef& connection,
-    //    api::ConnectionResultRequest request,
-    //    std::function<void(api::ResultCode)> completionHandler);
 
 private:
     ListeningPeerPool* const m_listeningPeerPool;

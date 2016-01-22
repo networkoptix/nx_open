@@ -138,7 +138,7 @@ TEST_F(StunUDP, client_test_sync)
         nx::stun::Message response;
         std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
             std::bind(
-                &UDPClient::sendRequest,
+                &UDPClient::sendRequestTo,
                 &client,
                 anyServerEndpoint(),
                 requestMessage,
@@ -175,7 +175,7 @@ TEST_F(StunUDP, client_test_async)
             std::unique_lock<std::mutex> lk(mutex);
             expectedTransactionIDs.insert(requestMessage.header.transactionId);
         }
-        client.sendRequest(
+        client.sendRequestTo(
             anyServerEndpoint(),
             std::move(requestMessage),
             [&mutex, &cond, &expectedTransactionIDs](
@@ -223,7 +223,7 @@ TEST_F(StunUDP, client_retransmits_general)
     nx::stun::Message response;
     std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
         std::bind(
-            &UDPClient::sendRequest,
+            &UDPClient::sendRequestTo,
             &client,
             anyServerEndpoint(),
             requestMessage,
@@ -259,7 +259,7 @@ TEST_F(StunUDP, client_retransmits_max_retransmits)
     nx::stun::Message response;
     std::tie(errorCode, response) = makeSyncCall<SystemError::ErrorCode, Message>(
         std::bind(
-            &UDPClient::sendRequest,
+            &UDPClient::sendRequestTo,
             &client,
             anyServerEndpoint(),
             requestMessage,
@@ -297,7 +297,7 @@ TEST_F(StunUDP, client_cancellation)
     for (int i = 0; i < REQUESTS_TO_SEND; ++i)
     {
         requestMessage.header.transactionId = Header::makeTransactionId();
-        client.sendRequest(
+        client.sendRequestTo(
             anyServerEndpoint(),
             requestMessage,
             completionHandler);

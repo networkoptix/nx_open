@@ -19,14 +19,16 @@ namespace nx {
 namespace hpm {
 namespace api {
 
+/** [connection_mediator, 4.3.5] */
 class NX_NETWORK_API ConnectRequest
 :
     public StunMessageData
 {
 public:
+    //TODO #ak destinationHostName MUST be unicode string (e.g., QString)
     nx::String destinationHostName;
     nx::String originatingPeerID;
-    QnUuid connectSessionGuid;
+    nx::String connectSessionID;
     ConnectionMethods connectionMethods;
 
     ConnectRequest();

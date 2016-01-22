@@ -45,10 +45,21 @@ UDPClient::UDPClient()
 {
 }
 
+//TODO #ak #msvc2015 delegating constructor
+UDPClient::UDPClient(SocketAddress serverAddress)
+:
+    m_receivingMessages(false),
+    m_messagePipeline(this),
+    m_retransmissionTimeout(kDefaultRetransmissionTimeOut),
+    m_maxRetransmissions(kDefaultMaxRetransmissions),
+    m_serverAddress(std::move(serverAddress))
+{
+}
+
 void UDPClient::pleaseStop(std::function<void()> handler)
 {
     m_messagePipeline.pleaseStop(
-        [/*std::move*/ handler, this](){  //TODO #ak #msvc2015
+        [/*std::move*/ handler, this](){  //TODO #ak #msvc2015 move to lambda
             //reporting failure for all ongoing requests
             std::vector<RequestCompletionHandler> completionHandlers;
             for (const auto& requestData: m_ongoingRequests)
@@ -67,12 +78,12 @@ void UDPClient::pleaseStop(std::function<void()> handler)
         });
 }
 
-const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket() const
+const std::unique_ptr<AbstractDatagramSocket>& UDPClient::socket()
 {
     return m_messagePipeline.socket();
 }
 
-void UDPClient::sendRequest(
+void UDPClient::sendRequestTo(
     SocketAddress serverAddress,
     Message request,
     RequestCompletionHandler completionHandler)
@@ -83,6 +94,16 @@ void UDPClient::sendRequest(
         std::move(serverAddress),
         std::move(request),
         std::move(completionHandler)));
+}
+
+void UDPClient::sendRequest(
+    Message request,
+    RequestCompletionHandler completionHandler)
+{
+    sendRequestTo(
+        m_serverAddress,
+        std::move(request),
+        std::move(completionHandler));
 }
 
 bool UDPClient::bind(const SocketAddress& localAddress)

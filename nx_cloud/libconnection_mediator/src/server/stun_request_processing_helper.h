@@ -19,7 +19,6 @@ namespace hpm {
 typedef std::shared_ptr< nx::stun::AbstractServerConnection > ConnectionStrongRef;
 typedef std::weak_ptr< nx::stun::AbstractServerConnection > ConnectionWeakRef;
 
-
 /** Send success responce without attributes */
 template<typename ConnectionPtr>
 void sendSuccessResponse(
@@ -31,6 +30,7 @@ void sendSuccessResponse(
             stun::MessageClass::successResponse,
             requestHeader.method,
             std::move(requestHeader.transactionId)));
+    response.newAttribute<stun::cc::attrs::ResultCode>(api::ResultCode::ok);
 
     connection->sendMessage(std::move(response));
 }
@@ -40,7 +40,8 @@ template<typename ConnectionPtr>
 void sendErrorResponse(
     const ConnectionPtr& connection,
     stun::Header requestHeader,
-    int code,
+    api::ResultCode resultCode,
+    int stunErrorCode,
     String reason)
 {
     stun::Message response(
@@ -49,8 +50,9 @@ void sendErrorResponse(
             requestHeader.method,
             std::move(requestHeader.transactionId)));
 
+    response.newAttribute<stun::cc::attrs::ResultCode>(resultCode);
     response.newAttribute< stun::attrs::ErrorDescription >(
-        code,
+        stunErrorCode,
         std::move(reason));
     connection->sendMessage(std::move(response));
 }
@@ -85,6 +87,7 @@ void fillAndSendResponse(
         return sendErrorResponse(
             connection,
             std::move(requestHeader),
+            resultCode,
             api::resultCodeToStunErrorCode(resultCode),
             QnLexical::serialized(resultCode).toLatin1());
 
@@ -94,6 +97,7 @@ void fillAndSendResponse(
             requestHeader.method,
             std::move(requestHeader.transactionId)));
     serialize(outputData, &response);
+    response.newAttribute<stun::cc::attrs::ResultCode>(resultCode);
 
     connection->sendMessage(std::move(response));
 }
@@ -113,6 +117,7 @@ void processRequestWithNoOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
+        nx::stun::Message,
         std::function<void(api::ResultCode)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
@@ -123,16 +128,18 @@ void processRequestWithNoOutput(
         return sendErrorResponse(
             connection,
             std::move(request.header),
+            api::ResultCode::badRequest,
             nx::stun::error::badRequest,
             input.errorText());
 
-    auto requestHeader = std::move(request.header);
+    auto requestHeader = request.header;
     if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
         //holding ownership of connection until request processing completion
         (processor->*processingFunc)(
             connection,
             std::move(input),
+            request,
             [/*std::move*/ requestHeader, connection](api::ResultCode resultCode) mutable
         {
             fillAndSendResponse<ConnectionStrongRef, void>(
@@ -148,6 +155,7 @@ void processRequestWithNoOutput(
         (processor->*processingFunc)(
             connection,
             std::move(input),
+            request,
             [/*std::move*/ requestHeader, weakConnectionRef](api::ResultCode resultCode) mutable
         {
             //connection can be removed at any moment
@@ -170,6 +178,7 @@ void processRequestWithOutput(
     void (ProcessorType::*processingFunc)(
         const ConnectionStrongRef&,
         InputData,
+        nx::stun::Message,
         std::function<void(api::ResultCode, OutputData)>),
     ProcessorType* processor,
     const ConnectionStrongRef& connection,
@@ -180,16 +189,18 @@ void processRequestWithOutput(
         return sendErrorResponse(
             connection,
             std::move(request.header),
+            api::ResultCode::badRequest,
             nx::stun::error::badRequest,
             input.errorText());
 
-    auto requestHeader = std::move(request.header);
+    auto requestHeader = request.header;
     if (connection->transportProtocol() == nx::network::TransportProtocol::udp)
     {
         //holding ownership of connection until request processing completion
         (processor->*processingFunc)(
             connection,
             std::move(input),
+            request,
             [/*std::move*/ requestHeader, connection](
                 api::ResultCode resultCode,
                 OutputData outputData) mutable
@@ -208,6 +219,7 @@ void processRequestWithOutput(
         (processor->*processingFunc)(
             connection,
             std::move(input),
+            request,
             [/*std::move*/ requestHeader, weakConnectionRef](
                 api::ResultCode resultCode,
                 OutputData outputData) mutable

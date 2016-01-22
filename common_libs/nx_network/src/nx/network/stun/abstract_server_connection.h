@@ -10,6 +10,7 @@
 
 #include "message.h"
 #include "nx/network/socket_common.h"
+#include "nx/network/abstract_socket.h"
 
 
 namespace nx {
@@ -33,6 +34,7 @@ public:
         \note \a AbstractServerConnection::sendMessage does nothing after \a handler has been invoked
     */
     virtual void addOnConnectionCloseHandler(std::function<void()> handler) = 0;
+    virtual AbstractCommunicatingSocket* socket() = 0;
 
 private:
     AbstractServerConnection(const AbstractServerConnection&);

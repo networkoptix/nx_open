@@ -52,6 +52,7 @@ public:
         SocketAddress destinationEndpoint,
         const Message& message,
         std::function<void(SystemError::ErrorCode)> completionHandler);
+    const std::unique_ptr<AbstractDatagramSocket>& socket();
 
 private:
     PipelineType m_messagePipeline;

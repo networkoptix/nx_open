@@ -17,10 +17,15 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::networkError, "networkError")
     (ResultCode::responseParseError, "responseParseError")
+    (ResultCode::notAuthorized, "notAuthorized")
     (ResultCode::badRequest, "badRequest")
     (ResultCode::notFound, "notFound")
     (ResultCode::otherLogicError, "otherLogicError")
     (ResultCode::notImplemented, "notImplemented")
+    (ResultCode::noSuitableConnectionMethod, "noSuitableConnectionMethod")
+    (ResultCode::timedout, "timedout")
+    (ResultCode::serverConnectionBroken, "serverConnectionBroken")
+    (ResultCode::badTransport, "badTransport")
     )
 
 

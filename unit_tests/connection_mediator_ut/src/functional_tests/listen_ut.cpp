@@ -19,20 +19,20 @@ namespace nx {
 namespace hpm {
 namespace test {
 
-TEST_F(MediatorFunctionalTest, listen)
+TEST_F(MediatorFunctionalTest, listen_connection_override)
 {
-    //TODO #ak adding multiple server to a system, checking that each very server is found
-
     using namespace nx::hpm;
 
     startAndWaitUntilStarted();
 
-    const std::shared_ptr<nx::network::cloud::MediatorClientConnection>
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
         client = clientConnection();
 
     const auto system1 = addRandomSystem();
-    auto server1 = addServer(system1, nx::String());
+    auto server1 = addRandomServer(system1);
+    ASSERT_NE(nullptr, server1);
     auto server2 = addServer(system1, server1->serverId());
+    ASSERT_NE(nullptr, server2);
 
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server2->listen());
@@ -49,6 +49,29 @@ TEST_F(MediatorFunctionalTest, listen)
         server2->mediatorConnectionLocalAddress(),
         strongConnectionRef->getSourceAddress());
     dataLocker.reset();
+
+    client->pleaseStopSync();
+}
+
+TEST_F(MediatorFunctionalTest, listen_unknown_system_credentials)
+{
+    using namespace nx::hpm;
+
+    startAndWaitUntilStarted();
+
+    const std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection>
+        client = clientConnection();
+
+    const auto system1 = addRandomSystem();
+    auto server1 = addRandomServer(system1);
+    ASSERT_NE(nullptr, server1);
+    ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
+
+    auto system2 = addRandomSystem();
+    system2.authKey.clear();
+    auto server2 = addRandomServer(system2);
+    ASSERT_NE(nullptr, server2);
+    ASSERT_EQ(nx::hpm::api::ResultCode::notAuthorized, server2->listen());
 
     client->pleaseStopSync();
 }

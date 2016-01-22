@@ -3,99 +3,210 @@
 
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/cc/custom_stun.h>
+#include <nx/network/stun/udp_client.h>
 
+#include "abstract_cloud_system_credentials_provider.h"
+#include "base_mediator_client.h"
+#include "data/bind_data.h"
 #include "data/connect_data.h"
+#include "data/connection_ack_data.h"
+#include "data/connection_requested_event_data.h"
+#include "data/connection_result_data.h"
 #include "data/listen_data.h"
+#include "data/ping_data.h"
 #include "data/resolve_data.h"
-#include "data/result_code.h"
 
 
 namespace nx {
-namespace network {
-namespace cloud {
+namespace hpm {
+namespace api {
 
-// Forward
-class MediatorConnector;
-
-/** Provides helper functions for easy adding requests to mediator */
-class NX_NETWORK_API BaseMediatorClient
+/** Provides access to mediator functions to be used by clients.
+    \note These requests DO NOT require authentication
+ */
+template<class NetworkClientType>
+class MediatorClientConnection
 :
-    public stun::AsyncClientUser
+    public BaseMediatorClient<NetworkClientType>
 {
 public:
-    BaseMediatorClient(std::shared_ptr<stun::AsyncClient> client);
+    //TODO #ak #msvc2015 variadic template
+    template<typename Arg1Type>
+        MediatorClientConnection(Arg1Type arg1)
+    :
+        BaseMediatorClient<NetworkClientType>(std::move(arg1))
+    {
+    }
 
-protected:
-    template<typename RequestData, typename ResponseData>
-    void doRequest(
-        nx::stun::cc::methods::Value method,
-        RequestData requestData,
-        std::function<void(nx::hpm::api::ResultCode, ResponseData)> completionHandler);
-
-    template<typename RequestData>
-    void doRequest(
-        nx::stun::cc::methods::Value method,
-        RequestData requestData,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler);
-};
-
-/** Provides client related STUN functionality */
-class NX_NETWORK_API MediatorClientConnection
-    : public BaseMediatorClient
-{
-    MediatorClientConnection(std::shared_ptr<stun::AsyncClient> client);
-    friend class MediatorConnector;
-
-public:
-    //void connect(
-    //    nx::hpm::api::ConnectRequest connectData,
-    //    std::function<void(
-    //        nx::hpm::api::ResultCode,
-    //        nx::hpm::api::ConnectResponse)> completionHandler);
     void resolve(
         nx::hpm::api::ResolveRequest resolveData,
         std::function<void(
             nx::hpm::api::ResultCode,
-            nx::hpm::api::ResolveResponse)> completionHandler);
+            nx::hpm::api::ResolveResponse)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::resolve,
+            std::move(resolveData),
+            std::move(completionHandler));
+    }
+
+    void connect(
+        nx::hpm::api::ConnectRequest connectData,
+        std::function<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::ConnectResponse)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::connect,
+            std::move(connectData),
+            std::move(completionHandler));
+    }
+
+    void connectionResult(
+        nx::hpm::api::ConnectionResultRequest resultData,
+        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        doRequest(
+            stun::cc::methods::connectionResult,
+            std::move(resultData),
+            std::move(completionHandler));
+    }
 };
 
-/** Provides system related STUN functionality */
-class NX_NETWORK_API MediatorSystemConnection
-    : public BaseMediatorClient
-{
-    MediatorSystemConnection(std::shared_ptr<stun::AsyncClient> client,
-                             MediatorConnector* connector);
-    friend class MediatorConnector;
+typedef MediatorClientConnection<stun::AsyncClientUser> MediatorClientTcpConnection;
+typedef MediatorClientConnection<stun::UDPClient> MediatorClientUdpConnection;
 
+/** Provides access to mediator functions to be used by servers.
+    \note All server requests MUST be authorized by cloudId and cloudAuthenticationKey
+*/
+template<class NetworkClientType>
+class MediatorServerConnection
+:
+    public BaseMediatorClient<NetworkClientType>
+{
 public:
-    void ping(std::list<SocketAddress> addresses,
-              std::function<void(bool, std::list<SocketAddress>)> handler);
+    //TODO #ak #msvc2015 variadic template
+    template<typename Arg1Type>
+    MediatorServerConnection(
+        Arg1Type arg1,
+        AbstractCloudSystemCredentialsProvider* connector)
+    :
+        BaseMediatorClient<NetworkClientType>(std::move(arg1)),
+        m_connector(connector)
+    {
+    }
+
+    /** Ask mediator to test connection to addresses.
+        \return list of endpoints available to the mediator
+    */
+    void ping(
+        nx::hpm::api::PingRequest requestData,
+        std::function<void(
+            nx::hpm::api::ResultCode,
+            nx::hpm::api::PingResponse)> completionHandler)
+    {
+        doAuthRequest(
+            stun::cc::methods::ping,
+            std::move(requestData),
+            std::move(completionHandler));
+    }
 
     /** reports to mediator that local server is available on \a addresses */
-    void bind(std::list<SocketAddress> addresses,
-              std::function<void(nx::hpm::api::ResultCode)> handler);
+    void bind(
+        nx::hpm::api::BindRequest requestData,
+        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        doAuthRequest(
+            stun::cc::methods::bind,
+            std::move(requestData),
+            std::move(completionHandler));
+    }
+
     /** notifies mediator this server is willing to accept cloud connections */
     void listen(
         nx::hpm::api::ListenRequest listenParams,
-        std::function<void(nx::hpm::api::ResultCode)> completionHandler);
+        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        doAuthRequest(
+            stun::cc::methods::listen,
+            std::move(listenParams),
+            std::move(completionHandler));
+    }
 
-    // TODO: propper implementation
-    typedef int ConnectionRequest;
-    void monitorConnectionRequest(std::function<void(ConnectionRequest)> handler);
+    /** server uses this request to confirm its willingness to proceed with cloud connection */
+    void connectionAck(
+        nx::hpm::api::ConnectionAckRequest request,
+        std::function<void(nx::hpm::api::ResultCode)> completionHandler)
+    {
+        doAuthRequest(
+            stun::cc::methods::connectionAck,
+            std::move(request),
+            std::move(completionHandler));
+    }
 
-    // TODO: propper implementation
-    typedef int ConnectionUpdate;
-    void monitorConnectionUpdate(std::function<void(ConnectionUpdate)> handler);
+protected:
+    template<typename RequestData, typename CompletionHandlerType>
+    void doAuthRequest(
+        nx::stun::cc::methods::Value method,
+        RequestData requestData,
+        CompletionHandlerType completionHandler)
+    {
+        stun::Message request(
+            stun::Header(
+                stun::MessageClass::request,
+                method));
+        requestData.serialize(&request);
+
+        if (auto credentials = m_connector->getSystemCredentials())
+        {
+            request.newAttribute<stun::cc::attrs::SystemId>(credentials->systemId);
+            request.newAttribute<stun::cc::attrs::ServerId>(credentials->serverId);
+            request.insertIntegrity(credentials->systemId, credentials->key);
+        }
+
+        sendRequestAndReceiveResponse(
+            std::move(request),
+            std::move(completionHandler));
+    }
 
 private:
-    void sendAuthRequest(stun::Message request,
-                         stun::AsyncClient::RequestHandler handler);
-
-    MediatorConnector* m_connector;
+    AbstractCloudSystemCredentialsProvider* m_connector;
 };
 
-} // namespace cloud
-} // namespace network
+typedef MediatorServerConnection<stun::UDPClient> MediatorServerUdpConnection;
+
+
+class MediatorServerTcpConnection
+:
+    public MediatorServerConnection<stun::AsyncClientUser>
+{
+public:
+    MediatorServerTcpConnection(
+        std::shared_ptr<nx::stun::AsyncClient> stunClient,
+        AbstractCloudSystemCredentialsProvider* connector)
+    :
+        MediatorServerConnection<stun::AsyncClientUser>(
+            std::move(stunClient),
+            connector)
+    {
+    }
+
+    void setOnConnectionRequestedHandler(
+        std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
+    {
+        setIndicationHandler(
+            nx::stun::cc::indications::connectionRequested,
+            [handler](nx::stun::Message msg)    //TODO #ak #msvc2015 move to lambda
+            {
+                ConnectionRequestedEvent indicationData;
+                indicationData.parse(msg);
+                handler(std::move(indicationData));
+            });
+    }
+};
+
+} // namespace api
+} // namespace hpm
 } // namespace nx
 
 #endif // NX_CC_MEDIATOR_CONNECTIONS_H

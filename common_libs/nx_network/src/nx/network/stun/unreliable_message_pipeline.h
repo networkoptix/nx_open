@@ -116,7 +116,7 @@ public:
             std::move(completionHandler)));
     }
 
-    const std::unique_ptr<AbstractDatagramSocket>& socket() const
+    const std::unique_ptr<AbstractDatagramSocket>& socket()
     {
         return m_socket;
     }

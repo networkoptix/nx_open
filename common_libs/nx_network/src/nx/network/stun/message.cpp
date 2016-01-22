@@ -97,18 +97,23 @@ namespace attrs
     }
 
     BufferedValue::BufferedValue( nx::Buffer buffer_ )
-        : buffer( std::move( buffer_ ) )
+        : m_buffer( std::move( buffer_ ) )
     {
     }
 
     const Buffer& BufferedValue::getBuffer() const
     {
-        return buffer;
+        return m_buffer;
+    }
+
+    void BufferedValue::setBuffer(Buffer buf)
+    {
+        m_buffer = std::move(buf);
     }
 
     String BufferedValue::getString() const
     {
-        return bufferToString( buffer );
+        return bufferToString(m_buffer);
     }
 
     UserName::UserName( const String& value )
@@ -142,6 +147,35 @@ namespace attrs
         : BufferedValue( std::move( value ) )
         , userType( userType_ )
     {
+    }
+
+
+    ////////////////////////////////////////////////////////////
+    //// IntAttribute
+    ////////////////////////////////////////////////////////////
+
+    IntAttribute::IntAttribute(int userType, int value)
+    :
+        Unknown(userType)
+    {
+        const int valueInNetworkByteOrder = htonl(value);
+        setBuffer(
+            Buffer(
+                reinterpret_cast<const char*>(&valueInNetworkByteOrder),
+                sizeof(valueInNetworkByteOrder)));
+    }
+
+    int IntAttribute::value() const
+    {
+        const auto& buf = getBuffer();
+        int valueInNetworkByteOrder = 0;
+        if (buf.size() != sizeof(valueInNetworkByteOrder))
+            return 0;
+        memcpy(
+            &valueInNetworkByteOrder,
+            buf.constData(),
+            sizeof(valueInNetworkByteOrder));
+        return ntohl(valueInNetworkByteOrder);
     }
 }
 

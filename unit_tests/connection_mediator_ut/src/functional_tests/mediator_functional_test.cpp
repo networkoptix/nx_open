@@ -125,13 +125,13 @@ SocketAddress MediatorFunctionalTest::endpoint() const
     return SocketAddress(HostAddress::localhost, m_port);
 }
 
-std::shared_ptr<nx::network::cloud::MediatorClientConnection> 
+std::shared_ptr<nx::hpm::api::MediatorClientTcpConnection> 
     MediatorFunctionalTest::clientConnection()
 {
     return network::SocketGlobals::mediatorConnector().clientConnection();
 }
 
-std::shared_ptr<nx::network::cloud::MediatorSystemConnection>
+std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection>
     MediatorFunctionalTest::systemConnection()
 {
     return network::SocketGlobals::mediatorConnector().systemConnection();
@@ -172,7 +172,16 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
         system,
         std::move(name));
     if (!server->start())
-        throw std::runtime_error("Failed to start server emulation");
+        return nullptr;
+    return server;
+}
+
+std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
+    const AbstractCloudDataProvider::System& system)
+{
+    auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
+    if (!server->start())
+        return nullptr;
     return server;
 }
 
@@ -186,7 +195,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
     for (auto& server: systemServers)
         if (!server->start())
-            throw std::runtime_error("Failed to start server emulation");
+            return std::vector<std::unique_ptr<MediaServerEmulator>>();
     return systemServers;
 }
 
