@@ -216,7 +216,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             {   // File's gone. Log this and skip this file.
                 NX_LOG(
                     lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
-                    .arg(fromFileFullName),
+                        .arg(fromFileFullName),
                     cl_logWARNING
                 );
                 return CopyError::SourceFileError;
