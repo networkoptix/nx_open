@@ -57,7 +57,7 @@ class SystemData
 {
 public:
     //!Globally unique ID of system assigned by cloud
-    QnUuid id;
+    std::string id;
     //!Not unique system name
     std::string name;
     std::string customization;
@@ -100,7 +100,7 @@ class SystemSharing
 {
 public:
     std::string accountEmail;
-    QnUuid systemID;
+    std::string systemID;
     SystemAccessRole accessRole;
 
     SystemSharing()

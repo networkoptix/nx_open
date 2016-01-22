@@ -139,7 +139,14 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
     {
         std::vector<api::SystemSharing> sharings;
         ASSERT_EQ(
-            getSystemSharings(account2.email, account2Password, system1.id.toStdString(), &sharings),
+            getSystemSharings(account2.email, account2Password, system1.id, &sharings),
+            api::ResultCode::forbidden);
+    }
+
+    {
+        std::vector<api::SystemSharing> sharings;
+        ASSERT_EQ(
+            getSystemSharings(account2.email, account2Password, "sdfnoowertn", &sharings),
             api::ResultCode::forbidden);
     }
 
@@ -148,7 +155,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         std::vector<api::SystemSharing> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
-            getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
+            getSystemSharings(account2.email, account2Password, system2.id, &sharings));
         ASSERT_EQ(sharings.size(), 2);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
@@ -618,33 +625,33 @@ TEST_F(CdbFunctionalTest, system_unbind)
                 //unbinding with owner credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+                    unbindSystem(account1.email, account1Password, system1.id));
                 break;
             case 1:
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 break;
             case 2:
                 //unbinding with owner credentials
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
-                    unbindSystem(account2.email, account2Password, system1.id.toStdString()));
+                    unbindSystem(account2.email, account2Password, system1.id));
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
             case 3:
                 //unbinding with other system credentials
                 ASSERT_EQ(
                     api::ResultCode::forbidden,
-                    unbindSystem(system0.id.toStdString(), system0.authKey, system1.id.toStdString()));
+                    unbindSystem(system0.id, system0.authKey, system1.id));
                 //unbinding with system credentials
                 ASSERT_EQ(
                     api::ResultCode::ok,
-                    unbindSystem(system1.id.toStdString(), system1.authKey, system1.id.toStdString()));
+                    unbindSystem(system1.id, system1.authKey, system1.id));
                 continue;
         }
 
@@ -693,7 +700,7 @@ TEST_F(CdbFunctionalTest, system_activation)
         {
             api::NonceData nonceData;
             auto resultCode = getCdbNonce(
-                system1.id.toStdString(),
+                system1.id,
                 system1.authKey,
                 &nonceData);
             ASSERT_EQ(api::ResultCode::ok, resultCode);
@@ -703,7 +710,7 @@ TEST_F(CdbFunctionalTest, system_activation)
         //    //activating with ping
         //    api::NonceData nonceData;
         //    auto resultCode = ping(
-        //        system1.id.toStdString(),
+        //        system1.id,
         //        system1.authKey);
         //    ASSERT_EQ(api::ResultCode::ok, resultCode);
         //}
@@ -733,7 +740,7 @@ TEST_F(CdbFunctionalTest, system_activation)
 
         ASSERT_EQ(
             api::ResultCode::ok,
-            unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+            unbindSystem(account1.email, account1Password, system1.id));
     }
 }
 

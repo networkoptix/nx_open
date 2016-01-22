@@ -380,7 +380,7 @@ api::ResultCode CdbFunctionalTest::getSystems(
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole accessRole)
 {
@@ -406,7 +406,7 @@ api::ResultCode CdbFunctionalTest::shareSystem(
 api::ResultCode CdbFunctionalTest::updateSystemSharing(
     const std::string& email,
     const std::string& password,
-    const QnUuid& systemID,
+    const std::string& systemID,
     const std::string& accountEmail,
     api::SystemAccessRole newAccessRole)
 {
@@ -516,7 +516,7 @@ api::ResultCode CdbFunctionalTest::getSystemSharings(
 api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
     const std::vector<api::SystemSharing>& sharings,
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     for (const auto& sharing: sharings)
     {

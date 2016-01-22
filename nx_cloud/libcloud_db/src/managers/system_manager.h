@@ -95,7 +95,7 @@ public:
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,
-        const QnUuid& systemID,
+        const std::string& systemID,
         const QnUuid& productID,
         std::function<void(api::ResultCode)> completionHandler);
     /*!
@@ -103,17 +103,18 @@ public:
     */
     void getActiveSubscriptions(
         const AuthorizationInfo& authzInfo,
-        const QnUuid& systemID,
+        const std::string& systemID,
         std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
 
-    boost::optional<data::SystemData> findSystemByID(const QnUuid& id) const;
+    boost::optional<data::SystemData> findSystemByID(const std::string& id) const;
     /*!
         \return \a api::SystemAccessRole::none is returned if\n
         - \a accountEmail has no rights for \a systemID
         - \a accountEmail or \a systemID is unknown
     */
     api::SystemAccessRole getAccountRightsForSystem(
-        const std::string& accountEmail, const QnUuid& systemID) const;
+        const std::string& accountEmail,
+        const std::string& systemID) const;
 
     //!Create data view restricted by \a authzInfo and \a filter
     DataView<data::SystemData> createView(
@@ -134,14 +135,14 @@ private:
                 api::SystemSharing, std::string, &api::SystemSharing::accountEmail>>,
             //indexing by system
             boost::multi_index::ordered_non_unique<boost::multi_index::member<
-                api::SystemSharing, QnUuid, &api::SystemSharing::systemID>>
+                api::SystemSharing, std::string, &api::SystemSharing::systemID>>
         >
     > AccountSystemAccessRoleDict;
 
     const AccountManager& m_accountManager;
     nx::db::DBManager* const m_dbManager;
     //!map<id, system>
-    Cache<QnUuid, data::SystemData> m_cache;
+    Cache<std::string, data::SystemData> m_cache;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
     QnCounter m_startedAsyncCallsCounter;
@@ -186,11 +187,11 @@ private:
 
     nx::db::DBResult activateSystem(
         QSqlDatabase* const connection,
-        const QnUuid& systemID);
+        const std::string& systemID);
     void systemActivated(
         QnCounter::ScopedIncrement asyncCallLocker,
         nx::db::DBResult dbResult,
-        QnUuid systemID,
+        std::string systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
     nx::db::DBResult fillCache();

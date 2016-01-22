@@ -34,7 +34,7 @@ bool SystemData::getAsVariant( int resID, QVariant* const value ) const
     switch( resID )
     {
         case attr::systemID:
-            *value = QVariant::fromValue(id);
+            *value = QVariant::fromValue(QString::fromStdString(id));
             return true;
         default:
             return false;
@@ -54,7 +54,7 @@ bool SystemSharing::getAsVariant( int resID, QVariant* const value ) const
             *value = QString::fromStdString(accountEmail);
             return true;
         case attr::systemID:
-            *value = QVariant::fromValue(systemID);
+            *value = QVariant::fromValue(QString::fromStdString(systemID));
             return true;
         case attr::systemAccessRole:
             *value = QVariant(QnLexical::serialized(accessRole));
@@ -74,7 +74,7 @@ bool SystemID::getAsVariant(int resID, QVariant* const value) const
     switch (resID)
     {
         case attr::systemID:
-            *value = QVariant::fromValue(systemID);
+            *value = QVariant::fromValue(QString::fromStdString(systemID));
             return true;
         default:
             return false;

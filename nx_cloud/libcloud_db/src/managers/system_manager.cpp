@@ -56,7 +56,7 @@ void SystemManager::authenticateByName(
 
     QnMutexLocker lk(&m_mutex);
 
-    auto systemData = m_cache.find(QnUuid::fromStringSafe(username));
+    auto systemData = m_cache.find(username.constData());
     if (!systemData)
         return;
 
@@ -68,11 +68,11 @@ void SystemManager::authenticateByName(
         return;
     }
 
-    auto systemID = QnUuid(systemData->id);
+    auto systemID = systemData->id;
 
     authProperties->put(
         cdb::attr::authSystemID,
-        QVariant::fromValue(systemID));
+        QString::fromStdString(systemID));
 
     m_cache.atomicUpdate(
         systemID,
@@ -80,7 +80,7 @@ void SystemManager::authenticateByName(
 
     using namespace std::placeholders;
 
-    m_dbManager->executeUpdate<QnUuid>(
+    m_dbManager->executeUpdate<std::string>(
         std::bind(&SystemManager::activateSystem, this, _1, _2),
         std::move(systemID),
         std::bind(&SystemManager::systemActivated, this,
@@ -155,13 +155,13 @@ void SystemManager::getSystems(
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     data::SystemDataList resultData;
-    auto systemID = wholeFilterMap.get(cdb::attr::authSystemID);
+    auto systemID = wholeFilterMap.get<std::string>(cdb::attr::authSystemID);
     if (!systemID)
-        systemID = wholeFilterMap.get(cdb::attr::systemID);
+        systemID = wholeFilterMap.get<std::string>(cdb::attr::systemID);
     if (systemID)
     {
         //selecting system by id
-        auto system = m_cache.find(systemID.get().value<QnUuid>());
+        auto system = m_cache.find(systemID.get());
         if (!system || !applyFilter(system.get(), filter))
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
@@ -182,7 +182,7 @@ void SystemManager::getSystems(
     {
         //filtering full system list
         m_cache.forEach(
-            [&](const std::pair<const QnUuid, data::SystemData>& data) {
+            [&](const std::pair<const std::string, data::SystemData>& data) {
                 if (applyFilter(data.second, filter))
                     resultData.systems.push_back(data.second);
             });
@@ -218,9 +218,9 @@ void SystemManager::getCloudUsersOfSystem(
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
         return completionHandler(api::ResultCode::notAuthorized, std::move(resultData));
 
-    auto systemID = filter.get<QnUuid>(attr::authSystemID);
+    auto systemID = filter.get<std::string>(attr::authSystemID);
     if (!systemID)
-        systemID = filter.get<QnUuid>(attr::systemID);
+        systemID = filter.get<std::string>(attr::systemID);
 
     QnMutexLocker lk(&m_mutex);
     if (systemID)
@@ -265,14 +265,14 @@ void SystemManager::getCloudUsersOfSystem(
         std::move(resultData));
 }
 
-boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
+boost::optional<data::SystemData> SystemManager::findSystemByID(const std::string& id) const
 {
     return m_cache.find(id);
 }
 
 api::SystemAccessRole SystemManager::getAccountRightsForSystem(
     const std::string& accountEmail,
-    const QnUuid& systemID) const
+    const std::string& systemID) const
 {
     QnMutexLocker lk(&m_mutex);
     const auto& accountSystemPairIndex = m_accountAccessRoleForSystem.get<0>();
@@ -302,7 +302,7 @@ nx::db::DBResult SystemManager::insertSystemToDB(
     insertSystemQuery.prepare(
         "INSERT INTO system( id, name, customization, auth_key, owner_account_id, status_code ) "
         " VALUES( :id, :name, :customization, :authKey, :ownerAccountID, :status )");
-    systemData->id = QnUuid::createUuid();
+    systemData->id = QnUuid::createUuid().toStdString();
     systemData->name = newSystem.name;
     systemData->customization = newSystem.customization;
     systemData->authKey = QnUuid::createUuid().toStdString();
@@ -525,7 +525,7 @@ void SystemManager::sharingUpdated(
 
 nx::db::DBResult SystemManager::activateSystem(
     QSqlDatabase* const connection,
-    const QnUuid& systemID)
+    const std::string& systemID)
 {
     QSqlQuery updateSystemStatusQuery(*connection);
     updateSystemStatusQuery.prepare(
@@ -551,7 +551,7 @@ nx::db::DBResult SystemManager::activateSystem(
 void SystemManager::systemActivated(
     QnCounter::ScopedIncrement asyncCallLocker,
     nx::db::DBResult dbResult,
-    QnUuid systemID,
+    std::string systemID,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (dbResult == nx::db::DBResult::ok)
