@@ -421,7 +421,7 @@ api::ResultCode CdbFunctionalTest::updateSystemSharing(
     std::tie(resCode) =
         makeSyncCall<api::ResultCode>(
             std::bind(
-                &nx::cdb::api::SystemManager::updateSharing,
+                &nx::cdb::api::SystemManager::shareSystem,
                 connection->systemManager(),
                 std::move(systemSharing),
                 std::placeholders::_1));

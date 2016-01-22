@@ -195,16 +195,16 @@ void SystemManager::getSystems(
 
 void SystemManager::shareSystem(
     const AuthorizationInfo& /*authzInfo*/,
-    data::SystemSharing sharingData,
+    data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::SystemSharing>(
-        std::bind(&SystemManager::insertSystemSharingToDB, this, _1, _2),
-        std::move(sharingData),
-        std::bind(&SystemManager::systemSharingAdded,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
+        std::move(sharing),
+        std::bind(&SystemManager::sharingUpdated,
+            this, m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, std::move(completionHandler)));
 }
 
 void SystemManager::getCloudUsersOfSystem(
@@ -263,20 +263,6 @@ void SystemManager::getCloudUsersOfSystem(
     completionHandler(
         api::ResultCode::ok,
         std::move(resultData));
-}
-
-void SystemManager::updateSharing(
-    const AuthorizationInfo& /*authzInfo*/,
-    data::SystemSharing sharing,
-    std::function<void(api::ResultCode)> completionHandler)
-{
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemSharing>(
-        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
-        std::move(sharing),
-        std::bind(&SystemManager::sharingUpdated,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const

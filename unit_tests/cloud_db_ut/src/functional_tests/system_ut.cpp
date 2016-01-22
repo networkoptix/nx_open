@@ -224,7 +224,8 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     restart();
 
-    //account1: trying to modify (change access rights) sharing to account2 (failure)
+    //account1: trying to modify (change access rights) sharing to account2 
+        //(failure: maintenance sharing cannot be updated)
     ASSERT_EQ(
         api::ResultCode::forbidden,
         updateSystemSharing(
@@ -234,7 +235,8 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::viewer));
 
-    //account1: trying to remove sharing to account2 (failure)
+    //account1: trying to remove sharing to account2 
+        //(failure: maintenance sharing cannot be removed)
     ASSERT_EQ(
         api::ResultCode::forbidden,
         updateSystemSharing(
@@ -244,7 +246,8 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to modify sharing to account2 (failure)
+    //account2: trying to modify sharing to account2 
+        //(failure: integrator cannot modify its sharing, only remove)
     ASSERT_EQ(
         api::ResultCode::forbidden,
         updateSystemSharing(
@@ -282,7 +285,8 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account1.email,
             api::SystemAccessRole::none));
 
-    //account2: trying to remove sharing to account2 (success)
+    //account2: trying to remove sharing to account2 
+        //(success: itegrator removed sharing to itself)
     ASSERT_EQ(
         api::ResultCode::ok,
         updateSystemSharing(

@@ -62,17 +62,6 @@
                         <set resName="authorized" resValue="false"/>
                         -->
                     </sequence>
-                    <sequence value="/system/share">
-                        <set resName="authorized" resValue="false"/>
-                        <condition resName="auth.accountRightsOnSystem">
-                            <set value="owner" resName="authorized" resValue="true"/>
-                            <set value="editorWithSharing" resName="authorized" resValue="true"/>
-                            <condition value="maintenance" resName="systemAccessRole">
-                                <!-- integrator can share system being monitored to other integrator account -->
-                                <set value="maintenance" resName="authorized" resValue="true"/>
-                            </condition>
-                        </condition>
-                    </sequence>
                     <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
                             <set resName="authorized" resValue="false"/>
@@ -85,7 +74,7 @@
                         </sequence>
                         <!-- request is allowed for account only -->
                     </condition>
-                    <sequence value="/system/update_sharing">
+                    <sequence value="/system/share">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>

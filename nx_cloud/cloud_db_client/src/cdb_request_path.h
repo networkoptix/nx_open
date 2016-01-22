@@ -22,7 +22,6 @@ extern const char* kSystemUnbindPath;
 extern const char* kSystemGetPath;
 extern const char* kSystemSharePath;
 extern const char* kSystemGetCloudUsersPath;
-extern const char* kSystemUpdateSharingPath;
 
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;

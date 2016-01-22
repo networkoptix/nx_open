@@ -83,7 +83,6 @@ public:
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
         std::function<void(api::ResultCode, data::SystemDataList)> completionHandler );
-    //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
@@ -93,10 +92,6 @@ public:
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler);
-    void updateSharing(
-        const AuthorizationInfo& authzInfo,
-        data::SystemSharing sharingData,
-        std::function<void(api::ResultCode)> completionHandler);
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,

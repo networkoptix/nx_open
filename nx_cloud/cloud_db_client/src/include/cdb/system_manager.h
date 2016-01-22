@@ -50,6 +50,7 @@ public:
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     /*!
         \note Required access role: account (owner or editor_with_sharing)
+        \note sharing is removed if \a sharingData.accessRole is \a api::SystemAccessRole::none
     */
     virtual void shareSystem(
         SystemSharing sharingData,
@@ -64,10 +65,6 @@ public:
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
         std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
-    //!Changes access role for system or remove sharing if \a sharing.accessRole is \a api::SystemAccessRole::none
-    virtual void updateSharing(
-        api::SystemSharing sharing,
-        std::function<void(ResultCode)> completionHandler) = 0;
 };
 
 }   //api
