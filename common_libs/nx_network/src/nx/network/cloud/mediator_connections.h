@@ -44,7 +44,7 @@ public:
             nx::hpm::api::ResultCode,
             nx::hpm::api::ResolveResponse)> completionHandler)
     {
-        doRequest(
+        this->doRequest(
             stun::cc::methods::resolve,
             std::move(resolveData),
             std::move(completionHandler));
@@ -56,7 +56,7 @@ public:
             nx::hpm::api::ResultCode,
             nx::hpm::api::ConnectResponse)> completionHandler)
     {
-        doRequest(
+        this->doRequest(
             stun::cc::methods::connect,
             std::move(connectData),
             std::move(completionHandler));
@@ -66,7 +66,7 @@ public:
         nx::hpm::api::ConnectionResultRequest resultData,
         std::function<void(nx::hpm::api::ResultCode)> completionHandler)
     {
-        doRequest(
+        this->doRequest(
             stun::cc::methods::connectionResult,
             std::move(resultData),
             std::move(completionHandler));
@@ -105,7 +105,7 @@ public:
             nx::hpm::api::ResultCode,
             nx::hpm::api::PingResponse)> completionHandler)
     {
-        doAuthRequest(
+        this->doAuthRequest(
             stun::cc::methods::ping,
             std::move(requestData),
             std::move(completionHandler));
@@ -116,7 +116,7 @@ public:
         nx::hpm::api::BindRequest requestData,
         std::function<void(nx::hpm::api::ResultCode)> completionHandler)
     {
-        doAuthRequest(
+        this->doAuthRequest(
             stun::cc::methods::bind,
             std::move(requestData),
             std::move(completionHandler));
@@ -127,7 +127,7 @@ public:
         nx::hpm::api::ListenRequest listenParams,
         std::function<void(nx::hpm::api::ResultCode)> completionHandler)
     {
-        doAuthRequest(
+        this->doAuthRequest(
             stun::cc::methods::listen,
             std::move(listenParams),
             std::move(completionHandler));
@@ -138,7 +138,7 @@ public:
         nx::hpm::api::ConnectionAckRequest request,
         std::function<void(nx::hpm::api::ResultCode)> completionHandler)
     {
-        doAuthRequest(
+        this->doAuthRequest(
             stun::cc::methods::connectionAck,
             std::move(request),
             std::move(completionHandler));
@@ -164,7 +164,7 @@ protected:
             request.insertIntegrity(credentials->systemId, credentials->key);
         }
 
-        sendRequestAndReceiveResponse(
+        this->sendRequestAndReceiveResponse(
             std::move(request),
             std::move(completionHandler));
     }

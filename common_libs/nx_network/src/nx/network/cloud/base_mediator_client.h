@@ -58,7 +58,7 @@ protected:
         const nx::stun::cc::methods::Value method =
             static_cast<nx::stun::cc::methods::Value>(request.header.method);
 
-        sendRequest(
+        this->sendRequest(
             std::move(request),
             [this, method, /*std::move*/ completionHandler](    //TODO #ak #msvc2015 move to lambda
                 SystemError::ErrorCode code,
@@ -116,7 +116,7 @@ protected:
         const nx::stun::cc::methods::Value method =
             static_cast<nx::stun::cc::methods::Value>(request.header.method);
 
-        sendRequest(
+        this->sendRequest(
             std::move(request),
             [this, method, /*std::move*/ completionHandler](
                 SystemError::ErrorCode code,
