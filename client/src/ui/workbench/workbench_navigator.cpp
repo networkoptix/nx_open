@@ -34,7 +34,7 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/storage_resource.h>
 
-#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 
 #include <camera/resource_display.h>
