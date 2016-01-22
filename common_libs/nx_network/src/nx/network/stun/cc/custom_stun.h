@@ -6,9 +6,11 @@
 #ifndef NX_CUSTOM_STUN_H
 #define NX_CUSTOM_STUN_H
 
+#include <nx/network/cloud/data/result_code.h>
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>
 #include <nx/utils/uuid.h>
+
 
 namespace nx {
 namespace stun {
@@ -82,7 +84,9 @@ namespace attrs
 {
     enum AttributeType
     {
-        systemId = stun::attrs::userDefined,
+        resultCode = stun::attrs::userDefined,
+
+        systemId,
         serverId,
         peerId,
         connectionId,
@@ -103,6 +107,20 @@ namespace attrs
     struct NX_NETWORK_API StringAttribute : stun::attrs::Unknown
     {
         StringAttribute( int userType, const String& value = String() );
+    };
+
+    struct NX_NETWORK_API ResultCode: stun::attrs::IntAttribute
+    {
+        static const AttributeType TYPE = resultCode;
+
+        ResultCode(const nx::hpm::api::ResultCode& value)
+            : stun::attrs::IntAttribute(TYPE, static_cast<int>(value)) {}
+
+        nx::hpm::api::ResultCode value() const
+        {
+            return static_cast<nx::hpm::api::ResultCode>(
+                stun::attrs::IntAttribute::value());
+        }
     };
 
     struct NX_NETWORK_API SystemId : StringAttribute

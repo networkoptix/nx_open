@@ -158,10 +158,11 @@ namespace attrs
     {
         BufferedValue( nx::Buffer buffer_ = nx::Buffer() );
         const Buffer& getBuffer() const; //!< Value to serialize
+        void setBuffer(Buffer buf);
         String getString() const; //!< Convert to string
 
     private:
-        Buffer buffer;
+        Buffer m_buffer;
     };
 
     struct NX_NETWORK_API UserName : Attribute, BufferedValue
@@ -228,6 +229,15 @@ namespace attrs
     private:
         int userType;
     };
+
+    /** Base class for attributes with integer value */
+    struct NX_NETWORK_API IntAttribute: Unknown
+    {
+        IntAttribute(int userType, int value = 0);
+
+        int value() const;
+    };
+
 }
 
 class NX_NETWORK_API Message

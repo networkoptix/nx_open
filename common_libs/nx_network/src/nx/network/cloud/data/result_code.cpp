@@ -17,6 +17,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::ok, "ok")
     (ResultCode::networkError, "networkError")
     (ResultCode::responseParseError, "responseParseError")
+    (ResultCode::notAuthorized, "notAuthorized")
     (ResultCode::badRequest, "badRequest")
     (ResultCode::notFound, "notFound")
     (ResultCode::otherLogicError, "otherLogicError")

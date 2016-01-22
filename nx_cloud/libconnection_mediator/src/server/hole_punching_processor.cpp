@@ -59,6 +59,7 @@ HolePunchingProcessor::HolePunchingProcessor(
 void HolePunchingProcessor::connect(
     const ConnectionStrongRef& connection,
     api::ConnectRequest request,
+    stun::Message /*message*/,
     std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler)
 {
     NX_LOGX(lm("connect request. from %1 to host %2, connection id %3").
@@ -110,6 +111,7 @@ void HolePunchingProcessor::connect(
 void HolePunchingProcessor::onConnectionAckRequest(
     const ConnectionStrongRef& connection,
     api::ConnectionAckRequest request,
+    stun::Message /*message*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);
@@ -128,6 +130,7 @@ void HolePunchingProcessor::onConnectionAckRequest(
 void HolePunchingProcessor::connectionResult(
     const ConnectionStrongRef& /*connection*/,
     api::ConnectionResultRequest request,
+    stun::Message /*message*/,
     std::function<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);

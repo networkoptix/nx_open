@@ -63,13 +63,18 @@ void PeerRegistrator::bind(
         return sendErrorResponse(
             connection,
             message.header,
+            api::ResultCode::badTransport,
             stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
     const auto mediaserverData = getMediaserverData(connection, message);
     if (!static_cast<bool>(mediaserverData))
     {
-        sendErrorResponse(connection, message.header, stun::error::badRequest,
+        sendErrorResponse(
+            connection,
+            message.header,
+            api::ResultCode::notAuthorized,
+            stun::error::badRequest,
             "No mediaserver data in request");
         return;
     }
@@ -95,10 +100,24 @@ void PeerRegistrator::bind(
 void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
+    stun::Message message,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
+
+    //TODO #ak make authentication centralized
+    const auto mediaserverData = getMediaserverData(connection, message);
+    if (!static_cast<bool>(mediaserverData))
+    {
+        sendErrorResponse(
+            connection,
+            message.header,
+            api::ResultCode::notAuthorized,
+            stun::error::badRequest,
+            "Bad system credentials supplied");
+        return;
+    }
 
     auto peerDataLocker = m_listeningPeerPool->insertAndLockPeerData(
         connection,
@@ -120,6 +139,7 @@ void PeerRegistrator::listen(
 void PeerRegistrator::resolve(
     const ConnectionStrongRef& connection,
     api::ResolveRequest requestData,
+    stun::Message /*message*/,
     std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler)
 {
     auto peerDataLocker = m_listeningPeerPool->findAndLockPeerDataByHostName(

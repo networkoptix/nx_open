@@ -43,10 +43,12 @@ public:
     void listen(
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
+        stun::Message message,
         std::function<void(api::ResultCode)> completionHandler);
     void resolve(
         const ConnectionStrongRef& connection,
         api::ResolveRequest request,
+        stun::Message message,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
 
 private:

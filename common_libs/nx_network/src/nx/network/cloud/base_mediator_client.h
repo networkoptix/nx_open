@@ -75,16 +75,19 @@ protected:
                     ResponseData());
             }
 
+            api::ResultCode resultCode = api::ResultCode::ok;
+            const auto* resultCodeHeader = 
+                message.getAttribute<nx::stun::cc::attrs::ResultCode>();
+            if (resultCodeHeader)
+                resultCode = resultCodeHeader->value();
+
             if (const auto error = nx::stun::AsyncClient::hasError(code, message))
             {
-                ResultCode resultCode = 
-                    ResultCode::otherLogicError;
-                if (const auto err = message.getAttribute<nx::stun::attrs::ErrorDescription>())
-                    resultCode = fromStunErrorToResultCode(*err);
-
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response
-                return completionHandler(resultCode, ResponseData());
+                return completionHandler(
+                    resultCodeHeader ? resultCode : api::ResultCode::otherLogicError,
+                    ResponseData());
             }
 
             ResponseData responseData;
@@ -99,7 +102,7 @@ protected:
             }
 
             completionHandler(
-                ResultCode::ok,
+                resultCode,
                 std::move(responseData));
         });
     }
@@ -127,19 +130,23 @@ protected:
                 return completionHandler(ResultCode::networkError);
             }
 
+            api::ResultCode resultCode = api::ResultCode::ok;
+            const auto* resultCodeHeader = 
+                message.getAttribute<nx::stun::cc::attrs::ResultCode>();
+            if (resultCodeHeader)
+                resultCode = resultCodeHeader->value();
+
             if (const auto error = nx::stun::AsyncClient::hasError(code, message))
             {
-                ResultCode resultCode = 
-                    ResultCode::otherLogicError;
-                if (const auto err = message.getAttribute< nx::stun::attrs::ErrorDescription >())
-                    resultCode = fromStunErrorToResultCode(*err);
-
                 NX_LOGX(*error, cl_logDEBUG1);
                 //TODO #ak get detailed error from response
-                return completionHandler(resultCode);
+                return completionHandler(
+                    resultCodeHeader
+                    ? resultCode
+                    : api::ResultCode::otherLogicError);
             }
 
-            completionHandler(ResultCode::ok);
+            completionHandler(resultCode);
         });
     }
 };

@@ -172,7 +172,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addServer(
         system,
         std::move(name));
     if (!server->start())
-        throw std::runtime_error("Failed to start server emulation");
+        return nullptr;
     return server;
 }
 
@@ -181,7 +181,7 @@ std::unique_ptr<MediaServerEmulator> MediatorFunctionalTest::addRandomServer(
 {
     auto server = std::make_unique<MediaServerEmulator>(endpoint(), system);
     if (!server->start())
-        throw std::runtime_error("Failed to start server emulation");
+        return nullptr;
     return server;
 }
 
@@ -195,7 +195,7 @@ std::vector<std::unique_ptr<MediaServerEmulator>>
     systemServers.push_back(std::make_unique<MediaServerEmulator>(endpoint(), system));
     for (auto& server: systemServers)
         if (!server->start())
-            throw std::runtime_error("Failed to start server emulation");
+            return std::vector<std::unique_ptr<MediaServerEmulator>>();
     return systemServers;
 }
 

@@ -19,6 +19,7 @@ enum class ResultCode
     ok = 0,
     networkError,
     responseParseError,
+    notAuthorized,
     badRequest,
     notFound,
     otherLogicError,
