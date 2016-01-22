@@ -6,8 +6,8 @@
 
 QnClientStorageResource::QnClientStorageResource()
     : base_type()
-    , m_freeSpace(QnStorageResource::UnknownSize)
-    , m_totalSpace(QnStorageResource::UnknownSize)
+    , m_freeSpace(QnStorageResource::kUnknownSize)
+    , m_totalSpace(QnStorageResource::kUnknownSize)
     , m_writable(false)
     , m_active(false)
 {
@@ -59,7 +59,8 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
 }
 
 bool QnClientStorageResource::isSpaceInfoAvailable() const {
-    return m_totalSpace != QnStorageResource::UnknownSize;
+    return m_totalSpace != QnStorageResource::kUnknownSize
+        && m_totalSpace != QnStorageResource::kFastCreateSize;
 }
 
 bool QnClientStorageResource::isActive() const

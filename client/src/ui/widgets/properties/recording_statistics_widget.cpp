@@ -341,7 +341,7 @@ void QnRecordingStatisticsWidget::query(qint64 bitrateAnalizePeriodMs)
             bitrateAnalizePeriodMs,
             this, SLOT(at_gotStatiscits(int, const QnRecordingStatsReply&, int)));
         m_requests.insert(handle, m_server->getId());
-        handle = m_server->apiConnection()->getStorageSpaceAsync(this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
+        handle = m_server->apiConnection()->getStorageSpaceAsync(false, this, SLOT(at_gotStorageSpace(int, const QnStorageSpaceReply&, int)));
         m_requests.insert(handle, m_server->getId());
     }
 }

@@ -194,8 +194,10 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         return storageData.storageType;
     case TotalSpaceColumn:
         switch (storageData.totalSpace) {
-        case QnStorageResource::UnknownSize:
+        case QnStorageResource::kUnknownSize:
             return tr("Invalid storage");
+        case QnStorageResource::kFastCreateSize:
+            return tr("Loading...");
         default:
             return tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1));
         }

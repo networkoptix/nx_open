@@ -5,8 +5,8 @@
 #include <QtCore/QtCore>
 #include <memory>
 
-class QnAbstractStorageResource 
-    : public QnResource 
+class QnAbstractStorageResource
+    : public QnResource
 {
 public:
     enum cap
@@ -25,7 +25,7 @@ public:
         typedef std::shared_ptr<QFileInfo> QFileInfoPtr;
 
     public: // ctors
-        explicit 
+        explicit
         FileInfo(const QString& uri, qint64 size, bool isDir = false)
             : m_fpath(uri),
               m_size(size),
@@ -77,10 +77,10 @@ public:
 
     private:
         void parseUri()
-        {   
+        {
             QStringList pathEntries = m_fpath.split(lit("/"));
             bool found = false;
-            
+
             auto assignBN = [this]()
             {
                 int dotIndex = m_fname.lastIndexOf(lit("."));
@@ -129,7 +129,8 @@ public:
     }
 
 public:
-    static const qint64 UnknownSize = -1;
+    static const qint64 kUnknownSize = -1;          /**< Size of the storage cannot be calculated. */
+    static const qint64 kFastCreateSize = -2;       /**< Size calculating was skipped. */
 
     virtual QIODevice *open(const QString &fileName, QIODevice::OpenMode openMode) = 0;
 
@@ -139,12 +140,12 @@ public:
     virtual int getCapabilities() const = 0;
 
     /**
-     * \returns                         Storage free space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
+     * \returns                         Storage free space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.
      */
     virtual qint64 getFreeSpace() = 0;
 
     /**
-     * \returns                         Storage total space in bytes, or <tt>UnknownSize</tt> if this function is not supported.
+     * \returns                         Storage total space in bytes, or <tt>kUnknownSize</tt> if this function is not supported.
      */
     virtual qint64 getTotalSpace() = 0;
 
@@ -177,7 +178,7 @@ public:
     /**
      * \param dirName                   Url of the folder to list.
      * \returns                         List of files in given directory, excluding subdirectories.
-     * 
+     *
      * \note QFileInfo structure MUST contains valid fields for full file name and file size.
      */
     virtual FileInfoList getFileList(const QString& dirName) = 0;
