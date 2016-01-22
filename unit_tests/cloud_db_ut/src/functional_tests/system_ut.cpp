@@ -22,6 +22,13 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         api::ResultCode::ok,
         addActivatedAccount(&account1, &account1Password));
 
+    {
+        std::vector<api::SystemSharing> sharings;
+        ASSERT_EQ(
+            getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings),
+            api::ResultCode::forbidden);
+    }
+
     api::AccountData account2;
     std::string account2Password;
     ASSERT_EQ(
@@ -140,13 +147,6 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         std::vector<api::SystemSharing> sharings;
         ASSERT_EQ(
             getSystemSharings(account2.email, account2Password, system1.id, &sharings),
-            api::ResultCode::forbidden);
-    }
-
-    {
-        std::vector<api::SystemSharing> sharings;
-        ASSERT_EQ(
-            getSystemSharings(account2.email, account2Password, "sdfnoowertn", &sharings),
             api::ResultCode::forbidden);
     }
 
