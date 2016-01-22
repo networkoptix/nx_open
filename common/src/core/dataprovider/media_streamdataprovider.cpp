@@ -92,7 +92,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
     {
         setNeedKeyData();
         ++mFramesLost;
-        m_stat[0].onData(0);
+        m_stat[0].onData(0, false);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
         if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
@@ -139,7 +139,9 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+        m_stat[videoData->channelNumber].onData(
+            static_cast<unsigned int>(data->dataSize()),
+            videoData->flags & AV_PKT_FLAG_KEY);
 
     return true;
 
@@ -165,6 +167,14 @@ float QnAbstractMediaStreamDataProvider::getFrameRate() const
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getFrameRate();
     return rez;
+}
+
+float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getAverageGopSize();
+    return rez / m_numberOfchannels;
 }
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
