@@ -904,7 +904,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenBookmarksSearchAction).
         flags(Qn::Main | Qn::GlobalHotkey).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalViewArchivePermission).
-        text(tr("Bookmarks Search...")).
+        text(tr("Bookmark Search...")).
         shortcut(tr("Ctrl+B")).
         autoRepeat(false);
 
@@ -1016,7 +1016,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open in the Alarm Layout"));
+        text(tr("Open in Alarm Layout"));
 
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).

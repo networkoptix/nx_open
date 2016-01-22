@@ -269,7 +269,7 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
     QString message = errorMessage.value(lit("message")).toString();
 
     if(messageId == lit("DatabaseError")) {
-        message = tr("There was a problem activating your license key. A database error has occurred.");  //TODO: Feature #3629 case J
+        message = tr("There was a problem activating your license key. A database error occurred.");  //TODO: Feature #3629 case J
     } else if(messageId == lit("InvalidData")) {
         message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
     } else if(messageId == lit("InvalidKey")) {

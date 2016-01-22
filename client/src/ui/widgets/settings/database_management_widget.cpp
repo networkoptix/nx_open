@@ -150,7 +150,7 @@ void QnDatabaseManagementWidget::at_restoreButton_clicked() {
     if (!conn) {
         QMessageBox::information(this,
             tr("Information"),
-            tr("You need to connect to a server prior to performing a backup."));
+            tr("You need to connect to a server prior to start backup."));
         return;
     }
 

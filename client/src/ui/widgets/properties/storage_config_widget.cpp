@@ -131,7 +131,7 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->setupUi(this);
 
     ui->comboBoxBackupType->addItem(tr("By Schedule"), Qn::Backup_Schedule);
-    ui->comboBoxBackupType->addItem(tr("In Real-Time"), Qn::Backup_RealTime);
+    ui->comboBoxBackupType->addItem(tr("Real-Time"), Qn::Backup_RealTime);
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
@@ -631,10 +631,10 @@ void QnStorageConfigWidget::startRebuid(bool isMain) {
 
     int warnResult = QMessageBox::warning(
         this,
-        tr("Warning"),
+        tr("Warning!"),
         tr("You are about to launch the archive re-synchronization routine.") + L'\n'
         + tr("ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.") + L'\n'
-        + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.") + L'\n'
+        + tr("This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.") + L'\n'
         + tr("Are you sure you want to continue?"),
         QMessageBox::Ok | QMessageBox::Cancel
         );
@@ -742,7 +742,7 @@ bool QnStorageConfigWidget::canStartBackup(const QnBackupStatusData& data
     if ((rebuildStatusState(QnServerStoragesPool::Main) != Qn::RebuildState_None)
         || (rebuildStatusState(QnServerStoragesPool::Backup) != Qn::RebuildState_None))
     {
-        return error(tr("Couldn't start backup while rebuilding archive index is being processed."));
+        return error(tr("Cannot start backup while archive index rebuild is in progress."));
     }
 
     return true;
@@ -810,9 +810,9 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
 
     //TODO: #GDM discuss texts
     QString backedUpTo = realtime
-        ? tr("In Real-Time mode all data is backed up continuously.") + L' ' + setWarningStyleHtml(tr("Notice: Only data from this point forward will be backed up. Existing archives will be ignored."))
+        ? tr("Real-Time mode all data is backed up continuously.") + L' ' + setWarningStyleHtml(tr("Notice: Only further recording will be backed up. Backup process will ignore existing footage."))
         : reply.backupTimeMs > 0
-        ? tr("Archive has been successfully backup until: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        ? tr("Archive backup complete until: %1.").arg(backupPositionToString(reply.backupTimeMs))
         : tr("Backup was never started.");
 
     ui->backupTimeLabel->setText(backedUpTo);
