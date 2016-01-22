@@ -1,5 +1,8 @@
 #include "authutil.h"
 
+namespace nx {
+namespace rest {
+
 //!Splits \a data by \a delimiter not closed within quotes
 /*!
     E.g.: 
@@ -66,3 +69,5 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
     return result;
 }
 
+} // namespace rest
+} // namespace nx

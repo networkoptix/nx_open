@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <nx/utils/log/log.h>
+
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
 #include "utils/media/h264_utils.h"
@@ -570,7 +572,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
     info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
+    {
         m_cameraRes->saveParamsAsync();
+        NX_LOG(lm("QnLiveStreamProvider: bitrateInfo has been updated for %1 stream")
+                .arg(info.encoderIndex), cl_logINFO);
+    }
 }
 
 #endif // ENABLE_DATA_PROVIDERS

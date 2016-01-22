@@ -1,7 +1,11 @@
 
 #include "server_info.h"
 
-rtu::InterfaceInfo::InterfaceInfo()
+namespace nx {
+namespace mediaserver {
+namespace api {
+
+InterfaceInfo::InterfaceInfo()
     : name()
     , ip()
     , macAddress()
@@ -10,8 +14,8 @@ rtu::InterfaceInfo::InterfaceInfo()
     , useDHCP()
 {}
 
-bool rtu::operator == (const rtu::InterfaceInfo &first
-    , const rtu::InterfaceInfo &second)
+bool operator == (const InterfaceInfo &first
+    , const InterfaceInfo &second)
 {
     return ((first.ip == second.ip)
         && (first.macAddress == second.macAddress)
@@ -21,13 +25,13 @@ bool rtu::operator == (const rtu::InterfaceInfo &first
         && (first.useDHCP == second.useDHCP));
 }
 
-bool rtu::operator != (const rtu::InterfaceInfo &first
-    , const rtu::InterfaceInfo &second)
+bool operator != (const InterfaceInfo &first
+    , const InterfaceInfo &second)
 {
     return !(first == second);
 }
 
-rtu::InterfaceInfo::InterfaceInfo(const QString &initName
+InterfaceInfo::InterfaceInfo(const QString &initName
     , const QString &initIp
     , const QString &initMacAddress
     , const QString &initMask
@@ -44,7 +48,7 @@ rtu::InterfaceInfo::InterfaceInfo(const QString &initName
 {}
 
 
-rtu::BaseServerInfo::BaseServerInfo()
+BaseServerInfo::BaseServerInfo()
     : id()
     , runtimeId()
     , customization()
@@ -60,12 +64,12 @@ rtu::BaseServerInfo::BaseServerInfo()
     , hostAddress()
     , port(0)
 
-    , accessibleByHttp(true)
+    , httpAccessMethod(HttpAccessMethod::kTcp)
 {
 }
 
 
-bool rtu::operator == (const BaseServerInfo &first
+bool operator == (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
     const bool firstHasHdd = (first.flags & Constants::HasHdd);
@@ -82,7 +86,7 @@ bool rtu::operator == (const BaseServerInfo &first
         && (firstHasHdd == secondHasHdd));
 }
 
-bool rtu::operator != (const BaseServerInfo &first
+bool operator != (const BaseServerInfo &first
     , const BaseServerInfo &second)
 {
     return !(first == second);
@@ -90,7 +94,7 @@ bool rtu::operator != (const BaseServerInfo &first
 
 ///
 
-rtu::ExtraServerInfo::ExtraServerInfo()
+ExtraServerInfo::ExtraServerInfo()
     : password()
     , timestampMs(0)
     , utcDateTimeMs(0)
@@ -101,7 +105,7 @@ rtu::ExtraServerInfo::ExtraServerInfo()
 {
 }
 
-rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
+ExtraServerInfo::ExtraServerInfo(const QString &initPassword
     , const qint64 &initTimestampMs
     , const qint64 &initUtcDateTimeMs
     , const QByteArray &initTimeZoneId
@@ -120,37 +124,37 @@ rtu::ExtraServerInfo::ExtraServerInfo(const QString &initPassword
 
 ///
 
-rtu::ServerInfo::ServerInfo()
+ServerInfo::ServerInfo()
     : m_base()
     , m_extra()
 {
 }
 
-rtu::ServerInfo::ServerInfo(const ServerInfo &other)
+ServerInfo::ServerInfo(const ServerInfo &other)
     : m_base(other.baseInfo())
     , m_extra(!other.hasExtraInfo() ? nullptr 
         : new ExtraServerInfo(other.extraInfo()))
 {
 }
 
-rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo)
+ServerInfo::ServerInfo(const BaseServerInfo &baseInfo)
     : m_base(baseInfo)
     , m_extra()
 {
 }
 
-rtu::ServerInfo::ServerInfo(const BaseServerInfo &baseInfo
+ServerInfo::ServerInfo(const BaseServerInfo &baseInfo
     , const ExtraServerInfo &extraInfo)
     : m_base(baseInfo)
     , m_extra(new ExtraServerInfo(extraInfo))
 {
 }
 
-rtu::ServerInfo::~ServerInfo()
+ServerInfo::~ServerInfo()
 {
 }
 
-rtu::ServerInfo &rtu::ServerInfo::operator = (const ServerInfo &other)
+ServerInfo &ServerInfo::operator = (const ServerInfo &other)
 {
     m_base = other.baseInfo();
     if (other.hasExtraInfo())
@@ -158,39 +162,39 @@ rtu::ServerInfo &rtu::ServerInfo::operator = (const ServerInfo &other)
     return *this;
 }
 
-const rtu::BaseServerInfo &rtu::ServerInfo::baseInfo() const
+const BaseServerInfo &ServerInfo::baseInfo() const
 {
     return m_base;
 }
 
-rtu::BaseServerInfo &rtu::ServerInfo::writableBaseInfo()
+BaseServerInfo &ServerInfo::writableBaseInfo()
 {
     return m_base;
 }
 
-void rtu::ServerInfo::setBaseInfo(const BaseServerInfo &baseInfo)
+void ServerInfo::setBaseInfo(const BaseServerInfo &baseInfo)
 {
     m_base = baseInfo;
 }
 
-bool rtu::ServerInfo::hasExtraInfo() const
+bool ServerInfo::hasExtraInfo() const
 {
     return !m_extra.isNull();
 }
 
-const rtu::ExtraServerInfo &rtu::ServerInfo::extraInfo() const
+const ExtraServerInfo &ServerInfo::extraInfo() const
 {
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
 
-rtu::ExtraServerInfo &rtu::ServerInfo::writableExtraInfo()
+ExtraServerInfo &ServerInfo::writableExtraInfo()
 {
     Q_ASSERT(!m_extra.isNull());
     return *m_extra;
 }
 
-void rtu::ServerInfo::setExtraInfo(const ExtraServerInfo &extraInfo)
+void ServerInfo::setExtraInfo(const ExtraServerInfo &extraInfo)
 {
     if (hasExtraInfo())
     {
@@ -201,7 +205,11 @@ void rtu::ServerInfo::setExtraInfo(const ExtraServerInfo &extraInfo)
     m_extra.reset(new ExtraServerInfo(extraInfo));
 }
 
-void rtu::ServerInfo::resetExtraInfo()
+void ServerInfo::resetExtraInfo()
 {
     m_extra.reset();
 }
+
+} // namespace api
+} // namespace mediaserver
+} // namespace nx

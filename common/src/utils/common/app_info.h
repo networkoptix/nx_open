@@ -60,6 +60,8 @@ struct QnAppInfo {
     static QString oldAndroidClientLink();
     static QString oldIosClientLink();
 
+    static QString oldAndroidAppId();
+
     // helpers:
 
     inline

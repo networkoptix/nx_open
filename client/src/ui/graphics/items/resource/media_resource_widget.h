@@ -126,6 +126,8 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
 signals:
     void motionSelectionChanged();
     void displayChanged();

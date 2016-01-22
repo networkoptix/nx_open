@@ -525,6 +525,9 @@ void DeviceFileCatalog::scanMediaFiles(const QString& folder, const QnStorageRes
     QnMutex scanFilesMutex;
     for(const auto& fi: files)
     {
+        if (QnResource::isStopping())
+            break;
+
         QnConcurrent::run( &tp, [&]()
         {
             //QString fileName = QDir::toNativeSeparators(fi.absoluteFilePath());

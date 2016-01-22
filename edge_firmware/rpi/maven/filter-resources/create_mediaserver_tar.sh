@@ -188,6 +188,10 @@ mv $PACKAGE_NAME ./zip
 mv update.* ./zip
 mv install.sh ./zip
 cd zip
+if [ ! -f $PACKAGE_NAME ]; then
+  echo "Distribution is not created! Exiting"
+  exit 1
+fi
 zip ./$UPDATE_NAME.zip ./*
 mv ./* ../
 cd ..

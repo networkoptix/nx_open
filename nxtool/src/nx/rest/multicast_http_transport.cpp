@@ -14,11 +14,11 @@
     #error Not supported target os
 #endif
 
-namespace QnMulticast
-{
+namespace nx {
+namespace rest {
 
-const int Packet::MAX_DATAGRAM_SIZE = 1412;
-const int Packet::MAX_PAYLOAD_SIZE = Packet::MAX_DATAGRAM_SIZE - 167;
+const int MulticastHttpTransport::Packet::MAX_DATAGRAM_SIZE = 1412;
+const int MulticastHttpTransport::Packet::MAX_PAYLOAD_SIZE = MulticastHttpTransport::Packet::MAX_DATAGRAM_SIZE - 167;
 
 static const QUuid PROTO_MAGIC("422DEA47-0B0C-439A-B1FA-19644CCBC0BD");
 static const int PROTO_VERSION = 1;
@@ -35,8 +35,8 @@ static const int DELAY_IF_OVERFLOW_MS = 100;           // delay if send buffer o
 
 static const int PROCESSED_REQUESTS_CACHE_SZE = 512;  // keep last sessions to ignore UDP duplicates
 static const int CSV_COLUMNS = 9;
-static char CSV_DELIMITER = ';';
-static char EMPTY_DATA_FILLER = '\x0';
+static const char CSV_DELIMITER = ';';
+static const char EMPTY_DATA_FILLER = '\x0';
 
 static const int INTERFACE_LIST_CHECK_INTERVAL = 1000 * 15;
 
@@ -130,7 +130,7 @@ bool setMulticastIF(int fd, const QString& multicastIF)
 
 // ----------- Packet ------------------
 
-Packet::Packet():
+MulticastHttpTransport::Packet::Packet():
     magic(PROTO_MAGIC), 
     version(PROTO_VERSION), 
     messageSize(0), 
@@ -139,7 +139,7 @@ Packet::Packet():
 
 }
 
-QByteArray Packet::serialize() const
+QByteArray MulticastHttpTransport::Packet::serialize() const
 {
     QByteArray result;
     result.append(magic.toString()).append(CSV_DELIMITER);             // magic
@@ -155,24 +155,29 @@ QByteArray Packet::serialize() const
     return result;
 }
 
-Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
+MulticastHttpTransport::Packet MulticastHttpTransport::Packet::deserialize(const QByteArray& str, bool* success)
 {
     Packet result;
-    QList<QByteArray> fields = deserialize.split(CSV_DELIMITER);
-    *ok = false;
+    QList<QByteArray> fields = str.split(CSV_DELIMITER);
+    *success = false;
     if (fields.size() != CSV_COLUMNS)
-        return result; // error
+        return result; //< error
 
     result.magic     = QUuid(fields[0]);
     result.version   = fields[1].toInt();
 
     if (result.magic != PROTO_MAGIC || result.version != PROTO_VERSION)
-        return result; // error
+        return result; //< error
 
     result.requestId   = QUuid(fields[2]);
     result.clientId    = QUuid(fields[3]);
     result.serverId    = QUuid(fields[4]);
-    result.messageType = (MessageType) fields[5].toInt();
+
+    if (fields[5].toInt() == 0)
+        result.messageType = MessageType::request;
+    else
+        result.messageType = MessageType::response;
+
     result.messageSize = fields[6].toInt();
     result.offset      = fields[7].toInt();
     result.payloadData = fields[8];
@@ -180,14 +185,14 @@ Packet Packet::deserialize(const QByteArray& deserialize, bool* ok)
     if (result.offset + result.payloadData.size() > result.messageSize)
         return result; // error
 
-    *ok = true;
+    *success = true;
     return result;
 }
 
 
 // ----------------- Transport -----------------
 
-Transport::Transport(const QUuid& localGuid):
+MulticastHttpTransport::MulticastHttpTransport(const QUuid& localGuid):
     m_localGuid(localGuid),
     m_processedRequests(PROCESSED_REQUESTS_CACHE_SZE),
     m_mutex(QMutex::Recursive),
@@ -196,12 +201,12 @@ Transport::Transport(const QUuid& localGuid):
     initSockets(getLocalAddressList());
 
     m_timer.reset(new QTimer());
-    connect(m_timer.get(), &QTimer::timeout, this, &Transport::at_timer);
+    connect(m_timer.get(), &QTimer::timeout, this, &MulticastHttpTransport::at_timer);
     m_timer->start(1000);
     m_checkInterfacesTimer.restart();
 }
 
-QSet<QString> Transport::getLocalAddressList() const
+QSet<QString> MulticastHttpTransport::getLocalAddressList() const
 {
     QSet<QString> result;
 
@@ -218,11 +223,11 @@ QSet<QString> Transport::getLocalAddressList() const
     return result;
 }
 
-void Transport::initSockets(const QSet<QString>& addrList)
+void MulticastHttpTransport::initSockets(const QSet<QString>& addrList)
 {
     if (m_recvSocket) 
     {
-        // unsabscribe socket from old multicast list
+        // unsubscribe socket from old multicast list
         for (const QString& ipv4Addr: m_localAddressList)
             leaveMulticastGroup(m_recvSocket->socketDescriptor(), MULTICAST_GROUP.toString(), ipv4Addr);
     }
@@ -234,7 +239,7 @@ void Transport::initSockets(const QSet<QString>& addrList)
     if (!m_recvSocket->bind(QHostAddress::AnyIPv4, MULTICAST_PORT, QAbstractSocket::ReuseAddressHint))
         qWarning() << "Failed to open Multicast Http receive socket";
     setRecvBufferSize(m_recvSocket->socketDescriptor(), SOCKET_RECV_BUFFER_SIZE);
-    connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &Transport::at_socketReadyRead);
+    connect(m_recvSocket.get(), &QUdpSocket::readyRead, this, &MulticastHttpTransport::at_socketReadyRead);
 
     m_sendSockets.clear();
 
@@ -258,12 +263,12 @@ void Transport::initSockets(const QSet<QString>& addrList)
     }
 }
 
-QString Transport::localAddress() const
+QString MulticastHttpTransport::localAddress() const
 {
     return m_localAddressList.isEmpty() ? QString() : *m_localAddressList.begin();
 }
 
-void Transport::at_timer()
+void MulticastHttpTransport::at_timer()
 {
     at_socketReadyRead();
 
@@ -273,7 +278,7 @@ void Transport::at_timer()
         TransportConnection& request = *itr;
         if (request.hasExpired()) {
             if (request.responseCallback)
-                request.responseCallback(request.requestId, ErrCode::timeout, Response());
+                request.responseCallback(request.requestId, multicastHttp::ResultCode::timeout, multicastHttp::Response());
             m_processedRequests.insert(request.requestId, 0);
             itr = m_requests.erase(itr);
         }
@@ -291,14 +296,14 @@ void Transport::at_timer()
     }
 }
 
-void Transport::cancelRequest(const QUuid& requestId)
+void MulticastHttpTransport::cancelRequest(const QUuid& requestId)
 {
     QMutexLocker lock(&m_mutex);
     eraseRequest(requestId);
     m_processedRequests.insert(requestId, 0);
 }
 
-QByteArray Transport::serializeMessage(const Request& request) const
+QByteArray MulticastHttpTransport::serializeMessage(const multicastHttp::Request& request) const
 {
     QString result;
 
@@ -313,7 +318,7 @@ QByteArray Transport::serializeMessage(const Request& request) const
     return result.toUtf8().append(request.messageBody);
 }
 
-bool Transport::parseHttpMessage(Message& result, const QByteArray& message) const
+bool MulticastHttpTransport::parseHttpMessage(multicastHttp::Message& result, const QByteArray& message) const
 {
     static const QByteArray ENDL("\r\n");
     static const QByteArray DOUBLE_ENDL("\r\n\r\n");
@@ -332,7 +337,7 @@ bool Transport::parseHttpMessage(Message& result, const QByteArray& message) con
     {
         int delimiterPos = header.indexOf(':');
         if (delimiterPos != -1) {
-            Header h;
+            multicastHttp::Header h;
             h.first = QLatin1String(header.left(delimiterPos).trimmed());
             h.second = QLatin1String(header.mid(delimiterPos+1).trimmed());
             if (h.first.toLower() == QLatin1String("content-type"))
@@ -345,10 +350,10 @@ bool Transport::parseHttpMessage(Message& result, const QByteArray& message) con
     return true;
 }
 
-QnMulticast::Response Transport::parseResponse(const TransportConnection& transportData, bool* ok) const
+multicastHttp::Response MulticastHttpTransport::parseResponse(const TransportConnection& transportData, bool* ok) const
 {
     *ok = false;
-    Response response;
+    multicastHttp::Response response;
 
     QByteArray message = QByteArray::fromBase64(transportData.receivedData);
     if (!parseHttpMessage(response, message))
@@ -364,10 +369,10 @@ QnMulticast::Response Transport::parseResponse(const TransportConnection& transp
     return response;
 }
 
-QnMulticast::Request Transport::parseRequest(const TransportConnection& transportData, bool* ok) const
+multicastHttp::Request MulticastHttpTransport::parseRequest(const TransportConnection& transportData, bool* ok) const
 {
     *ok = false;
-    QnMulticast::Request request;
+    multicastHttp::Request request;
     request.serverId = m_localGuid;
     QByteArray message = QByteArray::fromBase64(transportData.receivedData);
     if (!parseHttpMessage(request, message))
@@ -384,7 +389,8 @@ QnMulticast::Request Transport::parseRequest(const TransportConnection& transpor
     return request;
 }
 
-QUuid Transport::addRequest(const Request& request, ResponseCallback callback, int timeoutMs)
+QUuid MulticastHttpTransport::addRequest(const multicastHttp::Request& request,
+    multicastHttp::ResponseCallback callback, int timeoutMs)
 {
     QMutexLocker lock(&m_mutex);
     TransportConnection transportRequest = serializeRequest(request);
@@ -395,7 +401,7 @@ QUuid Transport::addRequest(const Request& request, ResponseCallback callback, i
     return transportRequest.requestId;
 }
 
-void Transport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
+void MulticastHttpTransport::putPacketToTransport(TransportConnection& transportConnection, const Packet& packet)
 {
     QByteArray encodedData = packet.serialize();
     Q_ASSERT(encodedData.size() <= Packet::MAX_DATAGRAM_SIZE);
@@ -406,7 +412,8 @@ void Transport::putPacketToTransport(TransportConnection& transportConnection, c
     }
 }
 
-Transport::TransportConnection Transport::serializeRequest(const Request& request)
+MulticastHttpTransport::TransportConnection MulticastHttpTransport::serializeRequest(
+    const multicastHttp::Request& request)
 {
     TransportConnection transportRequest;
     QByteArray message = serializeMessage(request).toBase64();
@@ -429,14 +436,14 @@ Transport::TransportConnection Transport::serializeRequest(const Request& reques
     return transportRequest;
 }
 
-void Transport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
+void MulticastHttpTransport::addResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
     QMutexLocker lock(&m_mutex);
     m_requests.push_back(serializeResponse(requestId, clientId, httpResponse));
     queueNextSendData(0);
 }
 
-Transport::TransportConnection Transport::serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
+MulticastHttpTransport::TransportConnection MulticastHttpTransport::serializeResponse(const QUuid& requestId, const QUuid& clientId, const QByteArray& httpResponse)
 {
     TransportConnection transportConnection;
     transportConnection.requestId = requestId;
@@ -460,14 +467,14 @@ Transport::TransportConnection Transport::serializeResponse(const QUuid& request
     return transportConnection;
 }
 
-void Transport::eraseRequest(const QUuid& id)
+void MulticastHttpTransport::eraseRequest(const QUuid& id)
 {
     m_requests.erase(std::remove_if(m_requests.begin(), m_requests.end(), [id](const TransportConnection& conn) {
         return conn.requestId == id;
     }));
 }
 
-void Transport::at_socketReadyRead()
+void MulticastHttpTransport::at_socketReadyRead()
 {
     QMutexLocker lock(&m_mutex);
     while (m_recvSocket->hasPendingDatagrams())
@@ -477,9 +484,9 @@ void Transport::at_socketReadyRead()
         int gotBytes = m_recvSocket->readDatagram(datagram.data(), datagram.size());
         if (gotBytes <= 0)
             continue;
-        bool ok;
-        Packet packet = Packet::deserialize(datagram, &ok);
-        if (!ok)
+        bool success;
+        Packet packet = Packet::deserialize(datagram, &success);
+        if (!success)
             continue;
 
         auto itr = std::find_if(m_requests.begin(), m_requests.end(), [packet](const TransportConnection& conn) {
@@ -514,14 +521,18 @@ void Transport::at_socketReadyRead()
             bool ok;
             if (packet.messageType == MessageType::response) 
             {
-                Response response = parseResponse(transportData, &ok);
+                multicastHttp::Response response = parseResponse(transportData, &ok);
                 response.serverId = packet.serverId;
                 if (transportData.responseCallback)
-                    transportData.responseCallback(transportData.requestId, ok ? ErrCode::ok : ErrCode::networkIssue, response);
+                {
+                    transportData.responseCallback(transportData.requestId,
+                        ok ? multicastHttp::ResultCode::ok :
+                            multicastHttp::ResultCode::networkIssue, response);
+                }
             }
             else if (packet.messageType == MessageType::request) 
             {
-                Request request = parseRequest(transportData, &ok);
+                multicastHttp::Request request = parseRequest(transportData, &ok);
                 if (ok && m_requestCallback)
                     m_requestCallback(transportData.requestId, packet.clientId, request);
             }
@@ -530,7 +541,7 @@ void Transport::at_socketReadyRead()
     }
 }
 
-void Transport::sendNextData()
+void MulticastHttpTransport::sendNextData()
 {
     QMutexLocker lock(&m_mutex);
     m_nextSendQueued = false;
@@ -540,8 +551,11 @@ void Transport::sendNextData()
         TransportConnection& request = *itr;
 
         if (m_localAddressList.isEmpty()) {
-            if (request.responseCallback)
-                request.responseCallback(request.requestId, ErrCode::networkIssue, Response());
+            if (request.responseCallback) {
+                request.responseCallback(
+                    request.requestId,
+                    multicastHttp::ResultCode::networkIssue, multicastHttp::Response());
+            }
             itr = m_requests.erase(itr);
             continue;
         }
@@ -574,7 +588,7 @@ void Transport::sendNextData()
     }
 }
 
-void Transport::queueNextSendData(int delay)
+void MulticastHttpTransport::queueNextSendData(int delay)
 {
     if (!m_nextSendQueued) {
         m_nextSendQueued = true;
@@ -582,4 +596,5 @@ void Transport::queueNextSendData(int delay)
     }
 }
 
-}
+} // namespace rest
+} // namespace nx

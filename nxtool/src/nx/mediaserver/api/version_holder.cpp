@@ -3,35 +3,39 @@
 
 #include <QStringList>
 
-namespace
+namespace nx {
+namespace mediaserver {
+namespace api {
+
+namespace {
+
+template<typename ResultType>
+ResultType initData(int major, int minor, int bugfix, int build)
 {
-    template<typename ResultType>
-    ResultType initData(int major, int minor, int bugfix, int build)
-    {
-        ResultType result;
-        if (result.size() > 0)
-            result[0] = major;
+    ResultType result;
+    if (result.size() > 0)
+        result[0] = major;
     
-        if (result.size() > 1)
-            result[1] = minor;
+    if (result.size() > 1)
+        result[1] = minor;
 
-        if (result.size() > 2)
-            result[2] = bugfix;
+    if (result.size() > 2)
+        result[2] = bugfix;
 
-        if (result.size() > 3)
-            result[3] = build;
+    if (result.size() > 3)
+        result[3] = build;
 
-        return result;
-    }
-
+    return result;
 }
 
-rtu::VersionHolder::VersionHolder()
+} // namespace
+
+VersionHolder::VersionHolder()
     : m_data(initData<Data>(0, 0, 0, 0))
 {
 }
 
-rtu::VersionHolder::VersionHolder(int major
+VersionHolder::VersionHolder(int major
     , int minor
     , int bugfix
     , int build)
@@ -39,7 +43,7 @@ rtu::VersionHolder::VersionHolder(int major
 {
 }
 
-rtu::VersionHolder::VersionHolder(const QString &str)
+VersionHolder::VersionHolder(const QString &str)
     : m_data(initData<Data>(0, 0, 0, 0))
 {
     static const char kBetaDelim = ' ';
@@ -56,11 +60,11 @@ rtu::VersionHolder::VersionHolder(const QString &str)
         { m_data[index] = value; };
 
     const std::size_t count = (versionParts.size() > m_data.size() ? m_data.size() : versionParts.size());
-    for (std::size_t i = 0; i != count; ++i)
+    for (int i = 0; i != count; ++i)
         setData(i, versionParts.at(i).toInt());
 }
 
-QString rtu::VersionHolder::toString() const
+QString VersionHolder::toString() const
 {
     static const auto kTemplate = QStringLiteral("%1.%2.%3.%4");
     return kTemplate.arg(QString::number(m_data[0])
@@ -69,23 +73,26 @@ QString rtu::VersionHolder::toString() const
         , QString::number(m_data[3]));
 }
 
-bool rtu::VersionHolder::operator < (const VersionHolder &other) const
+bool VersionHolder::operator < (const VersionHolder &other) const
 {
     return (m_data < other.m_data);
 }
 
-bool rtu::VersionHolder::operator > (const VersionHolder &other) const
+bool VersionHolder::operator > (const VersionHolder &other) const
 {
     return (m_data > other.m_data);
 }
 
-bool rtu::VersionHolder::operator == (const VersionHolder &other) const
+bool VersionHolder::operator == (const VersionHolder &other) const
 {
     return (m_data == other.m_data);
 }
 
-bool rtu::VersionHolder::operator != (const VersionHolder &other) const
+bool VersionHolder::operator != (const VersionHolder &other) const
 {
     return (m_data != other.m_data);
 }
 
+} // namespace api
+} // namespace mediaserver
+} // namespace nx

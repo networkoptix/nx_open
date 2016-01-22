@@ -36,7 +36,7 @@ SERVER_PORT=`cat /opt/$COMPANY_NAME/mediaserver/etc/mediaserver.conf | grep port
 # Determining process that occupies Server Port
 PORT_PROCESS=`netstat -tpan | grep $SERVER_PORT | grep LISTEN | awk {'print $NF'} | grep -o '[0-9]\+'`
 # Checking if the process belongs to our server. Netstat always shows process name like "xxxxx/mediaserver", but it may be mediaserver of a different customization
-SERVER_PROCESS=`ps $PORT_PROCESS | grep $COMPANY_NAME`
+SERVER_PROCESS=`ps $PORT_PROCESS | grep $'/opt/'$COMPANY_NAME'/mediaserver'`
 # Note that $SERVER_PROCESS may contain spaces or \n in this case we need to convert it to empty string
 while [ -z "${SERVER_PROCESS// }" ]; do
   echo "Restarting "$COMPANY_NAME"-mediaserver" >> /opt/$COMPANY_NAME/mediaserver/var/log/update.log

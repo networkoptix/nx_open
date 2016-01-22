@@ -12,6 +12,14 @@
 
 #include <plugins/resource/avi/filetypesupport.h>
 
+namespace {
+
+    /* Maximum nov-file entries. */
+    const quint32 kMaxEntries = 1024;
+
+    /* Max future nov-file version that should be opened by the current client version. */
+    const quint32 kMaxVersion = 1024;
+}
 
 class QnLayoutFile: public QIODevice
 {
@@ -44,7 +52,7 @@ public:
     virtual qint64 size() const
     {
         QnMutexLocker lock( &m_mutex );
-        return m_fileSize;   
+        return m_fileSize;
     }
 
     virtual qint64 pos() const
@@ -84,7 +92,7 @@ public:
     {
         QnMutexLocker lock( &m_mutex );
         m_openMode = openMode;
-        if (openMode & QIODevice::WriteOnly) 
+        if (openMode & QIODevice::WriteOnly)
         {
             qint64 fileSize;
             if (m_storageResource.getFileOffset(m_fileName, &fileSize) == -1)
@@ -219,7 +227,7 @@ QnLayoutFileStorageResource::QnLayoutFileStorageResource():
     m_novFileOffset = 0;
     //m_novFileLen = 0;
     m_allStorages.insert(this);
- 
+
     m_capabilities |= cap::ListFile;
     m_capabilities |= cap::ReadFile;
 }
@@ -243,7 +251,7 @@ bool QnLayoutFileStorageResource::renameFile(const QString& oldName, const QStri
 bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QString& newName, bool dataInOldFile)
 {
     QnMutexLocker lock( &m_storageSync );
-    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
+    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr)
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
@@ -260,7 +268,7 @@ bool QnLayoutFileStorageResource::switchToFile(const QString& oldName, const QSt
         QFile::remove(removeProtocolPrefix(oldName));
     }
 
-    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr) 
+    for (QSet<QnLayoutFileStorageResource*>::Iterator itr = m_allStorages.begin(); itr != m_allStorages.end(); ++itr)
     {
         QnLayoutFileStorageResource* storage = *itr;
         QString storageUrl = storage->getPath();
@@ -340,7 +348,7 @@ bool QnLayoutFileStorageResource::isAvailable() const
             dir.rmdir(tmpDir);
             return true;
         }
-        else 
+        else
             return false;
     }
 
@@ -361,16 +369,29 @@ QnStorageResource* QnLayoutFileStorageResource::instance(const QString&)
 bool QnLayoutFileStorageResource::readIndexHeader()
 {
     QFile file(removeProtocolPrefix(getUrl()));
-    if (!file.open(QIODevice::ReadOnly)) 
+    if (!file.open(QIODevice::ReadOnly))
         return false;
-    
+
     file.seek(m_novFileOffset);
     file.read((char*) &m_index, sizeof(m_index));
     if ((quint64)m_index.magic != MAGIC_STATIC) {
-        qWarning() << "Invalid Nov index detected! Disk write error or antivirus activty. Ignoring";
+        qWarning() << "Invalid nov index detected! Disk write error or antivirus activity. Ignoring.";
         m_index = QnLayoutFileIndex();
         return false;
     }
+
+    if (m_index.entryCount > kMaxEntries) {
+        qWarning() << "Corrupted nov file. Ignoring.";
+        m_index = QnLayoutFileIndex();
+        return false;
+    }
+
+    if (m_index.version > kMaxVersion) {
+        qWarning() << "Unsupported file from the future version. Ignoring.";
+        m_index = QnLayoutFileIndex();
+        return false;
+    }
+
     return true;
 }
 
@@ -469,7 +490,7 @@ void QnLayoutFileStorageResource::setUrl(const QString& value)
             quint64 magic;
             f.read((char*) &novOffset, sizeof(qint64));
             f.read((char*) &magic, sizeof(qint64));
-            if (magic == FileTypeSupport::NOV_EXE_MAGIC) 
+            if (magic == FileTypeSupport::NOV_EXE_MAGIC)
             {
                 m_novFileOffset = novOffset;
             }
