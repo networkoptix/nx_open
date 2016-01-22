@@ -29,7 +29,7 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
         return;
 
     QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
-    if (!forcedRotation.isEmpty()) 
+    if (!forcedRotation.isEmpty())
         m_rotation = forcedRotation.toInt();
 }
 
@@ -419,7 +419,7 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return false;
         }
     }
-                                       
+
     case Qn::ItemFlagsRole: {
         bool ok;
         int flags = value.toInt(&ok);
@@ -441,6 +441,16 @@ bool QnWorkbenchItem::setData(int role, const QVariant &value) {
             return false;
         }
     }
+    case Qn::ItemFlipRole: {
+        /* Avoiding unnecessary dataChanged calls */
+        bool flip = value.toBool();
+        bool localValue = m_dataByRole[Qn::ItemFlipRole].toBool();
+        if(localValue != value) {
+            m_dataByRole[Qn::ItemFlipRole] = value;
+            emit dataChanged(Qn::ItemFlipRole);
+        }
+        return true;
+                               }
     default:
         QVariant &localValue = m_dataByRole[role];
         if(localValue != value) {

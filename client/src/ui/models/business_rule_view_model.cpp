@@ -75,6 +75,27 @@ namespace QnBusiness {
             return filteredResources<QnUserResource>(resources);
         return QnResourceList();
     }
+
+    /**
+     *  This method must cleanup all action parameters that are not required for the given action.
+     *  For now it implements only handling of the deprecated CameraOutputOnceAction action.
+     *  //TODO: #GDM implement correct filtering
+     */
+    QnBusinessActionParameters filterActionParams(QnBusiness::ActionType actionType, const QnBusinessActionParameters &params)
+    {
+        QnBusinessActionParameters result(params);
+        switch (actionType)
+        {
+        case QnBusiness::CameraOutputOnceAction:
+            result.relayAutoResetTimeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs;
+
+            break;
+        default:
+            break;
+        }
+
+        return result;
+    }
 }
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
@@ -329,7 +350,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
     rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
-    rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
+    rule->setActionParams(filterActionParams(m_actionType, m_actionParams));
     rule->setAggregationPeriod(m_aggregationPeriodSec);
     rule->setDisabled(m_disabled);
     rule->setComment(m_comments);

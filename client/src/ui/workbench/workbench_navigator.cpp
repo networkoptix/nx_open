@@ -24,7 +24,6 @@ extern "C"
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <camera/resource_display.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_bookmark.h>
@@ -35,8 +34,13 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/storage_resource.h>
 
+#include <plugins/resource/archive/abstract_archive_stream_reader.h>
+#include <plugins/resource/avi/avi_resource.h>
+
+#include <camera/resource_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <camera/thumbnails_loader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
@@ -68,8 +72,6 @@ extern "C"
 #include "workbench_layout.h"
 #include "workbench_layout_snapshot_manager.h"
 
-#include "camera/thumbnails_loader.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
 #include <utils/common/delayed.h>
@@ -715,15 +717,7 @@ void QnWorkbenchNavigator::updateHasArchiveState()
 }
 
 bool QnWorkbenchNavigator::hasVideo() const {
-    if (!m_currentMediaWidget)
-        return false;
-
-    auto reader = m_currentMediaWidget->display()->archiveReader();
-    if (!reader)
-        return false;
-
-    //TODO: #GDM archiveReader()->hasVideo() cannot be used because always returns true for online sources
-    return m_currentMediaWidget->resource()->hasVideo(reader);
+    return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
 
@@ -814,7 +808,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnVirtualCameraResource>());
 
-    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false)) {
+    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false))
+    {
         loader->setMotionRegions(QList<QRegion>());
         if (!m_syncedResources.contains(syncedResource))
             loader->setEnabled(false);
@@ -1605,20 +1600,44 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
     if (!m_timeSlider)
         return;
 
-    QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget, false);
+    auto canLoadThumbnailsForWidget = [this] (QnMediaResourceWidget* widget) {
+        /* Widget must exist. */
+        if (!widget)
+            return false;
 
-    if (
-           !m_currentMediaWidget
-        || !m_currentMediaWidget->resource()
-        || !m_currentMediaWidget->hasAspectRatio()
-        || m_currentMediaWidget->display()->isStillImage()
-        || m_currentMediaWidget->channelLayout()->size().width() > 1            // disable thumbnails for panoramic cameras
-        || m_currentMediaWidget->channelLayout()->size().height() > 1
-        || !loader
-        || loader->periods(Qn::RecordingContent).empty()                        // no recording for this camera
-        )
+        /* Widget must have associated resource, supported by thumbnails loader. */
+        if (!QnThumbnailsLoader::supportedResource(widget->resource()))
+            return false;
+
+        /* First frame is not loaded yet, we must know it for setting up correct aspect ratio. */
+        if (!widget->hasAspectRatio())
+            return false;
+
+        /* Thumbnails for panoramic cameras are disabled for now. */
+        if (widget->channelLayout()->size().width() > 1
+         || widget->channelLayout()->size().height() > 1)
+            return false;
+
+        /* Thumbnails for I/O modules and sound files are disabled. */
+        if (!widget->hasVideo())
+            return false;
+
+        /* Further checks must be skipped for local files. */
+        QnAviResourcePtr aviFile = widget->resource().dynamicCast<QnAviResource>();
+        if (aviFile)
+            return true;
+
+        /* Check if the camera has recorded periods. */
+        QnCachingCameraDataLoader *loader = loaderByWidget(widget, false);
+        if (!loader || loader->periods(Qn::RecordingContent).empty())
+            return false;
+
+        return true;
+    };
+
+    if (!canLoadThumbnailsForWidget(m_currentMediaWidget))
     {
-        m_timeSlider->setThumbnailsLoader(NULL, -1);
+        m_timeSlider->setThumbnailsLoader(nullptr, -1);
         return;
     }
 
@@ -1941,6 +1960,8 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
     if(widget->options() & QnResourceWidget::DisplayMotion) {
         m_motionIgnoreWidgets.insert(widget);
+        if (widget == m_currentMediaWidget)
+            at_widget_motionSelectionChanged(m_currentMediaWidget);
     } else {
         m_motionIgnoreWidgets.remove(widget);
     }
