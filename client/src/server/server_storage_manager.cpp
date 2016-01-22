@@ -95,6 +95,7 @@ QnServerStorageManager::QnServerStorageManager( QObject *parent )
             connect(storage, &QnClientStorageResource::isWritableChanged,       this, emitStorageChanged);
             connect(storage, &QnClientStorageResource::isUsedForWritingChanged, this, emitStorageChanged);
             connect(storage, &QnClientStorageResource::isBackupChanged,         this, emitStorageChanged);
+            connect(storage, &QnClientStorageResource::isActiveChanged,         this, emitStorageChanged);
 
             emit storageAdded(storage);
             checkStoragesStatusInternal(storage);
@@ -206,7 +207,16 @@ void QnServerStorageManager::saveStorages(const QnStorageResourceList &storages 
     if (!conn)
         return;
 
-    conn->getMediaServerManager()->saveStorages(storages, this, [] {});
+    conn->getMediaServerManager()->saveStorages(storages, this, [storages](int reqID, ec2::ErrorCode error)
+    {
+        Q_UNUSED(reqID);
+        if (error != ec2::ErrorCode::ok)
+            return;
+
+        for (const QnStorageResourcePtr& storage: storages)
+            if (const QnClientStorageResourcePtr& clientStorage = storage.dynamicCast<QnClientStorageResource>())
+                clientStorage->setActive(true);
+    });
 }
 
 //TODO: #GDM SafeMode

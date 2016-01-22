@@ -22,28 +22,6 @@
 #include <utils/common/util.h>
 #include <utils/network/http/httptypes.h>
 
-namespace {
-
-#ifdef _DEBUG
-    void validateStoragesPool() {
-        /* Validate that all storages are placed in the resource pool. */
-        QList<QnUuid> managedStorages;
-        for (const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages())
-            managedStorages.append(storage->getId());
-        for (const QnStorageResourcePtr &storage: qnBackupStorageMan->getStorages())
-            managedStorages.append(storage->getId());
-
-        QList<QnUuid> pooledStorages;
-        for (const QnStorageResourcePtr &storage: qnResPool->getResourcesByParentId(qnCommon->remoteGUID()).filtered<QnStorageResource>())
-            pooledStorages.append(storage->getId());
-
-        Q_ASSERT_X(managedStorages.size() == pooledStorages.size(), Q_FUNC_INFO, "Make sure all storages are in the resource pool");
-        Q_ASSERT_X(managedStorages.toSet() == pooledStorages.toSet(), Q_FUNC_INFO, "Make sure all storages are in the resource pool");
-    }
-#endif
-
-}
-
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor())
 {}
@@ -57,7 +35,7 @@ int QnStorageSpaceRestHandler::executeGet(
 {
     QnStorageSpaceReply reply;
 
-    auto enoughSpace = [](const QnStorageResourcePtr& storage) 
+    auto enoughSpace = [](const QnStorageResourcePtr& storage)
     {   /* We should always display invalid storages. */
         qint64 totalSpace = storage->getTotalSpace();
         if (totalSpace == QnStorageResource::UnknownSize)
@@ -71,13 +49,9 @@ int QnStorageSpaceRestHandler::executeGet(
         return !storage->hasFlags(Qn::deprecated);
     };
 
-#ifdef _DEBUG
-    validateStoragesPool();
-#endif
-
     /* Enumerate normal storages. */
-    for (const QnStorageResourcePtr &storage : 
-         qnNormalStorageMan->getStorages().filtered(filterDeprecated)) 
+    for (const QnStorageResourcePtr &storage :
+         qnNormalStorageMan->getStorages().filtered(filterDeprecated))
     {
         QnStorageSpaceData data(storage);
         if (!enoughSpace(storage))
@@ -86,8 +60,8 @@ int QnStorageSpaceRestHandler::executeGet(
     }
 
     /* Enumerate backup storages. */
-    for (const QnStorageResourcePtr &storage : 
-         qnBackupStorageMan->getStorages().filtered(filterDeprecated)) 
+    for (const QnStorageResourcePtr &storage :
+         qnBackupStorageMan->getStorages().filtered(filterDeprecated))
     {
         QnStorageSpaceData data(storage);
             if (!enoughSpace(storage))
@@ -98,8 +72,8 @@ int QnStorageSpaceRestHandler::executeGet(
     auto partitionEnoughSpace = [](
         QnPlatformMonitor::PartitionType    ptype,
         qint64                              size
-    ) 
-    {   
+    )
+    {
         if (size == QnStorageResource::UnknownSize)
             return true;
         return size >= QnFileStorageResource::calcSpaceLimit(ptype);
@@ -125,7 +99,7 @@ int QnStorageSpaceRestHandler::executeGet(
         bool hasStorage = std::any_of(
             storagePaths.cbegin(),
             storagePaths.cend(),
-            [&partition](const QString &storagePath) 
+            [&partition](const QString &storagePath)
             {
                 return closeDirPath(storagePath).startsWith(partition.path);
             }
@@ -145,7 +119,7 @@ int QnStorageSpaceRestHandler::executeGet(
         QnStorageResourcePtr storage = QnStorageResourcePtr(
             QnStoragePluginFactory::instance()->createStorage(data.url, false)
         );
-        
+
         if (storage) {
             storage->setUrl(data.url); /* createStorage does not fill url. */
             storage->setSpaceLimit(

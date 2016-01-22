@@ -41,7 +41,7 @@
 namespace
 {
     static const int kColumnSpacing = 8;
-    static const int kMinColWidth = 16;
+    static const int kMinColWidth = 60;
 
     class StoragesPoolFilterModel: public QSortFilterProxyModel {
     public:
@@ -920,7 +920,7 @@ void QnStorageConfigWidget::updateRebuildUi(QnServerStoragesPool pool, const QnS
                 return info.isWritable
                     && info.isBackup != isMainPool
                     && info.isOnline
-                    && !m_model->storageIsJustAdded(info);   /* Ignoring newly added external storages until Apply pressed. */
+                    && m_model->storageIsActive(info);   /* Ignoring newly added external storages until Apply pressed. */
             })
         && !backupIsInProgress
     ;

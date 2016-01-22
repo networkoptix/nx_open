@@ -9,6 +9,7 @@ QnClientStorageResource::QnClientStorageResource()
     , m_freeSpace(QnStorageResource::UnknownSize)
     , m_totalSpace(QnStorageResource::UnknownSize)
     , m_writable(false)
+    , m_active(false)
 {
 
 }
@@ -16,7 +17,7 @@ QnClientStorageResource::QnClientStorageResource()
 QnClientStorageResourcePtr QnClientStorageResource::newStorage( const QnMediaServerResourcePtr &parentServer, const QString &url ) {
     Q_ASSERT_X(parentServer, Q_FUNC_INFO, "Server must exist here");
 
-    QnClientStorageResourcePtr storage(new QnClientStorageResource());  
+    QnClientStorageResourcePtr storage(new QnClientStorageResource());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName(lit("Storage"));
     if (resType)
@@ -59,6 +60,24 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
 
 bool QnClientStorageResource::isSpaceInfoAvailable() const {
     return m_totalSpace != QnStorageResource::UnknownSize;
+}
+
+bool QnClientStorageResource::isActive() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_active;
+}
+
+
+void QnClientStorageResource::setActive(bool value)
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_active == value)
+            return;
+        m_active = value;
+    }
+    emit isActiveChanged(::toSharedPointer(this));
 }
 
 
@@ -116,7 +135,7 @@ bool QnClientStorageResource::isDirExists(const QString&)
     return false;
 }
 
-qint64 QnClientStorageResource::getFreeSpace() {    
+qint64 QnClientStorageResource::getFreeSpace() {
     QnMutexLocker lock(&m_mutex);
     return m_freeSpace;
 }
@@ -148,7 +167,7 @@ void QnClientStorageResource::setTotalSpace( qint64 value ) {
 
 int QnClientStorageResource::getCapabilities() const {
     QnMutexLocker lock(&m_mutex);
-    return m_writable 
+    return m_writable
         ? QnAbstractStorageResource::cap::WriteFile
         : 0;
 }

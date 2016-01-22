@@ -56,8 +56,13 @@ public:
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo &data) const;
 
-    /** Check if storage is just added in the dialog and does not exist on server. */
-    bool storageIsJustAdded(const QnStorageModelInfo &data) const;
+    /**
+     *  Check if storage is active on the server.
+     *  Inactive storages are:
+     *      - newly added remote storages, until changes are applied
+     *      - auto-found server-side partitions without storage
+     */
+    bool storageIsActive(const QnStorageModelInfo &data) const;
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;

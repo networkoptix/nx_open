@@ -1,6 +1,7 @@
 #include "storage_list_model.h"
 
 #include <core/resource/storage_resource.h>
+#include <core/resource/client_storage_resource.h>
 #include <core/resource/media_server_resource.h>
 
 #include <utils/common/collection.h>
@@ -167,7 +168,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case UrlColumn:
         {
             QString path = urlPath(storageData.url);
-            if (!storageData.isOnline && storageData.isWritable && !storageIsJustAdded(storageData))
+            if (!storageData.isOnline && storageData.isWritable && storageIsActive(storageData))
                 return tr("%1 (Checking...)").arg(path);
 
             for (const auto &rebuildStatus: m_rebuildStatus)
@@ -352,7 +353,7 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
             return false;
 
         return (storageData.isOnline
-            || storageIsJustAdded(storageData)
+            || !storageIsActive(storageData)
             ||  index.column() == ChangeGroupActionColumn);
     };
 
@@ -395,14 +396,13 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
     }))
         return false;
 
-    /* Newly added storage, still not applied */
-    if (storageIsJustAdded(data))
+    if (!data.isWritable)
+        return false;
+
+    if (!storageIsActive(data))
         return true;
 
     if (!data.isOnline)
-        return false;
-
-    if (!data.isWritable)
         return false;
 
     if (data.isBackup)
@@ -440,12 +440,16 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     return data.isExternal || !data.isWritable;
 }
 
-bool QnStorageListModel::storageIsJustAdded(const QnStorageModelInfo &data) const
+bool QnStorageListModel::storageIsActive(const QnStorageModelInfo &data) const
 {
     if (!m_server)
-        return true;
+        return false;
 
-    return m_server->getStorageByUrl(data.url).isNull();
+    QnClientStorageResourcePtr storage = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
+    if (!storage)
+        return false;
+
+    return storage->isActive();
 }
 
 bool QnStorageListModel::isStoragePoolInRebuild( const QnStorageModelInfo& storage ) const
