@@ -1738,6 +1738,23 @@
                     </result>
                 </function>
                 <function>
+                    <name>saveCloudSystemCredentials</name>
+                    <description>Sets cloud credentials (systemId and authorization key) to be used by system</description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>cloudSystemID</name>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                        <param>
+                            <name>cloudAuthKey</name>
+                            <optional>false</optional>
+                            <values/>
+                        </param>
+                    </params>
+                </function>
+                <function>
                     <name>activateLicense</name>
                     <description>Activate new license and return license JSON data if success</description>
                     <method>GET</method>
