@@ -13,6 +13,8 @@
 
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
+#include <QtGui/qopengl.h>
+
 
 #if defined(Q_OS_ANDROID)
 
@@ -36,91 +38,53 @@ static const GLfloat g_texture_data[] = {
 
 // --------------------------------------------------------------------------------------------------
 
-class AndroidDecoderPrivate;
+typedef std::shared_ptr<QOpenGLFramebufferObject> FboPtr;
 
-class TextureBuffer : public QAbstractVideoBuffer
+class FboManager
 {
 public:
-    TextureBuffer (AndroidDecoderPrivate* owner);
-
-    ~TextureBuffer()
+    FboManager(const QSize& frameSize):
+        m_frameSize(frameSize)
     {
-        //m_javaDecoder.callMethod<void>("onCurrentBufferRendered");
+
     }
 
-    MapMode mapMode() const {
-        return NotMapped;
-    }
-    uchar *map(MapMode, int *, int *) {
-        return 0;
-    }
-    void unmap()
+    FboPtr getFbo()
     {
-    }
-
-    QVariant handle() const;
-
-private:
-    //GLuint m_textId;
-    //QAndroidJniObject m_javaDecoder;
-    mutable AndroidDecoderPrivate* m_owner;
-    mutable bool m_updated;
-    mutable GLuint m_id;
-};
-
-
-// ---------------------- QnTextureBuffer ----------------------
-/*
-class TextureBuffer : public QAbstractVideoBuffer
-{
-public:
-    TextureBuffer (uint id, const QAndroidJniObject& javaDecoder):
-        QAbstractVideoBuffer(GLTextureHandle),
-        m_id(id),
-        m_javaDecoder(javaDecoder),
-        m_updated(false)
-    {
-    }
-
-    ~TextureBuffer()
-    {
-        //m_javaDecoder.callMethod<void>("onCurrentBufferRendered");
-    }
-
-    MapMode mapMode() const {
-        return NotMapped;
-    }
-    uchar *map(MapMode, int *, int *) {
-        return 0;
-    }
-    void unmap()
-    {
-    }
-    QVariant handle() const
-    {
-        if (!m_updated)
-        //if (m_textId == -1)
+        for(const auto& fbo: m_data)
         {
-            m_updated = true;
-
-            QOpenGLContext* context = QOpenGLContext::currentContext();
-            if (!context)
-                return QVariant();
-            //context->functions()->glGenTextures(m_textId, 1);
-            //m_javaDecoder.callMethod<void>("attachToGLContext", "(I)Z", (jint) m_id);
-            int gg = 4;
-            //m_javaDecoder.callMethod<void>("updateTexImage");
+            if (fbo.use_count() == 1)
+                return fbo; // this object is free
         }
-        return QVariant::fromValue<uint>(m_id);
+        FboPtr newFbo(new QOpenGLFramebufferObject(m_frameSize));
+        m_data.push_back(newFbo);
+        return newFbo;
+    }
+private:
+    std::vector<FboPtr> m_data;
+    QSize m_frameSize;
+};
+
+// --------------------------------------------------------------------------------------------------
+
+class TextureBuffer: public QAbstractVideoBuffer
+{
+public:
+    TextureBuffer (const FboPtr& fbo):
+        QAbstractVideoBuffer(GLTextureHandle),
+        m_fbo(fbo)
+    {
     }
 
+    virtual MapMode mapMode() const override { return NotMapped;}
+    virtual uchar *map(MapMode, int *, int *) override { return 0; }
+    virtual void unmap() override {}
+    virtual QVariant handle() const override { return m_fbo->texture(); }
+
 private:
-    GLuint m_id;
-    //GLuint m_textId;
-    QAndroidJniObject m_javaDecoder;
-    mutable bool m_updated;
+    FboPtr m_fbo;
 };
-*/
+
 // --------------------------------------------------------------------------------------------------
 
 
@@ -142,11 +106,8 @@ public:
     AndroidDecoderPrivate():
         frameNumber(0),
         glSurfaceTexture(0),
-        glExternalTexture(0),
-        glExternalTexture2(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
-        m_fbo(nullptr),
         m_program(nullptr)
 
 	{
@@ -175,12 +136,6 @@ public:
         return matrix;
     }
 
-    void attachToGLContext(GLuint texId)
-    {
-        QMutexLocker locker(&m_mutex);
-        javaDecoder.callMethod<void>("attachToGLContext", "(I)Z", texId);
-    }
-
     void registerNativeMethods()
     {
         using namespace std::placeholders;
@@ -198,31 +153,43 @@ public:
     }
 
     void renderFrameToFbo();
-    void createGLResources();
+    FboPtr createGLResources();
 
+private:
     qint64 frameNumber;
     GLuint glSurfaceTexture;
-    GLuint glExternalTexture;
-    GLuint glExternalTexture2;
-    std::unique_ptr<QOpenGLContext> glContext;
-    std::unique_ptr<QOffscreenSurface> fakeSurface;
     bool initialized;
     QAndroidJniObject javaDecoder;
     AbstractResourceAllocator* allocator;
     QSize frameSize;
 
+    std::unique_ptr<FboManager> m_fboManager;
+    FboPtr m_currentFbo;
+
     QMutex m_mutex;
-    QOpenGLFramebufferObject *m_fbo;
     QOpenGLShaderProgram *m_program;
 };
+
+void renderFrameToFbo(void* opaque)
+{
+    AndroidDecoderPrivate* d = static_cast<AndroidDecoderPrivate*>(opaque);
+    d->renderFrameToFbo();
+}
 
 void AndroidDecoderPrivate::renderFrameToFbo()
 {
     QMutexLocker locker(&m_mutex);
 
-    createGLResources();
+    QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
+
+    m_currentFbo = createGLResources();
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
     updateTexImage();
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+
 
     // save current render states
     GLboolean stencilTestEnabled;
@@ -243,16 +210,27 @@ void AndroidDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glDisable(GL_BLEND);
 
-    m_fbo->bind();
+    m_currentFbo->bind();
 
     glViewport(0, 0, frameSize.width(), frameSize.height());
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
     m_program->bind();
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     m_program->enableAttributeArray(0);
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     m_program->enableAttributeArray(1);
-    //m_program->setUniformValue("frameTexture", GLuint(glExternalTexture));
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     m_program->setUniformValue("frameTexture", GLuint(0));
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     m_program->setUniformValue("texMatrix", getTransformMatrix());
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, g_vertex_data);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, g_texture_data);
@@ -263,7 +241,10 @@ void AndroidDecoderPrivate::renderFrameToFbo()
     m_program->disableAttributeArray(1);
 
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
-    m_fbo->release();
+    if (funcs->glGetError())
+        qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
+
+    m_currentFbo->release();
 
     // restore render states
     if (stencilTestEnabled)
@@ -277,14 +258,14 @@ void AndroidDecoderPrivate::renderFrameToFbo()
 
 }
 
-void AndroidDecoderPrivate::createGLResources()
+FboPtr AndroidDecoderPrivate::createGLResources()
 {
-    if (!m_fbo)
-    {
-        m_fbo = new QOpenGLFramebufferObject(frameSize);
-        //auto texId = allocator->newGlTexture();
-        //m_fbo = new QOpenGLFramebufferObject(frameSize, texId);
-    }
+    QOpenGLContext *ctx = QOpenGLContext::currentContext();
+    QOpenGLFunctions *funcs = ctx->functions();
+
+    if (!m_fboManager)
+        m_fboManager.reset(new FboManager(frameSize));
+    FboPtr fbo = m_fboManager->getFbo();
 
     if (!m_program)
     {
@@ -301,6 +282,8 @@ void AndroidDecoderPrivate::createGLResources()
                                         "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n" \
                                         "}\n");
         m_program->addShader(vertexShader);
+        if (funcs->glGetError())
+            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
         QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, m_program);
         fragmentShader->compileSourceCode("#extension GL_OES_EGL_image_external : require \n" \
@@ -311,11 +294,16 @@ void AndroidDecoderPrivate::createGLResources()
                                           "    gl_FragColor = texture2D(frameTexture, textureCoords); \n" \
                                           "}\n");
         m_program->addShader(fragmentShader);
+        if (funcs->glGetError())
+            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
         m_program->bindAttributeLocation("vertexCoordsArray", 0);
         m_program->bindAttributeLocation("textureCoordArray", 1);
         m_program->link();
+        if (funcs->glGetError())
+            qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     }
+    return fbo;
 }
 
 // ---------------------- AndroidDecoder ----------------------
@@ -335,35 +323,6 @@ void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator )
 {
     Q_D(AndroidDecoder);
     d->allocator = allocator;
-    QOpenGLContext* sharedContext = allocator->getGlContext();
-    if (sharedContext)
-    {
-        d->glContext.reset(new QOpenGLContext());
-        d->glContext->setShareContext(sharedContext);
-        d->glContext->setFormat(sharedContext->format());
-        //d->glContext->setScreen(sharedContext->screen());
-
-        //d->glContext->moveToThread(this);
-
-        // We need a non-visible surface to make current in the other thread
-                // and QWindows must be created and managed on the GUI thread.
-        d->fakeSurface.reset(new QOffscreenSurface());
-        d->fakeSurface->setFormat(d->glContext->format());
-        d->fakeSurface->create();
-
-        if (d->glContext->create())
-        {
-            //d->glContext->makeCurrent(sharedContext->surface());
-            d->glContext->setShareContext(sharedContext);
-            d->glContext->makeCurrent(d->fakeSurface.get());
-
-            QOpenGLContext* context = QOpenGLContext::currentContext();
-            d->glContext->functions()->glGenTextures(1, &d->glSurfaceTexture);
-            d->glExternalTexture = d->allocator->newGlTexture();
-            d->glExternalTexture2 = d->allocator->newGlTexture();
-        }
-    }
-
 }
 
 bool AndroidDecoder::isCompatible(const QnConstCompressedVideoDataPtr& frame)
@@ -413,10 +372,11 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     // got frame
 
-    //d->updateTexImage();
-    //d->renderFrameToFbo();
+    d->allocator->execAtGlThread(renderFrameToFbo, d);
+    if (!d->m_currentFbo)
+        return 0; //< can't decode now. skip frame
 
-    QAbstractVideoBuffer* buffer = new TextureBuffer (d);
+    QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->m_currentFbo));
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
 
     /*
@@ -427,27 +387,6 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     result->reset(videoFrame);
     return (int) outFrameNum - 1;
-}
-
-
-TextureBuffer::TextureBuffer (AndroidDecoderPrivate* owner):
-    QAbstractVideoBuffer(GLTextureHandle),
-    m_owner(owner),
-    m_updated(false),
-    m_id(0)
-{
-}
-
-QVariant TextureBuffer::handle() const
-{
-    if (!m_updated)
-    {
-        m_updated = true;
-        //m_owner->attachToGLContext(m_owner->glExternalTexture2);
-        m_owner->renderFrameToFbo();
-        m_id = m_owner->m_fbo->texture();
-    }
-    return m_id;
 }
 
 } // namespace media

@@ -122,6 +122,10 @@ INCLUDEPATH +=  ${environment.dir}/boost_1_56_0 \
                 $$ADDITIONAL_QT_INCLUDES \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/ \
                 ${qt.dir}/include/QtCore/$$QT_VERSION/QtCore/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/ \
+                ${qt.dir}/include/QtQuick/$$QT_VERSION/QtQuick/ \
+
+
 
 DEPENDPATH *= $${INCLUDEPATH}
 

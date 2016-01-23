@@ -128,6 +128,11 @@ SeamlessVideoDecoder::~SeamlessVideoDecoder()
 {
 }
 
+void SeamlessVideoDecoder::pleaseStop()
+{
+
+}
+
 bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result)
 {
 	Q_D(SeamlessVideoDecoder);

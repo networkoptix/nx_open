@@ -36,7 +36,9 @@ PlayerDataConsumer::~PlayerDataConsumer()
 void PlayerDataConsumer::pleaseStop()
 {
     base_type::pleaseStop();
+    m_decoder->pleaseStop();
     m_queueWaitCond.wakeAll();
+
 }
 
 bool PlayerDataConsumer::canAcceptData() const

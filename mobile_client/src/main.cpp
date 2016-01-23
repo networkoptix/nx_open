@@ -33,72 +33,10 @@
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
+#include "resource_allocator.h"
+
 
 #include "version.h"
-
-class ResourceAllocator: public QObject, public nx::media::AbstractResourceAllocator
-{
-private:
-    QQuickWindow *m_window;
-public:
-    ResourceAllocator(QQuickWindow *window):
-        nx::media::AbstractResourceAllocator(),
-        m_window(window)
-    {
-    }
-
-    virtual QOpenGLContext* getGlContext() override
-    {
-        QOpenGLContext *context = nullptr;
-        bool finished = false;
-
-        QMutex mutex;
-        QWaitCondition waitCondition;
-        QMutexLocker lock(&mutex);
-
-
-        connect(m_window, &QQuickWindow::beforeSynchronizing, this, [this, &context, &waitCondition, &finished]()
-        {
-            disconnect(m_window, nullptr, this, nullptr);
-
-            context = QOpenGLContext::currentContext();
-            finished = true;
-            waitCondition.wakeOne();
-        }, Qt::DirectConnection);
-
-        while (!finished)
-            waitCondition.wait(&mutex);
-
-        return context;
-    }
-
-    virtual int newGlTexture() override
-    {
-        GLuint texture = GL_INVALID_VALUE;
-        bool finished = false;
-
-        QMutex mutex;
-        QWaitCondition waitCondition;
-        QMutexLocker lock(&mutex);
-
-
-        connect(m_window, &QQuickWindow::beforeSynchronizing, this, [this, &texture, &waitCondition, &finished]()
-        {
-            disconnect(m_window, nullptr, this, nullptr);
-
-            QOpenGLContext *context = QOpenGLContext::currentContext();
-            if (context)
-                context->functions()->glGenTextures(1, &texture);
-            finished = true;
-            waitCondition.wakeOne();
-        }, Qt::DirectConnection);
-
-        while (!finished)
-            waitCondition.wait(&mutex);
-
-        return texture;
-    }
-};
 
 void initDecoders(QQuickWindow *window)
 {
