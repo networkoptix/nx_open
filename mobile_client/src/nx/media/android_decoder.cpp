@@ -92,7 +92,6 @@ void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr
 {
     void *bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*) srcDataPtr;
-    //int dataSize = env->GetDirectBufferCapacity(buffer);
     memcpy(bytes, srcData, dataSize);
 }
 
@@ -105,7 +104,6 @@ class AndroidDecoderPrivate : public QObject
 public:
     AndroidDecoderPrivate():
         frameNumber(0),
-        glSurfaceTexture(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
         m_program(nullptr)
@@ -157,7 +155,6 @@ public:
 
 private:
     qint64 frameNumber;
-    GLuint glSurfaceTexture;
     bool initialized;
     QAndroidJniObject javaDecoder;
     AbstractResourceAllocator* allocator;
@@ -353,10 +350,8 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
-        d->initialized = d->javaDecoder.callMethod<jboolean>("init", "(Ljava/lang/String;III)Z",
-                         jCodecName.object<jstring>(), d->frameSize.width(), d->frameSize.height(),
-                         d->glSurfaceTexture
-                         //d->glExternalTexture
+        d->initialized = d->javaDecoder.callMethod<jboolean>("init", "(Ljava/lang/String;II)Z",
+                         jCodecName.object<jstring>(), d->frameSize.width(), d->frameSize.height()
         );
         if (!d->initialized)
             return 0; //< wait for I frame
