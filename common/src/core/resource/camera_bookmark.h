@@ -72,6 +72,9 @@ struct QnCameraBookmark {
 
     static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
+    static void sortBookmarks(QnCameraBookmarkList &bookmarks
+        , const QnBookmarkSortProps sortProps);
+
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
         , const QnBookmarkSortProps &sortProperties = QnBookmarkSortProps::default
         , int limit = std::numeric_limits<int>().max());

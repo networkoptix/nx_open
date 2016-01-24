@@ -784,7 +784,7 @@ namespace
 
     QString createFilterSortPart(const QnCameraBookmarkSearchFilter &filter)
     {
-        static const auto kOrderByTemplate = lit("ORDER BY %1 %2, guid");
+        static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
 
         const auto order = (filter.sortProps.order == Qn::Ascending ? lit("ASC"): lit("DESC"));
         switch(filter.sortProps.column)
@@ -812,7 +812,7 @@ namespace
         case Qn::BookmarkName:
         case Qn::BookmarkStartTime:
         case Qn::BookmarkDuration:
-            return lit("LIMIT %1").arg(filter.limit);
+            return lit(" LIMIT %1 ").arg(filter.limit);
 
         case Qn::BookmarkCameraName:
         case Qn::BookmarkTags:
@@ -831,7 +831,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
     QString filterText;
     QStringList bindings;
 
-    typedef QSet<QnUuid> UuidsSet;
+    typedef QSet<QString> UuidsSet;
     const auto cameraIds = [cameras]() -> UuidsSet
     {
         UuidsSet result;
@@ -910,7 +910,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
 
         index = 0;
         for (auto it = cameraIds.begin(); it != cameraIds.end(); ++it, ++index)
-            checkedBind(getCameraBindingName(index), it->toString());
+            checkedBind(getCameraBindingName(index), *it);
 
         checkedBind(":minStartTimeMs", filter.startTimeMs);
         checkedBind(":maxEndTimeMs", filter.endTimeMs);

@@ -18,35 +18,32 @@ namespace
 
     enum { kInvalidSortingColumn = -1 };
     enum { kMaxVisibleRows = 4 }; // TODO: change me to 1000!
-    template<typename PredType
-        , typename Accessor>
-    void sortImpl(QnCameraBookmarkList &list
-        , const Accessor &accessor)
-    {
-        PredType pred;
-        std::sort(list.begin(), list.end()
-            , [&accessor, pred](const QnCameraBookmark &first, const QnCameraBookmark &second)
-        {
-            return pred(accessor(first), accessor(second));
-        });
-    }
 
-    // TODO: #ynikitenkov move me to QnCameraBookmark
-    template<typename Accessor>
-    void sortBookmarks(QnCameraBookmarkList &list
-        , Qt::SortOrder order
-        , const Accessor &accessor)
+    QnBookmarkSortProps toSortProperties(int col
+        , Qt::SortOrder ord)
     {
-        typedef decltype(accessor(QnCameraBookmark())) AccessorResultType;
+        const auto column = [col]() -> Qn::BookmarkSortColumn
+        {
+            switch(col)
+            {
+            case QnSearchBookmarksModel::kName:
+                return Qn::BookmarkName;
+            case QnSearchBookmarksModel::kStartTime:
+                return Qn::BookmarkStartTime;
+            case QnSearchBookmarksModel::kLength:
+                return Qn::BookmarkDuration;
+            case QnSearchBookmarksModel::kTags:
+                return Qn::BookmarkTags;
+            case QnSearchBookmarksModel::kCamera:
+                return Qn::BookmarkCameraName;
+            default:
+                Q_ASSERT_X(false, Q_FUNC_INFO, "Wrong column");
+                return Qn::BookmarkStartTime;
+            }
+        }();
 
-        if (order == Qt::AscendingOrder)
-        {
-            sortImpl<std::less<AccessorResultType>>(list, accessor);
-        }
-        else
-        {
-            sortImpl<std::greater<AccessorResultType>>(list, accessor);
-        }
+       const auto order = (ord == Qt::AscendingOrder ? Qn::Ascending : Qn::Descending);
+       return QnBookmarkSortProps(column, order);
     }
 }
 
@@ -75,8 +72,7 @@ public:
     void sort(int column
         , Qt::SortOrder order);
 
-    void sortManually(int column
-        , Qt::SortOrder order);
+    void sortManually(const QnBookmarkSortProps &sortProps);
 
     ///
 
@@ -173,30 +169,9 @@ void QnSearchBookmarksModel::Impl::applyFilter()
     m_query->setCameras(m_cameras.toSet());
 }
 
-void QnSearchBookmarksModel::Impl::sortManually(int column
-    , Qt::SortOrder order)
+void QnSearchBookmarksModel::Impl::sortManually(const QnBookmarkSortProps &sortProps)
 {
-    switch(column)
-    {
-    case kName:
-        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return bookmark.name; });
-        break;
-    case kStartTime:
-        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return bookmark.startTimeMs; });
-        break;
-    case kLength:
-        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return bookmark.durationMs; });
-        break;
-    case kTags:
-        sortBookmarks(m_bookmarks, order, [](const QnCameraBookmark &bookmark) { return QnCameraBookmark::tagsToString(bookmark.tags); });
-        break;
-    case kCamera:
-        sortBookmarks(m_bookmarks, order, [this](const QnCameraBookmark &bookmark) { return cameraNameFromId(bookmark.cameraId); });
-        break;
-    default:
-        return;
-    }
-
+    QnCameraBookmark::sortBookmarks(m_bookmarks, sortProps);
     emit m_owner->dataChanged(m_owner->index(0, 0)
         , m_owner->index(m_bookmarks.size() - 1, kColumnsCount - 1));
 }
@@ -204,35 +179,12 @@ void QnSearchBookmarksModel::Impl::sortManually(int column
 void QnSearchBookmarksModel::Impl::sort(int column
     , Qt::SortOrder order)
 {
-    m_filter.sortProps.column = [column]() -> Qn::BookmarkSortColumn
-    {
-        switch(column)
-        {
-        case kName:
-            return Qn::BookmarkName;
-        case kStartTime:
-            return Qn::BookmarkStartTime;
-        case kLength:
-            return Qn::BookmarkDuration;
-        case kTags:
-            return Qn::BookmarkTags;
-        case kCamera:
-            return Qn::BookmarkCameraName;
-        default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Wrong column");
-            return Qn::BookmarkStartTime;
-        }
-    }();
-
-    m_filter.sortProps.order = (order == Qt::AscendingOrder ? Qn::Ascending : Qn::Descending);
+    m_filter.sortProps = toSortProperties(column, order);
 
     if (m_bookmarks.size() < (kMaxVisibleRows - 1)) // Change me! remove -1
-    {
-        sortManually(column, order);
-        return;
-    }
-
-    applyFilter();
+        sortManually(m_filter.sortProps);
+    else
+        applyFilter();
 }
 
 

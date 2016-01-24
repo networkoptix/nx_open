@@ -757,6 +757,7 @@ public:
         , BookmarkCameraName    // Sorted manually!
     };
 
+    /// TODO: #ynikitenkov Do I need that?? remove.
     enum SortOrder
     {
         Ascending
