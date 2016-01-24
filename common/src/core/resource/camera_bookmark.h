@@ -13,9 +13,23 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+struct QnBookmarkSortProps
+{
+    Qn::BookmarkSortColumn column;
+    Qn::SortOrder order;
+
+    QnBookmarkSortProps(Qn::BookmarkSortColumn column = Qn::BookmarkStartTime
+        , Qn::SortOrder order = Qn::Ascending);
+
+    static const QnBookmarkSortProps default;
+};
+#define QnBookmarkSortProps_Fields (column)(order)
+
+
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
  */
+
 struct QnCameraBookmark {
     /** Unique id. */
     QnUuid guid;
@@ -38,7 +52,6 @@ struct QnCameraBookmark {
     /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
 
-
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
 
@@ -59,7 +72,9 @@ struct QnCameraBookmark {
 
     static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
-    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
+    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
+        , const QnBookmarkSortProps &sortProperties = QnBookmarkSortProps::default
+        , int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
 
@@ -67,6 +82,7 @@ struct QnCameraBookmark {
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
  *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
+
 struct QnCameraBookmarkSearchFilter {
     /** Minimum start time for the bookmark. */
     qint64 startTimeMs;
@@ -79,7 +95,8 @@ struct QnCameraBookmarkSearchFilter {
 
     int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    Qn::BookmarkSearchStrategy strategy; //TODO: #GDM #Bookmarks works in merge function only
+    // TODO: add fusion serialization
+    QnBookmarkSortProps sortProps;
 
     QnCameraBookmarkSearchFilter();
 
@@ -89,7 +106,7 @@ struct QnCameraBookmarkSearchFilter {
 
     static QnCameraBookmarkSearchFilter invalidFilter();
 };
-#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(sortProps)
 
 struct QnCameraBookmarkTag {
     QString name;
@@ -121,6 +138,7 @@ Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortProps, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))

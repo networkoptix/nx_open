@@ -738,12 +738,31 @@ public:
         LC_Count
     };
 
+
     /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-    enum BookmarkSearchStrategy {
-        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+
+//    enum BookmarkSearchStrategy {
+//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+//    };
+
+    // All columns are sorted by database initially, except camera name and tags.
+    enum BookmarkSortColumn
+    {
+        BookmarkName
+        , BookmarkStartTime
+        , BookmarkDuration
+        , BookmarkTags          // Sorted manually!
+        , BookmarkCameraName    // Sorted manually!
     };
+
+    enum SortOrder
+    {
+        Ascending
+        , Descending
+    };
+
 
     /**
     * Authentication error code
@@ -873,7 +892,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSearchStrategy)
+        (Qn::BookmarkSortColumn)(Qn::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)

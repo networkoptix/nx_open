@@ -23,7 +23,7 @@ class QnCurrentLayoutBookmarksCache : public Connective<QObject>
 
 public:
     QnCurrentLayoutBookmarksCache(int maxBookmarksCount
-        , Qn::BookmarkSearchStrategy strategy
+        , const QnBookmarkSortProps &sortProp
         , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
 

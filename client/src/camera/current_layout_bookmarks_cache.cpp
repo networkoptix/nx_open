@@ -16,24 +16,24 @@
 namespace
 {
     QnCameraBookmarkSearchFilter createFilter(int maxBookmarksCount
-        , Qn::BookmarkSearchStrategy strategy)
+        , const QnBookmarkSortProps &sortProps)
     {
         QnCameraBookmarkSearchFilter filter;
         filter.limit = maxBookmarksCount;
-        filter.strategy = strategy;
+        filter.sortProps= sortProps;
         return filter;
     }
 };
 
 QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCount
-    , Qn::BookmarkSearchStrategy strategy
+    , const QnBookmarkSortProps &sortProp
     , qint64 minWindowChangeMs
     , QObject *parent)
 
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_filter(createFilter(maxBookmarksCount, strategy))
+    , m_filter(createFilter(maxBookmarksCount, sortProp))
     , m_queriesCache(new QnBookmarkQueriesCache(minWindowChangeMs))
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
