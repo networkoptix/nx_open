@@ -130,6 +130,9 @@ int QnStatistics::getFrameSize() const
 float QnStatistics::getAverageGopSize() const
 {
     QnMutexLocker locker( &m_mutex );
+    if ( m_keyFrames == 0 )
+        return 0; // didn't have any frames yet
+
     return static_cast<float>( m_frames ) / static_cast<float>( m_keyFrames );
 }
 

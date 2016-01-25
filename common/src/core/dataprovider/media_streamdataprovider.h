@@ -42,8 +42,8 @@ public:
     virtual CameraDiagnostics::Result diagnoseMediaStreamConnection();
 
     virtual bool hasThread() const { return true; }
-protected:
 
+protected:
     virtual void sleepIfNeeded() {}
 
     virtual void beforeRun();

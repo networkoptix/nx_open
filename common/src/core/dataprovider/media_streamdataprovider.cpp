@@ -166,7 +166,9 @@ float QnAbstractMediaStreamDataProvider::getFrameRate() const
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getFrameRate();
-    return rez;
+
+    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
 }
 
 float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
@@ -174,7 +176,9 @@ float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
     float rez = 0;
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getAverageGopSize();
-    return rez / m_numberOfchannels;
+
+    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
 }
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
