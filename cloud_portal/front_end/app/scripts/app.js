@@ -13,6 +13,10 @@ angular.module('cloudApp', [
             templateUrl: 'views/login.html',
             controller: 'LoginCtrl'
         })
+        .when('/register/:email', {
+            templateUrl: 'views/register.html',
+            controller: 'LoginCtrl'
+        })
         .when('/register', {
             templateUrl: 'views/register.html',
             controller: 'LoginCtrl'

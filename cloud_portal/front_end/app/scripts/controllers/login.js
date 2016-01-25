@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage) {
+    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams) {
 
         cloudApi.account().then(function(account){
             if(account){
@@ -9,11 +9,13 @@ angular.module('cloudApp')
             }
         });
 
+        var registerEmail = $routeParams.email || '';
+
         $scope.Config = Config;
         $scope.session = $sessionStorage;
 
         $scope.auth = {
-            email: '',
+            email: registerEmail,
             password: '',
             remember: true
         };
