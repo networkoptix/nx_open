@@ -54,7 +54,8 @@ namespace nx
 
     Buffer stringToBuffer( const String& string )
     {
-        return Buffer( string.constData(), stringLength( string ) + 1 );
+        return string;
+        //return Buffer( string.constData(), stringLength( string ) + 1 );
     }
 
     String bufferToString( const Buffer& buffer )

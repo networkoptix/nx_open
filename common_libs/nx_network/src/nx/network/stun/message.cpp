@@ -4,9 +4,11 @@
 ***********************************************************/
 
 #include "message.h"
+#include "message_parser.h"
 #include "message_serializer.h"
 
 #include <openssl/hmac.h>
+
 
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
@@ -205,9 +207,35 @@ static Buffer hmacSha1( const String& key, const Message* message )
 
     size_t bytes;
     MessageSerializer serializer;
-    serializer.setMessage( message );
-    Q_ASSERT( serializer.serialize( &buffer, &bytes )
-              == nx_api::SerializerState::done );
+    serializer.setMessage(message);
+    if (serializer.serialize(&buffer, &bytes) != nx_api::SerializerState::done)
+    {
+        Q_ASSERT(false);
+    }
+
+#ifdef _DEBUG
+    {
+        MessageParser parser;
+        Message checkMessage;
+        parser.setMessage(&checkMessage);
+        size_t bytesRead = 0;
+        if (parser.parse(buffer, &bytesRead) != nx_api::ParserState::done)
+        {
+            Q_ASSERT(false);
+        }
+
+        Buffer buffer1;
+        buffer1.reserve(DEFAULT_BUFFER_SIZE);
+        MessageSerializer serializer1;
+        serializer1.setMessage(&checkMessage);
+        if (serializer1.serialize(&buffer1, &bytes) != nx_api::SerializerState::done)
+        {
+            Q_ASSERT(false);
+        }
+        int x = 0;
+        Q_ASSERT(buffer1 == buffer);
+    }
+#endif
 
     return hmacSha1( key, buffer );
 }
