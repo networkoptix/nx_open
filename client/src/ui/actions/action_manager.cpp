@@ -1697,6 +1697,15 @@ QnActionManager::QnActionManager(QObject *parent):
             new QnModifyBookmarkActionCondition(this),
             this));
 
+    factory(Qn::RemoveBookmarksAction).
+        flags(Qn::NoTarget).
+        text(tr("Remove Bookmarks...")).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
+        condition(new QnConjunctionActionCondition(
+            new QnForbiddenInSafeModeCondition(this),
+            new QnModifyBookmarkActionCondition(this),
+            this));
+
     factory().
         flags(Qn::Slider | Qn::SingleTarget).
         separator();
