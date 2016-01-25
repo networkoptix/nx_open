@@ -1006,7 +1006,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInNewLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in New Tab")).
+        text(tr("Open in a New Tab")).
         conditionalText(tr("Monitor in a New Tab"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
@@ -1016,12 +1016,12 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open in Alarm Layout"));
+        text(tr("Open in the Alarm Layout"));
 
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in New Window")).
+        text(tr("Open in a New Window")).
         conditionalText(tr("Monitor in a New Window"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
@@ -1698,12 +1698,12 @@ QnActionManager::QnActionManager(QObject *parent):
             this));
 
     factory(Qn::RemoveBookmarksAction).
-        flags(Qn::NoTarget).
+        flags(Qn::NoTarget | Qn::SingleTarget | Qn::ResourceTarget).
         text(tr("Remove Bookmarks...")).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
-            new QnModifyBookmarkActionCondition(this),
+            new QnRemoveBookmarksActionCondition(this),
             this));
 
     factory().

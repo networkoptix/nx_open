@@ -68,5 +68,6 @@ private:
 
     QAction * const m_openInNewTabAction;
     QAction * const m_exportBookmarkAction;
+    QAction * const m_removeBookmarksAction;
     bool m_updatingNow;
 };

@@ -36,18 +36,18 @@ class QnActionCondition: public QObject, public QnWorkbenchContextAware {
 public:
     /**
      * Constructor.
-     * 
+     *
      * \param parent                    Context-aware parent.
      */
     QnActionCondition(QObject *parent);
 
     /**
      * Main condition checking function.
-     * 
+     *
      * By default it forwards control to one of the specialized functions
      * based on the type of the default parameter. Note that these
      * specialized functions cannot access other parameters.
-     * 
+     *
      * \param parameters                Parameters to check.
      * \returns                         Check result.
      */
@@ -175,7 +175,7 @@ public:
     {}
 
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;
-     
+
 private:
     bool m_requiredZoomedState;
 };
@@ -275,7 +275,7 @@ public:
 };
 
 
-/** 
+/**
  * Base class for edge-specific action conditions.
  */
 class QnEdgeServerCondition: public QnActionCondition {
@@ -284,10 +284,10 @@ public:
         QnActionCondition(parent),
         m_isEdgeServer(isEdgeServer)
     {}
-    
+
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
 private:
-    /** If this flag is true action is visible for edge servers only, 
+    /** If this flag is true action is visible for edge servers only,
      *  in the other case - action is hidden for edge servers.
      */
     bool m_isEdgeServer;
@@ -422,6 +422,13 @@ public:
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
 };
 
+class QnRemoveBookmarksActionCondition: public QnActionCondition {
+public:
+    QnRemoveBookmarksActionCondition(QObject *parent):
+        QnActionCondition(parent) {}
+    virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
+};
+
 class QnPreviewActionCondition: public QnExportActionCondition {
 public:
     QnPreviewActionCondition(QObject *parent): QnExportActionCondition(true, parent) {}
@@ -522,7 +529,7 @@ public:
 };
 
 class QnOpenInNewEntityActionCondition: public QnActionCondition {
-public: 
+public:
     QnOpenInNewEntityActionCondition(QObject *parent): QnActionCondition(parent) {}
 
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
@@ -563,7 +570,7 @@ public:
         m_capabilities(capabilities),
         m_disableIfPtzDialogVisible(disableIfPtzDialogVisible)
     {}
-    
+
     virtual Qn::ActionVisibility check(const QnActionParameters &parameters) override;
     virtual Qn::ActionVisibility check(const QnResourceList &resources) override;
     virtual Qn::ActionVisibility check(const QnResourceWidgetList &widgets) override;

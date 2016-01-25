@@ -157,7 +157,7 @@ void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
     if (bookmarks.isEmpty())
         return;
 
-    const auto message = tr("Are you sure you want to delete these %n bookmarks?");
+    const auto message = tr("Are you sure you want to delete these %n bookmarks?", nullptr, bookmarks.size());
 
     if (QMessageBox::information(mainWindow(),
         tr("Confirm Deletion"), message,
