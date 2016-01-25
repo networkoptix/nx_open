@@ -85,13 +85,13 @@ protected:
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,
-        const std::string& systemID,
+        const QnUuid& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole accessRole);
     api::ResultCode updateSystemSharing(
         const std::string& email,
         const std::string& password,
-        const std::string& systemID,
+        const QnUuid& systemID,
         const std::string& accountEmail,
         api::SystemAccessRole newAccessRole);
     api::ResultCode getSystemSharings(
@@ -117,7 +117,7 @@ protected:
     api::SystemAccessRole accountAccessRoleForSystem(
         const std::vector<api::SystemSharing>& sharings,
         const std::string& accountEmail,
-        const std::string& systemID) const;
+        const QnUuid& systemID) const;
 
 private:
     QString m_tmpDir;
