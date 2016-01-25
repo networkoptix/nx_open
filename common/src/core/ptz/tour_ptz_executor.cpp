@@ -168,7 +168,8 @@ void QnTourPtzExecutorPrivate::updateDefaults()
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
 
-    canReadPosition = baseController->hasCapabilities(Qn::DevicePositioningPtzCapability | Qn::LogicalPositioningPtzCapability);
+    canReadPosition = baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) ||
+                      baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
