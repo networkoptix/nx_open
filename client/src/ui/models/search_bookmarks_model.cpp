@@ -2,6 +2,7 @@
 #include "search_bookmarks_model.h"
 
 #include <utils/common/qtimespan.h>
+#include <utils/camera/camera_names_watcher.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,7 +18,7 @@ namespace
     typedef std::function<void ()> ResetOperationFunction;
 
     enum { kInvalidSortingColumn = -1 };
-    enum { kMaxVisibleRows = 4 }; // TODO: change me to 1000!
+    enum { kMaxVisibleRows = 1000 };
 
     QnBookmarkSortProps toSortProperties(int col
         , Qt::SortOrder ord)
@@ -72,8 +73,6 @@ public:
     void sort(int column
         , Qt::SortOrder order);
 
-    void sortManually(const QnBookmarkSortProps &sortProps);
-
     ///
 
     int rowCount(const QModelIndex &parent) const;
@@ -82,9 +81,6 @@ public:
 
     QVariant getData(const QModelIndex &index
         , int role);
-
-private:
-    QString cameraNameFromId(const QString &id);
 
 private:
     typedef QHash<QString, QString> UniqIdToStringHash;
@@ -97,7 +93,7 @@ private:
     QnCameraBookmarksQueryPtr m_query;
     QnCameraBookmarkList m_bookmarks;
     QnVirtualCameraResourceList m_cameras;
-    UniqIdToStringHash m_camerasNames;
+    utils::QnCameraNamesWatcher m_cameraNamesWatcher;
 };
 
 ///
@@ -115,10 +111,19 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_filter()
     , m_query()
     , m_bookmarks()
-    , m_camerasNames()
+    , m_cameraNamesWatcher()
 {
     m_filter.limit = kMaxVisibleRows;
     m_filter.sortProps = QnBookmarkSortProps(Qn::BookmarkStartTime, Qn::Descending);
+
+    connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this
+        , [this](const QString &cameraUuid)
+    {
+        static const auto kCameraRoleToUpdate = QVector<int>(1, kCamera);
+        const auto topIndex = m_owner->index(0);
+        const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);
+        m_owner->dataChanged(topIndex, bottomIndex, kCameraRoleToUpdate);
+    });
 }
 
 QnSearchBookmarksModel::Impl::~Impl()
@@ -149,44 +154,34 @@ void QnSearchBookmarksModel::Impl::setCameras(const QnVirtualCameraResourceList 
 
 void QnSearchBookmarksModel::Impl::applyFilter()
 {
-    if (m_query)
-        disconnect(m_query.data(), nullptr, this, nullptr);
-
     m_beginResetModel();
     m_bookmarks.clear();
     m_endResetModel();
 
     m_query = qnCameraBookmarksManager->createQuery();
-    connect(m_query.data(), &QnCameraBookmarksQuery::bookmarksChanged, this
-        , [this](const QnCameraBookmarkList &bookmarks)
+    m_query->setFilter(m_filter);
+    m_query->setCameras(m_cameras.toSet());
+    m_query->executeRemoteAsync([this](bool success, const QnCameraBookmarkList &bookmarks)
     {
         m_beginResetModel();
         m_bookmarks = bookmarks;
         m_endResetModel();
     });
-
-    m_query->setFilter(m_filter);
-    m_query->setCameras(m_cameras.toSet());
-}
-
-void QnSearchBookmarksModel::Impl::sortManually(const QnBookmarkSortProps &sortProps)
-{
-    QnCameraBookmark::sortBookmarks(m_bookmarks, sortProps);
-    emit m_owner->dataChanged(m_owner->index(0, 0)
-        , m_owner->index(m_bookmarks.size() - 1, kColumnsCount - 1));
 }
 
 void QnSearchBookmarksModel::Impl::sort(int column
     , Qt::SortOrder order)
 {
     m_filter.sortProps = toSortProperties(column, order);
-
-    if (m_bookmarks.size() < (kMaxVisibleRows - 1)) // Change me! remove -1
-        sortManually(m_filter.sortProps);
+    if (m_bookmarks.size() < kMaxVisibleRows)   // All bookmarks should be loaded here
+    {
+        QnCameraBookmark::sortBookmarks(m_bookmarks, m_filter.sortProps);
+        emit m_owner->dataChanged(m_owner->index(0, 0)
+            , m_owner->index(m_bookmarks.size() - 1, kColumnsCount - 1));
+    }
     else
         applyFilter();
 }
-
 
 int QnSearchBookmarksModel::Impl::rowCount(const QModelIndex &parent) const
 {
@@ -222,49 +217,10 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kTags:
         return QnCameraBookmark::tagsToString(bookmark.tags);
     case kCamera:
-        return cameraNameFromId(bookmark.cameraId);
+        return m_cameraNamesWatcher.getCameraName(bookmark.cameraId);
     default:
         return QString();
     }
-}
-
-QString QnSearchBookmarksModel::Impl::cameraNameFromId(const QString &id)
-{
-    const auto it = m_camerasNames.find(id);
-    if (it != m_camerasNames.end())
-        return *it;
-
-    const auto cameraResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(id);
-    if (!cameraResource)
-        return tr("<Removed camera>");
-
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this
-        , [this](const QnResourcePtr &resource)
-    {
-        const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();
-        if (!cameraResource)
-            return;
-
-        m_camerasNames.remove(cameraResource->getUniqueId());
-        disconnect(cameraResource.data(), nullptr, this, nullptr);
-    });
-
-    connect(cameraResource.data(), &QnVirtualCameraResource::nameChanged, this
-        , [this, id, cameraResource](const QnResourcePtr & /* resource */)
-    {
-        static const auto kCameraRoleToUpdate = QVector<int>(1, kCamera);
-
-        const auto newName = cameraResource->getName();
-        m_camerasNames[id] = newName;
-
-        const auto topIndex = m_owner->index(0);
-        const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);
-        m_owner->dataChanged(topIndex, bottomIndex, kCameraRoleToUpdate);
-    });
-
-    const auto cameraName = cameraResource->getName();
-    m_camerasNames[id] = cameraName;
-    return cameraName;
 }
 
 ///

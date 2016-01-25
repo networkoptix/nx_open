@@ -7,8 +7,9 @@
 #include <business/events/abstract_business_event.h>
 #include <business/business_action_factory.h>
 
+#include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
-#include "core/resource/camera_bookmark.h"
+#include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <media_server/serverutil.h>
@@ -22,7 +23,8 @@
 #include <utils/common/util.h>
 #include <utils/common/model_functions.h>
 
-namespace {
+namespace
+{
 
     const char DELIMITER('$');
     const char STRING_LIST_DELIM('\n');
@@ -214,8 +216,65 @@ namespace {
 
         return result;
     }
-}
 
+    void addGetBookmarksFilter(const QString &text
+        , QString &filter)
+    {
+        if (filter.isEmpty())
+            filter = "WHERE " + text;
+        else
+            filter = filter + " AND " + text;
+    };
+
+    void addGetBookmarksFilter(const QString &text
+        , QString &filter
+        , QStringList &bindings)
+    {
+        addGetBookmarksFilter(text, filter);
+        bindings.append(text.mid(text.lastIndexOf(':')));
+    };
+
+    QString createBookmarksFilterSortPart(const QnCameraBookmarkSearchFilter &filter)
+    {
+        static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
+
+        const auto order = (filter.sortProps.order == Qn::Ascending ? lit("ASC"): lit("DESC"));
+        switch(filter.sortProps.column)
+        {
+        case Qn::BookmarkName:
+            return kOrderByTemplate.arg(lit("name"), order);
+        case Qn::BookmarkStartTime:
+            return kOrderByTemplate.arg(lit("startTimeMs"), order);
+        case Qn::BookmarkDuration:
+            return kOrderByTemplate.arg(lit("durationMs"), order);
+        case Qn::BookmarkCameraName:
+            return kOrderByTemplate.arg(lit("cameraId"), order);
+        case Qn::BookmarkTags:
+            return lit(""); // No sort by db
+        default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
+            return lit("");
+        }
+    };
+
+    int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
+    {
+        switch(filter.sortProps.column)
+        {
+        case Qn::BookmarkName:
+        case Qn::BookmarkStartTime:
+        case Qn::BookmarkDuration:
+            return filter.limit;
+
+        case Qn::BookmarkCameraName:
+        case Qn::BookmarkTags:
+            return std::numeric_limits<int>().max(); // No limit for manual sorted sequences!
+        default:
+            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
+            return std::numeric_limits<int>().max();
+        }
+    };
+}
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 static const qint64 DEFAULT_EVENT_KEEP_PERIOD = 1000000ll * 3600 * 24 * 30; // 30 days
 
@@ -761,69 +820,6 @@ bool QnServerDb::afterInstallUpdate(const QString& updateName) {
     return true;
 }
 
-#include <core/resource/camera_resource.h>
-
-namespace
-{
-    void addFilter(const QString &text
-        , QString &filter)
-    {
-        if (filter.isEmpty())
-            filter = "WHERE " + text;
-        else
-            filter = filter + " AND " + text;
-    };
-
-    void addFilter(const QString &text
-        , QString &filter
-        , QStringList &bindings)
-    {
-        addFilter(text, filter);
-        bindings.append(text.mid(text.lastIndexOf(':')));
-    };
-
-    QString createFilterSortPart(const QnCameraBookmarkSearchFilter &filter)
-    {
-        static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
-
-        const auto order = (filter.sortProps.order == Qn::Ascending ? lit("ASC"): lit("DESC"));
-        switch(filter.sortProps.column)
-        {
-        case Qn::BookmarkName:
-            return kOrderByTemplate.arg(lit("name"), order);
-        case Qn::BookmarkStartTime:
-            return kOrderByTemplate.arg(lit("startTimeMs"), order);
-        case Qn::BookmarkDuration:
-            return kOrderByTemplate.arg(lit("durationMs"), order);
-        case Qn::BookmarkCameraName:
-            return kOrderByTemplate.arg(lit("cameraId"), order);
-        case Qn::BookmarkTags:
-            return lit(""); // No sort by db
-        default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
-            return lit("");
-        }
-    };
-
-    QString createLimitFilterPart(const QnCameraBookmarkSearchFilter &filter)
-    {
-        switch(filter.sortProps.column)
-        {
-        case Qn::BookmarkName:
-        case Qn::BookmarkStartTime:
-        case Qn::BookmarkDuration:
-            return lit(" LIMIT %1 ").arg(filter.limit);
-
-        case Qn::BookmarkCameraName:
-        case Qn::BookmarkTags:
-            return lit(""); // No limit for manual sorted sequences!
-        default:
-            Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
-            return lit("");
-        }
-    };
-}
-
 bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
     , const QnCameraBookmarkSearchFilter &filter
     , QnCameraBookmarkList &result)
@@ -863,23 +859,25 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
         bindings.append(bindingName);
     }
     const auto camerasFullFilterTemplate = lit("(%1)").arg(camerasList.join(lit(" OR ")));
-    addFilter(camerasFullFilterTemplate, filterText);
+    addGetBookmarksFilter(camerasFullFilterTemplate, filterText);
 
     if (filter.isValid())
     {
         if (filter.startTimeMs > 0)
-            addFilter("endTimeMs >= :minStartTimeMs", filterText, bindings);
+            addGetBookmarksFilter("endTimeMs >= :minStartTimeMs", filterText, bindings);
         if (filter.endTimeMs < INT64_MAX)
-            addFilter("startTimeMs <= :maxEndTimeMs", filterText, bindings);
+            addGetBookmarksFilter("startTimeMs <= :maxEndTimeMs", filterText, bindings);
     }
 
     if (!filter.text.isEmpty())
     {
-        addFilter("book.rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH :text)", filterText);
+        addGetBookmarksFilter("book.rowid in (SELECT docid FROM fts_bookmarks WHERE fts_bookmarks MATCH :text)", filterText);
         bindings.append(":text");   // Manual binding: minor hack to workaround closing bracket
     }
 
-    QString queryStr("SELECT \
+    const auto limit = getBookmarksQueryLimit(filter);
+
+    QString queryStr = QString("SELECT \
                      book.guid as guid, \
                      book.start_time as startTimeMs, \
                      book.duration as durationMs, \
@@ -891,10 +889,9 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
                      tag.name as tagName \
                      FROM bookmarks book \
                      LEFT JOIN bookmark_tags tag \
-                     ON book.guid = tag.bookmark_guid "
-                     + filterText
-                     + createFilterSortPart(filter)
-                     + createLimitFilterPart(filter));
+                     ON book.guid = tag.bookmark_guid \
+                     %1 %2"
+                     ).arg(filterText, createBookmarksFilterSortPart(filter)) ;
 
     {
         QWriteLocker lock(&m_mutex);
@@ -953,6 +950,9 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
             QString tag = query.value(tagNameFieldIdx).toString();
             if (!tag.isEmpty())
                 result.back().tags.insert(tag);
+
+            if (result.size() > limit)
+                break;  // We can't use LIMIT keyword in queries with JOIN.
         }
     }
     return true;

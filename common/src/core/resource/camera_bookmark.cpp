@@ -3,6 +3,7 @@
 #include <QtCore/QMap>
 
 #include <utils/common/model_functions.h>
+#include <utils/camera/camera_names_watcher.h>
 
 namespace
 {
@@ -34,7 +35,12 @@ namespace
             return QnCameraBookmarkList();
 
         if (nonEmptySources.size() == 1)
-            return *nonEmptySources.front();
+        {
+            const QnCameraBookmarkList &result = *nonEmptySources.front();
+            if (result.size() <= limit)
+                return result;
+            return result.mid(0, limit);
+        }
 
         typedef QPair<QnCameraBookmarkList::const_iterator
             , QnCameraBookmarkList::const_iterator> IteratorsPair;
@@ -71,7 +77,7 @@ namespace
             if (++mergeDataIt->first == mergeDataIt->second)    // if list with min element is logically empty
                 mergeData.erase(mergeDataIt);
 
-            // TODO: add copy elements if it is only one list
+            // TODO: #ynikitenkov add copy elements if it is only one list
         }
         return result;
     }
@@ -99,9 +105,21 @@ namespace
         case Qn::BookmarkStartTime:
             return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.startTimeMs; } , isAscending);
         case Qn::BookmarkDuration:
-            return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.endTimeMs(); } , isAscending);
-            // case Qn::BookmarkTags:           // TODO: $ynikitenkov Implement me
-            // case Qn::BookmarkCameraName:     // TODO:
+            return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.durationMs; } , isAscending);
+        case Qn::BookmarkTags:
+        {
+            static const auto tagsGetter = [](const QnCameraBookmark &bookmark)
+                { return QnCameraBookmark::tagsToString(bookmark.tags); };
+            return makePredByGetter(tagsGetter, isAscending);
+        }
+        case Qn::BookmarkCameraName:
+        {
+            static utils::QnCameraNamesWatcher namesWatcher;
+            static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
+                { return namesWatcher.getCameraName(bookmark.cameraId); };
+
+            return makePredByGetter(cameraNameGetter, isAscending);
+        }
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid bookmark sorting column!");
             return BinaryPredicate();
