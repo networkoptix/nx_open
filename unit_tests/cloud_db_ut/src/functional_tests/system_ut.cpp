@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/httpclient.h>
+#include <nx/utils/log/log_message.h>
 
 #include "test_setup.h"
 
@@ -153,6 +154,32 @@ TEST_F(CdbFunctionalTest, system_get)
         url.setUserName(QString::fromStdString(account1.email));
         url.setPassword(QString::fromStdString(account1Password));
         ASSERT_TRUE(client.doGet(url));
+    }
+
+    {
+        nx_http::HttpClient client;
+        QUrl url(lit("http://127.0.0.1:%1/system/get?systemID=%2").
+            arg(endpoint().port).arg(system1.id.toString()));
+        url.setUserName(QString::fromStdString(account1.email));
+        url.setPassword(QString::fromStdString(account1Password));
+        ASSERT_TRUE(client.doGet(url));
+        const auto msgBody = client.fetchMessageBodyBuffer();
+        ASSERT_NE(-1, msgBody.indexOf(system1.id.toString()));
+    }
+
+    {
+        nx_http::HttpClient client;
+        QString urlStr(
+            lm("http://127.0.0.1:%1/system/get?systemID=%2").
+                arg(endpoint().port).arg(QUrl::toPercentEncoding(system1.id.toString())));
+        urlStr.replace(lit("{"), lit("%7B"));
+        urlStr.replace(lit("}"), lit("%7D"));
+        QUrl url(urlStr);
+        url.setUserName(QString::fromStdString(account1.email));
+        url.setPassword(QString::fromStdString(account1Password));
+        ASSERT_TRUE(client.doGet(url));
+        const auto msgBody = client.fetchMessageBodyBuffer();
+        ASSERT_NE(-1, msgBody.indexOf(system1.id.toString()));
     }
 }
 
