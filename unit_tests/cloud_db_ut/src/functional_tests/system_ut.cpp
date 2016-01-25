@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/network/http/httpclient.h>
+
 #include "test_setup.h"
 
 
@@ -143,6 +145,14 @@ TEST_F(CdbFunctionalTest, system_get)
             api::ResultCode::notFound,
             getSystem(account1.email, account1Password, "unknown_system_id", &systems));
         ASSERT_TRUE(systems.empty());
+    }
+
+    {
+        nx_http::HttpClient client;
+        QUrl url(lit("http://127.0.0.1:%1/system/get?systemID=1").arg(endpoint().port));
+        url.setUserName(QString::fromStdString(account1.email));
+        url.setPassword(QString::fromStdString(account1Password));
+        ASSERT_TRUE(client.doGet(url));
     }
 }
 
