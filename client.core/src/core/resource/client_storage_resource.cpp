@@ -60,7 +60,7 @@ void QnClientStorageResource::updateInner( const QnResourcePtr &other, QSet<QByt
 
 bool QnClientStorageResource::isSpaceInfoAvailable() const {
     return m_totalSpace != QnStorageResource::kUnknownSize
-        && m_totalSpace != QnStorageResource::kFastCreateSize;
+        && m_totalSpace != QnStorageResource::kSizeDetectionOmitted;
 }
 
 bool QnClientStorageResource::isActive() const
