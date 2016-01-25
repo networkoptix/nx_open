@@ -2954,7 +2954,7 @@ to view more bookmarks</source>
         <translation>Êtes-vous sûr de vouloir restaurer la base de données? Toutes les données existantes seront perdues.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to start backup.</source>
+        <source>You need to connect to a server prior to backup start.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3505,11 +3505,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1..</source>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export I/O module %1.</source>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4563,7 +4563,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage PTZ for %1..</source>
+        <source>Manage PTZ for %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5444,10 +5444,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d&apos;installation.</translation>
     </message>
     <message>
-        <source>Launcher process not found.</source>
-        <translation>Processus du lanceur n&apos;a pas été trouvé.</translation>
-    </message>
-    <message>
         <source>Update Cancelled</source>
         <translation>Mise à jour annulée</translation>
     </message>
@@ -5462,10 +5458,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>Internet Connectivity Problem</source>
         <translation>Problème de connexion Internet</translation>
-    </message>
-    <message>
-        <source>No such build available on update server.</source>
-        <translation>Aucune version disponible sur le serveur de mise à jour.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -5483,15 +5475,23 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to begin update. Updates for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5654,11 +5654,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished">Succès</translation>
     </message>
     <message>
-        <source>Provided parameters are not valid. Could not perform test.</source>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5838,15 +5838,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup complete until: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5859,6 +5851,14 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7128,11 +7128,11 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7649,15 +7649,15 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>%n éléments</translation>
     </message>
     <message>
-        <source>Changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

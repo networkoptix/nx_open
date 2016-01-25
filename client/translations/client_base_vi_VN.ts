@@ -2921,7 +2921,7 @@ to view more bookmarks</source>
         <translation>Bạn có chắc chắn bạn muốn khôi phục lại cơ sở dữ liệu? Tất cả các dữ liệu hiện có sẽ bị mất.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to start backup.</source>
+        <source>You need to connect to a server prior to backup start.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3469,11 +3469,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1..</source>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export I/O module %1.</source>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4513,7 +4513,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage PTZ for %1..</source>
+        <source>Manage PTZ for %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5382,10 +5382,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Vui lòng cập nhật cho khách hàng bằng tay dùng một gói cài đặt.</translation>
     </message>
     <message>
-        <source>Launcher process not found.</source>
-        <translation>Quá trình phóng không được tìm thấy.</translation>
-    </message>
-    <message>
         <source>Update Cancelled</source>
         <translation>Cập nhật hủy</translation>
     </message>
@@ -5402,10 +5398,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Vấn đề kết nối Internet</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>Không như xây dựng sẵn trên máy chủ cập nhật.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>Không thể giải nén tập tin cập nhật.</translation>
     </message>
@@ -5420,15 +5412,23 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to begin update. Updates for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5590,11 +5590,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation type="unfinished">sự thành công</translation>
     </message>
     <message>
-        <source>Provided parameters are not valid. Could not perform test.</source>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5774,15 +5774,7 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup complete until: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5795,6 +5787,14 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7047,11 +7047,11 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7559,15 +7559,15 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>%n mặt hàng</translation>
     </message>
     <message>
-        <source>Changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -2966,7 +2966,7 @@ to view more bookmarks</source>
         <translation>Czy na pewno  przywrócić bazę danych? Wszystkie istniejące dane zostaną utracone.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to start backup.</source>
+        <source>You need to connect to a server prior to backup start.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3520,11 +3520,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1..</source>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export I/O module %1.</source>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4576,7 +4576,7 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage PTZ for %1..</source>
+        <source>Manage PTZ for %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5469,10 +5469,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation>Proszę zaktualizować aplikację kliencką ręcznie używając pliku instalacyjnego.</translation>
     </message>
     <message>
-        <source>Launcher process not found.</source>
-        <translation>Launcher proces nie został znaleziony.</translation>
-    </message>
-    <message>
         <source>Update Cancelled</source>
         <translation>Aktualizacja anulowana</translation>
     </message>
@@ -5487,10 +5483,6 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     <message>
         <source>Internet Connectivity Problem</source>
         <translation>Problem połączenia z Internetem</translation>
-    </message>
-    <message>
-        <source>No such build available on update server.</source>
-        <translation>Nie ma takiej wersji na serwerze aktualizacji.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -5509,15 +5501,23 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to begin update. Updates for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5681,11 +5681,11 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation type="unfinished">Powodzenie</translation>
     </message>
     <message>
-        <source>Provided parameters are not valid. Could not perform test.</source>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5865,15 +5865,7 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup complete until: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5886,6 +5878,14 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
     </message>
     <message>
         <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7168,11 +7168,11 @@ Jeśli chcesz wyłączyć tę funkcję zrób to w oknie Ustawienia systemowe.</t
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7696,15 +7696,15 @@ Jeśli rozumiesz i chcesz kontynuować wciśnij  Połącz  aby kontynuować.</tr
         <translation>%n elementów</translation>
     </message>
     <message>
-        <source>Changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
