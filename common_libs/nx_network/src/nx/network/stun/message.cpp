@@ -213,30 +213,6 @@ static Buffer hmacSha1( const String& key, const Message* message )
         Q_ASSERT(false);
     }
 
-#ifdef _DEBUG
-    {
-        MessageParser parser;
-        Message checkMessage;
-        parser.setMessage(&checkMessage);
-        size_t bytesRead = 0;
-        if (parser.parse(buffer, &bytesRead) != nx_api::ParserState::done)
-        {
-            Q_ASSERT(false);
-        }
-
-        Buffer buffer1;
-        buffer1.reserve(DEFAULT_BUFFER_SIZE);
-        MessageSerializer serializer1;
-        serializer1.setMessage(&checkMessage);
-        if (serializer1.serialize(&buffer1, &bytes) != nx_api::SerializerState::done)
-        {
-            Q_ASSERT(false);
-        }
-        int x = 0;
-        Q_ASSERT(buffer1 == buffer);
-    }
-#endif
-
     return hmacSha1( key, buffer );
 }
 
