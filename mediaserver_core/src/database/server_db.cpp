@@ -259,6 +259,9 @@ namespace
 
     int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
     {
+        if (filter.thinOutpProps.use)
+            return QnCameraBookmarkSearchFilter::kNoLimit;
+
         switch(filter.sortProps.column)
         {
         case Qn::BookmarkName:
@@ -268,10 +271,10 @@ namespace
 
         case Qn::BookmarkCameraName:
         case Qn::BookmarkTags:
-            return std::numeric_limits<int>().max(); // No limit for manual sorted sequences!
+            return QnCameraBookmarkSearchFilter::kNoLimit; // No limit for manual sorted sequences!
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
-            return std::numeric_limits<int>().max();
+            return QnCameraBookmarkSearchFilter::kNoLimit;
         }
     };
 }

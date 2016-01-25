@@ -1,6 +1,7 @@
 #include "camera_bookmark.h"
 
 #include <QtCore/QMap>
+#include <QtCore/QLinkedList>
 
 #include <utils/common/model_functions.h>
 #include <utils/camera/camera_names_watcher.h>
@@ -134,7 +135,72 @@ namespace
 
         return std::move(sources);
     }
+
+    QnCameraBookmarkList thinOut(const QnCameraBookmarkList &bookmarks
+        , const QnBookmarksThinOutProperties &thinOutProp
+        , int limit)
+    {
+        if (!thinOutProp.use || (bookmarks.size() <= limit))
+            return bookmarks;
+
+        typedef QLinkedList<QnCameraBookmarkList::const_iterator> ItsLinkedList;
+        ItsLinkedList valuableBookmarksIts;
+        for (auto it = bookmarks.begin(); it != bookmarks.end(); ++it)
+        {
+            if (it->durationMs >= thinOutProp.minVisibleLengthMs)
+                valuableBookmarksIts.push_back(it);
+        }
+
+        const auto createListFromIts = [](const ItsLinkedList &its)
+        {
+            QnCameraBookmarkList result;
+            result.reserve(its.size());
+            for (auto it: its)
+                result.push_back(*it);
+            return result;
+        };
+
+        const int valuableBookmarksCount = valuableBookmarksIts.size();
+        if (valuableBookmarksCount <= limit)
+            return createListFromIts(valuableBookmarksIts);
+
+        const int removeCount = (limit - valuableBookmarksCount);
+        const int removeStep = limit/ removeCount;
+
+        // Thin out bookmarks with calculated step
+        int counter = 0;
+        for (auto it = valuableBookmarksIts.begin();
+            (it != valuableBookmarksIts.end() && valuableBookmarksIts.size() > limit); counter++)
+        {
+            if (counter % removeStep == 0)
+                it = valuableBookmarksIts.erase(it);
+            else
+                ++it;
+        }
+        return createListFromIts(valuableBookmarksIts);
+    }
 }
+
+//
+
+QnBookmarkSortProps::QnBookmarkSortProps(Qn::BookmarkSortColumn column
+    , Qn::SortOrder order)
+    : column(column)
+    , order(order)
+{}
+
+const QnBookmarkSortProps QnBookmarkSortProps::default =
+    QnBookmarkSortProps(Qn::BookmarkStartTime, Qn::Ascending);
+
+//
+
+QnBookmarksThinOutProperties::QnBookmarksThinOutProperties(bool use
+    , qint64 minVisibleLengthMs)
+    : use(use)
+    , minVisibleLengthMs(minVisibleLengthMs)
+{}
+
+//
 
 qint64 QnCameraBookmark::endTimeMs() const
 {
@@ -145,15 +211,6 @@ bool QnCameraBookmark::isNull() const
 {
     return guid.isNull();
 }
-
-QnBookmarkSortProps::QnBookmarkSortProps(Qn::BookmarkSortColumn column
-    , Qn::SortOrder order)
-    : column(column)
-    , order(order)
-{}
-
-const QnBookmarkSortProps QnBookmarkSortProps::default =
-    QnBookmarkSortProps(Qn::BookmarkStartTime, Qn::Ascending);
 
 QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, const QString &delimiter)
 {
@@ -170,18 +227,24 @@ void QnCameraBookmark::sortBookmarks(QnCameraBookmarkList &bookmarks
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
     , const QnBookmarkSortProps &sortProperties
+    , const QnBookmarksThinOutProperties &thinOut
     , int limit)
 {
     const auto pred = createPredicate(sortProperties);
 
-    if (sortProperties.column ==Qn::BookmarkCameraName)
-        mergeSortedBookmarks(sortEachList(source, sortProperties), pred, limit);
+    const int intermediateLimit = (thinOut.use ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
+    QnCameraBookmarkList result;
+    if (sortProperties.column == Qn::BookmarkCameraName)
+        result = mergeSortedBookmarks(sortEachList(source, sortProperties), pred, intermediateLimit);
     else if (sortProperties.column == Qn::BookmarkTags)
-        mergeSortedBookmarks(sortEachList(source, sortProperties), pred, limit);
+        result = mergeSortedBookmarks(sortEachList(source, sortProperties), pred, intermediateLimit);
+    else
+        result = mergeSortedBookmarks(source, pred, intermediateLimit);
 
-    // We have several properly sorted bookmark lists here.
-    // So, we just have to merge them
-    return mergeSortedBookmarks(source, pred, limit);
+    if (!thinOut.use)
+        return result;
+
+    return result;
 }
 
 QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
@@ -266,7 +329,8 @@ QDebug operator<<(QDebug dbg, const QnCameraBookmark &bookmark) {
 QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     startTimeMs(0),
     endTimeMs(std::numeric_limits<qint64>().max()),
-    limit(std::numeric_limits<int>().max()),
+    limit(kNoLimit),
+    thinOutpProps(),
     sortProps(QnBookmarkSortProps::default)
 {}
 
@@ -308,6 +372,8 @@ bool QnCameraBookmarkSearchFilter::checkBookmark(const QnCameraBookmark &bookmar
     return true;
 }
 
+const int QnCameraBookmarkSearchFilter::kNoLimit = std::numeric_limits<int>::max();
+
 QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter() {
     QnCameraBookmarkSearchFilter filter;
     filter.startTimeMs = 0;
@@ -320,6 +386,7 @@ void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortProps, (json)(eq), QnBookmarkSortProps_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarksThinOutProperties, (json)(eq), QnBookmarksThinOutProperties_Fileds, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark,      (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields,    (optional, true))

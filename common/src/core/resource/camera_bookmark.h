@@ -25,6 +25,15 @@ struct QnBookmarkSortProps
 };
 #define QnBookmarkSortProps_Fields (column)(order)
 
+struct QnBookmarksThinOutProperties
+{
+    bool use;
+    int minVisibleLengthMs;
+
+    QnBookmarksThinOutProperties(bool use = false
+        , qint64 minVisibleLengthMs = 0);
+};
+#define QnBookmarksThinOutProperties_Fileds (use)(minVisibleLengthMs)
 
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
@@ -77,6 +86,7 @@ struct QnCameraBookmark {
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
         , const QnBookmarkSortProps &sortProperties = QnBookmarkSortProps::default
+        , const QnBookmarksThinOutProperties &thinOut = QnBookmarksThinOutProperties()
         , int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
@@ -86,7 +96,8 @@ struct QnCameraBookmark {
  *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
 
-struct QnCameraBookmarkSearchFilter {
+struct QnCameraBookmarkSearchFilter
+{
     /** Minimum start time for the bookmark. */
     qint64 startTimeMs;
 
@@ -98,7 +109,8 @@ struct QnCameraBookmarkSearchFilter {
 
     int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    // TODO: add fusion serialization
+    QnBookmarksThinOutProperties thinOutpProps;
+
     QnBookmarkSortProps sortProps;
 
     QnCameraBookmarkSearchFilter();
@@ -108,10 +120,13 @@ struct QnCameraBookmarkSearchFilter {
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
 
     static QnCameraBookmarkSearchFilter invalidFilter();
+
+    static const int kNoLimit;
 };
 #define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(sortProps)
 
-struct QnCameraBookmarkTag {
+struct QnCameraBookmarkTag
+{
     QString name;
     int count;
 
@@ -142,6 +157,7 @@ Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortProps, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarksThinOutProperties, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))
