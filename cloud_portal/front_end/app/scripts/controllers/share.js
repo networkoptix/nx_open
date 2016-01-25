@@ -23,8 +23,13 @@ angular.module('cloudApp')
                 role.label = Config.accessRolesSettings.labels[role.accessRole] || role.accessRole;
             });
 
-            $scope.accessRoles = _.filter(roles,function(role){
-                return role.accessRole != Config.accessRolesSettings.unshare;
+            var filteredRoles = _.filter(roles,function(role){
+                return role.accessRole != Config.accessRolesSettings.unshare && role.accessRole != Config.accessRolesSettings.owner;
+            });
+
+            $scope.accessRoles = _.sortBy(filteredRoles,function(role){
+                var index = Config.accessRolesSettings.order.indexOf(role);
+                return index > 0 ? index: 10000;
             });
         }
         processAccessRoles(Config.accessRolesSettings.options);

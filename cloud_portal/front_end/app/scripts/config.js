@@ -15,6 +15,12 @@ var Config = {
             "editor": "editor",
             "editorWithSharing": "editor with sharing"
         },
+        order:[
+            "viewer",
+            "editor",
+            "editorWithSharing",
+            "maintenance"
+        ],
         options:[
             {
                 "accessRole": "maintenance"
