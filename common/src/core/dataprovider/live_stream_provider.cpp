@@ -2,7 +2,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include <nx/utils/log/log.h>
+#include <utils/common/log.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_properties.h"
