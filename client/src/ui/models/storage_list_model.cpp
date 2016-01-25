@@ -1,6 +1,8 @@
 #include "storage_list_model.h"
 
 #include <core/resource/storage_resource.h>
+#include <core/resource/client_storage_resource.h>
+#include <core/resource/media_server_resource.h>
 
 #include <utils/common/collection.h>
 
@@ -24,6 +26,7 @@ namespace {
 
 QnStorageListModel::QnStorageListModel(QObject *parent)
     : base_type(parent)
+    , m_server()
     , m_storages()
     , m_rebuildStatus()
     , m_readOnly(false)
@@ -73,6 +76,21 @@ void QnStorageListModel::removeStorage(const QnStorageModelInfo& storage) {
 
     beginResetModel();
     m_storages.removeAt(idx);
+    endResetModel();
+}
+
+QnMediaServerResourcePtr QnStorageListModel::server() const
+{
+    return m_server;
+}
+
+void QnStorageListModel::setServer(const QnMediaServerResourcePtr& server)
+{
+    if (m_server == server)
+        return;
+
+    beginResetModel();
+    m_server = server;
     endResetModel();
 }
 
@@ -150,7 +168,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
     case UrlColumn:
         {
             QString path = urlPath(storageData.url);
-            if (!storageData.isOnline && storageData.isWritable)
+            if (!storageData.isOnline && storageData.isWritable && storageIsActive(storageData))
                 return tr("%1 (Checking...)").arg(path);
 
             for (const auto &rebuildStatus: m_rebuildStatus)
@@ -176,8 +194,10 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         return storageData.storageType;
     case TotalSpaceColumn:
         switch (storageData.totalSpace) {
-        case QnStorageResource::UnknownSize:
+        case QnStorageResource::kUnknownSize:
             return tr("Invalid storage");
+        case QnStorageResource::kFastCreateSize:
+            return tr("Loading...");
         default:
             return tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1));
         }
@@ -334,7 +354,9 @@ Qt::ItemFlags QnStorageListModel::flags(const QModelIndex &index) const {
         if (isStoragePoolInRebuild(storageData))
             return false;
 
-        return (storageData.isOnline || index.column() == ChangeGroupActionColumn);
+        return (storageData.isOnline
+            || !storageIsActive(storageData)
+            ||  index.column() == ChangeGroupActionColumn);
     };
 
 
@@ -376,11 +398,13 @@ bool QnStorageListModel::canMoveStorage( const QnStorageModelInfo& data ) const 
     }))
         return false;
 
-
-    if (!data.isOnline)
+    if (!data.isWritable)
         return false;
 
-    if (!data.isWritable)
+    if (!storageIsActive(data))
+        return true;
+
+    if (!data.isOnline)
         return false;
 
     if (data.isBackup)
@@ -418,6 +442,17 @@ bool QnStorageListModel::canRemoveStorage( const QnStorageModelInfo &data ) cons
     return data.isExternal || !data.isWritable;
 }
 
+bool QnStorageListModel::storageIsActive(const QnStorageModelInfo &data) const
+{
+    if (!m_server)
+        return false;
+
+    QnClientStorageResourcePtr storage = m_server->getStorageByUrl(data.url).dynamicCast<QnClientStorageResource>();
+    if (!storage)
+        return false;
+
+    return storage->isActive();
+}
 
 bool QnStorageListModel::isStoragePoolInRebuild( const QnStorageModelInfo& storage ) const
 {
@@ -442,3 +477,4 @@ bool QnStorageListModel::isStorageInRebuild( const QnStorageModelInfo& storage )
     }
     return false;
 }
+

@@ -377,7 +377,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera."),
-            tr("An error has occurred while trying to get current position from camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to get a current position from camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -399,7 +399,7 @@ void QnPtzManageDialog::at_goToPositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -440,7 +440,7 @@ void QnPtzManageDialog::at_startTourButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not set position for camera."),
-            tr("An error has occurred while trying to set current position for camera %1.").arg(m_resource->getName()) + L'\n' 
+            tr("An error has occurred while trying to set the current position for camera %1.").arg(m_resource->getName()) + L'\n' 
           + tr("Please wait for the camera to go online.")
             );
         return;
@@ -634,7 +634,7 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource) {
     m_resource = resource;
     m_adaptor->setResource(resource);
 
-    setWindowTitle(tr("Manage PTZ for %1.").arg(getResourceName(m_resource)));
+    setWindowTitle(tr("Manage PTZ for %1..").arg(getResourceName(m_resource)));
 }
 
 bool QnPtzManageDialog::isModified() const {

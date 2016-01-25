@@ -5,7 +5,7 @@
 #include <core/resource/storage_resource.h>
 
 /*
-*   This class used only for manipulating storage as User Interface entity. 
+*   This class used only for manipulating storage as User Interface entity.
 *   Additional info like total space is loaded with a separate API request
 *   and is set from outside.
 */
@@ -29,7 +29,7 @@ public:
     virtual void updateInner(const QnResourcePtr &other, QSet<QByteArray>& modifiedFields) override;
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
-    
+
     virtual bool isAvailable() const override;
     virtual QnAbstractStorageResource::FileInfoList getFileList(const QString& dirName) override;
     qint64 getFileSize(const QString& url) const override;
@@ -48,10 +48,13 @@ public:
     void setWritable(bool isWritable);
     virtual int getCapabilities() const override;
 
+    bool isActive() const;
+    void setActive(bool value);
 signals:
     void freeSpaceChanged(const QnResourcePtr &storage);
     void totalSpaceChanged(const QnResourcePtr &storage);
     void isWritableChanged(const QnResourcePtr &storage);
+    void isActiveChanged(const QnResourcePtr &storage);
 
 protected:
     /** Check if space info is loaded for the given resource. */
@@ -61,6 +64,14 @@ private:
     qint64 m_freeSpace;
     qint64 m_totalSpace;
     bool m_writable;
+
+    /**
+     *  Flag: storage really exists in server-side resource pool.
+     *  Storages that won't have this flag:
+     *      - newly added remote storages, until changes are applied
+     *      - auto-found server-side partitions without storage
+     */
+    bool m_active;
 
 };
 

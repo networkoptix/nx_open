@@ -24,9 +24,9 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
     const QString description = lit("%1<br>%2<br>%3").arg(
-        tr("Actions will only work for Generic Events that pass all filters.")
+        tr("Actions will only work for Generic Events that are not filtered out.")
         , tr("Empty fields do not affect results.")
-        , tr("Each filter will pass if any keyword in a field is matched."));
+        , tr("Event will not be filtered out if any keyword in a field is matched."));
 
     const QString linkText = tr("Server API");
     const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
