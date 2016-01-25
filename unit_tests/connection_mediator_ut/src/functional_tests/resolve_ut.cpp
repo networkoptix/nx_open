@@ -127,6 +127,7 @@ TEST_F(MediatorFunctionalTest, resolve_forbidden_by_system_name)
     //emulating local mediaserver
     MediaServerEmulator mserverEmulator(endpoint(), system1);
     ASSERT_TRUE(mserverEmulator.start());
+    ASSERT_EQ(api::ResultCode::ok, mserverEmulator.registerOnMediator());
 
     //resolving 
     api::ResolveResponse resolveResponse;
