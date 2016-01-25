@@ -56,14 +56,10 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 class SystemID
 {
 public:
-    std::string systemID;
+    QnUuid systemID;
 
-    SystemID() {}
-    SystemID(std::string systemIDStr)
-    :
-        systemID(std::move(systemIDStr))
-    {
-    }
+    SystemID();
+    SystemID(std::string systemIDStr);
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
