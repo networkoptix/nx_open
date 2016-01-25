@@ -3,6 +3,7 @@ from rest_framework.request import Request
 from rest_framework import status
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.http import QueryDict
 from enum import Enum
 import logging
 import json
@@ -219,6 +220,9 @@ def handle_exceptions(func):
             ip = get_client_ip(request)
             if not isinstance(request.user, AnonymousUser):
                 user_name = request.user.email
+
+        if isinstance(request_data, QueryDict):
+            request_data = request_data.dict()
 
         if isinstance(error, APIException):
             error_formatted = 'Status: {0}\nMessage: {1}\nError code: {2}\nError data: {3}'.\

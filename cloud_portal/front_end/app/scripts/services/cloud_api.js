@@ -43,9 +43,9 @@ angular.module('cloudApp')
                 });
             },
 
-            notification_send:function(user_email,type,message){
+            notification_send:function(userEmail,type,message){
                 return $http.post(apiBase.replace("/api","/notifications") + '/send',{
-                    user_email:user_email,
+                    user_email:userEmail,
                     type:type,
                     message:message
                 });
@@ -64,9 +64,9 @@ angular.module('cloudApp')
                     old_password:oldPassword
                 });
             },
-            restorePasswordRequest:function(user_email){
+            restorePasswordRequest:function(userEmail){
                 return $http.post(apiBase + '/account/restorePassword',{
-                    user_email:user_email
+                    user_email:userEmail
                 });
             },
             restorePassword:function(code, newPassword){
@@ -75,9 +75,9 @@ angular.module('cloudApp')
                     new_password:newPassword
                 });
             },
-            reactivate:function(user_email){
+            reactivate:function(userEmail){
                 return $http.post(apiBase + '/account/activate',{
-                    user_email:user_email
+                    user_email:userEmail
                 });
             },
             activate:function(code){
@@ -85,21 +85,16 @@ angular.module('cloudApp')
                     code:code
                 });
             },
-
-            systems:function(){
-                return $http.get(apiBase + '/systems');
+            systems:function(systemId){
+                return $http.get(apiBase + '/systems' + (systemId?('/' + systemId):''));
             },
-
             getCommonPasswords:function(){
                 return $http.get('/scripts/commonPasswordsList.json');
             },
-
-
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
             },
-
-            share:function(systemId,userEmail,role){
+            share:function(systemId, userEmail, role){
                 return $http.post(apiBase + '/systems/' + systemId + '/users', {
                     user_email: userEmail,
                     role:role

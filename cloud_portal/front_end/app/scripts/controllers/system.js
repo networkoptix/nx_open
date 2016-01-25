@@ -7,21 +7,26 @@ angular.module('cloudApp')
         $scope.Config = Config;
         var systemId = $routeParams.systemId;
 
-        // 1. TODO: Get single system info (from cache
         $scope.system = {
-
+            users:[],
+            info:{name:''}
         };
 
+        // Retrieve system info
+        $scope.gettingSystem = process.init(function(){
+            return cloudApi.systems(systemId);
+        }).then(function(result){
+            $scope.system.info = result.data;
+        });
+        $scope.gettingSystem.run();
 
+        //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
             return cloudApi.users(systemId);
         }).then(function(result){
             $scope.system.users = result.data;
         });
-
         $scope.gettingSystemUsers.run();
-
-
 
         $scope.open = function(){
             nativeClient.open(systemId);
@@ -32,13 +37,8 @@ angular.module('cloudApp')
 
         };
 
-
-
-
-
         $scope.share = function(){
             // Call share dialog, run process inside
-
             dialogs.share(systemId);
         };
 
@@ -46,7 +46,6 @@ angular.module('cloudApp')
             //Pass user inside
             dialogs.share(systemId, user);
         };
-
 
         $scope.unshare = function(user){
             // Run a process of sharing

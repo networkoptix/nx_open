@@ -8,9 +8,16 @@ from api.helpers.exceptions import handle_exceptions, api_success, require_param
 @api_view(['GET'])
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
+def system(request, system_id):
+    data = cloud_api.System.get(request.user.email, request.session['password'],system_id)
+    return api_success(data['systems'])
+
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
 def list_systems(request):
     data = cloud_api.System.list(request.user.email, request.session['password'])
-    print(data['systems'])
     return api_success(data['systems'])
 
 

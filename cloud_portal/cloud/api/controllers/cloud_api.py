@@ -15,11 +15,17 @@ class System(object):
 
     @staticmethod
     @validate_response
+    def get(email, password, system_id):
+        # TODO: create wrappers
+        request = settings.CLOUD_CONNECT['url'] + "/system/get"
+        params = {
+           'systemID': system_id
+        }
+        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
     def users(email, password, system_id):
-
-        print("/system/get_cloud_users")
-        print(system_id)
-
         request = settings.CLOUD_CONNECT['url'] + "/system/get_cloud_users"
         params = {
            'systemID': system_id
