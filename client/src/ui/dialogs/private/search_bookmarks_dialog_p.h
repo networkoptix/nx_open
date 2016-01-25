@@ -14,6 +14,7 @@ namespace Ui {
 
 class QnSearchBookmarksDialogPrivate : public QObject , public QnWorkbenchContextAware
 {
+    Q_OBJECT
 public:
     QnSearchBookmarksDialogPrivate(const QString &filterText
         , qint64 utcStartTimeMs
