@@ -810,9 +810,9 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply
 
     //TODO: #GDM discuss texts
     QString backedUpTo = realtime
-        ? tr("Real-Time mode all data is backed up continuously.") + L' ' + setWarningStyleHtml(tr("Notice: Only further recording will be backed up. Backup process will ignore existing footage."))
+        ? tr("In Real-Time mode all data is backed up continuously.") + L' ' + setWarningStyleHtml(tr("Notice: Only further recording will be backed up. Backup process will ignore existing footage."))
         : reply.backupTimeMs > 0
-        ? tr("Archive backup complete until: %1.").arg(backupPositionToString(reply.backupTimeMs))
+        ? tr("Archive backup is completed up to: %1.").arg(backupPositionToString(reply.backupTimeMs))
         : tr("Backup was never started.");
 
     ui->backupTimeLabel->setText(backedUpTo);
