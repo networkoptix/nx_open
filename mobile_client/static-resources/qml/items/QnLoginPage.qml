@@ -334,6 +334,10 @@ QnPage {
         return portField.text ? portField.text : connectionManager.defaultServerPort()
     }
 
+    function scrollTop() {
+        flickable.contentY = -flickable.topMargin
+    }
+
     focus: true
 
     Keys.onReleased: {
