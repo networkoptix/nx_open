@@ -257,7 +257,7 @@ QnPage {
             name: "FailedSaved"
             PropertyChanges {
                 target: editButtons
-                visible: true
+                visible: false
             }
         }
     ]
