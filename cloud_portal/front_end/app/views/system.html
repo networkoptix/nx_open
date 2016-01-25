@@ -1,0 +1,37 @@
+
+<div class="auth-visible">
+    <h1><a href="#/systems">Systems</a> > _System_name_</h1>
+
+    <button class="btn btn-default" ng-click="unbind()">Delete</button>
+    <button class="btn btn-default" ng-click="share()">Share</button>
+    <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
+
+    <h2>Users</h2>
+
+    <process-alert process="unsharing"
+                   success-message="unsharingMessage"
+                   error-prefix="'Some error has happened:'"></process-alert>
+
+    <process-alert process="gettingSystemUsers"
+                   success-message="false"
+                   error-prefix="'Some error has happened:'"></process-alert>
+
+    <table class="table" ng-if="system.users.length">
+        <thead>
+        <tr>
+            <th>Account</th>
+            <th>Permissions</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-repeat="user in system.users">
+            <td>{{user.accountEmail}}</td>
+            <td>{{user.accessRole}}</td>
+            <td><a ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="editShare(user)">Edit permissions</a></td>
+            <td><a ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="unshare(user)">Remove</a></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

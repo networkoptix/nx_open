@@ -56,6 +56,19 @@ def api_success(data=None, status_code=status.HTTP_200_OK):
             }, status=status_code)
 
 
+def require_params(request, params_list):
+    miss_params = False
+    error_data = {}
+    for param in params_list:
+        if param not in request.data or request.data[param] == '':
+            miss_params = True
+            error_data[param] = ['This field is required.']
+
+    if miss_params:
+        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
+                                  error_data=error_data)
+
+
 class APIException(Exception):
     error_text = 'Unexpected error'
     error_code = ErrorCodes.unknown_error
@@ -138,7 +151,7 @@ class APILogicException(APIException):
 def validate_response(func):
     def validate_error(response_data):
         if 'resultCode' not in response_data or 'errorText' not in response_data:
-            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response )
+            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response)
 
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
@@ -151,7 +164,8 @@ def validate_response(func):
         try:
             response_data = response.json()
         except ValueError:
-            raise APIInternalException('No JSON data from cloud_db (code:' + str(response.status_code) + ") " + response.text, ErrorCodes.cloud_invalid_response)
+            raise APIInternalException('No JSON data from cloud_db (code:' + str(response.status_code) + ") " +
+                                       response.text, ErrorCodes.cloud_invalid_response)
 
         errors = {
             status.HTTP_500_INTERNAL_SERVER_ERROR: APIInternalException,
@@ -193,9 +207,7 @@ def handle_exceptions(func):
     :return:
     """
 
-
-
-    def log_error(request, error = None):
+    def log_error(request, error=None):
         page_url = 'unknown'
         user_name = 'not authorized'
         request_data = ''

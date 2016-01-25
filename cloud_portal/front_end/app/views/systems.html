@@ -3,12 +3,12 @@
     <h1>Systems</h1>
     <div ng-if="systems && !systems.length">
         Please, connect any systems to your cloud account first.
-        <button class="btn btn-default" ng-click="open(null)">Open Nx Witness</button>
+        <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>
     </div>
 
     <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 ">
         <div class="panel panel-default">
-            <div class="panel-body">
+            <div class="panel-body" ng-click="openSystem(system)">
                 <h2>{{system.name}}</h2>
                 <small>{{system.ownerAccountEmail}}</small><br/>
                 <span class="label label-success">{{system.status}}</span><br>

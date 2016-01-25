@@ -2,7 +2,7 @@ from django.utils import timezone
 from django import db
 import models
 from api.controllers.cloud_api import Account
-from api.helpers.exceptions import APIRequestException, ErrorCodes
+from api.helpers.exceptions import APIRequestException, APILogicException, ErrorCodes
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -15,7 +15,7 @@ class AccountBackend(object):
             try:
                 return models.Account.objects.get(email=username)
             except ObjectDoesNotExist:
-                return None
+                raise APILogicException('User is not in portal', ErrorCodes.portal_critical_error)
 
         return None
 

@@ -4,6 +4,36 @@ var Config = {
     apiBase: '/api',
     clientProtocol: 'vms://',
 
+    accessRolesSettings:{
+        unshare: 'none',
+        default: 'viewer',
+        owner:   'owner',
+        labels: {
+            "owner": "owner",
+            "maintenance" : "maintenance",
+            "viewer": "viewer",
+            "editor": "editor",
+            "editorWithSharing": "editor with sharing"
+        },
+        options:[
+            {
+                "accessRole": "maintenance"
+            },
+            {
+                "accessRole": "owner"
+            },
+            {
+                "accessRole": "viewer"
+            },
+            {
+                "accessRole": "editor"
+            },
+            {
+                "accessRole": "editorWithSharing"
+            }
+        ]
+    },
+
     emailRegex:'.+@.+\\..+', // Check only @ and . in the email
     passwordRequirements:
     {

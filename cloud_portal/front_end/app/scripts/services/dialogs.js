@@ -1,10 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
-    .factory('dialogs', function ($http, $modal, $q) {
-        function openDialog(title, template, content, hasFooter, cancellable){
+    .factory('dialogs', function ($http, $modal, $q, $location) {
+        function openDialog(title, template, url, content, hasFooter, cancellable, params){
             // Check 401 against offline
-            return $modal.open({
+            var modalInstance = $modal.open({
                 controller: 'DialogCtrl',
                 templateUrl: 'views/components/dialog.html',
                 keyboard:false,
@@ -16,22 +16,47 @@ angular.module('cloudApp')
                             template: template,
                             hasFooter: hasFooter,
                             content:content,
-                            cancellable: cancellable
+                            cancellable: cancellable,
+                            params: params
                         };
+                    },
+                    params:function(){
+                        return params;
                     }
                 }
             });
+
+            function clearPath(){
+                return $location.$$path.replace(new RegExp("/" + url + '$'),'');
+            }
+            if(url) {
+                $location.path(clearPath() + "/" + url, false);
+            }
+
+            modalInstance.result.catch(function () {
+                if(url){
+                    $location.path(clearPath());
+                }
+            });
+
+            return modalInstance;
         }
 
         return {
             alert:function(title, message){
-                return openDialog(title, null, message, true, true);
+                return openDialog(title, null, null, message, true, true);
             },
             confirm:function(title, message){
-                return openDialog(title, null, message, true, false);
+                return openDialog(title, null, null, message, true, false);
             },
             login:function(){
-                return openDialog('Login', 'views/login.html', null, false, true);
+                return openDialog('Login', 'views/login.html', 'login', null, false, true);
+            },
+            share:function(systemId, share){
+                return openDialog('Share', 'views/share.html', 'share', null, false, true,{
+                    systemId: systemId,
+                    share: share
+                });
             }
         };
     }).controller("DialogCtrl",function($scope, $modalInstance,settings){

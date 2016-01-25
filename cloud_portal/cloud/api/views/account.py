@@ -10,20 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 import api
 from api.controllers.cloud_api import Account
 from api.helpers.exceptions import handle_exceptions, APIRequestException, APINotAuthorisedException, \
-    APIInternalException, api_success, ErrorCodes
-
-
-def require_params(request, params_list):
-    miss_params = False
-    error_data = {}
-    for param in params_list:
-        if param not in request.data:
-            miss_params = True
-            error_data[error_data] = ['This field is required.']
-
-    if miss_params:
-        raise APIRequestException('Parameters are missing', ErrorCodes.wrong_parameters,
-                                  error_data=error_data)
+    APIInternalException, api_success, ErrorCodes, require_params
 
 
 @api_view(['POST'])

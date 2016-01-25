@@ -92,6 +92,28 @@ angular.module('cloudApp')
 
             getCommonPasswords:function(){
                 return $http.get('/scripts/commonPasswordsList.json');
+            },
+
+
+            users:function(systemId){
+                return $http.get(apiBase + '/systems/' + systemId + '/users');
+            },
+
+            share:function(systemId,userEmail,role){
+                return $http.post(apiBase + '/systems/' + systemId + '/users', {
+                    user_email: userEmail,
+                    role:role
+                });
+            },
+            unshare:function(systemId,userEmail){
+                return $http.post(apiBase + '/systems/' + systemId + '/users', {
+                    user_email: userEmail,
+                    role: Config.accessRolesSettings.unshare
+                });
+            },
+            accessRoles: function(){
+                // TODO: cache this request
+                return $http.get(apiBase + '/systems/accessRoles');
             }
         }
 

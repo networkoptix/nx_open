@@ -1,7 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location) {
+    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location, nativeClient) {
+
+
         cloudApi.systems().then(function(result){
             $scope.systems = result.data;
         });
@@ -13,13 +15,11 @@ angular.module('cloudApp')
             }
         });
 
-        $scope.open = function(system){
-            var username = encodeURIComponent($scope.account.email);
-            var password = encodeURIComponent($sessionStorage.password);
-            var system   = system?system.id:'localhost:7000';
-            var protocol = Config.clientProtocol;
-            system = system.replace('{','').replace('}','');
-            var url = protocol + username + ":" + password + "@" + system + "/";
-            window.open(url);
-        }
+        $scope.openClient = function(system){
+            nativeClient.open(system?system.id:null);
+        };
+
+        $scope.openSystem = function(system){
+            $location.path('/system/' + system.id);
+        };
     });

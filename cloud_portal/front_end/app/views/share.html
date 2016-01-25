@@ -1,0 +1,24 @@
+<div ng-controller="ShareCtrl">
+    <form name="shareForm" novalidate>
+        <div class="modal-body">
+            <process-alert process="sharing" ></process-alert>
+            <div class="form-group" validate-field>
+                <label for="email">Email address</label>
+                <input type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
+                       ng-pattern="Config.emailRegex" maxlength="255"
+                       required autofocus>
+            </div>
+            <div class="form-group">
+                <label for="role">Permissions</label>
+
+                <select class="form-control" name="role" id="role" ng-model="share.accessRole"
+                        ng-options="option.accessRole as option.label for option in accessRoles"></select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <process-button process="sharing"
+                            form="shareForm"
+                            button-text="'Share'"></process-button>
+        </div>
+    </form>
+</div>

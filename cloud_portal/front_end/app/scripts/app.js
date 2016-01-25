@@ -35,7 +35,17 @@ angular.module('cloudApp', [
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'
         })
-
+        .when('/system/:systemId', {
+            templateUrl: 'views/system.html',
+            controller: 'SystemCtrl'
+        })
+        .when('/system/:systemId/share', {
+            templateUrl: 'views/system.html',
+            controller: 'SystemCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.callShare = true; }]
+            }
+        })
         .when('/activate/', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
@@ -67,6 +77,14 @@ angular.module('cloudApp', [
             templateUrl: 'views/debug.html',
             controller: 'DebugCtrl'
         })
+
+        .when('/login', {
+            templateUrl: 'views/startPage.html',
+            controller: 'StartPageCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.callLogin = true; }]
+            }
+        })
         .otherwise({
             templateUrl: 'views/startPage.html',
             controller: 'StartPageCtrl'
@@ -75,3 +93,16 @@ angular.module('cloudApp', [
 
 
 
+angular.module('cloudApp').run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location) {
+    var original = $location.path;
+    $location.path = function (path, reload) {
+        if (reload === false) {
+            var lastRoute = $route.current;
+            var un = $rootScope.$on('$locationChangeSuccess', function () {
+                $route.current = lastRoute;
+                un();
+            });
+        }
+        return original.apply($location, [path]);
+    };
+}]);

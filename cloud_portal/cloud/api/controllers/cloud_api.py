@@ -11,7 +11,36 @@ class System(object):
     def list(email, password):
         # TODO: create wrappers
         request = settings.CLOUD_CONNECT['url'] + "/system/get"
+        return requests.get(request, auth=HTTPDigestAuth(email, password))
 
+    @staticmethod
+    @validate_response
+    def users(email, password, system_id):
+
+        print("/system/get_cloud_users")
+        print(system_id)
+
+        request = settings.CLOUD_CONNECT['url'] + "/system/get_cloud_users"
+        params = {
+           'systemID': system_id
+        }
+        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
+    def share(email, password, system_id, account_email, role):
+        request = settings.CLOUD_CONNECT['url'] + "/system/share"
+        params = {
+            'systemID': system_id,
+            'accountEmail': account_email,
+            'accessRole': role
+        }
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
+    @staticmethod
+    @validate_response
+    def access_roles(email, password):
+        request = settings.CLOUD_CONNECT['url'] + "/system/get_sharing_type_list"
         return requests.get(request, auth=HTTPDigestAuth(email, password))
 
 
@@ -95,5 +124,4 @@ class Account(object):
     def get(email=None, password=None):
         # TODO: create wrappers
         request = settings.CLOUD_CONNECT['url'] + "/account/get"
-
         return requests.get(request, auth=HTTPDigestAuth(email, password))
