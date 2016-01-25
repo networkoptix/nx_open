@@ -47,6 +47,10 @@ public:
     */
     virtual void getSystems(
         std::function<void(ResultCode, api::SystemDataList)> completionHandler ) = 0;
+    //!Get system by id
+    virtual void getSystem(
+        const std::string& systemID,
+        std::function<void(ResultCode, api::SystemDataList)> completionHandler) = 0;
     //!Share system with specified account. Operation allowed for system owner and editor_with_sharing only
     /*!
         \note Required access role: account (owner or editor_with_sharing)

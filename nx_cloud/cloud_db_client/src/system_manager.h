@@ -35,6 +35,9 @@ public:
     //!Implementation of \a SystemManager::getSystems
     virtual void getSystems(
         std::function<void(api::ResultCode, api::SystemDataList)> completionHandler ) override;
+    virtual void getSystem(
+        const std::string& systemID,
+        std::function<void(api::ResultCode, api::SystemDataList)> completionHandler) override;
     //!Implementation of \a SystemManager::shareSystem
     virtual void shareSystem(
         api::SystemSharing sharingData,

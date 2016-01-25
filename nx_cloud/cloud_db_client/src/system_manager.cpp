@@ -52,6 +52,17 @@ void SystemManager::getSystems(
         std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
 }
 
+void SystemManager::getSystem(
+    const std::string& systemID,
+    std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
+{
+    executeRequest(
+        kSystemGetPath,
+        api::SystemID(systemID),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
+}
+
 void SystemManager::shareSystem(
     api::SystemSharing sharingData,
     std::function<void(api::ResultCode)> completionHandler)

@@ -111,6 +111,41 @@ TEST_F(CdbFunctionalTest, system_unbind)
     }
 }
 
+TEST_F(CdbFunctionalTest, system_get)
+{
+    startAndWaitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system2 to account1
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    {
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystem(account1.email, account1Password, system1.id.toStdString(), &systems));
+        ASSERT_EQ(1, systems.size());
+        ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+    }
+
+    {
+        //requesting unknown system
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(
+            api::ResultCode::notFound,
+            getSystem(account1.email, account1Password, "unknown_system_id", &systems));
+        ASSERT_TRUE(systems.empty());
+    }
+}
+
 TEST_F(CdbFunctionalTest, system_activation)
 {
     startAndWaitUntilStarted();

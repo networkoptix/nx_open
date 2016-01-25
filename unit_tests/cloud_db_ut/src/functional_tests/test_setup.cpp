@@ -377,6 +377,28 @@ api::ResultCode CdbFunctionalTest::getSystems(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::getSystem(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    std::vector<api::SystemData>* const systems)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemDataList systemDataList;
+    std::tie(resCode, systemDataList) =
+        makeSyncCall<api::ResultCode, api::SystemDataList>(
+            std::bind(
+                &nx::cdb::api::SystemManager::getSystem,
+                connection->systemManager(),
+                systemID,
+                std::placeholders::_1));
+    *systems = std::move(systemDataList.systems);
+
+    return resCode;
+}
+
 api::ResultCode CdbFunctionalTest::shareSystem(
     const std::string& email,
     const std::string& password,

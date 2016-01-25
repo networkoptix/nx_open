@@ -155,13 +155,14 @@ void SystemManager::getSystems(
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     data::SystemDataList resultData;
-    auto systemID = wholeFilterMap.get(cdb::attr::authSystemID);
+    auto systemID = wholeFilterMap.get<QnUuid>(cdb::attr::authSystemID);
     if (!systemID)
-        systemID = wholeFilterMap.get(cdb::attr::systemID);
+        systemID = wholeFilterMap.get<QnUuid>(cdb::attr::systemID);
     if (systemID)
     {
+        auto systemIDVal = systemID.get().toString();
         //selecting system by id
-        auto system = m_cache.find(systemID.get().value<QnUuid>());
+        auto system = m_cache.find(systemID.get());
         if (!system || !applyFilter(system.get(), filter))
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
