@@ -572,7 +572,8 @@ bool QnFileStorageResource::isAvailable() const
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
     // write check fail is a cause to set dirty to true, thus enabling 
     // remount attempt in initOrUpdate()
-    m_dirty = !m_writeCapCached;
+    if (!m_writeCapCached)
+        m_dirty = true;
     m_cachedTotalSpace = getDiskTotalSpace(m_localPath.isEmpty() ? getPath() : m_localPath ); // update cached value periodically
     return *m_writeCapCached;
 
