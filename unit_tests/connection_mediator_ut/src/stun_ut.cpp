@@ -66,7 +66,7 @@ TEST_F( StunCustomTest, Ping )
     allEndpoints.push_back( GOOD_ADDRESS );
     allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( allEndpoints );
-    request.insertIntegrity( SERVER_ID, AUTH_KEY );
+    request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
 
     cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
     mediaserverApi.expect_pingServer( GOOD_ADDRESS, SERVER_ID, true );
@@ -100,7 +100,7 @@ TEST_F( StunCustomTest, BindResolve )
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 
-        request.insertIntegrity( SERVER_ID, AUTH_KEY );
+        request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
@@ -151,4 +151,3 @@ TEST_F( StunCustomTest, BindResolve )
 } // namespace test
 } // namespace hpm
 } // namespase nx
-
