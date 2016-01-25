@@ -551,12 +551,19 @@ QnRecordingStatsReply QnRecordingStatisticsWidget::getForecastData(qint64 extraS
         forecastData.cameras.push_back(std::move(cameraForecast));
         //forecastData.totalSpace += cameraStats.recordedBytes; // 2.1 add current archive space
 
-        for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
+        if (cameraStats.uniqueId == QnSortedRecordingStatsModel::kForeignCameras)
         {
-            for (const auto& storageSpaceData: m_availStorages)
+            forecastData.totalSpace += cameraStats.recordedBytes; //<< there are no storages for virtual camera called 'foreign cameras'
+        }
+        else 
+        {
+            for (auto itr = cameraStats.recordedBytesPerStorage.begin(); itr != cameraStats.recordedBytesPerStorage.end(); ++itr)
             {
-                if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
-                    forecastData.totalSpace += itr.value();
+                for (const auto& storageSpaceData: m_availStorages)
+                {
+                    if (storageSpaceData.storageId == itr.key() && storageSpaceData.isUsedForWriting && storageSpaceData.isWritable)
+                        forecastData.totalSpace += itr.value();
+                }
             }
         }
     }
