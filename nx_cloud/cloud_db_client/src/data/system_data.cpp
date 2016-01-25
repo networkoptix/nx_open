@@ -106,6 +106,16 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 //// class SystemID
 ////////////////////////////////////////////////////////////
 
+SystemID::SystemID()
+{
+}
+
+SystemID::SystemID(std::string systemIDStr)
+:
+    systemID(QnUuid::fromStringSafe(QByteArray(systemIDStr.c_str())))
+{
+}
+
 MAKE_FIELD_NAME_STR_CONST(SystemID, systemID)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)

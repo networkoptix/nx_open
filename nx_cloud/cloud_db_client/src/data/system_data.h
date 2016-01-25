@@ -58,12 +58,8 @@ class SystemID
 public:
     QnUuid systemID;
 
-    SystemID() {}
-    SystemID(std::string systemIDStr)
-    :
-        systemID(systemIDStr)
-    {
-    }
+    SystemID();
+    SystemID(std::string systemIDStr);
 };
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID);
