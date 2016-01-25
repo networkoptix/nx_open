@@ -58,6 +58,8 @@ public:
         nx::String name);
     std::unique_ptr<MediaServerEmulator> addRandomServer(
         const AbstractCloudDataProvider::System& system);
+    std::unique_ptr<MediaServerEmulator> addRandomServerNotRegisteredOnMediator(
+        const AbstractCloudDataProvider::System& system);
     std::vector<std::unique_ptr<MediaServerEmulator>> addRandomServers(
         const AbstractCloudDataProvider::System& system,
         size_t count);

@@ -28,8 +28,9 @@ public:
         nx::String serverName = nx::String());
     virtual ~MediaServerEmulator();
 
-    /** Attaches to a local port and registers on mediator */
+    /** Attaches to a local port and */
     bool start();
+    nx::hpm::api::ResultCode registerOnMediator();
     nx::String serverId() const;
     /** Server endpoint */
     SocketAddress endpoint() const;

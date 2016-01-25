@@ -56,7 +56,11 @@ bool MediaServerEmulator::start()
     m_serverClient = m_mediatorConnector.systemConnection();
     m_serverClient->setOnConnectionRequestedHandler(
         std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
+    return true;
+}
 
+nx::hpm::api::ResultCode MediaServerEmulator::registerOnMediator()
+{
     std::list<SocketAddress> localAddresses;
     localAddresses.push_back(m_httpServer.address());
 
@@ -67,8 +71,7 @@ bool MediaServerEmulator::start()
             m_serverClient.get(),
             std::move(localAddresses),
             std::placeholders::_1));
-
-    return resultCode == nx::hpm::api::ResultCode::ok;
+    return resultCode;
 }
 
 nx::String MediaServerEmulator::serverId() const
