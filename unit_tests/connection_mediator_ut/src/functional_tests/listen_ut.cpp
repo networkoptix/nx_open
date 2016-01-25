@@ -68,9 +68,10 @@ TEST_F(MediatorFunctionalTest, listen_unknown_system_credentials)
     ASSERT_EQ(nx::hpm::api::ResultCode::ok, server1->listen());
 
     auto system2 = addRandomSystem();
-    system2.authKey.clear();
-    auto server2 = addRandomServer(system2);
+    system2.authKey.clear();    //making credentials invalid
+    auto server2 = addRandomServerNotRegisteredOnMediator(system2);
     ASSERT_NE(nullptr, server2);
+    ASSERT_EQ(nx::hpm::api::ResultCode::notAuthorized, server2->registerOnMediator());
     ASSERT_EQ(nx::hpm::api::ResultCode::notAuthorized, server2->listen());
 
     client->pleaseStopSync();

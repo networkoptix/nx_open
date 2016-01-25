@@ -62,7 +62,7 @@ boost::optional< MediaserverData >
             "System could not be found" );
         return boost::none;
     }
-//    if( !system->mediatorEnabled )
+//    if( !system->mediatorEnabled )    //cloud connect is not 
 //    {
 //        sendErrorResponse( connection, request.header, stun::error::badRequest,
 //                       "Mediator is not enabled for this system" );

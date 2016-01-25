@@ -153,7 +153,7 @@ namespace stun {
             std::uint16_t length;
             nx::Buffer value;
             std::uint16_t type;
-            void Clear() {
+            void clear() {
                 length = 0;
                 value.clear();
                 type = 0;

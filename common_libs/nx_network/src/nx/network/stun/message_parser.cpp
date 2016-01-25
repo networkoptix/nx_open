@@ -15,74 +15,98 @@ using namespace attrs;
 // It will consume all the data in the user buffer, but provide a more consistent interface
 // for user. So if the parser stuck at one byte data, the MessageParserBuffer will temporary
 // store that one byte and make user buffer drained. However without losing any single bytes
-class MessageParser::MessageParserBuffer {
+class MessageParser::MessageParserBuffer
+{
 public:
-    MessageParserBuffer( std::deque<char>* temp_buffer , const nx::Buffer& buffer ): 
-        temp_buffer_(temp_buffer),
-        buffer_(buffer), 
-        m_position(0){}
-    MessageParserBuffer( const nx::Buffer& buffer ): 
-        temp_buffer_(NULL),
-        buffer_(buffer), 
-        m_position(0){}
-    std::uint16_t NextUint16( bool* ok );
-    std::uint32_t NextUint32( bool* ok );
-    std::uint8_t NextByte( bool* ok );
-    void NextBytes( char* bytes , std::size_t sz , bool* ok );
-    // Do not modify the temp_buffer_size_ here
-    void Clear() {
-        if( temp_buffer_ != NULL )
-            temp_buffer_->clear();
+    MessageParserBuffer(std::deque<char>* temp_buffer, const nx::Buffer& buffer):
+        m_tempBuffer(temp_buffer),
+        m_buffer(buffer),
+        m_position(0)
+    {
     }
-    std::size_t position() const {
+    MessageParserBuffer(const nx::Buffer& buffer):
+        m_tempBuffer(NULL),
+        m_buffer(buffer),
+        m_position(0)
+    {
+    }
+
+    std::uint16_t NextUint16(bool* ok);
+    std::uint32_t NextUint32(bool* ok);
+    std::uint8_t NextByte(bool* ok);
+    void readNextBytesToBuffer(char* buffer, std::size_t count, bool* ok);
+    // Do not modify the temp_buffer_size_ here
+    void clear()
+    {
+        if (m_tempBuffer != NULL)
+            m_tempBuffer->clear();
+    }
+    std::size_t position() const
+    {
         return m_position;
     }
+
 private:
-    bool Ensure( std::size_t byte_size , void* buffer );
-    std::deque<char>* temp_buffer_;
-    const nx::Buffer& buffer_;
+    std::deque<char>* m_tempBuffer;
+    const nx::Buffer& m_buffer;
     std::size_t m_position;
+
+    bool ensure(std::size_t byteSize, void* buffer);
+
     Q_DISABLE_COPY(MessageParserBuffer)
 };
 
-// Ensure will check the temporary buffer and also the buffer in nx::Buffer.
+// ensure will check the temporary buffer and also the buffer in nx::Buffer.
 // Additionally, if ensure cannot ensure the buffer size, it will still drain
 // the original buffer , so the user buffer will always be consumed over .
-bool MessageParser::MessageParserBuffer::Ensure( std::size_t byte_size , void* buffer ) {
+bool MessageParser::MessageParserBuffer::ensure(std::size_t count, void* buffer)
+{
     // Get the available bytes that we can read from the stream
-    std::size_t available_bytes = (temp_buffer_ == NULL ? 0 : temp_buffer_->size()) + buffer_.size() - m_position;
-    if( available_bytes < byte_size ) {
+    const std::size_t availableBytes = 
+        (m_tempBuffer == NULL ? 0 : m_tempBuffer->size()) +
+        m_buffer.size() - m_position;
+    if (availableBytes < count)
+    {
         // Drain the user buffer here
-        if( temp_buffer_ != NULL ) {
-            for( int i = m_position ; i < buffer_.size() ; ++i )
-                temp_buffer_->push_back(buffer_.at(i));
+        if (m_tempBuffer != NULL)
+        {
+            for (int i = m_position; i < m_buffer.size(); ++i)
+                m_tempBuffer->push_back(m_buffer.at(i));
             // Modify the position pointer here 
-            m_position = buffer_.size();
+            m_position = m_buffer.size();
         }
         return false;
-    } else {
+    }
+    else
+    {
         std::size_t pos = 0;
         // 1. Drain the buffer from the temporary buffer here
-        if( temp_buffer_ != NULL ) {
-            const std::size_t temp_buffer_size = temp_buffer_->size();
-            for( std::size_t i = 0 ; i < temp_buffer_size && byte_size != pos; ++i , ++pos) {
-                *(reinterpret_cast<char*>(buffer)+pos) = temp_buffer_->front();
-                temp_buffer_->pop_front();
+        if (m_tempBuffer != NULL)
+        {
+            const std::size_t temp_buffer_size = m_tempBuffer->size();
+            for (std::size_t i = 0; i < temp_buffer_size && count != pos; ++i, ++pos)
+            {
+                *(reinterpret_cast<char*>(buffer) + pos) = m_tempBuffer->front();
+                m_tempBuffer->pop_front();
             }
-            if( byte_size == pos ) {
+            if (count == pos)
+            {
                 return true;
             }
         }
         // 2. Finish the buffer feeding 
-        memcpy(reinterpret_cast<char*>(buffer)+pos,buffer_.constData() + m_position, byte_size - pos );
-        m_position += byte_size - pos;
+        memcpy(
+            reinterpret_cast<char*>(buffer) + pos,
+            m_buffer.constData() + m_position,
+            count - pos);
+        m_position += count - pos;
         return true;
     }
 }
 
 std::uint16_t MessageParser::MessageParserBuffer::NextUint16( bool* ok ) {
-    std::uint16_t value;
-    if( !Ensure(sizeof(quint16),&value) ) {
+    std::uint16_t value = 0;
+    if( !ensure(sizeof(quint16),&value) ) {
         *ok = false; return 0;
     } 
     *ok = true;
@@ -90,25 +114,33 @@ std::uint16_t MessageParser::MessageParserBuffer::NextUint16( bool* ok ) {
 }
 
 std::uint32_t MessageParser::MessageParserBuffer::NextUint32( bool* ok ) {
-    std::uint32_t value;
-    if( !Ensure(sizeof(quint32),&value) ) {
+    std::uint32_t value = 0;
+    if( !ensure(sizeof(quint32),&value) ) {
         *ok = false; return 0;
     }
     *ok = true;
     return qFromBigEndian(value);
 }
 
-std::uint8_t MessageParser::MessageParserBuffer::NextByte( bool* ok ) {
-    std::uint8_t value;
-    if( !Ensure(sizeof(quint8),&value) ) {
-        *ok = false; return 0;
+std::uint8_t MessageParser::MessageParserBuffer::NextByte( bool* ok )
+{
+    std::uint8_t value = 0;
+    if (!ensure(sizeof(quint8), &value))
+    {
+        *ok = false;
+        return 0;
     }
     *ok = true;
     return value;
 }
 
-void MessageParser::MessageParserBuffer::NextBytes( char* bytes , std::size_t sz , bool* ok ) {
-    if(!Ensure(sz,bytes)) {
+void MessageParser::MessageParserBuffer::readNextBytesToBuffer(
+    char* bytes,
+    std::size_t sz,
+    bool* ok)
+{
+    if (!ensure(sz, bytes))
+    {
         *ok = false;
         return;
     }
@@ -143,7 +175,7 @@ Attribute* MessageParser::parseXORMappedAddress() {
         Q_ASSERT(ok);
         attribute->address.ipv4 = xor_addr ^ MAGIC_COOKIE;
     } else {
-        // Ensure the buffer
+        // ensure the buffer
         if( m_attribute.value.size() != 20 )
             return NULL;
         // The RFC doesn't indicate how to concatenate, I just assume it with the natural byte order
@@ -333,7 +365,7 @@ int MessageParser::parseHeaderMagicCookie( MessageParserBuffer& buffer ) {
 int MessageParser::parseHeaderTransactionID( MessageParserBuffer& buffer ) {
     Q_ASSERT(m_state == HEADER_TRANSACTION_ID );
     bool ok;
-    buffer.NextBytes( m_header.transactionId.data(), m_header.transactionId.size(), &ok );
+    buffer.readNextBytesToBuffer( m_header.transactionId.data(), m_header.transactionId.size(), &ok );
     if(!ok) {
       return IN_PROGRESS;
     }
@@ -356,12 +388,12 @@ int MessageParser::parseMoreValue( MessageParserBuffer& buffer ) {
     // are associated with our body. 
     Q_ASSERT(m_state == MORE_VALUE);
     if( m_leftMessageLength == 0 ) {
-        buffer.Clear();
-        m_attribute.Clear();
+        buffer.clear();
+        m_attribute.clear();
         m_state = HEADER_INITIAL_AND_TYPE;
         return FINISH;
     } else {
-        m_attribute.Clear();
+        m_attribute.clear();
         m_state = ATTRIBUTE_TYPE;
         return SECTION_FINISH;
     }
@@ -389,35 +421,51 @@ int MessageParser::parseAttributeLength( MessageParserBuffer& buffer ) {
     return SECTION_FINISH;
 }
 
-int MessageParser::parseAttributeValueNotAdd( MessageParserBuffer& buffer ) {
-    bool ok;
-    std::size_t padding_length = calculatePaddingSize(m_attribute.length);
-    m_attribute.value.resize( static_cast<int>(padding_length) );
-    buffer.NextBytes(m_attribute.value.data(),padding_length,&ok);
-    if( !ok ) 
-      return IN_PROGRESS;
+int MessageParser::parseAttributeValueNotAdd( MessageParserBuffer& buffer )
+{
+    std::size_t valueWithPaddingLength = calculatePaddingSize(m_attribute.length);
+    m_attribute.value.resize(static_cast<int>(m_attribute.length));
+    bool ok = false;
+    buffer.readNextBytesToBuffer(m_attribute.value.data(), m_attribute.length, &ok);
+    if (!ok)
+        return IN_PROGRESS;
+    //skipping padding (valueWithPaddingLength-m_attribute.length) bytes
+    //TODO #ak add skipBytes method to buffer
+    char paddingBuf[4];
+    buffer.readNextBytesToBuffer(
+        paddingBuf,
+        valueWithPaddingLength - m_attribute.length,
+        &ok);
+    if (!ok)
+        return IN_PROGRESS;
     // Modify the left message length field : total size 
     // The value length + 2 bytes type + 2 bytes length 
-    m_leftMessageLength -= 4 + padding_length;
+    m_leftMessageLength -= 4 + valueWithPaddingLength;
     return SECTION_FINISH;
 }
 
-int MessageParser::parseAttributeValue( MessageParserBuffer& buffer ) {
+int MessageParser::parseAttributeValue(MessageParserBuffer& buffer)
+{
     Q_ASSERT(m_state == ATTRIBUTE_VALUE);
     int ret = parseAttributeValueNotAdd(buffer);
-    if( ret != SECTION_FINISH ) return ret;
+    if (ret != SECTION_FINISH)
+        return ret;
     Attribute* attr = parseValue();
-    if( attr == NULL ) return FAILED;
-    m_outputMessage->attributes.emplace( attr->getType(), std::unique_ptr<Attribute>(attr) );
-    switch( attr->getType() ) {
-    case attrs::fingerPrint:
-        m_state = END_FINGERPRINT;
-        break;
-    case attrs::messageIntegrity:
-        m_state = END_MESSAGE_INTEGRITY;
-        break;
-    default:
-        m_state = MORE_VALUE;
+    if (attr == NULL)
+        return FAILED;
+    m_outputMessage->attributes.emplace(
+        attr->getType(),
+        std::unique_ptr<Attribute>(attr));
+    switch (attr->getType())
+    {
+        case attrs::fingerPrint:
+            m_state = END_FINGERPRINT;
+            break;
+        case attrs::messageIntegrity:
+            m_state = END_MESSAGE_INTEGRITY;
+            break;
+        default:
+            m_state = MORE_VALUE;
     }
     return SECTION_FINISH;
 }
