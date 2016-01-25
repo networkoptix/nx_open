@@ -6822,14 +6822,14 @@ If you would like to disable this feature you can do so in the System Settings d
     <message numerus="yes">
         <source>Are you sure you want to remove these %n items from layout?</source>
         <translation>
-            <numerusform>Вы уверены, что хотите удалить этот элементо с раскладки?</numerusform>
+            <numerusform>Вы уверены, что хотите удалить этот элемент с раскладки?</numerusform>
             <numerusform>Вы уверены, что хотите удалить эти %n элемента с раскладки?</numerusform>
             <numerusform>Вы уверены, что хотите удалить эти %n элементов с раскладки?</numerusform>
         </translation>
     </message>
     <message>
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Эти устройства найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
+        <translation type="unfinished">Эти устройства найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
     </message>
     <message>
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
