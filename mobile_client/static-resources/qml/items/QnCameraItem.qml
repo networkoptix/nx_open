@@ -148,53 +148,6 @@ Item {
         }
     }
 
-    Rectangle {
-        id: hiddenDummy
-
-        width: parent.width
-        height: width * 3 / 4
-        color: QnTheme.cameraHiddenBackground
-        border.width: dp(1)
-        border.color: QnTheme.cameraDummyBorder
-
-        opacity: 1.0 - Math.min(0.5, content.opacity) * 2
-
-        Column {
-            width: parent.width
-            anchors.centerIn: parent
-
-            Text {
-                width: parent.width
-                height: dp(56)
-
-                text: qsTr("Camera\nhidden")
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: sp(16)
-                maximumLineCount: 2
-                wrapMode: Text.WordWrap
-                color: QnTheme.cameraHiddenText
-            }
-
-            QnButton {
-                id: undoButton
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                flat: true
-                text: qsTr("Undo")
-                icon: "image://icon/undo.png"
-                font.pixelSize: sp(18)
-
-                onClicked: {
-                    cameraItem.z = -1
-                    d.hidden = false
-                }
-            }
-        }
-    }
-
     QnMaterialSurface {
         id: materialSurface
 
