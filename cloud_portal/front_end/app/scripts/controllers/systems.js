@@ -1,12 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location, nativeClient) {
+    .controller('SystemsCtrl', function ($scope, cloudApi, $sessionStorage, $location, nativeClient, process) {
 
-
-        cloudApi.systems().then(function(result){
-            $scope.systems = result.data;
-        });
         cloudApi.account().then(function(account){
             $scope.account = account;
 
@@ -14,6 +10,14 @@ angular.module('cloudApp')
                 $location.path('/');
             }
         });
+
+        $scope.gettingSystems = process.init(function(){
+            return cloudApi.systems();
+        }).then(function(result){
+            $scope.systems = result.data;
+        });
+        $scope.gettingSystems.run();
+
 
         $scope.openClient = function(system){
             nativeClient.open(system?system.id:null);

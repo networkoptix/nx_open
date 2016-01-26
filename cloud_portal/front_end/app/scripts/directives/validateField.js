@@ -5,8 +5,12 @@ angular.module('cloudApp')
         return{
             restrict:'A',
             link:function(scope, element, attrs) {
-                var formName = element.attr("ng-form") || element.closest('form').attr('name');
                 var input = element.find('input,textarea');
+                if(!input.get(0)){ // No input inside - do nothing, just ignore directive
+                    return;
+                }
+
+                var formName = element.attr("ng-form") || element.closest('form').attr('name');
                 var fieldName = input.attr('name');
 
                 var scopeName = formName + '.' + fieldName;

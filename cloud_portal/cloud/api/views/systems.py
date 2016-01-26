@@ -9,7 +9,7 @@ from api.helpers.exceptions import handle_exceptions, api_success, require_param
 @permission_classes((IsAuthenticated, ))
 @handle_exceptions
 def system(request, system_id):
-    data = cloud_api.System.get(request.user.email, request.session['password'],system_id)
+    data = cloud_api.System.get(request.user.email, request.session['password'], system_id)
     return api_success(data['systems'])
 
 

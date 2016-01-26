@@ -16,7 +16,7 @@ angular.module('cloudApp')
         $scope.gettingSystem = process.init(function(){
             return cloudApi.systems(systemId);
         }).then(function(result){
-            $scope.system.info = result.data;
+            $scope.system.info = result.data[0];
         });
         $scope.gettingSystem.run();
 

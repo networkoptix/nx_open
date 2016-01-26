@@ -2,11 +2,11 @@
 
 angular.module('cloudApp')
     .controller('DebugCtrl', function ($scope,cloudApi,$location) {
-        /*cloudApi.account().then(function(account){
+        cloudApi.account().then(function(account){
             if(!account){
                 $location.path('/');
             }
-        });*/
+        });
 
         $scope.user_email = "ebalashov@networkoptix.com";
         $scope.type = "activate_account";

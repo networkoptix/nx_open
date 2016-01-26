@@ -13,6 +13,7 @@ angular.module('cloudApp')
         var dialogSettings = findSettings($scope);
 
         var systemId = dialogSettings.params.systemId;
+        $scope.lockEmail = !!dialogSettings.params.share;
         $scope.share = dialogSettings.params.share || {
             accountEmail:'',
             accessRole: Config.accessRolesSettings.default

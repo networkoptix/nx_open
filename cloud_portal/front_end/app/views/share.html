@@ -4,9 +4,11 @@
             <process-alert process="sharing" ></process-alert>
             <div class="form-group" validate-field>
                 <label for="email">Email address</label>
-                <input type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
+
+                <input ng-if="!lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
                        ng-pattern="Config.emailRegex" maxlength="255"
                        required autofocus>
+                <p ng-if="lockEmail" class="form-control-static">{{share.accountEmail}}</p>
             </div>
             <div class="form-group">
                 <label for="role">Permissions</label>

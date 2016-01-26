@@ -1,6 +1,12 @@
 
 <div class="auth-visible">
     <h1>Systems</h1>
+
+    <process-alert process="gettingSystems"
+                   success-message="false"
+                   error-prefix="'Systems list is unavailable:'"></process-alert>
+
+
     <div ng-if="systems && !systems.length">
         Please, connect any systems to your cloud account first.
         <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>

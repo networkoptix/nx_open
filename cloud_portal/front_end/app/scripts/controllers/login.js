@@ -9,13 +9,11 @@ angular.module('cloudApp')
             }
         });
 
-        var registerEmail = $routeParams.email || '';
-
         $scope.Config = Config;
         $scope.session = $sessionStorage;
 
         $scope.auth = {
-            email: registerEmail,
+            email: '',
             password: '',
             remember: true
         };
@@ -34,8 +32,12 @@ angular.module('cloudApp')
             });
         });
 
+
+        var registerEmail = $routeParams.email || '';
+        $scope.lockEmail = !!$routeParams.email;
+
         $scope.account = {
-            email: '',
+            email: registerEmail,
             password: '',
             firstName: '',
             lastName: '',
