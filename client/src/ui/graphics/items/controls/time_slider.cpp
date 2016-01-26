@@ -463,7 +463,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-//    m_bookmarkMergeHelper(new QnBookmarkMergeHelper()),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
