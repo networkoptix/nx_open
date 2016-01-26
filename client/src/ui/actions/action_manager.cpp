@@ -1006,8 +1006,8 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInNewLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in a New Tab")).
-        conditionalText(tr("Monitor in a New Tab"), hasFlags(Qn::server), Qn::All).
+        text(tr("Open in New Tab")).
+        conditionalText(tr("Monitor in New Tab"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
                       new QnNegativeActionCondition(new QnFakeServerActionCondition(true, this), this),
@@ -1016,13 +1016,13 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::OpenInAlarmLayoutAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open in the Alarm Layout"));
+        text(tr("Open in Alarm Layout"));
 
     factory(Qn::OpenInNewWindowAction).
         mode(QnActionTypes::DesktopMode).
         flags(Qn::Tree | Qn::Scene | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget | Qn::LayoutItemTarget | Qn::WidgetTarget).
-        text(tr("Open in a New Window")).
-        conditionalText(tr("Monitor in a New Window"), hasFlags(Qn::server), Qn::All).
+        text(tr("Open in New Window")).
+        conditionalText(tr("Monitor in New Window"), hasFlags(Qn::server), Qn::All).
         condition(new QnConjunctionActionCondition(
                       new QnOpenInNewEntityActionCondition(this),
                       new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
@@ -1031,7 +1031,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenSingleLayoutAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::ResourceTarget).
-        text(tr("Open Layout in a New Tab")).
+        text(tr("Open Layout in New Tab")).
         condition(hasFlags(Qn::layout));
 
     factory(Qn::OpenMultipleLayoutsAction).
@@ -1041,7 +1041,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenLayoutsInNewWindowAction).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
-        text(tr("Open Layout(s) in a New Window")). // TODO: #Elric split into sinle- & multi- action
+        text(tr("Open Layout(s) in New Window")). // TODO: #Elric split into sinle- & multi- action
         condition(new QnConjunctionActionCondition(
                       new QnResourceActionCondition(hasFlags(Qn::layout), Qn::All, this),
                       new QnLightModeCondition(Qn::LightModeNoNewWindow, this),
@@ -1049,7 +1049,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::OpenCurrentLayoutInNewWindowAction).
         flags(Qn::NoTarget).
-        text(tr("Open Current Layout in a New Window")).
+        text(tr("Open Current Layout in New Window")).
         condition(new QnLightModeCondition(Qn::LightModeNoNewWindow, this));
 
     factory(Qn::OpenAnyNumberOfLayoutsAction).
@@ -1673,7 +1673,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::AddCameraBookmarkAction).
         flags(Qn::Slider | Qn::SingleTarget).
-        text(tr("Add a Bookmark...")).
+        text(tr("Add Bookmark...")).
         condition(new QnConjunctionActionCondition(
             new QnForbiddenInSafeModeCondition(this),
             new QnAddBookmarkActionCondition(this),
