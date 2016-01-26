@@ -196,7 +196,7 @@ QString QnStorageListModel::displayData(const QModelIndex &index, bool forcedTex
         switch (storageData.totalSpace) {
         case QnStorageResource::kUnknownSize:
             return tr("Invalid storage");
-        case QnStorageResource::kFastCreateSize:
+        case QnStorageResource::kSizeDetectionOmitted:
             return tr("Loading...");
         default:
             return tr("%1 Gb").arg(QString::number(storageData.totalSpace/BYTES_IN_GB, 'f', 1));

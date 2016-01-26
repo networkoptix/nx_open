@@ -23,10 +23,9 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     connect(ui->captionEdit,     &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
-    const QString description = lit("%1<br>%2<br>%3").arg(
-        tr("Actions will only work for Generic Events that are not filtered out.")
-        , tr("Empty fields do not affect results.")
-        , tr("Event will not be filtered out if any keyword in a field is matched."));
+    const QString description = tr("Event will trigger only if Generic Event meets all the above conditions. "
+        "If a keyword field is empty, condition is always met. "
+        "If not, condition is met if the corresponding field of Generic Event contains any keyword.");
 
     const QString linkText = tr("Server API");
     const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);

@@ -129,7 +129,6 @@ function gotoNewSession() {
 
     var item = stackView.find(function(item, index) { return item.objectName === "newConnectionPage" })
 
-
     if (item) {
         stackView.setSlideTransition()
         stackView.pop(item)

@@ -2622,11 +2622,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation> พอร์ต IO</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>เปิดเสียง</translation>
     </message>
@@ -2674,6 +2669,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>ฟิชอาย</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

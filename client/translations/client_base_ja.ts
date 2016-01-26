@@ -155,57 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">新規タブで開く</translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;全デバイス&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;全カメラ&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search bookmarks by name, tag or description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any I/O Module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My I/O Modules&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -750,32 +699,12 @@ to view more bookmarks</source>
         <translation>新規タブで開く</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>新規タブでモニター</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>新規画面で開く</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>新規画面でモニター</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>新規タブでレイアウトを開く</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>レイアウトを開く</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>新規画面でレイアウトを開く</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>新規画面でレイアウトを開く</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1470,10 +1399,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1511,6 +1436,34 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2881,15 +2834,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actions will only work for Generic Events that are not filtered out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event will not be filtered out if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2968,7 +2913,7 @@ to view more bookmarks</source>
         <translation>データベースをリストアしますか？　既存の全てのデータは削除されます.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to start backup.</source>
+        <source>You need to connect to a server prior to backup start.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3331,7 +3276,7 @@ to view more bookmarks</source>
         <translation>重要なパフォーマンス情報</translation>
     </message>
     <message>
-        <source>This may result in issues (including unexpected crash).</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3516,11 +3461,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1..</source>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export I/O module %1.</source>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4560,7 +4505,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage PTZ for %1..</source>
+        <source>Manage PTZ for %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5027,6 +4972,53 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">&lt;全デバイス&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;全カメラ&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5378,10 +5370,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>クライアントをインストーラーパッケージよりマニュアルで更新してください.</translation>
     </message>
     <message>
-        <source>Launcher process not found.</source>
-        <translation>起動プロセスが見つかりません.</translation>
-    </message>
-    <message>
         <source>Update Cancelled</source>
         <translation>更新キャンセル</translation>
     </message>
@@ -5398,10 +5386,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>インターネット接続問題</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>アップデートサーバーではそのビルドは有効ではありません.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>更新ファイルがありません.</translation>
     </message>
@@ -5416,15 +5400,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to begin update. Updates for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5586,11 +5578,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">成功</translation>
     </message>
     <message>
-        <source>Provided parameters are not valid. Could not perform test.</source>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5770,15 +5762,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup complete until: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5791,6 +5775,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6799,6 +6791,10 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchConnectHandler</name>
@@ -7039,11 +7035,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7551,15 +7547,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>%n アイテム</translation>
     </message>
     <message>
-        <source>Changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

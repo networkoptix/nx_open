@@ -8,7 +8,7 @@
 QnMigratedSessionList getMigratedSessions(bool *success)
 {
     if (success)
-        success = false;
+        *success = false;
 
     return QnMigratedSessionList();
 }

@@ -63,7 +63,7 @@ bool QnSmtpTestConnectionWidget::testSettings( const QnEmailSettings &value ) {
     result.timeout = testSmtpTimeoutMSec / 1000;
 
     if (!result.isValid()) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Provided parameters are not valid. Could not perform test."));
+        QMessageBox::warning(this, tr("Invalid data"), tr("The provided parameters are not valid. Could not perform a test."));
         return false;
     }
 

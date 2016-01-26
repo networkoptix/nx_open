@@ -155,57 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">Ouvrir dans un nouvel onglet</translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;Tout Périphérique&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;Toute Caméra&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Search bookmarks by name, tag or description</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any I/O Module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My I/O Modules&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n I/O module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -938,14 +887,6 @@ to view more bookmarks</source>
         <translation>Surveiller</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>Surveiller dans une nouvelle mise en page</translation>
-    </message>
-    <message>
-        <source>Monitor in a New Window</source>
-        <translation>Surveiller dans une nouvelle fenêtre</translation>
-    </message>
-    <message>
         <source>Start Panic Recording</source>
         <translation>Démarrer l&apos;enregistrement panique</translation>
     </message>
@@ -1080,14 +1021,6 @@ to view more bookmarks</source>
     <message>
         <source>Restore Down</source>
         <translation>Rétablir le bas</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>Ouvrir la mise en page dans un nouvel onglet</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>Ouvrir Mise(s) en page dans une nouvelle fenêtre</translation>
     </message>
     <message>
         <source>Show Info</source>
@@ -1302,10 +1235,6 @@ to view more bookmarks</source>
         <translation>Journals Serveur...</translation>
     </message>
     <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>Ouvrir la mise en page actuelle dans une nouvelle fenêtre</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
         <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
@@ -1479,10 +1408,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1520,6 +1445,34 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2914,15 +2867,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actions will only work for Generic Events that are not filtered out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event will not be filtered out if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3001,7 +2946,7 @@ to view more bookmarks</source>
         <translation>Êtes-vous sûr de vouloir restaurer la base de données? Toutes les données existantes seront perdues.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to start backup.</source>
+        <source>You need to connect to a server prior to backup start.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3367,7 +3312,7 @@ to view more bookmarks</source>
         <translation> Conseil Important - Performance</translation>
     </message>
     <message>
-        <source>This may result in issues (including unexpected crash).</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3552,11 +3497,11 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not create output file %1..</source>
+        <source>Could not export I/O module %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not export I/O module %1.</source>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4610,7 +4555,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Manage PTZ for %1..</source>
+        <source>Manage PTZ for %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5085,6 +5030,53 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">&lt;Tout Périphérique&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;Toute Caméra&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5440,10 +5432,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d&apos;installation.</translation>
     </message>
     <message>
-        <source>Launcher process not found.</source>
-        <translation>Processus du lanceur n&apos;a pas été trouvé.</translation>
-    </message>
-    <message>
         <source>Update Cancelled</source>
         <translation>Mise à jour annulée</translation>
     </message>
@@ -5458,10 +5446,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>Internet Connectivity Problem</source>
         <translation>Problème de connexion Internet</translation>
-    </message>
-    <message>
-        <source>No such build available on update server.</source>
-        <translation>Aucune version disponible sur le serveur de mise à jour.</translation>
     </message>
     <message>
         <source>Unable to extract update file.</source>
@@ -5479,15 +5463,23 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to begin update. Updates for one or more servers not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Client update not found.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5650,11 +5642,11 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished">Succès</translation>
     </message>
     <message>
-        <source>Provided parameters are not valid. Could not perform test.</source>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5834,15 +5826,7 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup complete until: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5855,6 +5839,14 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6878,6 +6870,10 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <source>Press %1 to search bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchConnectHandler</name>
@@ -7120,11 +7116,11 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export a video footage that is longer than 30 minutes.</source>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>You are about to export several video footages with a total length exceeding 30 minutes.</source>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7641,15 +7637,15 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>%n éléments</translation>
     </message>
     <message>
-        <source>Changes cannot be applied. Unexpected error occurred.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Are you sure you want to stop Video Wall?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

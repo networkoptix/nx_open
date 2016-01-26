@@ -2625,11 +2625,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>Ports IO</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>Activer Audio</translation>
     </message>
@@ -2677,6 +2672,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Fisheye</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

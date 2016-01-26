@@ -2597,11 +2597,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2673,6 +2668,11 @@
     <message>
         <location/>
         <source>Expert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

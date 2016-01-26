@@ -2623,11 +2623,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>Порты ввода/вывода</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>Включить звук</translation>
     </message>
@@ -2675,6 +2670,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Рыбий глаз</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

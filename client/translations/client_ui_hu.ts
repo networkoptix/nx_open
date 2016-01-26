@@ -2623,11 +2623,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>IO portok</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>Audio engedélyezése</translation>
     </message>
@@ -2675,6 +2670,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Halszem</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

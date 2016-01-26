@@ -2623,11 +2623,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>IO端口</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>启用音频</translation>
     </message>
@@ -2675,6 +2670,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>鱼眼</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

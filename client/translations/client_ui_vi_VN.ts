@@ -2629,11 +2629,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>cổng IO</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>cho phép âm thanh</translation>
     </message>
@@ -2681,6 +2676,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Fisheye</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -23,7 +23,7 @@ class QnIncompatibleServerWatcherPrivate : public QObject
 public:
     QnIncompatibleServerWatcherPrivate(QnIncompatibleServerWatcher *parent);
 
-    void at_resourcePool_resourceChanged(const QnResourcePtr &resource);
+    void at_resourcePool_statusChanged(const QnResourcePtr &resource);
     void at_discoveredServerChanged(const ec2::ApiDiscoveredServerData &serverData);
 
     void addResource(const ec2::ApiDiscoveredServerData &serverData);
@@ -74,9 +74,8 @@ void QnIncompatibleServerWatcher::start()
     connect(QnCommonMessageProcessor::instance(), &QnCommonMessageProcessor::discoveredServerChanged,
             d, &QnIncompatibleServerWatcherPrivate::at_discoveredServerChanged);
 
-    connect(qnResPool,  &QnResourcePool::resourceAdded,     d,  &QnIncompatibleServerWatcherPrivate::at_resourcePool_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::resourceChanged,   d,  &QnIncompatibleServerWatcherPrivate::at_resourcePool_resourceChanged);
-    connect(qnResPool,  &QnResourcePool::statusChanged,     d,  &QnIncompatibleServerWatcherPrivate::at_resourcePool_resourceChanged);
+    connect(qnResPool, &QnResourcePool::statusChanged,
+            d, &QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged);
 }
 
 void QnIncompatibleServerWatcher::stop()
@@ -145,7 +144,7 @@ QnIncompatibleServerWatcherPrivate::QnIncompatibleServerWatcherPrivate(QnIncompa
 {
 }
 
-void QnIncompatibleServerWatcherPrivate::at_resourcePool_resourceChanged(const QnResourcePtr &resource)
+void QnIncompatibleServerWatcherPrivate::at_resourcePool_statusChanged(const QnResourcePtr &resource)
 {
     QnMediaServerResourcePtr server = resource.dynamicCast<QnMediaServerResource>();
     if (!server)
