@@ -11,6 +11,8 @@ angular.module('cloudApp')
             }
         });
 
+        $scope.Config = Config;
+
         $scope.gettingSystems = process.init(function(){
             return cloudApi.systems();
         }).then(function(result){

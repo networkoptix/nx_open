@@ -4,6 +4,19 @@ var Config = {
     apiBase: '/api',
     clientProtocol: 'vms://',
 
+    systemStatuses:{
+        default: {
+            style: 'label-default'
+        },
+        notActivated: {
+            label: 'not activated',
+            style: 'label-warning'
+        },
+        activated:{
+            label: 'activated',
+            style: 'label-info'
+        }
+    },
     accessRolesSettings:{
         unshare: 'none',
         default: 'viewer',
