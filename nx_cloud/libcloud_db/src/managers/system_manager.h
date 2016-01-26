@@ -91,7 +91,7 @@ public:
     void getCloudUsersOfSystem(
         const AuthorizationInfo& authzInfo,
         const data::DataFilter& filter,
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler);
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler);
 
     void addSubscription(
         const AuthorizationInfo& authzInfo,

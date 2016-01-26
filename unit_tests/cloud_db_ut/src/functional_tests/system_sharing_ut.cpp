@@ -23,7 +23,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         addActivatedAccount(&account1, &account1Password));
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             getSystemSharings(account1.email, account1Password, "sdfnoowertn", &sharings),
             api::ResultCode::forbidden);
@@ -105,28 +105,44 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
     //checking sharings from account1 view
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             getSystemSharings(account1.email, account1Password, &sharings),
             api::ResultCode::ok);
         ASSERT_EQ(sharings.size(), 4);
+
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system1.id),
             api::SystemAccessRole::owner);
         ASSERT_EQ(
+            account1.fullName,
+            findSharing(sharings, account1.email, system1.id).fullName);
+
+        ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account1.email, system2.id),
             api::SystemAccessRole::owner);
+        ASSERT_EQ(
+            account1.fullName,
+            findSharing(sharings, account1.email, system2.id).fullName);
+
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system1.id),
             api::SystemAccessRole::viewer);
         ASSERT_EQ(
+            account2.fullName,
+            findSharing(sharings, account2.email, system1.id).fullName);
+
+        ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
             api::SystemAccessRole::editorWithSharing);
+        ASSERT_EQ(
+            account2.fullName,
+            findSharing(sharings, account2.email, system2.id).fullName);
     }
 
     //checking sharings from account2 view
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             getSystemSharings(account2.email, account2Password, &sharings),
             api::ResultCode::ok);
@@ -144,7 +160,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
     //checking sharings of system1 from account2 view
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             getSystemSharings(account2.email, account2Password, system1.id.toStdString(), &sharings),
             api::ResultCode::forbidden);
@@ -152,7 +168,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
     //checking sharings of system2 from account2 view
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, system2.id.toStdString(), &sharings));
@@ -202,7 +218,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     //checking system list for both accounts
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
@@ -216,7 +232,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
@@ -305,7 +321,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     //checking system list for both accounts
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
@@ -316,7 +332,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
@@ -327,7 +343,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
 
     //checking system list for both accounts
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
@@ -338,7 +354,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
@@ -373,7 +389,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             api::SystemAccessRole::maintenance));
 
     //checking system list for both accounts
-    std::vector<api::SystemSharing> ownerSharings;
+    std::vector<api::SystemSharingEx> ownerSharings;
     {
         ASSERT_EQ(
             api::ResultCode::ok,
@@ -391,7 +407,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
@@ -399,7 +415,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account3.email, account3Password, &sharings));
@@ -466,7 +482,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account2.email, account2Password, &sharings));
@@ -474,7 +490,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account3.email, account3Password, &sharings));
@@ -554,7 +570,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
 
     //checking system list for account 1
     {
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystemSharings(account1.email, account1Password, &sharings));
@@ -568,7 +584,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
     }
 }
 
-TEST_F(CdbFunctionalTest, system_sharing_remove_unknown_sharing)
+TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_unknown_sharing)
 {
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();

@@ -163,7 +163,7 @@ api::ResultCode CdbFunctionalTest::addAccount(
     }
 
     if (accountData->fullName.empty())
-        accountData->fullName = "Test Test";
+        accountData->fullName = "Account " + accountData->email + " full name";
     if (accountData->passwordHa1.empty())
         accountData->passwordHa1 = nx_http::calcHa1(
             QUrl::fromPercentEncoding(QByteArray(accountData->email.c_str())).toLatin1().constData(),
@@ -454,21 +454,47 @@ api::ResultCode CdbFunctionalTest::updateSystemSharing(
 api::ResultCode CdbFunctionalTest::getSystemSharings(
     const std::string& email,
     const std::string& password,
-    std::vector<api::SystemSharing>* const sharings)
+    std::vector<api::SystemSharingEx>* const sharings)
 {
     auto connection = connectionFactory()->createConnection(email, password);
 
     typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
-                (std::function<void(api::ResultCode, api::SystemSharingList)>);
+                (std::function<void(api::ResultCode, api::SystemSharingExList)>);
 
     api::ResultCode resCode = api::ResultCode::ok;
-    api::SystemSharingList data;
+    api::SystemSharingExList data;
     std::tie(resCode, data) =
-        makeSyncCall<api::ResultCode, api::SystemSharingList>(
+        makeSyncCall<api::ResultCode, api::SystemSharingExList>(
             std::bind(
                 static_cast<GetCloudUsersOfSystemType>(
                     &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
                 connection->systemManager(),
+                std::placeholders::_1));
+
+    *sharings = std::move(data.sharing);
+    return resCode;
+}
+
+api::ResultCode CdbFunctionalTest::getSystemSharings(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    std::vector<api::SystemSharingEx>* const sharings)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
+        (const std::string&, std::function<void(api::ResultCode, api::SystemSharingExList)>);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemSharingExList data;
+    std::tie(resCode, data) =
+        makeSyncCall<api::ResultCode, api::SystemSharingExList>(
+            std::bind(
+                static_cast<GetCloudUsersOfSystemType>(
+                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
+                connection->systemManager(),
+                systemID,
                 std::placeholders::_1));
 
     *sharings = std::move(data.sharing);
@@ -509,44 +535,28 @@ api::ResultCode CdbFunctionalTest::ping(
     return resCode;
 }
 
-api::ResultCode CdbFunctionalTest::getSystemSharings(
-    const std::string& email,
-    const std::string& password,
-    const std::string& systemID,
-    std::vector<api::SystemSharing>* const sharings)
-{
-    auto connection = connectionFactory()->createConnection(email, password);
-
-    typedef void(nx::cdb::api::SystemManager::*GetCloudUsersOfSystemType)
-        (const std::string&, std::function<void(api::ResultCode, api::SystemSharingList)>);
-
-    api::ResultCode resCode = api::ResultCode::ok;
-    api::SystemSharingList data;
-    std::tie(resCode, data) =
-        makeSyncCall<api::ResultCode, api::SystemSharingList>(
-            std::bind(
-                static_cast<GetCloudUsersOfSystemType>(
-                    &nx::cdb::api::SystemManager::getCloudUsersOfSystem),
-                connection->systemManager(),
-                systemID,
-                std::placeholders::_1));
-
-    *sharings = std::move(data.sharing);
-    return resCode;
-}
-
-api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
-    const std::vector<api::SystemSharing>& sharings,
+const api::SystemSharingEx& CdbFunctionalTest::findSharing(
+    const std::vector<api::SystemSharingEx>& sharings,
     const std::string& accountEmail,
     const QnUuid& systemID) const
 {
-    for (const auto& sharing: sharings)
+    static const api::SystemSharingEx kDummySharing;
+
+    for (const auto& sharing : sharings)
     {
         if (sharing.accountEmail == accountEmail && sharing.systemID == systemID)
-            return sharing.accessRole;
+            return sharing;
     }
 
-    return api::SystemAccessRole::none;
+    return kDummySharing;
+}
+
+api::SystemAccessRole CdbFunctionalTest::accountAccessRoleForSystem(
+    const std::vector<api::SystemSharingEx>& sharings,
+    const std::string& accountEmail,
+    const QnUuid& systemID) const
+{
+    return findSharing(sharings, accountEmail, systemID).accessRole;
 }
 
 

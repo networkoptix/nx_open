@@ -19,7 +19,7 @@ namespace cdb {
 
 class GetCloudUsersOfSystemHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingList>
+    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingExList>
 {
 public:
     static const QString kHandlerPath;
@@ -28,7 +28,7 @@ public:
         SystemManager* const systemManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingList>(
+        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingExList>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,

@@ -133,12 +133,12 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemSharingEx)(SystemID),
     (json)(sql_record),
     _Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList),
+    (SystemDataList)(SystemSharingList)(SystemSharingExList),
     (json),
     _Fields);
 

@@ -211,9 +211,9 @@ void SystemManager::shareSystem(
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
-    api::SystemSharingList resultData;
+    api::SystemSharingExList resultData;
 
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -230,7 +230,11 @@ void SystemManager::getCloudUsersOfSystem(
         const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
-            resultData.sharing.push_back(*it);
+        {
+            api::SystemSharingEx sharingEx;
+            sharingEx.api::SystemSharing::operator=(*it);
+            resultData.sharing.emplace_back(std::move(sharingEx));
+        }
     }
     else
     {
@@ -255,11 +259,21 @@ void SystemManager::getCloudUsersOfSystem(
                  sharingIter != systemSharingRange.second;
                  ++sharingIter)
             {
-                resultData.sharing.emplace_back(*sharingIter);
+                api::SystemSharingEx sharingEx;
+                sharingEx.api::SystemSharing::operator=(*sharingIter);
+                resultData.sharing.emplace_back(std::move(sharingEx));
             }
         }
     }
     lk.unlock();
+
+    for (api::SystemSharingEx& sharingEx: resultData.sharing)
+    {
+        const auto account = 
+            m_accountManager.findAccountByUserName(sharingEx.accountEmail);
+        if (static_cast<bool>(account))
+            sharingEx.fullName = account->fullName;
+    }
 
     completionHandler(
         api::ResultCode::ok,

@@ -25,16 +25,6 @@ public:
     std::string systemID;
 };
 
-enum class SystemAccessRole
-{
-    none = 0,
-    owner = 1,
-    maintenance,
-    viewer,
-    editor,
-    editorWithSharing
-};
-
 //!Information required to register system in cloud
 class SystemRegistrationData
 {
@@ -96,6 +86,20 @@ public:
 };
 
 
+////////////////////////////////////////////////////////////
+//// system sharing data
+////////////////////////////////////////////////////////////
+
+enum class SystemAccessRole
+{
+    none = 0,
+    owner = 1,
+    maintenance,
+    viewer,
+    editor,
+    editorWithSharing
+};
+
 class SystemSharing
 {
 public:
@@ -111,9 +115,9 @@ public:
 
     bool operator<(const SystemSharing& rhs) const
     {
-        return accountEmail != rhs.accountEmail
-            ? accountEmail < rhs.accountEmail
-            : systemID < rhs.systemID;
+        if (accountEmail != rhs.accountEmail)
+            return accountEmail < rhs.accountEmail;
+        return systemID < rhs.systemID;
     }
     bool operator==(const SystemSharing& rhs) const
     {
@@ -123,10 +127,31 @@ public:
     }
 };
 
+/** adds account's full name */
+class SystemSharingEx
+:
+    public SystemSharing
+{
+public:
+    std::string fullName;
+
+    bool operator==(const SystemSharingEx& rhs) const
+    {
+        return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
+            && fullName == rhs.fullName;
+    }
+};
+
 class SystemSharingList
 {
 public:
     std::vector<SystemSharing> sharing;
+};
+
+class SystemSharingExList
+{
+public:
+    std::vector<SystemSharingEx> sharing;
 };
 
 }   //api

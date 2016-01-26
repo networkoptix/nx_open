@@ -48,8 +48,10 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemShar
 void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 
 #define SystemSharing_Fields (accountEmail)(systemID)(accessRole)
-
 #define SystemSharingList_Fields (sharing)
+
+#define SystemSharingEx_Fields SystemSharing_Fields(fullName)
+#define SystemSharingExList_Fields (sharing)
 
 
 //!for requests passing just system id
@@ -69,11 +71,11 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemSharingEx)(SystemID),
     (json)(sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList),
+    (SystemDataList)(SystemSharingList)(SystemSharingExList),
     (json));
 
 

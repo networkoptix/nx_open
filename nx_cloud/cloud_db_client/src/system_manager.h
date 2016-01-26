@@ -44,11 +44,11 @@ public:
         std::function<void(api::ResultCode)> completionHandler) override;
     //!Implementation of \a SystemManager::getCloudUsersOfSystem
     virtual void getCloudUsersOfSystem(
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
     //!Implementation of \a SystemManager::getCloudUsersOfSystem
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
 };
 
 }   //cl

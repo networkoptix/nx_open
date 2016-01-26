@@ -75,23 +75,23 @@ void SystemManager::shareSystem(
 }
 
 void SystemManager::getCloudUsersOfSystem(
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemID,
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
         api::SystemID(systemID),
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
 }   //cl

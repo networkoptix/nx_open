@@ -559,7 +559,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
         result = getSystems(account1.email, tmpPassword, &systems);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         result = getSystemSharings(account1.email, tmpPassword, &sharings);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 

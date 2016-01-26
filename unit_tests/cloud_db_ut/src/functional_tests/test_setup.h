@@ -102,12 +102,12 @@ protected:
     api::ResultCode getSystemSharings(
         const std::string& email,
         const std::string& password,
-        std::vector<api::SystemSharing>* const sharings);
+        std::vector<api::SystemSharingEx>* const sharings);
     api::ResultCode getSystemSharings(
         const std::string& email,
         const std::string& password,
         const std::string& systemID,
-        std::vector<api::SystemSharing>* const sharings);
+        std::vector<api::SystemSharingEx>* const sharings);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(
@@ -119,8 +119,15 @@ protected:
         const std::string& systemID,
         const std::string& authKey);
 
+    /** finds sharing of \a systemID to account \a accountEmail.
+        \return reference to an element of \a sharings
+    */
+    const api::SystemSharingEx& findSharing(
+        const std::vector<api::SystemSharingEx>& sharings,
+        const std::string& accountEmail,
+        const QnUuid& systemID) const;
     api::SystemAccessRole accountAccessRoleForSystem(
-        const std::vector<api::SystemSharing>& sharings,
+        const std::vector<api::SystemSharingEx>& sharings,
         const std::string& accountEmail,
         const QnUuid& systemID) const;
 

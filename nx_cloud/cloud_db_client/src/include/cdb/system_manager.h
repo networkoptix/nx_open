@@ -61,14 +61,14 @@ public:
         std::function<void(ResultCode)> completionHandler) = 0;
     //!Returns sharings (account email, access role) for every system of account authorized
     virtual void getCloudUsersOfSystem(
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
     //!Returns sharings (account email, access role) for the specified system
     /*!
         \note \a owner or \a editorWithSharing account credentials MUST be provided
     */
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) = 0;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
 };
 
 }   //api
