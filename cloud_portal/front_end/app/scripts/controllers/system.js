@@ -24,7 +24,11 @@ angular.module('cloudApp')
         $scope.gettingSystemUsers = process.init(function(){
             return cloudApi.users(systemId);
         }).then(function(result){
-            $scope.system.users = result.data;
+            var users = result.data;
+            // Sort users here
+            $scope.system.users = _.sortBy(users,function(user){
+                return - Config.accessRolesSettings.order.indexOf(user.accessRole);
+            });
         });
         $scope.gettingSystemUsers.run();
 

@@ -19,7 +19,8 @@ var Config = {
             "viewer",
             "editor",
             "editorWithSharing",
-            "maintenance"
+            "maintenance",
+            "owner"
         ],
         options:[
             {
