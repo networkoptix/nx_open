@@ -103,9 +103,9 @@ void QnLicensesProposeWidget::setCameras(const QnVirtualCameraResourceList &came
     else
         title = QnDeviceDependentStrings::getNameFromSet(
             QnCameraDeviceStringSet(
-                tr("Use licenses for selected %n devices",      nullptr,    m_cameras.size()),
-                tr("Use licenses for selected %n cameras",      nullptr,    m_cameras.size()),
-                tr("Use licenses for selected %n I/O modules",  nullptr,    m_cameras.size())
+                tr("Use licenses for selected %n devices",      "",    m_cameras.size()),
+                tr("Use licenses for selected %n cameras",      "",    m_cameras.size()),
+                tr("Use licenses for selected %n I/O modules",  "",    m_cameras.size())
             ), m_cameras
         );
     ui->useLicenseCheckBox->setText(title);
