@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%n 個裝置中的 %1 個</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個裝置中的 %1 個</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%n 個攝影機中的 %1 個</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個攝影機中的 %1 個</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">請選擇至少一個攝影機</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>攝影機列表</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>找到 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>找到 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>已找到 %n 個攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>已找到 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>匯出所選的攝影機至檔.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>攝影機規則</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>套用設定至以下 %n 個裝置?</translation>
+        <translation type="unfinished">
+            <numerusform>套用設定至以下 %n 個裝置?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>套用設定至以下 %n 個攝影機?</translation>
+        <translation type="unfinished">
+            <numerusform>套用設定至以下 %n 個攝影機?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>使用類比授權瀏覽這 %n 支攝影機</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>使用授權在所選的 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>使用授權在所選的 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>使用授權在所選的 %n 支攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>使用授權在所選的 %n 支攝影機</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4781,13 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>空</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>共 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>共 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>共 %n 個攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>共 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5477,10 +5507,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>軟體位移偵測需要提供2FPS的子串流. 目前排程填入的FPS為%1. FPS將降至 %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>攝影機的第二串流已關閉. 位移主碼錄影 + 全時子碼錄影選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>確認重置位移偵測區域</translation>
     </message>
@@ -5515,6 +5541,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">無效的排程</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6692,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>找不到啟動程式.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>新增裝置正在進行中. 是否要取消?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6702,29 +6728,41 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>您確定要從佈局中移除這 %n 個項目嗎?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>這 %n 個裝置是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>這 %n 個裝置是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>這 %n 個攝影機是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>這 %n 個攝影機是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 個裝置被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個裝置被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 個攝影機被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個攝影機被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>您確定要刪除以下 %n 個裝置嗎?</translation>
+        <translation type="unfinished">
+            <numerusform>您確定要刪除以下 %n 個裝置嗎?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>您確定要刪除以下 %n 個攝影機嗎?</translation>
+        <translation type="unfinished">
+            <numerusform>您確定要刪除以下 %n 個攝影機嗎?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6744,16 +6782,26 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7232,16 +7280,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>嘗試從攝影機 %1 取得位置時發生錯誤.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>請靜待攝影機上線.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>嘗試設定攝影機 %1 位置時發生錯誤.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7249,6 +7289,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7262,9 +7310,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>除了啟動授權 其它設定皆無法完成.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>下列 %n 個項目未被儲存.</translation>
+        <translation type="unfinished">
+            <numerusform>下列 %n 個項目未被儲存.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7276,9 +7326,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>下列 %n 個項目未被刪除.</translation>
+        <translation type="unfinished">
+            <numerusform>下列 %n 個項目未被刪除.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7542,9 +7594,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>已有相同名稱的電視牆.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n 物件</translation>
+        <translation type="unfinished">
+            <numerusform>%n 物件</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

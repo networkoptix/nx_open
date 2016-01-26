@@ -6,6 +6,7 @@ import com.networkoptix.qml 1.0
 import "../main.js" as Main
 
 import "../controls"
+import ".."
 
 Item {
     id: cameraFlow
@@ -14,19 +15,41 @@ Item {
 
     clip: true
 
-    QtObject {
+    QnObject
+    {
         id: d
 
-        property var pendingHiddenItems: []
+        property var hiddenItems: []
         property real maxItemWidth: dp(192)
         property int thumbnailsInRow: Math.max(2, Math.floor(cameraGrid.width / maxItemWidth))
 
-        function hidePendingItems() {
-            if (pendingHiddenItems.length == 0)
+        function showHiddenItems()
+        {
+            if (hiddenItems.length == 0)
                 return
 
-            settings.hiddenCameras = settings.hiddenCameras.concat(settings.hiddenCameras, pendingHiddenItems)
-            pendingHiddenItems = []
+            // use temporary object to update QML property correctly
+            var items = settings.hiddenCameras.slice()
+
+            for (var i = 0; i < hiddenItems.length; ++i)
+            {
+                var index = items.indexOf(hiddenItems[i])
+                    if (index != -1)
+                        items.splice(index, 1)
+            }
+
+            hiddenItems = []
+
+            settings.hiddenCameras = items
+        }
+
+        Connections {
+            target: resourcesPage
+            onPageStatusChanged:
+            {
+                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
+                    d.hiddenItems = []
+            }
         }
     }
 
@@ -67,17 +90,14 @@ Item {
                 }
                 onHiddenChanged: {
                     // use temporary object to update QML property correctly
-                    var items = d.pendingHiddenItems
+                    var items = d.hiddenItems
 
-                    if (hidden) {
+                    if (hidden)
                         items.push(model.uuid)
-                    } else {
-                        var index = items.indexOf(model.uuid)
-                        if (index != -1)
-                            items.splice(index, 1)
-                    }
+                    d.hiddenItems = items
 
-                    d.pendingHiddenItems = items
+                    settings.hiddenCameras.push(model.uuid)
+                    hiddenCamerasPopup.restartTimer()
                 }
             }
 
@@ -251,17 +271,15 @@ Item {
                                     Main.openMediaResource(model.uuid, Math.max(0, point.x), Math.max(0, point.y), model.thumbnail)
                                 }
                                 onShowClicked: {
-                                    var originalList = settings.hiddenCameras
+                                    d.hiddenItems = []
 
-                                    var hiddenCameras = d.pendingHiddenItems
-                                    d.pendingHiddenItems = []
+                                    var items = settings.hiddenCameras.slice()
 
-                                    for (var i = 0; i < originalList.length; i++) {
-                                        if (originalList[i] !== model.uuid)
-                                            hiddenCameras.push(originalList[i])
-                                    }
+                                    var index = items.indexOf(model.uuid)
+                                    if (index != -1)
+                                        items.splice(index, 1)
 
-                                    settings.hiddenCameras = hiddenCameras
+                                    settings.hiddenCameras = items
                                 }
                             }
                         }
@@ -281,13 +299,15 @@ Item {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool isShown: d.pendingHiddenItems.length > 0
+        property bool isShown: d.hiddenItems.length > 0
 
-        text: qsTr("%n cameras hidden", "", d.pendingHiddenItems.length)
+        timeout: 5000
+
+        text: qsTr("%n cameras are hidden", "", d.hiddenItems.length)
         mainButton {
-            icon: "image://icon/done.png"
+            icon: "image://icon/undo.png"
             color: "transparent"
-            onClicked: d.hidePendingItems()
+            onClicked: d.showHiddenItems()
         }
 
         onIsShownChanged: {
@@ -297,17 +317,8 @@ Item {
                 hide()
         }
 
-        Connections {
-            target: resourcesPage
-            onPageStatusChanged: {
-                if (pageStatus != Stack.Active && pageStatus != Stack.Activating)
-                    hiddenCamerasPopup.hide()
-            }
+        onHidden: {
+            d.hiddenItems = []
         }
-    }
-
-    onVisibleChanged: {
-        if (!visible)
-            d.hidePendingItems()
     }
 }

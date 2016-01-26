@@ -1816,13 +1816,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 a %n eszközből</translation>
+        <translation type="unfinished">
+            <numerusform>%1 a %n eszközből</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 a %n kamerából</translation>
+        <translation type="unfinished">
+            <numerusform>%1 a %n kamerából</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1840,9 +1844,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">Válasszon legalább egy kamerát</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2376,13 +2382,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Kameralista</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n eszköz megtalálva</translation>
+        <translation type="unfinished">
+            <numerusform>%n eszköz megtalálva</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n kamera megtalálva</translation>
+        <translation type="unfinished">
+            <numerusform>%n kamera megtalálva</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2392,9 +2402,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Kiválasztott kamerák exportálása fájlba.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2598,13 +2610,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Kamerák szabályai</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Változások alkalmazása a következő %n eszközre?</translation>
+        <translation type="unfinished">
+            <numerusform>Változások alkalmazása a következő %n eszközre?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Változások alkalmazása a következő %n kamerára?</translation>
+        <translation type="unfinished">
+            <numerusform>Változások alkalmazása a következő %n kamerára?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2634,9 +2650,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3852,17 +3870,23 @@ to view more bookmarks</source>
             <numerusform>Használjon analóg licenceket a %n kamerák megtekintéséhez</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Licencek használata a kiválasztott %n eszközhöz</translation>
+        <translation type="unfinished">
+            <numerusform>Licencek használata a kiválasztott %n eszközhöz</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Licencek használata a kiválasztott %n kamerához</translation>
+        <translation type="unfinished">
+            <numerusform>Licencek használata a kiválasztott %n kamerához</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4783,13 +4807,17 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>empty</source>
         <translation>üres</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>Összes %n eszköz</translation>
+        <translation type="unfinished">
+            <numerusform>Összes %n eszköz</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>Összes %n kamera</translation>
+        <translation type="unfinished">
+            <numerusform>Összes %n kamera</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4819,9 +4847,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5467,10 +5497,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>A másodlagos stream ki van kapcsolva a kamerában. Mozgás + Alacsony minőségű rögzítés nem működik. &quot;Igen&quot; a rögzítési típus megváltoztatásához vagy &quot;Nem&quot; a másodlagos stream engedélyezéséhez.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Mozgásérzékelési terlet visszaállításának elfogadása</translation>
     </message>
@@ -5517,6 +5543,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">Érvénytelen ütemzés</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6664,10 +6694,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Launcher process not found.</source>
         <translation>Az indító folyamat nem található.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Az eszköz hozzáadása már folyamatban. Biztos benne, hogy megszakítja a jelenlegi folyamatot?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6704,29 +6730,41 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
             <numerusform>Biztos benne, hogy szeretné eltávolítani ezt a %n elemet az elrendezésről?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ez a %n eszköz automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ez a %n eszköz automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>Biztos benne, hogy törölni szeretné a következő %n eszközt?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztos benne, hogy törölni szeretné a következő %n eszközt?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Biztos benne, hogy törölni szeretné a következő %n kamerát?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztos benne, hogy törölni szeretné a következő %n kamerát?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6746,16 +6784,26 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7231,16 +7279,8 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnWorkbenchPtzHandler</name>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Hiba történt a %1 kamera pozíciójának betöltése közben.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Hiba történt a %1 kamera jelenlegi pozíciójának beállítása közben.</translation>
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
@@ -7254,6 +7294,14 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Unable to set position on camera.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
@@ -7265,9 +7313,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Nem engedélyezett, hogy a licenc aktiváláson kívül bármit változtasson.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>A következő %n elem nincs elmentve.</translation>
+        <translation type="unfinished">
+            <numerusform>A következő %n elem nincs elmentve.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7279,9 +7329,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Error</source>
         <translation>Hiba</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>A következő %n elem nem lett törölve.</translation>
+        <translation type="unfinished">
+            <numerusform>A következő %n elem nem lett törölve.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7545,9 +7597,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>A Video Wall with the same name already exists.</source>
         <translation>Videofal ezzel a névvel már létezik.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n elem</translation>
+        <translation type="unfinished">
+            <numerusform>%n elem</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

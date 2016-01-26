@@ -1825,13 +1825,19 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 de %n dispositivos</translation>
+        <translation type="unfinished">
+            <numerusform>%1 de %n dispositivos</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 de %n cámaras</translation>
+        <translation type="unfinished">
+            <numerusform>%1 de %n cámaras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1849,9 +1855,12 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">Seleccione al menos una cámara</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2394,13 +2403,19 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Lista de cámaras</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n dispositivos encontrados</translation>
+        <translation type="unfinished">
+            <numerusform>%n dispositivos encontrados</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n camaras encontradas</translation>
+        <translation type="unfinished">
+            <numerusform>%n camaras encontradas</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2410,9 +2425,12 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Exportar las cámaras seleccionadas a un archivo.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2619,13 +2637,19 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Reglamento de las cámaras</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>¿Aplicar los cambios a los siguientes dispositivos de %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Aplicar los cambios a los siguientes dispositivos de %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>¿Aplicar los cambios a las siguientes cámaras de %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Aplicar los cambios a las siguientes cámaras de %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2655,9 +2679,12 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3881,17 +3908,26 @@ to view more bookmarks</source>
             <numerusform>Use licencias análogas para ver estas cámaras %n</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Use licencias para dispositivos %n seleccionados</translation>
+        <translation type="unfinished">
+            <numerusform>Use licencias para dispositivos %n seleccionados</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Use licencias para cámaras %n seleccionadas</translation>
+        <translation type="unfinished">
+            <numerusform>Use licencias para cámaras %n seleccionadas</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4820,13 +4856,19 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>empty</source>
         <translation>vacío</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>%n total de dispositivos</translation>
+        <translation type="unfinished">
+            <numerusform>%n total de dispositivos</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>%n total de cámaras</translation>
+        <translation type="unfinished">
+            <numerusform>%n total de cámaras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4856,9 +4898,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5522,10 +5567,6 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Para el movimiento del software 2 fps es reservado para la corriente secundaria. La fps en cuadrícula de programación es %1. Fps se bajó a %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Segunda secuencia está desactivado en esta cámara. Movimiento LQ opción no tiene ningún efecto.Pulse &quot;Sí&quot; para cambiar tipo de grabación que &quot;siempre&quot; o &quot;No&quot; para volver a habilitar segundo stream.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Confirme el reinicio de regiones de movimiento</translation>
     </message>
@@ -5560,6 +5601,10 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">Horario inválido</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6711,10 +6756,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>Proceso de inicio no se encuentra.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>La adición del dispositivo está ya en el progreso. ¿Está seguro que quiere anular el proceso corriente?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6757,29 +6798,47 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>¿Está seguro que desea eliminar estos elementos de %n de diseño?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Estos dispositivos %n son auto descubiertos. Pueden ser auto descubiertos otra vez después de eliminarlos. ¿Está seguro que desea eliminirlos?</translation>
+        <translation type="unfinished">
+            <numerusform>Estos dispositivos %n son auto descubiertos. Pueden ser auto descubiertos otra vez después de eliminarlos. ¿Está seguro que desea eliminirlos?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Estas camaras %n son auto descubiertas. Pueden ser auto descubiertas otra vez después de eliminarlas. ¿Está seguro que desea eliminirlas?</translation>
+        <translation type="unfinished">
+            <numerusform>Estas camaras %n son auto descubiertas. Pueden ser auto descubiertas otra vez después de eliminarlas. ¿Está seguro que desea eliminirlas?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Los %n de estos dispositivos son autodescubiertos. Pueden ser autodescubiertos otra vez después de eliminarlos. ¿Está seguro que quiere eliminarlos?</translation>
+        <translation type="unfinished">
+            <numerusform>Los %n de estos dispositivos son autodescubiertos. Pueden ser autodescubiertos otra vez después de eliminarlos. ¿Está seguro que quiere eliminarlos?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Los %n de estas camaras son autodescubiertos. Pueden ser autodescubiertas otra vez después de eliminarlas. ¿Está seguro que quiere eliminarlas?</translation>
+        <translation type="unfinished">
+            <numerusform>Los %n de estas camaras son autodescubiertos. Pueden ser autodescubiertas otra vez después de eliminarlas. ¿Está seguro que quiere eliminarlas?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>¿Está seguro que desea eliminar estos dispositivos %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Está seguro que desea eliminar estos dispositivos %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>¿Está seguro que desea eliminar estas camaras %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Está seguro que desea eliminar estas camaras %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6802,16 +6861,29 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7295,16 +7367,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>CALIBRACIÓN_PTZ_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Se ha producido un error al intentar obtener la posición actual de cámara %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Por favor espere a que la cámara esté en línea.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Ha ocurrido un error al intentar fijar la posición actual de la cámara %1.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7312,6 +7376,14 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7325,9 +7397,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>No está permitido realizar cambios excepto la activación de la licencia.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Los siguientes %n elementos no están guardados.</translation>
+        <translation type="unfinished">
+            <numerusform>Los siguientes %n elementos no están guardados.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7340,9 +7415,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>Error</source>
         <translation>Error</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Los siguientes %n elementos no se eliminaron.</translation>
+        <translation type="unfinished">
+            <numerusform>Los siguientes %n elementos no se eliminaron.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7609,9 +7687,12 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>A Video Wall with the same name already exists.</source>
         <translation>Pared de video con el mismo nombre ya existe.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n articulos</translation>
+        <translation type="unfinished">
+            <numerusform>%n articulos</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>ถึง</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>รีเฟส</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>เซิร์ฟเวอร์ทั้งหมดอยู่ในโหมดออฟไลน์ การตรวจสอบข้อมูลจะไม่สามารถใช้ได้.</translation>
+        <source>Audit Trail</source>
+        <translation>ตรวจสอบเส้นทาง</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>ตรวจสอบเส้นทาง</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>หมุนเริ่มต้น:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>นี่คือกล้องเลนส์ฟิชอาย</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>นี่คือกล้องเลนส์ฟิชอาย</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>ประเภทใบอนุญาตนี้ต้องใช้ซอฟต์แวร์รุ่นที่สูงขึ้น.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1983,11 +1983,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>ไม่สามารถตรวจสอบการอัพเดทผ่านทางอินเทอร์เน็ต.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>การปรับปรุงที่มีขณะนี้:</translation>
     </message>
@@ -1995,6 +1990,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>การอัปเดตด้วยตนเองดาวน์โหลดเก็บมีการเชื่อมโยงต่อไปนี้:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2116,8 +2116,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>โปรดรอสักครู่ในขณะที่การเชื่อมต่อจะถูกเรียกคืน...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2963,11 +2963,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>คำเตือน! FPS และคุณภาพใน การตั้งค่าการบันทึก จะไม่ทำงาน!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(แนะนำ)</translation>
     </message>
@@ -2980,6 +2975,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>ส่งการใช้งานที่ไม่ระบุชื่อและสถิติความผิดพลาดในการพัฒนาซอฟต์แวร์</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">คำเตือน! สิ่งนี้จะทำให้คุณภาพและอัตราเฟรม (FPS) การตั้งค่าในตารางเวลาการบันทึกที่ไม่เกี่ยวข้อง.</translation>
     </message>
 </context>
 <context>

@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>đến</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Tất cả máy chủ đang offline. Dữ liệu kiểm toán không có sẵn.</translation>
+        <source>Audit Trail</source>
+        <translation>Đường mòn kiểm toán</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Đường mòn kiểm toán</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1094,13 +1094,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Mặc định quay:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Đây là một mắt cá (180 độ) camera</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Đây là một mắt cá (180 độ) camera</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1309,8 +1309,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1990,11 +1990,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Không thể kiểm tra cập nhật thông qua internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Sẵn có:</translation>
     </message>
@@ -2002,6 +1997,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2123,8 +2123,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2970,11 +2970,6 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(đề nghị)</translation>
     </message>
@@ -2987,6 +2982,11 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
 </context>
 <context>

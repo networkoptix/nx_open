@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>ig</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Frissítés</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Minden szerver offline.Nincs elérhető audit adat.</translation>
+        <source>Audit Trail</source>
+        <translation>Audit nyomvonal</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Audit nyomvonal</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Alapértelmezett elforgatás:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Ez egy halszem optikás kamera</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Ez egy halszem optikás kamera</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Ehhez a licenc típushoz magasabb szoftververzióra van szükség.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1984,11 +1984,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Nem lehet ellenőrizni a frissitéseket az interneten.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Elérhető frissítés:</translation>
     </message>
@@ -1996,6 +1991,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>A kézi frissítéshez töltse le az archívumot a következő linkről:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2117,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Kérem várjon amíg a kapcsolat helyreáll...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2964,11 +2964,6 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Figyelem! Az FPS és minőség beállítások a Felvétel Ütemzésnél nem fog működni!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(ajánlott)</translation>
     </message>
@@ -2981,6 +2976,11 @@ Nem tiltja a régi felvételek törlését a meghajtóról.</translation>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Névtelen használati és összeomlás statisztikák küldése a szoftverfejlesztőknek</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Figyelem! Ez a Minőség és Képfrissítés (FPS) beállításokat jelentéktelenné teszi a Felvétel Ütemzésben.</translation>
     </message>
 </context>
 <context>

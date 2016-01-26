@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>直至</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>重新整理</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>所有伺服器皆離線. 無法取得審查資料.</translation>
+        <source>Audit Trail</source>
+        <translation>追蹤審查</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>追蹤審查</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1094,13 +1094,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>預設轉向為:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>這是魚眼 (360度) 攝影機</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>這是魚眼 (360度) 攝影機</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1309,8 +1309,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>此授權類型需要更高階的軟體.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1990,11 +1990,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>無法從網際網路取得更新.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>可用更新:</translation>
     </message>
@@ -2002,6 +1997,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>請至以下連結下載更新檔以手動更新:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2123,8 +2123,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>重新連線中, 請稍候...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2970,11 +2970,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>警告! 錄影排程的 FPS 及 畫質設定將無作用!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(建議)</translation>
     </message>
@@ -2987,6 +2982,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>匿名寄送使用與故障統計報告給軟體開發人員</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">警告! 這將導致錄影排程中的畫質與FPS設定失去關聯.</translation>
     </message>
 </context>
 <context>

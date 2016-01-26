@@ -114,9 +114,9 @@ void QnCameraListDialog::updateWindowTitle() {
 
     const QString titleCamerasPart = QnDeviceDependentStrings::getNameFromSet(
         QnCameraDeviceStringSet(
-            tr("%n devices found",      nullptr, cameras.size()),
-            tr("%n cameras found",      nullptr, cameras.size()),
-            tr("%n I/O modules found",   nullptr, cameras.size())
+            tr("%n devices found",      "", cameras.size()),
+            tr("%n cameras found",      "", cameras.size()),
+            tr("%n I/O modules found",  "", cameras.size())
         ),
         cameras
      );
