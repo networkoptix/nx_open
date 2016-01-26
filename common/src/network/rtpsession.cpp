@@ -756,6 +756,11 @@ bool RTPSession::isOpened() const
     return m_tcpSock->isConnected();
 }
 
+AbstractStreamSocket* RTPSession::tcpSock()
+{
+    return m_tcpSock.get();
+}
+
 unsigned int RTPSession::sessionTimeoutMs()
 {
     return 0;

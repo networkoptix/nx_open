@@ -286,6 +286,7 @@ public:
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
 
+    AbstractStreamSocket* tcpSock(); //< This method need for UT. do not delete
     void setUserAgent(const QString& value);
 signals:
     void gotTextResponse(QByteArray text);
