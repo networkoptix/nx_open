@@ -222,7 +222,8 @@ QnMjpegPlayer::~QnMjpegPlayer() {
         }
     });
 
-    stop();
+    disconnect(session, nullptr, this, nullptr);
+    d->session->stop();
 }
 
 QMediaPlayer::State QnMjpegPlayer::playbackState() const {
