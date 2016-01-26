@@ -23,7 +23,7 @@ QString utils::QnCameraNamesWatcher::getCameraName(const QString &cameraUuid)
 
     const auto cameraResource = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(cameraUuid);
     if (!cameraResource)
-        return tr("<Removed camer>");
+        return lit("<%1>").arg(tr("Removed camera"));
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this
         , [this](const QnResourcePtr &resource)
