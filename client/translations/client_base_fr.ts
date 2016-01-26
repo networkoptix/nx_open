@@ -5541,10 +5541,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>Pour le mouvement logiciel 2 IPS sont réservées pour le flux secondaire. L&apos;IPS actuel dans la grille horaire est %1. L&apos;IPS à été diminuée à %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Flux secondaire désactivé sur cette caméra. L&apos;option Mouv.+Basse Qualité n&apos;a aucun effet. Appuyez sur &quot;Oui&quot; pour changer le type d&apos;enreg. à &quot;Toujours&quot; ou sur &quot;Non&quot; pour réactiver le flux secondaire.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Confimer la réinitialisation des zones de mouvement</translation>
     </message>
@@ -5579,6 +5575,10 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">Horaire Invalide</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6732,10 +6732,6 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
         <source>Launcher process not found.</source>
         <translation>Le processus du lanceur n&apos;a pas été trouvé.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Ajout de périphérique déjà en progression. Etes-vous sûr que vous voulez annuler le processus actuel?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6833,6 +6829,10 @@ Si vous vous voulez désactiver cette fonction, vous pouvez le faire dans le men
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

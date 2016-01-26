@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>ถึง</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>รีเฟส</translation>
     </message>
@@ -176,6 +171,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>ตรวจสอบเส้นทาง</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

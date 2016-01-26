@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>ig</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Frissítés</translation>
     </message>
@@ -176,6 +171,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>Audit nyomvonal</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

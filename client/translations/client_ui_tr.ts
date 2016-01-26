@@ -104,11 +104,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -175,6 +170,11 @@
     <message>
         <location/>
         <source>All Servers are offline.  Audit data are not available.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

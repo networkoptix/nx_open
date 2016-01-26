@@ -100,12 +100,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translatorcomment>Since - Till, From - To</translatorcomment>
-        <translation type="unfinished">To</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -177,6 +171,11 @@
     <message>
         <location/>
         <source>Audit Trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -865,7 +864,7 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation>Clear Filter</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>

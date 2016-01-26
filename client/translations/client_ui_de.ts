@@ -104,11 +104,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>bis</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Aktualisieren</translation>
     </message>
@@ -181,6 +176,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>Überwachungsprotokoll</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

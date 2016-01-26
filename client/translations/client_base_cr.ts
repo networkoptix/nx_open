@@ -5491,10 +5491,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5512,6 +5508,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Invalid Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6571,10 +6571,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Delete Files</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6751,6 +6747,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

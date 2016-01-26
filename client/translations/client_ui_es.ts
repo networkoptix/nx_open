@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>Hasta</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Refrescar</translation>
     </message>
@@ -176,6 +171,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>Registro de auditoría</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

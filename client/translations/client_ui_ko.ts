@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>끝</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>새로고침</translation>
     </message>
@@ -176,6 +171,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>시스템 감사</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

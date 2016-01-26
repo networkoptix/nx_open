@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>đến</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
     </message>
@@ -176,6 +171,11 @@
         <location/>
         <source>Audit Trail</source>
         <translation>Đường mòn kiểm toán</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

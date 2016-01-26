@@ -5477,10 +5477,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>軟體位移偵測需要提供2FPS的子串流. 目前排程填入的FPS為%1. FPS將降至 %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>攝影機的第二串流已關閉. 位移主碼錄影 + 全時子碼錄影選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>確認重置位移偵測區域</translation>
     </message>
@@ -5515,6 +5511,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">無效的排程</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6662,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>找不到啟動程式.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>新增裝置正在進行中. 是否要取消?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6754,6 +6750,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -105,11 +105,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>עד</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>רענן</translation>
     </message>
@@ -177,6 +172,11 @@
         <location/>
         <source>All Servers are offline.  Audit data are not available.</source>
         <translation>כל השרתים אינם מקוונים. נתוני הביקורת אינם זמינים.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

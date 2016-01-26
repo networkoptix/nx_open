@@ -5477,10 +5477,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>软件移动侦测的2 fps是预留给次码流。当前帧调度网格是 %1 。Fps下降 %2 。</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>次码流已禁用。运动+ LQ选项没有影响。按“是”更改录像类型为“总是”，或“不”重新启用次码流。</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>确认移动侦测区域重置</translation>
     </message>
@@ -5515,6 +5511,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">无效计划</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6662,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>未发现启动过程.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>设备添加正在进行。确定要取消当前进程吗?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6754,6 +6750,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

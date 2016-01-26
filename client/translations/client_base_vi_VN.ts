@@ -5477,10 +5477,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới lịch là %1. Fps đã giảm xuống %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Xác nhận vùng chuyển động res</translation>
     </message>
@@ -5515,6 +5511,10 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">lịch trình không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6662,6 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>Launcher process not found.</source>
         <translation>Không thể tìm thấy khởi động.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Ngoài ra thiết bị đã có trong progress.Are Bạn có chắc chắn bạn muốn hủy bỏ quá trình hiện tại?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6754,6 +6750,10 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

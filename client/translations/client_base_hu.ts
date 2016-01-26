@@ -5467,10 +5467,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
 <context>
     <name>QnSingleCameraSettingsWidget</name>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>A másodlagos stream ki van kapcsolva a kamerában. Mozgás + Alacsony minőségű rögzítés nem működik. &quot;Igen&quot; a rögzítési típus megváltoztatásához vagy &quot;Nem&quot; a másodlagos stream engedélyezéséhez.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Mozgásérzékelési terlet visszaállításának elfogadása</translation>
     </message>
@@ -5517,6 +5513,10 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">Érvénytelen ütemzés</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6664,10 +6664,6 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
         <source>Launcher process not found.</source>
         <translation>Az indító folyamat nem található.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Az eszköz hozzáadása már folyamatban. Biztos benne, hogy megszakítja a jelenlegi folyamatot?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6756,6 +6752,10 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

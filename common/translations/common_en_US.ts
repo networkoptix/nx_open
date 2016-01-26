@@ -644,7 +644,7 @@
     <name>QnEnvironment</name>
     <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Could not find explorer.exe in path to launch Windows Explorer.</translation>
+        <translation></translation>
     </message>
     <message>
         <source>File explorer failed to open.</source>
@@ -740,11 +740,11 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>Only single license is allowed for this device</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation>Unknown error</translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module</source>

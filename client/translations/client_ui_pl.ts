@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>do</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Odśwież</translation>
     </message>
@@ -177,6 +172,11 @@
         <source>Audit Trail</source>
         <translatorcomment>?????</translatorcomment>
         <translation>Dziennik kontroli</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -5526,10 +5526,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>2 FPS für den zweiten Stream reserviert. Aktueller FPS Wert im Zeitraster ist %1. FPS Werte wurde auf %2 heruntergesetzt.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Der sekundäre Stream ist bei dieser Kamera deaktiviert. Die Motion und LQ-Option bleiben ohne Effekt. Drücken Sie &quot;Ja&quot; um den Aufnahmetyp auf &quot;Immer&quot; zu setzen oder &quot;Nein&quot; um den Sekundär Stream zu reaktivieren.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Bestätige Reset der Bewegungserkennungszonen</translation>
     </message>
@@ -5564,6 +5560,10 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">Ungültiger Aufnahmeplan</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6717,10 +6717,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Launcher process not found.</source>
         <translation>Ladeprozess nicht gefunden.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Das Hinzufügen von Geräten ist in Bearbeitung. Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6818,6 +6814,10 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

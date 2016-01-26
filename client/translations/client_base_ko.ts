@@ -5477,10 +5477,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation></translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>모션영역 초기화</translation>
     </message>
@@ -5515,6 +5511,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">유효하지 않은 스케줄</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6661,10 +6661,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>시작프로세서를 찾을 수 없음.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>장비 추가중입ㄴ디ㅏ.취소 하시겠습니까?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6753,6 +6749,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
