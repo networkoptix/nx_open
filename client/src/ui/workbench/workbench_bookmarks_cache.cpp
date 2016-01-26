@@ -47,6 +47,8 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
         , this, &QnWorkbenchBookmarksCache::onItemRemoved);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved
         , this, &QnWorkbenchBookmarksCache::onItemAboutToBeRemoved);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutChanged
+        , this, &QnWorkbenchBookmarksCache::onCurrentLayoutChanged);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this
         , [this](const QnResourcePtr &resource)
