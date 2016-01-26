@@ -337,7 +337,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-        if (!camera->hasVideo(nullptr))
+        if (camera && !camera->hasVideo(nullptr))
             result = tr("Connection to device was unexpectedly closed.");
         else if (isPrimaryStream)
             result = tr("Connection to camera (primary stream) was unexpectedly closed.");

@@ -97,7 +97,7 @@ void QnThumbnailsStreamReader::run()
         {
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             msleep(30);
@@ -128,8 +128,8 @@ void QnThumbnailsStreamReader::run()
         }
 
         if (videoData)
-            m_stat[videoData->channelNumber].onData(videoData->dataSize());
-
+            m_stat[videoData->channelNumber].onData(
+                videoData->dataSize(), videoData->flags & AV_PKT_FLAG_KEY);
 
         putData(data);
     }
