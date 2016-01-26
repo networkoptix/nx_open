@@ -171,7 +171,7 @@ void QnLdapSettingsDialogPrivate::at_timeoutTimer_timeout() {
         return;
     }
 
-    stopTesting(tr("Timed out"));
+    stopTesting(tr("Timed Out"));
 }
 
 void QnLdapSettingsDialogPrivate::at_serverLineEdit_editingFinished() {

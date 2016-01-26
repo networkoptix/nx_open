@@ -5,15 +5,17 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/common/updatable.h>
+
 namespace Ui {
     class ImageControlWidget;
 }
 
-class QnImageControlWidget : public QWidget {
+class QnImageControlWidget : public QWidget, public QnUpdatable {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 
-    typedef QWidget base_type;   
+    typedef QWidget base_type;
 public:
     QnImageControlWidget(QWidget* parent = 0);
     virtual ~QnImageControlWidget();

@@ -541,7 +541,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     for (const auto& storage: storages)
     {
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < storage->getSpaceLimit())
+        if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
     return result;
@@ -559,7 +559,7 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < storage->getSpaceLimit())
+        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
             continue; // if storage size isn't known do not add it by default
 
 
@@ -1376,9 +1376,9 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
 }
 
 void MediaServerProcess::at_archiveBackupFinished(
-    qint64                      backupedToMs,
+    qint64                      backedUpToMs,
     QnBusiness::EventReason     code
-) 
+)
 {
     if (isStopping())
         return;
@@ -1387,7 +1387,7 @@ void MediaServerProcess::at_archiveBackupFinished(
         m_mediaServer,
         qnSyncTime->currentUSecsSinceEpoch(),
         code,
-        QString::number(backupedToMs) 
+        QString::number(backedUpToMs)
     );
 }
 

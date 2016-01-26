@@ -266,7 +266,7 @@ bool QnLayoutExportTool::start() {
     ItemInfoList items = prepareLayout();
 
     if (!exportMetadata(items)) {
-        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
+        m_errorMessage = tr("Could not create output file %1...").arg(m_targetFilename);
         emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
         return false;
     }
@@ -437,7 +437,7 @@ void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &fil
                 QnCameraDeviceStringSet(
                     tr("Could not export device %1."),
                     tr("Could not export camera %1."),
-                    tr("Could not export IO module %1.")
+                    tr("Could not export I/O module %1.")
                 ), camRes
             ).arg(getShortResourceName(camRes));
         finishExport(false);

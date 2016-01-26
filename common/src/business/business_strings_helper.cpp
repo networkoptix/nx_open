@@ -126,7 +126,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
-                tr("IO Module %1 was disconnected")
+                tr("I/O Module %1 was disconnected")
             ), camera
         ).arg(resourceName);
 
@@ -240,7 +240,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict Address: %1").arg(params.caption);
+        result += tr("Conflicting Address: %1").arg(params.caption);
         result += delimiter;
         int n = 0;
         for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter)) {
@@ -337,7 +337,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-        if (!camera->hasVideo(nullptr))
+        if (camera && !camera->hasVideo(nullptr))
             result = tr("Connection to device was unexpectedly closed.");
         else if (isPrimaryStream)
             result = tr("Connection to camera (primary stream) was unexpectedly closed.");
@@ -400,7 +400,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
     }
     case BackupDone: {
         result = tr("Archive backup is successfully completed");
@@ -410,7 +410,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup is canceled by user. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
         break;
     }
 
@@ -425,7 +425,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 QnCameraDeviceStringSet(
                     tr("Recording on devices is disabled:"),
                     tr("Recording on cameras is disabled:"),
-                    tr("Recording on IO modules is disabled:")
+                    tr("Recording on I/O modules is disabled:")
                 ),
                 disabledCameras
             );

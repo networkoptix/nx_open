@@ -145,10 +145,6 @@
         <translation>סיבה: %1</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>כתובת ההתנגשות: %1</translation>
-    </message>
-    <message>
         <source>Conflicting Server #%1: %2</source>
         <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
         <translation>שרת ההתנגשות #%1: %2</translation>
@@ -307,10 +303,6 @@
         <translation>מצלמה %1 נותקה</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>התקן קלט פלט %1 נותק</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>קונפליקט כתובת רשת של התקן ב %1</translation>
@@ -354,10 +346,6 @@
         <translation>ההקלטה על המצלמות אינה מאופשרת:</translation>
     </message>
     <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>ההקלטה על התקני קלט פלט אינה מאופשרת:</translation>
-    </message>
-    <message>
         <source>Execute PTZ preset</source>
         <translation type="unfinished"></translation>
     </message>
@@ -386,19 +374,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed because of no backup storages available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <source>I/O Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -489,20 +505,12 @@
         <translation>נסה לאתחל את המצלמה ולהחזירה להגדרות ברירת מחדל בגישה מהדפדפן.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>נסה לאתחל את התקן הקלט פלט ולהחזירו להגדרות ברירת מחדל בגישה מהדפדפן.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>וודא שההתקן מחובר לרשת. נסה לאתחלו.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>וודא שהמצלמה מחוברת לרשת. נסה לאתחלה.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>וודא שהתקן הקלט פלט מחובר לרשת. נסה לאתחלו.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -517,10 +525,6 @@
         <translation>לא ניתן לפענח את תגובתה של המצלמה.URL %1, שם מבוקש %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>לא ניתן לפענח את תגובתו של התקן הקלט פלט.URL %1, שם מבוקש %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>לא מאושר. URL %1.</translation>
     </message>
@@ -533,20 +537,12 @@
         <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות המצלמה.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>קודם כל נסה להפעיל הקלטה (במידה והיא כבויה) ולהוריד את מספר הפריימים לשניה בהגדרות התקן הקלט פלט.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של ההתקן.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של המצלמה.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>במידה וזה לא עוזר, שחזר הגדרות ברירת מחדל בדף האינטרנט של התקן הקלט פלט.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -557,20 +553,12 @@
         <translation>הבקשה של מצלמה &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>הבקשה של התקן קלט פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>בעיית התקן לא ידועה.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>בעיית מצלמה לא ידועה.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>בעיית התקן קלט פלט לא ידועה.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -581,10 +569,6 @@
         <translation>מידע לא תקין התקבל ממצלמה %1.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>מידע לא תקין התקבל מהתקן קלט פלט %1.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של ההתקן למידע נוסף.</translation>
     </message>
@@ -593,23 +577,55 @@
         <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של המצלמה למידע נוסף.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>יותר מידי תקלות מדיה. פתח את חלון התקלות של התקן הקלט פלט למידע נוסף.</translation>
-    </message>
-    <message>
-        <source>Device initialization process in progress.</source>
-        <translation>תהליך אתחול ההתקן מתרחש כרגע.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>תהליך אתחול המצלמה מתרחש כרגע.</translation>
-    </message>
-    <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>תהליך אתחול התקן קלט פלט מתרחש כרגע.</translation>
-    </message>
-    <message>
         <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -627,12 +643,12 @@
 <context>
     <name>QnEnvironment</name>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>הפעלת סייר הקבצים נכשלה.</translation>
-    </message>
-    <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
         <translation>הקובץ explorer.exe המפעיל את סייר החלונות לא נמצא בנתיב.</translation>
+    </message>
+    <message>
+        <source>File explorer failed to open.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -646,12 +662,12 @@
         <translation>לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>לא ניתן להפעיל את מקודד האודיו.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>לא ניתן להפעיל את מפענח האודיו.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -688,8 +704,8 @@
         <translation>לא נמצא מקודד לקודק %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>לא ניתן להפעיל את מקודד הוידאו.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -838,10 +854,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>אירעה בעיה בהפעלת מפתח הרשיון שלך. התרחשה שגיאת מסד נתונים.</translation>
-    </message>
-    <message>
         <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
         <translation>אירעה בעיה בהפעלת מפתח הרשיון שלך. התקבל מידע שגוי. אנא צור קשר עם קבוצת התמיכה על מנת לדווח על הבעיה.</translation>
     </message>
@@ -856,6 +868,10 @@
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>מפתח הרשיון הופעל בעבר למזהה החומרה {{hwid}} ב{{time}}. אנא צור קשר עם קבוצת התמיכה על מנת להשיג מפתח רשיון תקין.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -889,20 +905,6 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>מודול קלט/פלט %n</numerusform>
-            <numerusform>%n מודולי קלט/פלט</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>מודול קלט/פלט %n</numerusform>
-            <numerusform>%n מודולי קלט/פלט</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
             <numerusform>מכשיר %n</numerusform>
@@ -933,22 +935,6 @@
         <translation>מצלמה</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>מודולי קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>מודולי קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>מכשירים</translation>
     </message>
@@ -963,6 +949,36 @@
     <message>
         <source>device</source>
         <translation>מכשיר</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished">מודול קלט/פלט</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,6 +1103,10 @@
     <message>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>אירעה שגיאה במהלך יצירת סימן מים לקובץ &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>File write error. Not enough free space.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

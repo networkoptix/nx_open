@@ -72,6 +72,8 @@ private:
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);
     void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, Qn::ResourceStatus status);
 
+    void removeModule(const QnUuid &id);
+
 private:
     /* Mutex prevents concurrent reading/wrighting of m_moduleItemById content.
      * All modifications are done in private methods and work always in the same thread,

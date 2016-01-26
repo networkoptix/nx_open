@@ -148,7 +148,7 @@ void QnSingleCameraSettingsWidget::retranslateUi() {
         QnCameraDeviceStringSet(
             tr("Device Settings"),
             tr("Camera Settings"),
-            tr("IO Module Settings")
+            tr("I/O Module Settings")
         ), m_camera
     ));
 }
@@ -690,8 +690,8 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
         return true;
 
     auto button = QMessageBox::warning(this,
-        tr("Invalid schedule"),
-        tr("Second stream is disabled on this camera. Motion + LQ option has no effect."\
+        tr("Invalid Schedule"),
+        tr("Second stream is disabled on this camera. Motion + LQ option has no effect. "
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
         QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
         QMessageBox::Yes);

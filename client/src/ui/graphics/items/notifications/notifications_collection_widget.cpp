@@ -357,7 +357,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         item->addActionButton(
             icon,
-            tr("Open in the Alarm Layout"),
+            tr("Open in Alarm Layout"),
             Qn::OpenInAlarmLayoutAction,
             QnActionParameters(alarmCameras)
             );
@@ -384,7 +384,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 QnCameraDeviceStringSet(
                     tr("Open Device"),
                     tr("Open Camera"),
-                    tr("Open IO Module")
+                    tr("Open I/O Module")
                 ), camera
             ),
             Qn::OpenInNewLayoutAction,
@@ -403,7 +403,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 QnCameraDeviceStringSet(
                     tr("Device Settings..."),
                     tr("Camera Settings..."),
-                    tr("IO Module Settings...")
+                    tr("I/O Module Settings...")
                 ), camera
             ),
             Qn::CameraSettingsAction,
@@ -436,7 +436,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 QnCameraDeviceStringSet(
                     tr("Open Device Web Page..."),
                     tr("Open Camera Web Page..."),
-                    tr("Open IO Module Web Page...")
+                    tr("Open I/O Module Web Page...")
                 ), camera
             ),
             Qn::BrowseUrlAction,
@@ -555,7 +555,7 @@ QIcon QnNotificationsCollectionWidget::iconForAction( const QnAbstractBusinessAc
     case QnBusiness::CameraDisconnectEvent:
     case QnBusiness::CameraIpConflictEvent:
     case QnBusiness::NetworkIssueEvent:
-        //TODO: #GDM #design #3.0 change icon if the device was IO Module
+        //TODO: #GDM #design #3.0 change icon if the device was I/O Module
         return qnSkin->icon("events/camera.png");
 
     case QnBusiness::StorageFailureEvent:

@@ -390,7 +390,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
-    m_firstTestStorageDone(false)
+    m_firstStoragesTestDone(false)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -1576,7 +1576,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::testStoragesDone()
 {
-    m_firstTestStorageDone = true;
+    m_firstStoragesTestDone = true;
     ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
@@ -1799,7 +1799,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
     };
 
     if (!result) {
-        if (!m_warnSended && !hasFastScanned() && m_firstTestStorageDone) {
+        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to

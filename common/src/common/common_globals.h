@@ -35,7 +35,7 @@ namespace Qn
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
-            ConnectionRole ResourceStatus
+            ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -311,7 +311,7 @@ public:
 
         depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
-        io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
+        io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
@@ -357,6 +357,7 @@ public:
         BPG_Predefined,
         BPG_User
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
@@ -552,6 +553,7 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
@@ -871,7 +873,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
         (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)
+        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
         (Qn::BookmarkSearchStrategy)
         (Qn::RebuildAction)(Qn::BackupAction)

@@ -16,7 +16,7 @@
      <property name="title">
       <string>Main Storage Locations</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -78,6 +78,13 @@
          <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="backupStoragesAbsentLabel">
+        <property name="text">
+         <string>You haven't configured any backup storage. Backup won't be performed.</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="backupOptionLabel">

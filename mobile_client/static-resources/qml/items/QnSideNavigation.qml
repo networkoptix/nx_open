@@ -115,6 +115,7 @@ QnNavigationDrawer {
             onClicked: {
                 panel.hide()
                 Main.gotoNewSession()
+                stackView.currentItem.scrollTop()
             }
         }
 
