@@ -953,12 +953,12 @@
     <message>
         <location/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Downmix Audio from 5.1 to 2.1</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Auto Pause Video</source>
-        <translation>Auto Pause Video</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -2378,7 +2378,7 @@
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
         <source>Never suggest saving layouts</source>
-        <translation>Never suggest saving layouts</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
