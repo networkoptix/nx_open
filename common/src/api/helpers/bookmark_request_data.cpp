@@ -16,8 +16,8 @@ namespace
     const QString endTimeKey                    (lit("endTime"));
     const QString sortColumnKey                 (lit("sortColumn"));
     const QString sortOrderKey                  (lit("sortOrder"));
-    const QString useThinOut                    (lit("useFinOut"));
-    const QString thinOutMinVisibleLengthMs     (lit("thinOutMinVisibleLength"));
+    const QString usesparsing                    (lit("useFinOut"));
+    const QString sparsingMinVisibleLengthMs     (lit("sparsingMinVisibleLength"));
     const QString filterKey                     (lit("filter"));
     const QString physicalIdKey                 (lit("physicalId"));
     const QString macKey                        (lit("mac"));
@@ -56,8 +56,8 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
     QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);
 
-    QnLexical::deserialize(params.value(useThinOut), &filter.thinOut.use);
-    QnLexical::deserialize(params.value(thinOutMinVisibleLengthMs), &filter.thinOut.minVisibleLengthMs);
+    QnLexical::deserialize(params.value(usesparsing), &filter.sparsing.use);
+    QnLexical::deserialize(params.value(sparsingMinVisibleLengthMs), &filter.sparsing.minVisibleLengthMs);
 
     if (params.contains(limitKey))
         filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
@@ -93,8 +93,8 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(sortColumnKey,    QnLexical::serialized(filter.orderBy.column));
     result.insert(sortOrderKey,     QnLexical::serialized(filter.orderBy.order));
 
-    result.insert(useThinOut,                   QnLexical::serialized(filter.thinOut.use));
-    result.insert(thinOutMinVisibleLengthMs,    QnLexical::serialized(filter.thinOut.minVisibleLengthMs));
+    result.insert(usesparsing,                   QnLexical::serialized(filter.sparsing.use));
+    result.insert(sparsingMinVisibleLengthMs,    QnLexical::serialized(filter.sparsing.minVisibleLengthMs));
 
     for (const auto &camera: cameras)
         result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));

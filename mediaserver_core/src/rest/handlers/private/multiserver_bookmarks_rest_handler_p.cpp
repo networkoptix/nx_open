@@ -185,7 +185,7 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(QnGe
         context.waitForDone();
     }
     const auto result = QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.orderBy
-        , request.filter.thinOut, request.filter.limit);
+        , request.filter.sparsing, request.filter.limit);
 
     return result;
 }

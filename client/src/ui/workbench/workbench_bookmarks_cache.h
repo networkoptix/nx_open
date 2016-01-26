@@ -24,7 +24,7 @@ class QnWorkbenchBookmarksCache : public Connective<QObject>
 public:
     QnWorkbenchBookmarksCache(int maxBookmarksCount
         , const QnBookmarkSortOrder &sortProp = QnBookmarkSortOrder::default
-        , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut::kNoThinOut
+        , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions::kNosparsing
         , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
 
@@ -35,7 +35,7 @@ public:
 
     void setWindow(const QnTimePeriod &window);
 
-    void setThinOut(const QnBookmarksThinOut &thinOut);
+    void setsparsing(const QnBookmarkSparsingOptions &sparsing);
 
     QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera);
 

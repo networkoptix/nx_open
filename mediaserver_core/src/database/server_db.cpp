@@ -259,7 +259,7 @@ namespace
 
     int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
     {
-        if (filter.thinOut.use)
+        if (filter.sparsing.use)
             return QnCameraBookmarkSearchFilter::kNoLimit;
 
         switch(filter.orderBy.column)
@@ -271,7 +271,7 @@ namespace
 
         case Qn::BookmarkCameraName:
         case Qn::BookmarkTags:
-            return QnCameraBookmarkSearchFilter::kNoLimit; // No limit for manual sorted sequences!
+            return QnCameraBookmarkSearchFilter::kNoLimit; // No limit for manually sorted sequences!
         default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "Invalid sorting column value!");
             return QnCameraBookmarkSearchFilter::kNoLimit;

@@ -25,17 +25,17 @@ struct QnBookmarkSortOrder
 };
 #define QnBookmarkSortOrder_Fields (column)(order)
 
-struct QnBookmarksThinOut
+struct QnBookmarkSparsingOptions
 {
     bool use;
     int minVisibleLengthMs;
 
-    explicit QnBookmarksThinOut(bool use = false
+    explicit QnBookmarkSparsingOptions(bool use = false
         , qint64 minVisibleLengthMs = 0);
 
-    static const QnBookmarksThinOut kNoThinOut;
+    static const QnBookmarkSparsingOptions kNosparsing;
 };
-#define QnBookmarksThinOut_Fileds (use)(minVisibleLengthMs)
+#define QnBookmarkSparsingOptions_Fileds (use)(minVisibleLengthMs)
 
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
@@ -88,7 +88,7 @@ struct QnCameraBookmark {
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
         , const QnBookmarkSortOrder &sortProperties = QnBookmarkSortOrder::default
-        , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut()
+        , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions()
         , int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
@@ -111,7 +111,7 @@ struct QnCameraBookmarkSearchFilter
 
     int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    QnBookmarksThinOut thinOut;
+    QnBookmarkSparsingOptions sparsing;
 
     QnBookmarkSortOrder orderBy;
 
@@ -159,7 +159,7 @@ Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype)(eq))
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarksThinOut, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSparsingOptions, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))

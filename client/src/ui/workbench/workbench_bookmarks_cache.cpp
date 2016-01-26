@@ -17,26 +17,26 @@ namespace
 {
     QnCameraBookmarkSearchFilter createFilter(int maxBookmarksCount
         , const QnBookmarkSortOrder &orderBy
-        , const QnBookmarksThinOut &thinOut)
+        , const QnBookmarkSparsingOptions &sparsing)
     {
         QnCameraBookmarkSearchFilter filter;
         filter.limit = maxBookmarksCount;
         filter.orderBy= orderBy;
-        filter.thinOut = thinOut;
+        filter.sparsing = sparsing;
         return filter;
     }
 };
 
 QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
     , const QnBookmarkSortOrder &sortProp
-    , const QnBookmarksThinOut &thinOut
+    , const QnBookmarkSparsingOptions &sparsing
     , qint64 minWindowChangeMs
     , QObject *parent)
 
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_filter(createFilter(maxBookmarksCount, sortProp, thinOut))
+    , m_filter(createFilter(maxBookmarksCount, sortProp, sparsing))
     , m_queriesCache(new QnBookmarkQueriesCache(minWindowChangeMs))
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
@@ -74,12 +74,12 @@ void QnWorkbenchBookmarksCache::setWindow(const QnTimePeriod &window)
     m_queriesCache->updateQueries(m_filter);
 }
 
-void QnWorkbenchBookmarksCache::setThinOut(const QnBookmarksThinOut &thinOut)
+void QnWorkbenchBookmarksCache::setsparsing(const QnBookmarkSparsingOptions &sparsing)
 {
-    if (m_filter.thinOut == thinOut)
+    if (m_filter.sparsing == sparsing)
         return;
 
-    m_filter.thinOut = thinOut;
+    m_filter.sparsing = sparsing;
     m_queriesCache->updateQueries(m_filter);
 }
 
