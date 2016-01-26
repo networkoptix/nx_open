@@ -66,7 +66,7 @@
        <item row="0" column="5">
         <widget class="QLabel" name="label_4">
          <property name="text">
-          <string>till</string>
+          <string>To</string>
          </property>
         </widget>
        </item>

@@ -1478,7 +1478,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
             int result = QMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Device addition is already in progress."\
+                        tr("Device addition is already in progress. "\
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
