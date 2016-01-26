@@ -68,7 +68,7 @@ int QnCameraHistoryRestHandler::executeGet(const QString& path, const QnRequestP
         updatedRequest.resList.push_back(camera);
         MultiServerPeriodDataList chunks = QnMultiserverChunksRestHandler::loadDataSync(updatedRequest, owner);
         ec2::ApiCameraHistoryData outputRecord;
-        outputRecord.cameraId = request.resList.first()->getId();
+        outputRecord.cameraId = camera->getId();
         outputRecord.items = buildHistoryData(chunks);
         outputData.push_back(std::move(outputRecord));
     }
