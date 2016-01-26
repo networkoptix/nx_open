@@ -45,7 +45,7 @@ def sharing(request, system_id):
 @handle_exceptions
 def access_roles(request):
     data = cloud_api.System.access_roles(request.user.email, request.session['password'])
-    return api_success(data['access_roles'])
+    return api_success(data['accessRoles'])
 
 
 @api_view(['POST'])
