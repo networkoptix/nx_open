@@ -198,6 +198,8 @@ public:
     // returns true if there is no error delivering STOP
     bool stop();
 
+    /** Shutdown TCP socket and terminate current IO operation. Can be called from the other thread */
+    void shutdown();
 
     // returns true if session is opened
     bool isOpened() const;
@@ -284,7 +286,6 @@ public:
     QString getVideoLayout() const;
     TrackMap getTrackInfo() const;
 
-    AbstractStreamSocket* tcpSock();
     void setUserAgent(const QString& value);
 signals:
     void gotTextResponse(QByteArray text);
@@ -374,7 +375,6 @@ private:
     int m_additionalReadBufferPos;
     int m_additionalReadBufferSize;
     HttpAuthenticationClientContext m_rtspAuthCtx;
-    mutable QnMutex m_sockMutex;
     QByteArray m_userAgent;
 #ifdef _DUMP_STREAM
     std::ofstream m_inStreamFile;

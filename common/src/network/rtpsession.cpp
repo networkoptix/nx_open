@@ -742,9 +742,13 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool RTPSession::stop()
 {
-    QnMutexLocker lock( &m_sockMutex );
     m_tcpSock->close();
     return true;
+}
+
+void RTPSession::shutdown()
+{
+    m_tcpSock->shutdown();
 }
 
 bool RTPSession::isOpened() const
@@ -834,11 +838,6 @@ bool RTPSession::sendRequestInternal(nx_http::Request&& request)
     m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
 #endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
-}
-
-AbstractStreamSocket* RTPSession::tcpSock()
-{
-    return m_tcpSock.get();
 }
 
 bool RTPSession::sendDescribe()
