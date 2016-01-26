@@ -45,9 +45,12 @@ class System(object):
 
     @staticmethod
     @validate_response
-    def access_roles(email, password):
+    def access_roles(email, password, system_id):
         request = settings.CLOUD_CONNECT['url'] + "/system/get_access_role_list"
-        return requests.get(request, auth=HTTPDigestAuth(email, password))
+        params = {
+           'systemID': system_id
+        }
+        return requests.get(request, params=params, auth=HTTPDigestAuth(email, password))
 
     @staticmethod
     @validate_response

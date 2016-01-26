@@ -23,7 +23,6 @@ var Config = {
         owner:   'owner',
         labels: {
             "owner": "owner",
-            "maintenance" : "maintenance",
             "viewer": "viewer",
             "editor": "editor",
             "editorWithSharing": "editor and sharing"
@@ -32,13 +31,9 @@ var Config = {
             "viewer",
             "editor",
             "editorWithSharing",
-            "maintenance",
             "owner"
         ],
         options:[
-            {
-                "accessRole": "maintenance"
-            },
             {
                 "accessRole": "owner"
             },

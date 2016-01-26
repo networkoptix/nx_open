@@ -111,9 +111,9 @@ angular.module('cloudApp')
                     system_id: systemId
                 });
             },
-            accessRoles: function(){
+            accessRoles: function(systemId){
                 // TODO: cache this request
-                return $http.get(apiBase + '/systems/accessRoles');
+                return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
             }
         }
 
