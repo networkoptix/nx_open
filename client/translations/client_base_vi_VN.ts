@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 of %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>%1 of %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 of %n cameras</translation>
+        <translation type="unfinished">
+            <numerusform>%1 of %n cameras</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">Chọn ít nhất một máy ảnh</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Danh sách máy ảnh</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n thiết bị được tìm</translation>
+        <translation type="unfinished">
+            <numerusform>%n thiết bị được tìm</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n máy ảnh được tìm thấy</translation>
+        <translation type="unfinished">
+            <numerusform>%n máy ảnh được tìm thấy</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Xuất khẩu chọn lọc máy ảnh vào một tập tin.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Nội quy camera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Áp dụng thay đổi cho các thiết bị %n sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Áp dụng thay đổi cho các thiết bị %n sau đây?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Áp dụng những thay đổi trong máy ảnh %n sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Áp dụng những thay đổi trong máy ảnh %n sau đây?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>Sử dụng giấy phép tương tự để xem những %n máy ảnh</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Sử dụng giấy phép để lựa chọn %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>Sử dụng giấy phép để lựa chọn %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</translation>
+        <translation type="unfinished">
+            <numerusform>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4781,13 +4805,17 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>empty</source>
         <translation>trống</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>Tổng cộng %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>Tổng cộng %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>Tổng cộng %n máy ảnh</translation>
+        <translation type="unfinished">
+            <numerusform>Tổng cộng %n máy ảnh</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7280,9 +7310,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Nó không được phép thực hiện bất kỳ thay đổi ngoại trừ kích hoạt giấy phép.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Các mục %n sau đây sẽ không được lưu.</translation>
+        <translation type="unfinished">
+            <numerusform>Các mục %n sau đây sẽ không được lưu.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7294,9 +7326,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Error</source>
         <translation>lỗi</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Các mục %n sau đây sẽ không bị xóa.</translation>
+        <translation type="unfinished">
+            <numerusform>Các mục %n sau đây sẽ không bị xóa.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7560,9 +7594,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>A Video Wall with the same name already exists.</source>
         <translation>bức tường video có cùng tên đã tồn tại.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n mặt hàng</translation>
+        <translation type="unfinished">
+            <numerusform>%n mặt hàng</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

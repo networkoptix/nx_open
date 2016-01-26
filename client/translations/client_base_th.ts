@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 ของ%n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 ของ%n กล้อง</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>รายชื่อกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n อุปกรณ์ที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n อุปกรณ์ที่พบ</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n กล้องที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n กล้องที่พบ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>ส่งออกกล้องที่เลือกไปยังแฟ้ม.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>กฎระเบียบกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่านี้%n</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Use licenses for selected %n cameras</translation>
+        <translation type="unfinished">
+            <numerusform>Use licenses for selected %n cameras</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4781,13 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>ว่างเปล่า</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>รวม %n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>รวม %n กล้อง</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7280,9 +7310,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>มันไม่ได้รับอนุญาตให้ทำการเปลี่ยนแปลงใด ๆ ยกเว้นใบอนุญาตการเปิดใช้งาน.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7294,9 +7326,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกลบ.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกลบ.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7560,9 +7594,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>จอแสดงผล มีชื่อเดียวกันกับที่มีอยู่แล้ว.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n รายการ</translation>
+        <translation type="unfinished">
+            <numerusform>%n รายการ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

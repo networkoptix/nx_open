@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 / %n デバイス</translation>
+        <translation type="unfinished">
+            <numerusform>%1 / %n デバイス</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 / %n カメラ</translation>
+        <translation type="unfinished">
+            <numerusform>%1 / %n カメラ</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">最低一つのカメラを選択してください</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>カメラリスト</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n デバイス検出</translation>
+        <translation type="unfinished">
+            <numerusform>%n デバイス検出</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n カメラ検出</translation>
+        <translation type="unfinished">
+            <numerusform>%n カメラ検出</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>エクスポート.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>カメラルール</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation> %n デバイスに変更内容を適用しますか？</translation>
+        <translation type="unfinished">
+            <numerusform> %n デバイスに変更内容を適用しますか？</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation> %n カメラに変更内容を適用しますか？</translation>
+        <translation type="unfinished">
+            <numerusform> %n カメラに変更内容を適用しますか？</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform> %n カメラの表示にアナログライセンスを使用</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation> %n デバイスにライセンスを使用</translation>
+        <translation type="unfinished">
+            <numerusform> %n デバイスにライセンスを使用</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation> %n カメラにライセンスを使用</translation>
+        <translation type="unfinished">
+            <numerusform> %n カメラにライセンスを使用</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4781,13 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>空</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>合計 %n デバイス</translation>
+        <translation type="unfinished">
+            <numerusform>合計 %n デバイス</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>合計 %n カメラ</translation>
+        <translation type="unfinished">
+            <numerusform>合計 %n カメラ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7280,9 +7310,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>ライセンスアクティベート以外の変更は許可されません.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation> %n アイテムは保存されていません.</translation>
+        <translation type="unfinished">
+            <numerusform> %n アイテムは保存されていません.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7294,9 +7326,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>エラー</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation> %n アイテムは削除されません.</translation>
+        <translation type="unfinished">
+            <numerusform> %n アイテムは削除されません.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7560,9 +7594,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>同じ名前のビデオウォールが既に存在します.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n アイテム</translation>
+        <translation type="unfinished">
+            <numerusform>%n アイテム</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

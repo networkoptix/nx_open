@@ -1836,13 +1836,21 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 из %n устройств</translation>
+        <translation type="unfinished">
+            <numerusform>%1 из %n устройств</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 из %n камер</translation>
+        <translation type="unfinished">
+            <numerusform>%1 из %n камер</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1860,9 +1868,13 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">Выберите хотя бы одну камеру</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2414,13 +2426,21 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Списко камер</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>Найдено устройств: %n</translation>
+        <translation type="unfinished">
+            <numerusform>Найдено устройств: %n</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>Найдено камер: %n</translation>
+        <translation type="unfinished">
+            <numerusform>Найдено камер: %n</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2430,9 +2450,13 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Экспортировать выбранные камеры в файл.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2642,13 +2666,21 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Правила для камер</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Применить изменения для следуйщих %n устройств?</translation>
+        <translation type="unfinished">
+            <numerusform>Применить изменения для следуйщих %n устройств?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Применить изменения для следуйщих %n камер?</translation>
+        <translation type="unfinished">
+            <numerusform>Применить изменения для следуйщих %n камер?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2678,9 +2710,13 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3912,17 +3948,29 @@ to view more bookmarks</source>
             <numerusform>Использовать аналоговые лицензии для просмотра этих %n камер</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Использовать лицензии для %n выбранных устройств</translation>
+        <translation type="unfinished">
+            <numerusform>Использовать лицензии для %n выбранных устройств</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Использовать лицензии для %n выбранных камер</translation>
+        <translation type="unfinished">
+            <numerusform>Использовать лицензии для %n выбранных камер</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4861,13 +4909,21 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>пусто</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>Всего %n устройств</translation>
+        <translation type="unfinished">
+            <numerusform>Всего %n устройств</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>Всего %n камер</translation>
+        <translation type="unfinished">
+            <numerusform>Всего %n камер</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4897,9 +4953,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7429,9 +7489,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Запрещено вносить изменения за исключением активации лицензии.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Следующие %n элементов не сохранены.</translation>
+        <translation type="unfinished">
+            <numerusform>Следующие %n элементов не сохранены.</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7445,9 +7509,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Следующие %n элементов не удалены.</translation>
+        <translation type="unfinished">
+            <numerusform>Следующие %n элементов не удалены.</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7717,9 +7785,13 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>Видеостена с таким именем уже существует.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n элементов</translation>
+        <translation type="unfinished">
+            <numerusform>%n элементов</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

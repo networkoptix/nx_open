@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation> %n 设备的 %1</translation>
+        <translation type="unfinished">
+            <numerusform> %n 设备的 %1</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation> %n 摄像机的 %1</translation>
+        <translation type="unfinished">
+            <numerusform> %n 摄像机的 %1</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">请至少选择一台摄像机</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>摄像机列表</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n 设备被发现</translation>
+        <translation type="unfinished">
+            <numerusform>%n 设备被发现</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n 摄像机被发现</translation>
+        <translation type="unfinished">
+            <numerusform>%n 摄像机被发现</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>导出所选摄像机到文件.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>摄像机规则</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>更改将应用到以下%n 设备?</translation>
+        <translation type="unfinished">
+            <numerusform>更改将应用到以下%n 设备?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>更改将应用到以下%n 摄像机?</translation>
+        <translation type="unfinished">
+            <numerusform>更改将应用到以下%n 摄像机?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>使用模拟授权预览 %n 摄像机</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>所选 %n设备使用授权</translation>
+        <translation type="unfinished">
+            <numerusform>所选 %n设备使用授权</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>所选 %n设备使用授权</translation>
+        <translation type="unfinished">
+            <numerusform>所选 %n设备使用授权</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4780,13 +4804,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>空</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>全部 %n 设备</translation>
+        <translation type="unfinished">
+            <numerusform>全部 %n 设备</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>全部 %n 摄像机</translation>
+        <translation type="unfinished">
+            <numerusform>全部 %n 摄像机</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4816,9 +4844,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7280,9 +7310,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>不允许进行任何更改，除了进行授权激活.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>以下%n 项未保存.</translation>
+        <translation type="unfinished">
+            <numerusform>以下%n 项未保存.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7294,9 +7326,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>错误</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>以下 %n项未删除.</translation>
+        <translation type="unfinished">
+            <numerusform>以下 %n项未删除.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7560,9 +7594,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>相同名称的电视墙已存在.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n 项</translation>
+        <translation type="unfinished">
+            <numerusform>%n 项</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

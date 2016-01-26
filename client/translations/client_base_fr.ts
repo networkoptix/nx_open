@@ -1826,13 +1826,19 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 de %n périphériques</translation>
+        <translation type="unfinished">
+            <numerusform>%1 de %n périphériques</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 de %n caméras</translation>
+        <translation type="unfinished">
+            <numerusform>%1 de %n caméras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1850,9 +1856,12 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">&lt;Sélectionner au moins une caméra&gt;</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2401,13 +2410,19 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Liste Caméras</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n périphériques trouvés</translation>
+        <translation type="unfinished">
+            <numerusform>%n périphériques trouvés</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n caméras trouvées</translation>
+        <translation type="unfinished">
+            <numerusform>%n caméras trouvées</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2417,9 +2432,12 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Exporter les caméras sélectionnées vers un fichier.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2630,13 +2648,19 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Règles Caméras</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Appliquer les changements sur les %n périphériques suivants?</translation>
+        <translation type="unfinished">
+            <numerusform>Appliquer les changements sur les %n périphériques suivants?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Appliquer les changements sur les %n caméras suivantes?</translation>
+        <translation type="unfinished">
+            <numerusform>Appliquer les changements sur les %n caméras suivantes?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2666,9 +2690,12 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3892,17 +3919,26 @@ to view more bookmarks</source>
             <numerusform>Utiliser une licence pour voir %n cameras</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Utiliser licences pour %n périphériques sélectionnés</translation>
+        <translation type="unfinished">
+            <numerusform>Utiliser licences pour %n périphériques sélectionnés</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Utiliser licences pour %n caméras sélectionnées</translation>
+        <translation type="unfinished">
+            <numerusform>Utiliser licences pour %n caméras sélectionnées</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4839,13 +4875,19 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>empty</source>
         <translation>vide</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>%n Périphérique Total</translation>
+        <translation type="unfinished">
+            <numerusform>%n Périphérique Total</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>%n Caméras Totale</translation>
+        <translation type="unfinished">
+            <numerusform>%n Caméras Totale</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4875,9 +4917,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -7375,9 +7420,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Il est interdit d&apos;apporter des modifications à l&apos;exception de l&apos;activation de licence.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Les %n éléments suivants ne sont pas sauvegardé.</translation>
+        <translation type="unfinished">
+            <numerusform>Les %n éléments suivants ne sont pas sauvegardé.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7390,9 +7438,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Les %n éléments suivants ne sont pas supprimé.</translation>
+        <translation type="unfinished">
+            <numerusform>Les %n éléments suivants ne sont pas supprimé.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7659,9 +7710,12 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>A Video Wall with the same name already exists.</source>
         <translation>Mur Vidéo avec le même nom existe déjà.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n éléments</translation>
+        <translation type="unfinished">
+            <numerusform>%n éléments</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>
