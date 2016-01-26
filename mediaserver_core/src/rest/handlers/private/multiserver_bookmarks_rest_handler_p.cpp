@@ -187,10 +187,6 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(QnGe
     const auto result = QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.sortProps
         , request.filter.thinOut, request.filter.limit);
 
-    if (result.size() > 5002)
-    {
-        int i = 0;
-    }
     return result;
 }
 
