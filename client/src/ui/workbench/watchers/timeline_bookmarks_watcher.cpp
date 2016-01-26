@@ -26,7 +26,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     , QnWorkbenchContextAware(parent)
 
     , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksOnTimeline
-        , QnBookmarkSortProps::default, QnBookmarksThinOutProperties(true, 0)   // TODO: add minLength
+        , QnBookmarkSortProps::default, QnBookmarksThinOut(true, 0)
         , kTimelineMinWindowChangeMs, parent))
     , m_mergeHelper(new QnBookmarkMergeHelper())
     , m_aggregation(new QnCameraBookmarkAggregation())
@@ -48,9 +48,9 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
     connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixel, this, [this]()
     {
-        const auto thinOutProps = QnBookmarksThinOutProperties(true
+        const auto thinOut = QnBookmarksThinOut(true
             , navigator()->timeSlider()->msecsPerPixel());
-        m_bookmarksCache->setThinoutProps(thinOutProps);
+        m_bookmarksCache->setThinOut(thinOut);
     });
 }
 

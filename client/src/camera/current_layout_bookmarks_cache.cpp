@@ -17,26 +17,26 @@ namespace
 {
     QnCameraBookmarkSearchFilter createFilter(int maxBookmarksCount
         , const QnBookmarkSortProps &sortProps
-        , const QnBookmarksThinOutProperties &thinOutProps)
+        , const QnBookmarksThinOut &thinOut)
     {
         QnCameraBookmarkSearchFilter filter;
         filter.limit = maxBookmarksCount;
         filter.sortProps= sortProps;
-        filter.thinOutProps = thinOutProps;
+        filter.thinOut = thinOut;
         return filter;
     }
 };
 
 QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCount
     , const QnBookmarkSortProps &sortProp
-    , const QnBookmarksThinOutProperties &thinOutProps
+    , const QnBookmarksThinOut &thinOut
     , qint64 minWindowChangeMs
     , QObject *parent)
 
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_filter(createFilter(maxBookmarksCount, sortProp, thinOutProps))
+    , m_filter(createFilter(maxBookmarksCount, sortProp, thinOut))
     , m_queriesCache(new QnBookmarkQueriesCache(minWindowChangeMs))
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
@@ -69,12 +69,12 @@ void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)
     m_queriesCache->updateQueries(m_filter);
 }
 
-void QnCurrentLayoutBookmarksCache::setThinoutProps(const QnBookmarksThinOutProperties &thinOutProps)
+void QnCurrentLayoutBookmarksCache::setThinOut(const QnBookmarksThinOut &thinOut)
 {
-    if (m_filter.thinOutProps == thinOutProps)
+    if (m_filter.thinOut == thinOut)
         return;
 
-    m_filter.thinOutProps = thinOutProps;
+    m_filter.thinOut = thinOut;
     m_queriesCache->updateQueries(m_filter);
 }
 

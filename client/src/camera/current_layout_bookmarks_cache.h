@@ -24,7 +24,7 @@ class QnCurrentLayoutBookmarksCache : public Connective<QObject>
 public:
     QnCurrentLayoutBookmarksCache(int maxBookmarksCount
         , const QnBookmarkSortProps &sortProp = QnBookmarkSortProps::default
-        , const QnBookmarksThinOutProperties &thinOutProps = QnBookmarksThinOutProperties::kNoThinOut
+        , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut::kNoThinOut
         , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
 
@@ -35,7 +35,7 @@ public:
 
     void setWindow(const QnTimePeriod &window);
 
-    void setThinoutProps(const QnBookmarksThinOutProperties &thinOutProps);
+    void setThinOut(const QnBookmarksThinOut &thinOut);
 
     QnCameraBookmarkList bookmarks(const QnVirtualCameraResourcePtr &camera);
 

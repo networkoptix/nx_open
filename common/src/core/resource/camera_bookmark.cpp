@@ -179,7 +179,7 @@ namespace
     }
 
     QnCameraBookmarkList thinOutBookmarks(const QnCameraBookmarkList &bookmarks
-        , const QnBookmarksThinOutProperties &thinOutProp
+        , const QnBookmarksThinOut &thinOutProp
         , int limit
         , const BinaryPredicate &pred)
     {
@@ -222,13 +222,13 @@ const QnBookmarkSortProps QnBookmarkSortProps::default =
 
 //
 
-QnBookmarksThinOutProperties::QnBookmarksThinOutProperties(bool use
+QnBookmarksThinOut::QnBookmarksThinOut(bool use
     , qint64 minVisibleLengthMs)
     : use(use)
     , minVisibleLengthMs(minVisibleLengthMs)
 {}
 
-const QnBookmarksThinOutProperties QnBookmarksThinOutProperties::kNoThinOut = QnBookmarksThinOutProperties();
+const QnBookmarksThinOut QnBookmarksThinOut::kNoThinOut = QnBookmarksThinOut();
 
 //
 
@@ -257,7 +257,7 @@ void QnCameraBookmark::sortBookmarks(QnCameraBookmarkList &bookmarks
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
     , const QnBookmarkSortProps &sortProperties
-    , const QnBookmarksThinOutProperties &thinOut
+    , const QnBookmarksThinOut &thinOut
     , int limit)
 {
     const auto pred = createPredicate(sortProperties);
@@ -360,7 +360,7 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     startTimeMs(0),
     endTimeMs(std::numeric_limits<qint64>().max()),
     limit(kNoLimit),
-    thinOutProps(),
+    thinOut(),
     sortProps(QnBookmarkSortProps::default)
 {}
 
@@ -416,7 +416,7 @@ void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortProps, (json)(eq), QnBookmarkSortProps_Fields, (optional, true) )
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarksThinOutProperties, (json)(eq), QnBookmarksThinOutProperties_Fileds, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarksThinOut, (json)(eq), QnBookmarksThinOut_Fileds, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmark,      (sql_record)(json)(ubjson)(xml)(csv_record)(eq), QnCameraBookmark_Fields,    (optional, true))

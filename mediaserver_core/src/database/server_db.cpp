@@ -259,7 +259,7 @@ namespace
 
     int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
     {
-        if (filter.thinOutProps.use)
+        if (filter.thinOut.use)
             return QnCameraBookmarkSearchFilter::kNoLimit;
 
         switch(filter.sortProps.column)

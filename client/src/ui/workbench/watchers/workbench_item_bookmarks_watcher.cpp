@@ -108,7 +108,7 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
     , m_aggregationHelper(new QnCameraBookmarkAggregation())
     , m_timelineWatcher(context()->instance<QnTimelineBookmarksWatcher>())
     , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksNearThePosition
-        , QnBookmarkSortProps::default, QnBookmarksThinOutProperties::kNoThinOut
+        , QnBookmarkSortProps::default, QnBookmarksThinOut::kNoThinOut
         , kMinWindowChange, parent))
     , m_itemListinersMap()
     , m_listeners()

@@ -56,8 +56,8 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     QnLexical::deserialize(params.value(sortColumnKey), &filter.sortProps.column);
     QnLexical::deserialize(params.value(sortOrderKey), &filter.sortProps.order);
 
-    QnLexical::deserialize(params.value(useThinOut), &filter.thinOutProps.use);
-    QnLexical::deserialize(params.value(thinOutMinVisibleLengthMs), &filter.thinOutProps.minVisibleLengthMs);
+    QnLexical::deserialize(params.value(useThinOut), &filter.thinOut.use);
+    QnLexical::deserialize(params.value(thinOutMinVisibleLengthMs), &filter.thinOut.minVisibleLengthMs);
 
     if (params.contains(limitKey))
         filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
@@ -93,8 +93,8 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(sortColumnKey,    QnLexical::serialized(filter.sortProps.column));
     result.insert(sortOrderKey,     QnLexical::serialized(filter.sortProps.order));
 
-    result.insert(useThinOut,                   QnLexical::serialized(filter.thinOutProps.use));
-    result.insert(thinOutMinVisibleLengthMs,    QnLexical::serialized(filter.thinOutProps.minVisibleLengthMs));
+    result.insert(useThinOut,                   QnLexical::serialized(filter.thinOut.use));
+    result.insert(thinOutMinVisibleLengthMs,    QnLexical::serialized(filter.thinOut.minVisibleLengthMs));
 
     for (const auto &camera: cameras)
         result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));
