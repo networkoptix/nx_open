@@ -4,12 +4,12 @@
 #include <utils/common/string.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <camera/camera_bookmark_aggregation.h>
-#include <camera/current_layout_bookmarks_cache.h>
 #include <ui/utils/workbench_item_helper.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_bookmarks_cache.h>
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/graphics/items/overlays/composite_text_overlay.h>
@@ -107,7 +107,7 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
 
     , m_aggregationHelper(new QnCameraBookmarkAggregation())
     , m_timelineWatcher(context()->instance<QnTimelineBookmarksWatcher>())
-    , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksNearThePosition
+    , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksNearThePosition
         , QnBookmarkSortProps::default, QnBookmarksThinOut::kNoThinOut
         , kMinWindowChange, parent))
     , m_itemListinersMap()
@@ -125,11 +125,11 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
     // For now, there is no practical need - bookmarks are updated every
     // ~5 seconds (by query), but if we decide to extend this period (for
     // 1 minute, for example), we will have to support it
-    connect(m_bookmarksCache, &QnCurrentLayoutBookmarksCache::bookmarksChanged
+    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::bookmarksChanged
         , this, &QnWorkbenchItemBookmarksWatcher::onBookmarksChanged);
-    connect(m_bookmarksCache, &QnCurrentLayoutBookmarksCache::itemAdded
+    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemAdded
         , this, &QnWorkbenchItemBookmarksWatcher::onItemAdded);
-    connect(m_bookmarksCache, &QnCurrentLayoutBookmarksCache::itemRemoved
+    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemRemoved
         , this, &QnWorkbenchItemBookmarksWatcher::onItemRemoved);
 }
 

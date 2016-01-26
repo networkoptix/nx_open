@@ -13,7 +13,7 @@
 
 class QTimer;
 class QnCameraBookmarkAggregation;
-class QnCurrentLayoutBookmarksCache;
+class QnWorkbenchBookmarksCache;
 class QnBookmarkMergeHelper;
 
 // @brief Caches bookmarks for each item on current layout and constrains
@@ -56,7 +56,7 @@ private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
-    typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
+    typedef QScopedPointer<QnWorkbenchBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
     typedef QScopedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
     typedef QScopedPointer<QTimer> QTimerPtr;

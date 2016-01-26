@@ -11,7 +11,7 @@
 #include <ui/customization/customized.h>
 
 class QnUuid;
-class QnCurrentLayoutBookmarksCache;
+class QnWorkbenchBookmarksCache;
 class QnWorkbenchItem;
 class QnTimelineBookmarksWatcher;
 class QnCameraBookmarkAggregation;
@@ -65,7 +65,7 @@ private:
 
 private:
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
-    typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
+    typedef QScopedPointer<QnWorkbenchBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
     typedef QMap<QnWorkbenchItem *, ListenerLifeHolder> ItemListenersMap;
 
     const QnCameraBookmarkAggregationPtr m_aggregationHelper;

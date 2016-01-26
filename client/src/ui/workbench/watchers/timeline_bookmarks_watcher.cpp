@@ -6,9 +6,9 @@
 #include <core/resource/camera_resource.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmark_aggregation.h>
-#include <camera/current_layout_bookmarks_cache.h>
 #include <ui/utils/bookmark_merge_helper.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_bookmarks_cache.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/graphics/items/controls/time_slider.h>
 
@@ -25,7 +25,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
 
-    , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksOnTimeline
+    , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksOnTimeline
         , QnBookmarkSortProps::default, QnBookmarksThinOut(true, 0)
         , kTimelineMinWindowChangeMs, parent))
     , m_mergeHelper(new QnBookmarkMergeHelper())
@@ -38,7 +38,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
         , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged
         , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
-    connect(m_bookmarksCache, &QnCurrentLayoutBookmarksCache::bookmarksChanged
+    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::bookmarksChanged
         , this, &QnTimelineBookmarksWatcher::onBookmarksChanged);
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved
         , this, &QnTimelineBookmarksWatcher::onBookmarkRemoved);
