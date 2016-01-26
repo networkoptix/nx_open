@@ -168,7 +168,7 @@ angular.module('webadminApp')
 
                     _.each($scope.storages,function(storageinfo){
                         var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
-                        if(storageToUpdate!==null) {
+                        if(storageToUpdate) {
                             storageToUpdate.spaceLimit = storageinfo.reservedSpace;
                             storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
                         }
