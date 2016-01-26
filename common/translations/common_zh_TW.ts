@@ -622,7 +622,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module initialization process in progress.</source>
+        <source>I/O Module initialization process is in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -847,10 +847,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>啟動授權時發生了問題. 接收到無效的資料. 請將問題回覆給您的廠商.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
     </message>
@@ -864,6 +860,10 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
