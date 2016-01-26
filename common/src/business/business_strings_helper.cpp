@@ -491,7 +491,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
         }
     }
 
-    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
     result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
 
     return result;
