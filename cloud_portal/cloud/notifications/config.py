@@ -7,6 +7,14 @@ notifications_config = {
         'engine': 'email',
         'subject': '[CLOUD] Restore your password'
     },
+    'system_invite': {
+        'engine': 'email',
+        'subject': '[CLOUD] Video system was shared with you'
+    },
+    'system_shared': {
+        'engine': 'email',
+        'subject': '[CLOUD] Video system was shared with you'
+    },
 }
 
 notifications_module_config = {
