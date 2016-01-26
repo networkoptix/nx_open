@@ -96,7 +96,7 @@ def change_password(request):
         CreateAccountSerializer.validate_password(new_password)
     except ValidationError as error:
         raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
-                              error_data={'new_password': error.detail})
+                                  error_data={'new_password': error.detail})
 
     Account.change_password(request.user.email, old_password, new_password)
     request.session['password'] = new_password
@@ -155,8 +155,7 @@ def restore_password(request):
             CreateAccountSerializer.validate_password(new_password)
         except ValidationError as error:
             raise APIRequestException('Wrong new password', ErrorCodes.wrong_parameters,
-                                  error_data={'new_password': error.detail})
-
+                                      error_data={'new_password': error.detail})
 
         Account.change_password(user_email, temp_password, new_password)
     elif 'user_email' in request.data:

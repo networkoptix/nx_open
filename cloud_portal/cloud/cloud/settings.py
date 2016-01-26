@@ -162,7 +162,8 @@ CLOUD_CONNECT = {
     'password_realm': 'VMS'
 }
 
-# whitelist for unauthorized IP addresses. Supports addresses withmore: https://docs.python.org/3/library/ipaddress.html) masks (
+# whitelist for unauthorized IP addresses. Supports addresses with masks
+# read more: https://docs.python.org/3/library/ipaddress.html
 IP_WHITELISTS = {
     'local': (
         '127.0.0.1',  # localhost

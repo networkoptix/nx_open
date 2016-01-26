@@ -5,8 +5,10 @@ from cloud import settings
 import re
 import json
 
+
 class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
-    password = serializers.CharField(required=True, allow_blank=False, max_length=255, min_length=settings.PASSWORD_REQUIREMENTS['minLength'])
+    password = serializers.CharField(required=True, allow_blank=False, max_length=255,
+                                     min_length=settings.PASSWORD_REQUIREMENTS['minLength'])
     email = serializers.CharField(required=True, allow_blank=False, max_length=255)
     first_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=255)
@@ -22,7 +24,7 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
             raise serializers.ValidationError("Too long password")
 
         # Correct characters
-        pattern =  settings.PASSWORD_REQUIREMENTS['requiredRegex']
+        pattern = settings.PASSWORD_REQUIREMENTS['requiredRegex']
         if not pattern.match(value):
             raise serializers.ValidationError("Incorrect password")
 
