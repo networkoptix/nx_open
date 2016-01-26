@@ -16,19 +16,19 @@
 namespace
 {
     QnCameraBookmarkSearchFilter createFilter(int maxBookmarksCount
-        , const QnBookmarkSortProps &sortProps
+        , const QnBookmarkSortOrder &orderBy
         , const QnBookmarksThinOut &thinOut)
     {
         QnCameraBookmarkSearchFilter filter;
         filter.limit = maxBookmarksCount;
-        filter.sortProps= sortProps;
+        filter.orderBy= orderBy;
         filter.thinOut = thinOut;
         return filter;
     }
 };
 
 QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
-    , const QnBookmarkSortProps &sortProp
+    , const QnBookmarkSortOrder &sortProp
     , const QnBookmarksThinOut &thinOut
     , qint64 minWindowChangeMs
     , QObject *parent)

@@ -11,7 +11,6 @@
 namespace
 {
     //TODO: #ynikitenkov make generic version of algorithm
-
     typedef std::function<bool (const QnCameraBookmark &first, const QnCameraBookmark &second)> BinaryPredicate;
     QnCameraBookmarkList mergeSortedBookmarks(const QnMultiServerCameraBookmarkList &source
         , const BinaryPredicate &pred
@@ -65,15 +64,15 @@ namespace
         {
             // Looking for bookmarks list with minimal value
             auto mergeDataIt = mergeData.begin();
-            const QnCameraBookmark *minBookmark = &*mergeDataIt->first;
+            const QnCameraBookmark *minBookmark = mergeDataIt->first;
             for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
             {
-                const auto &currentBookmark = *it->first;
-                if (!pred(*minBookmark, currentBookmark))
+                const QnCameraBookmark *currentBookmark= it->first;
+                if (!pred(*minBookmark, *currentBookmark))
                     continue;
 
                 mergeDataIt = it;
-                minBookmark = &currentBookmark;
+                minBookmark = currentBookmark;
             }
 
             result.append(*minBookmark);
@@ -97,9 +96,9 @@ namespace
         return (isAscending ? ascPred : descPred);
     }
 
-    BinaryPredicate createPredicate(const QnBookmarkSortProps &sortProperties)
+    BinaryPredicate createPredicate(const QnBookmarkSortOrder &sortProperties)
     {
-        const bool isAscending = (sortProperties.order == Qn::Ascending);
+        const bool isAscending = (sortProperties.order == Qt::AscendingOrder);
 
         switch(sortProperties.column)
         {
@@ -130,7 +129,7 @@ namespace
     };
 
     QnMultiServerCameraBookmarkList sortEachList(QnMultiServerCameraBookmarkList sources
-        , const QnBookmarkSortProps &sortProp)
+        , const QnBookmarkSortOrder &sortProp)
     {
         for (auto &source: sources)
             QnCameraBookmark::sortBookmarks(source, sortProp);
@@ -211,14 +210,14 @@ namespace
 
 //
 
-QnBookmarkSortProps::QnBookmarkSortProps(Qn::BookmarkSortColumn column
-    , Qn::SortOrder order)
+QnBookmarkSortOrder::QnBookmarkSortOrder(Qn::BookmarkSortField column
+    , Qt::SortOrder order)
     : column(column)
     , order(order)
 {}
 
-const QnBookmarkSortProps QnBookmarkSortProps::default =
-    QnBookmarkSortProps(Qn::BookmarkStartTime, Qn::Ascending);
+const QnBookmarkSortOrder QnBookmarkSortOrder::default =
+    QnBookmarkSortOrder(Qn::BookmarkStartTime, Qt::AscendingOrder);
 
 //
 
@@ -250,13 +249,13 @@ QString QnCameraBookmark::tagsToString(const QnCameraBookmarkTags &bokmarkTags, 
 //TODO: #GDM #Bookmarks UNIT TESTS! and future optimization
 
 void QnCameraBookmark::sortBookmarks(QnCameraBookmarkList &bookmarks
-    , const QnBookmarkSortProps sortProps)
+    , const QnBookmarkSortOrder orderBy)
 {
-    std::sort(bookmarks.begin(), bookmarks.end(), createPredicate(sortProps));
+    std::sort(bookmarks.begin(), bookmarks.end(), createPredicate(orderBy));
 }
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-    , const QnBookmarkSortProps &sortProperties
+    , const QnBookmarkSortOrder &sortProperties
     , const QnBookmarksThinOut &thinOut
     , int limit)
 {
@@ -361,7 +360,7 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     endTimeMs(std::numeric_limits<qint64>().max()),
     limit(kNoLimit),
     thinOut(),
-    sortProps(QnBookmarkSortProps::default)
+    orderBy(QnBookmarkSortOrder::default)
 {}
 
 bool QnCameraBookmarkSearchFilter::isValid() const {
@@ -415,7 +414,7 @@ QnCameraBookmarkSearchFilter QnCameraBookmarkSearchFilter::invalidFilter() {
 void serialize_field(const QnCameraBookmarkTags& /*value*/, QVariant* /*target*/) {return ;}
 void deserialize_field(const QVariant& /*value*/, QnCameraBookmarkTags* /*target*/) {return ;}
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortProps, (json)(eq), QnBookmarkSortProps_Fields, (optional, true) )
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarkSortOrder, (json)(eq), QnBookmarkSortOrder_Fields, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnBookmarksThinOut, (json)(eq), QnBookmarksThinOut_Fileds, (optional, true) )
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(eq), QnCameraBookmarkSearchFilter_Fields, (optional, true) )
 

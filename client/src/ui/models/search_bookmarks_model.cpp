@@ -20,10 +20,10 @@ namespace
     enum { kInvalidSortingColumn = -1 };
     enum { kMaxVisibleRows = 1000 };
 
-    QnBookmarkSortProps toSortProperties(int col
+    QnBookmarkSortOrder calculateSortOrder(int col
         , Qt::SortOrder ord)
     {
-        const auto column = [col]() -> Qn::BookmarkSortColumn
+        const auto column = [col]() -> Qn::BookmarkSortField
         {
             switch(col)
             {
@@ -43,8 +43,8 @@ namespace
             }
         }();
 
-       const auto order = (ord == Qt::AscendingOrder ? Qn::Ascending : Qn::Descending);
-       return QnBookmarkSortProps(column, order);
+       const auto order = (ord == Qt::AscendingOrder ? Qt::AscendingOrder : Qt::DescendingOrder);
+       return QnBookmarkSortOrder(column, order);
     }
 }
 
@@ -114,15 +114,14 @@ QnSearchBookmarksModel::Impl::Impl(QnSearchBookmarksModel *owner
     , m_cameraNamesWatcher()
 {
     m_filter.limit = kMaxVisibleRows;
-    m_filter.sortProps = QnBookmarkSortProps(Qn::BookmarkStartTime, Qn::Descending);
+    m_filter.orderBy = QnBookmarkSortOrder(Qn::BookmarkStartTime, Qt::DescendingOrder);
 
     connect(&m_cameraNamesWatcher, &utils::QnCameraNamesWatcher::cameraNameChanged, this
         , [this](const QString &cameraUuid)
     {
-        static const auto kCameraRoleToUpdate = QVector<int>(1, kCamera);
         const auto topIndex = m_owner->index(0);
         const auto bottomIndex = m_owner->index(m_bookmarks.size() - 1);
-        m_owner->dataChanged(topIndex, bottomIndex, kCameraRoleToUpdate);
+        emit m_owner->dataChanged(topIndex, bottomIndex);
     });
 }
 
@@ -172,10 +171,10 @@ void QnSearchBookmarksModel::Impl::applyFilter()
 void QnSearchBookmarksModel::Impl::sort(int column
     , Qt::SortOrder order)
 {
-    m_filter.sortProps = toSortProperties(column, order);
+    m_filter.orderBy = calculateSortOrder(column, order);
     if (m_bookmarks.size() < kMaxVisibleRows)   // All bookmarks should be loaded here
     {
-        QnCameraBookmark::sortBookmarks(m_bookmarks, m_filter.sortProps);
+        QnCameraBookmark::sortBookmarks(m_bookmarks, m_filter.orderBy);
         emit m_owner->dataChanged(m_owner->index(0, 0)
             , m_owner->index(m_bookmarks.size() - 1, kColumnsCount - 1));
     }

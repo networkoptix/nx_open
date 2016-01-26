@@ -13,17 +13,17 @@
 
 #include <utils/common/model_functions_fwd.h>
 
-struct QnBookmarkSortProps
+struct QnBookmarkSortOrder
 {
-    Qn::BookmarkSortColumn column;
-    Qn::SortOrder order;
+    Qn::BookmarkSortField column;
+    Qt::SortOrder order;
 
-    explicit QnBookmarkSortProps(Qn::BookmarkSortColumn column = Qn::BookmarkStartTime
-        , Qn::SortOrder order = Qn::Ascending);
+    explicit QnBookmarkSortOrder(Qn::BookmarkSortField column = Qn::BookmarkStartTime
+        , Qt::SortOrder order = Qt::AscendingOrder);
 
-    static const QnBookmarkSortProps default;
+    static const QnBookmarkSortOrder default;
 };
-#define QnBookmarkSortProps_Fields (column)(order)
+#define QnBookmarkSortOrder_Fields (column)(order)
 
 struct QnBookmarksThinOut
 {
@@ -84,10 +84,10 @@ struct QnCameraBookmark {
     static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
     static void sortBookmarks(QnCameraBookmarkList &bookmarks
-        , const QnBookmarkSortProps sortProps);
+        , const QnBookmarkSortOrder orderBy);
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-        , const QnBookmarkSortProps &sortProperties = QnBookmarkSortProps::default
+        , const QnBookmarkSortOrder &sortProperties = QnBookmarkSortOrder::default
         , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut()
         , int limit = std::numeric_limits<int>().max());
 };
@@ -113,7 +113,7 @@ struct QnCameraBookmarkSearchFilter
 
     QnBookmarksThinOut thinOut;
 
-    QnBookmarkSortProps sortProps;
+    QnBookmarkSortOrder orderBy;
 
     QnCameraBookmarkSearchFilter();
 
@@ -125,7 +125,7 @@ struct QnCameraBookmarkSearchFilter
 
     static const int kNoLimit;
 };
-#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(sortProps)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)
 
 struct QnCameraBookmarkTag
 {
@@ -158,7 +158,7 @@ Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
-QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortProps, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnBookmarksThinOut, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 

@@ -12,7 +12,8 @@ namespace utils
 
         typedef QObject base_type;
     public:
-        QnCameraNamesWatcher(QObject *parent = nullptr);
+        explicit QnCameraNamesWatcher(bool showCameraIp = false
+            , QObject *parent = nullptr);
 
         ~QnCameraNamesWatcher();
 
@@ -24,6 +25,7 @@ namespace utils
     public:
         typedef QHash<QString, QString> NamesHash;
 
+        bool m_showCameraIp;
         NamesHash m_names;
     };
 }

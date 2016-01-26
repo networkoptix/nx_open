@@ -92,7 +92,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::CompressedPeriodsFormat, "periods")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortColumn,
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortField,
     (Qn::BookmarkName,          "name")
     (Qn::BookmarkStartTime,     "startTime")
     (Qn::BookmarkDuration,      "duration")
@@ -100,9 +100,9 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortColumn,
     (Qn::BookmarkCameraName,    "cameraName")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SortOrder,
-    (Qn::Ascending,     "asc")
-    (Qn::Descending,    "desc")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qt::SortOrder,
+    (Qt::AscendingOrder,     "asc")
+    (Qt::DescendingOrder,    "desc")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::RebuildAction,

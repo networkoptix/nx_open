@@ -748,7 +748,7 @@ public:
 //    };
 
     // All columns are sorted by database initially, except camera name and tags.
-    enum BookmarkSortColumn
+    enum BookmarkSortField
     {
         BookmarkName
         , BookmarkStartTime
@@ -756,14 +756,6 @@ public:
         , BookmarkTags          // Sorted manually!
         , BookmarkCameraName    // Sorted manually!
     };
-
-    /// TODO: #ynikitenkov Do I need that?? remove.
-    enum SortOrder
-    {
-        Ascending
-        , Descending
-    };
-
 
     /**
     * Authentication error code
@@ -893,7 +885,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSortColumn)(Qn::SortOrder)
+        (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)

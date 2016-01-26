@@ -53,8 +53,8 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     if (params.contains(endTimeKey))
         filter.endTimeMs = parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
 
-    QnLexical::deserialize(params.value(sortColumnKey), &filter.sortProps.column);
-    QnLexical::deserialize(params.value(sortOrderKey), &filter.sortProps.order);
+    QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
+    QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);
 
     QnLexical::deserialize(params.value(useThinOut), &filter.thinOut.use);
     QnLexical::deserialize(params.value(thinOutMinVisibleLengthMs), &filter.thinOut.minVisibleLengthMs);
@@ -90,8 +90,8 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(filterKey,        QnLexical::serialized(filter.text));
     result.insert(limitKey,         QnLexical::serialized(filter.limit));
 
-    result.insert(sortColumnKey,    QnLexical::serialized(filter.sortProps.column));
-    result.insert(sortOrderKey,     QnLexical::serialized(filter.sortProps.order));
+    result.insert(sortColumnKey,    QnLexical::serialized(filter.orderBy.column));
+    result.insert(sortOrderKey,     QnLexical::serialized(filter.orderBy.order));
 
     result.insert(useThinOut,                   QnLexical::serialized(filter.thinOut.use));
     result.insert(thinOutMinVisibleLengthMs,    QnLexical::serialized(filter.thinOut.minVisibleLengthMs));

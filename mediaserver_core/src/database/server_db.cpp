@@ -238,8 +238,8 @@ namespace
     {
         static const auto kOrderByTemplate = lit(" ORDER BY %1 %2, guid ");
 
-        const auto order = (filter.sortProps.order == Qn::Ascending ? lit("ASC"): lit("DESC"));
-        switch(filter.sortProps.column)
+        const auto order = (filter.orderBy.order == Qt::AscendingOrder ? lit("ASC"): lit("DESC"));
+        switch(filter.orderBy.column)
         {
         case Qn::BookmarkName:
             return kOrderByTemplate.arg(lit("name"), order);
@@ -262,7 +262,7 @@ namespace
         if (filter.thinOut.use)
             return QnCameraBookmarkSearchFilter::kNoLimit;
 
-        switch(filter.sortProps.column)
+        switch(filter.orderBy.column)
         {
         case Qn::BookmarkName:
         case Qn::BookmarkStartTime:

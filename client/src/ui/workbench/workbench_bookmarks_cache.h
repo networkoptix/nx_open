@@ -23,7 +23,7 @@ class QnWorkbenchBookmarksCache : public Connective<QObject>
 
 public:
     QnWorkbenchBookmarksCache(int maxBookmarksCount
-        , const QnBookmarkSortProps &sortProp = QnBookmarkSortProps::default
+        , const QnBookmarkSortOrder &sortProp = QnBookmarkSortOrder::default
         , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut::kNoThinOut
         , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
