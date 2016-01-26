@@ -6698,29 +6698,41 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>确定是否从视图中移除 %n 项?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>已发现 %n设备。移除后也将会自动被发现.是否需要移除设备?</translation>
+        <translation type="unfinished">
+            <numerusform>已发现 %n设备。移除后也将会自动被发现.是否需要移除设备?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>已发现 %n摄像机。移除后也将会自动被发现.是否需要移除摄像机?</translation>
+        <translation type="unfinished">
+            <numerusform>已发现 %n摄像机。移除后也将会自动被发现.是否需要移除摄像机?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>已发现 %n设备。移除后也将会自动被发现.是否需要移除设备?</translation>
+        <translation type="unfinished">
+            <numerusform>已发现 %n设备。移除后也将会自动被发现.是否需要移除设备?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>已发现 %n 摄像机。移除后也将会自动被发现.是否需要移除摄像机?</translation>
+        <translation type="unfinished">
+            <numerusform>已发现 %n 摄像机。移除后也将会自动被发现.是否需要移除摄像机?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>是否需要删除以下设备 %n?</translation>
+        <translation type="unfinished">
+            <numerusform>是否需要删除以下设备 %n?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>是否需要删除以下摄像机 %n?</translation>
+        <translation type="unfinished">
+            <numerusform>是否需要删除以下摄像机 %n?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6740,17 +6752,23 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>

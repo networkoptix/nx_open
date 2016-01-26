@@ -6759,29 +6759,47 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
             <numerusform>Sind Sie sich sicher, dass Sie diese %n Objekte aus Ihrem Layout entfernen möchten?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Diese %n Geräte werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>Diese %n Geräte werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Diese %n Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>Diese %n Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n von diesen Geräten werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>%n von diesen Geräten werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n von diesen Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>%n von diesen Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>Wollen Sie %n Geräte wirklich löschen?</translation>
+        <translation type="unfinished">
+            <numerusform>Wollen Sie %n Geräte wirklich löschen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Wollen Sie %n Kameras wirklich löschen?</translation>
+        <translation type="unfinished">
+            <numerusform>Wollen Sie %n Kameras wirklich löschen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6804,17 +6822,26 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>

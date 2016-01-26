@@ -6700,29 +6700,41 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
             <numerusform>Biztos benne, hogy szeretné eltávolítani ezt a %n elemet az elrendezésről?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ez a %n eszköz automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ez a %n eszköz automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ez a %n kamera automatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ezekből az eszközökből %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</translation>
+        <translation type="unfinished">
+            <numerusform>Ezekből az kamerákból %n aztomatikusan felderítve. Lehet, hogy az eltávolítás után újra fel lesznek derítve. Biztos benne, hogy törli őket?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>Biztos benne, hogy törölni szeretné a következő %n eszközt?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztos benne, hogy törölni szeretné a következő %n eszközt?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Biztos benne, hogy törölni szeretné a következő %n kamerát?</translation>
+        <translation type="unfinished">
+            <numerusform>Biztos benne, hogy törölni szeretné a következő %n kamerát?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6742,17 +6754,23 @@ Ha szeretné kikapcsolni ezt a funkciót, a Rendszer Beállítások menüben meg
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>

@@ -6811,30 +6811,54 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>Вы уверены, что хотите удалить эти %n элементов с раскладки?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished">Эти устройства найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
+        <translation type="unfinished">
+            <numerusform>Эти устройства найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Эти камеры найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
+        <translation type="unfinished">
+            <numerusform>Эти камеры найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n из этих устройств найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
+        <translation type="unfinished">
+            <numerusform>%n из этих устройств найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n из этих камер найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</translation>
+        <translation type="unfinished">
+            <numerusform>%n из этих камер найдены автоматически. Они могут определиться снова после удаления. Вы уверены, что хотите их удалить?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
         <translatorcomment>need plural!</translatorcomment>
-        <translation>Вы действительно хотите удалить следующие %n устройств?</translation>
+        <translation type="unfinished">
+            <numerusform>Вы действительно хотите удалить следующие %n устройств?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Вы действительно хотите удалить следующие %n камер?</translation>
+        <translation type="unfinished">
+            <numerusform>Вы действительно хотите удалить следующие %n камер?</numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6860,17 +6884,29 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>

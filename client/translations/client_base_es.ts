@@ -6753,29 +6753,47 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>¿Está seguro que desea eliminar estos elementos de %n de diseño?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Estos dispositivos %n son auto descubiertos. Pueden ser auto descubiertos otra vez después de eliminarlos. ¿Está seguro que desea eliminirlos?</translation>
+        <translation type="unfinished">
+            <numerusform>Estos dispositivos %n son auto descubiertos. Pueden ser auto descubiertos otra vez después de eliminarlos. ¿Está seguro que desea eliminirlos?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Estas camaras %n son auto descubiertas. Pueden ser auto descubiertas otra vez después de eliminarlas. ¿Está seguro que desea eliminirlas?</translation>
+        <translation type="unfinished">
+            <numerusform>Estas camaras %n son auto descubiertas. Pueden ser auto descubiertas otra vez después de eliminarlas. ¿Está seguro que desea eliminirlas?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Los %n de estos dispositivos son autodescubiertos. Pueden ser autodescubiertos otra vez después de eliminarlos. ¿Está seguro que quiere eliminarlos?</translation>
+        <translation type="unfinished">
+            <numerusform>Los %n de estos dispositivos son autodescubiertos. Pueden ser autodescubiertos otra vez después de eliminarlos. ¿Está seguro que quiere eliminarlos?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Los %n de estas camaras son autodescubiertos. Pueden ser autodescubiertas otra vez después de eliminarlas. ¿Está seguro que quiere eliminarlas?</translation>
+        <translation type="unfinished">
+            <numerusform>Los %n de estas camaras son autodescubiertos. Pueden ser autodescubiertas otra vez después de eliminarlas. ¿Está seguro que quiere eliminarlas?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>¿Está seguro que desea eliminar estos dispositivos %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Está seguro que desea eliminar estos dispositivos %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>¿Está seguro que desea eliminar estas camaras %n?</translation>
+        <translation type="unfinished">
+            <numerusform>¿Está seguro que desea eliminar estas camaras %n?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6798,17 +6816,26 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
