@@ -2898,15 +2898,15 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Actions will only work for Generic Events that pass all filters.</source>
-        <translation type="unfinished">Actions will only work for Generic Events that are not filtered out.</translation>
+        <translation type="unfinished">Event will trigger only if Generic Event meets all the above conditions.</translation>
     </message>
     <message>
         <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">If a keyword field is empty, condition is always met.</translation>
     </message>
     <message>
         <source>Each filter will pass if any keyword in a field is matched.</source>
-        <translation type="unfinished">Event will not be filtered out if any keyword in a field is matched.</translation>
+        <translation type="unfinished">If not, condition is met if the corresponding field of Generic Event contains any keyword.</translation>
     </message>
 </context>
 <context>
@@ -3344,7 +3344,7 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>This could lead to client software malfunction including crash.</source>
-        <translation type="unfinished">This may result in issues (including unexpected crash).</translation>
+        <translation type="unfinished">This may result in client software issues (including unexpected crash).</translation>
     </message>
 </context>
 <context>
