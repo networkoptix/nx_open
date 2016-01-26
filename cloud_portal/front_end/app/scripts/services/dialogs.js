@@ -3,6 +3,7 @@
 angular.module('cloudApp')
     .factory('dialogs', function ($http, $modal, $q, $location) {
         function openDialog(title, template, url, content, hasFooter, cancellable, params){
+
             // Check 401 against offline
             var modalInstance = $modal.open({
                 controller: 'DialogCtrl',
@@ -43,20 +44,20 @@ angular.module('cloudApp')
         }
 
         return {
-            alert:function(title, message){
-                return openDialog(title, null, null, message, true, true);
+            alert:function(message, title){
+                return openDialog(title, null, null, message, true, true).result;
             },
-            confirm:function(title, message){
-                return openDialog(title, null, null, message, true, false);
+            confirm:function(message, title){
+                return openDialog(title, null, null, message, true, false).result;
             },
             login:function(){
-                return openDialog('Login', 'views/login.html', 'login', null, false, true);
+                return openDialog('Login', 'views/login.html', 'login', null, false, true).result;
             },
             share:function(systemId, share){
                 return openDialog('Share', 'views/share.html', 'share', null, false, true,{
                     systemId: systemId,
                     share: share
-                });
+                }).result;
             }
         };
     }).controller("DialogCtrl",function($scope, $modalInstance,settings){

@@ -106,6 +106,11 @@ angular.module('cloudApp')
                     role: Config.accessRolesSettings.unshare
                 });
             },
+            delete:function(systemId){
+                return $http.post(apiBase + '/systems/delete', {
+                    system_id: systemId
+                });
+            },
             accessRoles: function(){
                 // TODO: cache this request
                 return $http.get(apiBase + '/systems/accessRoles');

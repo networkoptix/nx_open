@@ -46,3 +46,13 @@ def sharing(request, system_id):
 def access_roles(request):
     data = cloud_api.System.access_roles(request.user.email, request.session['password'])
     return api_success(data['access_roles'])
+
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated, ))
+@handle_exceptions
+def delete(request):
+    require_params(request, ('system_id',))
+    cloud_api.System.unbind(request.user.email, request.session['password'], request.data['system_id'])
+    return api_success()
+

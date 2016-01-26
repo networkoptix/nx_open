@@ -12,6 +12,14 @@ angular.module('cloudApp')
             info:{name:''}
         };
 
+        cloudApi.account().then(function(account){
+            $scope.account = account;
+
+            if(!account){
+                $location.path('/');
+            }
+        });
+
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return cloudApi.systems(systemId);
@@ -36,8 +44,42 @@ angular.module('cloudApp')
             nativeClient.open(systemId);
         };
 
+        function getSystemOwner(){
+            return _.find( $scope.system.users,function(user){
+                return user.accessRole == Config.accessRolesSettings.owner;
+            });
+        }
         // Unbind or unshare from me
-        $scope.unbind = function(){
+        $scope.delete = function(){
+            //1. Determine, if I am the owner
+
+            var owner = getSystemOwner();
+
+            if(owner && $scope.account.email == owner.accountEmail){
+
+                // User is the owner. Deleting system means unbinding it and disconnecting all accounts
+                dialogs.confirm("You are going to completely disconnect your system from the cloud. Are you sure?").
+                    then(function(){
+                        $scope.deletingSystem = process.init(function(){
+                            return cloudApi.delete(systemId);
+                        }).then(function(){
+                            $location.path("/systems");
+                        });
+                        $scope.deletingSystem.run();
+                    });
+
+            }else{
+                // User is not owner. Deleting means he'll lose access to it
+                dialogs.confirm("You are going to disconnect your system from your account. You will lose an access for this system. Are you sure?").
+                    then(function(){
+                        $scope.deletingSystem = process.init(function(){
+                            return cloudApi.unshare(systemId, $scope.account.email);
+                        }).then(function(){
+                            $location.path("/systems");
+                        });
+                        $scope.deletingSystem.run();
+                    });
+            }
 
         };
 
@@ -52,6 +94,9 @@ angular.module('cloudApp')
         };
 
         $scope.unshare = function(user){
+            if($scope.account.email == user.accountEmail){
+                return $scope.delete();
+            }
             // Run a process of sharing
             $scope.unsharingMessage = "Permissions were removed from " + user.accountEmail;
             $scope.unsharing = process.init(function(){

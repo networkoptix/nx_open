@@ -14,6 +14,7 @@ urlpatterns = [
 
 
     url(r'^systems/accessRoles',                    systems.access_roles),
+    url(r'^systems/delete',                         systems.delete),
     url(r'^systems/(?P<system_id>.+?)/users',       systems.sharing),
     url(r'^systems/(?P<system_id>.+?)/?$',          systems.system),
     url(r'^systems',                                systems.list_systems),

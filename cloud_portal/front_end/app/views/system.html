@@ -2,23 +2,24 @@
 <div class="auth-visible">
     <h1><a href="#/systems">Systems</a> > {{system.info.name}}</h1>
 
-    <button class="btn btn-default" ng-click="unbind()">Delete</button>
+    <button class="btn btn-default" ng-click="delete()">Delete</button>
     <button class="btn btn-default" ng-click="share()">Share</button>
     <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
 
     <h2>Users</h2>
 
+    <process-alert process="deletingSystem"
+                   error-prefix="'Cannot delete the system:'"></process-alert>
+
     <process-alert process="gettingSystem"
-                   success-message="false"
                    error-prefix="'System info is unavailable:'"></process-alert>
+
+    <process-alert process="gettingSystemUsers"
+                   error-prefix="'Users list is unavailable:'"></process-alert>
 
     <process-alert process="unsharing"
                    success-message="unsharingMessage"
                    error-prefix="'Sharing failed:'"></process-alert>
-
-    <process-alert process="gettingSystemUsers"
-                   success-message="false"
-                   error-prefix="'Users list is unavailable:'"></process-alert>
 
     <table class="table" ng-if="system.users.length">
         <thead>

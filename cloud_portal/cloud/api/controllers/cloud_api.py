@@ -49,6 +49,15 @@ class System(object):
         request = settings.CLOUD_CONNECT['url'] + "/system/get_sharing_type_list"
         return requests.get(request, auth=HTTPDigestAuth(email, password))
 
+    @staticmethod
+    @validate_response
+    def unbind(email, password, system_id):
+        request = settings.CLOUD_CONNECT['url'] + "/system/unbind"
+        params = {
+            'systemID': system_id,
+        }
+        return requests.post(request, json=params, auth=HTTPDigestAuth(email, password))
+
 
 class Account(object):
 
