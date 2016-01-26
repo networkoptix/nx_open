@@ -7301,16 +7301,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>לא ניתן לקבל מיקום מהמצלמה.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>אירעה שגיאה במהלך הנסיון לקבל את המיקום הנוכחי ממצלמה %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>אנא המתן עד שהמצלמה תחזור להיות מקוונת.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>אירעה שגיאה במהלך נסיון להגדיר את המיקום הנוכחי עבור מצלמה %1.</translation>
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
@@ -7318,6 +7310,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

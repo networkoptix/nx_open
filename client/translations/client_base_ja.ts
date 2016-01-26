@@ -7232,16 +7232,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZキャリブレーション_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>カメラ%1.のポジション取得中にエラーが発生しました.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>カメラがオンラインになるまでお待ちください.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>カメラ %1.のポジション設定中にエラーが発生しました.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7249,6 +7241,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

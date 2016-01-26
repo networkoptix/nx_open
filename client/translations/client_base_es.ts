@@ -7295,16 +7295,8 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>CALIBRACIÓN_PTZ_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Se ha producido un error al intentar obtener la posición actual de cámara %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Por favor espere a que la cámara esté en línea.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Ha ocurrido un error al intentar fijar la posición actual de la cámara %1.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7312,6 +7304,14 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
