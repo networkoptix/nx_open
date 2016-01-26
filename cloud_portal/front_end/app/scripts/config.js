@@ -13,7 +13,7 @@ var Config = {
             "maintenance" : "maintenance",
             "viewer": "viewer",
             "editor": "editor",
-            "editorWithSharing": "editor with sharing"
+            "editorWithSharing": "editor and sharing"
         },
         order:[
             "viewer",
