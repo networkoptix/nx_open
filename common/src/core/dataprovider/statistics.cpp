@@ -12,6 +12,7 @@ void QnStatistics::resetStatistics()
     QnMutexLocker locker( &m_mutex );
     m_startTime = QDateTime::currentDateTime();
     m_frames = 0;
+    m_keyFrames = 0;
     m_dataTotal = 0;
     m_badsensor = false;
 
@@ -45,7 +46,7 @@ void QnStatistics::stop()
     m_runing = false;
 }
 
-void QnStatistics::onData(unsigned int datalen)
+void QnStatistics::onData(unsigned int datalen, bool isKeyFrame)
 {
     if (!m_runing) return; 
     QnMutexLocker locker( &m_mutex );
@@ -53,6 +54,9 @@ void QnStatistics::onData(unsigned int datalen)
     if (datalen)
     {
         ++m_frames;
+        if (isKeyFrame)
+            ++m_keyFrames;
+
         m_dataTotal+=datalen;
         m_connectionLost = false;
     }
@@ -121,6 +125,15 @@ float QnStatistics::getFrameRate() const
 int QnStatistics::getFrameSize() const
 {
     return getBitrateMbps()/8*1024 / getFrameRate();
+}
+
+float QnStatistics::getAverageGopSize() const
+{
+    QnMutexLocker locker( &m_mutex );
+    if ( m_keyFrames == 0 )
+        return 0; // didn't have any frames yet
+
+    return static_cast<float>( m_frames ) / static_cast<float>( m_keyFrames );
 }
 
 void QnStatistics::onBadSensor()
