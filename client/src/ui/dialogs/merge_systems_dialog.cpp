@@ -43,6 +43,7 @@ QnMergeSystemsDialog::QnMergeSystemsDialog(QWidget *parent) :
     setWarningStyle(ui->errorLabel);
     m_mergeButton->hide();
     ui->buttonBox->button(QDialogButtonBox::Close)->hide();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->hide();
 
     setHelpTopic(this, Qn::Systems_MergeSystems_Help);
 
@@ -257,8 +258,13 @@ void QnMergeSystemsDialog::at_mergeTool_mergeFinished(
     {
         m_mergeButton->hide();
         ui->buttonBox->button(QDialogButtonBox::Cancel)->hide();
-        ui->buttonBox->button(QDialogButtonBox::Close)->show();
-        ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+
+        const bool reconnectNeeded = ui->remoteSystemRadioButton->isChecked();
+        QDialogButtonBox::StandardButton closeButton = reconnectNeeded ? QDialogButtonBox::Ok : QDialogButtonBox::Close;
+        ui->buttonBox->button(closeButton)->show();
+        ui->buttonBox->button(closeButton)->setFocus();
+
+        ui->reconnectLabel->setVisible(reconnectNeeded);
         ui->stackedWidget->setCurrentWidget(ui->finalPage);
         m_successfullyFinished = true;
     }
