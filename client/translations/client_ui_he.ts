@@ -170,12 +170,12 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>כל השרתים אינם מקוונים. נתוני הביקורת אינם זמינים.</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>To</source>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1088,13 +1088,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>סיבוב ברירת-מחדל:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>זוהי מצלמת עדשת עין-הדג</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>זוהי מצלמת עדשת עין-הדג</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1303,8 +1303,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>סוג רשיון זה דורש גירסת תוכנה גבוהה יותר.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1939,11 +1939,6 @@
     <name>QnServerUpdatesWidget</name>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Unable to check updates via internet.</source>
-        <translation>בדיקת עדכונים דרך האינטרנט נכשלה.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>עדכון זמין:</translation>
     </message>
@@ -1996,6 +1991,11 @@
         <location/>
         <source>Check for updates automatically</source>
         <translation>חפש עדכונים זמינים באופן אוטומטי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2117,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>אנא המתן בזמן שהחיבור משוחזר...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2964,11 +2964,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>אזהרה! הגדרות הפריימים לשניה והאיכות שב&quot;לוח זמני הקלטות&quot; לא יעבדו!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(מומלץ)</translation>
     </message>
@@ -2981,6 +2976,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>שלח סטטיסטיקות אנונימיות על נתוני שימוש וקריסות למפתחי התוכנה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב&quot;לוח זמני הקלטות&quot; ללא רלוונטיים.</translation>
     </message>
 </context>
 <context>

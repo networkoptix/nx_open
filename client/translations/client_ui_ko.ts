@@ -164,17 +164,17 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>모든 서버가 offline상태</translation>
-    </message>
-    <message>
-        <location/>
         <source>Audit Trail</source>
         <translation>시스템 감사</translation>
     </message>
     <message>
         <location/>
         <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>기본 위치</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>어안 렌즈 커메라 사용</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>어안 렌즈 커메라 사용</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>상위버젼 SW가 필요한 라이센스 입니다.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1983,11 +1983,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>가능한 업데이트</translation>
     </message>
@@ -1995,6 +1990,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2116,8 +2116,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>연결을 복원하는 동안 잠시 기다려주세요...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2962,11 +2962,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(추천)</translation>
     </message>
@@ -2979,6 +2974,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>개발자에게 장애 문제 자동 보고</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">주위: 이 옵션 활성화 시  기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다. </translation>
     </message>
 </context>
 <context>

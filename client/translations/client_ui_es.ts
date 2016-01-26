@@ -164,17 +164,17 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Todos los servidores están desconectados.  Los datos de auditoría no están disponibles.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Audit Trail</source>
         <translation>Registro de auditoría</translation>
     </message>
     <message>
         <location/>
         <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Rotación predeterminada:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Esta es una cámara de lente de ojo de pez</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Esta es una cámara de lente de ojo de pez</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Este tipo de la licencia requiere la versión del software más reciente.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1983,11 +1983,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>No se puede comprobar las actualizaciones a través de internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Actualización disponible:</translation>
     </message>
@@ -1995,6 +1990,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Para actualizar manualmente, descarga un archivo con el siguiente enlace:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2116,8 +2116,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Por favor espere mientras se está restaurando la conexión...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2963,11 +2963,6 @@ No negará de retirar las más antiguas grabaciones de la unidad.</translation>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>¡ ADVERTENCIA! Configuración de FPS y calidad en horario de grabación no funcionará!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(recomendado)</translation>
     </message>
@@ -2980,6 +2975,11 @@ No negará de retirar las más antiguas grabaciones de la unidad.</translation>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Enviar uso anónimo y accidente estadísticas a los desarrolladores de software</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">¡ ADVERTENCIA! Esto hará que los ajustes de calidad y marco de velocidad (FPS) en el horario de grabación irrelevante.</translation>
     </message>
 </context>
 <context>
