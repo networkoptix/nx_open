@@ -161,18 +161,27 @@ Item {
 
         drag.axis: Drag.XAxis
         drag.target: content
-        drag.onActiveChanged: {
-            if (drag.active)
-                return
+        drag.threshold: dp(8)
 
-            if (Math.abs(content.x) > content.width / 2) {
-                content.x = content.x > 0 ? content.width : -content.width
+        QnPropertyChangeSpeedMeasurer
+        {
+            value: content.x
+            active: materialSurface.drag.active
+            onActiveChanged:
+            {
+                if (active)
+                    return
+
+                if (Math.abs(speed) < 500 && Math.abs(content.x) < content.width * 0.85)
+                {
+                    content.x = 0
+                    return
+                }
+
+                content.x = speed > 0 ? content.width : -content.width
                 d.hidden = true
-            } else {
-                content.x = 0
             }
         }
-        drag.threshold: dp(8)
     }
 
     Binding {
