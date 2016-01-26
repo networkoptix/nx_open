@@ -498,6 +498,74 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
     }
 }
 
+/** only system owner and integrator can share system granting maintenance role */
+TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    //creating two accounts
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
+    api::AccountData account3;
+    std::string account3Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account3, &account3Password));
+
+    //adding system to the first one
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        shareSystem(
+            account2.email,
+            account2Password,
+            system1.id,
+            account3.email,
+            api::SystemAccessRole::maintenance));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account2.email,
+            api::SystemAccessRole::editorWithSharing));
+
+    ASSERT_EQ(
+        api::ResultCode::forbidden,
+        shareSystem(
+            account2.email,
+            account2Password,
+            system1.id,
+            account3.email,
+            api::SystemAccessRole::maintenance));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account3.email,
+            api::SystemAccessRole::maintenance));
+}
+
 TEST_F(CdbFunctionalTest, system_sharing_owner)
 {
     //waiting for cloud_db initialization
@@ -584,7 +652,276 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
     }
 }
 
-TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_unknown_sharing)
+TEST_F(CdbFunctionalTest, system_sharing_remove_system)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    //creating two accounts
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system to account
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    //sharing system 
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
+    //adding "editorWithSharing" sharing
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account2.email,
+            api::SystemAccessRole::editorWithSharing));
+
+    {
+        std::vector<api::SystemSharingEx> sharings;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystemSharings(account1.email, account1Password, &sharings));
+        ASSERT_EQ(2, sharings.size());
+        ASSERT_EQ(
+            api::SystemAccessRole::editorWithSharing,
+            accountAccessRoleForSystem(sharings, account2.email, system1.id));
+    }
+
+    {
+        //checking account2 system list
+        std::vector<api::SystemData> systems;
+        ASSERT_EQ(
+            api::ResultCode::ok,
+            getSystems(account2.email, account2Password, &systems));
+        ASSERT_EQ(1, systems.size());
+        ASSERT_EQ(system1.name, systems[0].name);
+        ASSERT_EQ(system1.ownerAccountEmail, systems[0].ownerAccountEmail);
+    }
+
+    //removing system
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        unbindSystem(account1.email, account1Password, system1.id.toStdString()));
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        //checking that sharing has also been removed (before and after restart)
+        {
+            std::vector<api::SystemSharingEx> sharings;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystemSharings(account2.email, account2Password, &sharings));
+            ASSERT_TRUE(sharings.empty());
+        }
+
+        {
+            //checking account2 system list
+            std::vector<api::SystemData> systems;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getSystems(account2.email, account2Password, &systems));
+            ASSERT_TRUE(systems.empty());
+        }
+    }
+}
+
+TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system to account
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    //sharing system 
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
+    //adding "editorWithSharing" sharing
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account2.email,
+            api::SystemAccessRole::editorWithSharing));
+
+    api::AccountData account3;
+    std::string account3Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account3, &account3Password));
+
+    //adding "maintenance" sharing
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account3.email,
+            api::SystemAccessRole::maintenance));
+    api::AccountData account4;
+    std::string account4Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account4, &account4Password));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account4.email,
+            api::SystemAccessRole::editor));
+
+    api::AccountData account5;
+    std::string account5Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account5, &account5Password));
+
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        shareSystem(
+            account1.email,
+            account1Password,
+            system1.id,
+            account4.email,
+            api::SystemAccessRole::viewer));
+
+    api::AccountData account6;
+    std::string account6Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account6, &account6Password));
+
+    //checking access roles
+    for (int i = 0; i < 2; ++i)
+    {
+        if (i == 1)
+            restart();
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccessRoleList(account1.email, account1Password, system1.id.toStdString(), &accessRoles));
+            ASSERT_EQ(4, accessRoles.size());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editor) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editorWithSharing) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::viewer) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::forbidden,
+                getAccessRoleList(account1.email, account1Password, "unkown_system_id", &accessRoles));
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccessRoleList(account2.email, account2Password, system1.id.toStdString(), &accessRoles));
+            ASSERT_EQ(3, accessRoles.size());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editor) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editorWithSharing) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::viewer) != accessRoles.end());
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                getAccessRoleList(account3.email, account3Password, system1.id.toStdString(), &accessRoles));
+            ASSERT_EQ(1, accessRoles.size());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::forbidden,
+                getAccessRoleList(account4.email, account4Password, system1.id.toStdString(), &accessRoles));
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::forbidden,
+                getAccessRoleList(account5.email, account5Password, system1.id.toStdString(), &accessRoles));
+        }
+
+        {
+            std::set<api::SystemAccessRole> accessRoles;
+            ASSERT_EQ(
+                api::ResultCode::forbidden,
+                getAccessRoleList(account6.email, account6Password, system1.id.toStdString(), &accessRoles));
+        }
+    }
+}
+
+TEST_F(CdbFunctionalTest, system_sharing_remove_sharing_unknown_account)
+{
+    //waiting for cloud_db initialization
+    startAndWaitUntilStarted();
+
+    //creating two accounts
+    api::AccountData account1;
+    std::string account1Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account1, &account1Password));
+
+    //adding system to account
+    api::SystemData system1;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        bindRandomSystem(account1.email, account1Password, &system1));
+
+    //removing not-existent sharing
+    ASSERT_EQ(
+        api::ResultCode::notFound,
+        updateSystemSharing(
+            account1.email,
+            account1Password,
+            system1.id,
+            "unknown@account.email",
+            api::SystemAccessRole::none));
+}
+
+TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_sharing_unknown_system)
 {
     //waiting for cloud_db initialization
     startAndWaitUntilStarted();
@@ -604,7 +941,7 @@ TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_unknown_sharing)
 
     //removing not-existent sharing to unknown system
     ASSERT_EQ(
-        api::ResultCode::badRequest,
+        api::ResultCode::notFound,
         updateSystemSharing(
             account1.email,
             account1Password,
@@ -614,22 +951,12 @@ TEST_F(CdbFunctionalTest, DISABLED_system_sharing_remove_unknown_sharing)
 
     //removing not-existent sharing, empty account email
     ASSERT_EQ(
-        api::ResultCode::badRequest,
+        api::ResultCode::notFound,
         updateSystemSharing(
             account1.email,
             account1Password,
             system1.id,
             std::string(),
-            api::SystemAccessRole::none));
-
-    //removing not-existent sharing
-    ASSERT_EQ(
-        api::ResultCode::badRequest,
-        updateSystemSharing(
-            account1.email,
-            account1Password,
-            system1.id,
-            "unknown_account_name",
             api::SystemAccessRole::none));
 }
 

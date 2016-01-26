@@ -22,13 +22,14 @@ extern const char* kSystemUnbindPath;
 extern const char* kSystemGetPath;
 extern const char* kSystemSharePath;
 extern const char* kSystemGetCloudUsersPath;
+extern const char* kSystemGetAccessRoleListPath;
 
 extern const char* kAuthGetNoncePath;
 extern const char* kAuthGetAuthenticationPath;
 
 extern const char* kPingPath;
 
-}
-}
+}   //cdb
+}   //nx
 
 #endif //NX_CDB_CL_REQUEST_PATH_H

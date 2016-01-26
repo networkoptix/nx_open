@@ -17,7 +17,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-
 class SubscriptionData
 {
 public:
@@ -127,7 +126,13 @@ public:
     }
 };
 
-/** adds account's full name */
+class SystemSharingList
+{
+public:
+    std::vector<SystemSharing> sharing;
+};
+
+/** adds account's full name to \a SystemSharing */
 class SystemSharingEx
 :
     public SystemSharing
@@ -142,16 +147,34 @@ public:
     }
 };
 
-class SystemSharingList
-{
-public:
-    std::vector<SystemSharing> sharing;
-};
-
 class SystemSharingExList
 {
 public:
     std::vector<SystemSharingEx> sharing;
+};
+
+class SystemAccessRoleData
+{
+public:
+    SystemAccessRole accessRole;
+
+    SystemAccessRoleData()
+    :
+        accessRole(SystemAccessRole::none)
+    {
+    }
+
+    SystemAccessRoleData(SystemAccessRole _accessRole)
+    :
+        accessRole(_accessRole)
+    {
+    }
+};
+
+class SystemAccessRoleList
+{
+public:
+    std::vector<SystemAccessRoleData> accessRoles;
 };
 
 }   //api

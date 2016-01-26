@@ -475,6 +475,29 @@ api::ResultCode CdbFunctionalTest::getSystemSharings(
     return resCode;
 }
 
+api::ResultCode CdbFunctionalTest::getAccessRoleList(
+    const std::string& email,
+    const std::string& password,
+    const std::string& systemID,
+    std::set<api::SystemAccessRole>* const accessRoles)
+{
+    auto connection = connectionFactory()->createConnection(email, password);
+
+    api::ResultCode resCode = api::ResultCode::ok;
+    api::SystemAccessRoleList accessRoleList;
+    std::tie(resCode, accessRoleList) =
+        makeSyncCall<api::ResultCode, api::SystemAccessRoleList>(
+            std::bind(
+                &nx::cdb::api::SystemManager::getAccessRoleList,
+                connection->systemManager(),
+                systemID,
+                std::placeholders::_1));
+
+    for (const auto& accessRoleData: accessRoleList.accessRoles)
+        accessRoles->insert(accessRoleData.accessRole);
+    return resCode;
+}
+
 api::ResultCode CdbFunctionalTest::getSystemSharings(
     const std::string& email,
     const std::string& password,

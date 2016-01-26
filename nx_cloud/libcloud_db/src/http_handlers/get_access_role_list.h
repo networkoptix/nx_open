@@ -1,10 +1,9 @@
 /**********************************************************
-* Oct 9, 2015
+* Jan 26, 2016
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef NX_CDB_GET_CLOUD_USERS_OF_SYSTEM_H
-#define NX_CDB_GET_CLOUD_USERS_OF_SYSTEM_H
+#pragma once
 
 #include <cloud_db_client/src/data/auth_data.h>
 
@@ -17,23 +16,23 @@
 namespace nx {
 namespace cdb {
 
-class GetCloudUsersOfSystemHandler
+class GetAccessRoleListHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingExList>
+    public AbstractFiniteMsgBodyHttpHandler<data::SystemID, api::SystemAccessRoleList>
 {
 public:
     static const QString kHandlerPath;
 
-    GetCloudUsersOfSystemHandler(
+    GetAccessRoleListHandler(
         SystemManager* const systemManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemSharingExList>(
+        AbstractFiniteMsgBodyHttpHandler<data::SystemID, api::SystemAccessRoleList>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,
             std::bind(
-                &SystemManager::getCloudUsersOfSystem, systemManager,
+                &SystemManager::getAccessRoleList, systemManager,
                 std::placeholders::_1, std::placeholders::_2, std::placeholders::_3))
     {
     }
@@ -41,5 +40,3 @@ public:
 
 }   //cdb
 }   //nx
-
-#endif  //NX_CDB_GET_CLOUD_USERS_OF_SYSTEM_H

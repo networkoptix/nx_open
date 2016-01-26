@@ -93,18 +93,23 @@ public:
         const data::DataFilter& filter,
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler);
 
-    void addSubscription(
+    void getAccessRoleList(
         const AuthorizationInfo& authzInfo,
-        const QnUuid& systemID,
-        const QnUuid& productID,
-        std::function<void(api::ResultCode)> completionHandler);
-    /*!
-        \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
-    */
-    void getActiveSubscriptions(
-        const AuthorizationInfo& authzInfo,
-        const QnUuid& systemID,
-        std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
+        data::SystemID systemID,
+        std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler);
+
+    //void addSubscription(
+    //    const AuthorizationInfo& authzInfo,
+    //    const QnUuid& systemID,
+    //    const QnUuid& productID,
+    //    std::function<void(api::ResultCode)> completionHandler);
+    ///*!
+    //    \note if request can be completed immediately (e.g., data is present in internal cache) \a completionHandler will be invoked within this call
+    //*/
+    //void getActiveSubscriptions(
+    //    const AuthorizationInfo& authzInfo,
+    //    const QnUuid& systemID,
+    //    std::function<void(api::ResultCode, std::vector<data::SubscriptionData>)> completionHandler);
 
     boost::optional<data::SystemData> findSystemByID(const QnUuid& id) const;
     /*!

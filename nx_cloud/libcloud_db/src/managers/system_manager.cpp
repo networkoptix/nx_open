@@ -280,6 +280,55 @@ void SystemManager::getCloudUsersOfSystem(
         std::move(resultData));
 }
 
+void SystemManager::getAccessRoleList(
+    const AuthorizationInfo& authzInfo,
+    data::SystemID systemID,
+    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
+{
+    std::string accountEmail;
+    if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
+        return completionHandler(
+            api::ResultCode::notAuthorized,
+            api::SystemAccessRoleList());
+
+    api::SystemAccessRoleList resultData;
+    resultData.accessRoles.reserve(4);
+    const auto accessRole = getAccountRightsForSystem(accountEmail, systemID.systemID);
+    NX_LOGX(lm("account %1, system %2, account rights on system %3").
+            arg(accountEmail).arg(systemID.systemID).arg(QnLexical::serialized(accessRole)),
+            cl_logDEBUG2);
+    switch (accessRole)
+    {
+        case api::SystemAccessRole::none:
+            Q_ASSERT(false);
+            return completionHandler(
+                api::ResultCode::notAuthorized,
+                api::SystemAccessRoleList());
+
+        case api::SystemAccessRole::owner:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+
+        case api::SystemAccessRole::editorWithSharing:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::editor);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::editorWithSharing);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
+            break;
+
+        case api::SystemAccessRole::maintenance:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+            break;
+
+        case api::SystemAccessRole::viewer:
+        case api::SystemAccessRole::editor:
+            Q_ASSERT(false);
+            break;
+    }
+
+    return completionHandler(
+        api::ResultCode::ok,
+        std::move(resultData));
+}
+
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
 {
     return m_cache.find(id);
@@ -530,11 +579,13 @@ void SystemManager::sharingUpdated(
             //inserting modified version
             accountSystemPairIndex.emplace(sharing);
         }
+
+        return completionHandler(api::ResultCode::ok);
     }
 
     completionHandler(
-        dbResult == nx::db::DBResult::ok
-        ? api::ResultCode::ok
+        dbResult == nx::db::DBResult::notFound
+        ? api::ResultCode::notFound
         : api::ResultCode::dbError);
 }
 

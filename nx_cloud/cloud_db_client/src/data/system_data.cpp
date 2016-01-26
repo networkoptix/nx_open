@@ -14,14 +14,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
-    (SystemAccessRole::none, "none")
-    (SystemAccessRole::owner, "owner")
-    (SystemAccessRole::maintenance, "maintenance")
-    (SystemAccessRole::viewer, "viewer")
-    (SystemAccessRole::editor, "editor")
-    (SystemAccessRole::editorWithSharing, "editorWithSharing"));
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
     (ssInvalid, "invalid")
     (ssNotActivated, "notActivated")
@@ -59,6 +51,18 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
         data.customization.c_str());
 }
 
+
+////////////////////////////////////////////////////////////
+//// system sharing data
+////////////////////////////////////////////////////////////
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
+    (SystemAccessRole::none, "none")
+    (SystemAccessRole::owner, "owner")
+    (SystemAccessRole::maintenance, "maintenance")
+    (SystemAccessRole::viewer, "viewer")
+    (SystemAccessRole::editor, "editor")
+    (SystemAccessRole::editorWithSharing, "editorWithSharing"));
 
 ////////////////////////////////////////////////////////////
 //// class SystemSharing
@@ -133,12 +137,13 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery)
 
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemSharingEx)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json)(sql_record),
     _Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList)(SystemSharingExList),
+    (SystemDataList)(SystemSharingList)(SystemSharingEx) \
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json),
     _Fields);
 

@@ -22,9 +22,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemAccessRole)
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemStatus)
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemStatus), (lexical))
 
@@ -40,19 +37,7 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail)(status)(cloudConnectionSubscriptionStatus)
 
-
 #define SystemDataList_Fields (systems)
-
-
-bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
-void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
-
-#define SystemSharing_Fields (accountEmail)(systemID)(accessRole)
-#define SystemSharingList_Fields (sharing)
-
-#define SystemSharingEx_Fields SystemSharing_Fields(fullName)
-#define SystemSharingExList_Fields (sharing)
-
 
 //!for requests passing just system id
 class SystemID
@@ -70,14 +55,33 @@ void serializeToUrlQuery(const SystemID& data, QUrlQuery* const urlQuery);
 #define SystemID_Fields (systemID)
 
 
+////////////////////////////////////////////////////////////
+//// system sharing data
+////////////////////////////////////////////////////////////
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SystemAccessRole)
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((SystemAccessRole), (lexical))
+
+bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharing* const systemSharing);
+void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
+
+#define SystemSharing_Fields (accountEmail)(systemID)(accessRole)
+#define SystemSharingList_Fields (sharing)
+
+#define SystemSharingEx_Fields SystemSharing_Fields(fullName)
+#define SystemSharingExList_Fields (sharing)
+
+#define SystemAccessRoleData_Fields (accessRole)
+#define SystemAccessRoleList_Fields (accessRoles)
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemSharingEx)(SystemID),
+    (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json)(sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList)(SystemSharingExList),
+    (SystemDataList)(SystemSharingList)(SystemSharingEx) \
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json));
-
 
 }   //api
 }   //cdb

@@ -41,7 +41,7 @@ public:
     }
 };
 
-}
-}
+}   //cdb
+}   //nx
 
 #endif  //NX_CLOUD_DB_GET_SYSTEMS_HANDLER_H

@@ -94,6 +94,17 @@ void SystemManager::getCloudUsersOfSystem(
         std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
+void SystemManager::getAccessRoleList(
+    const std::string& systemID,
+    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
+{
+    executeRequest(
+        kSystemGetAccessRoleListPath,
+        api::SystemID(systemID),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
+}
+
 }   //cl
 }   //cdb
 }   //nx

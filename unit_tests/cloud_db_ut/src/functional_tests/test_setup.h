@@ -108,6 +108,11 @@ protected:
         const std::string& password,
         const std::string& systemID,
         std::vector<api::SystemSharingEx>* const sharings);
+    api::ResultCode getAccessRoleList(
+        const std::string& email,
+        const std::string& password,
+        const std::string& systemID,
+        std::set<api::SystemAccessRole>* const accessRoles);
 
     //calls on system's regard
     api::ResultCode getCdbNonce(
