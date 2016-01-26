@@ -333,7 +333,7 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
     return m_timeSlider->isBookmarksVisible();
 }
 
-void QnWorkbenchNavigator::onItemRemoved(QnWorkbenchItem *item)
+void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
 {
     if (hasArchive())
         updateHasArchiveState();
@@ -367,7 +367,9 @@ void QnWorkbenchNavigator::initialize() {
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
         , this, &QnWorkbenchNavigator::onItemAdded);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnWorkbenchNavigator::onItemRemoved);
+        , this, &QnWorkbenchNavigator::updateArchiveState);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved
+        , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged
         , this, &QnWorkbenchNavigator::updateSliderOptions);

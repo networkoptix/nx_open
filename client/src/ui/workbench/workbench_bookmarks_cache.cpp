@@ -42,8 +42,10 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
         , this, &QnWorkbenchBookmarksCache::onItemAdded);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnWorkbenchBookmarksCache::onItemRemoved);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved, this
+        , [this](QnWorkbenchItem *item) { removeQueryByItem(item, false); });
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved, this
+        , [this](QnWorkbenchItem *item) { removeQueryByItem(item, true); });
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this
         , [this](const QnResourcePtr &resource)
@@ -101,12 +103,11 @@ void QnWorkbenchBookmarksCache::onItemAdded(QnWorkbenchItem *item)
     if (!camera)
         return;
 
-    if (m_queriesCache->hasQuery(camera))
-        return; // In case of two or more items on layout
-
     const auto query = m_queriesCache->getOrCreateQuery(camera);
-    query->setFilter(m_filter);
+    if (query->filter() == m_filter)
+        return; // We have initialized query already
 
+    query->setFilter(m_filter);
     connect(query.data(), &QnCameraBookmarksQuery::bookmarksChanged, this
         , [this, camera](const QnCameraBookmarkList &bookmarks)
     {
@@ -114,7 +115,8 @@ void QnWorkbenchBookmarksCache::onItemAdded(QnWorkbenchItem *item)
     });
 }
 
-void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
+void QnWorkbenchBookmarksCache::removeQueryByItem(QnWorkbenchItem *item
+    , bool forceRemove)
 {
     emit itemRemoved(item);
     const auto layout = workbench()->currentLayout();
@@ -129,7 +131,7 @@ void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
     if (!isQueryExist)
         return;
 
-    const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
+    const bool hasSameCameras = !forceRemove && !layout->items(camera->getUniqueId()).isEmpty();
     if (hasSameCameras)
         return;
 

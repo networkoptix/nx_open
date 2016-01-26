@@ -220,7 +220,7 @@ private:
 
     void onItemAdded(QnWorkbenchItem *item);
 
-    void onItemRemoved(QnWorkbenchItem *item);
+    void updateArchiveState(QnWorkbenchItem *item);
 
     void updateHasArchiveState();
 

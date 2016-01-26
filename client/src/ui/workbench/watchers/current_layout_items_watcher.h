@@ -25,5 +25,6 @@ signals:
     void layoutChanged();
     void layoutAboutToBeChanged();
     void itemAdded(QnWorkbenchItem *item);
-    void itemRemoved(QnWorkbenchItem *item);
+    void itemRemoved(QnWorkbenchItem *item);            // Emits when item is physically removed
+    void itemAboutToBeRemoved(QnWorkbenchItem *item);   // Emits when current alyout about to be changed
 };

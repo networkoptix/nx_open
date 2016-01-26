@@ -42,7 +42,8 @@ public:
 private:
     void onItemAdded(QnWorkbenchItem *item);
 
-    void onItemRemoved(QnWorkbenchItem *item);
+    void removeQueryByItem(QnWorkbenchItem *item
+        , bool forceRemove);
 
     void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
 
