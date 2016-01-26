@@ -158,22 +158,18 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 }
 
 
-bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
+QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback)
 {
     Q_ASSERT_X(!camera.isNull(), Q_FUNC_INFO, "Camera resource is null!");
     if (camera.isNull())
-        return false;
+        return StartResult::failed;
 
     if (isCameraHistoryValid(camera))
-    {
-        if (callback)
-            executeDelayed([callback] { callback(true); });
-        return true;
-    }
+        return StartResult::ommited;
 
     QnMediaServerResourcePtr server = qnCommon->currentServer();
     if (!server)
-        return false;
+        return StartResult::failed;
 
     QnChunksRequestData request;
     request.format = Qn::UbjsonFormat;
@@ -191,10 +187,7 @@ bool QnCameraHistoryPool::updateCameraHistoryAsync(const QnVirtualCameraResource
 
     lock.unlock();
 
-    if (!started && callback)
-        executeDelayed([callback] { callback(false); });
-
-    return started;
+    return started ? StartResult::started : StartResult::failed;
 }
 
 void QnCameraHistoryPool::at_cameraPrepared(bool success, const rest::Handle& requestId, const ec2::ApiCameraHistoryDataList &periods, callbackFunction callback)
@@ -472,17 +465,16 @@ bool QnCameraHistoryPool::updateCameraHistorySync(const QnVirtualCameraResourceP
     if (isCameraHistoryValid(camera))
         return true;
 
-    bool rez = updateCameraHistoryAsync(camera, [this, camera] (bool success)
+    StartResult result = updateCameraHistoryAsync(camera, [this, camera] (bool success)
     {
         QnMutexLocker lock(&m_syncLoadMutex);
         m_syncRunningRequests.remove(camera->getId());
         m_syncLoadWaitCond.wakeAll();
     });
 
-    if (!rez)
-        return rez;
-
-    m_syncRunningRequests.insert(camera->getId());
-    m_syncLoadWaitCond.wait(&m_syncLoadMutex);
-    return rez;
+    if (result == StartResult::started) {
+        m_syncRunningRequests.insert(camera->getId());
+        m_syncLoadWaitCond.wait(&m_syncLoadMutex);
+    }
+    return result != StartResult::failed;
 }
