@@ -153,11 +153,8 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         if (!fillActionParameters(params, window))
             return;
 
-        if (!menu()->canTrigger(Qn::RemoveBookmarksAction, params))
-            return;
-
-        menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params);
-        refresh();
+        if (menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params))
+            refresh();
     });
 
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);

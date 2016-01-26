@@ -1947,7 +1947,7 @@ bool QnActionManager::canTrigger(Qn::ActionId id, const QnActionParameters &para
     if(!action)
         return false;
 
-    return action->checkCondition(action->scope(), parameters);
+    return action->checkCondition(action->scope(), parameters) == Qn::EnabledAction;
 }
 
 void QnActionManager::trigger(Qn::ActionId id, const QnActionParameters &parameters) {
