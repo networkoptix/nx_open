@@ -187,7 +187,8 @@ public:
 
     QnBookmarksViewer *bookmarksViewer();
 
-    void setBookmarksHelper(QnBookmarkMergeHelper *helper);
+    typedef QSharedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
+    void setBookmarksHelper(const QnBookmarkMergeHelperPtr &helper);
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
 
@@ -427,7 +428,7 @@ private:
 
     QnBookmarksViewer *m_bookmarksViewer;
     bool m_bookmarksVisible;
-    QnBookmarkMergeHelper *m_bookmarksHelper;
+    QnBookmarkMergeHelperPtr m_bookmarksHelper;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

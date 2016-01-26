@@ -53,7 +53,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
         m_bookmarksCache->setThinOut(thinOut);
     });
 
-    navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper.data());
+    navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper);
 }
 
 QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()

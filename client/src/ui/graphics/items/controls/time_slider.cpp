@@ -1304,7 +1304,7 @@ QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
     return m_bookmarksViewer;
 }
 
-void QnTimeSlider::setBookmarksHelper(QnBookmarkMergeHelper *helper)
+void QnTimeSlider::setBookmarksHelper(const QnBookmarkMergeHelperPtr &helper)
 {
     m_bookmarksHelper = helper;
 }

@@ -56,7 +56,7 @@ private:
 private:
     typedef QScopedPointer<QnWorkbenchBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
-    typedef QScopedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
+    typedef QSharedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
     typedef QScopedPointer<QTimer> QTimerPtr;
     const QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
     const QnBookmarkMergeHelperPtr m_mergeHelper;
