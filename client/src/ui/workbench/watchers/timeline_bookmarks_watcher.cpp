@@ -14,7 +14,7 @@
 
 namespace
 {
-    enum { kMaxBookmarksOnTimeline = 5000 };
+    enum { kMaxBookmarksOnTimeline = 10000 };
 
     enum { kTimelineMinWindowChangeMs = 60000 };
 }
