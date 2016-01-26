@@ -69,7 +69,7 @@ private:
     typedef QMap<QnWorkbenchItem *, ListenerLifeHolder> ItemListenersMap;
 
     const QnCameraBookmarkAggregationPtr m_aggregationHelper;
-    QnTimelineBookmarksWatcher * const m_timelineWatcher;
+    const QPointer<QnTimelineBookmarksWatcher> m_timelineWatcher;
     QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
     ItemListenersMap m_itemListinersMap;
     Listeners m_listeners;

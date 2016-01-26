@@ -44,6 +44,8 @@ private:
 
     void onItemRemoved(QnWorkbenchItem *item);
 
+    void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
+
 signals:
     void bookmarksChanged(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkList &bookmarks);

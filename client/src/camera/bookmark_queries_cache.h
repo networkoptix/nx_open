@@ -27,15 +27,19 @@ public:
 
     void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
 
+    // Returns true if at least one query was updated
     bool updateQueries(const QnCameraBookmarkSearchFilter &filter);
 
+    // Returns true if query was updated
     bool updateQuery(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkSearchFilter &filter);
 
+    // Returns true if time window was updated
     bool updateQueryTimeWindow(const QnVirtualCameraResourcePtr &camera
         , qint64 startTimeMs
         , qint64 endTimeMs);
 
+    // Returns true if filter text was updated
     bool updateQueryFilterText(const QnVirtualCameraResourcePtr &camera
         , const QString &text);
 

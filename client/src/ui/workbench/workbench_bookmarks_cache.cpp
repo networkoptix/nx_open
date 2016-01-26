@@ -45,6 +45,11 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
         , this, &QnWorkbenchBookmarksCache::onItemRemoved);
 
+    connect(qnResPool, &QnResourcePool::resourceRemoved, this
+        , [this](const QnResourcePtr &resource)
+    {
+        removeQueryByCamera(resource.dynamicCast<QnVirtualCameraResource>());
+    });
 }
 
 QnWorkbenchBookmarksCache::~QnWorkbenchBookmarksCache()
@@ -126,6 +131,14 @@ void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
 
     const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
     if (hasSameCameras)
+        return;
+
+    removeQueryByCamera(camera);
+}
+
+void QnWorkbenchBookmarksCache::removeQueryByCamera(const QnVirtualCameraResourcePtr &camera)
+{
+    if (!camera)
         return;
 
     const auto query = m_queriesCache->getOrCreateQuery(camera);

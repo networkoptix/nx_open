@@ -18,11 +18,11 @@
 
 namespace
 {
-    enum { kMaxBookmarksNearThePosition = 128 };
+    enum { kMaxBookmarksNearThePosition = 256 };
 
     enum
     {
-        kWindowWidthMs = 30000      // 15 seconds before and after current position
+        kWindowWidthMs =  5 * 60 * 1000      // 3 minute before and after current position
         , kLeftOffset = kWindowWidthMs / 2
         , kRightOffset = kLeftOffset
 
@@ -78,12 +78,13 @@ public:
 
     ~ListenerHolderPrivate()
     {
-        m_watcher->removeListener(m_it);
+        if (m_watcher)
+            m_watcher->removeListener(m_it);
     }
 
 private:
     const Listeners::iterator m_it;
-    QnWorkbenchItemBookmarksWatcher * const m_watcher;
+    const QPointer<QnWorkbenchItemBookmarksWatcher> m_watcher;
 };
 
 //
@@ -112,7 +113,7 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
         , kMinWindowChange, parent))
     , m_itemListinersMap()
     , m_listeners()
-    , m_posMs(0)
+    , m_posMs(DATETIME_INVALID)
 
     , m_colors()
 {
@@ -155,13 +156,16 @@ void QnWorkbenchItemBookmarksWatcher::onItemAdded(QnWorkbenchItem *item)
     if (!camera)
         return;
 
-    auto resource = display()->widget(item->uuid());
-    QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(resource);
+    auto resourceWidget = display()->widget(item->uuid());
+    QPointer<QnMediaResourceWidget> widget = dynamic_cast<QnMediaResourceWidget*>(resourceWidget);
     if (!widget)
         return;
 
     const auto bookmarksAtPosUpdatedCallback = [this, widget](const QnCameraBookmarkList &bookmarks)
     {
+        if (!widget)
+            return;
+
         auto compositeTextOverlay = widget->compositeTextOverlay();
         if (!compositeTextOverlay)
             return;
@@ -183,18 +187,20 @@ void QnWorkbenchItemBookmarksWatcher::onItemAdded(QnWorkbenchItem *item)
 
 void QnWorkbenchItemBookmarksWatcher::onItemRemoved(QnWorkbenchItem *item)
 {
-    const auto camera = helpers::extractCameraResource(item);
-    if (!camera)
-        return;
-
     m_itemListinersMap.remove(item);
 }
 
 void QnWorkbenchItemBookmarksWatcher::updatePosition(qint64 posMs)
 {
     m_posMs = posMs;
-    const QnTimePeriod newWindow = QnTimePeriod::fromInterval(
-        posMs - kLeftOffset, posMs + kRightOffset);
+    const auto leftPos = posMs - kLeftOffset;
+    const auto rightPos = posMs + kRightOffset;
+    const bool invalidInterval = ((leftPos < 0) || (rightPos < 0) || (leftPos > rightPos));
+    Q_ASSERT_X(!invalidInterval, Q_FUNC_INFO, "Invalid window period!");
+    if (invalidInterval)
+        return;
+
+    const QnTimePeriod newWindow = QnTimePeriod::fromInterval(leftPos, rightPos);
 
     m_bookmarksCache->setWindow(newWindow);
 
@@ -242,7 +248,8 @@ void QnWorkbenchItemBookmarksWatcher::updateListenerData(const Listeners::iterat
     // for specified position
 
     m_aggregationHelper->setBookmarkList(helpers::bookmarksAtPosition(bookmarks, m_posMs));
-    m_aggregationHelper->mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(camera, m_posMs));
+    if (m_timelineWatcher)
+        m_aggregationHelper->mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(camera, m_posMs));
 
     const auto currentBookmarksList = m_aggregationHelper->bookmarkList();
 

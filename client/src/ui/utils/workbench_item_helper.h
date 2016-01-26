@@ -13,7 +13,10 @@ namespace helpers
     {
         const auto layoutItemData = item->data();
         const auto id = layoutItemData.resource.id;
-        return qnResPool->getResourceById<ResourceType>(id);
+
+        return (id.isNull()
+            ? qnResPool->getResourceByUniqueId<ResourceType>(layoutItemData.resource.path)
+            : qnResPool->getResourceById<ResourceType>(id));
     }
 
     QnVirtualCameraResourcePtr extractCameraResource(QnWorkbenchItem *item);
