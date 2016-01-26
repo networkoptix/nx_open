@@ -59,7 +59,7 @@
                         </div>
                     </td>
                     <td>
-                        <div class="input-group" ng-if="storage.accessible"
+                        <div class="input-group" ng-if="storage.isWritable"
                              ng-class="{'has-error':!storageForm.reservedSpaceGb.$valid,
                              'has-warning':storage.reservedSpace >= storage.freeSpace}">
                             <input type="number"  class="form-control input-sm"
@@ -71,7 +71,7 @@
                                    placeholder="Reserved space"/>
                             <div class="input-group-addon">GB</div>
                         </div>
-                        <div class="input-group" ng-if="!storage.accessible">
+                        <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
