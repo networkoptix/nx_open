@@ -2622,11 +2622,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>IO포트</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>오디오 사용</translation>
     </message>
@@ -2674,6 +2669,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>어안렌즈</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

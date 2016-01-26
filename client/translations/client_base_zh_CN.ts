@@ -871,14 +871,6 @@ to view more bookmarks</source>
         <translation>监控</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>在新标签中监控</translation>
-    </message>
-    <message>
-        <source>Monitor in a New Window</source>
-        <translation>在新窗口中监控</translation>
-    </message>
-    <message>
         <source>Start Panic Recording</source>
         <translation>开始危机录像</translation>
     </message>
@@ -1025,14 +1017,6 @@ to view more bookmarks</source>
     <message>
         <source>Restore Down</source>
         <translation>向下还原</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>在新标签中打开视窗</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>在新窗口中打开视窗</translation>
     </message>
     <message>
         <source>Show Info</source>
@@ -1243,10 +1227,6 @@ to view more bookmarks</source>
         <translation>服务器日志...</translation>
     </message>
     <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>在新窗口打开当前视窗</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translation>视频教程及常见问题解答...</translation>
     </message>
@@ -1419,10 +1399,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1464,6 +1440,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2834,15 +2834,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actions will only work for Generic Events that are not filtered out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event will not be filtered out if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3284,7 +3276,7 @@ to view more bookmarks</source>
         <translation>重要性能提示</translation>
     </message>
     <message>
-        <source>This may result in issues (including unexpected crash).</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4980,10 +4972,6 @@ If you understand this and would like to proceed please click Merge to continue.
 </context>
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">在新标签页中打开</translation>
-    </message>
     <message>
         <source>Export bookmark...</source>
         <translation type="unfinished"></translation>

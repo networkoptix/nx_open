@@ -2598,11 +2598,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>יציאות קלט/פלט</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion</source>
         <translation>תנועה</translation>
     </message>
@@ -2675,6 +2670,11 @@
         <location/>
         <source>Expert</source>
         <translation>מומחה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

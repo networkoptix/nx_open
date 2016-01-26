@@ -887,14 +887,6 @@ to view more bookmarks</source>
         <translation>Surveiller</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>Surveiller dans une nouvelle mise en page</translation>
-    </message>
-    <message>
-        <source>Monitor in a New Window</source>
-        <translation>Surveiller dans une nouvelle fenêtre</translation>
-    </message>
-    <message>
         <source>Start Panic Recording</source>
         <translation>Démarrer l&apos;enregistrement panique</translation>
     </message>
@@ -1029,14 +1021,6 @@ to view more bookmarks</source>
     <message>
         <source>Restore Down</source>
         <translation>Rétablir le bas</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>Ouvrir la mise en page dans un nouvel onglet</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>Ouvrir Mise(s) en page dans une nouvelle fenêtre</translation>
     </message>
     <message>
         <source>Show Info</source>
@@ -1251,10 +1235,6 @@ to view more bookmarks</source>
         <translation>Journals Serveur...</translation>
     </message>
     <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>Ouvrir la mise en page actuelle dans une nouvelle fenêtre</translation>
-    </message>
-    <message>
         <source>How-to Videos and FAQ...</source>
         <translatorcomment>Added a note saying to french speaking that these video/faq are in english</translatorcomment>
         <translation>(Anglais)Vidéo &apos;Comment faire...&apos; et FAQ...</translation>
@@ -1428,10 +1408,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1473,6 +1449,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2867,15 +2867,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actions will only work for Generic Events that are not filtered out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event will not be filtered out if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3320,7 +3312,7 @@ to view more bookmarks</source>
         <translation> Conseil Important - Performance</translation>
     </message>
     <message>
-        <source>This may result in issues (including unexpected crash).</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5039,10 +5031,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
 </context>
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">Ouvrir dans un nouvel onglet</translation>
-    </message>
     <message>
         <source>Export bookmark...</source>
         <translation type="unfinished"></translation>

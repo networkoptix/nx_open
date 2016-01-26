@@ -704,32 +704,12 @@ to view more bookmarks</source>
         <translation>In neuem Tab öffnen</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>Monitor in einem neuen Tab</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>Öffnen in neuem Fenster</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>Monitor in neuem Fenster</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>Öffne Layout in neuem Tab</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>Öffne Layouts</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>Öffne Layout(s) in neuem Fenster</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>Öffne aktuelles Layout in einem neuen Fenster</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1428,10 +1408,6 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1473,6 +1449,30 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2858,15 +2858,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Actions will only work for Generic Events that are not filtered out.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event will not be filtered out if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3311,7 +3303,7 @@ to view more bookmarks</source>
         <translation>Das Installieren und/oder Aktualisieren Ihrer Grafikkartentreiber kann Ihre System-Performance beim Ansehen und Bearbeiten von Videos erheblich verbessern.</translation>
     </message>
     <message>
-        <source>This may result in issues (including unexpected crash).</source>
+        <source>This may result in client software issues (including unexpected crash).</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5024,10 +5016,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
 </context>
 <context>
     <name>QnSearchBookmarksDialogPrivate</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">In neuem Tab öffnen</translation>
-    </message>
     <message>
         <source>Export bookmark...</source>
         <translation type="unfinished"></translation>
