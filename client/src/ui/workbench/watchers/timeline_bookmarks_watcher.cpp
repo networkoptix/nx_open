@@ -1,6 +1,7 @@
 
 #include "timeline_bookmarks_watcher.h"
 
+#include <utils/common/delayed.h>
 #include <utils/camera/bookmark_helpers.h>
 #include <core/resource/camera_resource.h>
 #include <camera/camera_bookmarks_manager.h>
@@ -13,9 +14,9 @@
 
 namespace
 {
-    enum { kMaxBookmarksOnTimeline = 10000 };
+    enum { kMaxBookmarksOnTimeline = 5000 };
 
-    enum { kTimelineMinWindowChangeMs = 30000 };
+    enum { kTimelineMinWindowChangeMs = 60000 };
 }
 
 // TODO: add switch on/off bookmarks mode helper
@@ -25,10 +26,13 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     , QnWorkbenchContextAware(parent)
 
     , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksOnTimeline
-        , QnBookmarkSortProps::default, kTimelineMinWindowChangeMs, parent))
+        , QnBookmarkSortProps::default, QnBookmarksThinOutProperties(true, 0)   // TODO: add minLength
+        , kTimelineMinWindowChangeMs, parent))
     , m_mergeHelper(new QnBookmarkMergeHelper())
     , m_aggregation(new QnCameraBookmarkAggregation())
     , m_currentCamera()
+    , m_delayedTimer()
+    , m_delayedUpdateCounter()
 {
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged
         , this, &QnTimelineBookmarksWatcher::onWorkbenchCurrentWidgetChanged);
@@ -39,9 +43,15 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved
         , this, &QnTimelineBookmarksWatcher::onBookmarkRemoved);
 
-    // TODO: #ynikitenkov Remove dependency from time slider
+    // TODO: #ynikitenkov Remove dependency from time slider?
     connect(navigator()->timeSlider(), &QnTimeSlider::windowChanged
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
+    connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixel, this, [this]()
+    {
+        const auto thinOutProps = QnBookmarksThinOutProperties(true
+            , navigator()->timeSlider()->msecsPerPixel());
+        m_bookmarksCache->setThinoutProps(thinOutProps);
+    });
 }
 
 QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
@@ -87,8 +97,8 @@ void QnTimelineBookmarksWatcher::onBookmarksModeEnabledChanged()
 
 void QnTimelineBookmarksWatcher::onBookmarkRemoved(const QnUuid &id)
 {
-    m_aggregation->removeBookmark(id);
-    m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
+    if (m_aggregation->removeBookmark(id))
+        m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
 }
 
 void QnTimelineBookmarksWatcher::onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
@@ -97,14 +107,30 @@ void QnTimelineBookmarksWatcher::onBookmarksChanged(const QnVirtualCameraResourc
     if (m_currentCamera != camera)
         return;
 
-    m_aggregation->mergeBookmarkList(bookmarks);
+    m_aggregation->setBookmarkList(bookmarks);
     m_mergeHelper->setBookmarks(m_aggregation->bookmarkList());
 }
 
 void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
     , qint64 endTimeMs)
 {
-    m_bookmarksCache->setWindow(QnTimePeriod::createFromInterval(startTimeMs, endTimeMs));
+    const auto delayedUpdateWindow = [this, startTimeMs, endTimeMs]()
+    {
+        m_delayedTimer.reset(); // Have to reset manually to prevent double deletion
+        m_bookmarksCache->setWindow(QnTimePeriod::createFromInterval(startTimeMs, endTimeMs));
+        m_delayedUpdateCounter.invalidate();
+        m_delayedUpdateCounter.start();
+    };
+
+    enum { kMaxUpdateTimeMs = 5000};
+    if (!m_delayedUpdateCounter.isValid() || m_delayedUpdateCounter.hasExpired(kMaxUpdateTimeMs))
+    {
+        delayedUpdateWindow();
+        return;
+    }
+
+    enum { kDelayUpdateMs = 200 };
+    m_delayedTimer.reset(executeDelayedParented(delayedUpdateWindow, kDelayUpdateMs, this));
 }
 
 void QnTimelineBookmarksWatcher::setCurrentCamera(const QnVirtualCameraResourcePtr &camera)

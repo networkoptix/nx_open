@@ -191,6 +191,8 @@ public:
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
 
+    qreal msecsPerPixel() const;
+
 signals:
     void windowMoved();
     void windowChanged(qint64 windowStart, qint64 windowEnd);
@@ -200,6 +202,7 @@ signals:
     void selectionReleased();
     void thumbnailsVisibilityChanged();
     void thumbnailClicked();
+    void msecsPerPixelChanged();
 
 protected:
     virtual void sliderChange(SliderChange change) override;

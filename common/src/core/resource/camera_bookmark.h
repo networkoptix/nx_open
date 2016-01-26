@@ -18,7 +18,7 @@ struct QnBookmarkSortProps
     Qn::BookmarkSortColumn column;
     Qn::SortOrder order;
 
-    QnBookmarkSortProps(Qn::BookmarkSortColumn column = Qn::BookmarkStartTime
+    explicit QnBookmarkSortProps(Qn::BookmarkSortColumn column = Qn::BookmarkStartTime
         , Qn::SortOrder order = Qn::Ascending);
 
     static const QnBookmarkSortProps default;
@@ -30,8 +30,10 @@ struct QnBookmarksThinOutProperties
     bool use;
     int minVisibleLengthMs;
 
-    QnBookmarksThinOutProperties(bool use = false
+    explicit QnBookmarksThinOutProperties(bool use = false
         , qint64 minVisibleLengthMs = 0);
+
+    static const QnBookmarksThinOutProperties kNoThinOut;
 };
 #define QnBookmarksThinOutProperties_Fileds (use)(minVisibleLengthMs)
 
@@ -109,7 +111,7 @@ struct QnCameraBookmarkSearchFilter
 
     int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    QnBookmarksThinOutProperties thinOutpProps;
+    QnBookmarksThinOutProperties thinOutProps;
 
     QnBookmarkSortProps sortProps;
 

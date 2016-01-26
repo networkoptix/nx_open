@@ -1,5 +1,7 @@
 #include "camera_bookmark.h"
 
+#include <cmath>
+
 #include <QtCore/QMap>
 #include <QtCore/QLinkedList>
 
@@ -136,48 +138,74 @@ namespace
         return std::move(sources);
     }
 
-    QnCameraBookmarkList thinOut(const QnCameraBookmarkList &bookmarks
-        , const QnBookmarksThinOutProperties &thinOutProp
+    typedef QLinkedList<QnCameraBookmarkList::const_iterator> ItsLinkedList;
+    QnCameraBookmarkList createListFromIts(const ItsLinkedList &its)
+    {
+        QnCameraBookmarkList result;
+        result.reserve(its.size());
+        for (auto it: its)
+            result.push_back(*it);
+        return result;
+    };
+
+    QnCameraBookmarkList thinOutByIts(ItsLinkedList &bookmarkIts
         , int limit)
+    {
+        if (bookmarkIts.size() <= limit)
+            return createListFromIts(bookmarkIts);
+
+        // Thin out valuable bookmarks with calculated step
+        const int removeCount = (bookmarkIts.size() - limit);
+        const double removeStep = static_cast<double>(removeCount) / static_cast<double>(bookmarkIts.size());
+
+        double counter = 0.0;
+        double prevCounter = 0.0;
+        double notUsed1 = 0.0;
+        double removedCounter = 1.0;
+        for (auto it = bookmarkIts.begin(); (it != bookmarkIts.end() && bookmarkIts.size() > limit);)
+        {
+            if (qFuzzyBetween(prevCounter, removedCounter, counter))
+            {
+                it = bookmarkIts.erase(it); // We have to remove item if next integer counter is reached
+                removedCounter += 1.0;
+            }
+            else
+                ++it;
+
+            prevCounter = counter;
+            counter += removeStep;
+        }
+        return createListFromIts(bookmarkIts);
+    }
+
+    QnCameraBookmarkList thinOutBookmarks(const QnCameraBookmarkList &bookmarks
+        , const QnBookmarksThinOutProperties &thinOutProp
+        , int limit
+        , const BinaryPredicate &pred)
     {
         if (!thinOutProp.use || (bookmarks.size() <= limit))
             return bookmarks;
 
-        typedef QLinkedList<QnCameraBookmarkList::const_iterator> ItsLinkedList;
         ItsLinkedList valuableBookmarksIts;
+        ItsLinkedList nonValuableBookmarksIts;
         for (auto it = bookmarks.begin(); it != bookmarks.end(); ++it)
         {
             if (it->durationMs >= thinOutProp.minVisibleLengthMs)
                 valuableBookmarksIts.push_back(it);
+            else if (valuableBookmarksIts.size() < limit)
+                nonValuableBookmarksIts.push_back(it);
         }
-
-        const auto createListFromIts = [](const ItsLinkedList &its)
-        {
-            QnCameraBookmarkList result;
-            result.reserve(its.size());
-            for (auto it: its)
-                result.push_back(*it);
-            return result;
-        };
 
         const int valuableBookmarksCount = valuableBookmarksIts.size();
-        if (valuableBookmarksCount <= limit)
-            return createListFromIts(valuableBookmarksIts);
+        if (valuableBookmarksCount > limit)
+            return thinOutByIts(valuableBookmarksIts, limit);   // Thin out unnecessary valuable bookmarks
 
-        const int removeCount = (limit - valuableBookmarksCount);
-        const int removeStep = limit/ removeCount;
-
-        // Thin out bookmarks with calculated step
-        int counter = 0;
-        for (auto it = valuableBookmarksIts.begin();
-            (it != valuableBookmarksIts.end() && valuableBookmarksIts.size() > limit); counter++)
-        {
-            if (counter % removeStep == 0)
-                it = valuableBookmarksIts.erase(it);
-            else
-                ++it;
-        }
-        return createListFromIts(valuableBookmarksIts);
+        // Adds bookmarks from non-valuables to complete limit
+        const int nonValuableBookmarkToAddCount = (limit - valuableBookmarksCount);
+        QnMultiServerCameraBookmarkList toMergeLists;
+        toMergeLists.push_back(createListFromIts(valuableBookmarksIts));
+        toMergeLists.push_back(thinOutByIts(nonValuableBookmarksIts, nonValuableBookmarkToAddCount));
+        return mergeSortedBookmarks(toMergeLists, pred, limit);
     }
 }
 
@@ -199,6 +227,8 @@ QnBookmarksThinOutProperties::QnBookmarksThinOutProperties(bool use
     : use(use)
     , minVisibleLengthMs(minVisibleLengthMs)
 {}
+
+const QnBookmarksThinOutProperties QnBookmarksThinOutProperties::kNoThinOut = QnBookmarksThinOutProperties();
 
 //
 
@@ -244,7 +274,7 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
     if (!thinOut.use)
         return result;
 
-    return result;
+    return thinOutBookmarks(result, thinOut, limit, pred);
 }
 
 QnCameraBookmarkTagList QnCameraBookmarkTag::mergeCameraBookmarkTags(const QnMultiServerCameraBookmarkTagList &source, int limit) {
@@ -330,7 +360,7 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     startTimeMs(0),
     endTimeMs(std::numeric_limits<qint64>().max()),
     limit(kNoLimit),
-    thinOutpProps(),
+    thinOutProps(),
     sortProps(QnBookmarkSortProps::default)
 {}
 

@@ -18,7 +18,7 @@
 
 namespace
 {
-    enum { kMaxBookmarksNearThePosition = 512 };
+    enum { kMaxBookmarksNearThePosition = 128 };
 
     enum
     {
@@ -26,7 +26,7 @@ namespace
         , kLeftOffset = kWindowWidthMs / 2
         , kRightOffset = kLeftOffset
 
-        , kMinWindowChange = kRightOffset / 3
+        , kMinWindowChange = 10000
     };
 
     QnOverlayTextItemData makeBookmarkItem(const QnCameraBookmark &bookmark
@@ -108,7 +108,8 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
     , m_aggregationHelper(new QnCameraBookmarkAggregation())
     , m_timelineWatcher(context()->instance<QnTimelineBookmarksWatcher>())
     , m_bookmarksCache(new QnCurrentLayoutBookmarksCache(kMaxBookmarksNearThePosition
-        , QnBookmarkSortProps::default, kMinWindowChange, parent))
+        , QnBookmarkSortProps::default, QnBookmarksThinOutProperties::kNoThinOut
+        , kMinWindowChange, parent))
     , m_itemListinersMap()
     , m_listeners()
     , m_posMs(0)

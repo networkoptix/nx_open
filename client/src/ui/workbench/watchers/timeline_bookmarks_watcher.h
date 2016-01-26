@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QtCore/QObject>
+#include <QtCore/QElapsedTimer>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -10,6 +11,7 @@
 
 #include <utils/common/connective.h>
 
+class QTimer;
 class QnCameraBookmarkAggregation;
 class QnCurrentLayoutBookmarksCache;
 class QnBookmarkMergeHelper;
@@ -58,10 +60,12 @@ private:
     typedef QScopedPointer<QnCurrentLayoutBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
     typedef QScopedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
-
+    typedef QScopedPointer<QTimer> QTimerPtr;
     const QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
     const QnBookmarkMergeHelperPtr m_mergeHelper;
     const QnCameraBookmarkAggregationPtr m_aggregation;
 
     QnVirtualCameraResourcePtr m_currentCamera;
+    QTimerPtr m_delayedTimer;
+    QElapsedTimer m_delayedUpdateCounter;
 };

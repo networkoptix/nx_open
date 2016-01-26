@@ -1429,6 +1429,11 @@ void QnTimeSlider::updateTickmarkTextSteps() {
     }
 }
 
+qreal QnTimeSlider::msecsPerPixel() const
+{
+    return m_msecsPerPixel;
+}
+
 void QnTimeSlider::updateMSecsPerPixel() {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
@@ -1442,6 +1447,8 @@ void QnTimeSlider::updateMSecsPerPixel() {
     updateThumbnailsStepSize(false);
     updateStepAnimationTargets();
     updateAggregationValue();
+
+    emit msecsPerPixelChanged();
 }
 
 void QnTimeSlider::updateMinimalWindow() {
