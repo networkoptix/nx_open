@@ -299,11 +299,17 @@ Item {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool isShown: d.hiddenItems.length > 0
+        property int prevCount: 0
+        property int count: d.hiddenItems.length
+        property bool isShown: count > 0
 
         timeout: 5000
 
-        text: qsTr("%n cameras are hidden", "", d.hiddenItems.length)
+        onCountChanged: {
+            if (count > prevCount)
+                text = qsTr("%n cameras are hidden", "", count)
+        }
+
         mainButton {
             icon: "image://icon/undo.png"
             color: "transparent"
@@ -311,10 +317,12 @@ Item {
         }
 
         onIsShownChanged: {
-            if (isShown)
+            if (isShown) {
                 show()
-            else
+            } else {
                 hide()
+                prevCount = 0
+            }
         }
 
         onHidden: {
