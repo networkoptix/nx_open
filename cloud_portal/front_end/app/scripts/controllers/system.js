@@ -37,6 +37,29 @@ angular.module('cloudApp')
             $scope.system.users = _.sortBy(users,function(user){
                 return - Config.accessRolesSettings.order.indexOf(user.accessRole);
             });
+
+
+            if($routeParams.callShare){
+
+                var emailWith = $routeParams.shareEmail;
+                if(emailWith){
+                    var user = _.find($scope.system.users, function(user){
+                       return user.accountEmail == emailWith;
+                    });
+                    if(user) {
+                        $scope.editShare(user);
+                    }else{
+                        $scope.editShare({
+                            accountEmail:emailWith,
+                            accessRole: Config.accessRolesSettings.default
+                        });
+                    }
+                }else {
+                    $scope.share();
+                }
+            }
+
+
         });
         $scope.gettingSystemUsers.run();
 
@@ -85,12 +108,16 @@ angular.module('cloudApp')
 
         $scope.share = function(){
             // Call share dialog, run process inside
-            dialogs.share(systemId);
+            dialogs.share(systemId).then(function(){
+                $scope.gettingSystemUsers.run();
+            });
         };
 
         $scope.editShare = function(user){
             //Pass user inside
-            dialogs.share(systemId, user);
+            dialogs.share(systemId, user).then(function(){
+                $scope.gettingSystemUsers.run();
+            });
         };
 
         $scope.unshare = function(user){
@@ -108,7 +135,4 @@ angular.module('cloudApp')
             $scope.unsharing.run();
         };
 
-        if($routeParams.callShare){
-            $scope.share();
-        }
     });

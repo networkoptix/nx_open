@@ -32,10 +32,10 @@
         </thead>
         <tbody>
         <tr ng-repeat="user in system.users">
-            <td>{{user.accountEmail}}</td>
+            <td>{{user.fullName}} {{user.fullName?'(':''}}{{user.accountEmail}}{{user.fullName?')':''}}</td>
             <td>{{user.accessRole}}</td>
-            <td><a ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="editShare(user)">Edit permissions</a></td>
-            <td><a ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="unshare(user)">Remove</a></td>
+            <td><a href='' ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="editShare(user)">Edit permissions</a></td>
+            <td><a href='' ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="unshare(user)">Remove</a></td>
         </tr>
         </tbody>
     </table>

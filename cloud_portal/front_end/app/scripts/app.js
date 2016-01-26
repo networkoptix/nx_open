@@ -50,7 +50,14 @@ angular.module('cloudApp', [
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
         })
-        .when('/activate/', {
+        .when('/system/:systemId/share/:shareEmail', {
+            templateUrl: 'views/system.html',
+            controller: 'SystemCtrl',
+            resolve: {
+                test: ['$route',function ($route) { $route.current.params.callShare = true; }]
+            }
+        })
+        .when('/activate', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {
@@ -61,7 +68,7 @@ angular.module('cloudApp', [
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl'
         })
-        .when('/restore_password/', {
+        .when('/restore_password', {
             templateUrl: 'views/activate_restore.html',
             controller: 'ActivateRestoreCtrl',
             resolve: {

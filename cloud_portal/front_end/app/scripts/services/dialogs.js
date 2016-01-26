@@ -27,18 +27,22 @@ angular.module('cloudApp')
                 }
             });
 
-            function clearPath(){
-                return $location.$$path.replace(new RegExp("/" + url + '$'),'');
+            function escapeRegExp(str) {
+                return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
             }
-            if(url) {
-                $location.path(clearPath() + "/" + url, false);
+            function clearPath(){
+                return $location.$$path.replace(new RegExp("/" + escapeRegExp(url) + '$'),'');
             }
 
-            modalInstance.result.catch(function () {
-                if(url){
-                    $location.path(clearPath());
-                }
-            });
+            if(url) {
+                $location.path(clearPath() + "/" + url, false);
+
+                modalInstance.result.finally(function () {
+                    $location.path(clearPath(), false);
+                });
+            }
+
+
 
             return modalInstance;
         }
@@ -54,7 +58,12 @@ angular.module('cloudApp')
                 return openDialog('Login', 'views/login.html', 'login', null, false, true).result;
             },
             share:function(systemId, share){
-                return openDialog('Share', 'views/share.html', 'share', null, false, true,{
+
+                var url = 'share';
+                if(share){
+                    url += '/' + share.accountEmail;
+                }
+                return openDialog('Share', 'views/share.html', url, null, false, true,{
                     systemId: systemId,
                     share: share
                 }).result;
