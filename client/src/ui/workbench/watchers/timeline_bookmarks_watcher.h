@@ -45,8 +45,7 @@ public:
         , qint64 positionMs);
 
 private:
-    void onWorkbenchCurrentWidgetChanged();
-    void onBookmarksModeEnabledChanged();
+    void updateCurrentCamera();
     void onBookmarkRemoved(const QnUuid &id);
     void onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkList &bookmarks);

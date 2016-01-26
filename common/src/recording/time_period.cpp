@@ -48,11 +48,11 @@ QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
     durationMs(durationMs)
 {}
 
-QnTimePeriod QnTimePeriod::createFromInterval(qint64 startTimeMs
+QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
     , qint64 endTimeMs)
 {
     Q_ASSERT_X(endTimeMs >= startTimeMs, Q_FUNC_INFO
-        , "End time could not be greater than start time");
+        , "Start time could not be greater than end time");
 
     if (endTimeMs >= startTimeMs)
         return QnTimePeriod(startTimeMs, endTimeMs - startTimeMs);

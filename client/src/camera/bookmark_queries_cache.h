@@ -21,11 +21,11 @@ public:
 
     virtual ~QnBookmarkQueriesCache();
 
-    bool isQueryExists(const QnVirtualCameraResourcePtr &camera) const;
+    bool hasQuery(const QnVirtualCameraResourcePtr &camera) const;
 
-    QnCameraBookmarksQueryPtr getQuery(const QnVirtualCameraResourcePtr &camera);
+    QnCameraBookmarksQueryPtr getOrCreateQuery(const QnVirtualCameraResourcePtr &camera);
 
-    void removeQuery(const QnVirtualCameraResourcePtr &camera);
+    void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
 
     bool updateQueries(const QnCameraBookmarkSearchFilter &filter);
 

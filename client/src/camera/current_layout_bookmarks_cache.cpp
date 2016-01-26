@@ -53,7 +53,7 @@ QnCurrentLayoutBookmarksCache::~QnCurrentLayoutBookmarksCache()
 
 QnTimePeriod QnCurrentLayoutBookmarksCache::window() const
 {
-    return QnTimePeriod::createFromInterval(m_filter.startTimeMs, m_filter.endTimeMs);
+    return QnTimePeriod::fromInterval(m_filter.startTimeMs, m_filter.endTimeMs);
 }
 
 void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)
@@ -83,7 +83,7 @@ QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCam
     if (!camera)
         return QnCameraBookmarkList();
 
-    const auto query = m_queriesCache->getQuery(camera);
+    const auto query = m_queriesCache->getOrCreateQuery(camera);
     return query->cachedBookmarks();
 }
 
@@ -96,10 +96,10 @@ void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)
     if (!camera)
         return;
 
-    if (m_queriesCache->isQueryExists(camera))
+    if (m_queriesCache->hasQuery(camera))
         return; // In case of two or more items on layout
 
-    const auto query = m_queriesCache->getQuery(camera);
+    const auto query = m_queriesCache->getOrCreateQuery(camera);
     query->setFilter(m_filter);
 
     connect(query.data(), &QnCameraBookmarksQuery::bookmarksChanged, this
@@ -119,7 +119,7 @@ void QnCurrentLayoutBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
     if (!camera)
         return;
 
-    const bool isQueryExist = m_queriesCache->isQueryExists(camera);
+    const bool isQueryExist = m_queriesCache->hasQuery(camera);
     Q_ASSERT_X(isQueryExist, Q_FUNC_INFO, "Camera has not been added yet");
     if (!isQueryExist)
         return;
@@ -128,8 +128,8 @@ void QnCurrentLayoutBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
     if (hasSameCameras)
         return;
 
-    const auto query = m_queriesCache->getQuery(camera);
+    const auto query = m_queriesCache->getOrCreateQuery(camera);
     disconnect(query, nullptr, this, nullptr);
-    m_queriesCache->removeQuery(camera);
+    m_queriesCache->removeQueryByCamera(camera);
 }
 

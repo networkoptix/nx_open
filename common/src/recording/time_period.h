@@ -27,7 +27,7 @@ public:
      */
     QnTimePeriod(qint64 startTimeMs, qint64 durationMs);
 
-    static QnTimePeriod createFromInterval(qint64 startTimeMs
+    static QnTimePeriod fromInterval(qint64 startTimeMs
         , qint64 endTimeMs);
 
     bool operator==(const QnTimePeriod &other) const;

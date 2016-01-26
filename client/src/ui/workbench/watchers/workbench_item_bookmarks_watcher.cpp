@@ -193,7 +193,7 @@ void QnWorkbenchItemBookmarksWatcher::onItemRemoved(QnWorkbenchItem *item)
 void QnWorkbenchItemBookmarksWatcher::updatePosition(qint64 posMs)
 {
     m_posMs = posMs;
-    const QnTimePeriod newWindow = QnTimePeriod::createFromInterval(
+    const QnTimePeriod newWindow = QnTimePeriod::fromInterval(
         posMs - kLeftOffset, posMs + kRightOffset);
 
     m_bookmarksCache->setWindow(newWindow);

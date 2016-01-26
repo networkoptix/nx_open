@@ -35,9 +35,9 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     , m_delayedUpdateCounter()
 {
     connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged
-        , this, &QnTimelineBookmarksWatcher::onWorkbenchCurrentWidgetChanged);
+        , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged
-        , this, &QnTimelineBookmarksWatcher::onBookmarksModeEnabledChanged);
+        , this, &QnTimelineBookmarksWatcher::updateCurrentCamera);
     connect(m_bookmarksCache, &QnCurrentLayoutBookmarksCache::bookmarksChanged
         , this, &QnTimelineBookmarksWatcher::onBookmarksChanged);
     connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved
@@ -76,23 +76,15 @@ QnCameraBookmarkList QnTimelineBookmarksWatcher::rawBookmarksAtPosition(
     return helpers::bookmarksAtPosition(m_bookmarksCache->bookmarks(camera), positionMs);
 }
 
-void QnTimelineBookmarksWatcher::onWorkbenchCurrentWidgetChanged()
+void QnTimelineBookmarksWatcher::updateCurrentCamera()
 {
+    const bool bookmarksMode = navigator()->bookmarksModeEnabled();
     const auto resourceWidget = navigator()->currentWidget();
-    const auto camera = (resourceWidget
+    const auto camera = (resourceWidget && bookmarksMode
         ? resourceWidget->resource().dynamicCast<QnVirtualCameraResource>()
         : QnVirtualCameraResourcePtr());
 
     setCurrentCamera(camera);
-}
-
-void QnTimelineBookmarksWatcher::onBookmarksModeEnabledChanged()
-{
-    const bool bookmarksMode = navigator()->bookmarksModeEnabled();
-    if (bookmarksMode)
-        onWorkbenchCurrentWidgetChanged();  // Sets current camera
-    else
-        setCurrentCamera(QnVirtualCameraResourcePtr());
 }
 
 void QnTimelineBookmarksWatcher::onBookmarkRemoved(const QnUuid &id)
@@ -117,7 +109,7 @@ void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
     const auto delayedUpdateWindow = [this, startTimeMs, endTimeMs]()
     {
         m_delayedTimer.reset(); // Have to reset manually to prevent double deletion
-        m_bookmarksCache->setWindow(QnTimePeriod::createFromInterval(startTimeMs, endTimeMs));
+        m_bookmarksCache->setWindow(QnTimePeriod::fromInterval(startTimeMs, endTimeMs));
         m_delayedUpdateCounter.invalidate();
         m_delayedUpdateCounter.start();
     };
