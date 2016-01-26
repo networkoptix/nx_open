@@ -57,7 +57,7 @@ angular.module('cloudApp')
             login:function(){
                 return openDialog('Login', 'views/login.html', 'login', null, false, true).result;
             },
-            share:function(systemId, share){
+            share:function(systemId, isOwner, share){
 
                 var url = 'share';
                 if(share){
@@ -65,7 +65,8 @@ angular.module('cloudApp')
                 }
                 return openDialog('Share', 'views/share.html', url, null, false, true,{
                     systemId: systemId,
-                    share: share
+                    share: share,
+                    isOwner: isOwner
                 }).result;
             }
         };

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ShareCtrl', function ($scope, cloudApi, process) {
+    .controller('ShareCtrl', function ($scope, cloudApi, process, dialogs, $q) {
 
         // TODO: We must replace this hack with something more angular-way,
         // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
@@ -13,6 +13,7 @@ angular.module('cloudApp')
         var dialogSettings = findSettings($scope);
 
         var systemId = dialogSettings.params.systemId;
+        var isOwner = dialogSettings.params.isOwner;
         $scope.lockEmail = !!dialogSettings.params.share;
         $scope.share = dialogSettings.params.share || {
             accountEmail:'',
@@ -25,12 +26,12 @@ angular.module('cloudApp')
             });
 
             var filteredRoles = _.filter(roles,function(role){
-                return role.accessRole != Config.accessRolesSettings.unshare && role.accessRole != Config.accessRolesSettings.owner;
+                return role.accessRole != Config.accessRolesSettings.unshare && (isOwner || role.accessRole != Config.accessRolesSettings.owner);
             });
 
             $scope.accessRoles = _.sortBy(filteredRoles,function(role){
-                var index = Config.accessRolesSettings.order.indexOf(role);
-                return index > 0 ? index: 10000;
+                var index = Config.accessRolesSettings.order.indexOf(role.accessRole);
+                return index >= 0 ? index: 10000;
             });
         }
         processAccessRoles(Config.accessRolesSettings.options);
@@ -39,8 +40,28 @@ angular.module('cloudApp')
             processAccessRoles(roles.data);
         });
 
-        $scope.sharing = process.init(function(){
+        function doShare(){
             return cloudApi.share(systemId, $scope.share.accountEmail, $scope.share.accessRole);
+        }
+        $scope.sharing = process.init(function(){
+
+            if($scope.share.accessRole == Config.accessRolesSettings.owner) {
+                var defered = $q.defer();
+
+                dialogs.confirm("You are going to change the owner of your system. You will not be able to return this power back!").then(
+                    function () {
+                        doShare().then(function (data) {
+                            defered.resolve(data);
+                        }, function () {
+                            defered.reject(data);
+                        });
+                    }
+                );
+
+                return defered.promise;
+            }else{
+                return doShare();
+            }
         }).then(function(){
             // Update users list
 

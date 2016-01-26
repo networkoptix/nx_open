@@ -38,6 +38,7 @@ angular.module('cloudApp')
                 return - Config.accessRolesSettings.order.indexOf(user.accessRole);
             });
 
+            $scope.isOwner = checkIsOwner();
 
             if($routeParams.callShare){
 
@@ -67,18 +68,19 @@ angular.module('cloudApp')
             nativeClient.open(systemId);
         };
 
-        function getSystemOwner(){
-            return _.find( $scope.system.users,function(user){
+        function checkIsOwner(){
+            var owner = _.find( $scope.system.users,function(user){
                 return user.accessRole == Config.accessRolesSettings.owner;
             });
+            return owner && $scope.account.email == owner.accountEmail;
         }
+
         // Unbind or unshare from me
         $scope.delete = function(){
             //1. Determine, if I am the owner
 
-            var owner = getSystemOwner();
 
-            if(owner && $scope.account.email == owner.accountEmail){
+            if(isOwner ){
 
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                 dialogs.confirm("You are going to completely disconnect your system from the cloud. Are you sure?").
@@ -108,14 +110,14 @@ angular.module('cloudApp')
 
         $scope.share = function(){
             // Call share dialog, run process inside
-            dialogs.share(systemId).then(function(){
+            dialogs.share(systemId, $scope.isOwner).then(function(){
                 $scope.gettingSystemUsers.run();
             });
         };
 
         $scope.editShare = function(user){
             //Pass user inside
-            dialogs.share(systemId, user).then(function(){
+            dialogs.share(systemId, $scope.isOwner, user).then(function(){
                 $scope.gettingSystemUsers.run();
             });
         };
