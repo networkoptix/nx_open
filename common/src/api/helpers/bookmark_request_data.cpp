@@ -56,7 +56,7 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
     QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);
 
-    QnLexical::deserialize(params.value(useSparsing), &filter.sparsing.use);
+    QnLexical::deserialize(params.value(useSparsing), &filter.sparsing.used);
     QnLexical::deserialize(params.value(minVisibleLengthMs), &filter.sparsing.minVisibleLengthMs);
 
     if (params.contains(limitKey))
@@ -93,7 +93,7 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(sortColumnKey,    QnLexical::serialized(filter.orderBy.column));
     result.insert(sortOrderKey,     QnLexical::serialized(filter.orderBy.order));
 
-    result.insert(useSparsing,          QnLexical::serialized(filter.sparsing.use));
+    result.insert(useSparsing,          QnLexical::serialized(filter.sparsing.used));
     result.insert(minVisibleLengthMs,   QnLexical::serialized(filter.sparsing.minVisibleLengthMs));
 
     for (const auto &camera: cameras)

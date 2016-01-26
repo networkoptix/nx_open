@@ -27,15 +27,15 @@ struct QnBookmarkSortOrder
 
 struct QnBookmarkSparsingOptions
 {
-    bool use;
+    bool used;
     int minVisibleLengthMs;
 
-    explicit QnBookmarkSparsingOptions(bool use = false
+    explicit QnBookmarkSparsingOptions(bool used = false
         , qint64 minVisibleLengthMs = 0);
 
     static const QnBookmarkSparsingOptions kNosparsing;
 };
-#define QnBookmarkSparsingOptions_Fileds (use)(minVisibleLengthMs)
+#define QnBookmarkSparsingOptions_Fileds (used)(minVisibleLengthMs)
 
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
