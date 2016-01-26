@@ -943,9 +943,10 @@ void QnTransactionTransport::monitorConnectionForClosure(
 
 QUrl QnTransactionTransport::generatePostTranUrl()
 {
-    QUrl postTranUrl = m_postTranBaseUrl;
-    postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
-    return postTranUrl;
+    return m_postTranBaseUrl;
+    //QUrl postTranUrl = m_postTranBaseUrl;
+    //postTranUrl.setPath( lit("%1/%2").arg(postTranUrl.path()).arg(++m_sentTranSequence) );
+    //return postTranUrl;
 }
 
 void QnTransactionTransport::aggregateOutgoingTransactionsNonSafe()
