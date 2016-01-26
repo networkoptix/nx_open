@@ -346,8 +346,6 @@ public:
     */
     virtual bool getConnectionStatistics( StreamSocketInfo* info ) = 0;
 
-    //!Shutdown socket
-    virtual void shutdown() = 0;
 };
 
 //!Stream socket with encryption
