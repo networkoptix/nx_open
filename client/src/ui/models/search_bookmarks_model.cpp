@@ -21,7 +21,7 @@ namespace
     enum { kMaxVisibleRows = 1000 };
 
     QnBookmarkSortOrder calculateSortOrder(int col
-        , Qt::SortOrder ord)
+        , Qt::SortOrder order)
     {
         const auto column = [col]() -> Qn::BookmarkSortField
         {
@@ -43,7 +43,6 @@ namespace
             }
         }();
 
-       const auto order = (ord == Qt::AscendingOrder ? Qt::AscendingOrder : Qt::DescendingOrder);
        return QnBookmarkSortOrder(column, order);
     }
 }
