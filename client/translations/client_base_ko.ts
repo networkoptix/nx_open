@@ -4521,15 +4521,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>변경사항이 저장되지 않았습니다. 저장하시겠습니까?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

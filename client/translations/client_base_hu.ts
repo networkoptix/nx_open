@@ -4523,15 +4523,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A változások nincsenek elmentve. Szeretné menteni őket?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

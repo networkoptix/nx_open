@@ -4487,10 +4487,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4528,6 +4524,10 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -4568,15 +4568,15 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Änderungen wurden nicht gespeichert. Möchten Sie jetzt speichern?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
