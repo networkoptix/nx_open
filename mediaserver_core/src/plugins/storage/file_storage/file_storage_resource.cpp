@@ -55,7 +55,7 @@ static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
 
-namespace aux 
+namespace aux
 {
     QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
     {
@@ -310,7 +310,7 @@ int QnFileStorageResource::mountTmpDrive() const
             .arg(url.password())
             .arg(uncString);
 
-    QString srcString = lit("//") + url.host() + url.path();    
+    QString srcString = lit("//") + url.host() + url.path();
     m_localPath = aux::genLocalPath(getUrl());
 
     umount(m_localPath.toLatin1().constData());
@@ -349,8 +349,8 @@ bool QnFileStorageResource::updatePermissions() const
 {
     if (getUrl().startsWith("smb://"))
     {
-        QString userName = QUrl(getUrl()).userName().isEmpty() ? 
-                           "guest" : 
+        QString userName = QUrl(getUrl()).userName().isEmpty() ?
+                           "guest" :
                             QUrl(getUrl()).userName();
 
         NETRESOURCE netRes;
@@ -358,7 +358,7 @@ bool QnFileStorageResource::updatePermissions() const
         netRes.dwType = RESOURCETYPE_DISK;
 
         QUrl storageUrl(getUrl());
-        QString path = lit("\\\\") + storageUrl.host() + 
+        QString path = lit("\\\\") + storageUrl.host() +
                        lit("\\") + storageUrl.path().mid((1));
 
         netRes.lpRemoteName = (LPWSTR) path.constData();
@@ -367,10 +367,10 @@ bool QnFileStorageResource::updatePermissions() const
         LPWSTR user = (LPWSTR) userName.constData();
 
         DWORD errCode = WNetUseConnection(
-            0,   // window handler, not used 
-            &netRes, 
-            password, 
-            user, 
+            0,   // window handler, not used
+            &netRes,
+            password,
+            user,
             0,   // connection flags, should work with just 0 though
             0,
             0,   // additional connection info buffer size
@@ -570,7 +570,7 @@ bool QnFileStorageResource::isAvailable() const
 
     QnMutexLocker lock(&m_writeTestMutex);
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
-    // write check fail is a cause to set dirty to true, thus enabling 
+    // write check fail is a cause to set dirty to true, thus enabling
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached)
         m_dirty = true;
@@ -655,7 +655,7 @@ bool QnFileStorageResource::isLocal(const QString &url)
 
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         platformMonitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition 
+            QnPlatformMonitor::LocalDiskPartition
         );
 
     for (const auto &partition : partitions)
@@ -728,8 +728,8 @@ bool QnFileStorageResource::isStorageDirMounted() const
         auto badResultHandler = [this]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
-            // Will try to unmount, remove local mount point directory 
-            // and set flag meaning that local path recreation 
+            // Will try to unmount, remove local mount point directory
+            // and set flag meaning that local path recreation
             // + remount is needed
             umount(m_localPath.toLatin1().constData()); // directory may not exists, but this is Ok
             rmdir(m_localPath.toLatin1().constData()); // same as above
@@ -761,11 +761,6 @@ bool QnFileStorageResource::isStorageDirMounted() const
             return badResultHandler();
         }
 
-        mkdir(
-            m_localPath.toLatin1().constData(),
-            S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
-        );
-
 #if __linux__
         int retCode = mount(
             srcString.toLatin1().constData(),
@@ -791,15 +786,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             );
             return badResultHandler();
         }
-        else
-        {
-#if __linux__
-            umount(m_localPath.toLatin1().constData());
-#elif __APPLE__
-            unmount(m_localPath.toLatin1().constData(), 0);
-#endif
-            rmdir(m_localPath.toLatin1().constData());
-        }
+
         return true;
     }
 
