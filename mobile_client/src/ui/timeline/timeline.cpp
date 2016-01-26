@@ -36,6 +36,7 @@ namespace {
     const qreal windowMovingSpeed = 0.04;
     const qint64 correctionThreshold = 5000;
     const qint64 defaultWindowSize = 90 * 60 * 1000;
+    const qint64 kMSecsInMinute = 60 * 1000;
 
     struct MarkInfo {
         qint64 tick;
@@ -1005,8 +1006,11 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         }
     }
 
+    qint64 liveMs = QDateTime::currentMSecsSinceEpoch();
+
     qint64 minimumValue = this->windowStart();
     qint64 maximumValue = this->windowEnd();
+    qint64 kRightChunksBound = qMin(maximumValue, liveMs - kMSecsInMinute);
 
     /* The code here may look complicated, but it takes care of not rendering
      * different motion periods several times over the same location.
@@ -1039,7 +1043,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     chunkPainter.start(value, QRectF(0, y, width(), height() - y),
                        chunkCount, minimumValue, maximumValue);
 
-    while (value < maximumValue) {
+    while (value < kRightChunksBound) {
         qint64 nextValue[Qn::TimePeriodContentCount] = { maximumValue, maximumValue };
         for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
             if (pos[i] == end[i])
@@ -1078,6 +1082,9 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
             content = Qn::TimePeriodContentCount;
         }
 
+        if (bestValue > kRightChunksBound)
+            bestValue = kRightChunksBound;
+
         chunkPainter.paintChunk(bestValue - value, content);
 
         for (int i = 0; i < Qn::TimePeriodContentCount; i++) {
@@ -1092,6 +1099,9 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
         value = bestValue;
     }
 
+    if (value < maximumValue)
+        chunkPainter.paintChunk(maximumValue - value, Qn::TimePeriodContentCount);
+
     chunkPainter.stop();
 
     chunksNode->markDirty(QSGNode::DirtyGeometry);
@@ -1099,7 +1109,7 @@ QSGGeometryNode *QnTimeline::updateChunksNode(QSGGeometryNode *chunksNode) {
     stripesOpacityNode->setOpacity(d->liveOpacity);
     lightStripesOpacityNode->setOpacity(d->activeLiveOpacity);
 
-    qreal liveX = qMin(width(), d->timeToPixelPos(QDateTime::currentMSecsSinceEpoch()));
+    qreal liveX = qMin(width(), d->timeToPixelPos(liveMs));
     qreal textureX = (width() - liveX) / d->chunkBarHeight;
     QSGGeometry::TexturedPoint2D *stripesPoints = stripesGeometry->vertexDataAsTexturedPoint2D();
     stripesPoints[0].set(liveX, y, d->stripesPosition, 0);

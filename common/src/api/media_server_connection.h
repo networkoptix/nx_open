@@ -161,9 +161,10 @@ public:
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
     /*!
+        \param fastRequest          Request information about existing storages only. Getting full info may be quite slow.
         \returns information about storages space.
     */
-    int getStorageSpaceAsync(QObject *target, const char *slot);
+    int getStorageSpaceAsync(bool fastRequest, QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 

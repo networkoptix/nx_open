@@ -141,7 +141,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
         QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not configure the selected servers."));
         break;
     case QnConnectToCurrentSystemTool::UpdateFailed:
-        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.") + L'\n' + tr("You can try to update the servers again in the System Administration."));
+        QMessageBox::critical(mainWindow(), tr("Error"), tr("Could not update the selected servers.") + L'\n' + tr("You can try to update the servers again in the System Administration dialog."));
         break;
     default:
         break;
@@ -185,7 +185,7 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
         "As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.\n"\
         "If you understand this and would like to proceed please click Merge to continue.\n");
 
-    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+    QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
     messageBox.addButton(tr("Merge"), QnMessageBox::AcceptRole);
 
     return messageBox.exec() != QnMessageBox::Cancel;

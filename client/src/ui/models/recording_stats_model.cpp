@@ -217,7 +217,7 @@ QString QnRecordingStatsModel::tooltipText(Columns column) const
                 tr("Storage space occupied by cameras")
                 );
         case DurationColumn:
-            return tr("Archived duration in calendar days between the first record and the current moment");
+            return tr("Archived duration in calendar days since the first recording");
         case BitrateColumn:
             return tr("Average bitrate for the recorded period");
         default:

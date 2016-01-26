@@ -222,10 +222,6 @@
         <translation>发生未知事件</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>冲突IP地址:: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>无法连接到服务器</translation>
     </message>
@@ -329,10 +325,6 @@
         <translation>摄像机 %1断开连接</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>I/O设备 %1断开连接</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>设备IP冲突: %1</translation>
@@ -353,10 +345,6 @@
     <message>
         <source>Recording on cameras is disabled:</source>
         <translation>摄像机录像无法启用:</translation>
-    </message>
-    <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>I/O设备录像无法启用:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -387,19 +375,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed because of no backup storages available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <source>I/O Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -490,20 +506,12 @@
         <translation>请尝试重启摄像机,并通过网页恢复出厂设置.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>请尝试重启I/O设备,并通过设备网页恢复出厂设置.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>请确认设备已接入网络,并重启设备.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>请确认摄像机已接入网络,并重启摄像机.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>请确认I/O设备已接入网络,并重启I/O设备.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -518,10 +526,6 @@
         <translation>摄像机无响应.URL: %1,请求名称 %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>I/O设备无响应.URL: %1,请求名称 %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>无授权,URL: %1.</translation>
     </message>
@@ -534,20 +538,12 @@
         <translation>请尝试打开录像并且通过摄像机设置降低fps.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>请尝试打开录像并且通过I/O设置降低fps.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>请尝试通过网页恢复设备出厂设置.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>请尝试通过网页恢复摄像机出厂设置.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>请尝试通过网页恢复I/O设备出厂设置.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -558,20 +554,12 @@
         <translation>摄像机请求 &quot;%1&quot;出现错误&quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>I/O设备请求 &quot;%1&quot;出现错误&quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>未知设备故障.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>未知摄像机故障.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>未知I/O设备故障.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -582,10 +570,6 @@
         <translation>从摄像机 %1收到无效参数.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>从I/O设备 %1收到无效参数.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>媒体流错误,请打开设备故障日志获取更多信息.</translation>
     </message>
@@ -594,23 +578,55 @@
         <translation>媒体流错误,请打开摄像机故障日志获取更多信息.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>媒体流错误,请打开I/O设备故障日志获取更多信息.</translation>
-    </message>
-    <message>
-        <source>Device initialization process in progress.</source>
-        <translation>设备正在进行初始化.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>摄像机正在进行初始化.</translation>
-    </message>
-    <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>I/O设备正在进行初始化.</translation>
-    </message>
-    <message>
         <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -632,8 +648,8 @@
         <translation>启动Windows浏览器时无法找到explorer.exe。</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>启动Windows浏览器失败</translation>
+        <source>File explorer failed to open.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -647,12 +663,12 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>无法初始化音频编码器.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>无法初始化音频解码器.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -689,8 +705,8 @@
         <translation>%1无法发现音频编码器.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>无法初始化视频编码器</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -840,10 +856,6 @@
         <translation>授权码出现问题，接收到无效数据，请联系技术支持报告此问题。</translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>激活您的许可证密钥时，发生数据库错误。</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>输入授权无效，请确认输入的授权是否正确。如果问题仍存在，请联系技术支持确认授权码是否有效或获取有效授权码。</translation>
     </message>
@@ -854,6 +866,10 @@
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>此授权码已在 {{time}}激活过硬件ID{{hwid}} ，请联系技术支持获取有效的授权码。</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -885,18 +901,6 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IO 模块</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IO 模块</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
             <numerusform>%n 设备</numerusform>
@@ -925,22 +929,6 @@
         <translation>摄像机</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation> IO 模块</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>设备</translation>
     </message>
@@ -955,6 +943,34 @@
     <message>
         <source>device</source>
         <translation>设备</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished">I/O模块</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1080,6 +1096,10 @@
     <message>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>为文件&apos;%1&apos;生成水印时发生错误。</translation>
+    </message>
+    <message>
+        <source>File write error. Not enough free space.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

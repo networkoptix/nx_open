@@ -257,7 +257,7 @@ QnPage {
             name: "FailedSaved"
             PropertyChanges {
                 target: editButtons
-                visible: true
+                visible: false
             }
         }
     ]
@@ -332,6 +332,10 @@ QnPage {
 
     function actualPort() {
         return portField.text ? portField.text : connectionManager.defaultServerPort()
+    }
+
+    function scrollTop() {
+        flickable.contentY = -flickable.topMargin
     }
 
     focus: true

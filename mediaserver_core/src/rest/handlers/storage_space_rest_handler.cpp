@@ -22,85 +22,94 @@
 #include <utils/common/util.h>
 #include <utils/network/http/httptypes.h>
 
-namespace {
-
-#ifdef _DEBUG
-    void validateStoragesPool() {
-        /* Validate that all storages are placed in the resource pool. */
-        QList<QnUuid> managedStorages;
-        for (const QnStorageResourcePtr &storage: qnNormalStorageMan->getStorages())
-            managedStorages.append(storage->getId());
-        for (const QnStorageResourcePtr &storage: qnBackupStorageMan->getStorages())
-            managedStorages.append(storage->getId());
-
-        QList<QnUuid> pooledStorages;
-        for (const QnStorageResourcePtr &storage: qnResPool->getResourcesByParentId(qnCommon->remoteGUID()).filtered<QnStorageResource>())
-            pooledStorages.append(storage->getId());
-
-        Q_ASSERT_X(managedStorages.size() == pooledStorages.size(), Q_FUNC_INFO, "Make sure all storages are in the resource pool");
-        Q_ASSERT_X(managedStorages.toSet() == pooledStorages.toSet(), Q_FUNC_INFO, "Make sure all storages are in the resource pool");
-    }
-#endif
-
+namespace
+{
+    const QString kFastRequestKey("fast");
 }
 
 QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
     m_monitor(qnPlatform->monitor())
 {}
 
-int QnStorageSpaceRestHandler::executeGet(
-    const QString                   &,
-    const QnRequestParams           &params,
-    QnJsonRestResult                &result,
-    const QnRestConnectionProcessor *
-)
+int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestParams& params, QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
 {
+    QN_UNUSED(path, owner);
+
+    /* Some api calls can take a lot of time, so client can make a fast request for the first time. */
+    const bool fastRequest = QnLexical::deserialized(params[kFastRequestKey], false);
+
     QnStorageSpaceReply reply;
 
-    auto enoughSpace = [](const QnStorageResourcePtr& storage) 
-    {   /* We should always display invalid storages. */
+    auto enoughSpace = [](const QnStorageResourcePtr& storage)
+    {
         qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize)
+
+        /* We should always display invalid storages. */
+        if (totalSpace == QnStorageResource::kUnknownSize)
             return true;
+
         return totalSpace >= QnFileStorageResource::calcSpaceLimit(
             storage->getUrl()
         );
     };
 
-    auto filterDeprecated = [] (const QnStorageResourcePtr &storage){
-        return !storage->hasFlags(Qn::deprecated);
+    auto enumerate = [enoughSpace, fastRequest, &reply] (const QnStorageResourceList &storages)
+    {
+        for (const auto& storage: storages)
+        {
+            if (storage->hasFlags(Qn::deprecated))
+                continue;
+
+            QnStorageSpaceData data(storage, fastRequest);
+            if (!fastRequest && !enoughSpace(storage))
+                data.isWritable = false;
+            reply.storages.push_back(data);
+        }
     };
 
-#ifdef _DEBUG
-    validateStoragesPool();
-#endif
+    enumerate(qnNormalStorageMan->getStorages());
+    enumerate(qnBackupStorageMan->getStorages());
 
-    /* Enumerate normal storages. */
-    for (const QnStorageResourcePtr &storage : 
-         qnNormalStorageMan->getStorages().filtered(filterDeprecated)) 
+    if (!fastRequest)
     {
-        QnStorageSpaceData data(storage);
-        if (!enoughSpace(storage))
-            data.isWritable = false;
-        reply.storages.push_back(data);
+        for (const QnStorageSpaceData& optionalStorage: getOptionalStorages())
+            reply.storages.push_back(optionalStorage);
     }
 
-    /* Enumerate backup storages. */
-    for (const QnStorageResourcePtr &storage : 
-         qnBackupStorageMan->getStorages().filtered(filterDeprecated)) 
-    {
-        QnStorageSpaceData data(storage);
-            if (!enoughSpace(storage))
-                data.isWritable = false;
-        reply.storages.push_back(data);
-    }
+    reply.storageProtocols = getStorageProtocols();
 
-    auto partitionEnoughSpace = [](
-        QnPlatformMonitor::PartitionType    ptype,
-        qint64                              size
-    ) 
-    {   
-        if (size == QnStorageResource::UnknownSize)
+    result.setReply(reply);
+    return nx_http::StatusCode::ok;
+}
+
+QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const
+{
+    QList<QString> result;
+    for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
+        result.push_back(storagePlugin->storageType());
+    result.push_back(lit("smb"));
+    return result;
+}
+
+QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
+{
+    QList<QString> storagePaths;
+    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+
+    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
+        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
+
+    return storagePaths;
+}
+
+QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
+{
+    QnStorageSpaceDataList result;
+
+    auto partitionEnoughSpace = [](QnPlatformMonitor::PartitionType ptype, qint64 size)
+    {
+        if (size == QnStorageResource::kUnknownSize)
             return true;
         return size >= QnFileStorageResource::calcSpaceLimit(ptype);
     };
@@ -108,14 +117,15 @@ int QnStorageSpaceRestHandler::executeGet(
     /* Enumerate auto-generated storages on all possible partitions. */
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         m_monitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
+        QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
         );
 
     for(int i = 0; i < partitions.size(); i++)
         partitions[i].path = QnStorageResource::toNativeDirPath(partitions[i].path);
 
     const QList<QString> storagePaths = getStoragePaths();
-    for(const QnPlatformMonitor::PartitionSpace &partition: partitions) {
+    for(const QnPlatformMonitor::PartitionSpace &partition: partitions)
+    {
         if (partition.path.indexOf(NX_TEMP_FOLDER_NAME) != -1)
             continue;
 
@@ -125,10 +135,10 @@ int QnStorageSpaceRestHandler::executeGet(
         bool hasStorage = std::any_of(
             storagePaths.cbegin(),
             storagePaths.cend(),
-            [&partition](const QString &storagePath) 
-            {
-                return closeDirPath(storagePath).startsWith(partition.path);
-            }
+            [&partition](const QString &storagePath)
+        {
+            return closeDirPath(storagePath).startsWith(partition.path);
+        }
         );
 
         if(hasStorage)
@@ -144,43 +154,19 @@ int QnStorageSpaceRestHandler::executeGet(
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(
             QnStoragePluginFactory::instance()->createStorage(data.url, false)
-        );
-        
-        if (storage) {
-            storage->setUrl(data.url); /* createStorage does not fill url. */
-            storage->setSpaceLimit(
-                QnFileStorageResource::calcSpaceLimit(partition.type)
             );
+
+        if (storage)
+        {
+            storage->setUrl(data.url); /* createStorage does not fill url. */
+            storage->setSpaceLimit(QnFileStorageResource::calcSpaceLimit(partition.type));
             if (storage->getStorageType().isEmpty())
                 storage->setStorageType(data.storageType);
             data.isWritable = storage->isWritable();
         }
 
-        reply.storages.push_back(data);
+        result.push_back(data);
     }
 
-
-    reply.storageProtocols = getStorageProtocols();
-
-    result.setReply(reply);
-    return nx_http::StatusCode::ok;
-}
-
-QList<QString> QnStorageSpaceRestHandler::getStorageProtocols() const {
-    QList<QString> result;
-    for (const auto storagePlugin : PluginManager::instance()->findNxPlugins<nx_spl::StorageFactory>(nx_spl::IID_StorageFactory))
-        result.push_back(storagePlugin->storageType());
-    result.push_back(lit("smb"));
     return result;
-}
-
-QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const {
-    QList<QString> storagePaths;
-    for(const QnFileStorageResourcePtr &fileStorage: qnNormalStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
-
-    for(const QnFileStorageResourcePtr &fileStorage: qnBackupStorageMan->getStorages().filtered<QnFileStorageResource>())
-        storagePaths.push_back(QnStorageResource::toNativeDirPath(fileStorage->getLocalPath()));
-
-    return storagePaths;
 }

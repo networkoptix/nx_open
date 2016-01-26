@@ -20,7 +20,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>What to backup:</source>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -87,12 +91,12 @@ to view more bookmarks</source>
         <translation>חודש</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>כל הנתונים</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>קצב נתונים בהקלטה האחרונה:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -151,53 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">פתח בכרטיסיה חדשה</translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n IO module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;כל התקן&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;כל מצלמה&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any IO Module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My IO Modules&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -233,10 +190,6 @@ to view more bookmarks</source>
     <message>
         <source>None</source>
         <translation>ללא</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">סגור</translation>
     </message>
 </context>
 <context>
@@ -778,32 +731,12 @@ to view more bookmarks</source>
         <translation>פתח בכרטיסיה חדשה</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>נטר בכרטיסיה חדשה</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>פתח בחלון חדש</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>נטר בחלון חדש</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>פתח את הפריסה בכרטיסיה חדשה</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>פתח פריסות</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>פתח פריסה/פריסות בחלון חדש</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>פתח פריסה נוכחית בחלון חדש</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1384,10 +1317,6 @@ to view more bookmarks</source>
         <translation>אבחון מצלמה...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation>אבחון התקן קלט פלט...</translation>
-    </message>
-    <message>
         <source>Failover Priority...</source>
         <translation>קדימות גיבוי בעת כשל...</translation>
     </message>
@@ -1416,14 +1345,6 @@ to view more bookmarks</source>
         <translation>בדוק בעיות במצלמות...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>בדוק בעיות בהתקן קלט פלט...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>בדוק בעיות בהתקני קלט פלט...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>חוקי התקן...</translation>
     </message>
@@ -1438,14 +1359,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>חוקי מצלמות...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>חוקי התקן קלט פלט...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>חוקי התקני קלט פלט...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1464,14 +1377,6 @@ to view more bookmarks</source>
         <translation>הגדרות מצלמות...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>הקדרות התקן קלט פלט...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>הגדרות התקני קלט פלט...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>רשימת התקנים לפי שרת...</translation>
     </message>
@@ -1485,10 +1390,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1508,11 +1409,71 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks Search...</source>
+        <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1588,10 +1549,6 @@ to view more bookmarks</source>
         <translation>הפעלה מחדש של תיעוד(log) הביקורת</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>משאבים אלו כבר הוסרו מהמערכת</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>יצא את ההקלטות שנבחרו לקובץ</translation>
     </message>
@@ -1610,6 +1567,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>פעולות מצלמה</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1762,10 +1723,6 @@ to view more bookmarks</source>
         <translation>לחץ להגדלה</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>סימון אדום מסמל שקובץ ארכיון עדיין זמין</translation>
-    </message>
-    <message>
         <source>Device updated</source>
         <translation>התקן עודכן</translation>
     </message>
@@ -1797,6 +1754,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>שם מצלמה</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1806,21 +1767,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hi-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All streams</source>
-        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1890,10 +1836,6 @@ to view more bookmarks</source>
         <translation>מצלמות %1 מ %n</translation>
     </message>
     <message>
-        <source>%1 of %n IO modules</source>
-        <translation>התקני קלט פלט %1 מ %n</translation>
-    </message>
-    <message>
         <source>&lt;Any Device&gt;</source>
         <translation>&lt;כל התקן&gt;</translation>
     </message>
@@ -1908,6 +1850,10 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">בחר לפחות מצלמה אחת</translation>
+    </message>
+    <message>
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2209,10 +2155,6 @@ to view more bookmarks</source>
         <translation>טווח הIP שהוגדר מכיל יותר מ255 כתובות.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>החיפוש הסתיים...</translation>
-    </message>
-    <message>
         <source>Success</source>
         <translation>הצלחה</translation>
     </message>
@@ -2314,6 +2256,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation>מחפש שרת... (%1)</translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2361,20 +2307,12 @@ to view more bookmarks</source>
         <translation>אבחון למצלמה %1</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>אבחון להתקן קלט פלט %1</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>אבחון התקן</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>אבחון מצלמה</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>אבחון התקן קלט פלט</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2385,10 +2323,6 @@ to view more bookmarks</source>
         <translation>מוודא שהמצלמה נגישה.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>מוודא שהתקן הקלט פלט נגיש.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>מוודא שההתקן מספק תזרים מדיה.</translation>
     </message>
@@ -2397,8 +2331,20 @@ to view more bookmarks</source>
         <translation>מוודא שהמצלמה מספקת תזרים מדיה.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>מוודא שהתקן הקלט פלט מספק תזרים מדיה.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2459,16 +2405,16 @@ to view more bookmarks</source>
         <translation>נמצאו %n מצלמות</translation>
     </message>
     <message>
-        <source>%n IO modules found</source>
-        <translation>נמצאו %n התקני קלט פלט</translation>
-    </message>
-    <message>
         <source>Export selected devices to a file.</source>
         <translation>ייצא את ההתקנים שנבחרו לקובץ.</translation>
     </message>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>ייצא את המצלמות שנבחרו לקובץ.</translation>
+    </message>
+    <message>
+        <source>%n I/O modules found</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2585,20 +2531,20 @@ to view more bookmarks</source>
         <translation>אזהרה! ערך מינימום גבוה יוריד את משך ההקלטה של המצלמות האחרים.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>הקלטה בתנועה מבוטלת או לא נתמכת ע&quot;י חלק מהמצלמות שנבחרו. אנא בדוק את הגדרות ההקלטה בתנועה ווודא שהקלטה בתנועה נתמכת ומאופשרת.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>תזרים וידאו כפול אינו נתמך במצלמה זו.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>תזרים וידאו כפול וזיהוי תנועה אינם נתמכים במצלמה זו.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>זיהוי תנועה אינו מאופשר. יש להגדיר את זיהוי התנועה והרגישות בהגדרות זיהוי התנועה של המצלמה.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2644,14 +2590,6 @@ to view more bookmarks</source>
         <translation>הגדרות מצלמות</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>הגדרות התקן קלט פלט</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>הגדרות התקני קלט פלט</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>אבחון התקן</translation>
     </message>
@@ -2666,14 +2604,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>אבחון מצלמות</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>אבחון התקן קלט פלט</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>אבחון התקני קלט פלט</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2692,14 +2622,6 @@ to view more bookmarks</source>
         <translation>חוקי מצלמות</translation>
     </message>
     <message>
-        <source>IO Module Rules</source>
-        <translation>חוקי התקן קלט פלט</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>חוקי התקני קלט פלט</translation>
-    </message>
-    <message>
         <source>Apply changes to the following %n devices?</source>
         <translation>להחיל שינויים על על %n ההתקנים הבאים?</translation>
     </message>
@@ -2708,12 +2630,36 @@ to view more bookmarks</source>
         <translation>להחיל שינויים על על %n המצלמות הבאות?</translation>
     </message>
     <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>להחיל שינויים על על %n ההתקני הקלט פלט הבאים?</translation>
-    </message>
-    <message>
         <source>Changes are not saved</source>
         <translation>השינויים לא נשמרו</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2912,15 +2858,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Actions will only work for Generic Events that pass all filters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Each filter will pass if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2991,16 +2929,16 @@ to view more bookmarks</source>
         <translation>גבוי מסד הנתונים לשרת מתבצע, אנא המתן.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>עליך להתחבר לשרת לפני ביצוע גבוי.</translation>
-    </message>
-    <message>
         <source>Database was successfully restored from file &apos;%1&apos;. Media server will be restarted.</source>
         <translation>מסד הנתונים שוחזר בהצלחה מקובץ &apos;%1&apos;. שרת המדיה יאותחל.</translation>
     </message>
     <message>
         <source>An error has occurred while restoring the database from file &apos;%1&apos;.</source>
         <translation>אירעה שגיאה במהלך שחזור מסד הנתונים מהקובץ &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3322,27 +3260,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>פתח את ניהול האזעקות/חוקים...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>פתח את יומן האירועים...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>פתח רשימת התקנים...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>פתח רשימת המצלמות...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3357,12 +3299,12 @@ to view more bookmarks</source>
         <translation>זיהינו שיתכן והדרייברים של כרטיס המסך שלך אינם מותקנים או שאינם מעודכנים.</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>דבר זה עלול להוביל לבעיות בתפקוד תוכנת הקליינט ואף לקריסתה.</translation>
-    </message>
-    <message>
         <source>Installing and/or updating your video drivers can substantially increase your system performance when viewing and working with video.</source>
         <translation>התקנה ו/או עדכון דרייברי הוידאו שלך עשויים להביא לשיפור משמעותי בתפקוד המערכת שלך בזמן צפיה ועבודה עם וידאו.</translation>
+    </message>
+    <message>
+        <source>This may result in client software issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3529,10 +3471,6 @@ to view more bookmarks</source>
         <translation>הקובץ &apos;%1&apos; נמצא בשימוש על ידי תהליך אחר. אנא בחר בשם אחר.</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>יצירת קובץ הפלט %1 נכשלה.</translation>
-    </message>
-    <message>
         <source>Exporting to &quot;%1&quot;...</source>
         <translation>מייצא ל &quot;%1&quot;...</translation>
     </message>
@@ -3546,11 +3484,15 @@ to view more bookmarks</source>
         <translation>מצלמה %1 לא ניתנת לייצוא.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>התקן קלט פלט %1 לא ניתן לייצוא.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error has occurred.</source>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3618,12 +3560,12 @@ to view more bookmarks</source>
         <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>לא נמצא שרת המחובר לרשת.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>הזמן הקצוב עבר</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">הזמן הקצוב עבר</translation>
     </message>
 </context>
 <context>
@@ -3656,10 +3598,6 @@ to view more bookmarks</source>
         <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>לא נמצא שרת המחובר לרשת.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>לא ניתן לטעון את המשתמשים.</translation>
     </message>
@@ -3668,16 +3606,20 @@ to view more bookmarks</source>
         <translation>יבא משתמשים</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>הזמן הקצוב עבר</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>אירעה שגיאה במהלך טעינת המשתמשים.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation>לא נמצאו משתמשים חדשים.</translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">הזמן הקצוב עבר</translation>
     </message>
 </context>
 <context>
@@ -3950,8 +3892,8 @@ to view more bookmarks</source>
         <translation>השתמש ברישיונות עבור %n המצלמות שנבחרו</translation>
     </message>
     <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>השתמש ברישיונות עבור %n התקני קלט פלט שנבחרו</translation>
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4095,10 +4037,6 @@ to view more bookmarks</source>
 <context>
     <name>QnMediaResourceWidget</name>
     <message>
-        <source>IO Module</source>
-        <translation>מודול קלט/פלט</translation>
-    </message>
-    <message>
         <source>Screenshot</source>
         <translation>צילום מסך</translation>
     </message>
@@ -4141,6 +4079,10 @@ to view more bookmarks</source>
     <message>
         <source>%1 (Tour &quot;%2&quot; is active)</source>
         <translation>%1 (סיור &quot;%2&quot; פעיל)</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4426,20 +4368,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>פתח מצלמה</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>פתח התקן קלט פלט</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>הגדרות התקן...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>הגדרות מצלמה...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>הגדרות התקן קלט פלט...</translation>
     </message>
     <message>
         <source>Server Settings...</source>
@@ -4452,10 +4386,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Open Camera Web Page...</source>
         <translation>פתח מצלמה בדף אינטרנט...</translation>
-    </message>
-    <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>פתח התקן קלט פלטבדף אינטרנט...</translation>
     </message>
     <message>
         <source>Licenses...</source>
@@ -4486,7 +4416,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4501,8 +4443,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>על מנת לעבור למצב שימוש מלא, אנא השתמש במחשב אחר.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>אזהרה</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -4558,20 +4500,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>קבלת מיקום מהמצלמה נכשל.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>אירעה שגיאה במהלך הנסיון לקבל את המיקום הנוכחי ממצלמה %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>אנא המתן עד שהמצלמה תתחבר לרשת.</translation>
     </message>
     <message>
         <source>Could not set position for camera.</source>
         <translation>הגדרת מיקום המצלמה נכשל.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>אירעה שגיאה במהלך נסיון להגדיר את המיקום הנוכחי עבור מצלמה %1.</translation>
     </message>
     <message>
         <source>Remove Preset</source>
@@ -4590,16 +4524,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אל תציג שנית.</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>נהל מצלמה ממונעת עבור %1.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>הגדרות המצלמה הממונעת לא נשמרו.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>השינויים לא נשמרו. האם ברצונך לשמור אותם?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4823,10 +4765,6 @@ If you understand this and would like to proceed please click Merge to continue.
 <context>
     <name>QnRecordingStatsModel</name>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>זמן הארכיון בימים קלנדריים בין ההקלטה הראשונה ועד לרגע הנוכחי</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>קצב נתונים ממוצע במשך תקופת ההקלטה</translation>
     </message>
@@ -4891,10 +4829,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>סה&quot;כ %n מצלמות</translation>
     </message>
     <message>
-        <source>Total %n IO modules</source>
-        <translation>סה&quot;כ %n התקני קלט פלט</translation>
-    </message>
-    <message>
         <source>Devices with non-empty archive</source>
         <translation>התקנים עם ארכיון שאינו ריק</translation>
     </message>
@@ -4924,6 +4858,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5073,6 +5015,53 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">&lt;כל התקן&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;כל מצלמה&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5093,6 +5082,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation type="unfinished">מצלמה</translation>
+    </message>
+    <message>
+        <source>&lt;Removed camera&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5159,11 +5152,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>השרת אינו נשמר</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>החל שינויים על השרת %1?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5198,12 +5191,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>לשרת שרת זה יש מצלמות יותר מהמותר</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>בכדי למנוע תקלה עדכן את המספר המקסימלי של ההתקנים</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>בכדי למנוע תקלה עדכן את המספר המקסימלי של המצלמות</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5316,14 +5309,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>הקליינט יופעל מחדש לגירסה המעודכנת.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>העדכון בוצע בהצלחה.</translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation>תהליך הפעלת היישום לא נמצא.</translation>
-    </message>
-    <message>
         <source>Cannot restart the client.</source>
         <translation>לא ניתן לאתחל את הקליינט.</translation>
     </message>
@@ -5404,22 +5389,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>בעיית קישוריות לאינטרנט</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>לא נמצאה גירסה כזו על שרת העדכון.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>לא ניתן להתחיל בעדכון. עדכונים עבור שרת אחד או יותר לא נמצאו.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>לא ניתן להתחיל בעדכון. לא נמצא עדכון עבור הקליינט.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>לא ניתן להתחיל בעדכון. אין אפשרות לשנמך לגירסה קודמת.</translation>
-    </message>
-    <message>
         <source>Newer version found.</source>
         <translation>נמצאה גירסה מעודכנת.</translation>
     </message>
@@ -5474,6 +5443,30 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform></numerusform>
         </translation>
     </message>
+    <message>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
@@ -5487,6 +5480,16 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform>משתמש %n</numerusform>
             <numerusform>%n משתמשים</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5531,10 +5534,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>עבור גילוי תנועה מבוסס תוכנה 2 פריימים לשניה שמור לתזרים המשני. ערך הפריימים לשניה בלוח הזמנים הנוכחי הוא %1. ערך הפריימים לשניה הונמך למספר הפריימים לשניה המקסימלי של המצלמה %2.</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>לוח הזמנים איננו תקין</translation>
-    </message>
-    <message>
         <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
         <translation>הזרם המשני כבוי במצלמה זו. אפשרות &quot;תנועה +איכות נמוכה&quot; לא תשנה דבר. לחץ על &quot;כן&quot; על מנת לשנות את סוג ההקלטה ל&quot;תמיד&quot; או על &quot;לא&quot; על מנת לחזור ולאפשר את הזרם המשני.</translation>
     </message>
@@ -5559,8 +5558,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>הגדרות מצלמה</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>הגדרות התקן קלט פלט</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">לוח הזמנים איננו תקין</translation>
     </message>
 </context>
 <context>
@@ -5596,16 +5599,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">נתונים שגויים</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">הפרמטרים שסופקו שגויים. לא ניתן לבצע את הבדיקה.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">שגיאת רשת</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">לא ניתן לבצע את הבדיקה. כל השרתים שלך אינם מקוונים.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5630,6 +5625,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Success</source>
         <translation type="unfinished">הצלחה</translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5702,24 +5705,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>בדוק הגדרות אימות בהגדרות המצלמה</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>בדוק הגדרות אימות בהגדרות התקן קלט פלט</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">אזהרה</translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">אתה עומד להפעיל את רוטינת הסינכרון מחדש של הארכיון.</translation>
@@ -5727,10 +5718,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">שים לב! השימוש בדיסק הקשיח יוגבר במהלך תהליך הסנכרון מחדש! בהתאמה לגודל הכללי של הארכיון, התהליך עשוי לקחת מספר שעות.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">תהליך זה נצרך רק במידה ותיקיות הארכיון שלך הוזזו ממקומן, שמם השתנה או שהן הוחלפו. ביכולתך לבטל את תהליך הבניה מחדש בכל רגע, ללא איבוד נתונים.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5777,33 +5764,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 are selected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>In Real-Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notice: Only data from this point forward will be backed up. Existing archives will be ignored.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive has been successfully backup until: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No devices selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5812,7 +5772,66 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your archive has been successfully backed up.</source>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">אזהרה!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5853,6 +5872,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>%1 (Rebuilding... %2%)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">טוען...</translation>
     </message>
 </context>
 <context>
@@ -5898,12 +5921,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>למערכת שרת/ים אחר/ים המשתמשים באותו נתיב אחסון רשת. הקלטת מידע על ידי שרתים מרובים למיקום אחד איננו מומלץ.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>אזהרה</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>הוסף אחסון</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -6024,14 +6047,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6045,6 +6060,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6712,13 +6735,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>לא ניתן להעביר התקן קלט פלט זה לשרת %1. השרת אינו מגיב.</numerusform>
-            <numerusform>לא ניתן להעביר %n התקני קלט פלט לשרת %1. השרת אינו מגיב.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
         <translation>
             <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל התקן זה. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
@@ -6730,13 +6746,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>
             <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל מצלמה זו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
             <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל %n מצלמות אלו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל התקן קלט פלט זה. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
-            <numerusform>שרת %1 לא מצליח לאתר ולהגיע אל %n התקני קלט פלט אלו. האם ברצונך להעביר אותו בכל מקרה?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6762,20 +6771,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>%n מצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n התקני קלט פלט אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
-    </message>
-    <message>
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>%n מהתקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
         <translation>%n ממצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
-    </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n מהתקני קלט פלט אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
     </message>
     <message>
         <source>Do you really want to delete the following %n devices?</source>
@@ -6785,16 +6786,38 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Do you really want to delete the following %n cameras?</source>
         <translation>האם אתה רוצה למחוק את %n המצלמות הבאות?</translation>
     </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>האם אתה רוצה למחוק את %n התקני קלט פלט הבאים?</translation>
-    </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation>
             <numerusform>האם אתה רוצה למחוק את הפריט הבא?</numerusform>
             <numerusform>האם אתה רוצה למחוק את %n הפריטים הבאים?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6829,6 +6852,10 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6934,10 +6961,6 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Warning!</source>
         <translation>אזהרה!</translation>
-    </message>
-    <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>אתה עומד לייצא רצף וידאו ארוך מ30 דקות.</translation>
     </message>
     <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
@@ -7060,10 +7083,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>הפוך לקובץ לקריאה בלבד.</translation>
     </message>
     <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>אתה עומד לייצא מספר רצפי וידאו באורך כולל של למעלה מ30 דקות.</translation>
-    </message>
-    <message>
         <source>Export Successful.</source>
         <translation>היצוא הסתיים בהצלחה.</translation>
     </message>
@@ -7077,6 +7096,14 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message>
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7131,10 +7158,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>לא ניתן לעדכן את את השרתים שנבחרו.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation>אתה יכול לנסות לעדכן את השרתים שנית ב&quot;ניהול המערכת&quot;.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
@@ -7145,12 +7168,16 @@ If you understand this and would like to proceed please click Merge to continue.
 </translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>אזהרה</translation>
-    </message>
-    <message>
         <source>Merge</source>
         <translation>מזג</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">אזהרה!</translation>
     </message>
 </context>
 <context>
@@ -7263,8 +7290,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>כל המצלמות</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>כל התקני הקלט פלט</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7282,20 +7309,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אנא המתן עד שהמצלמה תחזור להיות מקוונת.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>לא ניתן להגדיר מיקום למצלמה.</translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set current position for camera %1.</source>
         <translation>אירעה שגיאה במהלך נסיון להגדיר את המיקום הנוכחי עבור מצלמה %1.</translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
-        <translation>לא ניתן להגדיר את המיקום של המצלמה.</translation>
-    </message>
-    <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
+    </message>
+    <message>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7494,10 +7517,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>שגיאה</translation>
     </message>
     <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>שגיאה לא צפויה אירעה. לא ניתן להחיל את השינויים.</translation>
-    </message>
-    <message>
         <source>There are no offline video wall items attached to this computer.</source>
         <translation>אין פריטי קיר וידאו זמינים בצורה לא מקוונת המחוברים למחשב זה.</translation>
     </message>
@@ -7574,14 +7593,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אשר עצירת קיר וידאו</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>האם אתה בטוח שברצונך לעצור את קיר הוידאו?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>תצטרך להפעיל את זה בצורה ידנית.</translation>
-    </message>
-    <message>
         <source>New Matrix %1</source>
         <translation>מטריצה חדשה %1</translation>
     </message>
@@ -7607,6 +7618,18 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>%n items</source>
         <translation>%n פריטים</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

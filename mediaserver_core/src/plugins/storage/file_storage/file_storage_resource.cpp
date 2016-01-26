@@ -420,7 +420,7 @@ QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
     m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::UnknownSize)
+    m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -489,7 +489,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 qint64 QnFileStorageResource::getFreeSpace()
 {
     if (!initOrUpdate())
-        return QnStorageResource::UnknownSize;
+        return QnStorageResource::kUnknownSize;
 
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
@@ -501,7 +501,7 @@ qint64 QnFileStorageResource::getFreeSpace()
 qint64 QnFileStorageResource::getTotalSpace()
 {
     if (!initOrUpdate())
-        return QnStorageResource::UnknownSize;
+        return QnStorageResource::kUnknownSize;
 
     QnMutexLocker locker (&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
