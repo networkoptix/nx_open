@@ -14,7 +14,7 @@
 class QnWorkbenchItem;
 class QnBookmarkQueriesCache;
 
-class QnCurrentLayoutBookmarksCache : public Connective<QObject>
+class QnWorkbenchBookmarksCache : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
     Q_OBJECT
@@ -22,13 +22,13 @@ class QnCurrentLayoutBookmarksCache : public Connective<QObject>
     typedef Connective<QObject> base_type;
 
 public:
-    QnCurrentLayoutBookmarksCache(int maxBookmarksCount
+    QnWorkbenchBookmarksCache(int maxBookmarksCount
         , const QnBookmarkSortProps &sortProp = QnBookmarkSortProps::default
         , const QnBookmarksThinOut &thinOut = QnBookmarksThinOut::kNoThinOut
         , qint64 minWindowChangeMs = 0
         , QObject *parent = nullptr);
 
-    virtual ~QnCurrentLayoutBookmarksCache();
+    virtual ~QnWorkbenchBookmarksCache();
 
 public:
     QnTimePeriod window() const;

@@ -1,5 +1,5 @@
 
-#include "current_layout_bookmarks_cache.h"
+#include "workbench_bookmarks_cache.h"
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_item.h>
@@ -27,7 +27,7 @@ namespace
     }
 };
 
-QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCount
+QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
     , const QnBookmarkSortProps &sortProp
     , const QnBookmarksThinOut &thinOut
     , qint64 minWindowChangeMs
@@ -41,22 +41,22 @@ QnCurrentLayoutBookmarksCache::QnCurrentLayoutBookmarksCache(int maxBookmarksCou
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
-        , this, &QnCurrentLayoutBookmarksCache::onItemAdded);
+        , this, &QnWorkbenchBookmarksCache::onItemAdded);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnCurrentLayoutBookmarksCache::onItemRemoved);
+        , this, &QnWorkbenchBookmarksCache::onItemRemoved);
 
 }
 
-QnCurrentLayoutBookmarksCache::~QnCurrentLayoutBookmarksCache()
+QnWorkbenchBookmarksCache::~QnWorkbenchBookmarksCache()
 {
 }
 
-QnTimePeriod QnCurrentLayoutBookmarksCache::window() const
+QnTimePeriod QnWorkbenchBookmarksCache::window() const
 {
     return QnTimePeriod::fromInterval(m_filter.startTimeMs, m_filter.endTimeMs);
 }
 
-void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)
+void QnWorkbenchBookmarksCache::setWindow(const QnTimePeriod &window)
 {
     if ((m_filter.startTimeMs == window.startTimeMs)
         && (m_filter.endTimeMs == window.endTimeMs()))
@@ -69,7 +69,7 @@ void QnCurrentLayoutBookmarksCache::setWindow(const QnTimePeriod &window)
     m_queriesCache->updateQueries(m_filter);
 }
 
-void QnCurrentLayoutBookmarksCache::setThinOut(const QnBookmarksThinOut &thinOut)
+void QnWorkbenchBookmarksCache::setThinOut(const QnBookmarksThinOut &thinOut)
 {
     if (m_filter.thinOut == thinOut)
         return;
@@ -78,7 +78,7 @@ void QnCurrentLayoutBookmarksCache::setThinOut(const QnBookmarksThinOut &thinOut
     m_queriesCache->updateQueries(m_filter);
 }
 
-QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCameraResourcePtr &camera)
+QnCameraBookmarkList QnWorkbenchBookmarksCache::bookmarks(const QnVirtualCameraResourcePtr &camera)
 {
     if (!camera)
         return QnCameraBookmarkList();
@@ -87,7 +87,7 @@ QnCameraBookmarkList QnCurrentLayoutBookmarksCache::bookmarks(const QnVirtualCam
     return query->cachedBookmarks();
 }
 
-void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)
+void QnWorkbenchBookmarksCache::onItemAdded(QnWorkbenchItem *item)
 {
     emit itemAdded(item);
 
@@ -109,7 +109,7 @@ void QnCurrentLayoutBookmarksCache::onItemAdded(QnWorkbenchItem *item)
     });
 }
 
-void QnCurrentLayoutBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
+void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
 {
     emit itemRemoved(item);
     const auto layout = workbench()->currentLayout();
