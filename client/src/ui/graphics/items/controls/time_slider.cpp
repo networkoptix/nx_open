@@ -463,7 +463,6 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_selecting(false),
     m_lineCount(0),
     m_totalLineStretch(0.0),
-    m_bookmarkMergeHelper(new QnBookmarkMergeHelper()),
     m_msecsPerPixel(1.0),
     m_animationUpdateMSecsPerPixel(1.0),
     m_thumbnailsAspectRatio(-1.0),
@@ -478,29 +477,9 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
 
     , m_currentRulerRectMousePos()
     , m_lastLineBarValue()
-    , m_bookmarksViewer(new QnBookmarksViewer(
-        std::bind(&QnTimeSlider::bookmarksAtPosition, this, std::placeholders::_1)
-        , [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
-        {
-            if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
-                return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
-
-            const auto viewer = bookmarksViewer();
-            const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
-
-            const auto pos = positionFromValue(timestamp);
-            const auto target = QPointF(pos.x(), lineBarRect.top());
-
-            Q_D(const GraphicsSlider);
-
-            const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
-            const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
-            const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
-            const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
-            return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
-        }
-        , this))
+    , m_bookmarksViewer(createBookmarksViewer())
     , m_bookmarksVisible(false)
+    , m_bookmarksHelper(nullptr)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -553,6 +532,37 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     m_bookmarksViewer->setZValue(std::numeric_limits<qreal>::max());
     toolTipItem()->setParentItem(tooltipParent);
     toolTipItem()->stackBefore(m_bookmarksViewer);
+}
+
+QnBookmarksViewer *QnTimeSlider::createBookmarksViewer()
+{
+    const auto bookmarksAtPositionFunc = [this](qint64 position) -> QnCameraBookmarkList
+    {
+        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(position, m_msecsPerPixel)
+            : QnCameraBookmarkList());
+    };
+
+    const auto getPosFunc = [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
+    {
+        if ((timestamp < m_windowStart) || (timestamp > m_windowEnd))
+            return QnBookmarksViewer::PosAndBoundsPair();   /// Out of window
+
+        const auto viewer = bookmarksViewer();
+        const QRectF lineBarRect = positionRect(rulerRect(), lineBarPosition);
+
+        const auto pos = positionFromValue(timestamp);
+        const auto target = QPointF(pos.x(), lineBarRect.top());
+
+        Q_D(const GraphicsSlider);
+
+        const auto left = viewer->mapFromItem(this, QPointF(d->pixelPosMin, 0));
+        const auto right = viewer->mapFromItem(this, QPointF(d->pixelPosMax, 0));
+        const QnBookmarksViewer::Bounds bounds(left.x(), right.x());
+        const QPointF finalPos = viewer->mapToParent(viewer->mapFromItem(this, target));
+        return QnBookmarksViewer::PosAndBoundsPair(finalPos, bounds);
+    };
+
+    return new QnBookmarksViewer(bookmarksAtPositionFunc, getPosFunc, this);
 }
 
 QnTimeSlider::~QnTimeSlider() {
@@ -763,16 +773,6 @@ void QnTimeSlider::setTimePeriods(int line, Qn::TimePeriodContent type, const Qn
         return;
 
     m_lineData[line].timeStorage.setPeriods(type, timePeriods);
-}
-
-QnCameraBookmarkList QnTimeSlider::bookmarks() const {
-    return m_bookmarks;
-}
-
-void QnTimeSlider::setBookmarks(const QnCameraBookmarkList &bookmarks) {
-    m_bookmarks = bookmarks;
-    m_bookmarkMergeHelper->setBookmarks(bookmarks);
-    update();
 }
 
 QnTimeSlider::Options QnTimeSlider::options() const {
@@ -1234,10 +1234,6 @@ void QnTimeSlider::clearThumbnails() {
     m_thumbnailData.clear();
 }
 
-QnCameraBookmarkList QnTimeSlider::bookmarksAtPosition(qint64 position) const {
-    return m_bookmarkMergeHelper->bookmarksAtPosition(position, m_msecsPerPixel);
-}
-
 void QnTimeSlider::freezeThumbnails() {
     m_oldThumbnailData = m_thumbnailData.values();
     clearThumbnails();
@@ -1306,6 +1302,11 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
 QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
 {
     return m_bookmarksViewer;
+}
+
+void QnTimeSlider::setBookmarksHelper(const QnBookmarkMergeHelperPtr &helper)
+{
+    m_bookmarksHelper = helper;
 }
 
 bool QnTimeSlider::isBookmarksVisible() const {
@@ -1430,6 +1431,11 @@ void QnTimeSlider::updateTickmarkTextSteps() {
     }
 }
 
+qreal QnTimeSlider::msecsPerPixel() const
+{
+    return m_msecsPerPixel;
+}
+
 void QnTimeSlider::updateMSecsPerPixel() {
     qreal msecsPerPixel = (m_windowEnd - m_windowStart) / size().width();
     if(qFuzzyIsNull(msecsPerPixel))
@@ -1443,6 +1449,8 @@ void QnTimeSlider::updateMSecsPerPixel() {
     updateThumbnailsStepSize(false);
     updateStepAnimationTargets();
     updateAggregationValue();
+
+    emit msecsPerPixelChanged();
 }
 
 void QnTimeSlider::updateMinimalWindow() {
@@ -2217,11 +2225,13 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 }
 
 //TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
-void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
+void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect)
+{
     if (!m_bookmarksVisible)
         return;
 
-    QnTimelineBookmarkItemList bookmarks = m_bookmarkMergeHelper->bookmarks(m_msecsPerPixel);
+    QnTimelineBookmarkItemList bookmarks = (m_bookmarksHelper
+        ? m_bookmarksHelper->bookmarks(m_msecsPerPixel) : QnTimelineBookmarkItemList());
     if (bookmarks.isEmpty())
         return;
 

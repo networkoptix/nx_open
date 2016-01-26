@@ -35,7 +35,7 @@ QnBookmarksLoader::QnBookmarksLoader(const QnVirtualCameraResourcePtr &camera, Q
     loadTimer->start();
 }
 
-void QnBookmarksLoader::queueToLoad(const QnTimePeriod &period) {   
+void QnBookmarksLoader::queueToLoad(const QnTimePeriod &period) {
     m_queuedPeriod = period;
     /* Check if we already ready to load. */
     processLoadQueue();
@@ -87,7 +87,7 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
     requestData.filter.endTimeMs = period.isInfinite()
         ? DATETIME_NOW
         : period.endTimeMs();
-    requestData.filter.strategy = Qn::LongestFirst;
+    requestData.filter.orderBy = QnBookmarkSortOrder::QnBookmarkSortOrder(Qn::BookmarkDuration, Qt::DescendingOrder);
     requestData.filter.limit = bookmarksLimitPerRequest;
 
     //TODO: #GDM #Bookmarks #IMPLEMENT ME
@@ -111,6 +111,6 @@ void QnBookmarksLoader::handleDataLoaded(int status, const QnCameraBookmarkList 
         mergeSource.push_back(data);
         m_loadedData = QnCameraBookmark::mergeCameraBookmarks(mergeSource);
     }
-   
+
     emit bookmarksChanged(m_loadedData);
 }
