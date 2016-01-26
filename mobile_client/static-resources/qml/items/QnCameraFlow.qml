@@ -219,32 +219,50 @@ Item {
                     height: 0
                     clip: true
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: expandAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: hiddenCamerasColumn.height
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: hiddenCamerasColumn.height
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                target: cameraGrid
+                                property: "contentY"
+                                to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        NumberAnimation {
-                            target: cameraGrid
-                            property: "contentY"
-                            to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = Qt.binding(function() { return hiddenCamerasColumn.height })
+                            }
                         }
                     }
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: collapseAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: 0
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = hiddenList.height // kill the binding
+                            }
+                        }
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: 0
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
