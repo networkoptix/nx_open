@@ -106,7 +106,7 @@ void QnWorkbenchPtzHandler::at_ptzSavePresetAction_triggered() {
         QMessageBox::critical(
             mainWindow(),
             tr("Unable to get position from camera."),
-            tr("An error has occurred while trying to get current position from camera %1.").arg(getResourceName(resource))
+            tr("An error has occurred while trying to get a current position from camera %1.").arg(getResourceName(resource))
           + L'\n' 
           + tr("Please wait for the camera to go online.")
         );
@@ -149,7 +149,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
+                tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;
@@ -202,7 +202,7 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered() {
             QMessageBox::critical(
                 mainWindow(),
                 tr("Unable to set position on camera."),
-                tr("An error has occurred while trying to set current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
+                tr("An error has occurred while trying to set the current position for camera %1.").arg(getResourceName(resource)) + L'\n' 
               + tr("Please wait for the camera to go online.")
             );
             return;
