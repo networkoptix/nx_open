@@ -132,6 +132,8 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
         , this, &QnWorkbenchItemBookmarksWatcher::onItemAdded);
     connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemRemoved
         , this, &QnWorkbenchItemBookmarksWatcher::onItemRemoved);
+    connect(m_bookmarksCache, &QnWorkbenchBookmarksCache::itemAboutToBeRemoved
+        , this, &QnWorkbenchItemBookmarksWatcher::onItemRemoved);
 }
 
 QnWorkbenchItemBookmarksWatcher::~QnWorkbenchItemBookmarksWatcher()

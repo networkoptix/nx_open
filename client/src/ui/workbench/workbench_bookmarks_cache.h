@@ -42,10 +42,13 @@ public:
 private:
     void onItemAdded(QnWorkbenchItem *item);
 
-    void removeQueryByItem(QnWorkbenchItem *item
-        , bool forceRemove);
+    void onItemRemoved(QnWorkbenchItem *item);
+
+    void onItemAboutToBeRemoved(QnWorkbenchItem *item);
 
     void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
+
+    void onCurrentLayoutChanged();
 
 signals:
     void bookmarksChanged(const QnVirtualCameraResourcePtr &camera
@@ -55,9 +58,14 @@ signals:
 
     void itemRemoved(QnWorkbenchItem *item);
 
+    void itemAboutToBeRemoved(QnWorkbenchItem *item);
+
 private:
     typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;
+    typedef std::function<void ()> PostponedAction;
+    typedef QLinkedList<PostponedAction> PostponedActionsList;
 
     QnCameraBookmarkSearchFilter m_filter;
     QnBookmarkQueriesCachePtr m_queriesCache;
+    PostponedActionsList m_atLayoutChangedActions;
 };

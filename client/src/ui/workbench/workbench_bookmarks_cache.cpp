@@ -38,14 +38,15 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
 
     , m_filter(createFilter(maxBookmarksCount, sortProp, sparsing))
     , m_queriesCache(new QnBookmarkQueriesCache(minWindowChangeMs))
+    , m_atLayoutChangedActions()
 {
     const auto itemsWatcher= context()->instance<QnCurrentLayoutItemsWatcher>();
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
         , this, &QnWorkbenchBookmarksCache::onItemAdded);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved, this
-        , [this](QnWorkbenchItem *item) { removeQueryByItem(item, false); });
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved, this
-        , [this](QnWorkbenchItem *item) { removeQueryByItem(item, true); });
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
+        , this, &QnWorkbenchBookmarksCache::onItemRemoved);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved
+        , this, &QnWorkbenchBookmarksCache::onItemAboutToBeRemoved);
 
     connect(qnResPool, &QnResourcePool::resourceRemoved, this
         , [this](const QnResourcePtr &resource)
@@ -115,8 +116,7 @@ void QnWorkbenchBookmarksCache::onItemAdded(QnWorkbenchItem *item)
     });
 }
 
-void QnWorkbenchBookmarksCache::removeQueryByItem(QnWorkbenchItem *item
-    , bool forceRemove)
+void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
 {
     emit itemRemoved(item);
     const auto layout = workbench()->currentLayout();
@@ -131,12 +131,42 @@ void QnWorkbenchBookmarksCache::removeQueryByItem(QnWorkbenchItem *item
     if (!isQueryExist)
         return;
 
-    const bool hasSameCameras = !forceRemove && !layout->items(camera->getUniqueId()).isEmpty();
+    const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
     if (hasSameCameras)
         return;
 
     removeQueryByCamera(camera);
 }
+
+void QnWorkbenchBookmarksCache::onItemAboutToBeRemoved(QnWorkbenchItem *item)
+{
+    emit itemAboutToBeRemoved(item);
+
+    const auto camera = helpers::extractCameraResource(item);
+    if (!camera)
+        return;
+
+    auto removeItemAction = [this, camera]()
+    {
+        const auto layout = workbench()->currentLayout();
+        const auto hasItemsWithThisCamera = (layout && !layout->items(camera->getUniqueId()).isEmpty());
+        if (hasItemsWithThisCamera)
+            return; // Do not remove query for this camera - it holds (possibly) some bookmarks for visible period
+
+        removeQueryByCamera(camera);
+    };
+
+    m_atLayoutChangedActions.append(removeItemAction);
+}
+
+void QnWorkbenchBookmarksCache::onCurrentLayoutChanged()
+{
+    for (const auto action: m_atLayoutChangedActions)
+        action();
+
+    m_atLayoutChangedActions.clear();
+}
+
 
 void QnWorkbenchBookmarksCache::removeQueryByCamera(const QnVirtualCameraResourcePtr &camera)
 {
@@ -147,4 +177,5 @@ void QnWorkbenchBookmarksCache::removeQueryByCamera(const QnVirtualCameraResourc
     disconnect(query, nullptr, this, nullptr);
     m_queriesCache->removeQueryByCamera(camera);
 }
+
 
