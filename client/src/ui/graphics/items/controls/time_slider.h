@@ -19,7 +19,6 @@
 #include <ui/animation/animation_timer_listener.h>
 #include <ui/animation/animated.h>
 #include <ui/common/help_topic_queryable.h>
-#include <ui/workbench/workbench_context_aware.h>
 
 #include "time_step.h"
 
@@ -32,7 +31,7 @@ class QnTimePeriodList;
 class QnBookmarksViewer;
 class QnBookmarkMergeHelper;
 
-class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable, public QnWorkbenchContextAware
+class QnTimeSlider: public Animated<QnToolTipSlider>, public HelpTopicQueryable
     , protected KineticProcessHandler, protected DragProcessHandler, protected AnimationTimerListener
 {
     Q_OBJECT
@@ -188,6 +187,7 @@ public:
 
     QnBookmarksViewer *bookmarksViewer();
 
+    void setBookmarksHelper(QnBookmarkMergeHelper *helper);
     bool isBookmarksVisible() const;
     void setBookmarksVisible(bool bookmarksVisible);
 
@@ -333,8 +333,6 @@ private:
     Q_SLOT void addThumbnail(const QnThumbnail &thumbnail);
     Q_SLOT void clearThumbnails();
 
-    void mergeBookmarks();
-
     void animateStepValues(int deltaMSecs);
     void animateThumbnails(int deltaMSecs);
     bool animateThumbnail(qreal dt, ThumbnailData &data);
@@ -429,6 +427,7 @@ private:
 
     QnBookmarksViewer *m_bookmarksViewer;
     bool m_bookmarksVisible;
+    QnBookmarkMergeHelper *m_bookmarksHelper;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);

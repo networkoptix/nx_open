@@ -52,15 +52,12 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
             , navigator()->timeSlider()->msecsPerPixel());
         m_bookmarksCache->setThinOut(thinOut);
     });
+
+    navigator()->timeSlider()->setBookmarksHelper(m_mergeHelper.data());
 }
 
 QnTimelineBookmarksWatcher::~QnTimelineBookmarksWatcher()
 {
-}
-
-QnTimelineBookmarkItemList QnTimelineBookmarksWatcher::mergedBookmarks(qint64 msecsPerDp)
-{
-    return m_mergeHelper->bookmarks(msecsPerDp);
 }
 
 QnCameraBookmarkList QnTimelineBookmarksWatcher::bookmarksAtPosition(qint64 position

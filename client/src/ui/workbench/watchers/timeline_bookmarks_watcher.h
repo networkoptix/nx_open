@@ -35,8 +35,6 @@ public:
     virtual ~QnTimelineBookmarksWatcher();
 
 public:
-    QnTimelineBookmarkItemList mergedBookmarks(qint64 msecsPerDp);
-
     QnCameraBookmarkList bookmarksAtPosition(qint64 position
         , qint64 msecdsPerDp = 0);
 

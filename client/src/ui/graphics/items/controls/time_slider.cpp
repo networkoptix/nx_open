@@ -32,8 +32,6 @@
 #include <ui/processors/kinetic_cutting_processor.h>
 #include <ui/processors/drag_processor.h>
 #include <ui/utils/bookmark_merge_helper.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 
 #include <ui/help/help_topics.h>
 
@@ -447,7 +445,6 @@ Q_GLOBAL_STATIC(QnTimeSliderStepStorage, timeSteps);
 QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     , QGraphicsItem *tooltipParent):
     base_type(parent),
-    QnWorkbenchContextAware(parent->toGraphicsObject()),
 
     m_windowStart(0),
     m_windowEnd(0),
@@ -483,6 +480,7 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem *parent
     , m_lastLineBarValue()
     , m_bookmarksViewer(createBookmarksViewer())
     , m_bookmarksVisible(false)
+    , m_bookmarksHelper(nullptr)
 {
     /* Prepare thumbnail update timer. */
     m_thumbnailsUpdateTimer = new QTimer(this);
@@ -541,8 +539,8 @@ QnBookmarksViewer *QnTimeSlider::createBookmarksViewer()
 {
     const auto bookmarksAtPositionFunc = [this](qint64 position) -> QnCameraBookmarkList
     {
-        const auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
-        return watcher->bookmarksAtPosition(position, m_msecsPerPixel);
+        return (m_bookmarksHelper ? m_bookmarksHelper->bookmarksAtPosition(position, m_msecsPerPixel)
+            : QnCameraBookmarkList());
     };
 
     const auto getPosFunc = [this](qint64 timestamp) -> QnBookmarksViewer::PosAndBoundsPair
@@ -1305,6 +1303,11 @@ bool QnTimeSlider::isLastMinuteIndicatorVisible(int line) const {
 QnBookmarksViewer *QnTimeSlider::bookmarksViewer()
 {
     return m_bookmarksViewer;
+}
+
+void QnTimeSlider::setBookmarksHelper(QnBookmarkMergeHelper *helper)
+{
+    m_bookmarksHelper = helper;
 }
 
 bool QnTimeSlider::isBookmarksVisible() const {
@@ -2223,12 +2226,13 @@ void QnTimeSlider::drawThumbnail(QPainter *painter, const ThumbnailData &data, c
 }
 
 //TODO: #GDM #Bookmarks check drawBookmarks() against m_localOffset
-void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect) {
+void QnTimeSlider::drawBookmarks(QPainter *painter, const QRectF &rect)
+{
     if (!m_bookmarksVisible)
         return;
 
-    const auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
-    QnTimelineBookmarkItemList bookmarks = watcher->mergedBookmarks(m_msecsPerPixel);
+    QnTimelineBookmarkItemList bookmarks = (m_bookmarksHelper
+        ? m_bookmarksHelper->bookmarks(m_msecsPerPixel) : QnTimelineBookmarkItemList());
     if (bookmarks.isEmpty())
         return;
 
