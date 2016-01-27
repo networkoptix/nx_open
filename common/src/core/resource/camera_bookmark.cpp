@@ -221,7 +221,7 @@ QnBookmarkSortOrder::QnBookmarkSortOrder(Qn::BookmarkSortField column
     , order(order)
 {}
 
-const QnBookmarkSortOrder QnBookmarkSortOrder::default =
+const QnBookmarkSortOrder QnBookmarkSortOrder::defaultOrder =
     QnBookmarkSortOrder(Qn::BookmarkStartTime, Qt::AscendingOrder);
 
 //
@@ -369,7 +369,7 @@ QnCameraBookmarkSearchFilter::QnCameraBookmarkSearchFilter():
     endTimeMs(std::numeric_limits<qint64>().max()),
     limit(kNoLimit),
     sparsing(),
-    orderBy(QnBookmarkSortOrder::default)
+    orderBy(QnBookmarkSortOrder::defaultOrder)
 {}
 
 bool QnCameraBookmarkSearchFilter::isValid() const {

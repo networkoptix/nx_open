@@ -21,7 +21,7 @@ struct QnBookmarkSortOrder
     explicit QnBookmarkSortOrder(Qn::BookmarkSortField column = Qn::BookmarkStartTime
         , Qt::SortOrder order = Qt::AscendingOrder);
 
-    static const QnBookmarkSortOrder default;
+    static const QnBookmarkSortOrder defaultOrder;
 };
 #define QnBookmarkSortOrder_Fields (column)(order)
 
@@ -87,7 +87,7 @@ struct QnCameraBookmark {
         , const QnBookmarkSortOrder orderBy);
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-        , const QnBookmarkSortOrder &sortProperties = QnBookmarkSortOrder::default
+        , const QnBookmarkSortOrder &sortProperties = QnBookmarkSortOrder::defaultOrder
         , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions()
         , int limit = std::numeric_limits<int>().max());
 };
