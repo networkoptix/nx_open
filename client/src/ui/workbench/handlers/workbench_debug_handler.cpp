@@ -113,7 +113,9 @@ qint64 move() {
     return random(100000, 300000);
 }
 
-void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
+void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
+{
+#ifdef _DEBUG
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
 
@@ -191,7 +193,7 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
 
 
     }
-
+#endif //_DEBUG
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

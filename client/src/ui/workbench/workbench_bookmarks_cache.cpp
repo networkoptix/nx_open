@@ -46,7 +46,7 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
         , this, &QnWorkbenchBookmarksCache::onItemRemoved);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
-        , this, &QnWorkbenchBookmarksCache::onItemAboutToBeRemoved);
+        , this, &QnWorkbenchBookmarksCache::onItemHidden);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutChanged
         , this, &QnWorkbenchBookmarksCache::onCurrentLayoutChanged);
 
@@ -140,7 +140,7 @@ void QnWorkbenchBookmarksCache::onItemRemoved(QnWorkbenchItem *item)
     removeQueryByCamera(camera);
 }
 
-void QnWorkbenchBookmarksCache::onItemAboutToBeRemoved(QnWorkbenchItem *item)
+void QnWorkbenchBookmarksCache::onItemHidden(QnWorkbenchItem *item)
 {
     emit itemAboutToBeRemoved(item);
 
