@@ -87,7 +87,7 @@ void QnBookmarksLoader::sendRequest(const QnTimePeriod &period) {
     requestData.filter.endTimeMs = period.isInfinite()
         ? DATETIME_NOW
         : period.endTimeMs();
-    requestData.filter.orderBy = QnBookmarkSortOrder::QnBookmarkSortOrder(Qn::BookmarkDuration, Qt::DescendingOrder);
+    requestData.filter.orderBy = QnBookmarkSortOrder(Qn::BookmarkDuration, Qt::DescendingOrder);
     requestData.filter.limit = bookmarksLimitPerRequest;
 
     //TODO: #GDM #Bookmarks #IMPLEMENT ME
