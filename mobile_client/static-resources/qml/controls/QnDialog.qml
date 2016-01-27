@@ -84,6 +84,18 @@ QnPopup {
                     height: childrenRect.height
                 }
             }
+
+            Rectangle {
+                width: parent.width
+                height: dp(8)
+
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: "#15000000" }
+                    GradientStop { position: 1.0; color: "#00000000" }
+                }
+
+                opacity: Math.min(dp(8), Math.max(0, flickable.contentY)) / dp(8)
+            }
         }
 
         Loader {
