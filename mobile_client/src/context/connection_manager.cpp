@@ -223,6 +223,7 @@ void QnConnectionManagerPrivate::doConnect() {
         Q_Q(QnConnectionManager);
 
         if (status != QnConnectionManager::Success) {
+            emit q->connectionStateChanged();
             emit q->connectionFailed(status, infoParameter);
             return;
         }
