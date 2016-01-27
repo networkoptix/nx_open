@@ -14,7 +14,7 @@ namespace
 {
     const QString startTimeKey                  (lit("startTime"));
     const QString endTimeKey                    (lit("endTime"));
-    const QString sortColumnKey                 (lit("sortColumn"));
+    const QString sortColumnKey                 (lit("sortField"));
     const QString sortOrderKey                  (lit("sortOrder"));
     const QString useSparsing                   (lit("useSparsing"));
     const QString minVisibleLengthMs            (lit("minVisibleLength"));
