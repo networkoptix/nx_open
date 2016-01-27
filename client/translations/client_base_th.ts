@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 ของ%n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 ของ%n กล้อง</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">เลือกอย่างน้อยหนึ่งกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>รายชื่อกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n อุปกรณ์ที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n อุปกรณ์ที่พบ</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n กล้องที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n กล้องที่พบ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>ส่งออกกล้องที่เลือกไปยังแฟ้ม.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>กฎระเบียบกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่านี้%n</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Use licenses for selected %n cameras</translation>
+        <translation type="unfinished">
+            <numerusform>Use licenses for selected %n cameras</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4497,15 +4521,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4781,13 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>ว่างเปล่า</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>รวม %n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>รวม %n กล้อง</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5039,10 +5069,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation type="unfinished">กล้อง</translation>
-    </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5370,10 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>โปรดอัปเดตส่วน ไคลเอ็นต์ โดยตรง จากแพคเกจการติดตั้ง.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>ยกเลิกการปรับปรุง</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>ปรับปรุงสำเร็จ.</translation>
     </message>
@@ -5417,6 +5439,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5477,10 +5511,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ซอฟแวร์สำหรับการเคลื่อนไหว 2 เฟรมต่อวินาทีสงวนไว้สำหรับกระแสรอง เฟรมต่อวินาทีปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>สตรีมมิ่งสำรองถูกปิดใช้งานในกล้องนี้ การเคลื่อนไหว + LQ ไม่มี effect.Press &quot;ตกลง&quot; เพื่อเปลี่ยนประเภทการบันทึกเพื่อ &quot;ตลอดไป&quot; หรือ &quot;ไม่&quot; เพื่อเปิดใช้งานสตรีมมิ่งสำรอง.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>ยืนยันการตั้งค่าพื้นที่ที่เคลื่อนไหว</translation>
     </message>
@@ -5515,6 +5545,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">ตารางเวลาที่ไม่ถูกต้อง</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6696,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>กระบวนการเปิดไม่พบ.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>อุปกรณ์ที่มีอยู่แล้วอยู่ระหว่างดำเนินการ คุณแน่ใจหรือว่าต้องการยกเลิกการดำเนินการปัจจุบันหรือไม่?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6702,29 +6732,41 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>คุณแน่ใจหรือว่าต้องการลบรายการเหล่านี้ %n  จากรูปแบบ?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>อุปกรณ์ %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>อุปกรณ์ %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ของอุปกรณ์เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>%n ของอุปกรณ์เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ของกล้องเหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>%n ของกล้องเหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>จริงๆคุณต้องการลบอุปกรณ์ %n ต่อไปนี้หรือไม่?</translation>
+        <translation type="unfinished">
+            <numerusform>จริงๆคุณต้องการลบอุปกรณ์ %n ต่อไปนี้หรือไม่?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>จริงๆคุณต้องการลบกล้อง %n ต่อไปนี้หรือไม่?</translation>
+        <translation type="unfinished">
+            <numerusform>จริงๆคุณต้องการลบกล้อง %n ต่อไปนี้หรือไม่?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6744,16 +6786,26 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7232,16 +7284,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากอกล้อง %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>โปรดรอสักครู่สำหรับกล้องที่จะไออนไลน์.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับกล้อง %1.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7249,6 +7293,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7262,9 +7314,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>มันไม่ได้รับอนุญาตให้ทำการเปลี่ยนแปลงใด ๆ ยกเว้นใบอนุญาตการเปิดใช้งาน.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7276,9 +7330,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกลบ.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกลบ.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7542,9 +7598,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>จอแสดงผล มีชื่อเดียวกันกับที่มีอยู่แล้ว.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n รายการ</translation>
+        <translation type="unfinished">
+            <numerusform>%n รายการ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

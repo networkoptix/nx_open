@@ -625,7 +625,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>I/O Module initialization process in progress.</source>
+        <source>I/O Module initialization process is in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -644,7 +644,7 @@
     <name>QnEnvironment</name>
     <message>
         <source>Could not find explorer.exe in path to launch Windows Explorer.</source>
-        <translation>Could not find explorer.exe in path to launch Windows Explorer.</translation>
+        <translation></translation>
     </message>
     <message>
         <source>File explorer failed to open.</source>
@@ -740,11 +740,11 @@
     </message>
     <message>
         <source>Only single license is allowed for this device</source>
-        <translation>Only single license is allowed for this device</translation>
+        <translation></translation>
     </message>
     <message>
         <source>Unknown error</source>
-        <translation>Unknown error</translation>
+        <translation></translation>
     </message>
     <message>
         <source>I/O Module</source>
@@ -854,10 +854,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -871,6 +867,10 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1164,6 +1164,13 @@
     <message>
         <source>%1 (external)</source>
         <translation></translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

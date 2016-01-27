@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>終了</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>リフレッシュ</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>全サーバーオフライン　操作履歴データは利用できません.</translation>
+        <source>Audit Trail</source>
+        <translation>操作履歴</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>操作履歴</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>回転初期値:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>魚眼レンズカメラ</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>魚眼レンズカメラ</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>このライセンスタイプでは高機能バージョンのソフトウェアーが必要です.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1864,6 +1864,11 @@
         <source>Check</source>
         <translation>チェック</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1983,11 +1988,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>インターネット経由で確認できません.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>有効な更新:</translation>
     </message>
@@ -1995,6 +1995,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>マニュアル更新を行うには次のリンクよりアーカイブをダウンロード:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2116,8 +2121,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>接続がリストアされるまでお待ちください...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2963,11 +2968,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>注意　録画スケジュールのFPSと画質設定は適応されません!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(推奨)</translation>
     </message>
@@ -2980,6 +2980,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>anonymou使用とクラッシュ統計をソフトウェア開発に送信</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
     </message>
 </context>
 <context>

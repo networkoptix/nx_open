@@ -23,6 +23,8 @@ public:
     explicit QnMergeSystemsDialog(QWidget *parent = 0);
     ~QnMergeSystemsDialog();
 
+    void done(int result) override;
+
     QUrl url() const;
     QString password() const;
 
@@ -49,6 +51,7 @@ private:
     QnMediaServerResourcePtr m_discoverer;
     QUrl m_url;
     QString m_adminPassword;
+    bool m_successfullyFinished;
 };
 
 #endif // MERGE_SYSTEMS_DIALOG_H

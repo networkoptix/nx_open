@@ -100,12 +100,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translatorcomment>Since - Till, From - To</translatorcomment>
-        <translation type="unfinished">To</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -171,12 +165,17 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation type="unfinished">All Servers are offline.  Audit data is not available.</translation>
+        <source>Audit Trail</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -865,7 +864,7 @@
     <message>
         <location/>
         <source>Clear Filter</source>
-        <translation>Clear Filter</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -954,12 +953,12 @@
     <message>
         <location/>
         <source>Downmix Audio from 5.1 to 2.1</source>
-        <translation>Downmix Audio from 5.1 to 2.1</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
         <source>Auto Pause Video</source>
-        <translation>Auto Pause Video</translation>
+        <translation></translation>
     </message>
     <message>
         <location/>
@@ -1089,12 +1088,12 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation type="unfinished">Default Rotation:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
+        <source>Default Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1304,8 +1303,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation type="unfinished">This license type requires a higher software version.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1866,6 +1865,11 @@
         <source>Check</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1985,17 +1989,17 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished">Unable to check updates on the Internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2118,8 +2122,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation type="unfinished">Please wait while the connection is being restored...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2379,7 +2383,7 @@
     <message>
         <location filename="../src/ui/dialogs/resource_list_dialog.ui"/>
         <source>Never suggest saving layouts</source>
-        <translation>Never suggest saving layouts</translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2964,11 +2968,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2980,6 +2979,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

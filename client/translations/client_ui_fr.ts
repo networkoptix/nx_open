@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>Jusqu&apos;à</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Actualiser</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Tous les serveurs sont hors ligne. Vérification de donnée non disponibles.</translation>
+        <source>Audit Trail</source>
+        <translation>Piste de vérification</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Piste de vérification</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1088,13 +1088,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Rotation par défaut:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Ceci est une lentille &apos;fisheye&apos;</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Ceci est une lentille &apos;fisheye&apos;</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1303,8 +1303,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Ce type de licence requiert une version logiciel récente.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1865,6 +1865,11 @@
         <source>Check</source>
         <translation>Vérifier</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1984,11 +1989,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Impossible de vérifier les MàJ depuis Internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Mise à jour disponible:</translation>
     </message>
@@ -1996,6 +1996,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Pour faire une MàJ manuelle, télécharger et utiliser le fichierdu lien suivant:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2122,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>S.V.P. attendre que la connexion soit restaurée...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2966,11 +2971,6 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Attention! Les paramètres de qualité et d&apos;IPS dans l&apos;horaire d&apos;enregistrement ne fonctionnera pas!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(recommandé)</translation>
     </message>
@@ -2983,6 +2983,11 @@ Il ne sera pas refuser de supprimer les séquences du disque.</translation>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Envoyer des statistiques anonymes de l&apos;utilisation et plantage aux développeurs du logiciels</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Attention! Cela rendra la qualité et l&apos;image par seconde (IPS) de la programmation d&apos;enregistrement non pertinent.</translation>
     </message>
 </context>
 <context>

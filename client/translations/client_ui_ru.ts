@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>по</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Все сервера отключены. Данные аудита недоступны.</translation>
+        <source>Audit Trail</source>
+        <translation>Аудит</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Аудит</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1088,13 +1088,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Поворот по-умолчанию:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Это камера с объективом &quot;рыбий глаз&quot; (fish-eye)</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1303,8 +1303,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Данный тип лицензии требует более высокой версии приложения.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1865,6 +1865,11 @@
         <source>Check</source>
         <translation>Проверить</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1984,11 +1989,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Невозможно проверить наличие обновлений через интернет.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Доступные обновления:</translation>
     </message>
@@ -1996,6 +1996,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Для того чтобы обновиться вручную, скачайте архив по следующей ссылке:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2122,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Пожалуйста подождите пока соединение будет восстановлено...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2964,11 +2969,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Внимание! Настройки &quot;Частота кадров&quot; и&quot;Качество&quot; в настройках записи камеры работать не будут!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(рекомендованные)</translation>
     </message>
@@ -2981,6 +2981,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Отправлять анонимную статистику использования и сбоев разработчикам</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Внимание! Это сделает настройки Качество и Частота кадров (FPS) неактуальными.</translation>
     </message>
 </context>
 <context>

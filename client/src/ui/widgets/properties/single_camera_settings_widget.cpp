@@ -691,7 +691,7 @@ bool QnSingleCameraSettingsWidget::isValidSecondStream() {
 
     auto button = QMessageBox::warning(this,
         tr("Invalid Schedule"),
-        tr("Second stream is disabled on this camera. Motion + LQ option has no effect."\
+        tr("Second stream is disabled on this camera. Motion + LQ option has no effect. "
         "Press \"Yes\" to change recording type to \"Always\" or \"No\" to re-enable second stream."),
         QMessageBox::StandardButtons(QMessageBox::Yes|QMessageBox::No | QMessageBox::Cancel),
         QMessageBox::Yes);

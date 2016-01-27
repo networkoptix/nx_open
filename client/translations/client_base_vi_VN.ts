@@ -1815,13 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 of %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>%1 of %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 of %n cameras</translation>
+        <translation type="unfinished">
+            <numerusform>%1 of %n cameras</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1839,9 +1843,11 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">Chọn ít nhất một máy ảnh</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2375,13 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Danh sách máy ảnh</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n thiết bị được tìm</translation>
+        <translation type="unfinished">
+            <numerusform>%n thiết bị được tìm</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n máy ảnh được tìm thấy</translation>
+        <translation type="unfinished">
+            <numerusform>%n máy ảnh được tìm thấy</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2391,9 +2401,11 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>Xuất khẩu chọn lọc máy ảnh vào một tập tin.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2597,13 +2609,17 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Nội quy camera</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Áp dụng thay đổi cho các thiết bị %n sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Áp dụng thay đổi cho các thiết bị %n sau đây?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Áp dụng những thay đổi trong máy ảnh %n sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Áp dụng những thay đổi trong máy ảnh %n sau đây?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2633,9 +2649,11 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3851,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>Sử dụng giấy phép tương tự để xem những %n máy ảnh</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Sử dụng giấy phép để lựa chọn %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>Sử dụng giấy phép để lựa chọn %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</translation>
+        <translation type="unfinished">
+            <numerusform>Sử dụng giấy phép cho %n máy ảnh được lựa chọn</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4497,15 +4521,15 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Những thay đổi chưa được lưu. Bạn có chắc chắn muốn lưu chúng?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4781,13 +4805,17 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>empty</source>
         <translation>trống</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>Tổng cộng %n thiết bị</translation>
+        <translation type="unfinished">
+            <numerusform>Tổng cộng %n thiết bị</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>Tổng cộng %n máy ảnh</translation>
+        <translation type="unfinished">
+            <numerusform>Tổng cộng %n máy ảnh</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4817,9 +4845,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5039,10 +5069,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Camera</source>
         <translation type="unfinished">Máy ảnh</translation>
-    </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5370,10 +5396,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Vui lòng cập nhật cho khách hàng bằng tay dùng một gói cài đặt.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>Cập nhật hủy</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>Cập nhật thành công.</translation>
     </message>
@@ -5417,6 +5439,18 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5477,10 +5511,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Đối với chuyển động phần mềm 2 fps được dành riêng cho các dòng thứ cấp. Fps hiện trong lưới lịch là %1. Fps đã giảm xuống %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Phần thứ hai được vô hiệu hóa trên máy ảnh này. Tùy chọn Chuyển động + LQ không có effect.Press &quot;Yes&quot; để thay đổi loại ghi âm để &quot;Luôn luôn&quot; hoặc &quot;Không&quot; để kích hoạt lại dòng thứ hai.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Xác nhận vùng chuyển động res</translation>
     </message>
@@ -5515,6 +5545,10 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">lịch trình không hợp lệ</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6662,10 +6696,6 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
         <source>Launcher process not found.</source>
         <translation>Không thể tìm thấy khởi động.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Ngoài ra thiết bị đã có trong progress.Are Bạn có chắc chắn bạn muốn hủy bỏ quá trình hiện tại?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6702,29 +6732,41 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
             <numerusform>Bạn có chắc là bạn muốn loại bỏ các mục %n từ bố trí?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Các thiết bị %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
+        <translation type="unfinished">
+            <numerusform>Các thiết bị %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Những máy ảnh %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
+        <translation type="unfinished">
+            <numerusform>Những máy ảnh %n được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n của các thiết bị này được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
+        <translation type="unfinished">
+            <numerusform>%n của các thiết bị này được tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n của dòng máy ảnh này tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</translation>
+        <translation type="unfinished">
+            <numerusform>%n của dòng máy ảnh này tự động phát hiện. Họ có thể tự động phát hiện ra một lần nữa sau khi gỡ bỏ. Bạn có chắc chắn muốn xóa chúng?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>Bạn có thực sự muốn xóa các thiết bị %n sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Bạn có thực sự muốn xóa các thiết bị %n sau đây?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Bạn có thực sự muốn xóa %n máy ảnh sau đây?</translation>
+        <translation type="unfinished">
+            <numerusform>Bạn có thực sự muốn xóa %n máy ảnh sau đây?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6744,16 +6786,26 @@ Nếu bạn muốn vô hiệu hóa tính năng này bạn có thể làm như v�
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7232,16 +7284,8 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi cố gắng để có được vị trí hiện tại từ camera %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Một lỗi đã xảy ra trong khi đang cố gắng để thiết lập vị trí hiện tại cho máy ảnh %1.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
@@ -7249,6 +7293,14 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7262,9 +7314,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Nó không được phép thực hiện bất kỳ thay đổi ngoại trừ kích hoạt giấy phép.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Các mục %n sau đây sẽ không được lưu.</translation>
+        <translation type="unfinished">
+            <numerusform>Các mục %n sau đây sẽ không được lưu.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7276,9 +7330,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Error</source>
         <translation>lỗi</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Các mục %n sau đây sẽ không bị xóa.</translation>
+        <translation type="unfinished">
+            <numerusform>Các mục %n sau đây sẽ không bị xóa.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7542,9 +7598,11 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>A Video Wall with the same name already exists.</source>
         <translation>bức tường video có cùng tên đã tồn tại.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n mặt hàng</translation>
+        <translation type="unfinished">
+            <numerusform>%n mặt hàng</numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>到</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>所有服务器离线，数据研判不可用.</translation>
+        <source>Audit Trail</source>
+        <translation>研判</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>研判</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1087,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>默认角度:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>全景鱼眼摄像机</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>全景鱼眼摄像机</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1302,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>许可类型需要更高的软件版本.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1865,6 +1865,11 @@
         <source>Check</source>
         <translation>检查</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1984,11 +1989,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>不能通过互联网检查更新.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>可用更新:</translation>
     </message>
@@ -1996,6 +1996,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>执行手动升级,从以下链接下载:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2117,8 +2122,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>正在恢复连接，请稍候...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2964,11 +2969,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>注意!录像计划中对每秒帧数/画质设置将无法正常运作!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(推荐)</translation>
     </message>
@@ -2981,6 +2981,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>发送匿名使用情况和事故统计至软件开发人员</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">注意！当前视频质量和帧率将无法与录像计划中的录像设置同步.</translation>
     </message>
 </context>
 <context>

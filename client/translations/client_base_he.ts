@@ -1827,13 +1827,19 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>התקנים %1 מ %n</translation>
+        <translation type="unfinished">
+            <numerusform>התקנים %1 מ %n</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>מצלמות %1 מ %n</translation>
+        <translation type="unfinished">
+            <numerusform>מצלמות %1 מ %n</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1851,9 +1857,12 @@ to view more bookmarks</source>
         <source>Select at least one camera</source>
         <translation type="unfinished">בחר לפחות מצלמה אחת</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2396,13 +2405,19 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>רשימת מצלמות</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>נמצאו %n התקנים</translation>
+        <translation type="unfinished">
+            <numerusform>נמצאו %n התקנים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>נמצאו %n מצלמות</translation>
+        <translation type="unfinished">
+            <numerusform>נמצאו %n מצלמות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2412,9 +2427,12 @@ to view more bookmarks</source>
         <source>Export selected cameras to a file.</source>
         <translation>ייצא את המצלמות שנבחרו לקובץ.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n I/O modules found</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2621,13 +2639,19 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>חוקי מצלמות</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>להחיל שינויים על על %n ההתקנים הבאים?</translation>
+        <translation type="unfinished">
+            <numerusform>להחיל שינויים על על %n ההתקנים הבאים?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>להחיל שינויים על על %n המצלמות הבאות?</translation>
+        <translation type="unfinished">
+            <numerusform>להחיל שינויים על על %n המצלמות הבאות?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
@@ -2657,9 +2681,12 @@ to view more bookmarks</source>
         <source>I/O Modules Rules</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n I/O modules?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -3883,17 +3910,26 @@ to view more bookmarks</source>
             <numerusform>השתמש ברשיונות אנלוגיים על מנת לצפות ב%n מצלמות אלו</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>השתמש ברישיונות עבור %n ההתקנים שנבחרו</translation>
+        <translation type="unfinished">
+            <numerusform>השתמש ברישיונות עבור %n ההתקנים שנבחרו</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>השתמש ברישיונות עבור %n המצלמות שנבחרו</translation>
+        <translation type="unfinished">
+            <numerusform>השתמש ברישיונות עבור %n המצלמות שנבחרו</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4532,15 +4568,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>השינויים לא נשמרו. האם ברצונך לשמור אותם?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4820,13 +4856,19 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>less than an hour</source>
         <translation>פחות משעה</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>סה&quot;כ %n התקנים</translation>
+        <translation type="unfinished">
+            <numerusform>סה&quot;כ %n התקנים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>סה&quot;כ %n מצלמות</translation>
+        <translation type="unfinished">
+            <numerusform>סה&quot;כ %n מצלמות</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4860,9 +4902,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n I/O modules</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Archived duration in calendar days since the first recording</source>
@@ -5082,10 +5127,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation type="unfinished">מצלמה</translation>
-    </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5317,10 +5358,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אנא סגור את התוכנה והפעל אותה שנית על ידי שימוש בקיצור הדרך שבתפריט ההתחל.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>העדכון בוטל</translation>
-    </message>
-    <message>
         <source>Update has been cancelled.</source>
         <translation>העדכון בוטל.</translation>
     </message>
@@ -5467,6 +5504,18 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Unable to begin update. Client update was not found.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnShowOnAlarmLayoutActionWidget</name>
@@ -5534,10 +5583,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>עבור גילוי תנועה מבוסס תוכנה 2 פריימים לשניה שמור לתזרים המשני. ערך הפריימים לשניה בלוח הזמנים הנוכחי הוא %1. ערך הפריימים לשניה הונמך למספר הפריימים לשניה המקסימלי של המצלמה %2.</translation>
     </message>
     <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>הזרם המשני כבוי במצלמה זו. אפשרות &quot;תנועה +איכות נמוכה&quot; לא תשנה דבר. לחץ על &quot;כן&quot; על מנת לשנות את סוג ההקלטה ל&quot;תמיד&quot; או על &quot;לא&quot; על מנת לחזור ולאפשר את הזרם המשני.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>אשר אתחול אזורי תנועה</translation>
     </message>
@@ -5564,6 +5609,10 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Invalid Schedule</source>
         <translation type="unfinished">לוח הזמנים איננו תקין</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6716,10 +6765,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Please close the application and start it again using the shortcut in the start menu.</source>
         <translation>אנא סגור את התוכנה והפעל אותה שנית על ידי שימוש בקיצור הדרך שבתפריט ההתחל.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>הוספת מכשיר כבר פועלת. האם אתה בטוח שברצונך לבטל את התהליך הנוכחי?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6762,29 +6807,47 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>האם אתה בטוח שאתה רוצה להסיר את %n vפריטים האלו מהפריסה?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n התקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
+        <translation type="unfinished">
+            <numerusform>%n התקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n מצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
+        <translation type="unfinished">
+            <numerusform>%n מצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n מהתקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
+        <translation type="unfinished">
+            <numerusform>%n מהתקנים אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ממצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</translation>
+        <translation type="unfinished">
+            <numerusform>%n ממצלמות אלו נתגלו באופן אוטומטי. יתכן והם יתגלו שוב לאחר הסרתם. האם למחוק אותם?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>האם אתה רוצה למחוק את %n ההתקנים הבאים?</translation>
+        <translation type="unfinished">
+            <numerusform>האם אתה רוצה למחוק את %n ההתקנים הבאים?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>האם אתה רוצה למחוק את %n המצלמות הבאות?</translation>
+        <translation type="unfinished">
+            <numerusform>האם אתה רוצה למחוק את %n המצלמות הבאות?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6807,16 +6870,29 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform></numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
-        <source>Do you really want to delete the following %n I/O modules?</source>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7301,16 +7377,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>לא ניתן לקבל מיקום מהמצלמה.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>אירעה שגיאה במהלך הנסיון לקבל את המיקום הנוכחי ממצלמה %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>אנא המתן עד שהמצלמה תחזור להיות מקוונת.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>אירעה שגיאה במהלך נסיון להגדיר את המיקום הנוכחי עבור מצלמה %1.</translation>
     </message>
     <message>
         <source>PTZ_CALIBRATION_%1.jpg</source>
@@ -7318,6 +7386,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7331,9 +7407,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>לא ניתן לעשות שינויים כלשהם למעט הפעלת רישיון.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>%n הפריטים הבאים לא נשמרו.</translation>
+        <translation type="unfinished">
+            <numerusform>%n הפריטים הבאים לא נשמרו.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7346,9 +7425,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>שגיאה</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>%n הפריטים הבאים לא נמחקו.</translation>
+        <translation type="unfinished">
+            <numerusform>%n הפריטים הבאים לא נמחקו.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7615,9 +7697,12 @@ If you understand this and would like to proceed please click Merge to continue.
             <numerusform>האם אתה בטוח שברצונך למחוק לצמיתות %n מטריצות אלו?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n פריטים</translation>
+        <translation type="unfinished">
+            <numerusform>%n פריטים</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Are you sure you want to stop Video Wall?</source>

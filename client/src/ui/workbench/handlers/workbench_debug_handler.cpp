@@ -113,7 +113,9 @@ qint64 move() {
     return random(100000, 300000);
 }
 
-void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
+void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered()
+{
+#ifdef _DEBUG
     qnRuntime->setDebugCounter(qnRuntime->debugCounter() - 1);
     qDebug() << qnRuntime->debugCounter();
 
@@ -121,14 +123,14 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
     steps << 1000 << 4000 << 16000 << 64000 << 256000;
 
     QStringList dict;
-    QFile dictFile(lit("D:/Temp/5000.dic"));
+    QFile dictFile(lit("c:/sandbox/5000.dic"));
     dictFile.open(QFile::ReadOnly);
     QTextStream stream(&dictFile);
     while (!stream.atEnd()) {
         dict << stream.readLine();
     }
- 
-    int skip = 8000;
+
+    int skip = 10;
     int limit = 16000;
     int counter = 0;
 
@@ -191,7 +193,7 @@ void QnWorkbenchDebugHandler::at_debugDecrementCounterAction_triggered() {
 
 
     }
-
+#endif //_DEBUG
 }
 
 void QnWorkbenchDebugHandler::at_debugShowResourcePoolAction_triggered() {

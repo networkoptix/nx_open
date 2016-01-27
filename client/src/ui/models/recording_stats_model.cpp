@@ -117,9 +117,9 @@ QString QnRecordingStatsModel::footerDisplayData(const QModelIndex &index) const
             //Q_ASSERT_X(cameras.size() == m_data.size(), Q_FUNC_INFO, "Make sure all cameras exist");
             return QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
-                    tr("Total %n devices",      nullptr, cameras.size()),
-                    tr("Total %n cameras",      nullptr, cameras.size()),
-                    tr("Total %n I/O modules",   nullptr, cameras.size())
+                    tr("Total %n devices",      "", cameras.size()),
+                    tr("Total %n cameras",      "", cameras.size()),
+                    tr("Total %n I/O modules",  "", cameras.size())
                 ), cameras
             );
         }

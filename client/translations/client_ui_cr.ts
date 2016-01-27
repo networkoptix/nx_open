@@ -104,11 +104,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -174,7 +169,12 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1087,12 +1087,12 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
+        <source>This is a fish-eye lens camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
+        <source>Default Rotation:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1302,7 +1302,7 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
+        <source>This license type requires a higher software version.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1864,6 +1864,11 @@
         <source>The new system will have password and name from the system:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1938,11 +1943,6 @@
     <name>QnServerUpdatesWidget</name>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Unable to check updates via internet.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1994,6 +1994,11 @@
     <message>
         <location/>
         <source>Check for updates automatically</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2116,7 +2121,7 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
+        <source>Please wait while the connection is being restored...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2962,11 +2967,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2978,6 +2978,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <message>
         <location/>
         <source>Enable audit trail</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

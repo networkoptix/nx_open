@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>do</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Odśwież</translation>
     </message>
@@ -169,14 +164,19 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Wszytkie serwery są wyłączone. Dane kontroli są niedostępne.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Audit Trail</source>
         <translatorcomment>?????</translatorcomment>
         <translation>Dziennik kontroli</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1089,13 +1089,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Domyślny obrót:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>To jest kamera z obiektywem fish-eye</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>To jest kamera z obiektywem fish-eye</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1304,8 +1304,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Ta licencja wymaga wyższej wersji oprogramowania.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1866,6 +1866,11 @@
         <source>Check</source>
         <translation>Sprawdź</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1985,11 +1990,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Nie można sprawdzić aktualizacji za pośrednictwem internetu.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Dostępna aktualizacja:</translation>
     </message>
@@ -1997,6 +1997,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>W celu aktualziacji ręcznej pobierz plik z następującego linku:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2118,8 +2123,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Proszę czekać, połączenie jest przywracane...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2965,11 +2970,6 @@ Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</t
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Uwaga! Ustawienia kl/s i  jakosci w Harmonogramie Rejestracji nie będą działać!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(zalecane)</translation>
     </message>
@@ -2982,6 +2982,11 @@ Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</t
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Wyślij anonimowo statystyki użytkowania i uszkodzeń do programistów</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Ostrzeżenie! Spowoduje to, że ustawienie jakości i klatek na sekundę (FPS) w harmonogramie nagrywania będzie niesitotne.</translation>
     </message>
 </context>
 <context>

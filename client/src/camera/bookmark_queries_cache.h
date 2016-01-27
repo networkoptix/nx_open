@@ -21,22 +21,29 @@ public:
 
     virtual ~QnBookmarkQueriesCache();
 
-    QnCameraBookmarksQueryPtr getQuery(const QnVirtualCameraResourcePtr &camera);
+    bool hasQuery(const QnVirtualCameraResourcePtr &camera) const;
 
-    void removeQuery(const QnVirtualCameraResourcePtr &camera);
+    QnCameraBookmarksQueryPtr getOrCreateQuery(const QnVirtualCameraResourcePtr &camera);
 
-    void clearQueries();
+    void removeQueryByCamera(const QnVirtualCameraResourcePtr &camera);
 
+    // Returns true if at least one query was updated
+    bool updateQueries(const QnCameraBookmarkSearchFilter &filter);
+
+    // Returns true if query was updated
     bool updateQuery(const QnVirtualCameraResourcePtr &camera
         , const QnCameraBookmarkSearchFilter &filter);
 
+    // Returns true if time window was updated
     bool updateQueryTimeWindow(const QnVirtualCameraResourcePtr &camera
         , qint64 startTimeMs
         , qint64 endTimeMs);
 
+    // Returns true if filter text was updated
     bool updateQueryFilterText(const QnVirtualCameraResourcePtr &camera
         , const QString &text);
 
+private:
     bool updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
         , qint64 startTimeMs
         , qint64 endTimeMs);
@@ -46,7 +53,7 @@ public:
 
 private:
     typedef std::function<bool (QnCameraBookmarkSearchFilter &filter)> NeedUpdateFilterFunctor;
-    
+
     bool updateDataImpl(const QnVirtualCameraResourcePtr &camera
         , const NeedUpdateFilterFunctor &needUpdateFunctor);
 
