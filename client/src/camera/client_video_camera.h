@@ -72,7 +72,7 @@ public:
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void exportProgress(int progress);
-    void exportFinished(int status, const QString &fileName);
+    void exportFinished(QnStreamRecorder::ErrorStruct reason, const QString &fileName);
     void exportStopped();
 
 public slots:

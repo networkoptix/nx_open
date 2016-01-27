@@ -5,6 +5,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <recording/time_period.h>
+#include <recording/stream_recorder.h>
 #include <transcoding/filters/filter_helper.h>
 
 #include <utils/common/connective.h>
@@ -64,7 +65,10 @@ signals:
     void finished(bool success, const QString &filename);
 
 private slots:
-    void at_camera_exportFinished(int status, const QString &filename);
+    void at_camera_exportFinished(
+        const QnStreamRecorder::ErrorStruct &status,
+        const QString                       &filename
+    );
     void at_camera_exportStopped();
 
 private:
