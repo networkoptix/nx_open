@@ -50,6 +50,9 @@ public:
 
     bool isUpdateNotificationsEnabled() const;
     void setUpdateNotificationsEnabled(bool updateNotificationsEnabled);
+
+    bool isTimeSynchronizationEnabled() const;
+
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -68,6 +71,7 @@ private:
     QnResourcePropertyAdaptor<QString> *m_disabledVendorsAdaptor;
     QnResourcePropertyAdaptor<bool> *m_serverAutoDiscoveryEnabledAdaptor;
     QnResourcePropertyAdaptor<bool> *m_updateNotificationsEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_timeSynchronizationEnabledAdaptor;
 
     // set of email settings adaptors
     QnResourcePropertyAdaptor<QString> *m_serverAdaptor;
