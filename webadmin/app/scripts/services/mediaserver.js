@@ -206,6 +206,19 @@ angular.module('webadminApp')
             logLevel:function(logId,level){
                 return wrapGet(proxy + '/api/logLevel?id=' + logId + (level?'&value=' + level:''));
             },
+            systemSettings:function(setParams){
+                //return;
+                if(!setParams) {
+                    return wrapGet(proxy + '/api/systemSettings');
+                }else{
+                    var requestParams = [];
+                    for(var key in setParams){
+                        requestParams.push(key + '=' + setParams[key]);
+                    }
+
+                    return wrapGet(proxy + '/api/systemSettings?' + requestParams.join('&'));
+                }
+            },
             getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
                 //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);
