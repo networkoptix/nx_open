@@ -97,7 +97,7 @@ public:
     void sendMessage(
         SocketAddress destinationEndpoint,
         const MessageType& message,
-        std::function<void(SystemError::ErrorCode)> completionHandler)
+        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
     {
         //serializing message
         SerializerType messageSerializer;
@@ -126,13 +126,15 @@ private:
     {
         SocketAddress destinationEndpoint;
         nx::Buffer serializedMessage;
-        std::function<void(SystemError::ErrorCode)> completionHandler;
+        std::function<void(
+            SystemError::ErrorCode,
+            SocketAddress resolvedTargetAddress)> completionHandler;
 
         OutgoingMessageContext(
             SocketAddress _destinationEndpoint,
             nx::Buffer _serializedMessage,
-            std::function<void(SystemError::ErrorCode)> _completionHandler)
-        :
+            std::function<void(SystemError::ErrorCode, SocketAddress)> _completionHandler)
+        :   
             destinationEndpoint(std::move(_destinationEndpoint)),
             serializedMessage(std::move(_serializedMessage)),
             completionHandler(std::move(_completionHandler))
@@ -202,7 +204,7 @@ private:
     void sendMessageInternal(
         SocketAddress destinationEndpoint,
         nx::Buffer serializedMessage,
-        std::function<void(SystemError::ErrorCode)> completionHandler)
+        std::function<void(SystemError::ErrorCode, SocketAddress)> completionHandler)
     {
         OutgoingMessageContext msgCtx(
             std::move(destinationEndpoint),
@@ -222,10 +224,13 @@ private:
         m_socket->sendToAsync(
             msgCtx.serializedMessage,
             msgCtx.destinationEndpoint,
-            std::bind(&self_type::messageSent, this, _1, _2));
+            std::bind(&self_type::messageSent, this, _1, _2, _3));
     }
 
-    void messageSent(SystemError::ErrorCode errorCode, size_t bytesSent)
+    void messageSent(
+        SystemError::ErrorCode errorCode,
+        SocketAddress resolvedTargetAddress,
+        size_t bytesSent)
     {
         assert(!m_sendQueue.empty());
         if (errorCode != SystemError::noError)
@@ -240,7 +245,9 @@ private:
         }
 
         if (m_sendQueue.front().completionHandler)
-            m_sendQueue.front().completionHandler(errorCode);
+            m_sendQueue.front().completionHandler(
+                errorCode,
+                std::move(resolvedTargetAddress));
         m_sendQueue.pop_front();
 
         if (!m_sendQueue.empty())

@@ -81,7 +81,9 @@ private:
         int retryNumber;
         //TODO #ak use some aio thread timer when it is available
         std::unique_ptr<AbstractStreamSocket> timer;
-        SocketAddress serverAddress;
+        SocketAddress originalServerAddress;
+        /** this address reported by socket on send completion */
+        SocketAddress resolvedServerAddress;
         Message request;
 
         RequestContext();
@@ -109,6 +111,10 @@ private:
         SocketAddress serverAddress,
         const Message& request,
         RequestContext* const requestContext);
+    void messageSent(
+        SystemError::ErrorCode errorCode,
+        nx::Buffer transactionId,
+        SocketAddress resolvedServerAddress);
     void timedout(nx::Buffer transactionId);
 };
 

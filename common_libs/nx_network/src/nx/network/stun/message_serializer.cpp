@@ -423,5 +423,16 @@ nx_api::SerializerState::Type MessageSerializer::serialize(
     }
 }
 
+nx::Buffer MessageSerializer::serialized(const Message& message)
+{
+    MessageSerializer serializator;
+    serializator.setMessage(&message);
+    nx::Buffer serializedMessage;
+    serializedMessage.reserve(100);
+    size_t bytesWritten = 0;
+    serializator.serialize(&serializedMessage, &bytesWritten);
+    return serializedMessage;
+}
+
 } // namespase stun
 } // namespase nx

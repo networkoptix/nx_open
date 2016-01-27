@@ -365,7 +365,7 @@ public:
     virtual void sendToAsync(
         const nx::Buffer& buf,
         const SocketAddress& foreignAddress,
-        std::function<void(SystemError::ErrorCode, size_t)> completionHandler) override;
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) override;
     //!Implementation of AbstractCommunicatingSocket::recv
     /*!
         Actually calls \a UDPSocket::recvFrom and saves datagram source address/port

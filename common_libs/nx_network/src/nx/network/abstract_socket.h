@@ -528,13 +528,13 @@ public:
         return sendTo(buf.constData(), buf.size(), foreignAddress);
     }
     /*!
-        \param completionHandler (errorCode, bytesSent)
+        \param completionHandler (errorCode, resolved target address, bytesSent)
     */
     virtual void sendToAsync(
         const nx::Buffer& buf,
-        const SocketAddress& foreignAddress,
-        std::function<void(SystemError::ErrorCode, size_t)> completionHandler) = 0;
-    //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
+        const SocketAddress& targetAddress,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+    //!Read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data
         \param bufferLen maximum number of bytes to receive

@@ -1422,10 +1422,16 @@ bool UDPSocket::sendTo(
 void UDPSocket::sendToAsync(
     const nx::Buffer& buf,
     const SocketAddress& foreignEndpoint,
-    std::function<void(SystemError::ErrorCode, size_t)> completionHandler)
+    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler)
 {
     setDestAddr(foreignEndpoint);
-    sendAsync(buf, std::move(completionHandler));
+    SocketAddress resolvedForeignEndpoint(
+        HostAddress(m_destAddr.sin_addr),
+        foreignEndpoint.port);
+    using namespace std::placeholders;
+    sendAsync(
+        buf,
+        std::bind(completionHandler, _1, std::move(resolvedForeignEndpoint), _2));
 }
 
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )

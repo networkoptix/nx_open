@@ -68,7 +68,13 @@ void UDPServer::sendMessage(
     m_messagePipeline.sendMessage(
         std::move(destinationEndpoint),
         message,
-        std::move(completionHandler));
+        [completionHandler](    //TODO #ak #msvc2015 move to lambda
+            SystemError::ErrorCode errorCode,
+            SocketAddress resolvedTargetAddress)
+        {
+            if (completionHandler)
+                completionHandler(errorCode);
+        });
 }
 
 const std::unique_ptr<AbstractDatagramSocket>& UDPServer::socket()

@@ -12,8 +12,11 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/udp_client.h>
 #include <nx/network/stun/udp_server.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/thread/wait_condition.h>
 
 #include <utils/common/cpp14.h>
+#include <utils/common/string.h>
 #include <utils/common/sync_call.h>
 
 
@@ -26,6 +29,8 @@ class StunUDP
     public ::testing::Test
 {
 public:
+    static const QByteArray kServerResponseNonce;
+
     StunUDP()
     :
         m_messagesToIgnore(0),
@@ -40,6 +45,8 @@ public:
 
     ~StunUDP()
     {
+        for (const auto& server: m_udpServers)
+            server->pleaseStopSync();
     }
 
     /** launches another server */
@@ -106,9 +113,14 @@ private:
                 nx::stun::MessageClass::successResponse,
                 nx::stun::bindingMethod,
                 message.header.transactionId));
+        response.newAttribute<stun::attrs::Nonce>(kServerResponseNonce);
         connection->sendMessage(std::move(response), nullptr);
     }
 };
+
+const QByteArray StunUDP::kServerResponseNonce("correctServerResponse");
+
+
 
 TEST_F(StunUDP, server_reports_port)
 {
@@ -306,6 +318,90 @@ TEST_F(StunUDP, client_cancellation)
     client.pleaseStopSync();
 
     ASSERT_EQ(REQUESTS_TO_SEND, errorsReported);
+}
+
+/** testing that client accepts response from server endpoint only */
+TEST_F(StunUDP, client_response_injection)
+{
+    addServer();
+
+    const auto serverEndpoint = anyServerEndpoint();
+
+    nx::stun::Message requestMessage(
+        stun::Header(
+            nx::stun::MessageClass::request,
+            nx::stun::bindingMethod));
+
+    //ignoring messages so that UDP client uses retransmits
+    ignoreNextMessage(3);
+
+    QnMutex mtx;
+    QnWaitCondition cond;
+    boost::optional<Message> response;
+    SystemError::ErrorCode responseErrorCode = SystemError::noError;
+
+    UDPClient client;
+    ASSERT_TRUE(client.bind(SocketAddress(HostAddress::localhost, 0)));
+    client.sendRequestTo(
+        SocketAddress("localhost", serverEndpoint.port),
+        //serverEndpoint,
+        requestMessage,
+        [&mtx, &cond, &response, &responseErrorCode](
+            SystemError::ErrorCode errorCode,
+            Message msg)
+        {
+            QnMutexLocker lk(&mtx);
+            responseErrorCode = errorCode;
+            response = std::move(msg);
+            cond.wakeAll();
+        });
+
+    //TODO #ak waiting for message to be sent
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+    //sending unexpected responses and junk to the client
+    auto udpSocket = SocketFactory::createDatagramSocket();
+    ASSERT_TRUE(
+        udpSocket->setDestAddr(
+            SocketAddress(
+                HostAddress::localhost,
+                client.localAddress().port)));
+
+    const int kPacketsToInject = 20;
+    for (int i = 0; i < kPacketsToInject; ++i)
+    {
+        if ((i == 0) || (rand() % 5 == 0))
+        {
+            nx::stun::Message injectedResponseMessage(
+                stun::Header(
+                    nx::stun::MessageClass::successResponse,
+                    nx::stun::bindingMethod,
+                    requestMessage.header.transactionId));
+            injectedResponseMessage.newAttribute<stun::attrs::Nonce>("bad");
+            const auto serializedMessage = MessageSerializer::serialized(injectedResponseMessage);
+            ASSERT_EQ(serializedMessage.size(), udpSocket->send(serializedMessage)) 
+                << SystemError::getLastOSErrorText().toStdString();
+        }
+        else
+        {
+            const auto buf = generateRandomName(100 + (rand() % 300));
+            ASSERT_EQ(buf.size(), udpSocket->send(buf))
+                << SystemError::getLastOSErrorText().toStdString();
+        }
+    }
+
+    {
+        QnMutexLocker lk(&mtx);
+        while (!response)
+            cond.wait(lk.mutex());
+    }
+
+    ASSERT_EQ(SystemError::noError, responseErrorCode);
+    const auto* nonceAttr = response->getAttribute<stun::attrs::Nonce>();
+    ASSERT_NE(nullptr, nonceAttr);
+    ASSERT_EQ(kServerResponseNonce, nonceAttr->getString());
+
+    client.pleaseStopSync();
 }
 
 }   //test
