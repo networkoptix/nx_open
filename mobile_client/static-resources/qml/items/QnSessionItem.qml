@@ -66,6 +66,10 @@ QnSideNavigationItem {
             connectionManager.disconnectFromServer(false)
             mainWindow.currentSystemName = systemName
             LoginDialog.connectToServer(sessionId, address, port, user, password)
+            if (stackView.depth > 1) {
+                stackView.setFadeTransition()
+                Main.gotoResources()
+            }
         } else {
             sideNavigation.hide()
         }
