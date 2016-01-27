@@ -23,30 +23,42 @@ namespace {
 }
 
 
-bool operator < (const QnTimePeriod& first, const QnTimePeriod& other) 
+bool operator < (const QnTimePeriod& first, const QnTimePeriod& other)
 {
     return first.startTimeMs < other.startTimeMs;
 }
 
-bool operator < (qint64 first, const QnTimePeriod& other) 
-{ 
-    return first < other.startTimeMs; 
+bool operator < (qint64 first, const QnTimePeriod& other)
+{
+    return first < other.startTimeMs;
 }
 
-bool operator < (const QnTimePeriod& other, qint64 first) 
-{ 
+bool operator < (const QnTimePeriod& other, qint64 first)
+{
     return other.startTimeMs < first;
 }
 
 QnTimePeriod::QnTimePeriod() :
     startTimeMs(0),
-    durationMs(0) 
+    durationMs(0)
 {}
 
-QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) : 
-    startTimeMs(startTimeMs), 
+QnTimePeriod::QnTimePeriod(qint64 startTimeMs, qint64 durationMs) :
+    startTimeMs(startTimeMs),
     durationMs(durationMs)
 {}
+
+QnTimePeriod QnTimePeriod::fromInterval(qint64 startTimeMs
+    , qint64 endTimeMs)
+{
+    Q_ASSERT_X(endTimeMs >= startTimeMs, Q_FUNC_INFO
+        , "Start time could not be greater than end time");
+
+    if (endTimeMs >= startTimeMs)
+        return QnTimePeriod(startTimeMs, endTimeMs - startTimeMs);
+
+    return QnTimePeriod();
+}
 
 void QnTimePeriod::clear()
 {
@@ -58,7 +70,7 @@ qint64 QnTimePeriod::endTimeMs() const
 {
     if (isInfinite())
         return DATETIME_NOW;
-    
+
     return startTimeMs + durationMs;
 }
 
@@ -122,7 +134,7 @@ QnTimePeriod QnTimePeriod::intersected(const QnTimePeriod &other) const
     return QnTimePeriod(start, end - start);
 }
 
-bool QnTimePeriod::intersects(const QnTimePeriod &other) const 
+bool QnTimePeriod::intersects(const QnTimePeriod &other) const
 {
     return !intersected(other).isEmpty();
 }
@@ -163,10 +175,10 @@ bool QnTimePeriod::isInfinite() const {
 Qn::TimePeriodType QnTimePeriod::type() const {
     if(isNull())
         return Qn::NullTimePeriod;
-    
+
     if(isEmpty())
         return Qn::EmptyTimePeriod;
-    
+
     return Qn::NormalTimePeriod;
 }
 
@@ -184,7 +196,7 @@ bool QnTimePeriod::isValid() const {
 
 qint64 QnTimePeriod::distanceToTime(qint64 timeMs) const
 {
-    if (timeMs >= startTimeMs) 
+    if (timeMs >= startTimeMs)
         return durationMs == -1 ? 0 : qMax(0ll, timeMs - (startTimeMs+durationMs));
     else
         return startTimeMs - timeMs;

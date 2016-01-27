@@ -172,7 +172,9 @@ Item {
                 if (active)
                     return
 
-                if (Math.abs(speed) < 500 && Math.abs(content.x) < content.width * 0.85)
+                var dx = Math.abs(content.x)
+
+                if ((Math.abs(speed) < dp(800) && dx < content.width * 0.85) || dx < content.width * 0.25)
                 {
                     content.x = 0
                     return

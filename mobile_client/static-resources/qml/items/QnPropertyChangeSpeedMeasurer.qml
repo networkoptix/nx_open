@@ -14,7 +14,7 @@ QnObject
     {
         id: d
 
-        property int kNoticeableMeasures: 8
+        property int kNoticeableMeasures: 16
 
         property real speed: 0
         property var measures: []
@@ -38,7 +38,7 @@ QnObject
             var lastTime = measures[l - 1].time
             var lastValue = measures[l - 1].value
 
-            speed = (lastValue - firstValue) / (lastTime - firstTime) * 1000
+            speed = (lastValue - firstValue) / Math.max(1, lastTime - firstTime) * 1000
         }
     }
 

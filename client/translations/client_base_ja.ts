@@ -4521,15 +4521,15 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>変更内容が保存されていません　保存しますか?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5070,10 +5070,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Camera</source>
         <translation type="unfinished">カメラ</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5400,10 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>クライアントをインストーラーパッケージよりマニュアルで更新してください.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>更新キャンセル</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>更新成功.</translation>
     </message>
@@ -5447,6 +5439,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7292,11 +7296,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

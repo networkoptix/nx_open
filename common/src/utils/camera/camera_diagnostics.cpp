@@ -227,7 +227,7 @@ public:
                     QnCameraDeviceStringSet details(
                         tr("Device initialization process is in progress."),
                         tr("Camera initialization process is in progress."),
-                        tr("I/O Module initialization process in progress.")
+                        tr("I/O Module initialization process is in progress.")
                         );
 
                     errorMessageParts

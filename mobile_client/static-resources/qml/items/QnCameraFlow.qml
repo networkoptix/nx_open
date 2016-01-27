@@ -219,32 +219,50 @@ Item {
                     height: 0
                     clip: true
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: expandAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: hiddenCamerasColumn.height
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: hiddenCamerasColumn.height
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                target: cameraGrid
+                                property: "contentY"
+                                to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        NumberAnimation {
-                            target: cameraGrid
-                            property: "contentY"
-                            to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = Qt.binding(function() { return hiddenCamerasColumn.height })
+                            }
                         }
                     }
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: collapseAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: 0
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = hiddenList.height // kill the binding
+                            }
+                        }
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: 0
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
@@ -299,11 +317,17 @@ Item {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool isShown: d.hiddenItems.length > 0
+        property int prevCount: 0
+        property int count: d.hiddenItems.length
+        property bool isShown: count > 0
 
         timeout: 5000
 
-        text: qsTr("%n cameras are hidden", "", d.hiddenItems.length)
+        onCountChanged: {
+            if (count > prevCount)
+                text = qsTr("%n cameras are hidden", "", count)
+        }
+
         mainButton {
             icon: "image://icon/undo.png"
             color: "transparent"
@@ -311,10 +335,12 @@ Item {
         }
 
         onIsShownChanged: {
-            if (isShown)
+            if (isShown) {
                 show()
-            else
+            } else {
                 hide()
+                prevCount = 0
+            }
         }
 
         onHidden: {

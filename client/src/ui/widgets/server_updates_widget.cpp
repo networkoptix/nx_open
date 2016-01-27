@@ -372,10 +372,13 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
             }
             break;
         case QnUpdateResult::Cancelled:
-            QMessageBox::information(this, tr("Update Cancelled"), tr("Update has been cancelled."));
+            QMessageBox::information(this, tr("Update cancelled"), tr("Update has been cancelled."));
             break;
         case QnUpdateResult::LockFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Another user has already started an update."));
+            break;
+        case QnUpdateResult::AlreadyUpdated:
+            QMessageBox::information(this, tr("Update is not needed."), tr("All servers are already updated."));
             break;
         case QnUpdateResult::DownloadingFailed:
             QMessageBox::critical(this, tr("Update unsuccessful."), tr("Could not download updates."));
@@ -436,7 +439,9 @@ void QnServerUpdatesWidget::at_updateFinished(const QnUpdateResult &result) {
         }
     }
 
-    bool canUpdate = result.result != QnUpdateResult::Successful;
+    bool canUpdate = (result.result != QnUpdateResult::Successful) &&
+                     (result.result != QnUpdateResult::AlreadyUpdated);
+
     if (m_updateSourceActions[LocalSource]->isChecked())
         ui->localUpdateButton->setEnabled(canUpdate);
     else
