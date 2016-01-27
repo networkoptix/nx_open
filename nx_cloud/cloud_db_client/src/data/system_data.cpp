@@ -58,11 +58,13 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
     (SystemAccessRole::none, "none")
-    (SystemAccessRole::owner, "owner")
-    (SystemAccessRole::maintenance, "maintenance")
+    (SystemAccessRole::viewer, "liveViewer")
     (SystemAccessRole::viewer, "viewer")
-    (SystemAccessRole::editor, "editor")
-    (SystemAccessRole::editorWithSharing, "editorWithSharing"));
+    (SystemAccessRole::viewer, "advancedViewer")
+    (SystemAccessRole::localAdmin, "localAdmin")
+    (SystemAccessRole::cloudAdmin, "cloudAdmin")
+    (SystemAccessRole::maintenance, "maintenance")
+    (SystemAccessRole::owner, "owner"));
 
 ////////////////////////////////////////////////////////////
 //// class SystemSharing

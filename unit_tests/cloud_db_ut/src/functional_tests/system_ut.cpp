@@ -63,7 +63,7 @@ TEST_F(CdbFunctionalTest, system_unbind)
                 account1Password,
                 system1.id,
                 account2.email,
-                api::SystemAccessRole::editorWithSharing));
+                api::SystemAccessRole::cloudAdmin));
 
         switch (i)
         {

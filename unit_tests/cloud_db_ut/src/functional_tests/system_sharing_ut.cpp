@@ -63,7 +63,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
             account2.email,
             api::SystemAccessRole::viewer));
 
-    //sharing system2 with account2 as editorWithSharing
+    //sharing system2 with account2 as cloudAdmin
     ASSERT_EQ(
         api::ResultCode::ok,
         shareSystem(
@@ -71,7 +71,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
             account1Password,
             system2.id,
             account2.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     restart();
 
@@ -85,11 +85,11 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
         ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, systems[0].accessRole);
-        ASSERT_EQ(4, systems[0].sharingPermissions.size());
+        ASSERT_EQ(6, systems[0].sharingPermissions.size());
 
         ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, systems[1].accessRole);
-        ASSERT_EQ(4, systems[1].sharingPermissions.size());
+        ASSERT_EQ(6, systems[1].sharingPermissions.size());
     }
 
     //checking account2 system list
@@ -109,12 +109,12 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         ASSERT_TRUE(system1Iter->sharingPermissions.empty());
 
         ASSERT_EQ(account1.email, system2Iter->ownerAccountEmail);
-        ASSERT_EQ(api::SystemAccessRole::editorWithSharing, system2Iter->accessRole);
-        ASSERT_EQ(3, system2Iter->sharingPermissions.size());
+        ASSERT_EQ(api::SystemAccessRole::cloudAdmin, system2Iter->accessRole);
+        ASSERT_EQ(5, system2Iter->sharingPermissions.size());
 
         ASSERT_EQ(account2.email, system3Iter->ownerAccountEmail);
         ASSERT_EQ(api::SystemAccessRole::owner, system3Iter->accessRole);
-        ASSERT_EQ(4, system3Iter->sharingPermissions.size());
+        ASSERT_EQ(6, system3Iter->sharingPermissions.size());
     }
 
     //checking sharings from account1 view
@@ -148,7 +148,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
-            api::SystemAccessRole::editorWithSharing);
+            api::SystemAccessRole::cloudAdmin);
         ASSERT_EQ(
             account2.fullName,
             findSharing(sharings, account2.email, system2.id).fullName);
@@ -166,7 +166,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
             api::SystemAccessRole::owner);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
-            api::SystemAccessRole::editorWithSharing);
+            api::SystemAccessRole::cloudAdmin);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system3.id),
             api::SystemAccessRole::owner);
@@ -192,7 +192,7 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
             api::SystemAccessRole::owner);
         ASSERT_EQ(
             accountAccessRoleForSystem(sharings, account2.email, system2.id),
-            api::SystemAccessRole::editorWithSharing);
+            api::SystemAccessRole::cloudAdmin);
     }
 }
 
@@ -444,7 +444,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
         addActivatedAccount(&account4, &account4Password));
 
     for (auto role = api::SystemAccessRole::owner;
-    role <= api::SystemAccessRole::editorWithSharing;
+    role <= api::SystemAccessRole::cloudAdmin;
         role = static_cast<api::SystemAccessRole>(static_cast<int>(role) + 1))
     {
         if (role == api::SystemAccessRole::maintenance)
@@ -468,7 +468,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance)
             account2Password,
             system1.id,
             account3.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     //account2: removing sharing to account3 (success)
     ASSERT_EQ(
@@ -559,7 +559,7 @@ TEST_F(CdbFunctionalTest, system_sharing_maintenance2)
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     ASSERT_EQ(
         api::ResultCode::forbidden,
@@ -604,7 +604,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
         api::ResultCode::ok,
         bindRandomSystem(account1.email, account1Password, &system1));
 
-    //adding "editorWithSharing" sharing
+    //adding "cloudAdmin" sharing
     ASSERT_EQ(
         api::ResultCode::ok,
         shareSystem(
@@ -612,7 +612,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     //trying to update "owner" sharing
     ASSERT_EQ(
@@ -661,7 +661,7 @@ TEST_F(CdbFunctionalTest, system_sharing_owner)
             api::SystemAccessRole::owner,
             accountAccessRoleForSystem(sharings, account1.email, system1.id));
         ASSERT_EQ(
-            api::SystemAccessRole::editorWithSharing,
+            api::SystemAccessRole::cloudAdmin,
             accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 }
@@ -691,7 +691,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
         api::ResultCode::ok,
         addActivatedAccount(&account2, &account2Password));
 
-    //adding "editorWithSharing" sharing
+    //adding "cloudAdmin" sharing
     ASSERT_EQ(
         api::ResultCode::ok,
         shareSystem(
@@ -699,7 +699,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     {
         std::vector<api::SystemSharingEx> sharings;
@@ -708,7 +708,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
             getSystemSharings(account1.email, account1Password, &sharings));
         ASSERT_EQ(2, sharings.size());
         ASSERT_EQ(
-            api::SystemAccessRole::editorWithSharing,
+            api::SystemAccessRole::cloudAdmin,
             accountAccessRoleForSystem(sharings, account2.email, system1.id));
     }
 
@@ -777,7 +777,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
         api::ResultCode::ok,
         addActivatedAccount(&account2, &account2Password));
 
-    //adding "editorWithSharing" sharing
+    //adding "cloudAdmin" sharing
     ASSERT_EQ(
         api::ResultCode::ok,
         shareSystem(
@@ -785,7 +785,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editorWithSharing));
+            api::SystemAccessRole::cloudAdmin));
 
     api::AccountData account3;
     std::string account3Password;
@@ -815,7 +815,7 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             account1Password,
             system1.id,
             account4.email,
-            api::SystemAccessRole::editor));
+            api::SystemAccessRole::localAdmin));
 
     api::AccountData account5;
     std::string account5Password;
@@ -849,10 +849,12 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getAccessRoleList(account1.email, account1Password, system1.id.toStdString(), &accessRoles));
-            ASSERT_EQ(4, accessRoles.size());
-            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editor) != accessRoles.end());
-            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editorWithSharing) != accessRoles.end());
+            ASSERT_EQ(6, accessRoles.size());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::liveViewer) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::viewer) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::advancedViewer) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::maintenance) != accessRoles.end());
         }
 
@@ -868,10 +870,12 @@ TEST_F(CdbFunctionalTest, system_sharing_get_access_role_list)
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getAccessRoleList(account2.email, account2Password, system1.id.toStdString(), &accessRoles));
-            ASSERT_EQ(3, accessRoles.size());
-            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editor) != accessRoles.end());
-            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::editorWithSharing) != accessRoles.end());
+            ASSERT_EQ(5, accessRoles.size());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::localAdmin) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::cloudAdmin) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::liveViewer) != accessRoles.end());
             ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::viewer) != accessRoles.end());
+            ASSERT_TRUE(accessRoles.find(api::SystemAccessRole::advancedViewer) != accessRoles.end());
         }
 
         {

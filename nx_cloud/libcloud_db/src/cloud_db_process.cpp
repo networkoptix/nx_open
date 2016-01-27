@@ -434,6 +434,7 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
     dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
     dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
+    dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
     return dbStructureUpdater.updateStructSync();
 }
 

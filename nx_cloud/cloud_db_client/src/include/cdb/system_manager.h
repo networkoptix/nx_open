@@ -59,7 +59,7 @@ public:
     virtual void getCloudUsersOfSystem(
         std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) = 0;
     /** Returns sharings (account email, access role) for the specified system
-        \note \a owner or \a editorWithSharing account credentials MUST be provided
+        \note \a owner or \a cloudAdmin account credentials MUST be provided
     */
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,

@@ -214,13 +214,13 @@ TEST_F(CdbFunctionalTest, account_general)
     }
 
     {
-        //sharing system to account2 with "editor" permission
+        //sharing system to account2 with "localAdmin" permission
         const auto result = shareSystem(
             account1.email,
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editor);
+            api::SystemAccessRole::localAdmin);
         ASSERT_EQ(result, api::ResultCode::ok);
     }
 
@@ -246,7 +246,7 @@ TEST_F(CdbFunctionalTest, account_general)
             account2Password,
             system1.id,
             account3.email,
-            api::SystemAccessRole::editor);
+            api::SystemAccessRole::localAdmin);
         ASSERT_EQ(result, api::ResultCode::forbidden);
     }
 }
@@ -564,13 +564,13 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
         {
-            //sharing system to account2 with "editor" permission
+            //sharing system to account2 with "localAdmin" permission
             const auto result = shareSystem(
                 account1.email,
                 tmpPassword,
                 system1.id,
                 account2.email,
-                api::SystemAccessRole::editor);
+                api::SystemAccessRole::localAdmin);
             ASSERT_EQ(api::ResultCode::notAuthorized, result);
         }
     }

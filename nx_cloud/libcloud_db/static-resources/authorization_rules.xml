@@ -67,7 +67,7 @@
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
-                                <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
@@ -83,7 +83,7 @@
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
-                                <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
@@ -93,7 +93,7 @@
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
-                            <sequence value="editorWithSharing">
+                            <sequence value="cloudAdmin">
                                 <set resName="authorized" resValue="true"/>
                                 <condition resName="systemAccessRole">
                                     <!-- only system owner and integrator can share system to another integrator -->

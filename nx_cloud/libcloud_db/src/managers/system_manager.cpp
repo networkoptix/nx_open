@@ -260,7 +260,7 @@ void SystemManager::getCloudUsersOfSystem(
              ++accountIter)
         {
             if (accountIter->accessRole != api::SystemAccessRole::owner &&
-                accountIter->accessRole != api::SystemAccessRole::editorWithSharing &&
+                accountIter->accessRole != api::SystemAccessRole::cloudAdmin &&
                 accountIter->accessRole != api::SystemAccessRole::maintenance)
             {
                 //TODO #ak this condition copies condition from authorization tree
@@ -638,21 +638,25 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
             Q_ASSERT(false);
             break;
 
-        case api::SystemAccessRole::owner:
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
-
-        case api::SystemAccessRole::editorWithSharing:
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::editor);
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::editorWithSharing);
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
-            break;
-
         case api::SystemAccessRole::maintenance:
             resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
             break;
 
+        case api::SystemAccessRole::owner:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+
+        case api::SystemAccessRole::cloudAdmin:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::liveViewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::advancedViewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::localAdmin);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::cloudAdmin);
+            break;
+
+        case api::SystemAccessRole::liveViewer:
         case api::SystemAccessRole::viewer:
-        case api::SystemAccessRole::editor:
+        case api::SystemAccessRole::advancedViewer:
+        case api::SystemAccessRole::localAdmin:
             break;
     }
 

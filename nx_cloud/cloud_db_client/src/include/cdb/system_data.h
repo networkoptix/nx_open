@@ -91,11 +91,13 @@ public:
 enum class SystemAccessRole
 {
     none = 0,
-    owner = 1,
-    maintenance,
-    viewer,
-    editor,
-    editorWithSharing
+    liveViewer = 1,
+    viewer = 2,
+    advancedViewer = 3,
+    localAdmin = 4,
+    cloudAdmin = 5,
+    maintenance = 6,
+    owner = 7,
 };
 
 class SystemSharing

@@ -134,6 +134,19 @@ ALTER TABLE account_password ADD COLUMN is_email_code INTEGER;      \
 UPDATE account_password set is_email_code = 1;                      \
 ";
 
+static const char kRenameSystemAccessRoles[] =
+"                                                                           \
+INSERT INTO access_role(id, description) VALUES(6, 'maintenance');          \
+INSERT INTO access_role(id, description) VALUES(7, 'owner');                \
+UPDATE system_to_account SET access_role_id=7 WHERE access_role_id=1;       \
+UPDATE system_to_account SET access_role_id=6 WHERE access_role_id=2;       \
+UPDATE system_to_account SET access_role_id=2 WHERE access_role_id=3;       \
+UPDATE access_role SET description='liveViewer' WHERE id=1;                 \
+UPDATE access_role SET description='viewer' WHERE id=2;                     \
+UPDATE access_role SET description='advancedViewer' WHERE id=3;             \
+UPDATE access_role SET description='localAdmin' WHERE id=4;                 \
+UPDATE access_role SET description='cloudAdmin' WHERE id=5;                 \
+";
 
 }   //db
 }   //cdb
