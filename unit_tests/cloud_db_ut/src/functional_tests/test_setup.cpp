@@ -360,14 +360,14 @@ api::ResultCode CdbFunctionalTest::unbindSystem(
 api::ResultCode CdbFunctionalTest::getSystems(
     const std::string& email,
     const std::string& password,
-    std::vector<api::SystemData>* const systems)
+    std::vector<api::SystemDataEx>* const systems)
 {
     auto connection = connectionFactory()->createConnection(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
-    api::SystemDataList systemDataList;
+    api::SystemDataExList systemDataList;
     std::tie(resCode, systemDataList) =
-        makeSyncCall<api::ResultCode, api::SystemDataList>(
+        makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
                 &nx::cdb::api::SystemManager::getSystems,
                 connection->systemManager(),
@@ -381,14 +381,14 @@ api::ResultCode CdbFunctionalTest::getSystem(
     const std::string& email,
     const std::string& password,
     const std::string& systemID,
-    std::vector<api::SystemData>* const systems)
+    std::vector<api::SystemDataEx>* const systems)
 {
     auto connection = connectionFactory()->createConnection(email, password);
 
     api::ResultCode resCode = api::ResultCode::ok;
-    api::SystemDataList systemDataList;
+    api::SystemDataExList systemDataList;
     std::tie(resCode, systemDataList) =
-        makeSyncCall<api::ResultCode, api::SystemDataList>(
+        makeSyncCall<api::ResultCode, api::SystemDataExList>(
             std::bind(
                 &nx::cdb::api::SystemManager::getSystem,
                 connection->systemManager(),

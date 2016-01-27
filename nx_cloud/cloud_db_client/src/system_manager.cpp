@@ -44,23 +44,23 @@ void SystemManager::unbindSystem(
 }
 
 void SystemManager::getSystems(
-    std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     executeRequest(
         kSystemGetPath,
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
 
 void SystemManager::getSystem(
     const std::string& systemID,
-    std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     executeRequest(
         kSystemGetPath,
         api::SystemID(systemID),
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
 
 void SystemManager::shareSystem(

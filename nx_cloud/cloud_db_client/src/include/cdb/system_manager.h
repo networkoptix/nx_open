@@ -43,11 +43,11 @@ public:
         \note Required access role: account, cloud_db module (e.g., connection_mediator)
     */
     virtual void getSystems(
-        std::function<void(ResultCode, api::SystemDataList)> completionHandler ) = 0;
+        std::function<void(ResultCode, api::SystemDataExList)> completionHandler ) = 0;
     /** Get system by id */
     virtual void getSystem(
         const std::string& systemID,
-        std::function<void(ResultCode, api::SystemDataList)> completionHandler) = 0;
+        std::function<void(ResultCode, api::SystemDataExList)> completionHandler) = 0;
     /** Share system with specified account. Operation allowed for system owner and editor_with_sharing only
         \note Required access role: account (owner or editor_with_sharing)
         \note sharing is removed if \a sharingData.accessRole is \a api::SystemAccessRole::none

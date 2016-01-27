@@ -77,7 +77,6 @@ public:
     }
 };
 
-
 class SystemDataList
 {
 public:
@@ -175,6 +174,35 @@ class SystemAccessRoleList
 {
 public:
     std::vector<SystemAccessRoleData> accessRoles;
+};
+
+class SystemDataEx
+:
+    public SystemData
+{
+public:
+    SystemAccessRole accessRole;
+    /** permissions, account can share current system with */
+    std::vector<SystemAccessRoleData> sharingPermissions;
+
+    SystemDataEx()
+    :
+        accessRole(SystemAccessRole::none)
+    {
+    }
+
+    SystemDataEx(SystemData systemData)
+    :
+        SystemData(std::move(systemData)),
+        accessRole(SystemAccessRole::none)
+    {
+    }
+};
+
+class SystemDataExList
+{
+public:
+    std::vector<SystemDataEx> systems;
 };
 
 }   //api

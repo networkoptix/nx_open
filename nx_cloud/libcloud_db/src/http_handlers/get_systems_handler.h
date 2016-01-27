@@ -21,7 +21,7 @@ namespace cdb {
 
 class GetSystemsHandler
 :
-    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, data::SystemDataList>
+    public AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemDataExList>
 {
 public:
     static const QString kHandlerPath;
@@ -30,7 +30,7 @@ public:
         SystemManager* const systemManager,
         const AuthorizationManager& authorizationManager)
     :
-        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, data::SystemDataList>(
+        AbstractFiniteMsgBodyHttpHandler<data::DataFilter, api::SystemDataExList>(
             EntityType::system,
             DataActionType::fetch,
             authorizationManager,

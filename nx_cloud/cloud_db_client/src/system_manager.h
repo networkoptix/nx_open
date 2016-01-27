@@ -31,10 +31,10 @@ public:
         const std::string& systemID,
         std::function<void(api::ResultCode)> completionHandler) override;
     virtual void getSystems(
-        std::function<void(api::ResultCode, api::SystemDataList)> completionHandler ) override;
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler ) override;
     virtual void getSystem(
         const std::string& systemID,
-        std::function<void(api::ResultCode, api::SystemDataList)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
     virtual void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;

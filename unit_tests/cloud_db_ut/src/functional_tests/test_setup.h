@@ -81,12 +81,12 @@ protected:
     api::ResultCode getSystems(
         const std::string& email,
         const std::string& password,
-        std::vector<api::SystemData>* const systems);
+        std::vector<api::SystemDataEx>* const systems);
     api::ResultCode getSystem(
         const std::string& email,
         const std::string& password,
         const std::string& systemID,
-        std::vector<api::SystemData>* const systems);
+        std::vector<api::SystemDataEx>* const systems);
     api::ResultCode shareSystem(
         const std::string& email,
         const std::string& password,

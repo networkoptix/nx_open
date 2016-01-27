@@ -150,11 +150,13 @@ bool applyFilter(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
-    std::function<void(api::ResultCode, data::SystemDataList)> completionHandler )
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
-    data::SystemDataList resultData;
+    const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
+
+    api::SystemDataExList resultData;
     auto systemID = wholeFilterMap.get<QnUuid>(cdb::attr::authSystemID);
     if (!systemID)
         systemID = wholeFilterMap.get<QnUuid>(cdb::attr::systemID);
@@ -167,7 +169,7 @@ void SystemManager::getSystems(
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    else if (auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail))
+    else if (accountEmail)
     {
         QnMutexLocker lk(&m_mutex);
         const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
@@ -187,6 +189,18 @@ void SystemManager::getSystems(
                 if (applyFilter(data.second, filter))
                     resultData.systems.push_back(data.second);
             });
+    }
+
+    if (accountEmail)
+    {
+        for (auto& systemDataEx: resultData.systems)
+        {
+            systemDataEx.accessRole = getAccountRightsForSystem(
+                *accountEmail,
+                systemDataEx.id);
+            systemDataEx.sharingPermissions = 
+                std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
+        }
     }
 
     completionHandler(
@@ -291,39 +305,19 @@ void SystemManager::getAccessRoleList(
             api::ResultCode::notAuthorized,
             api::SystemAccessRoleList());
 
-    api::SystemAccessRoleList resultData;
-    resultData.accessRoles.reserve(4);
     const auto accessRole = getAccountRightsForSystem(accountEmail, systemID.systemID);
     NX_LOGX(lm("account %1, system %2, account rights on system %3").
             arg(accountEmail).arg(systemID.systemID).arg(QnLexical::serialized(accessRole)),
             cl_logDEBUG2);
-    switch (accessRole)
+    if (accessRole == api::SystemAccessRole::none)
     {
-        case api::SystemAccessRole::none:
-            Q_ASSERT(false);
-            return completionHandler(
-                api::ResultCode::notAuthorized,
-                api::SystemAccessRoleList());
-
-        case api::SystemAccessRole::owner:
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
-
-        case api::SystemAccessRole::editorWithSharing:
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::editor);
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::editorWithSharing);
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
-            break;
-
-        case api::SystemAccessRole::maintenance:
-            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
-            break;
-
-        case api::SystemAccessRole::viewer:
-        case api::SystemAccessRole::editor:
-            Q_ASSERT(false);
-            break;
+        Q_ASSERT(false);
+        return completionHandler(
+            api::ResultCode::notAuthorized,
+            api::SystemAccessRoleList());
     }
 
+    api::SystemAccessRoleList resultData = getSharingPermissions(accessRole);
     return completionHandler(
         api::ResultCode::ok,
         std::move(resultData));
@@ -631,6 +625,38 @@ void SystemManager::systemActivated(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok
         : api::ResultCode::dbError);
+}
+
+api::SystemAccessRoleList SystemManager::getSharingPermissions(
+    api::SystemAccessRole accessRole) const
+{
+    api::SystemAccessRoleList resultData;
+    resultData.accessRoles.reserve(4);
+    switch (accessRole)
+    {
+        case api::SystemAccessRole::none:
+            Q_ASSERT(false);
+            break;
+
+        case api::SystemAccessRole::owner:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+
+        case api::SystemAccessRole::editorWithSharing:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::editor);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::editorWithSharing);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
+            break;
+
+        case api::SystemAccessRole::maintenance:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+            break;
+
+        case api::SystemAccessRole::viewer:
+        case api::SystemAccessRole::editor:
+            break;
+    }
+
+    return resultData;
 }
 
 nx::db::DBResult SystemManager::fillCache()

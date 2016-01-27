@@ -36,7 +36,6 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 //bool loadFromUrlQuery( const QUrlQuery& urlQuery, SystemData* const systemData );
 
 #define SystemData_Fields (id)(name)(customization)(authKey)(ownerAccountEmail)(status)(cloudConnectionSubscriptionStatus)
-
 #define SystemDataList_Fields (systems)
 
 //!for requests passing just system id
@@ -74,12 +73,15 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
+#define SystemDataEx_Fields SystemData_Fields(accessRole)(sharingPermissions)
+#define SystemDataExList_Fields (systems)
+
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (SystemRegistrationData)(SystemData)(SystemSharing)(SystemID),
     (json)(sql_record));
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList)(SystemSharingEx) \
+    (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
         (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json));
 

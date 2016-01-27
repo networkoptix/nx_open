@@ -77,18 +77,24 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
 
     //checking account1 system list
     {
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 2);
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system2) != systems.end());
+
         ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+        ASSERT_EQ(api::SystemAccessRole::owner, systems[0].accessRole);
+        ASSERT_EQ(4, systems[0].sharingPermissions.size());
+
         ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
+        ASSERT_EQ(api::SystemAccessRole::owner, systems[1].accessRole);
+        ASSERT_EQ(4, systems[1].sharingPermissions.size());
     }
 
     //checking account2 system list
     {
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(getSystems(account2.email, account2Password, &systems), api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 3);
         const auto system1Iter = std::find(systems.begin(), systems.end(), system1);
@@ -99,8 +105,16 @@ TEST_F(CdbFunctionalTest, system_sharing_getCloudUsers)
         ASSERT_TRUE(system3Iter != systems.end());
 
         ASSERT_EQ(account1.email, system1Iter->ownerAccountEmail);
+        ASSERT_EQ(api::SystemAccessRole::viewer, system1Iter->accessRole);
+        ASSERT_TRUE(system1Iter->sharingPermissions.empty());
+
         ASSERT_EQ(account1.email, system2Iter->ownerAccountEmail);
+        ASSERT_EQ(api::SystemAccessRole::editorWithSharing, system2Iter->accessRole);
+        ASSERT_EQ(3, system2Iter->sharingPermissions.size());
+
         ASSERT_EQ(account2.email, system3Iter->ownerAccountEmail);
+        ASSERT_EQ(api::SystemAccessRole::owner, system3Iter->accessRole);
+        ASSERT_EQ(4, system3Iter->sharingPermissions.size());
     }
 
     //checking sharings from account1 view
@@ -700,7 +714,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 
     {
         //checking account2 system list
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystems(account2.email, account2Password, &systems));
@@ -730,7 +744,7 @@ TEST_F(CdbFunctionalTest, system_sharing_remove_system)
 
         {
             //checking account2 system list
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(
                 api::ResultCode::ok,
                 getSystems(account2.email, account2Password, &systems));

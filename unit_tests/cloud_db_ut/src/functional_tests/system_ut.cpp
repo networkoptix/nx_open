@@ -46,7 +46,7 @@ TEST_F(CdbFunctionalTest, system_unbind)
 
         //checking account1 system list
         {
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
             ASSERT_EQ(systems.size(), 2);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
@@ -103,7 +103,7 @@ TEST_F(CdbFunctionalTest, system_unbind)
 
         //checking account1 system list
         {
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
             ASSERT_EQ(systems.size(), 1);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
@@ -131,7 +131,7 @@ TEST_F(CdbFunctionalTest, system_get)
         bindRandomSystem(account1.email, account1Password, &system1));
 
     {
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::ok,
             getSystem(account1.email, account1Password, system1.id.toStdString(), &systems));
@@ -141,7 +141,7 @@ TEST_F(CdbFunctionalTest, system_get)
 
     {
         //requesting unknown system
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
             api::ResultCode::notFound,
             getSystem(account1.email, account1Password, "unknown_system_id", &systems));
@@ -203,7 +203,7 @@ TEST_F(CdbFunctionalTest, system_activation)
 
         //checking account1 system list
         {
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
             ASSERT_EQ(systems.size(), 1);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
@@ -233,7 +233,7 @@ TEST_F(CdbFunctionalTest, system_activation)
 
         //checking account1 system list
         {
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
             ASSERT_EQ(systems.size(), 1);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
@@ -245,7 +245,7 @@ TEST_F(CdbFunctionalTest, system_activation)
 
         //checking account1 system list
         {
-            std::vector<api::SystemData> systems;
+            std::vector<api::SystemDataEx> systems;
             ASSERT_EQ(getSystems(account1.email, account1Password, &systems), api::ResultCode::ok);
             ASSERT_EQ(systems.size(), 1);
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());

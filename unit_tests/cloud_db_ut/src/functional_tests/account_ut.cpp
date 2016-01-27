@@ -198,7 +198,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
     {
         //fetching account1 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account1.email, account1Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 1);
@@ -207,7 +207,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
     {
         //fetching account2 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 0);
@@ -226,7 +226,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
     {
         //fetching account2 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 1);
@@ -555,7 +555,7 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
             &system2);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         result = getSystems(account1.email, tmpPassword, &systems);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 

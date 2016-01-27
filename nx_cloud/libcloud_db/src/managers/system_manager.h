@@ -82,7 +82,7 @@ public:
     void getSystems(
         const AuthorizationInfo& authzInfo,
         data::DataFilter filter,
-        std::function<void(api::ResultCode, data::SystemDataList)> completionHandler );
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler );
     void shareSystem(
         const AuthorizationInfo& authzInfo,
         data::SystemSharing sharingData,
@@ -198,9 +198,15 @@ private:
         QnUuid systemID,
         std::function<void(api::ResultCode)> completionHandler);
 
+    /** returns sharing permissions depending on current access role */
+    api::SystemAccessRoleList getSharingPermissions(
+        api::SystemAccessRole accessRole) const;
+
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchSystems(QSqlDatabase* connection, int* const /*dummy*/);
-    nx::db::DBResult fetchSystemToAccountBinder(QSqlDatabase* connection, int* const /*dummy*/);
+    nx::db::DBResult fetchSystemToAccountBinder(
+        QSqlDatabase* connection,
+        int* const /*dummy*/);
 };
 
 }   //cdb
