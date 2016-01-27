@@ -26,7 +26,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     , QnWorkbenchContextAware(parent)
 
     , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksOnTimeline
-        , QnBookmarkSortOrder::default, QnBookmarkSparsingOptions(true, 0)
+        , QnBookmarkSortOrder::defaultOrder, QnBookmarkSparsingOptions(true, 0)
         , kTimelineMinWindowChangeMs, parent))
     , m_mergeHelper(new QnBookmarkMergeHelper())
     , m_aggregation(new QnCameraBookmarkAggregation())

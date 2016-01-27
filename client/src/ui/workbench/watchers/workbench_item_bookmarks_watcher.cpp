@@ -109,7 +109,7 @@ QnWorkbenchItemBookmarksWatcher::QnWorkbenchItemBookmarksWatcher(QObject *parent
     , m_aggregationHelper(new QnCameraBookmarkAggregation())
     , m_timelineWatcher(context()->instance<QnTimelineBookmarksWatcher>())
     , m_bookmarksCache(new QnWorkbenchBookmarksCache(kMaxBookmarksNearThePosition
-        , QnBookmarkSortOrder::default, QnBookmarkSparsingOptions::kNosparsing
+        , QnBookmarkSortOrder::defaultOrder, QnBookmarkSparsingOptions::kNosparsing
         , kMinWindowChange, parent))
     , m_itemListinersMap()
     , m_listeners()
