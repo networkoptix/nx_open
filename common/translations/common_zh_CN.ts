@@ -1159,4 +1159,11 @@
         <translation>%1 (外部)</translation>
     </message>
 </context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

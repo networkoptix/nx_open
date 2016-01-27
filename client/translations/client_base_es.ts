@@ -5124,10 +5124,6 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <source>Camera</source>
         <translation type="unfinished">Cámara</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5458,10 +5454,6 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
         <translation>Por favor actualizar al cliente manualmente utilizando un paquete de instalación.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>Actualización cancelada</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>Se ha actualizado sin éxito.</translation>
     </message>
@@ -5506,6 +5498,18 @@ Si usted entiende esto y le gustaría continuar por favor haga clic en combinar 
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

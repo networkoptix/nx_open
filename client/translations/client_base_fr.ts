@@ -5143,10 +5143,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <source>Camera</source>
         <translation type="unfinished">Caméra</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5477,10 +5473,6 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
         <translation>S.V.P. mettre à jour le client manuellement en utilisant un paquet d&apos;installation.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>Mise à jour annulée</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>Échec mise à jour.</translation>
     </message>
@@ -5525,6 +5517,18 @@ Si vous comprenez cela et que vous souhaitez procéder, S.V.P. cliquez sur Fusio
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

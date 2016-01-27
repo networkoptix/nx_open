@@ -5128,10 +5128,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Camera</source>
         <translation type="unfinished">מצלמה</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5362,10 +5358,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>אנא סגור את התוכנה והפעל אותה שנית על ידי שימוש בקיצור הדרך שבתפריט ההתחל.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>העדכון בוטל</translation>
-    </message>
-    <message>
         <source>Update has been cancelled.</source>
         <translation>העדכון בוטל.</translation>
     </message>
@@ -5510,6 +5502,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

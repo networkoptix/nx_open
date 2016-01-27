@@ -5070,10 +5070,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <source>Camera</source>
         <translation type="unfinished">Máy ảnh</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5400,10 +5396,6 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
         <translation>Vui lòng cập nhật cho khách hàng bằng tay dùng một gói cài đặt.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>Cập nhật hủy</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>Cập nhật thành công.</translation>
     </message>
@@ -5447,6 +5439,18 @@ Nếu bạn hiểu được điều này và muốn tiến hành xin vui lòng b
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

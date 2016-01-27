@@ -1865,6 +1865,11 @@
         <source>The new system will have password and name from the system:</source>
         <translation>המערכת החדשה תקבל שם וסיסמה מהמערכת:</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>

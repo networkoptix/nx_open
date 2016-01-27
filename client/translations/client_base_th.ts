@@ -5070,10 +5070,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Camera</source>
         <translation type="unfinished">กล้อง</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5400,10 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>โปรดอัปเดตส่วน ไคลเอ็นต์ โดยตรง จากแพคเกจการติดตั้ง.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>ยกเลิกการปรับปรุง</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>ปรับปรุงสำเร็จ.</translation>
     </message>
@@ -5447,6 +5439,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

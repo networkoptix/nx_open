@@ -1864,6 +1864,11 @@
         <source>Check</source>
         <translation>확인</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>

@@ -5069,10 +5069,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Camera</source>
         <translation type="unfinished">摄像机</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5399,10 +5395,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>请使用安装包手动更新客户端.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>升级取消</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>升级成功.</translation>
     </message>
@@ -5446,6 +5438,18 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
