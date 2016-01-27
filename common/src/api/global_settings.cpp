@@ -79,7 +79,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
     m_auditTrailEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameAuditTrailEnabled, true, this);
     m_serverAutoDiscoveryEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameServerAutoDiscoveryEnabled, true, this);
     m_updateNotificationsEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameUpdateNotificationsEnabled, true, this);
-    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(nameTimeSynchronizationEnabled, true, this);
     m_serverAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameHost, QString(), this);
     m_fromAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameFrom, QString(), this);
     m_userAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(nameUser, QString(), this);
@@ -118,6 +117,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         kServerDiscoveryPingTimeoutDefault,
         this);
     ec2Adaptors << m_serverDiscoveryPingTimeout;
+    m_timeSynchronizationEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        nameTimeSynchronizationEnabled,
+        true,
+        this);
+    ec2Adaptors << m_timeSynchronizationEnabledAdaptor;
 
     QList<QnAbstractResourcePropertyAdaptor*> emailAdaptors;
     emailAdaptors
@@ -147,7 +151,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << m_cameraSettingsOptimizationAdaptor
         << m_serverAutoDiscoveryEnabledAdaptor
         << m_updateNotificationsEnabledAdaptor
-        << m_timeSynchronizationEnabledAdaptor
         << emailAdaptors
         << ldapAdaptors
         << m_auditTrailEnabledAdaptor
