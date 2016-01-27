@@ -66,6 +66,9 @@ public:
     SocketAddress getLocalAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown();
+
     //!Implementation of AbstractSocket::isClosed
     bool isClosed() const;
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -194,8 +197,8 @@ public:
     void cancelAsyncIO( aio::EventType eventType, bool waitForRunningHandlerCompletion );
 
 
-    void shutdown();
     virtual void close() override;
+    virtual void shutdown() override;
 
 private:
     AsyncSocketImplHelper<Pollable>* m_aioHelper;
@@ -249,6 +252,8 @@ public:
     virtual SocketAddress getLocalAddress() const override { return m_implDelegate.getLocalAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_implDelegate.close(); }
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown() override { return m_implDelegate.shutdown(); }
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override { return m_implDelegate.isClosed(); }
     //!Implementation of AbstractSocket::setReuseAddrFlag

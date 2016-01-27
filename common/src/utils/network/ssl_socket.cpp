@@ -1341,6 +1341,12 @@ void QnSSLSocket::close()
     d->wrappedSocket->close();
 }
 
+void QnSSLSocket::shutdown()
+{
+    Q_D(const QnSSLSocket);
+    d->wrappedSocket->shutdown();
+}
+
 bool QnSSLSocket::isClosed() const
 {
     Q_D(const QnSSLSocket);

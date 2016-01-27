@@ -1899,11 +1899,14 @@ void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr cam
 
     if (qnCameraHistoryPool->isCameraHistoryValid(camera))
         return;
-
-    qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) {
+    
+    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) 
+    {
         if (!success)
-            m_updateHistoryQueue.insert(camera);
+            m_updateHistoryQueue.insert(camera); //< retry loading
     });
+    if (result == QnCameraHistoryPool::StartResult::failed)
+        m_updateHistoryQueue.insert(camera); //< retry loading
 }
 
 void QnWorkbenchNavigator::updateSliderBookmarks() {
