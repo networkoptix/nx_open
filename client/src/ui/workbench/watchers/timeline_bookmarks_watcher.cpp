@@ -106,7 +106,15 @@ void QnTimelineBookmarksWatcher::onTimelineWindowChanged(qint64 startTimeMs
     const auto delayedUpdateWindow = [this, startTimeMs, endTimeMs]()
     {
         m_delayedTimer.reset(); // Have to reset manually to prevent double deletion
-        m_bookmarksCache->setWindow(QnTimePeriod::fromInterval(startTimeMs, endTimeMs));
+
+        static const qint64 kMinStartTime = 0;
+        static const qint64 kMaxEndTime = std::numeric_limits<qint64>::max();
+
+        const qint64 windowStartMs = (startTimeMs > kTimelineMinWindowChangeMs
+            ? startTimeMs - kTimelineMinWindowChangeMs : kMinStartTime);
+        const qint64 windowEndMs = (kMaxEndTime - kTimelineMinWindowChangeMs > endTimeMs
+            ? endTimeMs + kTimelineMinWindowChangeMs : kMaxEndTime);
+        m_bookmarksCache->setWindow(QnTimePeriod::fromInterval(windowStartMs, windowEndMs));
         m_delayedUpdateCounter.invalidate();
         m_delayedUpdateCounter.start();
     };

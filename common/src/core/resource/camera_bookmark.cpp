@@ -94,11 +94,11 @@ namespace
         return (isAscending ? ascPred : descPred);
     }
 
-    BinaryPredicate createPredicate(const QnBookmarkSortOrder &sortProperties)
+    BinaryPredicate createPredicate(const QnBookmarkSortOrder &sortOrder)
     {
-        const bool isAscending = (sortProperties.order == Qt::AscendingOrder);
+        const bool isAscending = (sortOrder.order == Qt::AscendingOrder);
 
-        switch(sortProperties.column)
+        switch(sortOrder.column)
         {
         case Qn::BookmarkName:
             return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.name; }, isAscending);
@@ -260,7 +260,7 @@ void QnCameraBookmark::sortBookmarks(QnCameraBookmarkList &bookmarks
 }
 
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-    , const QnBookmarkSortOrder &sortProperties
+    , const QnBookmarkSortOrder &sortOrder
     , const QnBookmarkSparsingOptions &sparsing
     , int limit)
 {
@@ -268,14 +268,14 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(const QnMultiServerC
     if (limit <= 0)
         return QnCameraBookmarkList();
 
-    const auto pred = createPredicate(sortProperties);
+    const auto pred = createPredicate(sortOrder);
 
     const int intermediateLimit = (sparsing.used ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
     QnCameraBookmarkList result;
-    if (sortProperties.column == Qn::BookmarkCameraName)
-        result = mergeSortedBookmarks(sortEachList(source, sortProperties), pred, intermediateLimit);
-    else if (sortProperties.column == Qn::BookmarkTags)
-        result = mergeSortedBookmarks(sortEachList(source, sortProperties), pred, intermediateLimit);
+    if (sortOrder.column == Qn::BookmarkCameraName)
+        result = mergeSortedBookmarks(sortEachList(source, sortOrder), pred, intermediateLimit);
+    else if (sortOrder.column == Qn::BookmarkTags)
+        result = mergeSortedBookmarks(sortEachList(source, sortOrder), pred, intermediateLimit);
     else
         result = mergeSortedBookmarks(source, pred, intermediateLimit);
 

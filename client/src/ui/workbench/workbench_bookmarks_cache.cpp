@@ -45,7 +45,7 @@ QnWorkbenchBookmarksCache::QnWorkbenchBookmarksCache(int maxBookmarksCount
         , this, &QnWorkbenchBookmarksCache::onItemAdded);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
         , this, &QnWorkbenchBookmarksCache::onItemRemoved);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
         , this, &QnWorkbenchBookmarksCache::onItemAboutToBeRemoved);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::layoutChanged
         , this, &QnWorkbenchBookmarksCache::onCurrentLayoutChanged);

@@ -370,7 +370,7 @@ void QnWorkbenchNavigator::initialize() {
         , this, &QnWorkbenchNavigator::onItemAdded);
     connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
         , this, &QnWorkbenchNavigator::updateArchiveState);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAboutToBeRemoved
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
         , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged

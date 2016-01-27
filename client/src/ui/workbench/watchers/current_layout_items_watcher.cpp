@@ -37,7 +37,7 @@ QnCurrentLayoutItemsWatcher::QnCurrentLayoutItemsWatcher(QObject *parent)
 
         const auto items = layout->items();
         for (const auto item: items)
-            emit itemAboutToBeRemoved(item);
+            emit itemHidden(item);
     };
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this, onLayoutChangedHandler);

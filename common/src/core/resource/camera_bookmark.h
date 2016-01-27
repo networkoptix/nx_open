@@ -87,7 +87,7 @@ struct QnCameraBookmark {
         , const QnBookmarkSortOrder orderBy);
 
     static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
-        , const QnBookmarkSortOrder &sortProperties = QnBookmarkSortOrder::defaultOrder
+        , const QnBookmarkSortOrder &sortOrder = QnBookmarkSortOrder::defaultOrder
         , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions()
         , int limit = std::numeric_limits<int>().max());
 };
