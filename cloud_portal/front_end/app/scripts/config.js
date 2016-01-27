@@ -10,11 +10,23 @@ var Config = {
         },
         notActivated: {
             label: 'not activated',
-            style: 'label-warning'
+            style: 'label-danger'
         },
         activated:{
             label: 'activated',
             style: 'label-info'
+        },
+        online:{
+            label: 'online',
+            style: 'label-success'
+        },
+        offline:{
+            label: 'offline',
+            style: 'label-default'
+        },
+        unavailable:{
+            label: 'unavailable',
+            style: 'label-default'
         }
     },
     accessRolesSettings:{
@@ -24,13 +36,15 @@ var Config = {
         labels: {
             "owner": "owner",
             "viewer": "viewer",
-            "editor": "editor",
-            "editorWithSharing": "editor and sharing"
+            "liveViewer": "live viewer",
+            "advancedViewer": "advanced viewer",
+            "cloudAdmin": "admin & sharing"
         },
         order:[
+            "liveViewer",
             "viewer",
-            "editor",
-            "editorWithSharing",
+            "advancedViewer",
+            "cloudAdmin",
             "owner"
         ],
         options:[
@@ -41,10 +55,13 @@ var Config = {
                 "accessRole": "viewer"
             },
             {
-                "accessRole": "editor"
+                "accessRole": "liveViewer"
             },
             {
-                "accessRole": "editorWithSharing"
+                "accessRole": "advancedViewer"
+            },
+            {
+                "accessRole": "cloudAdmin"
             }
         ]
     },

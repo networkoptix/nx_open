@@ -27,6 +27,15 @@ angular.module('cloudApp')
                 }
             });
 
+            /*
+
+            // We are not going to support changing urls on opening dialog: too much trouble
+            // Later we should investigate way to user window.history.replaceState to avoid changing browser history on opening dialog.
+            // Otherwise it is a mess.
+            // Nevertheless we support urls to call dialogs for direct links
+            // In code we can call dialog both ways: using link and using this service
+
+
             function escapeRegExp(str) {
                 return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
             }
@@ -41,6 +50,7 @@ angular.module('cloudApp')
                     $location.path(clearPath(), false);
                 });
             }
+            */
 
 
 

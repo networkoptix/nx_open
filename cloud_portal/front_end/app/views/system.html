@@ -3,7 +3,7 @@
     <h1><a href="#/systems">Systems</a> > {{system.info.name}}</h1>
 
     <button class="btn btn-default" ng-click="delete()">Delete</button>
-    <button class="btn btn-default" ng-click="share()">Share</button>
+    <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">Share</button>
     <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
 
     <h2>Users</h2>

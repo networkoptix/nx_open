@@ -13,7 +13,7 @@ angular.module('cloudApp')
         var dialogSettings = findSettings($scope);
 
         var systemId = dialogSettings.params.systemId;
-        var isOwner = dialogSettings.params.isOwner;
+
         $scope.lockEmail = !!dialogSettings.params.share;
         $scope.share = dialogSettings.params.share? _.clone(dialogSettings.params.share):{
             accountEmail:'',
@@ -21,13 +21,10 @@ angular.module('cloudApp')
         };
 
         function processAccessRoles(roles){
-            roles.push({ accessRole: Config.accessRolesSettings.owner }); // TODO: remove this later. This was added for demo purposes.
-
             var filteredRoles = _.filter(roles,function(role){
                 role.label = Config.accessRolesSettings.labels[role.accessRole] || role.accessRole;
                 return  (Config.accessRolesSettings.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
-                        role.accessRole != Config.accessRolesSettings.unshare &&            // 2. Remove unsharing role from interface
-                        (isOwner || role.accessRole != Config.accessRolesSettings.owner);   // 3. Remove owner role for not owner TODO: remove this later. This was added for demo purposes.
+                        role.accessRole != Config.accessRolesSettings.unshare;            // 2. Remove unsharing role from interface
             });
 
             $scope.accessRoles = _.sortBy(filteredRoles,function(role){
