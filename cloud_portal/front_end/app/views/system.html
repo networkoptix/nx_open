@@ -1,42 +1,88 @@
 
 <div class="auth-visible">
-    <h1><a href="#/systems">Systems</a> > {{system.info.name}}</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <h1><a href="#/systems">Systems</a> > {{system.info.name}}</h1>
+        </div>
+        <div class="col-md-6">
+            <div class="pull-right">
+                <div class="btn-group">
+                    <button class="btn btn-default" ng-click="delete()">
+                        <span class="glyphicon glyphicon-trash"></span> Delete</button>
+                    <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">
+                        <span class="glyphicon glyphicon-share"></span> Share</button>
+                </div>
 
-    <button class="btn btn-default" ng-click="delete()">Delete</button>
-    <button class="btn btn-default" ng-click="share()" ng-if="system.info.sharingPermissions.length">Share</button>
-    <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
+                <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
+            </div>
+        </div>
 
-    <h2>Users</h2>
+        <process-alert process="gettingSystem"
+                       error-prefix="'System info is unavailable:'"></process-alert>
 
-    <process-alert process="deletingSystem"
-                   error-prefix="'Cannot delete the system:'"></process-alert>
+    </div>
+    <div class="row">
+        <div class="col-md-8">
+            <div ng-if="!system.info.sharingPermissions.length" class="alert alert-info">
+                You have no access to view system information
+            </div>
+            <div class="panel panel-default"  ng-if="system.info.sharingPermissions.length">
+                <div class="panel-body">
+                    <h2>Users</h2>
 
-    <process-alert process="gettingSystem"
-                   error-prefix="'System info is unavailable:'"></process-alert>
+                    <process-alert process="deletingSystem"
+                                   error-prefix="'Cannot delete the system:'"></process-alert>
 
-    <process-alert process="gettingSystemUsers"
-                   error-prefix="'Users list is unavailable:'"></process-alert>
+                    <process-alert process="gettingSystemUsers"
+                                   error-prefix="'Users list is unavailable:'"></process-alert>
 
-    <process-alert process="unsharing"
-                   success-message="unsharingMessage"
-                   error-prefix="'Sharing failed:'"></process-alert>
+                    <process-alert process="unsharing"
+                                   success-message="unsharingMessage"
+                                   error-prefix="'Sharing failed:'"></process-alert>
 
-    <table class="table" ng-if="system.users.length">
-        <thead>
-        <tr>
-            <th>Account</th>
-            <th>Permissions</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="user in system.users">
-            <td>{{user.fullName}} {{user.fullName?'(':''}}{{user.accountEmail}}{{user.fullName?')':''}}</td>
-            <td>{{Config.accessRolesSettings.labels[user.accessRole] || user.accessRole}}</td>
-            <td><a href='' ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="editShare(user)">Edit permissions</a></td>
-            <td><a href='' ng-if="user.accessRole!=Config.accessRolesSettings.owner" ng-click="unshare(user)">Remove</a></td>
-        </tr>
-        </tbody>
-    </table>
+                </div>
+                <table class="table" ng-if="system.users.length">
+                    <thead>
+                    <tr>
+                        <th>Account</th>
+                        <th>Permissions</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="user in system.users">
+                        <td>{{user.fullName}} {{user.fullName?'(':''}}{{user.accountEmail}}{{user.fullName?')':''}}</td>
+                        <td>{{Config.accessRoles.settings[user.accessRole].label || user.accessRole}}</td>
+                        <td><a href='' ng-if="user.accessRole!=Config.accessRoles.owner" ng-click="editShare(user)">Edit permissions</a></td>
+                        <td><a href='' ng-if="user.accessRole!=Config.accessRoles.owner" ng-click="unshare(user)">Remove</a></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="col-md-4" ng-if="typeof(isOwner) != 'undefined' ">
+
+            <div class="panel panel-default" ng-if="isOwner">
+                <div class="panel-body">
+                    <h2>Your system</h2>
+                </div>
+            </div>
+
+            <div class="panel panel-default" ng-if="!isOwner">
+                <div class="panel-body">
+                    <h2>Owner</h2>
+                    <h3>{{system.info.ownerFullName}}</h3>
+                    <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+                    <hr>
+                    Your permissions:<br>
+                    <b>{{Config.accessRoles.settings[system.info.accessRole].label || system.info.accessRole}}</b>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
 </div>

@@ -10,6 +10,8 @@ angular.module('cloudApp')
             return $scope.settings || $scope.$parent && findSettings($scope.$parent) || null;
         }
 
+        $scope.Config = Config;
+
         var dialogSettings = findSettings($scope);
 
         var systemId = dialogSettings.params.systemId;
@@ -17,35 +19,35 @@ angular.module('cloudApp')
         $scope.lockEmail = !!dialogSettings.params.share;
         $scope.share = dialogSettings.params.share? _.clone(dialogSettings.params.share):{
             accountEmail:'',
-            accessRole: Config.accessRolesSettings.default
+            accessRole: Config.accessRoles.default
         };
 
         function processAccessRoles(roles){
             var filteredRoles = _.filter(roles,function(role){
-                role.label = Config.accessRolesSettings.labels[role.accessRole] || role.accessRole;
-                return  (Config.accessRolesSettings.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
-                        role.accessRole != Config.accessRolesSettings.unshare;            // 2. Remove unsharing role from interface
+                role.label = Config.accessRoles.settings[role.accessRole]?
+                    Config.accessRoles.settings[role.accessRole].label : role.accessRole;
+                return  (Config.accessRoles.order.indexOf(role.accessRole)>=0) &&   // 1. Access role must be registered
+                        role.accessRole != Config.accessRoles.unshare;            // 2. Remove unsharing role from interface
             });
 
             $scope.accessRoles = _.sortBy(filteredRoles,function(role){
-                var index = Config.accessRolesSettings.order.indexOf(role.accessRole);
+                var index = Config.accessRoles.order.indexOf(role.accessRole);
                 return index >= 0 ? index: 10000;
             });
         }
-
 
         processAccessRoles([{ accessRole: $scope.share.accessRole }]);
         cloudApi.accessRoles(systemId).then(function(roles){
             processAccessRoles(roles.data);
         },function(){
-            processAccessRoles(Config.accessRolesSettings.options);
+            processAccessRoles(Config.accessRoles.options);
         });
 
         function doShare(){
             return cloudApi.share(systemId, $scope.share.accountEmail, $scope.share.accessRole);
         }
         $scope.sharing = process.init(function(){
-            if($scope.share.accessRole == Config.accessRolesSettings.owner) {
+            if($scope.share.accessRole == Config.accessRoles.owner) {
                 var defered = $q.defer();
 
                 dialogs.confirm("You are going to change the owner of your system. You will not be able to return this power back!").then(

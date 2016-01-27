@@ -35,7 +35,7 @@ angular.module('cloudApp')
             var users = result.data;
             // Sort users here
             $scope.system.users = _.sortBy(users,function(user){
-                return - Config.accessRolesSettings.order.indexOf(user.accessRole);
+                return - Config.accessRoles.order.indexOf(user.accessRole);
             });
 
             $scope.isOwner = checkIsOwner();
@@ -52,7 +52,7 @@ angular.module('cloudApp')
                     }else{
                         $scope.editShare({
                             accountEmail:emailWith,
-                            accessRole: Config.accessRolesSettings.default
+                            accessRole: Config.accessRoles.default
                         });
                     }
                 }else {
@@ -70,7 +70,7 @@ angular.module('cloudApp')
 
         function checkIsOwner(){
             var owner = _.find( $scope.system.users,function(user){
-                return user.accessRole == Config.accessRolesSettings.owner;
+                return user.accessRole == Config.accessRoles.owner;
             });
             return owner && $scope.account.email == owner.accountEmail;
         }

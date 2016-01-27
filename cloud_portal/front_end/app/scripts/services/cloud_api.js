@@ -103,7 +103,7 @@ angular.module('cloudApp')
             unshare:function(systemId,userEmail){
                 return $http.post(apiBase + '/systems/' + systemId + '/users', {
                     user_email: userEmail,
-                    role: Config.accessRolesSettings.unshare
+                    role: Config.accessRoles.unshare
                 });
             },
             delete:function(systemId){

@@ -29,16 +29,31 @@ var Config = {
             style: 'label-default'
         }
     },
-    accessRolesSettings:{
+    accessRoles:{
         unshare: 'none',
         default: 'viewer',
         owner:   'owner',
-        labels: {
-            "owner": "owner",
-            "viewer": "viewer",
-            "liveViewer": "live viewer",
-            "advancedViewer": "advanced viewer",
-            "cloudAdmin": "admin & sharing"
+        settings:{
+            "owner": {
+                label: "owner",
+                description: "Can do pretty much everything with his system"
+            },
+            "viewer": {
+                label: "viewer",
+                description: "Can view live video from cameras and archive"
+            },
+            "liveViewer": {
+                label: "live viewer",
+                description: "Can view only live video from cameras"
+            },
+            "advancedViewer": {
+                label: "advanced viewer",
+                description: "Can view live video from cameras and archive, configure cameras"
+            },
+            "cloudAdmin": {
+                label: "admin & sharing",
+                description: "Can configure system and share it"
+            }
         },
         order:[
             "liveViewer",

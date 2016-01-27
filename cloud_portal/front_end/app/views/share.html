@@ -15,6 +15,10 @@
 
                 <select class="form-control" name="role" id="role" ng-model="share.accessRole"
                         ng-options="option.accessRole as option.label for option in accessRoles"></select>
+
+                <span class="help-block">
+                    {{Config.accessRoles.settings[share.accessRole].description}}
+                </span>
             </div>
         </div>
         <div class="modal-footer">
