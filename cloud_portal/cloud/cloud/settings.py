@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import re
+import json
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -195,3 +196,5 @@ PASSWORD_REQUIREMENTS = {
     'requiredRegex': re.compile("^[\x21-\x7E]+$"),
     'commonList': 'static/scripts/commonPasswordsList.json'
 }
+with open(PASSWORD_REQUIREMENTS['commonList']) as data_file:
+    PASSWORD_REQUIREMENTS['common_passwords'] = json.load(data_file)

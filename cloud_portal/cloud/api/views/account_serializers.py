@@ -29,10 +29,7 @@ class CreateAccountSerializer(serializers.Serializer):  # ModelSerializer
             raise serializers.ValidationError("Incorrect password")
 
         # popular passwords list
-        with open(settings.PASSWORD_REQUIREMENTS['commonList']) as data_file:
-            common_passwords = json.load(data_file)
-
-        if value in common_passwords or (value.upper() == value and value.lower() in common_passwords):
+        if value in settings.PASSWORD_REQUIREMENTS['common_passwords'] or (value.upper() == value and value.lower() in common_passwords):
             raise serializers.ValidationError("Too common password")
 
         return value
