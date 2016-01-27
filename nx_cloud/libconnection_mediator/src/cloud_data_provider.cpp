@@ -147,7 +147,7 @@ static QString traceSystems( const std::map< String, AbstractCloudDataProvider::
 void CloudDataProvider::updateSystemsAsync()
 {
     m_connection->systemManager()->getSystems(
-                [ this ]( cdb::api::ResultCode code, cdb::api::SystemDataList systems )
+                [ this ]( cdb::api::ResultCode code, cdb::api::SystemDataExList systems )
     {
         if( code != cdb::api::ResultCode::ok )
         {
