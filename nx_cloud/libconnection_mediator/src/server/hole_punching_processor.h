@@ -43,17 +43,17 @@ public:
     void connect(
         const ConnectionStrongRef& connection,
         api::ConnectRequest request,
-        stun::Message message,
+        stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ConnectResponse)> completionHandler);
     void onConnectionAckRequest(
         const ConnectionStrongRef& connection,
         api::ConnectionAckRequest request,
-        stun::Message message,
+        stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
     void connectionResult(
         const ConnectionStrongRef& connection,
         api::ConnectionResultRequest request,
-        stun::Message message,
+        stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
 
 private:

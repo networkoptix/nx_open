@@ -39,16 +39,16 @@ public:
 
     void bind(
         const ConnectionStrongRef& connection,
-        stun::Message message);
+        stun::Message requestMessage);
     void listen(
         const ConnectionStrongRef& connection,
         api::ListenRequest requestData,
-        stun::Message message,
+        stun::Message requestMessage,
         std::function<void(api::ResultCode)> completionHandler);
     void resolve(
         const ConnectionStrongRef& connection,
         api::ResolveRequest request,
-        stun::Message message,
+        stun::Message requestMessage,
         std::function<void(api::ResultCode, api::ResolveResponse)> completionHandler);
 
 private:

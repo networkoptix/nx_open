@@ -57,22 +57,22 @@ PeerRegistrator::PeerRegistrator(
 
 void PeerRegistrator::bind(
     const ConnectionStrongRef& connection,
-    stun::Message message)
+    stun::Message requestMessage)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return sendErrorResponse(
             connection,
-            message.header,
+            requestMessage.header,
             api::ResultCode::badTransport,
             stun::error::badRequest,
             "Only tcp is allowed for bind request");
 
-    const auto mediaserverData = getMediaserverData(connection, message);
+    const auto mediaserverData = getMediaserverData(connection, requestMessage);
     if (!static_cast<bool>(mediaserverData))
     {
         sendErrorResponse(
             connection,
-            message.header,
+            requestMessage.header,
             api::ResultCode::notAuthorized,
             stun::error::badRequest,
             "No mediaserver data in request");
@@ -84,7 +84,7 @@ void PeerRegistrator::bind(
         *mediaserverData);
     //TODO #ak if peer has already been bound with another connection, overwriting it...
     //peerDataLocker.value().peerConnection = connection;
-    if (const auto attr = message.getAttribute< stun::cc::attrs::PublicEndpointList >())
+    if (const auto attr = requestMessage.getAttribute< stun::cc::attrs::PublicEndpointList >())
         peerDataLocker.value().endpoints = attr->get();
     else
         peerDataLocker.value().endpoints.clear();
@@ -94,25 +94,25 @@ void PeerRegistrator::bind(
         .arg(QString::fromUtf8(mediaserverData->serverId))
         .arg(containerString(peerDataLocker.value().endpoints)), cl_logDEBUG1);
 
-    sendSuccessResponse(connection, message.header);
+    sendSuccessResponse(connection, requestMessage.header);
 }
 
 void PeerRegistrator::listen(
     const ConnectionStrongRef& connection,
     api::ListenRequest requestData,
-    stun::Message message,
+    stun::Message requestMessage,
     std::function<void(api::ResultCode)> completionHandler)
 {
     if (connection->transportProtocol() != nx::network::TransportProtocol::tcp)
         return completionHandler(api::ResultCode::badTransport);    //Only tcp is allowed for listen request
 
     //TODO #ak make authentication centralized
-    const auto mediaserverData = getMediaserverData(connection, message);
+    const auto mediaserverData = getMediaserverData(connection, requestMessage);
     if (!static_cast<bool>(mediaserverData))
     {
         sendErrorResponse(
             connection,
-            message.header,
+            requestMessage.header,
             api::ResultCode::notAuthorized,
             stun::error::badRequest,
             "Bad system credentials supplied");
