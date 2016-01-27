@@ -46,7 +46,7 @@ QnTimelineBookmarksWatcher::QnTimelineBookmarksWatcher(QObject *parent)
     // TODO: #ynikitenkov Remove dependency from time slider?
     connect(navigator()->timeSlider(), &QnTimeSlider::windowChanged
         , this, &QnTimelineBookmarksWatcher::onTimelineWindowChanged);
-    connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixel, this, [this]()
+    connect(navigator()->timeSlider(), &QnTimeSlider::msecsPerPixelChanged, this, [this]()
     {
         const auto sparsing = QnBookmarkSparsingOptions(true
             , navigator()->timeSlider()->msecsPerPixel());
