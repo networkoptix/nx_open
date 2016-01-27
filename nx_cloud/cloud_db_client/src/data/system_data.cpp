@@ -58,9 +58,9 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
     (SystemAccessRole::none, "none")
-    (SystemAccessRole::viewer, "liveViewer")
+    (SystemAccessRole::liveViewer, "liveViewer")
     (SystemAccessRole::viewer, "viewer")
-    (SystemAccessRole::viewer, "advancedViewer")
+    (SystemAccessRole::advancedViewer, "advancedViewer")
     (SystemAccessRole::localAdmin, "localAdmin")
     (SystemAccessRole::cloudAdmin, "cloudAdmin")
     (SystemAccessRole::maintenance, "maintenance")
