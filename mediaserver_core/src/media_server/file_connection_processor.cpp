@@ -89,6 +89,8 @@ void QnFileConnectionProcessor::run()
 
     QUrl url = getDecodedUrl();
     QString path = url.path();
+    while (path.endsWith(QLatin1String("/")))
+        path.chop(1);
 
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
