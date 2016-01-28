@@ -27,6 +27,7 @@ enum class ResultCode
     noSuitableConnectionMethod,
     timedout,
     serverConnectionBroken,
+    noReplyFromServer,
     badTransport
 };
 

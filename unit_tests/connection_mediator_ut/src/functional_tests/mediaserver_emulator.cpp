@@ -19,6 +19,7 @@ MediaServerEmulator::MediaServerEmulator(
     AbstractCloudDataProvider::System systemData,
     nx::String serverName)
 :
+    m_mediatorConnector(std::make_unique<hpm::api::MediatorConnector>()),
     m_httpServer(
         nullptr,
         &m_httpMessageDispatcher,
@@ -26,11 +27,11 @@ MediaServerEmulator::MediaServerEmulator(
         SocketFactory::NatTraversalType::nttDisabled),
     m_systemData(std::move(systemData)),
     m_serverId(serverName.isEmpty() ? generateRandomName(16) : std::move(serverName)),
-    m_mediatorUdpClient(mediatorEndpoint, &m_mediatorConnector)
+    m_mediatorUdpClient(mediatorEndpoint, m_mediatorConnector.get())
 {
-    m_mediatorConnector.mockupAddress(std::move(mediatorEndpoint));
+    m_mediatorConnector->mockupAddress(std::move(mediatorEndpoint));
 
-    m_mediatorConnector.setSystemCredentials(
+    m_mediatorConnector->setSystemCredentials(
         api::SystemCredentials(
             m_systemData.id,
             m_serverId,
@@ -53,7 +54,7 @@ bool MediaServerEmulator::start()
     }
 
     using namespace std::placeholders;
-    m_serverClient = m_mediatorConnector.systemConnection();
+    m_serverClient = m_mediatorConnector->systemConnection();
     m_serverClient->setOnConnectionRequestedHandler(
         std::bind(&MediaServerEmulator::onConnectionRequested, this, _1));
     return true;
@@ -111,7 +112,7 @@ SocketAddress MediaServerEmulator::udpHolePunchingEndpoint() const
 }
 
 void MediaServerEmulator::setOnConnectionRequestedHandler(
-    std::function<void(nx::hpm::api::ConnectionRequestedEvent)> handler)
+    std::function<ActionToTake(nx::hpm::api::ConnectionRequestedEvent)> handler)
 {
     m_onConnectionRequestedHandler = std::move(handler);
 }
@@ -130,12 +131,29 @@ void MediaServerEmulator::onConnectionRequested(
     nx::hpm::api::ConnectionAckRequest connectionAckData;
     connectionAckData.connectSessionID = connectionRequestedData.connectSessionID;
     connectionAckData.connectionMethods = nx::hpm::api::ConnectionMethod::udpHolePunching;
+
+    if (m_onConnectionRequestedHandler)
+    {
+        const auto actionToTake = m_onConnectionRequestedHandler(
+            std::move(connectionRequestedData));
+        switch (actionToTake)
+        {
+            case ActionToTake::proceedWithConnection:
+                break;
+            case ActionToTake::ignoreIndication:
+                return;
+            case ActionToTake::closeConnectionToMediator:
+                m_serverClient.reset();
+                m_mediatorConnector.reset();
+                return;
+            default:
+                assert(false);
+        }
+    }
+
     m_mediatorUdpClient.connectionAck(
         std::move(connectionAckData),
         std::bind(&MediaServerEmulator::onConnectionAckResponseReceived, this, _1));
-
-    if (m_onConnectionRequestedHandler)
-        m_onConnectionRequestedHandler(std::move(connectionRequestedData));
 }
 
 void MediaServerEmulator::onConnectionAckResponseReceived(

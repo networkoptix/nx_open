@@ -25,6 +25,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(ResultCode,
     (ResultCode::noSuitableConnectionMethod, "noSuitableConnectionMethod")
     (ResultCode::timedout, "timedout")
     (ResultCode::serverConnectionBroken, "serverConnectionBroken")
+    (ResultCode::noReplyFromServer, "noReplyFromServer")
     (ResultCode::badTransport, "badTransport")
     )
 

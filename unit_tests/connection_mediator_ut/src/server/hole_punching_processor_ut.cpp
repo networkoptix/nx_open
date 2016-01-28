@@ -37,8 +37,10 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
     server1->setOnConnectionRequestedHandler(
         [&connectionRequestedEventData](api::ConnectionRequestedEvent data)
+            -> MediaServerEmulator::ActionToTake
         {
             connectionRequestedEventData = std::move(data);
+            return MediaServerEmulator::ActionToTake::proceedWithConnection;
         });
 
     boost::optional<api::ResultCode> connectionAckResult;
@@ -121,7 +123,103 @@ TEST_F(MediatorFunctionalTest, HolePunchingProcessor_generic)
     ASSERT_TRUE(static_cast<bool>(connectionAckResult));
     ASSERT_EQ(api::ResultCode::ok, connectionAckResult.get());
 
+    //testing that mediator has cleaned up session data
+    std::tie(resultCode) =
+        makeSyncCall<api::ResultCode>(
+            std::bind(
+                &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                &udpClient,
+                std::move(connectionResult),
+                std::placeholders::_1));
+    ASSERT_EQ(api::ResultCode::notFound, resultCode);
+
     udpClient.pleaseStopSync();
+}
+
+TEST_F(MediatorFunctionalTest, HolePunchingProcessor_server_failure)
+{
+    const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
+
+    using namespace nx::hpm;
+
+    startAndWaitUntilStarted();
+
+    const auto system1 = addRandomSystem();
+    const auto server1 = addRandomServer(system1);
+
+    for (int i = 0; i < 2; ++i)
+    {
+        //TODO #ak #msvc2015 use future/promise
+        QnMutex mtx;
+        QnWaitCondition waitCond;
+
+        const MediaServerEmulator::ActionToTake actionToTake =
+            i == 0
+            ? MediaServerEmulator::ActionToTake::ignoreIndication
+            : MediaServerEmulator::ActionToTake::closeConnectionToMediator;
+
+        boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
+        server1->setOnConnectionRequestedHandler(
+            [&connectionRequestedEventData, actionToTake](api::ConnectionRequestedEvent data)
+                -> MediaServerEmulator::ActionToTake
+        {
+            connectionRequestedEventData = std::move(data);
+            return actionToTake;
+        });
+
+        ASSERT_EQ(api::ResultCode::ok, server1->listen());
+
+        //requesting connect to the server 
+        nx::hpm::api::MediatorClientUdpConnection udpClient(endpoint());
+
+        boost::optional<api::ResultCode> connectResult;
+
+        api::ConnectResponse connectResponseData;
+        auto connectCompletionHandler =
+            [&mtx, &waitCond, &connectResult, &connectResponseData](
+                api::ResultCode resultCode,
+                api::ConnectResponse responseData)
+        {
+            QnMutexLocker lk(&mtx);
+            connectResult = resultCode;
+            connectResponseData = std::move(responseData);
+            waitCond.wakeAll();
+        };
+        api::ConnectRequest connectRequest;
+        connectRequest.originatingPeerID = QnUuid::createUuid().toByteArray();
+        connectRequest.connectSessionID = QnUuid::createUuid().toByteArray();
+        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+        connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
+        udpClient.connect(
+            connectRequest,
+            connectCompletionHandler);
+
+        //waiting for connect response and checking server UDP endpoint in response
+        {
+            QnMutexLocker lk(&mtx);
+            while (!static_cast<bool>(connectResult))
+                ASSERT_TRUE(waitCond.wait(lk.mutex(), kMaxConnectResponseWaitTimeout.count()));
+        }
+
+        const auto connectResultVal = connectResult.get();
+        ASSERT_EQ(api::ResultCode::noReplyFromServer, connectResultVal);
+
+        //testing that mediator has cleaned up session data
+        api::ResultCode resultCode = api::ResultCode::ok;
+        api::ConnectionResultRequest connectionResult;
+        connectionResult.connectSessionID = connectRequest.connectSessionID;
+        connectionResult.connectionSucceeded = false;
+        std::tie(resultCode) =
+            makeSyncCall<api::ResultCode>(
+                std::bind(
+                    &nx::hpm::api::MediatorClientUdpConnection::connectionResult,
+                    &udpClient,
+                    std::move(connectionResult),
+                    std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::notFound, resultCode);
+
+        udpClient.pleaseStopSync();
+    }
 }
 
 }   //test
