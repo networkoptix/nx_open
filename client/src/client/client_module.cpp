@@ -42,6 +42,8 @@
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
 
+#include <watchers/cloud_status_watcher.h>
+
 #include "version.h"
 
 namespace
@@ -71,7 +73,7 @@ namespace
 
 QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     , QObject *parent)
-    : QObject(parent) 
+    : QObject(parent)
 {
     Q_INIT_RESOURCE(client);
     Q_INIT_RESOURCE(appserver2);
@@ -125,6 +127,11 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     common->store<QnResourcesChangesManager>(new QnResourcesChangesManager());
     common->store<QnCameraBookmarksManager>(new QnCameraBookmarksManager());
     common->store<QnServerStorageManager>(new QnServerStorageManager());
+
+    QnCloudStatusWatcher *cloudStatusWatcher = new QnCloudStatusWatcher();
+    cloudStatusWatcher->setCloudEndpoint(qnSettings->cdbEndpoint());
+    cloudStatusWatcher->setCloudCredentials(qnSettings->cloudLogin(), qnSettings->cloudPassword(), true);
+    common->store<QnCloudStatusWatcher>(cloudStatusWatcher);
 
 #ifdef Q_OS_WIN
     win32_exception::setCreateFullCrashDump(qnSettings->createFullCrashDump());

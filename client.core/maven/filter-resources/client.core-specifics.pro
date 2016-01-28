@@ -1,7 +1,8 @@
 TEMPLATE = lib
 
 INCLUDEPATH +=  ${qt.dir}/include/QtGui/$$QT_VERSION/ \
-                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/
+                ${qt.dir}/include/QtGui/$$QT_VERSION/QtGui/ \
+                ${root.dir}/nx_cloud/cloud_db_client/src/include/
 
 mac:!ios {
     INCLUDEPATH += /System/Library/Frameworks/OpenAL.framework/Versions/A/Headers/ \

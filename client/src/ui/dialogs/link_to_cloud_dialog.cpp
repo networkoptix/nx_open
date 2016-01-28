@@ -12,8 +12,9 @@
 #include <common/common_module.h>
 #include <client/client_settings.h>
 
-#include <utils/common/app_info.h>
+#include <helpers/cloud_url_helper.h>
 #include <utils/common/delayed.h>
+#include <utils/common/string.h>
 
 #include <ui/style/warning_style.h>
 #include <ui/dialogs/message_box.h>
@@ -44,9 +45,12 @@ namespace
 
 class QnLinkToCloudDialogPrivate : public QObject
 {
-public:
     QnLinkToCloudDialog *q_ptr;
 
+    Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
+    Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
+
+public:
     QnLinkToCloudDialogPrivate(QnLinkToCloudDialog *parent);
 
     void lockUi(bool lock);
@@ -65,9 +69,6 @@ public:
         decltype(&destroyConnectionFactory)> connectionFactory;
     std::unique_ptr<api::Connection> cloudConnection;
     bool linkedSuccessfully;
-
-    Q_DECLARE_PUBLIC(QnLinkToCloudDialog)
-    Q_DECLARE_TR_FUNCTIONS(QnLinkToCloudDialogPrivate)
 };
 
 QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
@@ -86,12 +87,18 @@ QnLinkToCloudDialog::QnLinkToCloudDialog(QWidget *parent)
                              !ui->passwordLineEdit->text().isEmpty());
     };
 
+    ui->accountLineEdit->setText(qnSettings->cloudLogin());
+    ui->passwordLineEdit->setText(qnSettings->cloudPassword());
+
     connect(ui->accountLineEdit,    &QLineEdit::textChanged,            d,      updateOkButton);
     connect(ui->passwordLineEdit,   &QLineEdit::textChanged,            d,      updateOkButton);
 
-    const QString createAccountUrl = QnAppInfo::cloudPortalUrl() + kCreateAccountPath;
-    const QString createAccountText = tr("Create account");
-    ui->createAccountLabel->setText(lit("<a href=\"%2\">%1</a>").arg(createAccountText, createAccountUrl));
+    if (!ui->accountLineEdit->text().isEmpty() && !ui->passwordLineEdit->text().isEmpty())
+        okButton->setFocus();
+    else
+        ui->accountLineEdit->selectAll();
+
+    ui->createAccountLabel->setText(makeHref(tr("Create account"), QnCloudUrlHelper::createAccountUrl()));
     setWarningStyle(ui->invalidCredentialsLabel);
     ui->invalidCredentialsLabel->hide();
     updateOkButton();
@@ -269,7 +276,7 @@ void QnLinkToCloudDialogPrivate::at_bindFinished(
         if (success)
             showSuccess();
         else
-            showFailure(tr("Can not save information to database"));
+            showFailure(tr("Cannot save information to database"));
     };
 
     connection->saveCloudSystemCredentials(systemData.id.toString(), QString::fromStdString(systemData.authKey),
