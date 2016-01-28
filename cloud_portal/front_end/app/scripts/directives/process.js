@@ -1,7 +1,6 @@
 'use strict';
 
-angular.module('cloudApp')
-    .directive('processAlert', function () {
+angular.module('cloudApp').directive('processAlert', function () {
         return {
             restrict: 'E',
             templateUrl: 'views/components/process-alert.html',
@@ -52,4 +51,29 @@ angular.module('cloudApp')
 
             }
         };
+    }).directive("processLoading",function(){
+        return {
+            restrict: 'A',
+            scope:{
+                processLoading:'='
+            },
+            link:function(scope, element, attrs){
+                function checkVisibility(){
+                    if(scope.processLoading && scope.processLoading.finished){
+                        element.removeClass("process-loading");
+                        element.children(".preloader").remove();
+                    }else{
+
+                        element.addClass("process-loading");
+
+                        if(!element.children(".preloader").get(0)) {
+                            element.prepend("<div class='preloader'><img src='images/loader.gif'></div></div>");
+                        }
+                    }
+                }
+
+                scope.$watch("processLoading.finished",checkVisibility);
+                checkVisibility();
+            }
+        }
     });

@@ -25,6 +25,7 @@ angular.module('cloudApp')
                     success:false,
                     error:false,
                     processing: false,
+                    finished: false,
                     errorData: null,
                     then:function(successHanlder, errorHandler, processHandler){
                         this.successHanlder = successHanlder;
@@ -36,6 +37,7 @@ angular.module('cloudApp')
                         this.processing = true;
                         this.error = false;
                         this.success = false;
+                        this.finished = false;
                         var self = this;
 
                         var deferred = $q.defer();
@@ -47,6 +49,7 @@ angular.module('cloudApp')
 
                         return caller().then(function(data){
                             self.processing = false;
+                            self.finished = true;
                             if(data.data.resultCode && data.data.resultCode != Config.errorCodes.ok){
                                 self.error = true;
                                 self.errorData = data;
@@ -58,6 +61,7 @@ angular.module('cloudApp')
                             }
                         },function(error){
                             self.processing = false;
+                            self.finished = true;
                             self.error = true;
                             self.errorData = error;
                             self.errorMessage = formatError(error.data, errorCodes);
