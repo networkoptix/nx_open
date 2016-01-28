@@ -14,7 +14,6 @@
 #include <nx/utils/log/log.h>
 #include "client/client_settings.h"
 #include "ui/workbench/workbench_context.h"
-#include "ui/workbench/watchers/workbench_user_watcher.h"
 #include "ui/actions/action_manager.h"
 #include "ui/actions/action.h"
 
@@ -67,12 +66,6 @@ int QnMergeSystemsTool::mergeSystem(const QnMediaServerResourcePtr &proxy, const
 {
     QString currentPassword = QnAppServerConnectionFactory::getConnection2()->authInfo();
     Q_ASSERT_X(!currentPassword.isEmpty(), "currentPassword cannot be empty", Q_FUNC_INFO);
-    if (!ownSettings && context()->user()->isAdmin())
-    {
-        context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(false);
-        m_adminPassword = password;
-    }
-
     NX_LOG(lit("QnMergeSystemsTool: merge request to %1 url=%2").arg(proxy->getApiUrl()).arg(url.toString()), cl_logDEBUG1);
     return proxy->apiConnection()->mergeSystemAsync(url, password, currentPassword, ownSettings, false, false, this, SLOT(at_mergeSystem_finished(int,QnModuleInformation,int,QString)));
 }
@@ -119,16 +112,6 @@ void QnMergeSystemsTool::at_pingSystem_finished(int status, const QnModuleInform
 void QnMergeSystemsTool::at_mergeSystem_finished(int status, const QnModuleInformation &moduleInformation, int handle, const QString &errorString)
 {
     NX_LOG(lit("QnMergeSystemsTool: merge reply id=%1 error=%2").arg(moduleInformation.id.toString()).arg(errorString), cl_logDEBUG1);
-
-    if (status == 0 && errorString.isEmpty() && !m_adminPassword.isEmpty())
-    {
-        context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_adminPassword);
-        QUrl url = QnAppServerConnectionFactory::url();
-        url.setPassword(m_adminPassword);
-        QnAppServerConnectionFactory::setUrl(url);
-    }
-    m_adminPassword.clear();
-    context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
 
     QnMergeSystemsTool::ErrorCode errCode = InternalError;
     if (status == QNetworkReply::ContentOperationNotPermittedError)

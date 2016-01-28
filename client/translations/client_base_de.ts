@@ -20,7 +20,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>What to backup:</source>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -87,12 +91,12 @@ to view more bookmarks</source>
         <translation>Monat</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>Alle Daten</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>Bitrate für die zuletzt aufgenommenen:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -151,53 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished">In neuem Tab öffnen</translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n device(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n camera(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;%n IO module(s)&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any Device&gt;</source>
-        <translation type="unfinished">&lt;Jedes Gerät&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any Camera&gt;</source>
-        <translation type="unfinished">&lt;Jede Kamera&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;Any IO Module&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Devices&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My Cameras&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;All My IO Modules&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -233,10 +190,6 @@ to view more bookmarks</source>
     <message>
         <source>None</source>
         <translation>Keine</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -751,32 +704,12 @@ to view more bookmarks</source>
         <translation>In neuem Tab öffnen</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>Monitor in einem neuen Tab</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>Öffnen in neuem Fenster</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>Monitor in neuem Fenster</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>Öffne Layout in neuem Tab</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>Öffne Layouts</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>Öffne Layout(s) in neuem Fenster</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>Öffne aktuelles Layout in einem neuen Fenster</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1387,10 +1320,6 @@ to view more bookmarks</source>
         <translation>Kamera-Diagnose...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation>IO Modul-Diagnose...</translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation>Geräteliste</translation>
     </message>
@@ -1415,14 +1344,6 @@ to view more bookmarks</source>
         <translation>Überprüfen von Kameraproblemen...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>Überprüfen von IO Modul-Problemen...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>Überprüfen von IO Modul-Problemen...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>Geräteregeln...</translation>
     </message>
@@ -1437,14 +1358,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>Kameraregeln...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>IO Modul-Regeln...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>IO Modul-Regeln...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1463,14 +1376,6 @@ to view more bookmarks</source>
         <translation>Kameraeinstellungen...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>IO Modul-Einstellungen...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>IO Modul-Einstellungen...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>Liste Geräte nach Server...</translation>
     </message>
@@ -1484,10 +1389,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1507,11 +1408,71 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks Search...</source>
+        <source>I/O Module Diagnostics...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Add a Bookmark...</source>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1583,10 +1544,6 @@ to view more bookmarks</source>
         <translation>Keine Archivdaten für diese Position vorhanden</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>Diese Ressourcen wurden bereits aus dem System entfernt</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>Exportiere ausgewählte Aufnahmen</translation>
     </message>
@@ -1609,6 +1566,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>Kameraaktionen</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1757,10 +1718,6 @@ to view more bookmarks</source>
         <translation>Klicken zum Erweitern</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>Die rote Markierung bedeutet, dass ein Archiv noch verfügbar ist</translation>
-    </message>
-    <message>
         <source>E-mail settings changed</source>
         <translation>E-Mail Einstellungen wurden geändert</translation>
     </message>
@@ -1796,6 +1753,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>Kameraname</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1805,21 +1766,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hi-Res Streams</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>All streams</source>
-        <comment>Cameras Backup</comment>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1880,17 +1826,19 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 von %n Geräten</translation>
+        <translation type="unfinished">
+            <numerusform>%1 von %n Geräten</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 von %n Kameras</translation>
-    </message>
-    <message>
-        <source>%1 of %n IO modules</source>
-        <translation>%1 von %n IO Modulen</translation>
+        <translation type="unfinished">
+            <numerusform>%1 von %n Kameras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1907,6 +1855,13 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">Wählen Sie mindestens eine Kamera</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2233,10 +2188,6 @@ to view more bookmarks</source>
         <translation>Der definierte Adressbereich umfasst mehr als 255 Adressen.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>Suche abschließen...</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation>Server ging offline. Suche abgebrochen.</translation>
     </message>
@@ -2314,6 +2265,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation>Scanne Hosts... (%1)</translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2361,20 +2316,12 @@ to view more bookmarks</source>
         <translation>Diagnose für Kamera %1</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>Diagnose für IO Modul %1</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>Geräte-Diagnose</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>Kamera-Diagnose</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO Modul-Diagnose</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2385,10 +2332,6 @@ to view more bookmarks</source>
         <translation>Kamera ist erreichbar.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>IO Modul ist erreichbar.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>Zielgerät bietet Medienstream.</translation>
     </message>
@@ -2397,8 +2340,20 @@ to view more bookmarks</source>
         <translation>Zielkamera bietet Medienstream.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>Ziel-IO-Modul  bietet Medienstream.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2450,17 +2405,19 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>Kameraliste</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n Geräte gefunden</translation>
+        <translation type="unfinished">
+            <numerusform>%n Geräte gefunden</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n Kameras gefunden</translation>
-    </message>
-    <message>
-        <source>%n IO modules found</source>
-        <translation>%n IO Module gefunden</translation>
+        <translation type="unfinished">
+            <numerusform>%n Kameras gefunden</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2469,6 +2426,13 @@ to view more bookmarks</source>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>Exportiere markierte Kameras in eine Datei.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2585,20 +2549,20 @@ to view more bookmarks</source>
         <translation>Warnung! Hoher Minimumwert könnte Aufnahmedauer anderer Kameras beeinflussen.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>Bewegungserkennung ist deaktiviert oder wird von einigen der markierten Kameras nicht unterstützt. Prüfen Sie bitte in den Bewegungserkennungseinstellungen, ob die Funktion unterstützt wird und aktiviert ist.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>Dual-Streaming wird von dieser Kamera nicht unterstützt.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>Dual-Streaming und Bewegungserkennung wird von dieser Kamera nicht unterstützt.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>Bewegungserkennung ist deaktiviert. Gehen Sie in das Bewegungserkennungseinstellungsmenü um Bewegungserkennungsbereiche und Empfindlichkeit einzustellen.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2644,14 +2608,6 @@ to view more bookmarks</source>
         <translation>Kameraeinstellungen</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO Modul-Einstellungen</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>IO Modul-Einstellungen</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>Geräte-Diagnose</translation>
     </message>
@@ -2666,14 +2622,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>Kamera-Diagnose</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO Modul-Diagnose</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>IO Modul-Diagnose</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2691,29 +2639,54 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>Kameraregeln</translation>
     </message>
-    <message>
-        <source>IO Module Rules</source>
-        <translation>IO Modul-Regeln</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>IO Modul-Regeln</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>Änderungen für diese %n Geräte bestätigen?</translation>
+        <translation type="unfinished">
+            <numerusform>Änderungen für diese %n Geräte bestätigen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>Änderungen für diese %n Kameras bestätigen?</translation>
-    </message>
-    <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>Änderungen für diese %n IO Module bestätigen?</translation>
+        <translation type="unfinished">
+            <numerusform>Änderungen für diese %n Kameras bestätigen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
         <translation>Änderungen wurden nicht gespeichert</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2912,15 +2885,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Actions will only work for Generic Events that pass all filters.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Empty fields do not affect results.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Each filter will pass if any keyword in a field is matched.</source>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2999,8 +2964,8 @@ to view more bookmarks</source>
         <translation>Datenbank wirklich zurücksetzen? Alle Daten werden dabei gelöscht.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>Sie müssen sich mit einem Server verbinden um eine Datensicherung erstellen zu können.</translation>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3322,27 +3287,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>Öffne Alarm/Ereignis Management...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>Öffne Ereignissprotokoll...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>Öffne Geräteliste...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>Öffne Kameraliste...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3361,8 +3330,8 @@ to view more bookmarks</source>
         <translation>Das Installieren und/oder Aktualisieren Ihrer Grafikkartentreiber kann Ihre System-Performance beim Ansehen und Bearbeiten von Videos erheblich verbessern.</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>Dies könnte zu Fehlfunktionen/Abstürzen der Client-Software führen.</translation>
+        <source>This may result in client software issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3533,10 +3502,6 @@ to view more bookmarks</source>
         <translation>Exportiere nach &quot;%1&quot;...</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>Konnte die Ausgabedatei %1. nicht anlegen.</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>Konnte Gerät %1 nicht exportieren.</translation>
@@ -3546,11 +3511,15 @@ to view more bookmarks</source>
         <translation>Konnte Kamera %1 nicht exportieren.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>Konnte IO Modul %1 nicht exportieren.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unknown error has occurred.</source>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3619,12 +3588,12 @@ to view more bookmarks</source>
         <translation>Test konnte nicht ausgeführt werden.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>Zeitüberschreitung</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">Zeitüberschreitung</translation>
     </message>
 </context>
 <context>
@@ -3657,10 +3626,6 @@ to view more bookmarks</source>
         <translation>Test konnte nicht ausgeführt werden.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>Keiner Ihrer Server ist mit dem Internet verbunden.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>Benutzer konnten nicht geladen werden.</translation>
     </message>
@@ -3669,16 +3634,20 @@ to view more bookmarks</source>
         <translation>Benutzer importieren</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>Zeitüberschreitung</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>Fehler beim Laden der Benutzer.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation>Keine neuen Benutzer gefunden.</translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">Zeitüberschreitung</translation>
     </message>
 </context>
 <context>
@@ -3943,17 +3912,26 @@ to view more bookmarks</source>
             <numerusform>Benutze entsprechende Lizenzen, um diese Kameras %n anzusehen</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Verwende Lizenzen für %n Geräte</translation>
+        <translation type="unfinished">
+            <numerusform>Verwende Lizenzen für %n Geräte</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>Verwende Lizenzen für %n Kameras</translation>
+        <translation type="unfinished">
+            <numerusform>Verwende Lizenzen für %n Kameras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>Verwende Lizenzen für %n IO Module</translation>
+    <message numerus="yes">
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4133,16 +4111,16 @@ to view more bookmarks</source>
         <translation>%1 (Tour &quot;%2&quot; ist aktiviert)</translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation>IO Modul</translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation>Zoom-Fenster</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation>Low-Res</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4454,20 +4432,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Öffne Kamera</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>Öffne IO Modul</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>Geräteeinstellungen...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>Kameraeinstellungen...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>IO Modul-Einstellungen...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
@@ -4478,15 +4448,23 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Öffne Webseite der Kamera...</translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>Öffne Webseite des IO Moduls...</translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4501,8 +4479,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Verwenden Sie einen leistungsfähigeren Computer, um auf alle Funktionen zuzugreifen.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>Warnung</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">Warnung!</translation>
     </message>
 </context>
 <context>
@@ -4566,16 +4544,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Diese Tourdefinitionen werden ungültig, wenn Sie sie entfernen.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Beim Versuch die Position von Kamera %1 zu ermitteln, ereignete sich ein Fehler.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Bitte warten Sie bis die Kamera online ist.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Beim Versuch die Position von Kamera %1 zu setzen, ereignete sich ein Fehler.</translation>
     </message>
     <message>
         <source>Could not get position from camera.</source>
@@ -4590,16 +4560,24 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Voreinstellung löschen</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>PTZ für %1. steuern.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>PTZ Konfiguration wurde nicht gespeichert.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>Änderungen wurden nicht gespeichert. Möchten Sie jetzt speichern?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4851,10 +4829,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         </translation>
     </message>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>Archivierte Laufzeit in Kalendertagen zwischen dem ersten Datensatz und dem aktuellen Zeitpunkt</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>Durchschnittliche Bitrate für den aufgezeichneten Zeitraum</translation>
     </message>
@@ -4886,17 +4860,19 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>empty</source>
         <translation>leer</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>Gesamt %n Geräte</translation>
+        <translation type="unfinished">
+            <numerusform>Gesamt %n Geräte</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>Gesamt %n Kameras</translation>
-    </message>
-    <message>
-        <source>Total %n IO modules</source>
-        <translation>Gesamt %n IO Module</translation>
+        <translation type="unfinished">
+            <numerusform>Gesamt %n Kameras</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4924,6 +4900,17 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5073,6 +5060,53 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">&lt;Jedes Gerät&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;Jede Kamera&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5159,11 +5193,11 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Server nicht gespeichert</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>Änderungen an Server %1 bestätigen?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5198,12 +5232,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Dieser Server hat bereits mehr als die maximale Anzahl an Kameras</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>Um Fehlfunktionen zu vermeiden passen Sie die maximale Anzahl der Geräte an</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>Um Fehlfunktionen zu vermeiden passen Sie die maximale Anzahl der Kameras an</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5424,18 +5458,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Bitte updaten Sie den Client manuell mit einem Installationspaket.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>Update erfolgreich.</translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation>Ladeprozess nicht gefunden.</translation>
-    </message>
-    <message>
-        <source>Update Cancelled</source>
-        <translation>Update abgebrochen</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>Update nicht erfolgreich.</translation>
     </message>
@@ -5448,24 +5470,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Internetverbindungsproblem</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>Diese Version ist auf dem Updateserver nicht verfügbar.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>Update kann nicht gestartet werden. Für einen oder mehrere Server konnte kein Update gefunden werden.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>Update kann nicht gestartet werden. Für den Client konnte kein Update gefunden werden.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>Kann Update Datei nicht extrahieren.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>Kann Update nicht beginnen. Ein Downgrade auf die Vorgängerversion ist verboten.</translation>
     </message>
     <message numerus="yes">
         <source>Authentication failed for %n servers:</source>
@@ -5473,6 +5479,42 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
             <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
+    </message>
+    <message>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5487,6 +5529,16 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
             <numerusform>%n Benutzer</numerusform>
             <numerusform>%n Benutzer</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5523,14 +5575,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>2 FPS für den zweiten Stream reserviert. Aktueller FPS Wert im Zeitraster ist %1. FPS Werte wurde auf %2 heruntergesetzt.</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>Ungültiger Aufnahmeplan</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>Der sekundäre Stream ist bei dieser Kamera deaktiviert. Die Motion und LQ-Option bleiben ohne Effekt. Drücken Sie &quot;Ja&quot; um den Aufnahmetyp auf &quot;Immer&quot; zu setzen oder &quot;Nein&quot; um den Sekundär Stream zu reaktivieren.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>Bestätige Reset der Bewegungserkennungszonen</translation>
     </message>
@@ -5559,8 +5603,16 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Kameraeinstellungen</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO Modul-Einstellungen</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">Ungültiger Aufnahmeplan</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5596,16 +5648,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation type="unfinished">Ungültige Daten</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">Eingegebene Daten sind ungültig. Test konnte nicht durchgeführt werden.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">Netzwerkfehler</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">Test konnte nicht durchgeführt werden. Keiner der Server ist über das Internet erreichbar.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5630,6 +5674,14 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>Success</source>
         <translation type="unfinished">Aktion erfolgreich</translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5702,24 +5754,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Bitte überprüfen Sie die Authentifizierungsinformationen in den Kameraeinstellungen</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>Bitte überprüfen Sie die Authentifizierungsinformationen in den IO Modul-Einstellungen</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">Warnung</translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">Sie sind dabei die Archiv Resynchronisationsroutine zu starten.</translation>
@@ -5727,10 +5767,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">WICHTIG! Während die Resynchronisationsroutine läuft, wird ihre Festplatte eine erhöhte Aktivität aufweisen. Abhängig von der Größe ihres Archives kann der Vorgang mehrere Stunden benötigen.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">Dieser Vorgang ist nur nötig, falls Ihr Archiv Ordner verschoben, umbenannt oder ersetzt wurde. Sie können die Resynchronisationsroutine jederzeit ohne Datenverlust abbrechen.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5777,33 +5813,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Couldn&apos;t start backup while rebuilding archive index is being processed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n of %1 are selected</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>In Real-Time</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In Real-Time mode all data is backed up continuously.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notice: Only data from this point forward will be backed up. Existing archives will be ignored.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive has been successfully backup until: %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>No devices selected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5812,7 +5821,66 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Your archive has been successfully backed up.</source>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warnung!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5854,6 +5922,10 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>%1 (Rebuilding... %2%)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">Lade...</translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
@@ -5894,16 +5966,16 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Das System hat andere Server, welche denselben Netzwerkspeicherpfad verwenden. Aufnahmen von mehreren Servern auf denselben Pfad werden nicht empfohlen.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>Warnung</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>Speicher hinzufügen</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation>Ungültge Pfadangabe zu externem Speicher.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warnung!</translation>
     </message>
 </context>
 <context>
@@ -6024,14 +6096,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6045,6 +6109,14 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6694,10 +6766,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Launcher process not found.</source>
         <translation>Ladeprozess nicht gefunden.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>Das Hinzufügen von Geräten ist in Bearbeitung. Sind Sie sicher, dass Sie den Vorgang abbrechen möchten?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6710,13 +6778,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>
             <numerusform>Konnte %n Kamera nicht auf den Server %1 verschieben. Server reagiert nicht mehr.</numerusform>
             <numerusform>Konnte %n Kameras nicht auf den Server %1 verschieben. Server reagiert nicht mehr.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>Konnte %n IO Modul nicht auf den Server %1 verschieben. Server reagiert nicht mehr.</numerusform>
-            <numerusform>Konnte %n IO Module nicht auf den Server %1 verschieben. Server reagiert nicht mehr.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6734,13 +6795,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         </translation>
     </message>
     <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>Server %1 ist nicht in der Lage %n IO Modul zu finden/erreichen. Sind Sie sich sicher, dass Sie dieses verschieben möchten?</numerusform>
-            <numerusform>Server %1 ist nicht in der Lage %n IO Module zu finden/erreichen. Sind Sie sich sicher, dass Sie diese verschieben möchten?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation>
             <numerusform>Sind Sie sich sicher, dass Sie diese %n Datei dauerhaft entfernen möchten?</numerusform>
@@ -6754,41 +6808,47 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
             <numerusform>Sind Sie sich sicher, dass Sie diese %n Objekte aus Ihrem Layout entfernen möchten?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Diese %n Geräte werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>Diese %n Geräte werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Diese %n Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>Diese %n Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>Diese %n IO Module werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n von diesen Geräten werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>%n von diesen Geräten werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n von diesen Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
+        <translation type="unfinished">
+            <numerusform>%n von diesen Kameras werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n von diesen IO Modulen werden automatisch erkannt. Sie können nach dem Entfernen erneut automatisch erkannt werden. Sind Sie sicher, dass Sie diese entfernen möchten?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>Wollen Sie %n Geräte wirklich löschen?</translation>
+        <translation type="unfinished">
+            <numerusform>Wollen Sie %n Geräte wirklich löschen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>Wollen Sie %n Kameras wirklich löschen?</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>Wollen Sie %n IO Module wirklich löschen?</translation>
+        <translation type="unfinished">
+            <numerusform>Wollen Sie %n Kameras wirklich löschen?</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
@@ -6796,6 +6856,45 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
             <numerusform>Wollen Sie %n Objekt wirklich löschen?</numerusform>
             <numerusform>Wollen Sie %n Objekte wirklich löschen?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6830,6 +6929,10 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
     </message>
     <message>
         <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6981,20 +7084,12 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>%1 Media Datei (*.nov)</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>Sie versuchen eine Videosequenz, die länger als 30 Minuten ist, zu exportieren.</translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation>Dies könnte über ein Gigabyte Plattenplatz benötigen und, abhängig von der Verbindungsgeschwindigkeit, eine ganze Weile dauern.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
         <translation>Möchten Sie fortfahren?</translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>Sie versuchen mehrere Videosequenzen, die gemeinsam länger als 30 Minuten sind, zu exportieren.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
@@ -7080,6 +7175,14 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
@@ -7124,11 +7227,6 @@ Wenn Sie die Funktion abschalten möchten, können Sie diese in den Systemeinste
         <translation>Der ausgewählte Server konnte nicht aktualisiert werden.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translatorcomment>???What is this supposed to meanm???  please improve translation.</translatorcomment>
-        <translation>Sie können das Update erneut in der Systemadministation starten.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
@@ -7136,10 +7234,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>Warnung: Sie sind dabei Systeme mit START Lizenzen zusammenzufügen.
 Da nur eine START Lizenz pro System erlaubt ist, wird Ihnen nach dem Zusammenfügen nur eine START Lizenz verbleiben.
 Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zusammenfügen.</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>Warnung</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -7152,6 +7246,14 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation>Der ausgewählte Server wurde erfolgreich mit Ihrem System verbunden!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">Warnung!</translation>
     </message>
 </context>
 <context>
@@ -7264,8 +7366,8 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Alle Kameras</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>Alle IO Module</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7275,28 +7377,24 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>Beim Versuch die Position von Kamera %1 zu ermitteln, ereignete sich ein Fehler.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>Bitte warten Sie bis die Kamera online ist.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>Beim Versuch die Position von Kamera %1 zu setzen, ereignete sich ein Fehler.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
         <translation>Positionsabfrage bei Kamera gescheitert.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>Konnte Position der Kamera nicht setzen.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
-        <translation>Konnte Position von Kamera nicht setzen.</translation>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7309,9 +7407,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>Es ist nicht erlaubt irgendwelche Einstellungen zu tätigen, außer Lizenzaktivierung.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>Die folgenden %n Objekte wurden nicht gespeichert.</translation>
+        <translation type="unfinished">
+            <numerusform>Die folgenden %n Objekte wurden nicht gespeichert.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7324,9 +7425,12 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>Error</source>
         <translation>Fehler</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>Die folgenden %n Objekte wurden nicht gelöscht.</translation>
+        <translation type="unfinished">
+            <numerusform>Die folgenden %n Objekte wurden nicht gelöscht.</numerusform>
+            <numerusform></numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7557,14 +7661,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <translation>Ein anderer Benutzer steuert bereits diesen Bildschirm.</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>Möchten Sie die Videowand wirklich anhalten?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>Es ist ein manueller Start erforderlich.</translation>
-    </message>
-    <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
         <translation>Bildschirm von %1</translation>
@@ -7572,10 +7668,6 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
     <message>
         <source>A control session is already running.</source>
         <translation>Kontrollsitzung bereits aktiv.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>Ein unerwarteter Fehler ist aufgetreten. Die Änderungen können nicht gespeichert werden.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7605,9 +7697,24 @@ Wenn Sie das verstanden haben und fortfahren möchten, klicken Sie bitte auf Zus
         <source>A Video Wall with the same name already exists.</source>
         <translation>Video-Wand mit diesem Namen existiert bereits.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n Elemente</translation>
+        <translation type="unfinished">
+            <numerusform>%n Elemente</numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -55,7 +55,7 @@ static const auto MS_NOEXEC = MNT_NOEXEC;
 #endif
 
 
-namespace aux 
+namespace aux
 {
     QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
     {
@@ -310,7 +310,7 @@ int QnFileStorageResource::mountTmpDrive() const
             .arg(url.password())
             .arg(uncString);
 
-    QString srcString = lit("//") + url.host() + url.path();    
+    QString srcString = lit("//") + url.host() + url.path();
     m_localPath = aux::genLocalPath(getUrl());
 
     umount(m_localPath.toLatin1().constData());
@@ -349,16 +349,42 @@ bool QnFileStorageResource::updatePermissions() const
 {
     if (getUrl().startsWith("smb://"))
     {
-        QString userName = QUrl(getUrl()).userName().isEmpty() ? "guest" : QUrl(getUrl()).userName();
+        QString userName = QUrl(getUrl()).userName().isEmpty() ?
+                           "guest" :
+                            QUrl(getUrl()).userName();
+
         NETRESOURCE netRes;
         memset(&netRes, 0, sizeof(netRes));
         netRes.dwType = RESOURCETYPE_DISK;
+
         QUrl storageUrl(getUrl());
-        QString path = lit("\\\\") + storageUrl.host() + lit("\\") + storageUrl.path().mid((1));
+        QString path = lit("\\\\") + storageUrl.host() +
+                       lit("\\") + storageUrl.path().mid((1));
+
         netRes.lpRemoteName = (LPWSTR) path.constData();
+
         LPWSTR password = (LPWSTR) storageUrl.password().constData();
         LPWSTR user = (LPWSTR) userName.constData();
-        if (WNetUseConnection(0, &netRes, password, user, 0, 0, 0, 0) != NO_ERROR)
+
+        DWORD errCode = WNetUseConnection(
+            0,   // window handler, not used
+            &netRes,
+            password,
+            user,
+            0,   // connection flags, should work with just 0 though
+            0,
+            0,   // additional connection info buffer size
+            NULL // additional connection info buffer
+        );
+
+        if (errCode == ERROR_SESSION_CREDENTIAL_CONFLICT)
+        {   // That means that user has alreay used this network resource
+            // with different credentials set.
+            // If so we can attempt to just use this resource as local one.
+            return true;
+        }
+
+        if (errCode != NO_ERROR)
             return false;
     }
     return true;
@@ -394,7 +420,7 @@ QnFileStorageResource::QnFileStorageResource():
     m_dirty(false),
     m_valid(false),
     m_capabilities(0),
-    m_cachedTotalSpace(QnStorageResource::UnknownSize)
+    m_cachedTotalSpace(QnStorageResource::kSizeDetectionOmitted)
 {
     m_capabilities |= QnAbstractStorageResource::cap::RemoveFile;
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
@@ -463,7 +489,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 qint64 QnFileStorageResource::getFreeSpace()
 {
     if (!initOrUpdate())
-        return QnStorageResource::UnknownSize;
+        return QnStorageResource::kUnknownSize;
 
     return getDiskFreeSpace(
         m_localPath.isEmpty() ?
@@ -475,7 +501,7 @@ qint64 QnFileStorageResource::getFreeSpace()
 qint64 QnFileStorageResource::getTotalSpace()
 {
     if (!initOrUpdate())
-        return QnStorageResource::UnknownSize;
+        return QnStorageResource::kUnknownSize;
 
     QnMutexLocker locker (&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
@@ -543,8 +569,11 @@ bool QnFileStorageResource::isAvailable() const
         return false;
 
     QnMutexLocker lock(&m_writeTestMutex);
-    //m_hasFreeSpaceCached = getFreeSpace() > 0;
     m_writeCapCached = testWriteCapInternal(); // update cached value periodically
+    // write check fail is a cause to set dirty to true, thus enabling
+    // remount attempt in initOrUpdate()
+    if (!m_writeCapCached)
+        m_dirty = true;
     m_cachedTotalSpace = getDiskTotalSpace(m_localPath.isEmpty() ? getPath() : m_localPath ); // update cached value periodically
     return *m_writeCapCached;
 
@@ -626,7 +655,7 @@ bool QnFileStorageResource::isLocal(const QString &url)
 
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         platformMonitor->totalPartitionSpaceInfo(
-            QnPlatformMonitor::LocalDiskPartition 
+            QnPlatformMonitor::LocalDiskPartition
         );
 
     for (const auto &partition : partitions)
@@ -699,8 +728,8 @@ bool QnFileStorageResource::isStorageDirMounted() const
         auto badResultHandler = [this]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
-            // Will try to unmount, remove local mount point directory 
-            // and set flag meaning that local path recreation 
+            // Will try to unmount, remove local mount point directory
+            // and set flag meaning that local path recreation
             // + remount is needed
             umount(m_localPath.toLatin1().constData()); // directory may not exists, but this is Ok
             rmdir(m_localPath.toLatin1().constData()); // same as above
@@ -732,11 +761,6 @@ bool QnFileStorageResource::isStorageDirMounted() const
             return badResultHandler();
         }
 
-        mkdir(
-            m_localPath.toLatin1().constData(),
-            S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
-        );
-
 #if __linux__
         int retCode = mount(
             srcString.toLatin1().constData(),
@@ -762,15 +786,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
             );
             return badResultHandler();
         }
-        else
-        {
-#if __linux__
-            umount(m_localPath.toLatin1().constData());
-#elif __APPLE__
-            unmount(m_localPath.toLatin1().constData(), 0);
-#endif
-            rmdir(m_localPath.toLatin1().constData());
-        }
+
         return true;
     }
 

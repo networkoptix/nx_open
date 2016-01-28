@@ -184,6 +184,7 @@ Window {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
+                currentSystemName = connectionManager.systemName
                 if (stackView.currentItem.objectName == "newConnectionPage" || stackView.currentItem.objectName == "loginPage") {
                     stackView.setFadeTransition()
                     Main.gotoResources()
@@ -191,7 +192,7 @@ Window {
             } else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
-                if (stackView.currentItem.objectName != "newConnectionPage" && stackView.currentItem.objectName != "loginPage")
+                if (stackView.currentItem.objectName != "newConnectionPage")
                     Main.gotoNewSession()
             }
         }

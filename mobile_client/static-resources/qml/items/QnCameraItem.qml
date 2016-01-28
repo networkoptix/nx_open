@@ -104,8 +104,7 @@ Item {
         id: thumbnailDummyComponent
 
         Column {
-            x: dp(8)
-            width: thumbnailContainer.width - 2 * x
+            width: thumbnailContainer.width - dp(16)
 
             Image {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -148,53 +147,6 @@ Item {
         }
     }
 
-    Rectangle {
-        id: hiddenDummy
-
-        width: parent.width
-        height: width * 3 / 4
-        color: QnTheme.cameraHiddenBackground
-        border.width: dp(1)
-        border.color: QnTheme.cameraDummyBorder
-
-        opacity: 1.0 - Math.min(0.5, content.opacity) * 2
-
-        Column {
-            width: parent.width
-            anchors.centerIn: parent
-
-            Text {
-                width: parent.width
-                height: dp(56)
-
-                text: qsTr("Camera\nhidden")
-
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                font.pixelSize: sp(16)
-                maximumLineCount: 2
-                wrapMode: Text.WordWrap
-                color: QnTheme.cameraHiddenText
-            }
-
-            QnButton {
-                id: undoButton
-
-                anchors.horizontalCenter: parent.horizontalCenter
-
-                flat: true
-                text: qsTr("Undo")
-                icon: "image://icon/undo.png"
-                font.pixelSize: sp(18)
-
-                onClicked: {
-                    cameraItem.z = -1
-                    d.hidden = false
-                }
-            }
-        }
-    }
-
     QnMaterialSurface {
         id: materialSurface
 
@@ -208,18 +160,29 @@ Item {
 
         drag.axis: Drag.XAxis
         drag.target: content
-        drag.onActiveChanged: {
-            if (drag.active)
-                return
+        drag.threshold: dp(8)
 
-            if (Math.abs(content.x) > content.width / 2) {
-                content.x = content.x > 0 ? content.width : -content.width
+        QnPropertyChangeSpeedMeasurer
+        {
+            value: content.x
+            active: materialSurface.drag.active
+            onActiveChanged:
+            {
+                if (active)
+                    return
+
+                var dx = Math.abs(content.x)
+
+                if ((Math.abs(speed) < dp(800) && dx < content.width * 0.85) || dx < content.width * 0.25)
+                {
+                    content.x = 0
+                    return
+                }
+
+                content.x = speed > 0 ? content.width : -content.width
                 d.hidden = true
-            } else {
-                content.x = 0
             }
         }
-        drag.threshold: dp(8)
     }
 
     Binding {

@@ -10,7 +10,7 @@ import ".."
 QnPage {
     id: resourcesPage
 
-    title: connectionManager.systemName
+    title: mainWindow.currentSystemName
 
     property alias searchActive: searchItem.opened
 

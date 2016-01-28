@@ -184,6 +184,9 @@ void QnModuleFinder::setModuleStatus(const QnUuid &moduleId, Qn::ResourceStatus 
     case Qn::Unauthorized:
     case Qn::Incompatible:
         break;
+    case Qn::Offline:
+        removeModule(moduleId);
+        return;
     default:
         status = Qn::Incompatible;
     }
@@ -564,4 +567,23 @@ void QnModuleFinder::sendModuleInformation(
     QnAppServerConnectionFactory::getConnection2()->getDiscoveryManager()->sendDiscoveredServer(
                 std::move(serverData),
                 ec2::DummyHandler::instance(), &ec2::DummyHandler::onRequestDone);
+}
+
+void QnModuleFinder::removeModule(const QnUuid &id)
+{
+    QList<SocketAddress> addresses;
+    {
+        QnMutexLocker lock(&m_itemsMutex);
+
+        auto it = m_moduleItemById.find(id);
+        if (it == m_moduleItemById.end())
+            return;
+
+        addresses = (it->addresses - (QSet<SocketAddress>() << it->primaryAddress)).toList();
+        // Place primary address to the end of the list
+        addresses.append(it->primaryAddress);
+    }
+
+    for (const SocketAddress &address: addresses)
+        removeAddress(address, false);
 }

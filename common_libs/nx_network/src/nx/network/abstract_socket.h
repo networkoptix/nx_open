@@ -70,6 +70,9 @@ public:
     //!Returns true, if socket has been closed previously with \a AbstractSocket::close call
     virtual bool isClosed() const = 0;
 
+    //!Shutdown socket
+    virtual void shutdown() = 0;
+
     //!Allows mutiple sockets to bind to same address and port
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code

@@ -549,7 +549,7 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
     for (const auto& storage: storages)
     {
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < storage->getSpaceLimit())
+        if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
     return result;
@@ -567,7 +567,7 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < storage->getSpaceLimit())
+        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
             continue; // if storage size isn't known do not add it by default
 
 

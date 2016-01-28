@@ -14,7 +14,7 @@ namespace {
     const QString primaryUrlsList("http://www.mypublicip.com;http://checkip.eurodyndns.org");
     const QString secondaryUrlsList("http://networkoptix.com/myip");
     const int requestTimeoutMs = 4*1000;
-    const QString iPRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
+    const QLatin1String iPRegExprValue("[^a-zA-Z0-9\\.](([0-9]){1,3}\\.){3}([0-9]){1,3}[^a-zA-Z0-9\\.]");
 }
 
 #ifdef _DEBUG
@@ -101,7 +101,7 @@ void QnPublicIPDiscovery::handleReply(const nx_http::AsyncHttpClientPtr& httpCli
 
     /* Check if reply contents contain any ip address. */
     QByteArray response = QByteArray(" ") + httpClient->fetchMessageBodyBuffer() + QByteArray(" ");
-    int ipPos = iPRegExpr.indexIn(response);
+    int ipPos = iPRegExpr.indexIn(QString::fromUtf8(response));
     if (ipPos < 0)
         return;
 

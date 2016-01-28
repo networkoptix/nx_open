@@ -24,8 +24,6 @@
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 #include <plugins/resource/avi/avi_resource.h>
 
-#include <recording/stream_recorder.h>
-
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
@@ -266,7 +264,7 @@ bool QnLayoutExportTool::start() {
     ItemInfoList items = prepareLayout();
 
     if (!exportMetadata(items)) {
-        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
+        m_errorMessage = tr("Could not create output file %1...").arg(m_targetFilename);
         emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
         return false;
     }
@@ -398,10 +396,14 @@ bool QnLayoutExportTool::exportMediaResource(const QnMediaResourcePtr& resource)
     return true;
 }
 
-void QnLayoutExportTool::at_camera_exportFinished(int status, const QString &filename) {
+void QnLayoutExportTool::at_camera_exportFinished(
+    const QnStreamRecorder::ErrorStruct &status,
+    const QString                       &filename
+) 
+{
     Q_UNUSED(filename)
-    if (status != QnClientVideoCamera::NoError) {
-        m_errorMessage = QnClientVideoCamera::errorString(status);
+    if (status.lastError != QnClientVideoCamera::NoError) {
+        m_errorMessage = QnClientVideoCamera::errorString(status.lastError);
         finishExport(false);
         return;
     }

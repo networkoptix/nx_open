@@ -39,6 +39,7 @@ struct QnUpdateResult {
         Successful,
         Cancelled,
         LockFailed,
+        AlreadyUpdated,
         DownloadingFailed,
         DownloadingFailed_NoFreeSpace,
         UploadingFailed,

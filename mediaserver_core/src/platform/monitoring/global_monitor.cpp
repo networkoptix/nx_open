@@ -1,4 +1,10 @@
+
 #include "global_monitor.h"
+
+#ifdef __linux__
+#include <malloc.h>
+#include <stdio.h>
+#endif
 
 #include <QtCore/QBasicTimer>
 #include <QtCore/QCoreApplication>
@@ -191,6 +197,16 @@ QList<QnPlatformMonitor::HddLoad> QnGlobalMonitor::totalHddLoad() {
         for( const HddLoad& hddLoad : d->totalHddLoad )
             NX_LOG(lit("    %1: %2%").arg(hddLoad.hdd.name).arg(hddLoad.load * 100, 0, 'f', 2), cl_logWARNING);
         d->prevHddUsageLoggingClock = d->upTimeTimer.elapsed();
+
+#ifdef __linux__
+        const size_t memStatBufSize = 64*1024;
+        std::vector<char> memStatBuf;
+        memStatBuf.resize(memStatBufSize);
+        FILE* memStatStr = fmemopen(memStatBuf.data(), memStatBufSize, "w");
+        malloc_info(0, memStatStr);
+        fclose(memStatStr);
+        NX_LOG(lit("MONITORING. malloc statistics: \n%1").arg(memStatBuf.data()), cl_logWARNING);
+#endif
     }
 
     return d->totalHddLoad;

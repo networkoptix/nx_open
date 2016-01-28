@@ -18,6 +18,7 @@
 #include <ui/widgets/settings/cloud_management_widget.h>
 
 #include <update/updates_common.h>
+#include <update/update_info.h>
 
 #include <utils/color_space/image_correction.h>
 #include <utils/serialization/json_functions.h>
@@ -74,6 +75,8 @@ void QnClientMetaTypes::initialize() {
     qRegisterMetaType<QnActionParameters>();
     qRegisterMetaType<QnAspectRatioHash>();
     qRegisterMetaTypeStreamOperators<QnAspectRatioHash>();
+    qRegisterMetaType<QnUpdateInfo>();
+    qRegisterMetaTypeStreamOperators<QnUpdateInfo>();
 
     qRegisterMetaType<Qn::LightModeFlags>();
 

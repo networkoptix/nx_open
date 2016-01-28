@@ -209,9 +209,13 @@ public:
         Q_UNUSED(line);
         Q_ASSERT(openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get() != nullptr);
         if (mode & CRYPTO_LOCK)
+        {
             openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].lock();
+        }
         else
+        {
             openSSLGlobalLockManagerInstance->kOpenSSLGlobalLock.get()[type].unlock();
+        }
     }
 
 private:
