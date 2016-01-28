@@ -321,7 +321,7 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-                    if (fullscanProcessed) 
+                    if (fullscanProcessed)
                     {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
@@ -607,7 +607,12 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     int totalTasks = list.size();
     int currentTask = 0;
     if (progressCallback)
-        progressCallback(currentTask, totalTasks);
+    {
+        if (totalTasks > 0)
+            progressCallback(currentTask, totalTasks);
+        else
+            progressCallback(1, 1); /* We have just completed the only task - have indexed the folder. */
+    }
     for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
@@ -1803,7 +1808,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to
-                // specific backup error by the calling code and this error 
+                // specific backup error by the calling code and this error
                 // is reported to the client (and also logged).
                 // Hence these below seem redundant for Backup storage manager.
                 emit noStoragesAvailable();
