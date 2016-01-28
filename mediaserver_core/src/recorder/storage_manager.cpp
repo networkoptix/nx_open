@@ -294,6 +294,12 @@ public:
                   -> std::function<void(int, int)>
                 {
                     return [this, url, totalProgressValue, totalProgressStep, offset](int current, int total) {
+                        if (total <= 0)
+                        {   /* Lets think we have already done this =) */
+                            total = 1;
+                            current = 1;
+                        }
+
                         /* Dividing storage progress by two as there are two catalogs rebuilding. */
                         const qreal storageProgress = offset + (0.5 * current / (qreal) total);
                         const qreal totalProgress = totalProgressValue + storageProgress * totalProgressStep;
@@ -607,12 +613,8 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
     int totalTasks = list.size();
     int currentTask = 0;
     if (progressCallback)
-    {
-        if (totalTasks > 0)
-            progressCallback(currentTask, totalTasks);
-        else
-            progressCallback(1, 1); /* We have just completed the only task - have indexed the folder. */
-    }
+        progressCallback(currentTask, totalTasks);
+
     for(const QnAbstractStorageResource::FileInfo& fi: list)
     {
         if (m_rebuildCancelled)
