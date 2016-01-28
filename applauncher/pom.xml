@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <!--
     Example pom for delegating maven goals to msbuild so it builds the "solution"
- 
+
     A solution can be a group of projects, but here we only have one.
-    It should also be possible to have one maven project per solution project, 
+    It should also be possible to have one maven project per solution project,
     and have a parent pom to deletegate the build.
   -->
     <parent>
@@ -18,32 +18,32 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>applauncher</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Launcher</name>    
+    <name>HD Witness Launcher</name>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>           
-    </dependencies>         
-    
+        </dependency>
+    </dependencies>
+
     <properties>
         <guid>${applauncher.guid}</guid>
-        <product.title>${applauncher.name}</product.title>  
+        <product.title>${applauncher.name}</product.title>
         <product.display.title>${applauncher.display.name}</product.display.title>
-        <!--Global libs-->      
+        <!--Global libs-->
         <template>app</template>
         <qt.libs>core gui network xml widgets</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon -lquazip</global.libs>
+        <global.libs>-lcommon -lnx_streaming -lquazip</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
-        <windows.oslibs.release></windows.oslibs.release> 
-        <windows.oslibs.debug></windows.oslibs.debug>        
+        <windows.oslibs.release></windows.oslibs.release>
+        <windows.oslibs.debug></windows.oslibs.debug>
         <linux.oslibs></linux.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
         <!--Global defines-->
@@ -51,6 +51,6 @@
         <!--Specific os defines-->
         <windows.defines/>
         <linux.defines/>
-        <mac.defines/>      
-    </properties>   
+        <mac.defines/>
+    </properties>
 </project>

@@ -31,7 +31,6 @@
 #include "transcoding/filters/tiled_image_filter.h"
 
 #include "decoders/video/ffmpeg_video_decoder.h"
-#include "decoders/video/ffmpeg.h"
 #include "export/sign_helper.h"
 #include "transcoding/filters/scale_image_filter.h"
 

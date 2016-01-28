@@ -722,7 +722,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     return result;
 }
 
-RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, double scale)
+QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
 {
     m_prefferedTransport = m_transport;
     if (m_prefferedTransport == TRANSPORT_AUTO)
@@ -741,7 +741,6 @@ RTPSession::TrackMap RTPSession::play(qint64 positionStart, qint64 positionEnd, 
 
 bool QnRtspClient::stop()
 {
-    QnMutexLocker lock( &m_sockMutex );
     m_tcpSock->close();
     return true;
 }
