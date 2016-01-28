@@ -21,7 +21,7 @@
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
-static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
+static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 3;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;

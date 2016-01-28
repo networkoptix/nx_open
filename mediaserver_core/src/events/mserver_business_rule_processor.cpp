@@ -45,6 +45,7 @@
 
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/abstract_ptz_controller.h>
+#include "utils/common/delayed.h"
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -78,6 +79,8 @@ namespace {
     static const QSize SCREENSHOT_SIZE(640, 480);
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
+
+    static const int kEmailSendDelay = 1000 * 5;
 };
 
 struct QnEmailAttachmentData {
@@ -361,7 +364,7 @@ bool QnMServerBusinessRuleProcessor::triggerCameraOutput( const QnCameraOutputBu
 QByteArray QnMServerBusinessRuleProcessor::getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize)
 {
     const QnResourcePtr& cameraRes = qnResPool->getResourceById(id);
-    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize);
+    QSharedPointer<CLVideoDecoderOutput> frame = QnGetImageHelper::getImage(cameraRes.dynamicCast<QnVirtualCameraResource>(), timestampUsec, dstSize, QnThumbnailRequestData::KeyFrameAfterMethod);
     return frame ? QnGetImageHelper::encodeImage(frame, "jpg") : QByteArray();
 }
 
@@ -398,7 +401,9 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     NX_LOG( lit("Processing action SendMail. Sending mail to %1").
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
-    QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
+    executeDelayed([this, action, recipients, aggregatedResCount]() {
+        QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
+    }, kEmailSendDelay);
 
     /*
      * This action instance is not used anymore but storing into the Events Log db.
