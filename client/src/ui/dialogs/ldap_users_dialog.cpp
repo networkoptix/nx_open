@@ -67,7 +67,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
     ui->buttonBox->showProgress();
     m_timeoutTimer->setInterval(testLdapTimeoutMSec);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this]{
-        stopTesting(tr("Timed out"));
+        stopTesting(tr("Timed Out"));
     });
     m_timeoutTimer->start();
 

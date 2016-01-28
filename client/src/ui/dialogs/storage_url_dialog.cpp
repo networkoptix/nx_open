@@ -160,7 +160,7 @@ void QnStorageUrlDialog::accept()
         QString message = tr("System has other server(s) using the same network storage path. "\
                              "Recording data by multiple servers to exactly same place is not recommended.");
 
-        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
         messageBox.addButton(tr("Add storage"), QnMessageBox::AcceptRole);
 
         if (messageBox.exec() == QnMessageBox::Cancel)

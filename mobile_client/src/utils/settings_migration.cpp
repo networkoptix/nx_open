@@ -7,7 +7,9 @@
 
 QnMigratedSessionList getMigratedSessions(bool *success)
 {
-    Q_UNUSED(success)
+    if (success)
+        *success = false;
+
     return QnMigratedSessionList();
 }
 
@@ -44,4 +46,6 @@ void migrateSettings()
 
     if (success)
         qnSettings->setSettingsMigrated(true);
+    else
+        qDebug() << "Settings migration failed.";
 }

@@ -357,7 +357,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction) {
         item->addActionButton(
             icon,
-            tr("Open in the Alarm Layout"),
+            tr("Open in Alarm Layout"),
             Qn::OpenInAlarmLayoutAction,
             QnActionParameters(alarmCameras)
             );

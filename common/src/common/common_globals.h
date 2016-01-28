@@ -556,6 +556,7 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
@@ -742,11 +743,23 @@ public:
         LC_Count
     };
 
+
     /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-    enum BookmarkSearchStrategy {
-        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+
+//    enum BookmarkSearchStrategy {
+//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+//    };
+
+    // All columns are sorted by database initially, except camera name and tags.
+    enum BookmarkSortField
+    {
+        BookmarkName
+        , BookmarkStartTime
+        , BookmarkDuration
+        , BookmarkTags          // Sorted manually!
+        , BookmarkCameraName    // Sorted manually!
     };
 
     /**
@@ -877,7 +890,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::PanicMode)(Qn::RecordingType)
         (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSearchStrategy)
+        (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)

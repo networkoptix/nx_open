@@ -128,6 +128,9 @@ public:
 
     /** Check if the widget has video. It can be absent in I/O Module, for example. */
     bool hasVideo() const;
+    
+    QnCompositeTextOverlay *compositeTextOverlay();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();

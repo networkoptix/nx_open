@@ -252,7 +252,7 @@
      </widget>
      <widget class="QWidget" name="ioSettingsTab">
       <attribute name="title">
-       <string>IO ports</string>
+       <string>I/O ports</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_28" stretch="0">
        <item>

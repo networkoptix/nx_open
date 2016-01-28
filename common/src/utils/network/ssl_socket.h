@@ -48,6 +48,7 @@ public:
     virtual SocketAddress getLocalAddress() const override;
     virtual void close() override;
     virtual bool isClosed() const override;
+    virtual void shutdown() override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) override;
     virtual bool setNonBlockingMode( bool val ) override;

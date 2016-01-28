@@ -6,6 +6,7 @@ import com.networkoptix.qml 1.0
 import "../controls"
 import "../controls/style"
 import "../items"
+import "../icons"
 import "../main.js" as Main
 import "QnLoginPage.js" as LoginFunctions
 
@@ -26,37 +27,65 @@ QnPage {
 
     property bool _authError: false
     property bool _serverError: false
-    property bool _showWarning: false
 
-    property int _warningAnimationDuration: 500
+    readonly property bool connecting: connectionManager.connectionState == QnConnectionManager.Connecting
 
     objectName: "loginPage"
 
-    Connections {
+    Connections
+    {
         target: menuBackButton
-        onClicked: {
+        onClicked:
+        {
             if (state != "New")
+            {
+                if (connecting)
+                    connectionManager.disconnectFromServer()
                 Main.gotoMainScreen()
+            }
         }
     }
 
     Item {
         id: warning
 
+        property bool shown: false
+
         width: parent.width
         height: warningRect.height + dp(8)
+
+        onShownChanged:
+        {
+            if (shown)
+            {
+                warningAnimation.stop()
+                warningAnimation.to = warningRect.implicitHeight
+                warningAnimation.start()
+            }
+            else
+            {
+                warningAnimation.stop()
+                warningAnimation.to = 0
+                warningAnimation.start()
+            }
+        }
 
         Rectangle {
             id: warningRect
 
             width: parent.width
-            height: _showWarning ? dp(40) : 0
+            implicitHeight: dp(40)
+            height: 0
             clip: true
             anchors.horizontalCenter: parent.horizontalCenter
 
             color: QnTheme.attentionBackground
 
-            Behavior on height { NumberAnimation { duration: _warningAnimationDuration; easing.type: Easing.OutCubic } }
+            NumberAnimation on height {
+                id: warningAnimation
+                duration: 500
+                easing.type: Easing.OutCubic
+            }
 
             Text {
                 id: warningText
@@ -99,6 +128,7 @@ QnPage {
                     onTextChanged: loginPage.removeWarnings()
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
+                    enabled: !connecting
                     KeyNavigation.tab: loginField
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
@@ -112,6 +142,7 @@ QnPage {
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhDigitsOnly
                     validator: IntValidator { bottom: 0; top: 32767 }
+                    enabled: !connecting
                     KeyNavigation.tab: loginField
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
@@ -128,6 +159,7 @@ QnPage {
                     onTextChanged: loginPage.removeWarnings()
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData
+                    enabled: !connecting
                     KeyNavigation.tab: passwordField
                     onAccepted: KeyNavigation.tab.forceActiveFocus()
                 }
@@ -142,6 +174,7 @@ QnPage {
                     onTextChanged: loginPage.removeWarnings()
                     selectionAllowed: false
                     inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase | Qt.ImhSensitiveData | Qt.ImhHiddenText
+                    enabled: !connecting
                     KeyNavigation.tab: hostField
                     onAccepted: connect()
                     Component.onCompleted: {
@@ -151,43 +184,69 @@ QnPage {
                 }
             }
 
-            Row {
-                id: editButtons
+            Item {
+                id: buttonsItem
+
                 width: parent.width
-                spacing: dp(8)
-                visible: false
+                height: buttonsColumn.height
 
-                QnButton {
-                    id: saveButton
-                    text: qsTr("Save")
-                    width: parent.width * 3 / 5
+                Column {
+                    id: buttonsColumn
 
-                    onClicked: LoginFunctions.saveSession(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, title)
+                    width: parent.width
+                    spacing: dp(24)
+
+                    Row {
+                        id: editButtons
+                        width: parent.width
+                        spacing: dp(8)
+                        visible: false
+
+                        QnButton {
+                            id: saveButton
+                            text: qsTr("Save")
+                            width: parent.width * 3 / 5
+
+                            onClicked: LoginFunctions.saveSession(sessionId, hostField.text, actualPort(), loginField.text, passwordField.text, title)
+                        }
+
+                        QnButton {
+                            id: deleteButton
+                            text: qsTr("Delete")
+                            width: parent.width * 2 / 5 - parent.spacing
+                            color: QnTheme.buttonAttentionBackground
+
+                            onClicked: LoginFunctions.deleteSesion(sessionId)
+                        }
+                    }
+
+                    QnButton {
+                        id: connectButton
+                        width: parent.width
+                        text: qsTr("Connect")
+                        color: QnTheme.buttonAccentBackground
+                        textColor: QnTheme.buttonAccentText
+
+                        onClicked: connect()
+                    }
+
+                    opacity: connecting ? 0.0 : 1.0
+
+                    Behavior on opacity { NumberAnimation { duration: 250; easing.type: Easing.OutCubic } }
                 }
 
-                QnButton {
-                    id: deleteButton
-                    text: qsTr("Delete")
-                    width: parent.width * 2 / 5 - parent.spacing
-                    color: QnTheme.buttonAttentionBackground
-
-                    onClicked: LoginFunctions.deleteSesion(sessionId)
+                QnThreeDotPreloader {
+                    height: dp(48)
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    color: QnTheme.preloaderCircle
+                    opacity: 1.0 - buttonsColumn.opacity
                 }
-            }
-
-            QnButton {
-                id: connectButton
-                width: parent.width
-                text: qsTr("Connect")
-                color: QnTheme.buttonAccentBackground
-                textColor: QnTheme.buttonAccentText
-
-                onClicked: connect()
             }
 
             Loader {
                 id: discoveredSessionsLoader
                 width: parent.width
+                enabled: !connecting
             }
         }
     }
@@ -257,7 +316,7 @@ QnPage {
             name: "FailedSaved"
             PropertyChanges {
                 target: editButtons
-                visible: true
+                visible: false
             }
         }
     ]
@@ -273,14 +332,6 @@ QnPage {
         }
     }
 
-    Timer {
-        id: delayedLoginTimer
-        interval: _warningAnimationDuration
-        running: false
-        repeat: false
-        onTriggered: loginWithCurrentFields()
-    }
-
     QnOldClientOfferDialog {
         id: oldClientOfferDialog
     }
@@ -288,13 +339,8 @@ QnPage {
     function connect() {
         loginPage.removeWarnings()
         connectButton.forceActiveFocus()
-
-        if (_showWarning) {
-            _showWarning = false
-            delayedLoginTimer.start()
-        } else {
-            loginWithCurrentFields()
-        }
+        warning.shown = false
+        loginWithCurrentFields()
     }
 
     function showWarning(status, infoParameter) {
@@ -313,7 +359,7 @@ QnPage {
             _authError = true
         else
             _serverError = true
-        _showWarning = true
+        warning.shown = true
 
         if (status == QnConnectionManager.InvalidVersion)
             oldClientOfferDialog.show()
@@ -332,6 +378,10 @@ QnPage {
 
     function actualPort() {
         return portField.text ? portField.text : connectionManager.defaultServerPort()
+    }
+
+    function scrollTop() {
+        flickable.contentY = -flickable.topMargin
     }
 
     focus: true

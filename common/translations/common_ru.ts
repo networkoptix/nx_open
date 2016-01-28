@@ -222,10 +222,6 @@
         <translation>Произошло неизвестное событие</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>Конфликтующий адрес: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>Потеряно соединение с сервером.</translation>
     </message>
@@ -331,10 +327,6 @@
         <translation>Камера %1 была отключена</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>Модуль IO %1 был отключен</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>Конфликт IP адреса устройства на %1</translation>
@@ -355,10 +347,6 @@
     <message>
         <source>Recording on cameras is disabled:</source>
         <translation>Запись отключена для камер:</translation>
-    </message>
-    <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>Запись отключена для модулей IO:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -389,19 +377,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed because of no backup storages available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <source>I/O Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -492,20 +508,12 @@
         <translation>Перезагрузите камеру, зайтем сбросьте её настройки к стандартным через веб-интерфейс.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>Перезагрузите модуль IO, зайтем сбросьте его настройки к стандартным через веб-интерфейс.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>Убедитесь, что устройство подключено к сети. Попробуйте его перезагрузить.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>Убедитесь, что камера подключена к сети. Попробуйте её перезагрузить.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>Убедитесь, что модуль IO подключен к сети. Попробуйте его перезагрузить.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -520,10 +528,6 @@
         <translation>Невозможно разобрать ответ камеры. URL %1, имя запроса %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>Невозможно разобрать ответ модуля IO. URL %1, имя запроса %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>Не авторизован. URL %1.</translation>
     </message>
@@ -536,20 +540,12 @@
         <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках камеры.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>Сначала попробуйте включить запись (если она отключена) и снизить частоту кадров в настройках модуля IO.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>Если это не помогает, восстановите заводские настройки на веб-странице устройства.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>Если это не помогает, восстановите заводские настройки на веб-странице камеры.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>Если это не помогает, восстановите заводские настройки на веб-странице модуля IO.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -560,20 +556,12 @@
         <translation>Запрос камеры &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>Запрос модуля IO &quot;%1&quot; вернул ошибку &quot;%2&quot;.</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>Неизвестная проблема с устройством.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>Неизвестная проблема с камерой.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>Неизвестная проблема с модулем IO.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -584,10 +572,6 @@
         <translation>Камера %1 вернула некорректные данные.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>Модуль IO %1 вернул некорректные данные.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>Слишком много ошибок медиа. Откройте диалог ошибок устройства для подробностей.</translation>
     </message>
@@ -596,23 +580,55 @@
         <translation>Слишком много ошибок медиа. Откройте диалог ошибок камеры для подробностей.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>Слишком много ошибок медиа. Откройте диалог ошибок модуля IO для подробностей.</translation>
-    </message>
-    <message>
-        <source>Device initialization process in progress.</source>
-        <translation>Устройство инициализируется.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>Камера инициализируется.</translation>
-    </message>
-    <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>Модуль IO инициализируется.</translation>
-    </message>
-    <message>
         <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process is in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -634,8 +650,8 @@
         <translation>Не найден путь к explorer.exe для запуска Проводника Windows.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>Ошибка запуска Проводника Windows.</translation>
+        <source>File explorer failed to open.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -649,12 +665,12 @@
         <translation>Не найден кодировщик для кодек %1.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>Невозможно инициализировать аудио кодировщик.</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>Невозможно инициализировать аудио декодер.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -691,8 +707,8 @@
         <translation>Не найден кодировщик для кодекa %1.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>Невозможно инициализировать видео кодировщик.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -845,14 +861,6 @@
         </translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report issue.</source>
-        <translation>Проблема при активации лицензионного ключа. Приняты некорректные данные. Пожалуйста, свяжитесь с командой поддержки.</translation>
-    </message>
-    <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>Проблема при активации лицензионного ключа. Произошла ошибка базы данных.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>Лицензионный ключ, введенный вами, неверен. Пожалуйста, проверьте, что вы правильно ввели лицензионный ключ. Если проблема не исчезла обратитесь в службу поддержки, стобы подтвердить правильность лицензионного ключа либо для получения верного лицензионного ключа.</translation>
     </message>
@@ -863,6 +871,14 @@
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>Этот лицензионный ключ был активирован {{time}} для аппаратного ID {{hwid}}. Пожалуйста, обратитесь в службу поддержки для получения правильного лицензионного ключа.</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -898,22 +914,6 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n модуль ввода/вывода</numerusform>
-            <numerusform>%n модуля ввода/вывода</numerusform>
-            <numerusform>%n модулей ввода/вывода</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n модуль ввода/вывода</numerusform>
-            <numerusform>%n модуля ввода/вывода</numerusform>
-            <numerusform>%n модулей ввода/вывода</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
             <numerusform>%n устройство</numerusform>
@@ -946,22 +946,6 @@
         <translation>камера</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>Модули ввода/вывода</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>модули ввода/вывода</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>Модуль ввода/вывода</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>модуль ввода/вывода</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>Устройства</translation>
     </message>
@@ -976,6 +960,38 @@
     <message>
         <source>device</source>
         <translation>устройство</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished">Модуль ввода/вывода</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1101,6 +1117,10 @@
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>Ошибка при генерации водяного знака для файла %1.</translation>
     </message>
+    <message>
+        <source>File write error. Not enough free space.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnTCPConnectionProcessor</name>
@@ -1157,6 +1177,13 @@
     <message>
         <source>%1 (external)</source>
         <translation>%1 (внешний)</translation>
+    </message>
+</context>
+<context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+        <source>Removed camera</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

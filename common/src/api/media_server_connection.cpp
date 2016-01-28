@@ -727,9 +727,11 @@ int QnMediaServerConnection::backupControlActionAsync(Qn::BackupAction action, Q
     return sendAsyncGetRequest(BackupControlObject, params, QN_STRINGIZE_TYPE(QnBackupStatusData), target, slot);
 }
 
-int QnMediaServerConnection::getStorageSpaceAsync(QObject *target, const char *slot)
+int QnMediaServerConnection::getStorageSpaceAsync(bool fastRequest, QObject *target, const char *slot)
 {
     QnRequestParamList params;
+    if (fastRequest)
+        params << QnRequestParam("fast", QnLexical::serialized(true));
     return sendAsyncGetRequest(StorageSpaceObject, params, QN_STRINGIZE_TYPE(QnStorageSpaceReply), target, slot);
 }
 

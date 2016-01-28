@@ -569,7 +569,7 @@ void QnMulticodecRtpReader::pleaseStop()
 {
     m_pleaseStop = true;
     m_rtpStarted = false;
-    m_RtpSession.stop();
+    m_RtpSession.shutdown();
 }
 
 void QnMulticodecRtpReader::setDefaultTransport( const RtpTransport::Value& _defaultTransportToUse )

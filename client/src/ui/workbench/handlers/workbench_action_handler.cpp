@@ -536,17 +536,16 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnRuntime->isActiveXMode()) {
-		if (!user) {
-	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-			return;
-		}
-
-		if (user->isAdmin())
+	if (qnRuntime->isDesktopMode())
+    {
+		if (user && user->isAdmin())
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-	    else
-			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+        else
+            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+
+    if (!user)
+        return;
 
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
@@ -1154,7 +1153,7 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
 }
 
@@ -1486,7 +1485,7 @@ void QnWorkbenchActionHandler::at_serverAddCameraManuallyAction_triggered(){
             int result = QMessageBox::warning(
                         mainWindow(),
                         tr("Process in progress..."),
-                        tr("Device addition is already in progress."\
+                        tr("Device addition is already in progress. "
                            "Are you sure you want to cancel current process?"), //TODO: #GDM #Common show current process details
                         QMessageBox::Ok | QMessageBox::Cancel,
                         QMessageBox::Cancel
@@ -1822,11 +1821,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 onlineAutoDiscoveredCameras
             );
@@ -1838,11 +1837,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size()),
+                        "", onlineAutoDiscoveredCameras.size()),
                     tr("%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?",
-                        nullptr, onlineAutoDiscoveredCameras.size())
+                        "", onlineAutoDiscoveredCameras.size())
                 ),
                 cameras
             );
@@ -1854,11 +1853,11 @@ void QnWorkbenchActionHandler::at_removeFromServerAction_triggered() {
             QnDeviceDependentStrings::getNameFromSet(
                 QnCameraDeviceStringSet(
                     tr("Do you really want to delete the following %n devices?",
-                        nullptr, cameras.size()),
+                        "", cameras.size()),
                     tr("Do you really want to delete the following %n cameras?",
-                        nullptr, cameras.size()),
+                        "", cameras.size()),
                     tr("Do you really want to delete the following %n I/O modules?",
-                        nullptr, cameras.size())
+                        "", cameras.size())
                 ),
                 cameras
             );

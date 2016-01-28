@@ -1,5 +1,8 @@
 #pragma once
 
+#include <QtCore/QList>
+#include <QtCore/QString>
+
 struct QnMigratedSession
 {
     QString title;

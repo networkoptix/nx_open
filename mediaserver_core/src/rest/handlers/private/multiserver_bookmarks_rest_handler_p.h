@@ -3,10 +3,11 @@
 #include <api/helpers/request_helpers_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <rest/helpers/bookmarks_request_helper.h>
+#include <rest/helpers/request_context.h>
 #include <rest/server/rest_connection_processor.h>
 
-enum class QnBookmarkOperation {
+enum class QnBookmarkOperation
+{
     Get,
     GetTags,
     Add,
@@ -16,7 +17,13 @@ enum class QnBookmarkOperation {
     Count
 };
 
-class QnMultiserverBookmarksRestHandlerPrivate {
+typedef QnMultiserverRequestContext<QnGetBookmarksRequestData> QnGetBookmarksRequestContext;
+typedef QnMultiserverRequestContext<QnGetBookmarkTagsRequestData> QnGetBookmarkTagsRequestContext;
+typedef QnMultiserverRequestContext<QnUpdateBookmarkRequestData> QnUpdateBookmarkRequestContext;
+typedef QnMultiserverRequestContext<QnDeleteBookmarkRequestData> QnDeleteBookmarkRequestContext;
+
+class QnMultiserverBookmarksRestHandlerPrivate
+{
 public:
     static QString urlPath;
     static QnCameraBookmarkList getBookmarks(QnGetBookmarksRequestContext& context);

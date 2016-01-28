@@ -1,10 +1,12 @@
-
 #pragma once
 
 #include <ui/dialogs/workbench_state_dependent_dialog.h>
 
+class QnSearchBookmarksDialogPrivate;
+
 class QnSearchBookmarksDialog: public QnWorkbenchStateDependentButtonBoxDialog
 {
+    typedef QnWorkbenchStateDependentButtonBoxDialog base_type;
 public:
     QnSearchBookmarksDialog(const QString &filterText
         , qint64 utcStartTimeMs
@@ -23,8 +25,6 @@ private:
     void showEvent(QShowEvent *event);
 
 private:
-    typedef QnButtonBoxDialog Base;
-    class Impl;
-
-    Impl * const m_impl;
+    Q_DECLARE_PRIVATE(QnSearchBookmarksDialog)
+    QScopedPointer<QnSearchBookmarksDialogPrivate> d_ptr;
 };

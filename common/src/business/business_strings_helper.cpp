@@ -240,7 +240,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict Address: %1").arg(params.caption);
+        result += tr("Conflicting Address: %1").arg(params.caption);
         result += delimiter;
         int n = 0;
         for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter)) {
@@ -337,7 +337,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-        if (!camera->hasVideo(nullptr))
+        if (camera && !camera->hasVideo(nullptr))
             result = tr("Connection to device was unexpectedly closed.");
         else if (isPrimaryStream)
             result = tr("Connection to camera (primary stream) was unexpectedly closed.");
@@ -491,7 +491,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
         }
     }
 
-    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
     result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
 
     return result;

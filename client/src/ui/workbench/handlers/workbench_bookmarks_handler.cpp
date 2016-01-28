@@ -46,6 +46,7 @@ QnWorkbenchBookmarksHandler::QnWorkbenchBookmarksHandler(QObject *parent /* = NU
     connect(action(Qn::AddCameraBookmarkAction),    &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered);
     connect(action(Qn::EditCameraBookmarkAction),   &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_editCameraBookmarkAction_triggered);
     connect(action(Qn::RemoveCameraBookmarkAction), &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered);
+    connect(action(Qn::RemoveBookmarksAction),      &QAction::triggered,    this,   &QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered);
     connect(action(Qn::BookmarksModeAction),        &QAction::toggled,      this,   &QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered);
 
     /* Reset hint flag for each user. */
@@ -146,6 +147,26 @@ void QnWorkbenchBookmarksHandler::at_removeCameraBookmarkAction_triggered() {
         return;
 
     qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
+}
+
+void QnWorkbenchBookmarksHandler::at_removeBookmarksAction_triggered()
+{
+    QnActionParameters parameters = menu()->currentParameters(sender());
+
+    QnCameraBookmarkList bookmarks = parameters.argument<QnCameraBookmarkList>(Qn::CameraBookmarkListRole);
+    if (bookmarks.isEmpty())
+        return;
+
+    const auto message = tr("Are you sure you want to delete these %n bookmarks?", nullptr, bookmarks.size());
+
+    if (QMessageBox::information(mainWindow(),
+        tr("Confirm Deletion"), message,
+        QMessageBox::Ok | QMessageBox::Cancel,
+        QMessageBox::Cancel) != QMessageBox::Ok)
+        return;
+
+    for (const auto bookmark: bookmarks)
+        qnCameraBookmarksManager->deleteCameraBookmark(bookmark.guid);
 }
 
 void QnWorkbenchBookmarksHandler::at_bookmarksModeAction_triggered()

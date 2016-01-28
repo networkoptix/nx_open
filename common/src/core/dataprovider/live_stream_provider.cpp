@@ -569,6 +569,7 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
 
     info.fps = liveParams.fps;
     info.actualFps = getFrameRate();
+    info.averageGopSize = getAverageGopSize();
     info.resolution = CameraMediaStreamInfo::resolutionToString(resoulution);
 
     if (m_cameraRes->saveBitrateIfNeeded(info))
