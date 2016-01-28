@@ -40,6 +40,19 @@ angular.module('webadminApp')
             });
         };
 
+
+        $scope.openDisconnectDialog = function () {
+            $modal.open({
+                templateUrl: 'views/disconnectServer.html',
+                controller: 'DisconnectServerCtrl',
+                resolve: {
+                    system:function(){
+                        return null;
+                    }
+                }
+            });
+        };
+
         function restartServer(passPort){
             $modal.open({
                 templateUrl: 'views/restart.html',
@@ -85,28 +98,13 @@ angular.module('webadminApp')
         }
 
         $scope.save = function () {
-
-
             if($scope.settingsForm.$valid) {
-                if($scope.oldSystemName !== $scope.settings.systemName &&
-                    !confirm('If there are others servers in local network with "' + $scope.settings.systemName +
-                        '" system name then it could lead to this server settings loss. Continue?')){
-                    $scope.settings.systemName = $scope.oldSystemName;
-                }
-
-                if($scope.oldSystemName !== $scope.settings.systemName  || $scope.oldPort !== $scope.settings.port ) {
-                    mediaserver.saveSettings($scope.settings.systemName, $scope.settings.port).then(resultHandler, errorHandler);
-                }
+                mediaserver.changePort($scope.settings.port).then(resultHandler, errorHandler);
             }else{
                 alert('form is not valid');
             }
         };
 
-        $scope.changePassword = function () {
-            if($scope.password === $scope.confirmPassword) {
-                mediaserver.changePassword($scope.password, $scope.oldPassword).then(resultHandler, errorHandler);
-            }
-        };
 // execute/scryptname&mode
         $scope.restart = function () {
             if(confirm('Do you want to restart server now?')){

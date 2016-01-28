@@ -168,12 +168,17 @@ angular.module('webadminApp')
                     timeout: 3*1000
                 });
             },
-            saveSettings: function(systemName,port) {
-                return wrapPost(proxy + '/api/configure?systemName=' + systemName + '&port=' + port);
+
+
+            changeSystem:function(systemName,pasword){
+                return wrapPost(proxy + '/api/configure?systemName=' + systemName + '&password=' + password);
             },
-            changePassword: function(password,oldPassword) {
-                return wrapPost(proxy + '/api/configure?password=' + password  + '&oldPassword=' + oldPassword);
+
+            changePort: function(port) {
+                return wrapPost(proxy + '/api/configure?port=' + port);
             },
+
+
             mergeSystems: function(url,password,currentPassword,keepMySystem){
                 return wrapPost(proxy + '/api/mergeSystems?password=' + password
                     + '&currentPassword=' + currentPassword
