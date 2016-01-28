@@ -1,3 +1,5 @@
+#include <limits>
+#include <cstdint>
 #include "server_stream_recorder.h"
 
 #include <api/global_settings.h>
@@ -92,26 +94,26 @@ void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, co
     }
 }
 
-void QnServerStreamRecorder::at_recordingFinished(int status, const QString &filename) {
+void QnServerStreamRecorder::at_recordingFinished(
+    const ErrorStruct   &status,
+    const QString       &filename
+) 
+{
     Q_UNUSED(filename)
-    if (status == QnStreamRecorder::NoError)
+    if (status.lastError == QnStreamRecorder::NoError)
         return;
 
     Q_ASSERT(m_mediaServer);
     if (m_mediaServer) {
         if (!m_diskErrorWarned)
         {
-            // TODO: temporary! refactor!
-            if (!m_recordingContextVector.empty() &&
-                m_recordingContextVector[0].storage)
-            {
+            if (status.storage)
                 emit storageFailure(
                     m_mediaServer,
                     qnSyncTime->currentUSecsSinceEpoch(),
                     QnBusiness::StorageIoErrorReason ,
-                    m_recordingContextVector[0].storage
+                    status.storage
                 );
-            }
         }
         m_diskErrorWarned = true;
     }
@@ -158,16 +160,24 @@ void QnServerStreamRecorder::putData(const QnAbstractDataPacketPtr& nonConstData
     }
 
     bool rez = m_queuedSize <= m_maxRecordQueueSizeBytes && (size_t)m_dataQueue.size() < m_maxRecordQueueSizeElements;
-    if (!rez) {
-         // TODO: temporary! refactor!
-        if (!m_recordingContextVector.empty() &&
-            m_recordingContextVector[0].storage)
+    if (!rez) 
+    {
+        if (!m_recordingContextVector.empty())
         {
+            size_t slowestStorageIndex;
+            int64_t slowestWriteTime = std::numeric_limits<int64_t>::min();
+
+            for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
+            {
+                if (m_recordingContextVector[i].totalWriteTimeNs > slowestWriteTime)
+                    slowestStorageIndex = i;
+            }
+
             emit storageFailure(
                 m_mediaServer,
                 qnSyncTime->currentUSecsSinceEpoch(),
                 QnBusiness::StorageTooSlowReason,
-                m_recordingContextVector[0].storage
+                m_recordingContextVector[slowestStorageIndex].storage
             );
         }
         //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
