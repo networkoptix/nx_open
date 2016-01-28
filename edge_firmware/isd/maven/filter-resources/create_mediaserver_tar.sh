@@ -37,7 +37,7 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR=/tmp/hdw_$BOX_NAME_build.tmp
+BUILD_DIR=/${project.build.directory}/hdw_$BOX_NAME_build.tmp
 PREFIX_DIR=/usr/local/apps/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
