@@ -4,25 +4,51 @@ angular.module('cloudApp')
     .factory('cloudApi', function ($http, $q) {
 
         var apiBase = Config.apiBase;
-        var accountCache = null;
-        return {
-            account:function(){
+
+        function cacheGet(url, cacheForever){
+            var cachedResult = null;
+            var cacheReceived = 0;
+            return function(fromCache) {
                 var defer = $q.defer();
-                if(!accountCache){
-                    $http.get(apiBase + '/account').then(function(response){
-                        accountCache = response.data;
-                        defer.resolve(accountCache);
+                var now = (new Date()).getTime();
+
+                if(!fromCache && (cachedResult === null || !cacheForever && (now - cacheReceived) > Config.cacheTimeout)){
+                    $http.get(url).then(function(response){
+                        cachedResult = response;
+                        cacheReceived  = now;
+                        defer.resolve(cachedResult);
                     },function(error){
-                        accountCache = null;
-                        defer.resolve(null);
+                        cachedResult = null;
+                        cacheReceived = 0;
+                        defer.reject(error);
                         return null
                     })
                 }else{
-                    defer.resolve(accountCache);
+                    if(cachedResult !== null) {
+                        defer.resolve(cachedResult);
+                    }else{
+                        defer.reject(cachedResult);
+                    }
                 }
                 return defer.promise;
-            },
+            }
+        }
 
+        function extractData(request){
+            return function() {
+                var defer = $q.defer();
+                request().then(function (success) {
+                    defer.resolve(success.data);
+                }, function (error) {
+                    defer.resolve(null);
+                });
+                return defer.promise;
+            }
+        }
+        var getSystems = cacheGet(apiBase + '/systems');
+
+        return {
+            account: extractData(cacheGet(apiBase + '/account')),
             login:function(email, password, remember){
                 return $http.post(apiBase + '/account/login',{
                     email: email,
@@ -85,12 +111,38 @@ angular.module('cloudApp')
                     code:code
                 });
             },
-            systems:function(systemId){
-                return $http.get(apiBase + '/systems' + (systemId?('/' + systemId):''));
+            systems: getSystems,
+
+            system: function(systemId){
+
+
+                var defer = $q.defer();
+
+                function requestSystem(){
+                    $http.get(apiBase + '/systems/' + systemId).then(function(success){
+                        defer.resolve(success);
+                    },function(error){
+                        defer.reject(error);
+                    });
+                }
+
+                getSystems(true).then(function(systemsCache){
+                    //Search our system in cache
+                    var system = _.find(systemsCache.data,function(system){
+                        return system.id == systemId;
+                    });
+
+                    if(system) { // Cache success
+                        defer.resolve({data:[system]});
+                    }else{ // Cache miss
+                        requestSystem();
+                    }
+                },requestSystem); // Total cache miss
+
+                return defer.promise;
             },
-            getCommonPasswords:function(){
-                return $http.get('/scripts/commonPasswordsList.json');
-            },
+
+            getCommonPasswords:cacheGet('/scripts/commonPasswordsList.json',true),
             users:function(systemId){
                 return $http.get(apiBase + '/systems/' + systemId + '/users');
             },
@@ -112,7 +164,6 @@ angular.module('cloudApp')
                 });
             },
             accessRoles: function(systemId){
-                // TODO: cache this request
                 return $http.get(apiBase + '/systems/' + systemId + '/accessRoles');
             }
         }

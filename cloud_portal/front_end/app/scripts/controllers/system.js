@@ -22,7 +22,7 @@ angular.module('cloudApp')
 
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
-            return cloudApi.systems(systemId);
+            return cloudApi.system(systemId);
         }).then(function(result){
             $scope.system.info = result.data[0];
         });

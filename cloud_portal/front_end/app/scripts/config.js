@@ -3,6 +3,7 @@
 var Config = {
     apiBase: '/api',
     clientProtocol: 'vms://',
+    cacheTimeout: 30*1000, // Cache lives for 30 seconds
 
     systemStatuses:{
         onlineStatus: 'online',
