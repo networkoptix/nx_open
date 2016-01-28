@@ -16,8 +16,9 @@
 
 #include <utils/common/property_storage.h>
 #include <utils/common/software_version.h>
-#include <utils/common/singleton.h>
-#include <utils/common/uuid.h>
+
+#include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 
 class QSettings;
 

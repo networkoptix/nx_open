@@ -10,7 +10,7 @@
 #include <camera/bookmark_queries_cache.h>
 #include <camera/camera_bookmarks_query.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
-#include <utils/common/uuid.h>
+#include <nx/utils/uuid.h>
 #include <core/resource/camera_resource.h>
 
 namespace
