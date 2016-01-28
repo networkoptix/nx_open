@@ -48,7 +48,7 @@
 #endif
 
 
-namespace aux
+namespace aux 
 {
     QString genLocalPath(const QString &url, const QString &prefix = "/tmp/")
     {
@@ -75,8 +75,8 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
-
-    if (openMode & QIODevice::WriteOnly)
+    
+    if (openMode & QIODevice::WriteOnly) 
     {
         QDir dir;
         dir.mkpath(QnFile::absolutePath(fileName));
@@ -84,11 +84,11 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
 
     std::unique_ptr<QBufferedFile> rez(
         new QBufferedFile(
-            std::shared_ptr<IQnFile>(new QnFile(fileName)),
-            ioBlockSize,
+            std::shared_ptr<IQnFile>(new QnFile(fileName)), 
+            ioBlockSize, 
             ffmpegBufferSize,
             getId()
-        )
+        ) 
     );
     rez->setSystemFlags(systemFlags);
     if (!rez->open(openMode))
@@ -108,7 +108,7 @@ QString QnFileStorageResource::getPath() const
 bool QnFileStorageResource::initOrUpdate() const
 {
     QMutexLocker lock(&m_mutexPermission);
-
+    
     if (getUrl().isEmpty())
         return false;
 
@@ -131,30 +131,30 @@ bool QnFileStorageResource::checkWriteCap() const
 
     if(!isStorageDirMounted())
         return false;
-
+    
     if (hasFlags(Qn::deprecated))
         return false;
-
+    
     QString localDirPath = m_localPath.isEmpty() ? getPath() : m_localPath;
     QDir dir(localDirPath);
-
+    
     bool needRemoveDir = false;
     if (!dir.exists())  {
         if (!dir.mkpath(localDirPath))
             return false;
         needRemoveDir = true;
     }
-
+    
     QFile file(closeDirPath(localDirPath) + QString("tmp") + QString::number((unsigned) ((rand() << 16) + rand())));
     bool result = file.open(QFile::WriteOnly);
     if (result) {
         file.close();
         file.remove();
     }
-
+    
     if (needRemoveDir)
         dir.remove(localDirPath);
-
+    
     return result;
 }
 
@@ -168,7 +168,7 @@ bool QnFileStorageResource::checkDBCap() const
     if (!m_localPath.isEmpty())
         return false;
 
-    QList<QnPlatformMonitor::PartitionSpace> partitions =
+    QList<QnPlatformMonitor::PartitionSpace> partitions = 
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
 
@@ -285,7 +285,7 @@ int QnFileStorageResource::mountTmpDrive() const
             .arg(url.password())
             .arg(uncString);
 
-    QString srcString = lit("//") + url.host() + url.path();
+    QString srcString = lit("//") + url.host() + url.path();    
     m_localPath = aux::genLocalPath(getUrl());
 
     umount(m_localPath.toLatin1().constData());
@@ -296,7 +296,7 @@ int QnFileStorageResource::mountTmpDrive() const
         S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH
     );
 
-     retCode = mount(
+    retCode = mount(        
         srcString.toLatin1().constData(),
         m_localPath.toLatin1().constData(),
         "cifs",
@@ -304,7 +304,7 @@ int QnFileStorageResource::mountTmpDrive() const
         cifsOptionsString.toLatin1().constData()
     );
 
-    if (retCode == -1)
+    if (retCode == -1) 
     {
         qWarning()
             << "Mount SMB resource " << srcString
@@ -341,9 +341,9 @@ int QnFileStorageResource::mountTmpDrive() const
     if (!storageUrl.isValid())
         return -1;
 
-    QString path =
-        lit("\\\\") +
-        storageUrl.host() +
+    QString path = 
+        lit("\\\\") + 
+        storageUrl.host() + 
         storageUrl.path().replace(lit("/"), lit("\\"));
 
     if (!updatePermissions())
@@ -486,7 +486,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     return QnFile::getFileSize(translateUrlToLocal(url));
 }
 
-bool QnFileStorageResource::isAvailable() const
+bool QnFileStorageResource::isAvailable() const 
 {
     if (!m_valid)
         m_dirty = true;
@@ -600,6 +600,10 @@ bool QnFileStorageResource::isStorageDirMounted() const
 
         auto badResultHandler = [this]()
         {   // Treat every unexpected test result the same way.
+            // Cleanup attempt will be performed.
+            // Will try to unmount, remove local mount point directory 
+            // and set flag meaning that local path recreation 
+            // + remount is needed
             umount(m_localPath.toLatin1().constData()); // directory may not exists, but this is Ok
             rmdir(m_localPath.toLatin1().constData()); // same as above
             m_dirty = true;
@@ -642,10 +646,8 @@ bool QnFileStorageResource::isStorageDirMounted() const
         int err = errno;
 
         if ((retCode == -1 && err != EBUSY) || retCode == 0)
-        {   // Bad. Mount succeeded OR it failed but for another reason that
+        {   // Bad. Mount succeeded OR it failed but for another reason than
             // local path is already mounted.
-            // Will try to unmount, remove it and set flag meaning
-            // that local path recreation + remount is needed
             NX_LOG(
                 lit("[QnFileStorageResource::isStorageDirMounted] mount result = %1 , errno = %2")
                     .arg(retCode)

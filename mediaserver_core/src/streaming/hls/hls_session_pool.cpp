@@ -239,6 +239,7 @@ namespace nx_hls
     {
         QMutexLocker lk( &m_mutex );
         m_lockedIDs.erase( id );
+        m_cond.wakeAll();
 
         //creating session remove task
         std::map<QString, HLSSessionContext>::iterator it = m_sessionByID.find( id );
