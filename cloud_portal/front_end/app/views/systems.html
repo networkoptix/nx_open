@@ -4,23 +4,24 @@
     <process-alert process="gettingSystems"
                    success-message="false"
                    error-prefix="'Systems list is unavailable:'"></process-alert>
+    <div process-loading="gettingSystems">
+        <div ng-if="!systems.length">
+            Please, connect any systems to your cloud account first.
+            <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>
+        </div>
 
-    <div ng-if="systems && !systems.length">
-        Please, connect any systems to your cloud account first.
-        <button class="btn btn-default" ng-click="openClient(null)">Open Nx Witness</button>
-    </div>
+        <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 ">
+            <div class="panel panel-default system-button">
+                <div class="panel-body" ng-click="openSystem(system)">
+                    <h2>{{system.name}}</h2>
+                    <small><b>{{system.ownerAccountEmail == account.email?'Your system':system.ownerFullName||system.ownerAccountEmail}}</b></small><br/>
 
-    <div ng-repeat="system in systems" class="col-xs-12	col-sm-6 col-lg-4 ">
-        <div class="panel panel-default system-button">
-            <div class="panel-body" ng-click="openSystem(system)">
-                <h2>{{system.name}}</h2>
-                <small><b>{{system.ownerAccountEmail == account.email?'Your system':system.ownerFullName||system.ownerAccountEmail}}</b></small><br/>
-
-                <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
-                      ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
-                    {{Config.systemStatuses[system.status].label||system.status}}</span>
-                <button ng-if="system.status==Config.systemStatuses.onlineStatus" class="btn btn-default"
-                        ng-click="open(system);$event.stopPropagation();">Open in Nx Witness</button>
+                    <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
+                          ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
+                        {{Config.systemStatuses[system.status].label||system.status}}</span>
+                    <button ng-if="system.status==Config.systemStatuses.onlineStatus" class="btn btn-default"
+                            ng-click="open(system);$event.stopPropagation();">Open in Nx Witness</button>
+                </div>
             </div>
         </div>
     </div>
