@@ -246,11 +246,16 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     }
 
     QnCameraBookmarkList bookmarks;
+    QSet<QnUuid> bookmarkIds;   /*< Make sure we will have no duplicates in all cases. */
     for (const QModelIndex &index: selection)
     {
         const auto bookmark = bookmarkFromIndex(index);
         if (!bookmark.isValid())
             continue;
+
+        if (bookmarkIds.contains(bookmark.guid))
+            continue;
+        bookmarkIds << bookmark.guid;
 
         bookmarks << bookmark;
     }
