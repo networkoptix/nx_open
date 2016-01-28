@@ -35,7 +35,7 @@ namespace ite
             NOT_A_CHANNEL = 16 // TxDevice::CHANNELS_NUM
         };
 
-        static constexpr unsigned MIN_STRENGTH() { return 80; }
+        static constexpr unsigned MIN_STRENGTH() { return 90; }
         static constexpr unsigned MIN_QUALITY() { return 60; }
 
         static constexpr unsigned RC_DELAY_MS() { return 250; }

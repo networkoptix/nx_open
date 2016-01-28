@@ -321,7 +321,7 @@ namespace ite
                     debug_printf("[search] Hint testChannel failed; \
                                   txID: %d, hint.txID: %d, hint.chan: %d\n",
                                  txID, hint.txId, hint.chan);
-                    return false;
+//                    return false;
                 }
             }
         }
@@ -345,7 +345,10 @@ namespace ite
 
             }
         }
+
+        m_it930x->unlockFrequency();
         printf("[search] Rx: %d; Search failed\n", m_rxID);
+
         return false;
     }
 
