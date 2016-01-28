@@ -26,7 +26,7 @@ SocketGlobals::~SocketGlobals()
     }
 
     promise.get_future().wait();
-    m_mediatorConnector.release();
+    m_mediatorConnector.reset();
 }
 
 void SocketGlobals::init()
@@ -49,4 +49,3 @@ SocketGlobals* SocketGlobals::s_instance;
 
 } // namespace network
 } // namespace nx
-
