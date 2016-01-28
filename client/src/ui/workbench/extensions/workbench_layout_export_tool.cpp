@@ -266,7 +266,7 @@ bool QnLayoutExportTool::start() {
     ItemInfoList items = prepareLayout();
 
     if (!exportMetadata(items)) {
-        m_errorMessage = tr("Could not create output file %1.").arg(m_targetFilename);
+        m_errorMessage = tr("Could not create output file %1...").arg(m_targetFilename);
         emit finished(false, m_targetFilename);   //file is not created, finishExport() is not required
         return false;
     }

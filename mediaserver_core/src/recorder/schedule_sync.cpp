@@ -209,11 +209,23 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             )
         );
 
-        if (!fromFile) {
-            NX_LOG(lit("[Backup::copyFile] Source file %1 open failed")
+        if (!fromFile) 
+        {   // This means that source storage is not available or 
+            // source file's been removed by external force.
+            if (fromStorage->isAvailable())
+            {   // File's gone. Log this and skip this file.
+                NX_LOG(
+                    lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
                         .arg(fromFileFullName),
-                   cl_logWARNING);
-            return CopyError::SourceFileError;
+                    cl_logWARNING
+                );
+                return CopyError::SourceFileError;
+            }
+            else
+            {   // Source storage is not available.
+                // We will interrupt backup for now and try another time.
+                return CopyError::FromStorageError;
+            }
         }
 
         auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
@@ -395,7 +407,7 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         }
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
-            if (err != CopyError::NoError) {
+            if (err != CopyError::NoError && err != CopyError::SourceFileError) {
                 m_lastError = err;
                 NX_LOG(
                     lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
@@ -407,8 +419,6 @@ QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                     return QnBusiness::BackupFailedNoBackupStorageError;
                 case CopyError::FromStorageError:
                     return QnBusiness::BackupFailedSourceStorageError;
-                case CopyError::SourceFileError:
-                    return QnBusiness::BackupFailedSourceFileError;
                 case CopyError::TargetFileError:
                     return QnBusiness::BackupFailedTargetFileError;
                 case CopyError::ChunkError:

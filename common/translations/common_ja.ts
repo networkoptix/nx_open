@@ -218,10 +218,6 @@
         <translation>不明なイベント</translation>
     </message>
     <message>
-        <source>Conflict Address: %1</source>
-        <translation>競合アドレス: %1</translation>
-    </message>
-    <message>
         <source>Connection to server is lost.</source>
         <translation>サーバーとの接続ロスト.</translation>
     </message>
@@ -325,10 +321,6 @@
         <translation>カメラ %1 切断</translation>
     </message>
     <message>
-        <source>IO Module %1 was disconnected</source>
-        <translation>IOモジュール %1 切断</translation>
-    </message>
-    <message>
         <source>Device IP Conflict at %1</source>
         <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
         <translation>デバイスIPが %1 と重複</translation>
@@ -349,10 +341,6 @@
     <message>
         <source>Recording on cameras is disabled:</source>
         <translation>カメラ録画無効:</translation>
-    </message>
-    <message>
-        <source>Recording on IO modules is disabled:</source>
-        <translation>IOモジュール録画無効:</translation>
     </message>
     <message>
         <source>Execute PTZ preset</source>
@@ -383,19 +371,47 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup failed because of no backup storages available</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Archive backup is successfully completed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Archive backup is canceled by user. Data is backuped up to %1</source>
+        <source>I/O Module %1 was disconnected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Conflicting Address: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: No available backup storages with sufficient free space</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target storage failure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Source file open/read error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: Target file create/write error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup failed: File catalog error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is canceled by user. Data is backed up to %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Recording on I/O modules is disabled:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -486,20 +502,12 @@
         <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
-        <source>Please try to reboot the IO module, then restore factory defaults on the web-page.</source>
-        <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
         <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
         <translation>デバイスがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
         <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
-    </message>
-    <message>
-        <source>Make sure the IO module is plugged into the network. Try to reboot the IO module.</source>
-        <translation>IOモジュールがネットワークに接続されている事を確認して再起動を行ってください.</translation>
     </message>
     <message>
         <source>Make sure port %2 is accessible (e.g. forwarded).</source>
@@ -514,10 +522,6 @@
         <translation>カメラ応答がありません Url %1 リクエスト名 %2.</translation>
     </message>
     <message>
-        <source>Could not parse IO module response. Url %1, request name %2.</source>
-        <translation>IOモジュール応答がありません Url %1 リクエスト名 %2.</translation>
-    </message>
-    <message>
         <source>Not authorized. Url %1.</source>
         <translation>許可されないUrl %1.</translation>
     </message>
@@ -530,20 +534,12 @@
         <translation>録画を開始してカメラ設定のFPSを減らしてください.</translation>
     </message>
     <message>
-        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in IO module settings.</source>
-        <translation>録画を開始してIOモジュール設定のFPSを減らしてください.</translation>
-    </message>
-    <message>
         <source>If it doesn&apos;t help, restore factory defaults on the device web-page.</source>
         <translation>解決しない場合はデバイスWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>If it doesn&apos;t help, restore factory defaults on the camera web-page.</source>
         <translation>解決しない場合はカメラWebページより工場出荷時にリストアしてください.</translation>
-    </message>
-    <message>
-        <source>If it doesn&apos;t help, restore factory defaults on the IO module web-page.</source>
-        <translation>解決しない場合はIOモジュールWebページより工場出荷時にリストアしてください.</translation>
     </message>
     <message>
         <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -554,20 +550,12 @@
         <translation>カメラリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
     </message>
     <message>
-        <source>IO Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-        <translation>IOモジュールリクエスト &quot;%1&quot;がエラー&quot;%2 で失敗.　</translation>
-    </message>
-    <message>
         <source>Unknown device issue.</source>
         <translation>不明なデバイス障害.</translation>
     </message>
     <message>
         <source>Unknown camera issue.</source>
         <translation>不明なカメラ障害.</translation>
-    </message>
-    <message>
-        <source>Unknown IO module issue.</source>
-        <translation>不明なIOモジュール障害.</translation>
     </message>
     <message>
         <source>Invalid data was received from the device %1.</source>
@@ -578,10 +566,6 @@
         <translation>カメラ %1.より無効なデータ受信.</translation>
     </message>
     <message>
-        <source>Invalid data was received from the IO module %1.</source>
-        <translation>IOモジュール %1.より無効なデータ受信.</translation>
-    </message>
-    <message>
         <source>Too many media errors. Please open device issues dialog for more details.</source>
         <translation>メディアエラー発生 デバイス障害を開いて詳細を確認してください.</translation>
     </message>
@@ -590,23 +574,55 @@
         <translation>メディアエラー発生 カメラ障害を開いて詳細を確認してください.</translation>
     </message>
     <message>
-        <source>Too many media errors. Please open IO module issues dialog for more details.</source>
-        <translation>メディアエラー発生 IOモジュール障害を開いて詳細を確認してください.</translation>
-    </message>
-    <message>
-        <source>Device initialization process in progress.</source>
-        <translation>デバイスイニシャライズ中.</translation>
-    </message>
-    <message>
-        <source>Camera initialization process in progress.</source>
-        <translation>カメライニシャライズ中.</translation>
-    </message>
-    <message>
-        <source>IO Module initialization process in progress.</source>
-        <translation>IOモジュールイニシャライズ中.</translation>
-    </message>
-    <message>
         <source>Camera plugin error. %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not parse I/O module response. Url %1, request name %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>First, try to turn on recording (if it&apos;s off) and decrease fps in I/O module settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If it doesn&apos;t help, restore factory defaults on the I/O module web-page.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unknown I/O module issue.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid data was received from the I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera initialization process is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module initialization process in progress.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -628,8 +644,8 @@
         <translation>ウィンドウズエクスプローラを起動するパスにexplorer.exeを見つけることができませんでした.</translation>
     </message>
     <message>
-        <source>Launching file explorer failed.</source>
-        <translation>ウィンドウズエクスプローラーの軌道に失敗しました.</translation>
+        <source>File explorer failed to open.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -643,12 +659,12 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialise audio encoder.</source>
-        <translation>音声エンコーダーを初期化出来ません..</translation>
+        <source>Could not initialize audio encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Could not initialise audio decoder.</source>
-        <translation>音声デコーダーを初期化出来ません.</translation>
+        <source>Could not initialize audio decoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -685,8 +701,8 @@
         <translation>コーデック%1のエンコーダーを見つけられません.</translation>
     </message>
     <message>
-        <source>Could not initialise video encoder.</source>
-        <translation>ビデオエンコーダーを初期化出来ません.</translation>
+        <source>Could not initialize video encoder.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -835,10 +851,6 @@
         <translation>ライセンスキーのアクティベートエラー　サポート窓口にお問合せ下さい.</translation>
     </message>
     <message>
-        <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation>ライセンスキーのアクティベートエラー　データベースエラーが発生しました.</translation>
-    </message>
-    <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
         <translation>無効なライセンスキーが入力されました　サポート窓口に問合せて正しいライセンスキーを入力してください.</translation>
     </message>
@@ -849,6 +861,10 @@
     <message>
         <source>This license key has been previously activated to hardware id {{hwid}} on {{time}}. Please contact support team to obtain a valid license key.</source>
         <translation>このライセンスキーはハードウェアID {{hwid}}  {{time}} に既にアクティベートされています..</translation>
+    </message>
+    <message>
+        <source>There was a problem activating your license key. A database error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -880,18 +896,6 @@
         </translation>
     </message>
     <message numerus="yes">
-        <source>%n IO Module(s)</source>
-        <translation>
-            <numerusform>%n IOモジュール</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n IO module(s)</source>
-        <translation>
-            <numerusform>%n IOモジュール</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>%n Device(s)</source>
         <translation>
             <numerusform>%n デバイス</numerusform>
@@ -920,22 +924,6 @@
         <translation>カメラ</translation>
     </message>
     <message>
-        <source>IO Modules</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO modules</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO Module</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
-        <source>IO module</source>
-        <translation>IOモジュール</translation>
-    </message>
-    <message>
         <source>Devices</source>
         <translation>デバイス</translation>
     </message>
@@ -950,6 +938,34 @@
     <message>
         <source>device</source>
         <translation>デバイス</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O Module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O module(s)</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>I/O Modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O modules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished">I/Oモジュール</translation>
+    </message>
+    <message>
+        <source>I/O module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1074,6 +1090,10 @@
     <message>
         <source>Error during watermark generation for file &apos;%1&apos;.</source>
         <translation>ファイル &apos;%1&apos;用の電子透かしの作成中にエラーが発生しました.</translation>
+    </message>
+    <message>
+        <source>File write error. Not enough free space.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

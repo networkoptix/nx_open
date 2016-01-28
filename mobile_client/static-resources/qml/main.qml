@@ -191,7 +191,7 @@ Window {
             } else if (connectionState == QnConnectionManager.Disconnected && currentSessionId == "") {
                 loginSessionManager.lastUsedSessionId = ""
                 settings.sessionId = ""
-                if (stackView.currentItem.objectName != "newConnectionPage" && stackView.currentItem.objectName != "loginPage")
+                if (stackView.currentItem.objectName != "newConnectionPage")
                     Main.gotoNewSession()
             }
         }

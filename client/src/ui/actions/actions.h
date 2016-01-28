@@ -940,6 +940,11 @@ namespace Qn {
         RemoveCameraBookmarkAction,
 
         /**
+         * Batch bookmarks deleting.
+         */
+        RemoveBookmarksAction,
+
+        /**
          * Opens new layout for Quick Search.
          *
          * Parameters:
