@@ -158,38 +158,18 @@ Item
                 h = ch
             }
 
-            if (allowedHorizontalMargin > 0)
-            {
-                if (-x + w < width - allowedHorizontalMargin)
-                    x = w - width + allowedHorizontalMargin
-                if (-x > allowedHorizontalMargin)
-                    x = -allowedHorizontalMargin
-            }
-            else
-            {
-                var xMargin = Math.max(0, (width - w) / 2)
-                if (-x + w < width - xMargin)
-                    x = w - width + xMargin
-                if (-x > xMargin)
-                    x = -xMargin
-            }
+            var xMargin = Math.max(allowedHorizontalMargin, (width - w) / 2)
+            if (-x + w < width - xMargin)
+                x = w - width + xMargin
+            if (-x > xMargin)
+                x = -xMargin
 
-            if (allowedVerticalMargin > 0)
-            {
-                if (-y + h < height - allowedVerticalMargin)
-                    y = h - height + allowedVerticalMargin
-                if (-y > allowedVerticalMargin)
-                    y = -allowedVerticalMargin
-            }
-            else
-            {
-                var yMargin = Math.max(0, (height - h) / 3)
-
-                if (-y + h < height - yMargin * 2)
-                    y = h - height + yMargin * 2
-                if (-y > yMargin)
-                    y = -yMargin
-            }
+            var topMargin = Math.max(allowedVerticalMargin, (height - h) / 3)
+            var bottomMargin = Math.max(allowedVerticalMargin, (height - h) / 3 * 2)
+            if (-y + h < height - bottomMargin)
+                y = h - height + bottomMargin
+            if (-y > topMargin)
+                y = -topMargin
 
             if (animate)
             {
