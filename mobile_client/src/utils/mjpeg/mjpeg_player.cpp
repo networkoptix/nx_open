@@ -11,6 +11,7 @@
 
 namespace {
     const qint64 invalidTimestamp = -1;
+    const int kMaxFrameQueueSize = 8;
 }
 
 class QnMjpegPlayerPrivate : public QObject {
@@ -23,8 +24,11 @@ public:
     QMediaPlayer::MediaStatus mediaStatus;
 
     bool waitingForFrame;
+    bool frameAvailable;
     QElapsedTimer frameTimer;
     int framePresentationTime;
+
+    QQueue<QnMjpegSession::FrameData> frameQueue;
 
     QAbstractVideoSurface *videoSurface;
     int position;
@@ -40,7 +44,8 @@ public:
     void setMediaStatus(QMediaPlayer::MediaStatus status);
     void updateMediaStatus();
     void processFrame();
-    void at_session_frameEnqueued();
+    void enqueueNextFrame();
+    void at_session_frameAvailable();
 };
 
 
@@ -50,6 +55,7 @@ QnMjpegPlayerPrivate::QnMjpegPlayerPrivate(QnMjpegPlayer *parent)
     , session(new QnMjpegSession())
     , state(QMediaPlayer::StoppedState)
     , waitingForFrame(true)
+    , frameAvailable(false)
     , framePresentationTime(0)
     , videoSurface(0)
     , position(0)
@@ -107,21 +113,26 @@ void QnMjpegPlayerPrivate::processFrame() {
     if (state != QMediaPlayer::PlayingState)
         return;
 
-    int presentationTime;
-    QImage image;
-
-    if (!session->dequeueFrame(&image, &timestamp, &presentationTime))
+    if (frameQueue.isEmpty())
         return;
 
+    QnMjpegSession::FrameData frameData = frameQueue.dequeue();
+
+    if (frameAvailable)
+        enqueueNextFrame();
+
+    int presentationTime = frameData.presentationTime;
+
     position += presentationTime;
+    timestamp = frameData.timestamp;
 
     if (frameTimer.isValid())
         presentationTime -= qMax(0, static_cast<int>(frameTimer.elapsed()) - framePresentationTime);
 
-    if (image.width() > maxTextureSize || image.height() > maxTextureSize)
-        image = image.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
+    if (frameData.image.width() > maxTextureSize || frameData.image.height() > maxTextureSize)
+        frameData.image = frameData.image.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
 
-    QVideoFrame frame(image);
+    QVideoFrame frame(frameData.image);
     if (videoSurface) {
         if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != frame.pixelFormat())
             videoSurface->stop();
@@ -146,19 +157,36 @@ void QnMjpegPlayerPrivate::processFrame() {
         processFrame();
     } else {
         waitingForFrame = false;
-        executeDelayed([this](){
+        executeDelayedParented([this](){
             waitingForFrame = true;
             processFrame();
-        }, presentationTime);
+        }, presentationTime, this);
     }
 }
 
-void QnMjpegPlayerPrivate::at_session_frameEnqueued() {
+void QnMjpegPlayerPrivate::enqueueNextFrame() {
     if (state != QMediaPlayer::PlayingState)
         return;
 
-    if (waitingForFrame)
-        processFrame();
+    if (frameQueue.size() >= kMaxFrameQueueSize)
+    {
+        frameAvailable = true;
+        return;
+    }
+
+    frameAvailable = false;
+
+    QnMjpegSession::FrameData frameData = session->getFrame();
+    if (frameData.isNull())
+        return;
+
+    frameQueue.enqueue(frameData);
+}
+
+void QnMjpegPlayerPrivate::at_session_frameAvailable()
+{
+    enqueueNextFrame();
+    processFrame();
 }
 
 
@@ -174,7 +202,7 @@ QnMjpegPlayer::QnMjpegPlayer(QObject *parent)
     d->session->moveToThread(networkThread);
     networkThread->start();
 
-    connect(d->session, &QnMjpegSession::frameEnqueued,             d,      &QnMjpegPlayerPrivate::at_session_frameEnqueued);
+    connect(d->session, &QnMjpegSession::frameAvailable,            d,      &QnMjpegPlayerPrivate::at_session_frameAvailable);
     connect(d->session, &QnMjpegSession::urlChanged,                this,   &QnMjpegPlayer::sourceChanged);
     connect(d->session, &QnMjpegSession::finished,                  this,   &QnMjpegPlayer::playbackFinished);
     connect(d->session, &QnMjpegSession::finalTimestampChanged,     this,   &QnMjpegPlayer::finalTimestampChanged);
@@ -297,7 +325,9 @@ void QnMjpegPlayer::stop() {
     Q_D(QnMjpegPlayer);
 
     d->session->stop();
+    d->frameAvailable = false;
     d->setState(QMediaPlayer::StoppedState);
+    d->frameQueue.clear();
 
     if (d->position != 0) {
         d->position = 0;
@@ -315,6 +345,8 @@ void QnMjpegPlayer::setSource(const QUrl &url) {
     d->waitingForFrame = true;
     d->session->setUrl(url);
     d->session->stop();
+    d->frameAvailable = false;
+    d->frameQueue.clear();
 
     if (d->position != 0) {
         d->position = 0;

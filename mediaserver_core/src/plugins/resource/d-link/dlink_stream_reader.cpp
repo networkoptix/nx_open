@@ -8,7 +8,7 @@
 #include <utils/common/synctime.h>
 #include <nx/network/http/httptypes.h>
 
-#include "core/datapacket/video_data_packet.h"
+#include "nx/streaming/video_data_packet.h"
 
 extern int getIntParam(const char* pos);
 
@@ -44,6 +44,31 @@ PlDlinkStreamReader::~PlDlinkStreamReader()
     stop();
 }
 
+QString PlDlinkStreamReader::getRTPurl(int profileId) const
+{
+    CLHttpStatus status;
+
+    QnPlDlinkResourcePtr res = getResource().dynamicCast<QnPlDlinkResource>();
+
+    QByteArray reply = downloadFile(status, QString(lit("config/rtspurl.cgi?profileid=%1")).arg(profileId),  res->getHostAddress(), 80, 1000, res->getAuth());
+
+    if (status != CL_HTTP_SUCCESS || reply.isEmpty())
+        return QString();
+
+    int lastProfileId = -1;
+    QByteArray requiredProfile = QString(lit("profileid=%1")).arg(profileId).toUtf8();
+    QList<QByteArray> lines = reply.split('\n');
+    for(QByteArray line: lines)
+    {
+        line = line.toLower().trimmed();
+        if (line.startsWith("profileid="))
+            lastProfileId = line.split('=')[1].toInt();
+        else if (line.startsWith("urlentry=") && lastProfileId == profileId)
+            return QString::fromUtf8(line.split('=')[1]);
+    }
+
+    return QString();
+}
 
 CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraControlRequired, const QnLiveStreamParams& params)
 {
@@ -110,9 +135,13 @@ CameraDiagnostics::Result PlDlinkStreamReader::openStreamInternal(bool isCameraC
         return CameraDiagnostics::CameraResponseParseErrorResult( m_resource->getUrl(), lit("config/rtspurl.cgi?profileid=%1").arg(m_profile.url) );
     }
     NX_LOG(lit("got stream URL %1 for camera %2 for role %3").arg(m_profile.url).arg(m_resource->getUrl()).arg(getRole()), cl_logINFO);
-    if (m_profile.codec == "H264")
+    if (m_profile.codec.contains("264"))
     {
-        m_rtpReader.setRequest(m_profile.url);
+        QString rtspUrl(m_profile.url);
+        if (!rtspUrl.contains(".sdp"))
+            rtspUrl = getRTPurl(m_profile.number); //< DLink with old firmware. profile url contains some string, but it can't be passed to the RTSP
+        
+        m_rtpReader.setRequest(rtspUrl);
         return m_rtpReader.openStream();
     }
     else
@@ -146,7 +175,7 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextData()
     if (needMetaData())
         return getMetaData();
 
-    if (m_profile.codec == "H264")
+    if (m_profile.codec.contains("264"))
         return m_rtpReader.getNextData();
     else if (m_profile.codec == "MJPEG")
         return getNextDataMJPEG();
@@ -257,7 +286,7 @@ QString PlDlinkStreamReader::composeVideoProfile(bool isCameraControlRequired, c
         int fps = info.frameRateCloseTo( qMin((int)params.fps, res->getMaxFps()) );
         t << "framerate=" << fps << "&";
         t << "codec=" << profile.codec.toLower() << "&";
-        bool useCBR = (profile.codec == "H264" || profile.codec == "MPEG4");
+        bool useCBR = (profile.codec.contains("264") || profile.codec == "MPEG4");
         if (useCBR)
         {
             // just CBR fo mpeg so far

@@ -7,7 +7,9 @@
 
 #include <core/resource/resource_fwd.h>
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 /**
  * This class contains all the necessary information to look up a videowall item.

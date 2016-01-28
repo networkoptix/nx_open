@@ -10,17 +10,24 @@ namespace nx {
 namespace hpm {
 
 //! Cloud DB data interface
-class CloudDataProviderBase
+class AbstractCloudDataProvider
 {
 public:
-    virtual ~CloudDataProviderBase() = 0;
+    virtual ~AbstractCloudDataProvider() = 0;
 
     struct System
     {
+        String id;
         String authKey;
         bool mediatorEnabled;
 
-        System( String authKey_, bool mediatorEnabled_ = false );
+        System(
+            String authKey_,
+            bool mediatorEnabled_ = false);
+        System(
+            String id_,
+            String authKey_,
+            bool mediatorEnabled_);
     };
 
     virtual boost::optional< System > getSystem( const String& systemId ) const = 0;
@@ -28,17 +35,39 @@ public:
 
 // for GMock only
 std::ostream& operator<<( std::ostream& os,
-                          const boost::optional< CloudDataProviderBase::System >& system );
+                          const boost::optional< AbstractCloudDataProvider::System >& system );
+
+class AbstractCloudDataProviderFactory
+{
+public:
+    typedef std::function<
+        std::unique_ptr<AbstractCloudDataProvider>(
+            const std::string& address,
+            const std::string& user,
+            const std::string& password,
+            TimerDuration updateInterval)> FactoryFunc;
+
+    virtual ~AbstractCloudDataProviderFactory() {}
+
+    static std::unique_ptr<AbstractCloudDataProvider> create(
+        const std::string& address,
+        const std::string& user,
+        const std::string& password,
+        TimerDuration updateInterval);
+
+    static void setFactoryFunc(FactoryFunc factoryFunc);
+};
 
 //! Cloud DB data interface over \class nx::cdb::api::ConnectionFactory
 class CloudDataProvider
-    : public CloudDataProviderBase
+    : public AbstractCloudDataProvider
 {
 public:
     static const TimerDuration DEFAULT_UPDATE_INTERVAL;
 
     CloudDataProvider( const std::string& address,
-                       const std::string& user, const std::string& password,
+                       const std::string& user,
+                       const std::string& password,
                        TimerDuration updateInterval = DEFAULT_UPDATE_INTERVAL );
     ~CloudDataProvider();
 

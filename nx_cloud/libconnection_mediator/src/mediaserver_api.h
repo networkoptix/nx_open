@@ -6,7 +6,13 @@
 
 #include "request_processor.h"
 
+
 namespace nx {
+
+namespace stun {
+class MessageDispatcher;
+}
+
 namespace hpm {
 
 //! Mediaserver API communicating interface
@@ -14,10 +20,10 @@ class MediaserverApiBase
         : protected RequestProcessor
 {
 public:
-    MediaserverApiBase( CloudDataProviderBase* cloudData,
-                      stun::MessageDispatcher* dispatcher );
+    MediaserverApiBase( AbstractCloudDataProvider* cloudData,
+                        nx::stun::MessageDispatcher* dispatcher );
 
-    void ping( const ConnectionSharedPtr& connection, stun::Message message );
+    void ping( const ConnectionStrongRef& connection, stun::Message message );
 
     //! Pings \a address and verifies if the is the mediaservers with \a expectedId
     virtual void pingServer( const SocketAddress& address, const String& expectedId,
@@ -29,8 +35,8 @@ class MediaserverApi
         : public MediaserverApiBase
 {
 public:
-    MediaserverApi( CloudDataProviderBase* cloudData,
-                    stun::MessageDispatcher* dispatcher );
+    MediaserverApi( AbstractCloudDataProvider* cloudData,
+                    nx::stun::MessageDispatcher* dispatcher );
 
     virtual void pingServer( const SocketAddress& address, const String& expectedId,
                              std::function< void( SocketAddress, bool ) > onPinged ) override;

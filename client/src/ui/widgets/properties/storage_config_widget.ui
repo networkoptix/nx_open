@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>570</height>
+    <width>794</width>
+    <height>551</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0">
@@ -16,7 +16,7 @@
      <property name="title">
       <string>Main Storage Locations</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -78,6 +78,20 @@
          <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="backupStoragesAbsentLabel">
+        <property name="text">
+         <string>You haven't configured any backup storage. Backup won't be performed.</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="backupOptionLabel">
+        <property name="text">
+         <string>Storage backup is available if there are 2 or more valid storage drives in the system.</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -168,8 +182,27 @@
       <string notr="true"/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
       <item>
-       <layout class="QHBoxLayout" name="settingsLayout">
+       <spacer name="verticalSpacer">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>20</width>
+          <height>40</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="settingsLayout" stretch="0,0">
         <item>
          <widget class="QGroupBox" name="globalSettingsGroupBox">
           <property name="sizePolicy">
@@ -185,6 +218,12 @@
            <set>Qt::AlignCenter</set>
           </property>
           <layout class="QGridLayout" name="gridLayout_2">
+           <property name="horizontalSpacing">
+            <number>8</number>
+           </property>
+           <property name="verticalSpacing">
+            <number>6</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="label">
              <property name="text">
@@ -192,27 +231,73 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="2">
+           <item row="0" column="1">
             <widget class="QLabel" name="label_2">
              <property name="text">
               <string>Backup Quality:</string>
              </property>
             </widget>
            </item>
+           <item row="1" column="1">
+            <widget class="QComboBox" name="qualityComboBox"/>
+           </item>
            <item row="1" column="0">
             <widget class="QPushButton" name="backupResourcesButton">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>170</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>16777215</height>
+              </size>
+             </property>
              <property name="text">
               <string>&lt;Select at least one camera&gt; </string>
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
-            <widget class="QComboBox" name="qualityComboBox"/>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="serverSettingsGroupBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="title">
+           <string>Server Backup Settings</string>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_3">
+           <property name="horizontalSpacing">
+            <number>8</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="whenToBackupLabel">
+             <property name="text">
+              <string>Execute Backup</string>
+             </property>
+            </widget>
            </item>
-           <item row="1" column="1">
-            <spacer name="horizontalSpacer">
+           <item row="0" column="2" colspan="2">
+            <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -221,35 +306,6 @@
               </size>
              </property>
             </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="serverSettingsGroupBox">
-          <property name="title">
-           <string>Server Backup Settings</string>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
-            <widget class="QLabel" name="whenToBackupLabel">
-             <property name="text">
-              <string>Execute Backup</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="4">
-            <widget class="QPushButton" name="backupStartButton">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Start Backup Now</string>
-             </property>
-            </widget>
            </item>
            <item row="1" column="0">
             <widget class="QComboBox" name="comboBoxBackupType">
@@ -275,39 +331,27 @@
             </widget>
            </item>
            <item row="1" column="3">
-            <widget class="QLabel" name="backupWarningLabel">
+            <widget class="QPushButton" name="backupStartButton">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Backup Warning Label</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="wordWrap">
-              <bool>false</bool>
+              <string>Start Backup Now</string>
              </property>
             </widget>
            </item>
            <item row="1" column="2">
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Expanding</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
+            <widget class="QnWordWrappedLabel" name="backupWarningLabel" native="true">
+             <property name="minimumSize">
               <size>
-               <width>40</width>
-               <height>20</height>
+               <width>200</width>
+               <height>26</height>
               </size>
              </property>
-            </spacer>
+            </widget>
            </item>
           </layout>
          </widget>
@@ -317,20 +361,13 @@
       <item>
        <widget class="QStackedWidget" name="stackedWidgetBackupInfo">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="backupPreparePage">
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="QLabel" name="backupOptionLabel">
-            <property name="text">
-             <string>Storage backup is available if there are 2 or more valid storages in the system.</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="storagesWarningLabel">
             <property name="text">
@@ -397,6 +434,12 @@ It won't deny oldest footage removing from the drive.</string>
    <class>QnStorageRebuildWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

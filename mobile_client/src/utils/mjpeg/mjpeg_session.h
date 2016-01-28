@@ -15,6 +15,18 @@ public:
         Playing
     };
 
+    struct FrameData
+    {
+        int presentationTime;
+        qint64 timestamp;
+        QImage image;
+
+        FrameData();
+
+        bool isNull() const;
+        void clear();
+    };
+
     QnMjpegSession(QObject *parent = nullptr);
     ~QnMjpegSession();
 
@@ -23,13 +35,13 @@ public:
 
     State state() const;
 
-    bool dequeueFrame(QImage *image, qint64 *timestamp, int *presentationTime);
+    FrameData getFrame();
 
     qint64 finalTimestampMs() const;
     void setFinalTimestampMs(qint64 finalTimestampMs);
 
 signals:
-    void frameEnqueued();
+    void frameAvailable();
     void stateChanged();
     void urlChanged();
     void finished();

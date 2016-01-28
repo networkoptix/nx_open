@@ -21,9 +21,6 @@ FocusScope {
                 parent.hide()
 
             popup.hidden()
-
-            if (Window.activeFocusItem == popup)
-                d.lastFocusedItem.forceActiveFocus()
         }
     }
 
@@ -65,6 +62,9 @@ FocusScope {
         if (!parent || !visible)
             return
 
+        if (Window.activeFocusItem == popup)
+            d.lastFocusedItem.forceActiveFocus()
+
         if (hideAnimation)
             hideAnimation.start()
         else
@@ -80,7 +80,7 @@ FocusScope {
     focus: true
 
     Keys.onReleased: {
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (visible) {
                 hide()
                 event.accepted = true

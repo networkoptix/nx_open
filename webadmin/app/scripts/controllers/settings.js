@@ -8,6 +8,8 @@ angular.module('webadminApp')
                 $location.path('/info'); //no admin rights - redirect
                 return;
             }
+
+            $scope.canMerge = user.isOwner;
         });
 
         mediaserver.getSettings().then(function (r) {
@@ -74,8 +76,8 @@ angular.module('webadminApp')
                 }
             } else {
                 alert('Settings saved');
-                if( $scope.settings.port !==  window.location.port ) {
-                    window.location.href = window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port;
+                if( $scope.settings.port !=  window.location.port ) {
+                    window.location.href = (window.location.protocol + '//' + window.location.hostname + ':' + $scope.settings.port + window.location.pathname + window.location.hash);
                 }else{
                     window.location.reload();
                 }

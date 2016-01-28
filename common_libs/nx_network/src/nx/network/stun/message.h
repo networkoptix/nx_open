@@ -60,8 +60,15 @@ class NX_NETWORK_API Header
 {
 public:
     Header();
-    Header( MessageClass messageClass_, int method_ );
-    Header( MessageClass messageClass_, int method_, Buffer transactionId_ );
+    Header(const Header&);
+    Header(Header&&);
+    /**
+        \note \a transactionId is generated using \a Header::makeTransactionId
+    */
+    Header(MessageClass messageClass_, int method_);
+    Header(MessageClass messageClass_, int method_, Buffer transactionId_);
+
+    Header& operator=(Header&& rhs);    //TODO #ak #msvc2015 =default
 
     static Buffer makeTransactionId();
 
@@ -151,10 +158,11 @@ namespace attrs
     {
         BufferedValue( nx::Buffer buffer_ = nx::Buffer() );
         const Buffer& getBuffer() const; //!< Value to serialize
+        void setBuffer(Buffer buf);
         String getString() const; //!< Convert to string
 
     private:
-        Buffer buffer;
+        Buffer m_buffer;
     };
 
     struct NX_NETWORK_API UserName : Attribute, BufferedValue
@@ -221,16 +229,21 @@ namespace attrs
     private:
         int userType;
     };
+
+    /** Base class for attributes with integer value */
+    struct NX_NETWORK_API IntAttribute: Unknown
+    {
+        IntAttribute(int userType, int value = 0);
+
+        int value() const;
+    };
+
 }
 
 class NX_NETWORK_API Message
 {
 public:
-	#if defined(_MSC_VER) && (_MSC_VER < 1900)
-		typedef std::shared_ptr< attrs::Attribute > AttributePtr;
-	#else
-		typedef std::unique_ptr< attrs::Attribute > AttributePtr;
-	#endif
+	typedef std::shared_ptr< attrs::Attribute > AttributePtr;
 
 	#ifdef _DEBUG
 		typedef std::map< int, AttributePtr > AttributesMap;
@@ -244,14 +257,15 @@ public:
     explicit Message( Header header_ = Header(),
                       AttributesMap attributes_ = AttributesMap() );
 
+    //TODO #ak #msvc2015 remove following macro conditions
 #if defined(_MSC_VER) && (_MSC_VER < 1900)
     // auto generated copy and move
 #else
     Message( Message&& message ) = default;
     Message& operator=( Message&& message ) = default;
 
-    Message( const Message& ) = delete;
-    Message& operator=( const Message& ) = delete;
+    Message( const Message& ) = default;
+    Message& operator=( const Message& ) = default;
 #endif
 
     void clear();

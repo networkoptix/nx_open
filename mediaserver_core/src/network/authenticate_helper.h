@@ -111,7 +111,8 @@ private:
     void addAuthHeader(
         nx_http::Response& responseHeaders,
         const QnUserResourcePtr& userRes,
-        bool isProxy );
+        bool isProxy,
+        bool isDigest = true);
     Qn::AuthResult doDigestAuth(
         const QByteArray& method,
         const nx_http::header::Authorization& authorization,

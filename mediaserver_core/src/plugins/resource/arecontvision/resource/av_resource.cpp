@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
 #include <nx/utils/log/log.h>
@@ -204,8 +205,9 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
     url.setPassword( getAuth().password() );
 
     nx_http::AsyncHttpClientPtr httpClientCaptured = nx_http::AsyncHttpClient::create();
-    const QnMacAddress cameraMAC = getMAC();
+    httpClientCaptured->setResponseReadTimeoutMs(getNetworkTimeout());
 
+    const QnMacAddress cameraMAC = getMAC();
     auto httpReqCompletionHandler = [httpClientCaptured, cameraMAC, completionHandler]
         ( const nx_http::AsyncHttpClientPtr& httpClient ) mutable
     {
@@ -778,7 +780,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
     return isH264() &&
-           qnCommon->isArecontRTSPEnabled() &&
+           QnGlobalSettings::instance()->arecontRtspEnabled() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), true);
 }

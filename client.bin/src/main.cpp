@@ -64,7 +64,7 @@ extern "C"
 #include "ui/workbench/workbench_context.h"
 #include "ui/actions/action_manager.h"
 #include "ui/style/skin.h"
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #ifdef Q_OS_WIN
     #include <plugins/resource/desktop_win/desktop_resource_searcher.h>
 #endif
@@ -291,7 +291,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
         SocketFactory::enforceStreamSocketType( SocketFactory::SocketType::Udt );
 
     if (!startupParams.enforceMediatorEndpoint.isEmpty())
-        nx::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
             startupParams.enforceMediatorEndpoint );
 
     /* Dev mode. */
@@ -332,7 +332,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
     initLog(startupParams.logLevel, logFileNameSuffix, startupParams.ec2TranLogLevel);
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::SocketGlobals::mediatorConnector().enable(true);
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
 	// TODO: #Elric why QString???
     if (!startupParams.lightMode.isEmpty() && startupParams.videoWallGuid.isNull()) {
@@ -476,7 +476,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
     // ===========================================================================
 
-    CLVideoDecoderFactory::setCodecManufacture( CLVideoDecoderFactory::AUTO );
+    QnVideoDecoderFactory::setCodecManufacture( QnVideoDecoderFactory::AUTO );
 
     /* Create workbench context. */
     QScopedPointer<QnWorkbenchContext> context(new QnWorkbenchContext(qnResPool));
@@ -663,7 +663,7 @@ int runApplication(QtSingleApplication* application, int argc, char **argv) {
 
 int main(int argc, char **argv)
 {
-	nx::SocketGlobals::InitGuard sgGuard;
+	nx::network::SocketGlobals::InitGuard sgGuard;
 
 #ifdef Q_WS_X11
     XInitThreads();

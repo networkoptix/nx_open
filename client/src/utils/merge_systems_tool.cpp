@@ -54,11 +54,9 @@ void QnMergeSystemsTool::pingSystem(const QUrl &url, const QString &password)
 
     m_foundModule.first = NotFoundError;
 
-    for (const QnMediaServerResourcePtr &server: qnResPool->getAllServers())
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr &server: onlineServers)
     {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
         int handle = server->apiConnection()->pingSystemAsync(url, password, this, SLOT(at_pingSystem_finished(int,QnModuleInformation,int,QString)));
         m_serverByRequestHandle[handle] = server;
         NX_LOG(lit("QnMergeSystemsTool: ping request to %1 via %2").arg(url.toString()).arg(server->getApiUrl()), cl_logDEBUG1);

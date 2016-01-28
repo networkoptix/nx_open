@@ -1,7 +1,9 @@
 #ifndef QN_MAC_ADDRESS_H
 #define QN_MAC_ADDRESS_H
 
+#ifndef Q_MOC_RUN
 #include <boost/operators.hpp>
+#endif
 
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
@@ -47,5 +49,5 @@ private:
 
 Q_DECLARE_TYPEINFO(QnMacAddress, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnMacAddress)
-    
+
 #endif //QN_MAC_ADDRESS_H

@@ -14,7 +14,7 @@ namespace nx {
 namespace cdb {
 namespace cl {
 
-SystemManager::SystemManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
+SystemManager::SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher)
 :
     AsyncRequestsExecutor(cloudModuleEndPointFetcher)
 {
@@ -44,12 +44,23 @@ void SystemManager::unbindSystem(
 }
 
 void SystemManager::getSystems(
-    std::function<void(api::ResultCode, api::SystemDataList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
 {
     executeRequest(
         kSystemGetPath,
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemDataList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
+}
+
+void SystemManager::getSystem(
+    const std::string& systemID,
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler)
+{
+    executeRequest(
+        kSystemGetPath,
+        api::SystemID(systemID),
+        completionHandler,
+        std::bind(completionHandler, std::placeholders::_1, api::SystemDataExList()));
 }
 
 void SystemManager::shareSystem(
@@ -64,34 +75,34 @@ void SystemManager::shareSystem(
 }
 
 void SystemManager::getCloudUsersOfSystem(
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
 void SystemManager::getCloudUsersOfSystem(
     const std::string& systemID,
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
     executeRequest(
         kSystemGetCloudUsersPath,
         api::SystemID(systemID),
         completionHandler,
-        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingList()));
+        std::bind(completionHandler, std::placeholders::_1, api::SystemSharingExList()));
 }
 
-void SystemManager::updateSharing(
-    api::SystemSharing sharing,
-    std::function<void(api::ResultCode)> completionHandler)
+void SystemManager::getAccessRoleList(
+    const std::string& systemID,
+    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
     executeRequest(
-        kSystemUpdateSharingPath,
-        std::move(sharing),
+        kSystemGetAccessRoleListPath,
+        api::SystemID(systemID),
         completionHandler,
-        completionHandler);
+        std::bind(completionHandler, std::placeholders::_1, api::SystemAccessRoleList()));
 }
 
 }   //cl

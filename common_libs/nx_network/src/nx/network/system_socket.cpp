@@ -288,20 +288,20 @@ bool Socket::setSendTimeout( unsigned int ms )
     return true;
 }
 
-bool Socket::getLastError( SystemError::ErrorCode* errorCode ) const
+bool Socket::getLastError(SystemError::ErrorCode* errorCode) const
 {
     socklen_t optLen = sizeof(*errorCode);
     return getsockopt(m_fd, SOL_SOCKET, SO_ERROR, reinterpret_cast<char*>(errorCode), &optLen) == 0;
 }
 
-void Socket::post( std::function<void()>&& handler )
+void Socket::post(std::function<void()> handler)
 {
-    m_baseAsyncHelper->post( std::move(handler) );
+    m_baseAsyncHelper->post(std::move(handler));
 }
 
-void Socket::dispatch( std::function<void()>&& handler )
+void Socket::dispatch(std::function<void()> handler)
 {
-    m_baseAsyncHelper->dispatch( std::move(handler) );
+    m_baseAsyncHelper->dispatch(std::move(handler));
 }
 
 unsigned short Socket::getLocalPort() const
@@ -740,7 +740,7 @@ bool CommunicatingSocket::isConnected() const
 void CommunicatingSocket::close()
 {
     //checking that socket is not registered in aio
-    assert( !nx::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
+    assert( !nx::network::SocketGlobals::aioService().isSocketBeingWatched( static_cast<Pollable*>(this) ) );
 
     m_connected = false;
     Socket::close();
@@ -764,24 +764,32 @@ void CommunicatingSocket::cancelIOAsync(
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
 
-void CommunicatingSocket::connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler )
+void CommunicatingSocket::connectAsync(
+    const SocketAddress& addr,
+    std::function<void( SystemError::ErrorCode )> handler )
 {
-    return m_aioHelper->connectAsyncImpl( addr, std::move(handler) );
+    return m_aioHelper->connectAsync( addr, std::move(handler) );
 }
 
-void CommunicatingSocket::recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::readSomeAsync(
+    nx::Buffer* const buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
-    return m_aioHelper->recvAsyncImpl( buf, std::move( handler ) );
+    return m_aioHelper->readSomeAsync( buf, std::move( handler ) );
 }
 
-void CommunicatingSocket::sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler )
+void CommunicatingSocket::sendAsync(
+    const nx::Buffer& buf,
+    std::function<void( SystemError::ErrorCode, size_t )> handler )
 {
-    return m_aioHelper->sendAsyncImpl( buf, std::move( handler ) );
+    return m_aioHelper->sendAsync( buf, std::move( handler ) );
 }
 
-void CommunicatingSocket::registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler )
+void CommunicatingSocket::registerTimer(
+    unsigned int timeoutMs,
+    std::function<void()> handler )
 {
-    return m_aioHelper->registerTimerImpl( timeoutMs, std::move( handler ) );
+    return m_aioHelper->registerTimer( timeoutMs, std::move( handler ) );
 }
 
 
@@ -1002,7 +1010,7 @@ bool TCPSocket::setKeepAlive( boost::optional< KeepAliveOptions > info )
     return true;
 }
 
-bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result )
+bool TCPSocket::getKeepAlive( boost::optional< KeepAliveOptions >* result ) const
 {
     int isEnabled = 0;
     socklen_t length = sizeof(isEnabled);
@@ -1050,9 +1058,16 @@ static const int DEFAULT_ACCEPT_TIMEOUT_MSEC = 250;
 /*!
     \return fd (>=0) on success, <0 on error (-2 if timed out)
 */
-static int acceptWithTimeout( int m_fd, int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC )
+static int acceptWithTimeout( int m_fd,
+                              int timeoutMillis = DEFAULT_ACCEPT_TIMEOUT_MSEC,
+                              bool nonBlockingMode = false )
 {
+    if (nonBlockingMode)
+        return ::accept( m_fd, NULL, NULL );
+
     int result = 0;
+    if (timeoutMillis == 0)
+        timeoutMillis = -1; // poll expects -1 as an infinity
 
 #ifdef _WIN32
     struct pollfd fds[1];
@@ -1135,9 +1150,9 @@ public:
     {
     }
 
-    AbstractStreamSocket* accept( unsigned int recvTimeoutMs )
+    AbstractStreamSocket* accept( unsigned int recvTimeoutMs, bool nonBlockingMode )
     {
-        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs );
+        int newConnSD = acceptWithTimeout( socketHandle, recvTimeoutMs, nonBlockingMode );
         if( newConnSD >= 0 )
         {
             return new TCPSocket(newConnSD);
@@ -1167,14 +1182,13 @@ TCPServerSocket::TCPServerSocket()
         new TCPServerSocketPrivate( &m_implDelegate, this ) )
 {
     static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl())->socketHandle = m_implDelegate.handle();
-    setRecvTimeout( DEFAULT_ACCEPT_TIMEOUT_MSEC );
 }
 
 TCPServerSocket::~TCPServerSocket()
 {
     //checking that socket is not registered in aio
     Q_ASSERT_X(
-        !nx::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(&this->m_implDelegate)),
+        !nx::network::SocketGlobals::aioService().isSocketBeingWatched(static_cast<Pollable*>(&this->m_implDelegate)),
         Q_FUNC_INFO,
         "You MUST cancel running async socket operation before deleting socket if you delete socket from non-aio thread (2)");
 }
@@ -1184,30 +1198,33 @@ int TCPServerSocket::accept(int sockDesc)
     return acceptWithTimeout( sockDesc );
 }
 
-void TCPServerSocket::acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler )
+void TCPServerSocket::acceptAsync(
+    std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler)
 {
     TCPServerSocketPrivate* d = static_cast<TCPServerSocketPrivate*>(m_implDelegate.impl());
     return d->asyncServerSocketHelper.acceptAsync( std::move(handler) );
 }
 
 //!Implementation of AbstractStreamServerSocket::listen
-bool TCPServerSocket::listen( int queueLen )
+bool TCPServerSocket::listen(int queueLen)
 {
     return ::listen( m_implDelegate.handle(), queueLen ) == 0;
 }
 
-void TCPServerSocket::pleaseStop( std::function<void()> completionHandler )
+void TCPServerSocket::pleaseStop(std::function<void()> completionHandler)
 {
     //TODO #ak add general implementation to Socket class and remove this method
     m_implDelegate.dispatch( [ this, completionHandler ]()
     {
         //m_implDelegate.impl()->terminated.store(true, std::memory_order_relaxed);
 
-        nx::SocketGlobals::aioService().cancelPostedCalls(
+        nx::network::SocketGlobals::aioService().cancelPostedCalls(
             static_cast<Pollable*>(&m_implDelegate), true);
-        nx::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().removeFromWatch(
             static_cast<Pollable*>(&m_implDelegate), aio::etRead, true);
-        nx::SocketGlobals::aioService().removeFromWatch(
+        nx::network::SocketGlobals::aioService().removeFromWatch(
             static_cast<Pollable*>(&m_implDelegate), aio::etTimedOut, true);
 
         completionHandler();
@@ -1223,7 +1240,11 @@ AbstractStreamSocket* TCPServerSocket::accept()
     if( !getRecvTimeout( &recvTimeoutMs ) )
         return nullptr;
 
-    return d->accept( recvTimeoutMs );
+    bool nonBlockingMode = false;
+    if( !getNonBlockingMode(&nonBlockingMode) )
+        return nullptr;
+
+    return d->accept( recvTimeoutMs, nonBlockingMode );
 }
 
 bool TCPServerSocket::setListen(int queueLen)
@@ -1398,6 +1419,21 @@ bool UDPSocket::sendTo(
     return sendTo( buffer, bufferLen );
 }
 
+void UDPSocket::sendToAsync(
+    const nx::Buffer& buf,
+    const SocketAddress& foreignEndpoint,
+    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler)
+{
+    setDestAddr(foreignEndpoint);
+    SocketAddress resolvedForeignEndpoint(
+        HostAddress(m_destAddr.sin_addr),
+        foreignEndpoint.port);
+    using namespace std::placeholders;
+    sendAsync(
+        buf,
+        std::bind(completionHandler, _1, std::move(resolvedForeignEndpoint), _2));
+}
+
 int UDPSocket::recv( void* buffer, unsigned int bufferLen, int /*flags*/ )
 {
     //TODO #ak use flags
@@ -1418,6 +1454,18 @@ int UDPSocket::recvFrom(
     if( rtn >= 0 && sourceAddress )
         *sourceAddress = m_prevDatagramAddress;
     return rtn;
+}
+
+void UDPSocket::recvFromAsync(
+    nx::Buffer* const buf,
+    std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> handler)
+{
+    //TODO #ak #msvc2015 move handler
+    readSomeAsync(
+        buf,
+        [/*std::move*/ handler, this](SystemError::ErrorCode errCode, size_t bytesRead){
+            handler(errCode, std::move(m_prevDatagramAddress), bytesRead);
+        });
 }
 
 SocketAddress UDPSocket::lastDatagramSourceAddress() const

@@ -71,7 +71,7 @@ bool QnIOModuleMonitor::open()
         requestUrl.setHost(route.addr.address.toString());
         requestUrl.setPort(route.addr.port);
     }
-    
+
     httpClient->setUserName( QnAppServerConnectionFactory::url().userName().toLower() );
     httpClient->setUserPassword( QnAppServerConnectionFactory::url().password() );
 
@@ -90,7 +90,7 @@ void QnIOModuleMonitor::at_MonitorResponseReceived( nx_http::AsyncHttpClientPtr 
 
     if( httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok )
     {
-        NX_LOG( lit("Failed to subscribe to io monitor for camera %1. reason: %2").
+        NX_LOG( lit("Failed to subscribe to i/o monitor for camera %1. reason: %2").
             arg(m_camera->getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
         return;
     }

@@ -30,7 +30,7 @@ class AccountManager
     public AsyncRequestsExecutor
 {
 public:
-    AccountManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AccountManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     //!Implementation of api::AccountManager::registerNewAccount
     virtual void registerNewAccount(

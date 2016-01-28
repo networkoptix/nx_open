@@ -3,10 +3,9 @@
 
 #include <QHostAddress>
 
-#include <base/requests.h>
-
 #include <helpers/qml_helpers.h>
-#include <helpers/time_helper.h>
+
+namespace api = nx::mediaserver::api;
 
 namespace
 {
@@ -64,7 +63,7 @@ const rtu::DateTimePointer &rtu::Changeset::dateTime() const
     return m_dateTime;
 }
 
-const rtu::ItfUpdateInfoContainerPointer &rtu::Changeset::itfUpdateInfo() const
+const api::Client::ItfUpdateInfoContainerPtr &rtu::Changeset::itfUpdateInfo() const
 {
     return m_itfUpdateInfo;
 }
@@ -214,24 +213,24 @@ void rtu::Changeset::preparePropChangesData()
     m_factoryDefaultsButNetwork = false;
 }
 
-rtu::ItfUpdateInfo &rtu::Changeset::getItfUpdateInfo(const QString &name)
+api::Client::ItfUpdateInfo &rtu::Changeset::getItfUpdateInfo(const QString &name)
 {
-    ItfUpdateInfoContainer &itfUpdate = [this]()-> ItfUpdateInfoContainer&
+    api::Client::ItfUpdateInfoContainer &itfUpdate = [this]() -> api::Client::ItfUpdateInfoContainer&
     {
         if (!m_itfUpdateInfo)
-            m_itfUpdateInfo = std::make_shared<ItfUpdateInfoContainer>();
+            m_itfUpdateInfo = std::make_shared<api::Client::ItfUpdateInfoContainer>();
         return *m_itfUpdateInfo;
     }();
 
     const auto &it = std::find_if(itfUpdate.begin(), itfUpdate.end()
-        , [&name](const ItfUpdateInfo &itf)
+        , [&name](const api::Client::ItfUpdateInfo &itf)
     {
         return (itf.name == name);
     });
     
     if (it == itfUpdate.end())
     {
-        itfUpdate.push_back(ItfUpdateInfo(name));
+        itfUpdate.push_back(api::Client::ItfUpdateInfo(name));
         return itfUpdate.back();
     }
     return *it;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="en">
+<TS version="2.0" language="en_US" sourcelanguage="en">
 <context>
     <name>Language</name>
     <message>
@@ -221,7 +221,7 @@
     </message>
     <message>
         <source>Conflict Address: %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Conflicting Address: %1</translation>
     </message>
     <message>
         <source>Connection to server is lost.</source>
@@ -230,7 +230,6 @@
     <message numerus="yes">
         <source>No data received during last %n seconds.</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -387,11 +386,11 @@
     </message>
     <message>
         <source>Archive backup failed because of no backup storages available</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archive backup failed: no backup storages available</translation>
     </message>
     <message>
         <source>Archive backup finished, but isn&apos;t fully completed because backup time is over. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archive finished partially because backup time is over. Data is backed up to %1</translation>
     </message>
     <message>
         <source>Archive backup is successfully completed</source>
@@ -399,7 +398,7 @@
     </message>
     <message>
         <source>Archive backup is canceled by user. Data is backuped up to %1</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Archive backup is canceled. Data is backed up to %1</translation>
     </message>
 </context>
 <context>
@@ -598,15 +597,15 @@
     </message>
     <message>
         <source>Device initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Device initialization process is in progress.</translation>
     </message>
     <message>
         <source>Camera initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Camera initialization process is in progress.</translation>
     </message>
     <message>
         <source>IO Module initialization process in progress.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">IO Module initialization process is in progress.</translation>
     </message>
     <message>
         <source>Camera plugin error. %1</source>
@@ -632,7 +631,7 @@
     </message>
     <message>
         <source>Launching file explorer failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">File explorer failed to open.</translation>
     </message>
 </context>
 <context>
@@ -647,11 +646,11 @@
     </message>
     <message>
         <source>Could not initialise audio encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
         <source>Could not initialise audio decoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not initialize audio decoder.</translation>
     </message>
 </context>
 <context>
@@ -689,7 +688,7 @@
     </message>
     <message>
         <source>Could not initialise video encoder.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
 </context>
 <context>
@@ -820,20 +819,17 @@
         <source>%n %2 will be used out of %1.</source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Activate %n more %2. </source>
         <translation>
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n more %2 will be used. </source>
         <translation>
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -843,7 +839,7 @@
     </message>
     <message>
         <source>There was a problem activating your license key. A database error has occurred.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">There was a problem activating your license key. A database error occurred.</translation>
     </message>
     <message>
         <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
@@ -878,13 +874,11 @@
         <source>%n Camera(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n camera(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -892,13 +886,11 @@
         <source>%n IO Module(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n IO module(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>
@@ -906,13 +898,11 @@
         <source>%n Device(s)</source>
         <translation type="unfinished">
             <numerusform></numerusform>
-            <numerusform></numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n device(s)</source>
         <translation type="unfinished">
-            <numerusform></numerusform>
             <numerusform></numerusform>
         </translation>
     </message>

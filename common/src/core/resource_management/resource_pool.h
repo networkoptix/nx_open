@@ -133,7 +133,10 @@ public:
     QnNetworkResourceList getAllNetResourceByHostAddress(const QString &hostAddress) const;
     QnNetworkResourceList getAllNetResourceByHostAddress(const QHostAddress &hostAddress) const;
     QnVirtualCameraResourceList getAllCameras(const QnResourcePtr &mServer, bool ignoreDesktopCameras = false) const;
-    QnMediaServerResourceList getAllServers() const;
+
+    // @note Never returns fake servers
+    QnMediaServerResourceList getAllServers(Qn::ResourceStatus status) const;
+
     QnResourceList getResourcesByParentId(const QnUuid& parentId) const;
 
     // returns list of resources with such flag
@@ -192,7 +195,7 @@ public:
     //!Empties all internal dictionaries. Needed for correct destruction order at application stop
     void clear();
 
-    /** Check if there is at least one IO Module in the system. */
+    /** Check if there is at least one I/O Module in the system. */
     bool containsIoModules() const;
 
     /** Check if layout was created automatically, e.g. by 'Push my screen' action.

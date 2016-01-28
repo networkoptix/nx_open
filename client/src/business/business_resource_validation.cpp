@@ -19,7 +19,7 @@ namespace {
                 QnCameraDeviceStringSet(
                     tr("%1 of %n devices", nullptr, totalCount),
                     tr("%1 of %n cameras", nullptr, totalCount),
-                    tr("%1 of %n IO modules", nullptr, totalCount)
+                    tr("%1 of %n I/O modules", nullptr, totalCount)
                 ), total
             ).arg(count);
         }

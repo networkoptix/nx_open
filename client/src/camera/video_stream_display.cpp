@@ -3,7 +3,7 @@
 
 #include <algorithm>
 
-#include "decoders/video/abstractdecoder.h"
+#include "decoders/video/abstract_video_decoder.h"
 #include "utils/math/math.h"
 #include "utils/common/long_runnable.h"
 #include "utils/common/adaptive_sleep.h"
@@ -465,7 +465,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         // todo: all renders MUST have same GL context!!!
         const QnAbstractRenderer* renderer = m_renderList.isEmpty() ? 0 : *m_renderList.constBegin();
         const QnResourceWidgetRenderer* widgetRenderer = dynamic_cast<const QnResourceWidgetRenderer*>(renderer);
-        dec = CLVideoDecoderFactory::createDecoder(
+        dec = QnVideoDecoderFactory::createDecoder(
                 data,
                 enableFrameQueue,
                 widgetRenderer ? widgetRenderer->glContext() : NULL);

@@ -112,6 +112,9 @@ void QnCameraThumbnailManager::setThumbnailSize(const QSize &size)
 
 rest::Handle QnCameraThumbnailManager::loadThumbnailForCamera(const QnVirtualCameraResourcePtr &camera) {
 
+    if (!camera)
+        return kInvalidHandle;
+
     QnThumbnailRequestData request;
     request.camera = camera;
     request.size = m_thumnailSize;
@@ -167,8 +170,10 @@ void QnCameraThumbnailManager::at_resPool_statusChanged(const QnResourcePtr &res
      if (!isUpdateRequired(camera, data.status))
          return;
 
-     data.status = Refreshing;
      data.loadingHandle = loadThumbnailForCamera(camera);
+     data.status = data.loadingHandle != kInvalidHandle
+         ? Refreshing
+         : NoData;
 }
 
 void QnCameraThumbnailManager::at_resPool_resourceRemoved(const QnResourcePtr &resource) {
@@ -193,7 +198,9 @@ void QnCameraThumbnailManager::forceRefreshThumbnails() {
         if (!isUpdateRequired(it.key(), it->status))
             continue;
 
-        it->status = Refreshing;
         it->loadingHandle = loadThumbnailForCamera(it.key());
+        it->status = it->loadingHandle != kInvalidHandle
+            ? Refreshing
+            : NoData;
     }
 }

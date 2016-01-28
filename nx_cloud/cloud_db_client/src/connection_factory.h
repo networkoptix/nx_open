@@ -8,7 +8,7 @@
 
 #include "include/cdb/connection.h"
 
-#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cdb_endpoint_fetcher.h>
 
 
 namespace nx {
@@ -41,7 +41,7 @@ public:
         unsigned short port) override;
 
 private:
-    cc::CloudModuleEndPointFetcher m_endPointFetcher;
+    network::cloud::CloudModuleEndPointFetcher m_endPointFetcher;
 };
 
 }   //cl

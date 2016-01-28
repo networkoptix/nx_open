@@ -142,7 +142,7 @@ private:
 #define NX_CLASS_NAME QString::fromStdString(boost::core::demangle(typeid(*this).name()))
 #define NX_LOGX(...) NX_LOG_MSVC_EXPAND(GET_NX_LOG_MACRO(__VA_ARGS__, NX_LOGX_3, NX_LOGX_2)(__VA_ARGS__))
 
-#define NX_LOGX_2(msg, level) NX_LOG_2( lit("%1 %2").arg(NX_CLASS_NAME).arg(msg), level )
+#define NX_LOGX_2(msg, level) NX_LOG_2( lm("%1 %2").arg(NX_CLASS_NAME).arg(msg), level )
 #define NX_LOGX_3(logID, msg, level) NX_LOG_3( logID, lit("%1 %2").arg(NX_CLASS_NAME).arg(msg), level )
 
 #define cl_log (*QnLog::instance())

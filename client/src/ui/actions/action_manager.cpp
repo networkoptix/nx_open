@@ -516,7 +516,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Diagnostics..."),
                 tr("Camera Diagnostics..."),
-                tr("IO Module Diagnostics...")
+                tr("I/O Module Diagnostics...")
             ), this)).
         condition(new QnResourceActionCondition(hasFlags(Qn::live_cam), Qn::Any, this));
 
@@ -732,6 +732,16 @@ QnActionManager::QnActionManager(QObject *parent):
             flags(Qn::Main | Qn::Scene).
             requiredPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission).
             text(tr("Folder..."));
+
+        factory().separator().
+            flags(Qn::Main);
+
+        factory(Qn::WebClientActionSubMenu).
+            flags(Qn::Main).
+            text(tr("Web Client...")).
+            autoRepeat(false).
+            requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission);
+
     } factory.endSubMenu();
 
     factory(Qn::SaveCurrentLayoutAction).
@@ -942,7 +952,7 @@ QnActionManager::QnActionManager(QObject *parent):
     factory(Qn::MergeSystems).
         flags(Qn::Main | Qn::Tree).
         text(tr("Merge Systems...")).
-        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalOwnerPermissions).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ServersNode, this),
             new QnForbiddenInSafeModeCondition(this),
@@ -1442,7 +1452,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Check Device Issues..."),       tr("Check Devices Issues..."),
                 tr("Check Camera Issues..."),       tr("Check Cameras Issues..."),
-                tr("Check IO Module Issues..."),    tr("Check IO Modules Issues...")
+                tr("Check I/O Module Issues..."),    tr("Check I/O Modules Issues...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
@@ -1457,7 +1467,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Rules..."),          tr("Devices Rules..."),
                 tr("Camera Rules..."),          tr("Cameras Rules..."),
-                tr("IO Module Rules..."),       tr("IO Modules Rules...")
+                tr("I/O Module Rules..."),       tr("I/O Modules Rules...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalProtectedPermission).
         condition(new QnConjunctionActionCondition(
@@ -1472,7 +1482,7 @@ QnActionManager::QnActionManager(QObject *parent):
             QnCameraDeviceStringSet(
                 tr("Device Settings..."),       tr("Devices Settings..."),
                 tr("Camera Settings..."),       tr("Cameras Settings..."),
-                tr("IO Module Settings..."),    tr("IO Modules Settings...")
+                tr("I/O Module Settings..."),    tr("I/O Modules Settings...")
             ), this)).
         requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalEditCamerasPermission).
         condition(new QnConjunctionActionCondition(
@@ -1555,6 +1565,7 @@ QnActionManager::QnActionManager(QObject *parent):
 
     factory(Qn::ConnectToCurrentSystem).
         flags(Qn::Tree | Qn::SingleTarget | Qn::MultiTarget | Qn::ResourceTarget).
+        requiredPermissions(Qn::CurrentUserResourceRole, Qn::GlobalOwnerPermissions).
         text(tr("Merge to Currently Connected System...")).
         condition(new QnConjunctionActionCondition(
             new QnTreeNodeTypeCondition(Qn::ResourceNode, this),

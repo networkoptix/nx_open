@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include <nx/utils/uuid.h>
+
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <camera/camera_bookmarks_manager_fwd.h>
@@ -23,12 +25,13 @@
 
 class QAction;
 
+class QnWorkbenchItem;
 class QnWorkbenchDisplay;
 class QnTimeSlider;
 class QnTimeScrollBar;
 class QnResourceWidget;
 class QnMediaResourceWidget;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnThumbnailsLoader;
 class QnCameraDataManager;
 class QnCachingCameraDataLoader;
@@ -46,6 +49,7 @@ class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContex
 
     typedef Connective<QObject> base_type;
 
+    Q_PROPERTY(bool hasArchive READ hasArchive NOTIFY hasArchiveChanged)
 public:
     enum WidgetFlag {
         WidgetUsesUTC = 0x1,
@@ -84,6 +88,8 @@ public:
 
     bool hasVideo() const;
 
+    bool hasArchive() const;
+
     qreal speed() const;
     Q_SLOT void setSpeed(qreal speed);
     qreal minimalSpeed() const;
@@ -110,6 +116,7 @@ signals:
     void currentWidgetChanged();
     void liveChanged();
     void liveSupportedChanged();
+    void hasArchiveChanged();
     void playingChanged();
     void playingSupportedChanged();
     void speedChanged();
@@ -226,6 +233,20 @@ private:
 
     QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
 
+    void onCurrentLayoutChanged();
+
+    void onCurrentLayoutAboutToBeChanged();
+
+    void onItemAdded(QnWorkbenchLayout *layout
+        , QnWorkbenchItem *item);
+
+    void onItemRemoved(QnWorkbenchLayout *layout
+        , QnWorkbenchItem *item);
+
+    void updateHasArchiveState();
+
+    bool layoutHasAchive();
+
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -286,6 +307,8 @@ private:
     std::array<QnThreadedChunksMergeTool*, Qn::TimePeriodContentCount> m_threadedChunksMergeTool;
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
+
+    bool m_hasArchive;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnWorkbenchNavigator::WidgetFlags);

@@ -6,19 +6,20 @@
 
 #include <QJsonDocument>
 
+
 namespace nx {
 namespace hpm {
 
-MediaserverApiBase::MediaserverApiBase( CloudDataProviderBase* cloudData,
-                                    stun::MessageDispatcher* dispatcher )
+MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
+                                        nx::stun::MessageDispatcher* dispatcher )
     : RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
     const auto result =
         dispatcher->registerRequestProcessor(
             stun::cc::methods::ping,
-            [ this ]( const ConnectionSharedPtr& connection, stun::Message message )
-                { ping( connection, std::move( message ) ); } );
+            [this](ConnectionStrongRef connection, stun::Message message)
+                { ping(std::move(connection), std::move(message)); });
 
     // TODO: NX_LOG
     Q_ASSERT_X( result, Q_FUNC_INFO, "Could not register ping processor" );
@@ -29,16 +30,16 @@ struct PingCollector
     QnMutex mutex;
     size_t expected;
     std::list< SocketAddress > endpoints;
-    std::weak_ptr< stun::ServerConnection > connection;
+    ConnectionWeakRef connection;
 
     PingCollector( size_t expected_,
-                   const std::weak_ptr< stun::ServerConnection >& connection_ )
+                   ConnectionWeakRef connection_ )
         : expected( expected_ )
-        , connection( connection_ )
+        , connection( std::move(connection_) )
     {}
 };
 
-void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
+void MediaserverApiBase::ping( const ConnectionStrongRef& connection,
                              stun::Message message )
 {
     if( const auto mediaserver = getMediaserverData( connection, message ) )
@@ -47,8 +48,12 @@ void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
                 message.getAttribute< stun::cc::attrs::PublicEndpointList >();
         if( !endpointsAttr )
         {
-            errorResponse( connection, message.header, stun::error::badRequest,
-                           "Attribute PublicEndpointList is required" );
+            sendErrorResponse(
+                connection,
+                message.header,
+                api::ResultCode::badRequest,
+                stun::error::badRequest,
+                "Attribute PublicEndpointList is required" );
             return;
         }
 
@@ -90,8 +95,8 @@ void MediaserverApiBase::ping( const ConnectionSharedPtr& connection,
 
 // impl
 
-MediaserverApi::MediaserverApi( CloudDataProviderBase* cloudData,
-                                stun::MessageDispatcher* dispatcher )
+MediaserverApi::MediaserverApi( AbstractCloudDataProvider* cloudData,
+                                nx::stun::MessageDispatcher* dispatcher )
     : MediaserverApiBase( cloudData, dispatcher )
 {
 }

@@ -73,7 +73,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGra
             QnCameraDeviceStringSet(
                 tr("Please check authentication information in device settings"),
                 tr("Please check authentication information in camera settings"),
-                tr("Please check authentication information in IO module settings")
+                tr("Please check authentication information in I/O module settings")
             ), camera
         );
     m_staticTexts[AnalogLicenseText] = tr("Activate analog license to remove this message");
@@ -81,7 +81,7 @@ QnStatusOverlayWidget::QnStatusOverlayWidget(const QnResourcePtr &resource, QGra
     m_staticTexts[LoadingText] = tr("Loading...");
     m_staticTexts[NoVideoStreamText] = tr("No video stream");
     m_staticTexts[IoModuleDisabledText] = tr("Module is disabled");
-    
+
     for (QStaticText &staticText : m_staticTexts) {
         staticText.setPerformanceHint(QStaticText::AggressiveCaching);
         staticText.setTextOption(QTextOption(Qt::AlignCenter));
@@ -152,7 +152,7 @@ void QnStatusOverlayWidget::setButtonVisible(bool visible
     static const char kVisiblePropertyName[] = "isVisible";
     const bool currentVisible = m_button->property(kVisiblePropertyName).toBool();
 
-    if (currentVisible == visible) 
+    if (currentVisible == visible)
         return;
 
     m_button->setProperty(kVisiblePropertyName, visible);
@@ -232,7 +232,7 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
 
     QRectF rect = this->rect();
 
-    if (m_statusOverlay == Qn::NoVideoDataOverlay) 
+    if (m_statusOverlay == Qn::NoVideoDataOverlay)
     {
         auto color = palette().color(QPalette::Window);
         QRadialGradient gradient(rect.center(), rect.width()/2);
@@ -302,14 +302,14 @@ void QnStatusOverlayWidget::paint(QPainter *painter, const QStyleOptionGraphicsI
     case Qn::ServerOfflineOverlay:
         paintFlashingText(painter, m_staticTexts[ServerOfflineText], 0.125);
         break;
-    case Qn::AnalogWithoutLicenseOverlay: 
+    case Qn::AnalogWithoutLicenseOverlay:
         {
             QRectF rect = this->rect();
             int count = qFloor(qMax(1.0, rect.height() / rect.width()) * 7.5);
             for (int i = -count; i <= count; i++)
                 paintFlashingText(painter, m_staticTexts[AnalogLicenseText], 0.035, QPointF(0.0, 0.06 * i));
             break;
-        }   
+        }
     case Qn::VideowallWithoutLicenseOverlay:
         {
             QRectF rect = this->rect();
@@ -358,7 +358,7 @@ void QnStatusOverlayWidget::paintFlashingText(QPainter *painter, const QStaticTe
     Q_UNUSED(fontRollback) // TODO: #Elric remove
 }
 
-void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize) 
+void QnStatusOverlayWidget::paintPixmap(QPainter *painter, const QPixmap &picture, qreal imageSize)
 {
     QRectF rect = this->rect();
     qreal unit = qMin(rect.width(), rect.height());

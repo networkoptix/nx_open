@@ -5,19 +5,22 @@
 
 #include "server_connection.h"
 
+#include <common/common_globals.h>
+
 #include "message_dispatcher.h"
 
-#include <common/common_globals.h>
 
 namespace nx {
 namespace stun {
 
 ServerConnection::ServerConnection(
     StreamConnectionHolder<ServerConnection>* socketServer,
-    std::unique_ptr<AbstractCommunicatingSocket> sock )
+    std::unique_ptr<AbstractCommunicatingSocket> sock,
+    const MessageDispatcher& dispatcher)
 :
-    BaseType( socketServer, std::move( sock ) ),
-    m_peerAddress( BaseType::getForeignAddress() )
+    BaseType(socketServer, std::move(sock)),
+    m_peerAddress(BaseType::getForeignAddress()),
+    m_dispatcher(dispatcher)
 {
 }
 
@@ -28,6 +31,35 @@ ServerConnection::~ServerConnection()
     //       weak_ptr is not valid any more
     if( m_destructHandler )
         m_destructHandler();
+}
+
+void ServerConnection::sendMessage(
+    nx::stun::Message message,
+    std::function<void(SystemError::ErrorCode)> handler)
+{
+    BaseType::sendMessage(
+        std::move(message),
+        std::move(handler));
+}
+
+nx::network::TransportProtocol ServerConnection::transportProtocol() const
+{
+    return nx::network::TransportProtocol::tcp;
+}
+
+SocketAddress ServerConnection::getSourceAddress() const
+{
+    return BaseType::socket()->getForeignAddress();
+}
+
+void ServerConnection::addOnConnectionCloseHandler(std::function<void()> handler)
+{
+    registerCloseHandler(std::move(handler));
+}
+
+AbstractCommunicatingSocket* ServerConnection::socket()
+{
+    return BaseType::socket().get();
 }
 
 void ServerConnection::processMessage( Message message )
@@ -63,32 +95,31 @@ void ServerConnection::setDestructHandler( std::function< void() > handler )
 
 void ServerConnection::processBindingRequest( Message message )
 {
-    Message response( stun::Header(
+    Message response(stun::Header(
         MessageClass::successResponse,
-        bindingMethod, std::move( message.header.transactionId ) ) );
+        bindingMethod, std::move(message.header.transactionId)));
 
     response.newAttribute< stun::attrs::XorMappedAddress >(
-                m_peerAddress.port, m_peerAddress.address.ipv4() );
+        m_peerAddress.port, m_peerAddress.address.ipv4());
 
-    sendMessage( std::move( response ) );
+    sendMessage(std::move(response), nullptr);
 }
 
 void ServerConnection::processCustomRequest( Message message )
 {
-    if( auto disp = MessageDispatcher::instance() )
-        if( disp->dispatchRequest( shared_from_this(), std::move(message) ) )
-            return;
+    if (m_dispatcher.dispatchRequest(shared_from_this(), std::move(message)))
+        return;
 
-    stun::Message response( stun::Header(
+    stun::Message response(stun::Header(
         stun::MessageClass::errorResponse,
         message.header.method,
-        std::move( message.header.transactionId ) ) );
+        std::move(message.header.transactionId)));
 
     // TODO: verify with RFC
     response.newAttribute< stun::attrs::ErrorDescription >(
-        404, "Method is not supported" );
+        404, "Method is not supported");    //TODO #ak replace 404 with constant
 
-    sendMessage( std::move( response ) );
+    sendMessage(std::move(response), nullptr);
 }
 
 } // namespace stun

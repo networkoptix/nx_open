@@ -6,18 +6,16 @@
 #include <QStringList>
 #include <QElapsedTimer>
 
-#include <base/requests.h>
-#include <base/server_info.h>
-#include <helpers/rest_client.h>
+namespace api = nx::mediaserver::api;
 
 namespace
 {
     enum { kShortTimeout = 3000};
 
-    QStringList g_availablePasswords = rtu::RestClient::defaultAdminPasswords();
+    QStringList g_availablePasswords = api::Client::defaultAdminPasswords();
 
     const auto globalSuccessful = [](const rtu::ServerInfoManager::SuccessfulCallback &callback
-        , const QUuid &id, const rtu::ExtraServerInfo &extraInfo, const QString &host)
+        , const QUuid &id, const api::ExtraServerInfo &extraInfo, const QString &host)
     {
         if (!g_availablePasswords.contains(extraInfo.password))
             g_availablePasswords.push_back(extraInfo.password);
@@ -34,12 +32,12 @@ public:
     
     virtual ~Impl();
     
-    void primaryLoginToServer(const BaseServerInfoPtr &info
+    void primaryLoginToServer(const api::BaseServerInfoPtr &info
         , const QString &password
         , const ServerInfoManager::SuccessfulCallback &successful
         , const ServerInfoManager::FailedCallback &failed);
     
-    void loginToServer(const BaseServerInfoPtr &info
+    void loginToServer(const api::BaseServerInfoPtr &info
         , int passwordIndex
         , const ServerInfoManager::SuccessfulCallback &successful
         , const ServerInfoManager::FailedCallback &failed);    
@@ -72,7 +70,7 @@ rtu::ServerInfoManager::Impl::~Impl()
 {
 }
 
-void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfoPtr &info
+void rtu::ServerInfoManager::Impl::primaryLoginToServer(const api::BaseServerInfoPtr &info
     , const QString &password
     , const ServerInfoManager::SuccessfulCallback &successful
     , const ServerInfoManager::FailedCallback &failed)
@@ -82,16 +80,16 @@ void rtu::ServerInfoManager::Impl::primaryLoginToServer(const BaseServerInfoPtr 
         globalSuccessful(successful, id, extra, info->hostAddress);
     };
 
-    const auto &localFailed = [this, info, failed](const RequestError errorCode, int)
+    const auto &localFailed = [this, info, failed](const api::Client::ResultCode errorCode, int)
     {
         if (failed)
             failed(info->id, errorCode);
     };
     
-    getServerExtraInfo(info, password, localSuccessful, localFailed, kShortTimeout);
+    api::Client::getServerExtraInfo(info, password, localSuccessful, localFailed, kShortTimeout);
 } 
 
-void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfoPtr &info
+void rtu::ServerInfoManager::Impl::loginToServer(const api::BaseServerInfoPtr &info
     , int passwordIndex
     , const ServerInfoManager::SuccessfulCallback &successful
     , const ServerInfoManager::FailedCallback &failed)
@@ -99,21 +97,21 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfoPtr &info
     if (passwordIndex >= g_availablePasswords.size())
     {
         if (failed)
-            failed(info->id, RequestError::kUnauthorized);
+            failed(info->id, api::Client::ResultCode::kUnauthorized);
         return;
     }
     
     const auto &localFailed = 
-        [this, info, passwordIndex, successful, failed](const RequestError errorCode, int)
+        [this, info, passwordIndex, successful, failed](const api::Client::ResultCode errorCode, int)
     {
-        if (errorCode == RequestError::kUnauthorized)
+        if (errorCode == api::Client::ResultCode::kUnauthorized)
         {
             loginToServer(info, passwordIndex + 1, successful, failed);
             return;
         }
 
         if (failed)
-            failed(info->id, RequestError::kUnspecified);
+            failed(info->id, api::Client::ResultCode::kUnspecified);
     };
     
     const auto &localSuccessful = [successful, info](const QUuid &id, const ExtraServerInfo &extra)
@@ -121,7 +119,7 @@ void rtu::ServerInfoManager::Impl::loginToServer(const BaseServerInfoPtr &info
         globalSuccessful(successful, id, extra, info->hostAddress);
     };
 
-    getServerExtraInfo(info
+    api::Client::getServerExtraInfo(info
         , g_availablePasswords.at(passwordIndex), localSuccessful, localFailed, kShortTimeout);
 }
 
@@ -130,9 +128,9 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
     , const ServerInfoManager::FailedCallback &failed)
 {
 
-    for (const ServerInfo &server: servers)
+    for (const api::ServerInfo &server: servers)
     {
-        const BaseServerInfoPtr &base = std::make_shared<BaseServerInfo>(server.baseInfo());
+        const api::BaseServerInfoPtr &base = std::make_shared<BaseServerInfo>(server.baseInfo());
         const int timestamp = m_msCounter.elapsed();
         const auto &localSuccessful = 
             [this, base, timestamp, successful](const QUuid &, const ExtraServerInfo &extraInfo)
@@ -149,10 +147,10 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         };
 
         const auto &localFailed = 
-            [this, base, successful, timestamp, failed](const RequestError /* errorCode */, int /* affected */) 
+            [this, base, successful, timestamp, failed](const api::Client::ResultCode /* errorCode */, int /* affected */) 
         {
             /// on fail - try re-login
-            const auto &loginFailed = [this, timestamp, failed](const QUuid &id, RequestError errorCode)
+            const auto &loginFailed = [this, timestamp, failed](const QUuid &id, api::Client::ResultCode errorCode)
             {
                 if (m_lastUpdated[id] <= timestamp)
                     failed(id, errorCode);
@@ -162,9 +160,9 @@ void rtu::ServerInfoManager::Impl::updateServerInfos(const ServerInfoContainer &
         };
 
         const QString password = (server.hasExtraInfo() ? server.extraInfo().password 
-            : rtu::RestClient::defaultAdminPasswords().front());
+            : api::Client::defaultAdminPasswords().front());
 
-        getServerExtraInfo(base, password, localSuccessful, localFailed);
+        api::Client::getServerExtraInfo(base, password, localSuccessful, localFailed, api::Client::kDefaultTimeoutMs);
     }
 }
 

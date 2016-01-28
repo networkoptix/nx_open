@@ -51,6 +51,9 @@ public:
         int sourceLine );
     ~QnMutexLockerBase();
 
+    QnMutexLockerBase(QnMutexLockerBase&&);
+    QnMutexLockerBase& operator=(QnMutexLockerBase&&);
+
     QnMutex* mutex();
 
     void relock();
@@ -60,7 +63,7 @@ public:
     bool isLocked() const;
 
 private:
-    QnMutex* const m_mtx;
+    QnMutex* m_mtx;
     const char* m_sourceFile;
     int m_sourceLine;
     bool m_locked;

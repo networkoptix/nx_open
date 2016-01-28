@@ -14,12 +14,14 @@
 #include <qtservice.h>
 
 #include <utils/common/stoppable.h>
-#include <nx/network/connection_server/multi_address_server.h>
-#include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/network/stun/stream_socket_server.h>
+
 
 namespace nx {
 namespace hpm {
+
+namespace conf {
+    class Settings;
+}
 
 class MediatorProcess
 :
@@ -41,10 +43,10 @@ private:
     std::unique_ptr<QSettings> m_settings;
     int m_argc;
     char** m_argv;
-    std::unique_ptr<MultiAddressServer<stun::SocketServer>> m_multiAddressStunServer;
 
     QString getDataDirectory();
     int printHelp();
+    void initializeLogging(const conf::Settings& settings);
 };
 
 } // namespace hpm

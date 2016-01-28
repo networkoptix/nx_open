@@ -7,7 +7,7 @@
 #include <QtCore/QMap>
 #include <network/tcp_listener.h>
 #include <network/tcp_connection_processor.h>
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "vmax480_stream_fetcher.h"
 
 class VMaxStreamFetcher;

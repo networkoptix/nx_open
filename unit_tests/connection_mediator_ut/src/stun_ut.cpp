@@ -10,6 +10,7 @@
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/cc/custom_stun.h>
 #include <listening_peer_pool.h>
+#include <peer_registrator.h>
 #include <mediaserver_api.h>
 
 #include "mediator_mocks.h"
@@ -24,13 +25,16 @@ class StunCustomTest : public testing::Test
 {
 protected:
     StunCustomTest()
-        : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
-        , mediaserverApi( &cloudData, &stunMessageDispatcher )
-        , listeningPeerPool( &cloudData, &stunMessageDispatcher )
-        , server( false, SocketFactory::NatTraversalType::nttDisabled )
+        : address(lit("127.0.0.1"), 10001 + (qrand() % 50000))
+        , mediaserverApi(&cloudData, &stunMessageDispatcher)
+        , listeningPeerRegistrator(&cloudData, &stunMessageDispatcher, &listeningPeerPool)
+        , server(
+            stunMessageDispatcher,
+            false,
+            SocketFactory::NatTraversalType::nttDisabled)
     {
-        EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
-        EXPECT_TRUE( server.listen() );
+        EXPECT_TRUE(server.bind(std::list< SocketAddress >(1, address)));
+        EXPECT_TRUE(server.listen());
     }
 
     SocketAddress address;
@@ -38,6 +42,7 @@ protected:
     CloudDataProviderMock cloudData;
     MediaserverApiMock mediaserverApi;
     ListeningPeerPool listeningPeerPool;
+    PeerRegistrator listeningPeerRegistrator;
     MultiAddressServer<SocketServer> server;
 };
 
@@ -61,7 +66,7 @@ TEST_F( StunCustomTest, Ping )
     allEndpoints.push_back( GOOD_ADDRESS );
     allEndpoints.push_back( BAD_ADDRESS );
     request.newAttribute< stun::cc::attrs::PublicEndpointList >( allEndpoints );
-    request.insertIntegrity( SERVER_ID, AUTH_KEY );
+    request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
 
     cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
     mediaserverApi.expect_pingServer( GOOD_ADDRESS, SERVER_ID, true );
@@ -84,7 +89,7 @@ TEST_F( StunCustomTest, Ping )
     ASSERT_EQ( eps->get(), std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 }
 
-TEST_F( StunCustomTest, BindConnect )
+TEST_F( StunCustomTest, BindResolve )
 {
     AsyncClient msClient;
     msClient.connect( address );
@@ -95,7 +100,7 @@ TEST_F( StunCustomTest, BindConnect )
         request.newAttribute< stun::cc::attrs::PublicEndpointList >(
                     std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
 
-        request.insertIntegrity( SERVER_ID, AUTH_KEY );
+        request.insertIntegrity(SYSTEM_ID, AUTH_KEY );
         cloudData.expect_getSystem( SYSTEM_ID, AUTH_KEY );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
@@ -109,9 +114,9 @@ TEST_F( StunCustomTest, BindConnect )
     AsyncClient connectClient;
     connectClient.connect( address );
     {
-        stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
+        stun::Message request( Header( MessageClass::request, stun::cc::methods::resolve ) );
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
-        request.newAttribute< stun::cc::attrs::HostName >( SYSTEM_ID );
+        request.newAttribute< stun::cc::attrs::HostName >(SERVER_ID+"."+SYSTEM_ID );
 
         SyncMultiQueue< SystemError::ErrorCode, Message > waiter;
         msClient.sendRequest( std::move( request ), waiter.pusher() );
@@ -124,8 +129,9 @@ TEST_F( StunCustomTest, BindConnect )
         ASSERT_NE( eps, nullptr );
         ASSERT_EQ( eps->get(), std::list< SocketAddress >( 1, GOOD_ADDRESS ) );
     }
+
     {
-        stun::Message request( Header( MessageClass::request, stun::cc::methods::connect ) );
+        stun::Message request( Header( MessageClass::request, stun::cc::methods::resolve) );
         request.newAttribute< stun::cc::attrs::PeerId >( "SomeClient" );
         request.newAttribute< stun::cc::attrs::HostName >( "WrongHost" );
 
@@ -145,4 +151,3 @@ TEST_F( StunCustomTest, BindConnect )
 } // namespace test
 } // namespace hpm
 } // namespase nx
-

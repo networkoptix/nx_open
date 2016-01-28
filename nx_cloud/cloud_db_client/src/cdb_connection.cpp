@@ -14,7 +14,7 @@ namespace cdb {
 namespace cl {
 
 Connection::Connection(
-    cc::CloudModuleEndPointFetcher* const endPointFetcher,
+    network::cloud::CloudModuleEndPointFetcher* const endPointFetcher,
     const std::string& login,
     const std::string& password)
 :

@@ -150,23 +150,26 @@ bool applyFilter(
 void SystemManager::getSystems(
     const AuthorizationInfo& authzInfo,
     data::DataFilter filter,
-    std::function<void(api::ResultCode, data::SystemDataList)> completionHandler )
+    std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler )
 {
     stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
-    data::SystemDataList resultData;
-    auto systemID = wholeFilterMap.get(cdb::attr::authSystemID);
+    const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
+
+    api::SystemDataExList resultData;
+    auto systemID = wholeFilterMap.get<QnUuid>(cdb::attr::authSystemID);
     if (!systemID)
-        systemID = wholeFilterMap.get(cdb::attr::systemID);
+        systemID = wholeFilterMap.get<QnUuid>(cdb::attr::systemID);
     if (systemID)
     {
+        auto systemIDVal = systemID.get().toString();
         //selecting system by id
-        auto system = m_cache.find(systemID.get().value<QnUuid>());
+        auto system = m_cache.find(systemID.get());
         if (!system || !applyFilter(system.get(), filter))
             return completionHandler(api::ResultCode::notFound, resultData);
         resultData.systems.emplace_back(std::move(system.get()));
     }
-    else if (auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail))
+    else if (accountEmail)
     {
         QnMutexLocker lk(&m_mutex);
         const auto& accountIndex = m_accountAccessRoleForSystem.get<INDEX_BY_ACCOUNT_EMAIL>();
@@ -188,6 +191,18 @@ void SystemManager::getSystems(
             });
     }
 
+    if (accountEmail)
+    {
+        for (auto& systemDataEx: resultData.systems)
+        {
+            systemDataEx.accessRole = getAccountRightsForSystem(
+                *accountEmail,
+                systemDataEx.id);
+            systemDataEx.sharingPermissions = 
+                std::move(getSharingPermissions(systemDataEx.accessRole).accessRoles);
+        }
+    }
+
     completionHandler(
         api::ResultCode::ok,
         resultData);
@@ -195,24 +210,24 @@ void SystemManager::getSystems(
 
 void SystemManager::shareSystem(
     const AuthorizationInfo& /*authzInfo*/,
-    data::SystemSharing sharingData,
+    data::SystemSharing sharing,
     std::function<void(api::ResultCode)> completionHandler)
 {
     using namespace std::placeholders;
     m_dbManager->executeUpdate<data::SystemSharing>(
-        std::bind(&SystemManager::insertSystemSharingToDB, this, _1, _2),
-        std::move(sharingData),
-        std::bind(&SystemManager::systemSharingAdded,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
+        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
+        std::move(sharing),
+        std::bind(&SystemManager::sharingUpdated,
+            this, m_startedAsyncCallsCounter.getScopedIncrement(),
+            _1, _2, std::move(completionHandler)));
 }
 
 void SystemManager::getCloudUsersOfSystem(
     const AuthorizationInfo& authzInfo,
     const data::DataFilter& filter,
-    std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler)
+    std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler)
 {
-    api::SystemSharingList resultData;
+    api::SystemSharingExList resultData;
 
     std::string accountEmail;
     if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
@@ -229,7 +244,11 @@ void SystemManager::getCloudUsersOfSystem(
         const auto& systemIndex = m_accountAccessRoleForSystem.get<INDEX_BY_SYSTEM_ID>();
         const auto systemSharingsRange = systemIndex.equal_range(systemID.get());
         for (auto it = systemSharingsRange.first; it != systemSharingsRange.second; ++it)
-            resultData.sharing.push_back(*it);
+        {
+            api::SystemSharingEx sharingEx;
+            sharingEx.api::SystemSharing::operator=(*it);
+            resultData.sharing.emplace_back(std::move(sharingEx));
+        }
     }
     else
     {
@@ -241,7 +260,7 @@ void SystemManager::getCloudUsersOfSystem(
              ++accountIter)
         {
             if (accountIter->accessRole != api::SystemAccessRole::owner &&
-                accountIter->accessRole != api::SystemAccessRole::editorWithSharing &&
+                accountIter->accessRole != api::SystemAccessRole::cloudAdmin &&
                 accountIter->accessRole != api::SystemAccessRole::maintenance)
             {
                 //TODO #ak this condition copies condition from authorization tree
@@ -254,29 +273,54 @@ void SystemManager::getCloudUsersOfSystem(
                  sharingIter != systemSharingRange.second;
                  ++sharingIter)
             {
-                resultData.sharing.emplace_back(*sharingIter);
+                api::SystemSharingEx sharingEx;
+                sharingEx.api::SystemSharing::operator=(*sharingIter);
+                resultData.sharing.emplace_back(std::move(sharingEx));
             }
         }
     }
     lk.unlock();
+
+    for (api::SystemSharingEx& sharingEx: resultData.sharing)
+    {
+        const auto account = 
+            m_accountManager.findAccountByUserName(sharingEx.accountEmail);
+        if (static_cast<bool>(account))
+            sharingEx.fullName = account->fullName;
+    }
 
     completionHandler(
         api::ResultCode::ok,
         std::move(resultData));
 }
 
-void SystemManager::updateSharing(
-    const AuthorizationInfo& /*authzInfo*/,
-    data::SystemSharing sharing,
-    std::function<void(api::ResultCode)> completionHandler)
+void SystemManager::getAccessRoleList(
+    const AuthorizationInfo& authzInfo,
+    data::SystemID systemID,
+    std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler)
 {
-    using namespace std::placeholders;
-    m_dbManager->executeUpdate<data::SystemSharing>(
-        std::bind(&SystemManager::updateSharingInDB, this, _1, _2),
-        std::move(sharing),
-        std::bind(&SystemManager::sharingUpdated,
-                    this, m_startedAsyncCallsCounter.getScopedIncrement(),
-                    _1, _2, std::move(completionHandler)));
+    std::string accountEmail;
+    if (!authzInfo.get(attr::authAccountEmail, &accountEmail))
+        return completionHandler(
+            api::ResultCode::notAuthorized,
+            api::SystemAccessRoleList());
+
+    const auto accessRole = getAccountRightsForSystem(accountEmail, systemID.systemID);
+    NX_LOGX(lm("account %1, system %2, account rights on system %3").
+            arg(accountEmail).arg(systemID.systemID).arg(QnLexical::serialized(accessRole)),
+            cl_logDEBUG2);
+    if (accessRole == api::SystemAccessRole::none)
+    {
+        Q_ASSERT(false);
+        return completionHandler(
+            api::ResultCode::notAuthorized,
+            api::SystemAccessRoleList());
+    }
+
+    api::SystemAccessRoleList resultData = getSharingPermissions(accessRole);
+    return completionHandler(
+        api::ResultCode::ok,
+        std::move(resultData));
 }
 
 boost::optional<data::SystemData> SystemManager::findSystemByID(const QnUuid& id) const
@@ -529,11 +573,13 @@ void SystemManager::sharingUpdated(
             //inserting modified version
             accountSystemPairIndex.emplace(sharing);
         }
+
+        return completionHandler(api::ResultCode::ok);
     }
 
     completionHandler(
-        dbResult == nx::db::DBResult::ok
-        ? api::ResultCode::ok
+        dbResult == nx::db::DBResult::notFound
+        ? api::ResultCode::notFound
         : api::ResultCode::dbError);
 }
 
@@ -579,6 +625,42 @@ void SystemManager::systemActivated(
         dbResult == nx::db::DBResult::ok
         ? api::ResultCode::ok
         : api::ResultCode::dbError);
+}
+
+api::SystemAccessRoleList SystemManager::getSharingPermissions(
+    api::SystemAccessRole accessRole) const
+{
+    api::SystemAccessRoleList resultData;
+    resultData.accessRoles.reserve(4);
+    switch (accessRole)
+    {
+        case api::SystemAccessRole::none:
+            Q_ASSERT(false);
+            break;
+
+        case api::SystemAccessRole::maintenance:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+            break;
+
+        case api::SystemAccessRole::owner:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
+
+        case api::SystemAccessRole::cloudAdmin:
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::liveViewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::viewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::advancedViewer);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::localAdmin);
+            resultData.accessRoles.emplace_back(api::SystemAccessRole::cloudAdmin);
+            break;
+
+        case api::SystemAccessRole::liveViewer:
+        case api::SystemAccessRole::viewer:
+        case api::SystemAccessRole::advancedViewer:
+        case api::SystemAccessRole::localAdmin:
+            break;
+    }
+
+    return resultData;
 }
 
 nx::db::DBResult SystemManager::fillCache()

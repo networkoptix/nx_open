@@ -47,7 +47,7 @@ void AsyncClient::connect( SocketAddress endpoint, bool useSsl )
     openConnectionImpl( &lock );
 }
 
-bool AsyncClient::monitorIndications( int method, IndicationHandler handler )
+bool AsyncClient::setIndicationHandler( int method, IndicationHandler handler )
 {
     QnMutexLocker lock( &m_mutex );
     return m_indicationHandlers.emplace( method, std::move(handler) ).second;
@@ -84,6 +84,14 @@ void AsyncClient::sendRequest( Message request, RequestHandler handler )
                     .arg( static_cast< int >( m_state ) ), cl_logERROR );
             return;
     };
+}
+
+SocketAddress AsyncClient::localAddress() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_baseConnection
+        ? m_baseConnection->socket()->getLocalAddress()
+        : SocketAddress();
 }
 
 void AsyncClient::closeConnection(

@@ -17,22 +17,11 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-
 class SubscriptionData
 {
 public:
     std::string productID;
     std::string systemID;
-};
-
-enum class SystemAccessRole
-{
-    none = 0,
-    owner = 1,
-    maintenance,
-    viewer,
-    editor,
-    editorWithSharing
 };
 
 //!Information required to register system in cloud
@@ -88,13 +77,28 @@ public:
     }
 };
 
-
 class SystemDataList
 {
 public:
     std::vector<SystemData> systems;
 };
 
+
+////////////////////////////////////////////////////////////
+//// system sharing data
+////////////////////////////////////////////////////////////
+
+enum class SystemAccessRole
+{
+    none = 0,
+    liveViewer = 1,
+    viewer = 2,
+    advancedViewer = 3,
+    localAdmin = 4,
+    cloudAdmin = 5,
+    maintenance = 6,
+    owner = 7,
+};
 
 class SystemSharing
 {
@@ -111,9 +115,9 @@ public:
 
     bool operator<(const SystemSharing& rhs) const
     {
-        return accountEmail != rhs.accountEmail
-            ? accountEmail < rhs.accountEmail
-            : systemID < rhs.systemID;
+        if (accountEmail != rhs.accountEmail)
+            return accountEmail < rhs.accountEmail;
+        return systemID < rhs.systemID;
     }
     bool operator==(const SystemSharing& rhs) const
     {
@@ -127,6 +131,80 @@ class SystemSharingList
 {
 public:
     std::vector<SystemSharing> sharing;
+};
+
+/** adds account's full name to \a SystemSharing */
+class SystemSharingEx
+:
+    public SystemSharing
+{
+public:
+    std::string fullName;
+
+    bool operator==(const SystemSharingEx& rhs) const
+    {
+        return static_cast<const SystemSharing&>(*this) == static_cast<const SystemSharing&>(rhs)
+            && fullName == rhs.fullName;
+    }
+};
+
+class SystemSharingExList
+{
+public:
+    std::vector<SystemSharingEx> sharing;
+};
+
+class SystemAccessRoleData
+{
+public:
+    SystemAccessRole accessRole;
+
+    SystemAccessRoleData()
+    :
+        accessRole(SystemAccessRole::none)
+    {
+    }
+
+    SystemAccessRoleData(SystemAccessRole _accessRole)
+    :
+        accessRole(_accessRole)
+    {
+    }
+};
+
+class SystemAccessRoleList
+{
+public:
+    std::vector<SystemAccessRoleData> accessRoles;
+};
+
+class SystemDataEx
+:
+    public SystemData
+{
+public:
+    SystemAccessRole accessRole;
+    /** permissions, account can share current system with */
+    std::vector<SystemAccessRoleData> sharingPermissions;
+
+    SystemDataEx()
+    :
+        accessRole(SystemAccessRole::none)
+    {
+    }
+
+    SystemDataEx(SystemData systemData)
+    :
+        SystemData(std::move(systemData)),
+        accessRole(SystemAccessRole::none)
+    {
+    }
+};
+
+class SystemDataExList
+{
+public:
+    std::vector<SystemDataEx> systems;
 };
 
 }   //api

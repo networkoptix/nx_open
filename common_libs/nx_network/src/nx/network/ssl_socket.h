@@ -53,7 +53,7 @@ public:
     //!Implementation of \a AbstractStreamSocket::setKeepAlive
     virtual bool setKeepAlive( boost::optional< KeepAliveOptions > info ) override;
     //!Implementation of \a AbstractStreamSocket::getKeepAlive
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) override;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const override;
 
     //!Implementation of \a AbstractEncryptedStreamSocket::connectWithoutEncryption
     virtual bool connectWithoutEncryption(
@@ -87,14 +87,22 @@ protected:
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal( const void* buffer, unsigned int bufferLen );
 
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::connectAsync
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendAsync
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::registerTimer
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler ) override;
 
 private:
     // Async version
@@ -122,14 +130,22 @@ public:
         std::function<void()> cancellationDoneHandler) override;
 
 protected:
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override;
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::connectAsync
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::sendAsync
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override;
+    //!Implementation of AbstractCommunicatingSocket::registerTimer
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler ) override;
 
 private:
     Q_DECLARE_PRIVATE(QnMixedSSLSocket);
@@ -160,8 +176,11 @@ public:
     virtual void pleaseStop( std::function< void() > handler ) override;
 
 protected:
-    //!Implementation of SSLServerSocket::acceptAsyncImpl
-    virtual void acceptAsyncImpl(std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)>&& handler) override;
+    //!Implementation of SSLServerSocket::acceptAsync
+    virtual void acceptAsync(
+        std::function<void(
+            SystemError::ErrorCode,
+            AbstractStreamSocket*)> handler) override;
 
 private:
     const bool m_allowNonSecureConnect;

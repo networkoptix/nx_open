@@ -27,7 +27,7 @@
         <template>lib</template>
         <qt.libs>core network xml sql concurrent</qt.libs>
         <ffmpeg.libs></ffmpeg.libs>
-        <global.libs>-lcommon</global.libs>
+        <global.libs>-lcommon -lnx_streaming</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm -lssleay32 -llibeay32</windows.oslibs>
         <linux.oslibs>-lssl -lcrypto</linux.oslibs>
@@ -66,6 +66,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type> 
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+        </dependency>           
     </dependencies>    
 
     <profiles>
@@ -125,6 +134,14 @@
                     <scope>system</scope>
                     <systemPath>${root.dir}/common/pom.xml</systemPath>            
                 </dependency>
+                <dependency>
+                    <groupId>${project.groupId}</groupId>
+                    <artifactId>nx_streaming</artifactId>
+                    <version>${project.version}</version>
+                    <type>pom</type> 
+                    <scope>system</scope>
+                    <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
+                </dependency>           
             </dependencies>
         </profile>        
     </profiles>

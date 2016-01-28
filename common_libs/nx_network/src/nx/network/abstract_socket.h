@@ -6,6 +6,7 @@
 #ifndef ABSTRACT_SOCKET_H
 #define ABSTRACT_SOCKET_H
 
+#include <chrono>
 #include <cstdint> /* For std::uintptr_t. */
 #include <functional>
 #include <memory>
@@ -21,7 +22,18 @@
 
 //todo: #ak cancel asynchoronous operations
 
-//!Base interface for sockets. Provides methods to set different socket configuration parameters
+// forward
+namespace aio { class AbstractAioThread; }
+
+/** Base interface for sockets. Provides methods to set different socket configuration parameters.
+
+    \par Removing socket:
+        Socket can be safely removed while inside socket's aio thread 
+    (e.g., inside completion handler of any asynchronous operation).
+        If removing socket in different thread, then caller MUST 
+    cancel all ongoing asynchronous operations (including timers, posts etc)
+    on socket first using \a QnStoppableAsync::pleaseStop
+*/
 class NX_NETWORK_API AbstractSocket
     : public QnStoppableAsync
 {
@@ -146,19 +158,27 @@ public:
         \note Call will always be queued. I.e., if called from handler running in aio thread, it will be called after handler has returned
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    template<class HandlerType>
-    void post( HandlerType&& handler ) { postImpl( std::forward<HandlerType>(handler) ); }
+    virtual void post(std::function<void()> handler) = 0;
     //!Call \a handler from within aio thread \a sock is bound to
     /*!
         \note If called in aio thread, handler will be called from within this method, otherwise - queued like \a AbstractSocket::post does
         \note \a handler execution is cancelled if socket polling for every event is cancelled
     */
-    template<class HandlerType>
-    void dispatch( HandlerType&& handler ) { dispatchImpl( std::forward<HandlerType>(handler) ); }
+    virtual void dispatch(std::function<void()> handler) = 0;
 
-protected:
-    virtual void postImpl( std::function<void()>&& handler ) = 0;
-    virtual void dispatchImpl( std::function<void()>&& handler ) = 0;
+    //!Returns pointer to AIOThread this socket is bound to
+    /*!
+        \note if socket is not bound to any thread yet, binds it automatically
+    */
+    virtual aio::AbstractAioThread* getAioThread() = 0;
+
+    //!Binds current socket to specified AIOThread
+    /*!
+        \note internal assert(false) in case if socket can not be bound to
+              specified tread (e.g. it's already bound to different thread or
+              certaind thread type is not the same)
+     */
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) = 0;
 };
 
 //!Interface for writing to/reading from socket
@@ -187,6 +207,13 @@ public:
     {
         //TODO #ak this method MUST replace the previous one
         return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
+    }
+    bool connect(
+        const SocketAddress& remoteSocketAddress,
+        std::chrono::milliseconds timeoutMillis)
+    {
+        //TODO #ak this method MUST replace the previous one
+        return connect(remoteSocketAddress, timeoutMillis.count());
     }
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
@@ -225,11 +252,9 @@ public:
     /*!
         \note uses sendTimeout
     */
-    template<class HandlerType>
-        void connectAsync( const SocketAddress& addr, HandlerType&& handler )
-        {
-            return connectAsyncImpl( addr, std::function<void( SystemError::ErrorCode )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void(SystemError::ErrorCode)> handler) = 0;
 
     //!Reads bytes from socket asynchronously
     /*!
@@ -245,11 +270,9 @@ public:
         \warning If \a dst->capacity() == 0, \a false is returned and no bytes read
         \warning Multiple concurrent asynchronous write operations result in undefined behavour
     */
-    template<class HandlerType>
-        void readSomeAsync( nx::Buffer* const dst, HandlerType&& handler )
-        {
-            return recvAsyncImpl( dst, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!
@@ -259,21 +282,23 @@ public:
             \endcode
             \a bytesWritten differ from \a src size only if errorCode is not SystemError::noError
     */
-    template<class HandlerType>
-        void sendAsync( const nx::Buffer& src, HandlerType&& handler )
-        {
-            return sendAsyncImpl( src, std::function<void( SystemError::ErrorCode, size_t )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void(SystemError::ErrorCode, size_t)> handler) = 0;
 
     //!Register timer on this socket
     /*!
         \param handler functor with no parameters
     */
-    template<class HandlerType>
-        void registerTimer( unsigned int timeoutMs, HandlerType&& handler )
-        {
-            return registerTimerImpl( timeoutMs, std::function<void()>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler) = 0;
+    void registerTimer(
+        std::chrono::milliseconds timeout,
+        std::function<void()> handler)
+    {
+        return registerTimer(timeout.count(), std::move(handler));
+    }
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
@@ -298,12 +323,6 @@ public:
     {
         cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
     }
-
-protected:
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) = 0;
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) = 0;
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) = 0;
 };
 
 struct NX_NETWORK_API StreamSocketInfo
@@ -385,7 +404,7 @@ public:
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
         \note due to some OS limitations some values might be = 0 (meaning system defaults)
     */
-    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) = 0;
+    virtual bool getKeepAlive( boost::optional< KeepAliveOptions >* result ) const = 0;
 };
 
 //!Stream socket with encryption
@@ -443,14 +462,11 @@ public:
             \endcode
             \a newConnection is NULL, if errorCode is not SystemError::noError
     */
-    template<class HandlerType>
-        void acceptAsync( HandlerType&& handler )
-        {
-            return acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>( std::forward<HandlerType>(handler) ) );
-        }
+    virtual void acceptAsync(std::function<void(
+        SystemError::ErrorCode,
+        AbstractStreamSocket*)> handler) = 0;
 
 protected:
-    virtual void acceptAsyncImpl( std::function<void( SystemError::ErrorCode, AbstractStreamSocket* )>&& handler ) = 0;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
@@ -505,7 +521,20 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const SocketAddress& foreignAddress ) = 0;
-    //!Read read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
+    bool sendTo(
+        const nx::Buffer& buf,
+        const SocketAddress& foreignAddress)
+    {
+        return sendTo(buf.constData(), buf.size(), foreignAddress);
+    }
+    /*!
+        \param completionHandler (errorCode, resolved target address, bytesSent)
+    */
+    virtual void sendToAsync(
+        const nx::Buffer& buf,
+        const SocketAddress& targetAddress,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
+    //!Read up to \a bufferLen bytes data from this socket. The given \a buffer is where the data will be placed
     /*!
         \param buffer buffer to receive data
         \param bufferLen maximum number of bytes to receive
@@ -516,6 +545,13 @@ public:
         void* buffer,
         unsigned int bufferLen,
         SocketAddress* const sourceAddress ) = 0;
+    /*!
+        \param buf Data appended here
+        \param handler(errorCode, sourceAddress, bytesRead)
+    */
+    virtual void recvFromAsync(
+        nx::Buffer* const buf,
+        std::function<void(SystemError::ErrorCode, SocketAddress, size_t)> completionHandler) = 0;
     //!Returns address of previous datagram read with \a AbstractCommunicatingSocket::recv or \a AbstractDatagramSocket::recvFrom
     virtual SocketAddress lastDatagramSourceAddress() const = 0;
     //!Checks, whether data is available for reading in non-blocking mode. Does not block for timeout, returns immediately
@@ -543,5 +579,55 @@ public:
     virtual bool leaveGroup( const QString &multicastGroup ) = 0;
     virtual bool leaveGroup( const QString &multicastGroup, const QString& multicastIF ) = 0;
 };
+
+#ifdef SocketOptions_setOrFalse
+    #error SocketOptions_setOrFalse macro is already defined.
+#endif
+
+#define SocketOptions_setOrFalse(setter, param) \
+    if( param )                                 \
+        if( !socket->setter( *param ) )         \
+            return false;
+
+//!Socket configuration options ready to apply to any \class AbstractSocket
+struct NX_NETWORK_API SocketOptions
+{
+    boost::optional< SocketAddress > boundAddress;
+    boost::optional< bool > reuseAddrFlag, nonBlockingMode;
+    boost::optional< unsigned int > sendBufferSize, recvBufferSize;
+    boost::optional< unsigned int > sendTimeout, recvTimeout;
+
+    inline bool apply( AbstractSocket* socket )
+    {
+        SocketOptions_setOrFalse(bind,              boundAddress);
+        SocketOptions_setOrFalse(setReuseAddrFlag,  reuseAddrFlag);
+        SocketOptions_setOrFalse(setReuseAddrFlag,  nonBlockingMode);
+        SocketOptions_setOrFalse(setSendBufferSize, sendBufferSize);
+        SocketOptions_setOrFalse(setRecvBufferSize, recvBufferSize);
+        SocketOptions_setOrFalse(setSendTimeout,    sendTimeout);
+        SocketOptions_setOrFalse(setRecvTimeout,    recvTimeout);
+        return true;
+    }
+};
+
+//!Socket configuration options ready to apply to any \class AbstractStreamSocket
+struct NX_NETWORK_API StreamSocketOptions : SocketOptions
+{
+    boost::optional< bool > noDelay, statCollect;
+    boost::optional< boost::optional< KeepAliveOptions > > keepAliveOptions;
+
+    inline bool apply( AbstractStreamSocket* socket )
+    {
+        if( !SocketOptions::apply( socket ) )
+            return false;
+
+        SocketOptions_setOrFalse(setNoDelay,                    noDelay);
+        SocketOptions_setOrFalse(toggleStatisticsCollection,    statCollect);
+        SocketOptions_setOrFalse(setKeepAlive,                  keepAliveOptions);
+        return true;
+    }
+};
+
+#undef SocketOptions_setOrFalse
 
 #endif  //ABSTRACT_SOCKET_H

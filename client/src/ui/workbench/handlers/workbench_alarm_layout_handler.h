@@ -24,4 +24,10 @@ private:
     bool alarmLayoutExists() const;
 
     void jumpToLive(QnWorkbenchLayout *layout, QnWorkbenchItem *item);
+
+    /**
+     *  Check if current client instance is the main one.
+     *  Main instance is the first that was started on the given PC.
+     */
+    bool currentInstanceIsMain() const;
 };

@@ -5,7 +5,10 @@
 #include <atomic>
 #include <vector>
 #include <map>
+
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <common/common_globals.h>
 #include <api/model/backup_status_reply.h>
@@ -18,7 +21,7 @@ class QnScheduleSync: public QnLongRunnable
 {
     Q_OBJECT
 private:
-    struct ChunkKey 
+    struct ChunkKey
     {
         DeviceFileCatalog::Chunk chunk;
         QString                  cameraID;
@@ -26,24 +29,24 @@ private:
     };
     friend bool operator < (const ChunkKey &key1, const ChunkKey &key2);
 
-    struct SyncData 
+    struct SyncData
     {
         int totalChunks;
         int startIndex;
         int currentIndex;
 
-        SyncData() 
-            : totalChunks(0), 
-              startIndex(0), 
-              currentIndex(0) 
+        SyncData()
+            : totalChunks(0),
+              startIndex(0),
+              currentIndex(0)
         {}
-        explicit SyncData(int startIndex) 
+        explicit SyncData(int startIndex)
             : totalChunks(0),
               startIndex(startIndex),
               currentIndex(startIndex)
         {}
     };
-    
+
     typedef std::vector<ChunkKey>         ChunkKeyVector;
     typedef std::map<ChunkKey, SyncData>  SyncDataMap;
 
@@ -60,9 +63,13 @@ public:
     QnScheduleSync();
     ~QnScheduleSync();
 signals:
-    void backupFinished(qint64 timestampMs, QnServer::BackupResultCode status);
+    void backupFinished(
+        qint64                      timestampMs,
+        QnBusiness::EventReason     status
+    );
+
 public:
-    int forceStart(); 
+    int forceStart();
     virtual void stop() override;
     int interrupt();
 
@@ -111,7 +118,7 @@ private:
 
 private:
     template<typename NeedMoveOnCB>
-    QnServer::BackupResultCode synchronize(NeedMoveOnCB needMoveOn);
+    QnBusiness::EventReason synchronize(NeedMoveOnCB needMoveOn);
 
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
@@ -127,8 +134,8 @@ private:
     boost::optional<ChunkKeyVector> getOldestChunk(qint64 fromTimeMs) const;
 
     ChunkKey getOldestChunk(
-        const QString           &cameraId, 
-        QnServer::ChunksCatalog catalog, 
+        const QString           &cameraId,
+        QnServer::ChunksCatalog catalog,
         qint64                  fromTimeMs,
         SyncData                *syncData = nullptr
     ) const;
@@ -148,6 +155,7 @@ private:
 
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
+    CopyError             m_lastError;
 };
 
 #endif

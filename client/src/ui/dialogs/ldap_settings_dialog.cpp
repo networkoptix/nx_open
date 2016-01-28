@@ -69,10 +69,9 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr server: onlineServers)
+    {
         if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
             continue;
 
@@ -81,7 +80,7 @@ void QnLdapSettingsDialogPrivate::testSettings() {
     }
 
     if (!serverConnection) {
-        stopTesting(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
+        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not perform a test."));
         return;
     }
 

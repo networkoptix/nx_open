@@ -30,6 +30,7 @@
         <!-- Project GUIDs (c++/qt only) -->
         <common.guid>{7f2f48c9-e466-45d9-a9a0-1dcfb486f6cb}</common.guid>
         <nx_email.guid>{0034cf9a-0454-475d-9b54-87d4b4a6b65b}</nx_email.guid>
+        <nx_streaming.guid>{3c0acd3f-d641-4690-a7c5-129cb4bea938}</nx_streaming.guid>
         <appserver2.guid>{16bb7b01-5096-4cee-93ae-b34b3153459f}</appserver2.guid>
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
@@ -53,6 +54,7 @@
         <nxtool.guid>{d78c3988-0459-4dce-a1dc-e70df990fa54}</nxtool.guid>
         <ftpstorageplugin.guid>{f6c9f457-910c-4c0d-bb67-b4f752a8664e}</ftpstorageplugin.guid>
         <storage_plugin_test_client.guid>{83e8bbad-6976-45da-bdd7-baf8f17fc71c}</storage_plugin_test_client.guid>
+        <common_ut.guid>{2f2d9175-70c1-404d-82e3-5e797b92263c}</common_ut.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -112,21 +114,23 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
+        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
+        <qt.dir>${environment.dir}/${qt.path}</qt.dir>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.2.1-SNAPSHOT</qt.version>
+        <qt.version>5.2.1</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io-SNAPSHOT</onvif.version>
         <sigar.version>1.7-SNAPSHOT</sigar.version>
         <festival.version>2.1-SNAPSHOT</festival.version>
-        <boost.version>1.54-SNAPSHOT</boost.version>
+        <boost.version>1.56-SNAPSHOT</boost.version>
         <bespin.version>1.2-SNAPSHOT</bespin.version>
         <quazip.version>0.6.2-SNAPSHOT</quazip.version>
 
@@ -158,7 +162,7 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <!--qtlib19 is for desktop only-->
+        <!-- qtlib19 is replaced with DBus in the client profile -->
         <qtlib19></qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
@@ -346,6 +350,7 @@
                 <module>nx_cloud/connection_mediator</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
             </modules>
@@ -359,11 +364,11 @@
                 </property>
             </activation>
             <modules>
-                <module>unit_tests/build_ut</module>
                 <module>unit_tests/common_ut</module>
                 <module>unit_tests/connection_mediator_ut</module>
                 <module>unit_tests/image_library_plugin_ut</module>
                 <module>unit_tests/mediaserver_core_ut</module>
+                <module>unit_tests/nx_network_ut</module>
                 <module>unit_tests/traytool_ut</module>
             </modules>
         </profile>
@@ -423,10 +428,17 @@
                 </os>
             </activation>
             <modules>
+                <module>traytool</module>
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>
                 <module>client.core</module>
+                <module>nxtool</module>
+                <module>client.bin</module>
+                <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${libdir}/${arch}</qt.dir>
+                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
@@ -533,7 +545,6 @@
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
-                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -756,6 +767,33 @@
             </modules>
         </profile>
         <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <modification>bananapi</modification>
+                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+            </properties>
+            <modules>
+                <!-- Banana pie uses same distro as rpi -->
+                <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>
+        <profile>
             <id>linux-x64</id>
             <activation>
                 <os>
@@ -863,12 +901,12 @@
                 <property>
                     <name>newmobile</name>
                     <value>true</value>
-                </property>               
+                </property>
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
                 <compile.options/>
-            </properties>            
+            </properties>
             <modules>
                 <module>client.core</module>
                 <module>mobile_client</module>
@@ -884,7 +922,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/android.skip</missing>
-                </file>                
+                </file>
             </activation>
             <build>
                 <directory>target</directory>
@@ -916,7 +954,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/mobile.skip</missing>
-                </file>                
+                </file>
             </activation>
             <properties>
                 <qt.classifier>${platform}-${arch}-release</qt.classifier>
@@ -936,7 +974,7 @@
                 </property>
                 <file>
                     <missing>customization/${customization}/ios.skip</missing>
-                </file>                
+                </file>
             </activation>
             <build>
                 <directory>target</directory>

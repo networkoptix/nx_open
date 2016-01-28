@@ -9,7 +9,9 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */ // TODO: #Elric FWD!
+struct QnMetaDataV1;
+typedef std::shared_ptr<QnMetaDataV1> QnMetaDataV1Ptr;
+
 #include <core/resource/motion_window.h>
 #include <core/resource/camera_bookmark_fwd.h>
 
@@ -18,7 +20,7 @@
 #include <core/ptz/media_dewarping_params.h>
 
 #include <client/client_globals.h>
-#include <camera/resource_display.h> // TODO: #Elric FWD!
+#include <camera/resource_display.h> //< TODO: #Elric FWD!
 #include <utils/license_usage_helper.h>
 #include <utils/color_space/image_correction.h>
 
@@ -124,6 +126,8 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -169,6 +173,9 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
+
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);

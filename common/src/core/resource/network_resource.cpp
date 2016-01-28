@@ -245,7 +245,7 @@ bool QnNetworkResource::ping()
 void QnNetworkResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
 {
     //calling completionHandler(false) in aio_thread
-    nx::SocketGlobals::aioService().post(std::bind(completionHandler, false));
+    nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
 }
 
 QnTimePeriodList QnNetworkResource::getDtsTimePeriods(qint64 startTimeMs, qint64 endTimeMs, int detailLevel) {

@@ -6,6 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "camera_settings_tab.h"
 #include "ui/workbench/workbench_context_aware.h"
+#include <ui/common/updatable.h>
 
 namespace Ui {
     class MultipleCameraSettingsWidget;
@@ -13,7 +14,7 @@ namespace Ui {
 
 class QnCameraSettingsWidgetPrivate;
 
-class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware {
+class QnMultipleCameraSettingsWidget : public QWidget, public QnWorkbenchContextAware, public QnUpdatable {
     Q_OBJECT
     Q_PROPERTY(bool readOnly READ isReadOnly WRITE setReadOnly)
 

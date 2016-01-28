@@ -17,9 +17,9 @@ extern "C"
 
 #include <core/ptz/item_dewarping_params.h>
 
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -51,6 +51,7 @@ public:
         AudioStreamAllocationError,
         InvalidAudioCodecError,
         IncompatibleCodecError,
+        FileWriteError,
 
         LastError
     };

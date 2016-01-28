@@ -15,7 +15,7 @@
 #include <utils/common/cpp14.h>
 #include <utils/common/stoppable.h>
 #include <nx/network/http/fusion_data_http_client.h>
-#include <nx/network/cloud_connectivity/cdb_endpoint_fetcher.h>
+#include <nx/network/cloud/cdb_endpoint_fetcher.h>
 #include <nx/utils/thread/mutex.h>
 
 #include "data/account_data.h"
@@ -36,7 +36,7 @@ namespace cl {
 class AsyncRequestsExecutor
 {
 public:
-    AsyncRequestsExecutor(cc::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
+    AsyncRequestsExecutor(network::cloud::CloudModuleEndPointFetcher* const cdbEndPointFetcher)
     :
         m_cdbEndPointFetcher(cdbEndPointFetcher)
     {
@@ -145,7 +145,7 @@ private:
     QString m_username;
     QString m_password;
     std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
-    cc::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
+    network::cloud::CloudModuleEndPointFetcher* const m_cdbEndPointFetcher;
 
     /*!
         \param completionHandler Can be invoked within this call if failed to initiate async request

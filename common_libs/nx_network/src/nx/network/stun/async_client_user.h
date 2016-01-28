@@ -14,14 +14,17 @@ class NX_NETWORK_API AsyncClientUser
 public:
     ~AsyncClientUser();
 
-    /** Shell be called before the last shared_pointer is gone */
+    /** Returns local connection address in case if client is connected to STUN server */
+    SocketAddress localAddress() const;
+
+    /** Shall be called before the last shared_pointer is gone */
     virtual void pleaseStop(std::function<void()> handler) override;
 
 protected:
     AsyncClientUser(std::shared_ptr<AsyncClient> client);
 
     void sendRequest(Message request, AsyncClient::RequestHandler handler);
-    bool monitorIndications(int method, AsyncClient::IndicationHandler handler);
+    bool setIndicationHandler(int method, AsyncClient::IndicationHandler handler);
 
 private:
     bool startOperation();

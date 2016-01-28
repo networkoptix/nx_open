@@ -148,7 +148,7 @@ int main( int argc, char* argv[] )
     }
 
     // TODO: #mu ON/OFF switch in settings?
-    nx::SocketGlobals::cloudInfo().enableMediator();
+    nx::network::SocketGlobals::cloudInfo().enableMediator();
 
     NX_LOG( appName + " started", cl_logALWAYS );
     NX_LOG( "Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS );

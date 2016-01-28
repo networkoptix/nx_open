@@ -16,7 +16,7 @@
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
 
-#include <core/datapacket/media_data_packet.h> /* For QnMetaDataV1Ptr. */
+#include <nx/streaming/media_data_packet.h> /* For QnMetaDataV1Ptr. */
 #include <utils/common/safepool.h>
 #include <utils/common/stoppable.h>
 #include <ui/graphics/opengl/gl_fence.h>

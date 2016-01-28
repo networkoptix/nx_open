@@ -33,6 +33,7 @@ namespace ec2
         m_businessEventManager( new QnBusinessEventManager<T>(m_queryProcessor, resCtx) ),
         m_layoutManager( new QnLayoutManager<T>(m_queryProcessor, resCtx) ),
         m_videowallManager( new QnVideowallManager<T>(m_queryProcessor, resCtx) ),
+        m_webPageManager ( new QnWebPageManager<T>(m_queryProcessor, resCtx) ),
         m_storedFileManager( new QnStoredFileManager<T>(m_queryProcessor, resCtx) ),
         m_updatesManager( new QnUpdatesManager<T>(m_queryProcessor) ),
         m_miscManager( new QnMiscManager<T>(m_queryProcessor) ),
@@ -42,7 +43,7 @@ namespace ec2
         m_notificationManager.reset(
             new ECConnectionNotificationManager(
                 m_resCtx,
-                this, 
+                this,
                 m_licenseManager.get(),
                 m_resourceManager.get(),
                 m_mediaServerManager.get(),
@@ -51,6 +52,7 @@ namespace ec2
                 m_businessEventManager.get(),
                 m_layoutManager.get(),
                 m_videowallManager.get(),
+                m_webPageManager.get(),
                 m_storedFileManager.get(),
                 m_updatesManager.get(),
                 m_miscManager.get(),
@@ -126,6 +128,12 @@ namespace ec2
     }
 
     template<class T>
+    AbstractWebPageManagerPtr BaseEc2Connection<T>::getWebPageManager()
+    {
+        return m_webPageManager;
+    }
+
+    template<class T>
     AbstractStoredFileManagerPtr BaseEc2Connection<T>::getStoredFileManager()
     {
         return m_storedFileManager;
@@ -166,7 +174,7 @@ namespace ec2
                 outData = data;
             handler->done( reqID, errorCode, outData );
         };
-        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> ( 
+        m_queryProcessor->template processQueryAsync<std::nullptr_t, ApiDatabaseDumpData, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabase, nullptr, queryDoneHandler);
         return reqID;
     }
@@ -182,7 +190,7 @@ namespace ec2
         auto queryDoneHandler = [reqID, handler]( ErrorCode errorCode, qint64 /*dumpFileSize*/ ) {
             handler->done( reqID, errorCode );
         };
-        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, qint64, decltype(queryDoneHandler)> ( 
+        m_queryProcessor->template processQueryAsync<ApiStoredFilePath, qint64, decltype(queryDoneHandler)> (
             ApiCommand::dumpDatabaseToFile, dumpFilePathData, queryDoneHandler );
 
         return reqID;
