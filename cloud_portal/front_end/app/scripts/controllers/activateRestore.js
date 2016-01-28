@@ -3,10 +3,6 @@
 angular.module('cloudApp')
     .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $sessionStorage, account) {
 
-        if(!$scope.data.activateCode){
-            account.redirectAuthorised();
-        }
-
         $scope.session = $sessionStorage;
 
         $scope.Config = Config;
@@ -17,6 +13,10 @@ angular.module('cloudApp')
             restoreCode: $routeParams.restoreCode,
             activateCode: $routeParams.activateCode
         };
+
+        if(!$scope.data.activateCode){
+            account.redirectAuthorised();
+        }
 
         $scope.reactivating = $routeParams.reactivating;
         $scope.restoring = $routeParams.restoring;

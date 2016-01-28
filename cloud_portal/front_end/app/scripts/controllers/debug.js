@@ -1,12 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('DebugCtrl', function ($scope,cloudApi,$location) {
-        cloudApi.account().then(function(account){
-            if(!account){
-                $location.path('/');
-            }
-        });
+    .controller('DebugCtrl', function ($scope, cloudApi, account) {
+
+        account.requireLogin();
 
         $scope.user_email = "ebalashov@networkoptix.com";
         $scope.type = "activate_account";

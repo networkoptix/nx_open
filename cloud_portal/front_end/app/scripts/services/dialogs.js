@@ -64,8 +64,8 @@ angular.module('cloudApp')
             confirm:function(message, title){
                 return openDialog(title, null, null, message, true, false).result;
             },
-            login:function(){
-                return openDialog('Login', 'views/login.html', 'login', null, false, true).result;
+            login:function(force){
+                return openDialog('Login', 'views/login.html', 'login', null, false, !force).result;
             },
             share:function(systemId, isOwner, share){
 

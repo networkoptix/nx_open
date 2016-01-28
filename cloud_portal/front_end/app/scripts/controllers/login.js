@@ -21,8 +21,6 @@ angular.module('cloudApp')
             if($scope.auth.password) { // TODO: This is dirty security hole, but I need this to make "Open in client" work
                 $scope.session.password = $scope.auth.password;
             }
-            $location.path('/systems');
-
             setTimeout(function(){
                 document.location.reload();
             });

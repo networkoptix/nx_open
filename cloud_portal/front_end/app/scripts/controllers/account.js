@@ -1,13 +1,10 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('AccountCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams) {
+    .controller('AccountCtrl', function ($scope, cloudApi, process, $sessionStorage, $routeParams, account) {
 
-        cloudApi.account().then(function(account){
+        account.requireLogin().then(function(account){
             $scope.account = account;
-            if(!account){
-                $location.path('/');
-            }
         });
 
         $scope.accountMode = $routeParams.accountMode;

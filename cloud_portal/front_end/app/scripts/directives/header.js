@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .directive('header', function (dialogs, cloudApi,$sessionStorage) {
+    .directive('header', function (dialogs, cloudApi, $sessionStorage, account) {
         return {
             restrict: 'E',
             templateUrl: 'views/components/header.html',
@@ -18,16 +18,13 @@ angular.module('cloudApp')
                     });
                 };
 
-                cloudApi.account().then(function(account){
-
+                account.get().then(function(account){
                     scope.account = account;
-
                     $("body").removeClass("loading");
-                    if(scope.account) {
-                        $("body").addClass("authorized");
-                    }else{
-                        $("body").addClass("anonymous");
-                    }
+                    $("body").addClass("authorized");
+                },function(){
+                    $("body").removeClass("loading");
+                    $("body").addClass("anonymous");
                 });
             }
         };

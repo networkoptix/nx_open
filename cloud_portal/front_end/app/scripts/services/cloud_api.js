@@ -34,21 +34,10 @@ angular.module('cloudApp')
             }
         }
 
-        function extractData(request){
-            return function() {
-                var defer = $q.defer();
-                request().then(function (success) {
-                    defer.resolve(success.data);
-                }, function (error) {
-                    defer.resolve(null);
-                });
-                return defer.promise;
-            }
-        }
         var getSystems = cacheGet(apiBase + '/systems');
 
         return {
-            account: extractData(cacheGet(apiBase + '/account')),
+            account: cacheGet(apiBase + '/account'),
             login:function(email, password, remember){
                 return $http.post(apiBase + '/account/login',{
                     email: email,

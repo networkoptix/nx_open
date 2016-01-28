@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('SystemCtrl', function ($scope, cloudApi, $sessionStorage, $routeParams, $location, nativeClient, dialogs, process) {
+    .controller('SystemCtrl', function ($scope, cloudApi, $sessionStorage, $routeParams, $location, nativeClient, dialogs, process, account) {
 
 
         $scope.Config = Config;
@@ -12,12 +12,9 @@ angular.module('cloudApp')
             info:{name:''}
         };
 
-        cloudApi.account().then(function(account){
-            $scope.account = account;
 
-            if(!account){
-                $location.path('/');
-            }
+        account.requireLogin().then(function(account){
+            $scope.account = account;
         });
 
         // Retrieve system info
