@@ -5,6 +5,8 @@ var Config = {
     clientProtocol: 'vms://',
     cacheTimeout: 30*1000, // Cache lives for 30 seconds
 
+    redirectAuthorised:'/systems', // PAge for redirecting all authorised users
+
     systemStatuses:{
         onlineStatus: 'online',
         default: {

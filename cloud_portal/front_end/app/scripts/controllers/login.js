@@ -1,13 +1,9 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams) {
+    .controller('LoginCtrl', function ($scope, cloudApi, process, $location, $sessionStorage, $routeParams, account) {
 
-        cloudApi.account().then(function(account){
-            if(account){
-                $location.path('/systems');
-            }
-        });
+        account.redirectAuthorised();
 
         $scope.Config = Config;
         $scope.session = $sessionStorage;

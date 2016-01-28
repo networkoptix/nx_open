@@ -1,8 +1,11 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams,  process, $sessionStorage) {
+    .controller('ActivateRestoreCtrl', function ($scope, cloudApi, $routeParams, process, $sessionStorage, account) {
 
+        if(!$scope.data.activateCode){
+            account.redirectAuthorised();
+        }
 
         $scope.session = $sessionStorage;
 
