@@ -52,7 +52,9 @@ TEST_F(CdbFunctionalTest, system_unbind)
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
             ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
+            ASSERT_EQ(account1.fullName, systems[1].ownerFullName);
         }
 
         //sharing system1 with account2 as viewer
@@ -137,6 +139,7 @@ TEST_F(CdbFunctionalTest, system_get)
             getSystem(account1.email, account1Password, system1.id.toStdString(), &systems));
         ASSERT_EQ(1, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+        ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
     }
 
     {
