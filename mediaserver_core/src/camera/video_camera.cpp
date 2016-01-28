@@ -21,7 +21,7 @@
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
-static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 3;
+static const qint64 KEEP_IFRAMES_DISTANCE = 1000000ll * 5;
 static const qint64 GET_FRAME_MAX_TIME = 1000000ll * 15;
 static const qint64 MSEC_PER_SEC = 1000;
 static const qint64 USEC_PER_MSEC = 1000;
@@ -180,8 +180,12 @@ QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::GetIFrameByTime(qint64 tim
     if (queue.empty())
         return QnConstCompressedVideoDataPtr(); // no video data
     auto itr = std::lower_bound(queue.begin(), queue.end(), time, [](const QnConstCompressedVideoDataPtr& data, qint64 time) { return data->timestamp < time; } );
-    if (itr == queue.end())
-        return queue.back();
+    if (itr == queue.end()) {
+        if (m_lastKeyFrame[channel] && (m_lastKeyFrame[channel]->timestamp <= time || iFrameAfterTime))
+            return m_lastKeyFrame[channel];
+        else
+            return queue.back();
+    }
     if (itr != queue.begin() && (*itr)->timestamp > time && !iFrameAfterTime)
         --itr; // prefer frame before defined time if no exact match
     return *itr;

@@ -80,7 +80,7 @@ namespace {
     static const unsigned int MS_PER_SEC = 1000;
     static const unsigned int emailAggregationPeriodMS = 30 * MS_PER_SEC;
 
-    static const int kEmailSendDelay = 1000 * 5;
+    static const int kEmailSendDelay = 1000 * 3;
 };
 
 struct QnEmailAttachmentData {
