@@ -81,7 +81,7 @@ Item
 
             var newContentY = contentY
 
-            if (topMargin > 0 && newContentY < -topMargin)
+            if (topMargin > 0 && -newContentY > topMargin)
                 newContentY = -topMargin
 
             if (bottomMargin > 0 && -newContentY + contentHeight < height - bottomMargin)
