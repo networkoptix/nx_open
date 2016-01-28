@@ -104,7 +104,6 @@ Item {
         id: thumbnailDummyComponent
 
         Column {
-            x: dp(8)
             width: thumbnailContainer.width - 2 * x
 
             Image {
