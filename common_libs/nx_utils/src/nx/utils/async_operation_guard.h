@@ -1,6 +1,8 @@
 #ifndef ASYNC_OPERATION_GUARD_H
 #define ASYNC_OPERATION_GUARD_H
 
+#include <memory>
+
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
