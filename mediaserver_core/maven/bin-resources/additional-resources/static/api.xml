@@ -336,28 +336,83 @@
                                 Default value is current time. Should be less than startTime.
                             </description>
                         </param>
+
                         <param>
-                            <name>strategy</name>
+                            <name>sortField</name>
                             <optional>true</optional>
                             <description>
-                                Strategy of the bookmarks search. Used when request result
-                                is limited by size. Default value is EarliestFirst.
+                                Sorting field name.
                             </description>
                             <values>
                                 <value>
-                                    <name>EarliestFirst</name>
-                                    <desciption>Returns bookmarks by time in direct order. Standard way</desciption>
+                                    <name>name</name>
+                                    <description>Sorts bookmarks by name</description>
                                 </value>
                                 <value>
-                                    <name>LatestFirst</name>
-                                    <desciption>Returns bookmarks by time in reverse order. So the latest bookmarks will be returned</desciption>
+                                    <name>startTime</name>
+                                    <description>Sorts bookmarks by start time</description>
                                 </value>
                                 <value>
-                                    <name>LongestFirst</name>
-                                    <desciption>Returns bookmarks by length. The longest bookmarks will be returned.</desciption>
+                                    <name>duration</name>
+                                    <description>Sorts bookmarks by duration</description>
+                                </value>
+                                <value>
+                                    <name>tags</name>
+                                    <description>Sorts bookmarks by tags</description>
+                                </value>
+                                <value>
+                                    <name>cameraName</name>
+                                    <description>Sorts bookmarks by camera name</description>
                                 </value>
                             </values>
                         </param>
+                        
+                        <param>
+                            <name>sortOrder</name>
+                            <optional>true</optional>
+                            <description>
+                                Sort order
+                            </description>
+                            <values>
+                                <value>
+                                    <name>asc</name>
+                                    <description>Ascending sort order</description>
+                                </value>
+                                <value>
+                                    <name>desc</name>
+                                    <description>Descending sort order</description>
+                                </value>
+                            </values>
+                        </param>
+                        
+                        <param>
+                            <name>useSparsing</name>
+                            <optional>true</optional>
+                            <description>
+                                Shows if bookmarks are sparse. It means that instead of
+                                returning 'limit' number of bookmarks from the start or the end of time window, they will be evenly
+                                thined out.
+                            </description>
+                            <values>
+                                <value>
+                                    <name>true</name>
+                                    <description>Thin out bookmarks</description>
+                                </value>
+                                <value>
+                                    <name>false</name>
+                                    <description>Do not thin out bookmarks</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>minVisibleLength</name>
+                            <optional>true</optional>
+                            <description>
+                                Minimal length of bookmark (in milliseconds) that could be visible on the screen.
+                                When useSparsing parameter is 'true' this field is used as a hint to thin out algorithm.
+                            </description>
+                        </param>
+                      
                         <param>
                             <name>limit</name>
                             <optional>true</optional>
@@ -409,7 +464,7 @@
                         </param>
                         <param>
                             <name>cameraId</name>
-                            <description>Identifier of bookmark owner</description>
+                            <description>Physical id of camera with bookmark</description>
                             <optional>false</optional>
                         </param>
                         <param>
@@ -457,7 +512,7 @@
                         </param>
                         <param>
                             <name>cameraId</name>
-                            <description>Identifier of bookmark owner</description>
+                            <description>Physical id of camera with bookmark</description>
                             <optional>false</optional>
                         </param>
                         <param>

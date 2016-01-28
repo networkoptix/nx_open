@@ -1116,7 +1116,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             startTimeMSec =  endTimeMSec - timelineWindowNearLive;
 
             /* And then try to read saved value - it was valid someday. */
-            if (qnSettings->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
+            if (qnRuntime->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
                 if (QnWorkbenchItem *item = m_currentMediaWidget->item()) {
                     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
                     if (window.isValid()) {
@@ -1899,8 +1899,8 @@ void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr cam
 
     if (qnCameraHistoryPool->isCameraHistoryValid(camera))
         return;
-    
-    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) 
+
+    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success)
     {
         if (!success)
             m_updateHistoryQueue.insert(camera); //< retry loading

@@ -104,8 +104,7 @@ Item {
         id: thumbnailDummyComponent
 
         Column {
-            x: dp(8)
-            width: thumbnailContainer.width - 2 * x
+            width: thumbnailContainer.width - dp(16)
 
             Image {
                 anchors.horizontalCenter: parent.horizontalCenter
