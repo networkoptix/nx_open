@@ -14,9 +14,13 @@
         <div class="panel panel-default system-button">
             <div class="panel-body" ng-click="openSystem(system)">
                 <h2>{{system.name}}</h2>
-                <small>{{system.ownerAccountEmail == account.email?'Your system':system.ownerAccountEmail}}</small><br/>
-                <span class="label" ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">{{Config.systemStatuses[system.status].label||system.status}}</span><br>
-                <button class="btn btn-default" ng-click="open(system);$event.stopPropagation();">Open in Nx Witness</button>
+                <small><b>{{system.ownerAccountEmail == account.email?'Your system':system.ownerFullName||system.ownerAccountEmail}}</b></small><br/>
+
+                <span ng-if="system.status!=Config.systemStatuses.onlineStatus" class="label"
+                      ng-class="Config.systemStatuses[system.status].style || Config.systemStatuses.default.style">
+                    {{Config.systemStatuses[system.status].label||system.status}}</span>
+                <button ng-if="system.status==Config.systemStatuses.onlineStatus" class="btn btn-default"
+                        ng-click="open(system);$event.stopPropagation();">Open in Nx Witness</button>
             </div>
         </div>
     </div>

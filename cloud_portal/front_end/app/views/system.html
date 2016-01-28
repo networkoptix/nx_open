@@ -2,10 +2,16 @@
 <div class="auth-visible">
     <div class="row">
         <div class="col-md-6">
-            <h1><a href="#/systems">Systems</a> > {{system.info.name}}</h1>
+            <h1>
+                <a href="#/systems">Systems</a> > {{system.info.name}}
+                <small><span ng-if="system.info.status!=Config.systemStatuses.onlineStatus" class="label"
+                      ng-class="Config.systemStatuses[system.info.status].style || Config.systemStatuses.default.style">
+                      {{Config.systemStatuses[system.info.status].label||system.info.status}}</span></small>
+            </h1>
         </div>
         <div class="col-md-6">
             <div class="pull-right">
+
                 <div class="btn-group">
                     <button class="btn btn-default" ng-click="delete()">
                         <span class="glyphicon glyphicon-trash"></span> Delete</button>
@@ -13,7 +19,9 @@
                         <span class="glyphicon glyphicon-share"></span> Share</button>
                 </div>
 
-                <button class="btn btn-default" ng-click="open(null)">Open in Nx Witness</button>
+                <button class="btn btn-default" ng-click="open(null)"
+                        ng-disabled="system.info.status!=Config.systemStatuses.onlineStatus">Open in Nx Witness</button>
+
             </div>
         </div>
 

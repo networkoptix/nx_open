@@ -5,6 +5,7 @@ var Config = {
     clientProtocol: 'vms://',
 
     systemStatuses:{
+        onlineStatus: 'online',
         default: {
             style: 'label-default'
         },
