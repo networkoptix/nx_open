@@ -94,7 +94,7 @@ QnPopup {
                     GradientStop { position: 1.0; color: "#00000000" }
                 }
 
-                opacity: Math.min(dp(8), Math.max(0, flickable.contentY)) / dp(8)
+                opacity: Math.min(height, Math.max(0, flickable.contentY)) / height
             }
         }
 
