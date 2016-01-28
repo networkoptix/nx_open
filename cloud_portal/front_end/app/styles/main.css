@@ -114,3 +114,12 @@ body {
 .system-button:hover{
     box-shadow: 1px 1px 1px 0px #dddddd;
 }
+
+
+.hoverable .hover-visible{
+    visibility: hidden;
+}
+
+.hoverable:hover .hover-visible{
+    visibility: visible;
+}

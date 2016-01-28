@@ -52,6 +52,7 @@
                 <table class="table" ng-if="system.users.length">
                     <thead>
                     <tr>
+                        <th>Name</th>
                         <th>Account</th>
                         <th>Permissions</th>
                         <th></th>
@@ -59,11 +60,14 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr ng-repeat="user in system.users">
-                        <td>{{user.fullName}} {{user.fullName?'(':''}}{{user.accountEmail}}{{user.fullName?')':''}}</td>
+                    <tr ng-repeat="user in system.users" class="hoverable">
+                        <td>{{user.fullName}}</td>
+                        <td><a ng-href="mail-to:{{user.accountEmail}}">{{user.accountEmail}}</a></td>
                         <td>{{Config.accessRoles.settings[user.accessRole].label || user.accessRole}}</td>
-                        <td><a href='' ng-if="user.accessRole!=Config.accessRoles.owner" ng-click="editShare(user)">Edit permissions</a></td>
-                        <td><a href='' ng-if="user.accessRole!=Config.accessRoles.owner" ng-click="unshare(user)">Remove</a></td>
+                        <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
+                               ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                        <td><a href='' class="hover-visible" ng-if="user.accessRole!=Config.accessRoles.owner"
+                               ng-click="unshare(user)"><span class="glyphicon glyphicon-remove"></span></a></td>
                     </tr>
                     </tbody>
                 </table>

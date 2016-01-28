@@ -52,7 +52,7 @@ var Config = {
                 description: "Can view live video from cameras and archive, configure cameras"
             },
             "cloudAdmin": {
-                label: "admin & sharing",
+                label: "admin",
                 description: "Can configure system and share it"
             }
         },
