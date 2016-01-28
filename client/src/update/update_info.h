@@ -5,6 +5,8 @@
 
 struct QnUpdateInfo
 {
+    QnUpdateInfo();
+
     QnSoftwareVersion currentRelease;   /**< Published release version. */
     QUrl releaseNotesUrl;               /**< Link to release notes. */
     qint64 releaseDateMs;               /**< Release date - in msecs since epoch. */
