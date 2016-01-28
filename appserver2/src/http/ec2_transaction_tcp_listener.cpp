@@ -85,7 +85,7 @@ void QnTransactionTcpProcessor::run()
     }
 
     d->response.headers.emplace(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
 
@@ -188,7 +188,7 @@ void QnTransactionTcpProcessor::run()
         }
 
         d->response.headers.emplace(
-            "Keep-Alive",
+            Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
             nx_http::header::KeepAlive(
                 QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
     }

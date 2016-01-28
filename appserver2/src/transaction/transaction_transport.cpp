@@ -150,7 +150,7 @@ QnTransactionTransport::QnTransactionTransport(
     m_base64EncodeOutgoingTransactions = nx_http::getHeaderValue(
         request.headers, Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true";
 
-    auto keepAliveHeaderIter = request.headers.find("Keep-Alive");
+    auto keepAliveHeaderIter = request.headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
     if (keepAliveHeaderIter != request.headers.end())
     {
         nx_http::header::KeepAlive keepAliveHeader;
@@ -529,7 +529,7 @@ void QnTransactionTransport::doOutgoingConnect(const QUrl& remotePeerUrl)
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
             "true" );
     m_httpClient->addAdditionalHeader(
-        "Keep-Alive",
+        Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
             std::chrono::duration_cast<std::chrono::seconds>(
                 m_tcpKeepAliveTimeout)).toString());
@@ -1320,7 +1320,7 @@ void QnTransactionTransport::at_responseReceived(const nx_http::AsyncHttpClientP
                 std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
         }
 
-        auto keepAliveHeaderIter = m_httpClient->response()->headers.find("Keep-Alive");
+        auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
         if (keepAliveHeaderIter != m_httpClient->response()->headers.end())
         {
             nx_http::header::KeepAlive keepAliveHeader;
