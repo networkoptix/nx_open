@@ -184,6 +184,7 @@ Window {
                 LoginFunctions.saveCurrentSession()
                 loginSessionManager.lastUsedSessionId = currentSessionId
                 settings.sessionId = currentSessionId
+                currentSystemName = connectionManager.systemName
                 if (stackView.currentItem.objectName == "newConnectionPage" || stackView.currentItem.objectName == "loginPage") {
                     stackView.setFadeTransition()
                     Main.gotoResources()

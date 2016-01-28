@@ -531,17 +531,16 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnRuntime->isActiveXMode()) {
-		if (!user) {
-	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-			return;
-		}
-
-		if (user->isAdmin())
+	if (qnRuntime->isDesktopMode())
+    {
+		if (user && user->isAdmin())
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-	    else
-			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+        else
+            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+
+    if (!user)
+        return;
 
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
