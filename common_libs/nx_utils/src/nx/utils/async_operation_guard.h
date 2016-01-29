@@ -24,7 +24,7 @@ public:
     AsyncOperationGuard();
     ~AsyncOperationGuard();
 
-    /** The guard shell be passed in every async operation handler to be able to
+    /** The guard shall be passed in every async operation handler to be able to
      *  find out if master object has been deleted */
     class NX_UTILS_API SharedGuard
     {
