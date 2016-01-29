@@ -1,7 +1,7 @@
 #ifndef NX_CC_CLOUD_TUNNEL_IMPLS_H
 #define NX_CC_CLOUD_TUNNEL_IMPLS_H
 
-#include "cloud_tunnel.h"
+#include "tunnel/tunnel.h"
 
 namespace nx {
 namespace network {

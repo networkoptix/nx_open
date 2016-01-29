@@ -8,7 +8,7 @@
 #include "cloud/address_resolver.h"
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
-#include "cloud/cloud_tunnel.h"
+#include "cloud/tunnel/incoming_tunnel.h"
 #include "cloud/tunnel/outgoing_tunnel.h"
 
 
