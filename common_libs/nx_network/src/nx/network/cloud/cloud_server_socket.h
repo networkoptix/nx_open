@@ -22,7 +22,7 @@ class NX_NETWORK_API CloudServerSocket
 public:
     CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        TunnelPool* tunnelPool);
+        IncomingTunnelPool* tunnelPool);
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -68,7 +68,7 @@ protected:
 
 private:
     const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
-    TunnelPool* const m_tunnelPool;
+    IncomingTunnelPool* const m_tunnelPool;
 
     typedef AbstractTunnelAcceptor Acceptor;
     std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;

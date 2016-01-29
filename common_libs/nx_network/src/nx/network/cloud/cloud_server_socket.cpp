@@ -10,7 +10,7 @@ namespace cloud {
 
 CloudServerSocket::CloudServerSocket(
         std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-        TunnelPool* tunnelPool)
+        IncomingTunnelPool* tunnelPool)
     : m_mediatorConnection(mediatorConnection)
     , m_tunnelPool(tunnelPool)
     , m_isAcceptingTunnelPool(false)
@@ -227,7 +227,7 @@ void CloudServerSocket::startAcceptor(
         std::unique_ptr<AbstractTunnelConnection> connection)
     {
         if (connection)
-            m_tunnelPool->newTunnel(std::move(connection));
+            m_tunnelPool->addNewTunnel(std::move(connection));
 
         if (auto lock = sharedGuard->lock())
             m_acceptors.erase(acceptorPtr);

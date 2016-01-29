@@ -9,6 +9,8 @@
 #include "cloud/mediator_address_publisher.h"
 #include "cloud/mediator_connector.h"
 #include "cloud/cloud_tunnel.h"
+#include "cloud/tunnel/outgoing_tunnel.h"
+
 
 namespace nx {
 namespace network {
@@ -33,8 +35,12 @@ public:
     { return *s_instance->m_mediatorConnector; }
 
     inline static
-    cloud::TunnelPool& tunnelPool()
-    { return s_instance->m_cloudTunnelPool; }
+    cloud::IncomingTunnelPool& incomingTunnelPool()
+    { return s_instance->m_incomingTunnelPool; }
+
+    inline static
+    cloud::OutgoingTunnelPool& outgoingTunnelPool()
+    { return s_instance->m_outgoingTunnelPool; }
 
 	static void init();	/** Should be called before any socket use */
 	static void deinit();  /** Should be called when sockets are not needed any more */
@@ -68,7 +74,8 @@ private:
     std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     cloud::AddressResolver m_addressResolver;
     cloud::MediatorAddressPublisher m_addressPublisher;
-    cloud::TunnelPool m_cloudTunnelPool;
+    cloud::IncomingTunnelPool m_incomingTunnelPool;
+    cloud::OutgoingTunnelPool m_outgoingTunnelPool;
 };
 
 } // namespace network

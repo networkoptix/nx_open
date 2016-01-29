@@ -302,7 +302,7 @@ bool CloudStreamSocket::startAsyncConnect(
                 return false;
 
             //establishing cloud connect
-            auto tunnel = SocketGlobals::tunnelPool().getTunnel(
+            auto tunnel = SocketGlobals::outgoingTunnelPool().getTunnel(
                 dnsEntry.host.toString().toLatin1());
             assert(tunnel);
 
