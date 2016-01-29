@@ -690,6 +690,9 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     size_t length = 0;
     while( !feof(tabFile) )
     {
+        // man getline 3:
+        // This buffer should be freed by the user program even if getline() failed.
+        std::unique_ptr< void, decltype( free )* >( line, &free );
         if( getline( &line, &length, tabFile ) == -1 )
             break;
 
@@ -702,7 +705,6 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
             mountPoints->push_back( fields[1] );
     }
 
-    free( line );
     fclose( tabFile );
 
     return true;
