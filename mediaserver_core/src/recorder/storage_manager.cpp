@@ -462,8 +462,8 @@ void QnStorageManager::partialMediaScan(const DeviceFileCatalogPtr &fileCatalog,
         bool stillHaveThisStorage = hasStorageUnsafe(storage);
         if (!stillHaveThisStorage)
             return;
-        fileCatalog->addChunks(newChunks);
     }
+    fileCatalog->addChunks(newChunks);
 }
 
 void QnStorageManager::initDone()
