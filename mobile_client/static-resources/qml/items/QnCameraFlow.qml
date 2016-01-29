@@ -153,16 +153,15 @@ Item {
 
         Item {
             width: cameraFlow.width
-            height: hiddenCamerasContent.height
+            height: visible ? hiddenCamerasContent.height : 0
+            visible: hiddenCamerasList.count > 0
 
             Column {
                 id: hiddenCamerasContent
 
                 property bool collapsed: true
 
-                width: parent.width - cameraGrid.spacing * 2
-                x: cameraGrid.spacing
-                visible: hiddenCamerasList.count > 0
+                width: parent.width
 
                 Item {
                     height: dp(24)
@@ -170,7 +169,6 @@ Item {
 
                     Rectangle {
                         anchors.verticalCenter: parent.bottom
-                        anchors.verticalCenterOffset: -dp(8)
                         width: parent.width
                         height: dp(1)
                         color: QnTheme.listSeparator
@@ -192,7 +190,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        x: dp(72)
+                        x: dp(56)
                         text: qsTr("Hidden cameras")
                         font.pixelSize: sp(16)
                         font.weight: Font.DemiBold
@@ -268,8 +266,8 @@ Item {
 
                     Column {
                         id: hiddenCamerasColumn
-                        width: parent.width - cameraGrid.leftMargin - cameraGrid.rightMargin
-                        x: cameraGrid.leftMargin
+
+                        width: parent.width
 
                         Repeater {
                             id: hiddenCamerasList
