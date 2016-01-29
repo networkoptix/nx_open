@@ -7,8 +7,8 @@ class Account(models.Model):
     objects = AccountManager()
 
     email = models.CharField(unique=True, max_length=255)
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
     created_date = models.DateField(auto_now_add=True)
     activated_date = models.DateField(null=True, blank=True)
     last_login = models.DateField(null=True, blank=True)

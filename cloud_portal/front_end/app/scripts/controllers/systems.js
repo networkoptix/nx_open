@@ -24,4 +24,17 @@ angular.module('cloudApp')
         $scope.openSystem = function(system){
             $location.path('/system/' + system.id);
         };
+
+        $scope.getSystemOwnerName = function(system) {
+            if(system.ownerAccountEmail == $scope.account.email ){
+                return 'Your system';
+            }
+
+            if(system.ownerFullName && system.ownerFullName.trim() != ''){
+                return system.ownerFullName;
+            }
+
+            return system.ownerAccountEmail;
+        }
+
     });
