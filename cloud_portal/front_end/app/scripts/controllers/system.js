@@ -24,7 +24,10 @@ angular.module('cloudApp')
             forbidden: Config.errorCodes.systemForbidden,
             notFound: Config.errorCodes.systemNotFound
         }).then(function(result){
+
             $scope.system.info = result.data[0];
+
+            $scope.isOwner = $scope.system.info.ownerAccountEmail == $scope.account.email;
         });
         $scope.gettingSystem.run();
 
@@ -38,7 +41,6 @@ angular.module('cloudApp')
                 return - Config.accessRoles.order.indexOf(user.accessRole);
             });
 
-            $scope.isOwner = checkIsOwner();
 
             if($routeParams.callShare){
 
@@ -68,19 +70,12 @@ angular.module('cloudApp')
             nativeClient.open(systemId);
         };
 
-        function checkIsOwner(){
-            var owner = _.find( $scope.system.users,function(user){
-                return user.accessRole == Config.accessRoles.owner;
-            });
-            return owner && $scope.account.email == owner.accountEmail;
-        }
-
         // Unbind or unshare from me
         $scope.delete = function(){
             //1. Determine, if I am the owner
 
 
-            if(isOwner ){
+            if($scope.isOwner ){
 
                 // User is the owner. Deleting system means unbinding it and disconnecting all accounts
                 dialogs.confirm("You are going to completely disconnect your system from the cloud. Are you sure?").

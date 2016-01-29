@@ -8,7 +8,7 @@
                 <input ng-hide="lockEmail" type="email" class="form-control" ng-model="share.accountEmail" id="email" name="email"
                        ng-pattern="Config.emailRegex" maxlength="255"
                        required autofocus>
-                <p ng-if="lockEmail" class="form-control-static">{{share.fullName}} {{share.fullName?'(':''}}{{share.accountEmail}}{{share.fullName?')':''}}</p>
+                <p ng-if="lockEmail" class="form-control-static">{{formatUserName()}}</p>
             </div>
             <div class="form-group">
                 <label for="role">Permissions</label>

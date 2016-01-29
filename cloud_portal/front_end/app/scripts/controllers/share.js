@@ -43,6 +43,16 @@ angular.module('cloudApp')
             processAccessRoles(Config.accessRoles.options);
         });
 
+        $scope.formatUserName = function(){
+            var share = $scope.share;
+
+            if(!share.fullName || share.fullName.trim() == ''){
+                return share.accountEmail;
+            }
+
+            return share.fullName + '(' + share.accountEmail +')';
+        };
+
         function doShare(){
             return cloudApi.share(systemId, $scope.share.accountEmail, $scope.share.accessRole);
         }
