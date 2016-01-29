@@ -135,7 +135,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
-    ui->storagesWarningLabel->hide();
 
     setWarningStyle(ui->backupStoragesAbsentLabel);
     ui->backupStoragesAbsentLabel->hide();
@@ -378,7 +377,7 @@ void QnStorageConfigWidget::loadDataToUi() {
     updateBackupInfo();
     updateBackupWidgetsVisibility();
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
 }
 
@@ -447,7 +446,9 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn) {
         if (index.data(Qt::CheckStateRole) == Qt::Unchecked && hasChanges())
-            ui->storagesWarningLabel->show();
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageStoragesWarning);
+        else if (!hasChanges())
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     }
 
     emit hasChangesChanged();
@@ -620,7 +621,7 @@ void QnStorageConfigWidget::applyChanges()
         });
     }
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
     emit hasChangesChanged();
 }

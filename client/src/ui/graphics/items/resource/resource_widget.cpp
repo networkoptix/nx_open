@@ -301,7 +301,7 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
 
 void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
 {
-    auto iconButtonCopy = new QnImageButtonWidget(this);
+    auto iconButtonCopy = new QnImageButtonWidget();
     iconButtonCopy->setPreferredSize(24.0, 24.0);
 
     setupIconButton(layout, iconButtonCopy);

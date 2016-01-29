@@ -581,27 +581,14 @@ bool QnWorkbenchNavigator::hasArchive() const
     return m_hasArchive;
 }
 
-bool QnWorkbenchNavigator::layoutHasAchive()
-{
-    const auto layout = workbench()->currentLayout();
-    if (!layout)
-        return false;
-
-    const auto items = layout->items();
-    return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
-    {
-        const auto camera = extractCamera(item);
-        if (!camera)
-            return false;
-
-        const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
-        return camHasArchive;
-    });
-}
-
 void QnWorkbenchNavigator::updateHasArchiveState()
 {
-    const bool newValue = layoutHasAchive();
+    const bool newValue = boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
+    {
+        auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+    });
+
     if (m_hasArchive == newValue)
         return;
 
@@ -609,7 +596,7 @@ void QnWorkbenchNavigator::updateHasArchiveState()
     emit hasArchiveChanged();
 }
 
-bool QnWorkbenchNavigator::hasVideo() const {
+bool QnWorkbenchNavigator::currentWidgetHasVideo() const {
     return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
@@ -622,7 +609,7 @@ qreal QnWorkbenchNavigator::minimalSpeed() const {
         if (!reader->isNegativeSpeedSupported())
             return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? -16.0
         : 0.0;
 }
@@ -631,7 +618,7 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     if (!isPlayingSupported())
         return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? 16.0
         : 1.0;
 }

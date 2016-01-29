@@ -198,7 +198,7 @@ void QnWorkbenchItemBookmarksWatcher::updatePosition(qint64 posMs)
     const auto leftPos = posMs - kLeftOffset;
     const auto rightPos = posMs + kRightOffset;
     const bool invalidInterval = ((leftPos < 0) || (rightPos < 0) || (leftPos > rightPos));
-    Q_ASSERT_X(!invalidInterval, Q_FUNC_INFO, "Invalid window period!");
+    //Q_ASSERT_X(!invalidInterval, Q_FUNC_INFO, "Invalid window period!");
     if (invalidInterval)
         return;
 
