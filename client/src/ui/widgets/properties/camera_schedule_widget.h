@@ -4,13 +4,14 @@
 
 #include <core/misc/schedule_task.h>
 
+#include <ui/common/updatable.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
     class CameraScheduleWidget;
 }
 
-class QnCameraScheduleWidget: public QWidget, public QnWorkbenchContextAware
+class QnCameraScheduleWidget: public QWidget, public QnWorkbenchContextAware, public QnUpdatable
 {
     Q_OBJECT
     Q_PROPERTY(QList<QnScheduleTask::Data> scheduleTasks READ scheduleTasks WRITE setScheduleTasks NOTIFY scheduleTasksChanged USER true DESIGNABLE false)
@@ -21,16 +22,6 @@ public:
     virtual ~QnCameraScheduleWidget();
 
     virtual bool hasHeightForWidth() const override;
-
-    /**
-     * @brief beginUpdate           Begin component update process. Inner update signals are not called while in update.
-     */
-    void beginUpdate();
-
-    /**
-     * @brief endUpdate             End component update process.
-     */
-    void endUpdate();
 
     void setChangesDisabled(bool);
     bool isChangesDisabled() const;
@@ -89,6 +80,9 @@ signals:
     void controlsChangesApplied();
 
 protected:
+    virtual void beforeUpdate() override;
+    virtual void afterUpdate() override;
+
     virtual void afterContextInitialized() override;
 
 private slots:
@@ -143,9 +137,4 @@ private:
      * @brief m_maxDualStreamingFps     Maximum fps value for record types "motion-plus-lq"
      */
     int m_maxDualStreamingFps;
-
-    /**
-     * @brief m_inUpdate                Counter that will prevent unnessesary calls when component update is in progress.
-     */
-    int m_inUpdate;
 };

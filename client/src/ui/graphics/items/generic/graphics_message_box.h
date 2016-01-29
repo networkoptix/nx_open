@@ -1,13 +1,14 @@
-#ifndef GRAPHICS_MESSAGE_BOX_H
-#define GRAPHICS_MESSAGE_BOX_H
+#pragma once
 
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QGraphicsLinearLayout>
 
-#include <ui/graphics/items/standard/graphics_widget.h>
-#include <ui/animation/animated.h>
+#include <client/client_color_types.h>
 
-#include "framed_widget.h"
+#include <ui/graphics/items/standard/graphics_widget.h>
+#include <ui/graphics/items/generic/framed_widget.h>
+#include <ui/animation/animated.h>
+#include <ui/customization/customized.h>
 
 class GraphicsLabel;
 
@@ -33,11 +34,12 @@ private:
 };
 
 
-class QnGraphicsMessageBox : public Animated<QnFramedWidget> {
+class QnGraphicsMessageBox : public Customized<Animated<QnFramedWidget>> {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText)
-    Q_PROPERTY(QColor textColor READ textColor WRITE setTextColor)
-    typedef Animated<QnFramedWidget> base_type;
+    Q_PROPERTY(QnGraphicsMessageBoxColors colors READ colors WRITE setColors)
+
+    typedef Customized<Animated<QnFramedWidget>> base_type;
 
 public:
     explicit QnGraphicsMessageBox(QGraphicsItem *parent = NULL, const QString &text = QString(), int timeoutMsec = 0, int fontSize = 0);
@@ -46,8 +48,8 @@ public:
     QString text() const;
     void setText(const QString &text);
 
-    const QColor &textColor() const;
-    void setTextColor(const QColor &textColor);
+    QnGraphicsMessageBoxColors colors() const;
+    void setColors(const QnGraphicsMessageBoxColors &value);
 
     int timeout() const;
 
@@ -61,15 +63,11 @@ signals:
     void finished();
     void tick(int time);
 
-protected:
-    //virtual QSizeF sizeHint(Qt::SizeHint which, const QSizeF &constraint = QSizeF()) const override;
-
 private slots:
     void at_animationIn_finished();
 
 private:
     GraphicsLabel *m_label;
     int m_timeout;
+    QnGraphicsMessageBoxColors m_colors;
 };
-
-#endif // GRAPHICS_MESSAGE_BOX_H

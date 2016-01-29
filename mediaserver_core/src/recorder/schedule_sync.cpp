@@ -209,11 +209,23 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             )
         );
 
-        if (!fromFile) {
-            NX_LOG(lit("[Backup::copyFile] Source file %1 open failed")
+        if (!fromFile) 
+        {   // This means that source storage is not available or 
+            // source file's been removed by external force.
+            if (fromStorage->isAvailable())
+            {   // File's gone. Log this and skip this file.
+                NX_LOG(
+                    lit("[Backup::copyFile] Source file %1 open failed. Skipping.")
                         .arg(fromFileFullName),
-                   cl_logWARNING);
-            return CopyError::SourceFileError;
+                    cl_logWARNING
+                );
+                return CopyError::SourceFileError;
+            }
+            else
+            {   // Source storage is not available.
+                // We will interrupt backup for now and try another time.
+                return CopyError::FromStorageError;
+            }
         }
 
         auto optimalRootBackupPred = [](const QnStorageResourcePtr & storage) {
@@ -364,8 +376,14 @@ void QnScheduleSync::initSyncData()
 }
 
 template<typename NeedMoveOnCB>
-QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
+QnBusiness::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
+    // Let's check if at least one target backup storage is available first.
+    if (!qnBackupStorageMan->getOptimalStorageRoot(nullptr)) {
+        NX_LOG("[Backup] No approprirate storages found. Bailing out.", cl_logDEBUG1);
+        return QnBusiness::BackupFailedNoBackupStorageError;
+    }
+
     NX_LOG("[Backup] Starting...", cl_logDEBUG2);
     QnMutexLocker lock(&m_syncPointMutex);
     auto chunk = findLastSyncChunkUnsafe();
@@ -389,17 +407,24 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         }
         for (const auto &chunkKey : *chunkKeyVector) {
             auto err = copyChunk(chunkKey);
-            if (err != CopyError::NoError) {
+            if (err != CopyError::NoError && err != CopyError::SourceFileError) {
+                m_lastError = err;
                 NX_LOG(
                     lit("[QnScheduleSync::synchronize] %1").arg(copyErrorString(err)),
                     cl_logWARNING
                 );
-                if (err == CopyError::NoBackupStorageError || 
-                    err == CopyError::FromStorageError ||
-                    err == CopyError::TargetFileError) {
-                    return QnServer::BackupResultCode::Failed;
-                } else if (err == CopyError::Interrupted) {
-                    return QnServer::BackupResultCode::Cancelled;
+                switch (err) {
+                case CopyError::NoBackupStorageError:
+                case CopyError::GetCatalogError:
+                    return QnBusiness::BackupFailedNoBackupStorageError;
+                case CopyError::FromStorageError:
+                    return QnBusiness::BackupFailedSourceStorageError;
+                case CopyError::TargetFileError:
+                    return QnBusiness::BackupFailedTargetFileError;
+                case CopyError::ChunkError:
+                    return QnBusiness::BackupFailedChunkError;
+                case CopyError::Interrupted:
+                    return QnBusiness::BackupCancelled;
                 }
             }
         }
@@ -407,16 +432,16 @@ QnServer::BackupResultCode QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
         bool needStop = needMoveOnCode != SyncCode::Ok;
         if (needStop) {
             if (needMoveOnCode == SyncCode::OutOfTime) {
-                return QnServer::BackupResultCode::EndOfPeriod;
+                return QnBusiness::BackupEndOfPeriod;
             } else if (needMoveOnCode == SyncCode::WrongBackupType || 
                        needMoveOnCode == SyncCode::Interrupted) {
-                return QnServer::BackupResultCode::Cancelled;
+                return QnBusiness::BackupCancelled;
             }
             break;
         }
     }
     m_interrupted = true; // we are done till the next backup period
-    return QnServer::BackupResultCode::Done;
+    return QnBusiness::BackupDone;
 }
 
 void QnScheduleSync::stop() 
@@ -604,10 +629,14 @@ void QnScheduleSync::run()
             m_forced = false;
             m_syncing = false;
 
-            if (result == QnServer::BackupResultCode::Failed && !m_failReported) {
+            bool backupFailed = result != QnBusiness::BackupDone && 
+                                result != QnBusiness::BackupCancelled && 
+                                result != QnBusiness::BackupEndOfPeriod;  
+
+            if (backupFailed && !m_failReported) {
                 emit backupFinished(m_syncEndTimePoint, result);
                 m_failReported = true;
-            } else if (result != QnServer::BackupResultCode::Failed) {
+            } else if (!backupFailed) {
                 emit backupFinished(m_syncEndTimePoint, result);
                 m_failReported = false; 
             }

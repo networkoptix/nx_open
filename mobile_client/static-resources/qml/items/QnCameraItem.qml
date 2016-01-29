@@ -3,6 +3,7 @@ import QtQuick 2.4
 import com.networkoptix.qml 1.0
 
 import "../controls"
+import "../icons"
 
 Item {
     id: cameraItem
@@ -56,51 +57,19 @@ Item {
                 height: parent.width * 3 / 4
                 color: d.offline ? QnTheme.cameraOfflineBackground : QnTheme.cameraBackground
 
-                Column {
-                    id: thumbnailDummyContent
-
-                    x: dp(8)
-                    width: parent.width - 2 * x
-                    anchors.centerIn: parent
-
-                    visible: d.offline
-
-                    Image {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
-                        width: dp(64)
-                        height: dp(64)
-                    }
-
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: parent.width
-                        height: dp(32)
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-
-                        text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
-                        wrapMode: Text.WordWrap
-                        maximumLineCount: 2
-                        font.pixelSize: sp(14)
-                        font.weight: Font.Normal
-                        color: QnTheme.cameraText
-                    }
-                }
-
                 Loader {
-                    id: preloader
-                    anchors.centerIn: parent
-                    source: (!d.offline && thumbnail.status != Image.Ready) ? Qt.resolvedUrl("qrc:///qml/icons/QnThreeDotPreloader.qml") : ""
-                }
+                    id: thumbnailContentLoader
 
-                Image {
-                    id: thumbnail
-                    source: d.offline ? "" : cameraItem.thumbnail
-                    anchors.fill: parent
-                    fillMode: Qt.KeepAspectRatio
-                    visible: !d.offline && status == Image.Ready
-                    asynchronous: true
+                    anchors.centerIn: parent
+
+                    sourceComponent: {
+                        if (d.offline || d.unauthorized)
+                            return thumbnailDummyComponent
+                        else if (!cameraItem.thumbnail)
+                            return thumbnailPreloaderComponent
+                        else
+                            return thumbnailComponent
+                    }
                 }
             }
 
@@ -131,50 +100,51 @@ Item {
         Behavior on x { NumberAnimation { duration: 200 } }
     }
 
-    Rectangle {
-        id: hiddenDummy
-
-        width: parent.width
-        height: width * 3 / 4
-        color: QnTheme.cameraHiddenBackground
-        border.width: dp(1)
-        border.color: QnTheme.cameraDummyBorder
-
-        opacity: 1.0 - Math.min(0.5, content.opacity) * 2
+    Component {
+        id: thumbnailDummyComponent
 
         Column {
-            width: parent.width
-            anchors.centerIn: parent
+            x: dp(8)
+            width: thumbnailContainer.width - 2 * x
+
+            Image {
+                anchors.horizontalCenter: parent.horizontalCenter
+                source: d.unauthorized ? "image://icon/camera_locked.png" : "image://icon/camera_offline.png"
+                width: dp(64)
+                height: dp(64)
+            }
 
             Text {
+                anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width
-                height: dp(56)
-
-                text: qsTr("Camera\nhidden")
-
+                height: dp(32)
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                font.pixelSize: sp(16)
-                maximumLineCount: 2
+
+                text: d.unauthorized ? qsTr("Authentication\nrequired") : qsTr("Offline")
                 wrapMode: Text.WordWrap
-                color: QnTheme.cameraHiddenText
+                maximumLineCount: 2
+                font.pixelSize: sp(14)
+                font.weight: Font.Normal
+                color: QnTheme.cameraText
             }
+        }
+    }
 
-            QnButton {
-                id: undoButton
+    Component {
+        id: thumbnailPreloaderComponent
 
-                anchors.horizontalCenter: parent.horizontalCenter
+        QnThreeDotPreloader {}
+    }
 
-                flat: true
-                text: qsTr("Undo")
-                icon: "image://icon/undo.png"
-                font.pixelSize: sp(18)
+    Component {
+        id: thumbnailComponent
 
-                onClicked: {
-                    cameraItem.z = -1
-                    d.hidden = false
-                }
-            }
+        Image {
+            source: cameraItem.thumbnail
+            width: thumbnailContainer.width
+            height: thumbnailContainer.height
+            fillMode: Qt.KeepAspectRatio
         }
     }
 
@@ -191,18 +161,29 @@ Item {
 
         drag.axis: Drag.XAxis
         drag.target: content
-        drag.onActiveChanged: {
-            if (drag.active)
-                return
+        drag.threshold: dp(8)
 
-            if (Math.abs(content.x) > content.width / 2) {
-                content.x = content.x > 0 ? content.width : -content.width
+        QnPropertyChangeSpeedMeasurer
+        {
+            value: content.x
+            active: materialSurface.drag.active
+            onActiveChanged:
+            {
+                if (active)
+                    return
+
+                var dx = Math.abs(content.x)
+
+                if ((Math.abs(speed) < dp(800) && dx < content.width * 0.85) || dx < content.width * 0.25)
+                {
+                    content.x = 0
+                    return
+                }
+
+                content.x = speed > 0 ? content.width : -content.width
                 d.hidden = true
-            } else {
-                content.x = 0
             }
         }
-        drag.threshold: dp(8)
     }
 
     Binding {

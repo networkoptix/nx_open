@@ -29,7 +29,7 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     m_engineVersion = QnSoftwareVersion(QnAppInfo::engineVersion());
 
     QnCommonMetaTypes::initialize();
-    
+
     /* Init statics. */
     qnProductFeatures();
     store<TimerManager>(new TimerManager());
@@ -50,7 +50,6 @@ QnCommonModule::QnCommonModule(QObject *parent): QObject(parent) {
     /* Init members. */
     m_runUuid = QnUuid::createUuid();
     m_transcodingDisabled = false;
-    m_arecontRTSPEnabled = false;
     m_systemIdentityTime = 0;
     m_lowPriorityAdminPassword = false;
     m_localPeerType = Qn::PT_NotDefined;
@@ -64,12 +63,6 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(server.data(),  &QnMediaServerResource::nameChanged,    this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::apiUrlChanged,  this,   &QnCommonModule::updateModuleInformation);
     connect(server.data(),  &QnMediaServerResource::serverFlagsChanged,  this,   &QnCommonModule::updateModuleInformation);
-}
-
-void QnCommonModule::bindModuleinformation(const QnUserResourcePtr &adminUser) {
-    connect(adminUser.data(),   &QnUserResource::resourceChanged,   this,   &QnCommonModule::updateModuleInformation);
-    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
-    connect(adminUser.data(),   &QnUserResource::hashChanged,       this,   &QnCommonModule::updateModuleInformation);
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid) {
@@ -154,7 +147,7 @@ QnModuleInformation QnCommonModule::moduleInformation() const
 
 void QnCommonModule::loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required) {
     bool loaded = QFile::exists(fileName) && dataPool->load(fileName);
-    
+
     Q_ASSERT_X(!required || loaded, Q_FUNC_INFO, "Can't parse resource_data.json file!");  /* Getting an assert here? Something is wrong with resource data json file. */
 }
 
@@ -171,26 +164,18 @@ void QnCommonModule::updateModuleInformation() {
         moduleInformationCopy.serverFlags = moduleInformation.serverFlags;
     }
 
-    QnUserResourcePtr admin = qnResPool->getAdministrator();
-    if (admin) {
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(admin->getDigest());
-        md5.addData(moduleInformationCopy.systemName.toUtf8());
-        moduleInformationCopy.authHash = md5.result();
-    }
-
     setModuleInformation(moduleInformationCopy);
 }
 
 void QnCommonModule::setSystemIdentityTime(qint64 value, const QnUuid& sender)
-{ 
-    m_systemIdentityTime = value; 
+{
+    m_systemIdentityTime = value;
     emit systemIdentityTimeChanged(value, sender);
 }
 
-qint64 QnCommonModule::systemIdentityTime() const 
-{ 
-    return m_systemIdentityTime; 
+qint64 QnCommonModule::systemIdentityTime() const
+{
+    return m_systemIdentityTime;
 }
 
 void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArray& digest)
@@ -201,7 +186,7 @@ void QnCommonModule::setAdminPasswordData(const QByteArray& hash, const QByteArr
 
 void QnCommonModule::adminPasswordData(QByteArray* hash, QByteArray* digest) const
 {
-    *hash = m_adminPaswdHash;    
+    *hash = m_adminPaswdHash;
     *digest = m_adminPaswdDigest;
 }
 
@@ -216,15 +201,18 @@ bool QnCommonModule::useLowPriorityAdminPasswordHach() const
 }
 
 QnUuid QnCommonModule::runningInstanceGUID() const
-{ 
+{
     QnMutexLocker lock(&m_mutex);
-    return m_runUuid; 
+    return m_runUuid;
 }
 
 void QnCommonModule::updateRunningInstanceGuid()
 {
-    QnMutexLocker lock(&m_mutex);
-    m_runUuid = QnUuid::createUuid();
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_runUuid = QnUuid::createUuid();
+    }
+    emit runningInstanceGUIDChanged();
 }
 
 void QnCommonModule::setLocalPeerType(Qn::PeerType peerType)

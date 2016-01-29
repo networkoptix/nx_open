@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     android:installLocation="auto" android:versionCode="${project.version.code}"
-    android:versionName="${project.version.name}.${project.version.code}" package="${new.android.namespace}">
+    android:versionName="${project.version.name}.${project.version.code}" package="${new.android.packagename}">
 
     <application
         android:hardwareAccelerated="true"
@@ -48,6 +48,8 @@
         </activity>
     </application>
     <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="22"/>
+
+    <uses-permission android:name="${old.android.packagename}.readLogonEntries"/>
 
     <!-- The following comment will be replaced upon deployment with default permissions based on the dependencies of the application.
          Remove the comment if you do not require these default permissions. -->

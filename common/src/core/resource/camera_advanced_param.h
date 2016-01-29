@@ -25,6 +25,8 @@ public:
 
     /** Get all values from this map that differs from corresponding values from other map. */
     QnCameraAdvancedParamValueList difference(const QnCameraAdvancedParamValueMap &other) const;
+
+    bool differsFrom(const QnCameraAdvancedParamValueMap &other) const;
 };
 
 struct QnCameraAdvancedParameter {

@@ -71,7 +71,7 @@ namespace {
 
     const QColor infoBackgroundColor = QColor(0, 0, 0, 127); // TODO: #gdm #customization
 
-    const QColor overlayTextColor = QColor(255, 255, 255, 160); // TODO: #gdm #customization
+    const QColor overlayTextColor = QColor(255, 255, 255); // TODO: #gdm #customization
 
     const float noAspectRatio = -1.0;
 
@@ -101,6 +101,10 @@ namespace {
         auto label = new GraphicsLabel();
         label->setAcceptedMouseButtons(0);
         label->setPerformanceHint(GraphicsLabel::PixmapCaching);
+        label->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        QFont f = label->font();
+        f.setBold(true);
+        label->setFont(f);
         return label;
     }
 
@@ -168,8 +172,10 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
 
     /* Set up overlay widgets. */
     QFont font = this->font();
-    font.setPixelSize(20);
+    font.setStyleName(lit("Arial"));
+    font.setPixelSize(15);
     setFont(font);
+
     setPaletteColor(this, QPalette::WindowText, overlayTextColor);
 
     createButtons();
@@ -218,6 +224,7 @@ QnResourceWidget::~QnResourceWidget() {
 void QnResourceWidget::addInfoOverlay() {
     {
         auto titleLayout = createGraphicsLayout(Qt::Horizontal);
+        titleLayout->setSpacing(2.0);
         titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
         titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
 
@@ -233,12 +240,14 @@ void QnResourceWidget::addInfoOverlay() {
 
         addOverlayWidget(m_overlayWidgets.cameraNameOnlyOverlay, UserVisible, true, true, InfoLayer);
         setOverlayWidgetVisible(m_overlayWidgets.cameraNameOnlyOverlay, false, false);
+
+        insertIconButtonCopy(titleLayout);
     }
 
     {
         QnHtmlTextItemOptions infoOptions;
         infoOptions.backgroundColor = infoBackgroundColor;
-        infoOptions.borderRadius = 4;
+        infoOptions.borderRadius = 2;
         infoOptions.autosize = true;
 
         enum { kMargin = 2 };
@@ -268,6 +277,36 @@ void QnResourceWidget::addInfoOverlay() {
     }
 }
 
+void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
+    , QnImageButtonWidget *button)
+{
+    enum { kItemButtonIndex = 0};
+    layout->insertItem(kItemButtonIndex, button);
+    connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this
+        , [this, layout, button]()
+    {
+        if(m_iconButton->isVisible())
+            layout->insertItem(kItemButtonIndex, button);
+        else
+            layout->removeItem(button);
+    });
+
+    connect(m_iconButton, &QnImageButtonWidget::iconChanged, this, [this, button]()
+    {
+        if (button != m_iconButton)
+            button->setIcon(m_iconButton->icon());
+    });
+
+}
+
+void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
+{
+    auto iconButtonCopy = new QnImageButtonWidget(this);
+    iconButtonCopy->setPreferredSize(24.0, 24.0);
+
+    setupIconButton(layout, iconButtonCopy);
+}
+
 void QnResourceWidget::addMainOverlay() {
     auto headerLayout = createGraphicsLayout(Qt::Horizontal);
     headerLayout->setSpacing(2.0);
@@ -276,13 +315,7 @@ void QnResourceWidget::addMainOverlay() {
     headerLayout->addItem(m_overlayWidgets.mainExtrasLabel);
     headerLayout->addItem(m_buttonBar);
 
-    connect(m_iconButton, &QnImageButtonWidget::visibleChanged, this, [this, headerLayout](){
-        if(m_iconButton->isVisible()) {
-            headerLayout->insertItem(0, m_iconButton);
-        } else {
-            headerLayout->removeItem(m_iconButton);
-        }
-    });
+    setupIconButton(headerLayout, m_iconButton);
 
     auto headerWidget = createGraphicsWidget(headerLayout);
 
@@ -653,7 +686,8 @@ QnResourceWidget::Buttons QnResourceWidget::calculateButtonsVisibility() const {
 }
 
 void QnResourceWidget::updateButtonsVisibility() {
-    if (!item())
+    // TODO: #ynikitenkov Change destroying sequence: items should be destroyed before layout
+    if (!item() || !item()->layout())
         return;
 
     m_buttonBar->setVisibleButtons(calculateButtonsVisibility() & ~(item()->data<int>(Qn::ItemDisabledButtonsRole, 0)));
@@ -778,7 +812,8 @@ void QnResourceWidget::updateHud(bool animate) {
 
     /*
         Logic must be the following:
-        * there are two options: 'mouse in the widget' and 'info button checked'
+        * if widget is in full screen mode and there is no activity - hide all following overlays
+        * otherwise, there are two options: 'mouse in the widget' and 'info button checked'
         * camera name should be visible if any option is active
         * position item should be visible if any option is active
         * control buttons should be visible if mouse cursor is in the widget
@@ -786,7 +821,12 @@ void QnResourceWidget::updateHud(bool animate) {
     */
 
     /* Motion mask widget should not have overlays at all */
-    bool overlaysCanBeVisible = !options().testFlag(QnResourceWidget::InfoOverlaysForbidden);
+
+    bool isInactiveInFullScreen = (options().testFlag(FullScreenMode)
+        && !options().testFlag(ActivityPresence));
+
+    bool overlaysCanBeVisible = (!isInactiveInFullScreen
+        && !options().testFlag(QnResourceWidget::InfoOverlaysForbidden));
 
     bool detailsVisible = m_options.testFlag(DisplayInfo);
     if(QnImageButtonWidget *infoButton = buttonBar()->button(InfoButton))
@@ -942,11 +982,16 @@ void QnResourceWidget::hoverLeaveEvent(QGraphicsSceneHoverEvent *event) {
     base_type::hoverLeaveEvent(event);
 }
 
-void QnResourceWidget::optionsChangedNotify(Options changedFlags){
-    if (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
+void QnResourceWidget::optionsChangedNotify(Options changedFlags)
+{
+    const bool updateHudWoAnimation =
+        (changedFlags.testFlag(DisplayInfo) && visibleButtons().testFlag(InfoButton))
+        || (changedFlags.testFlag(InfoOverlaysForbidden));
+
+    if (updateHudWoAnimation)
         updateHud(false);
-    else if (changedFlags.testFlag(InfoOverlaysForbidden))
-        updateHud(false);
+    else if (changedFlags.testFlag(FullScreenMode) || changedFlags.testFlag(ActivityPresence))
+        updateHud(true);
 }
 
 void QnResourceWidget::at_itemDataChanged(int role) {

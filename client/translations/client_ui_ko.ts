@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>끝</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>새로고침</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>모든 서버가 offline상태</translation>
+        <source>Audit Trail</source>
+        <translation>시스템 감사</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>시스템 감사</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -228,6 +228,16 @@
         <source>Tags:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -266,11 +276,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished"></translation>
     </message>
@@ -288,6 +293,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -473,18 +483,13 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
         <translation type="unfinished">카테고리</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
+        <translation type="unfinished">새로고침</translation>
     </message>
 </context>
 <context>
@@ -999,18 +1004,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation>알람/이벤트 정책(&amp;A)</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
-        <translation>이벤트 로그(&amp;E)</translation>
     </message>
     <message>
         <location/>
@@ -1024,18 +1019,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation>상태 보기(&amp;H)</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>시스템설정</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
-        <translation>감사 보고 로그 보기</translation>
     </message>
     <message>
         <location/>
@@ -1049,22 +1034,42 @@
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>감사 보고</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1082,13 +1087,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>기본 위치</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>어안 렌즈 커메라 사용</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>어안 렌즈 커메라 사용</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1297,8 +1302,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>상위버젼 SW가 필요한 라이센스 입니다.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1859,6 +1864,11 @@
         <source>Check</source>
         <translation>확인</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1978,11 +1988,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>인터넷을 통해 업데이트를 확인할 수 없습니다.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>가능한 업데이트</translation>
     </message>
@@ -1990,6 +1995,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>수동 업데이트를 할 경우, 아래 링크를 통해 다운로드 받기:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2111,8 +2121,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>연결을 복원하는 동안 잠시 기다려주세요...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2471,17 +2481,27 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2607,11 +2627,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>IO포트</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>오디오 사용</translation>
     </message>
@@ -2659,6 +2674,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>어안렌즈</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2817,22 +2837,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2847,22 +2852,7 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">일정...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2870,6 +2860,71 @@
         <source>Unchecking the storage will cause nothing but writing stop.
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished">선택하지 않은 장치에 다른 문제가 발생하지 않으나, 녹화는 멈춤, 예전 데이터 삭제시 거부 하지 않게 됩니다.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">외부 장치 추가...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2912,11 +2967,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>주의! 녹화설정의 FPS과 화질 설정이 동작하지 않습니다!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(추천)</translation>
     </message>
@@ -2929,6 +2979,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>개발자에게 장애 문제 자동 보고</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">주위: 이 옵션 활성화 시  기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다. </translation>
     </message>
 </context>
 <context>

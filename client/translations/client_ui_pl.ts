@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>do</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Odśwież</translation>
     </message>
@@ -169,14 +164,19 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Wszytkie serwery są wyłączone. Dane kontroli są niedostępne.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Audit Trail</source>
         <translatorcomment>?????</translatorcomment>
         <translation>Dziennik kontroli</translation>
+    </message>
+    <message>
+        <location/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -229,6 +229,16 @@
         <source>Tags:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -267,11 +277,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
@@ -289,6 +294,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">Wszytkie serwery są wyłączone. Logi są niedostępne.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -474,18 +484,13 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
         <translation type="unfinished">Kategoria</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
+        <translation type="unfinished">Odśwież</translation>
     </message>
 </context>
 <context>
@@ -1001,18 +1006,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation>&amp;Alarm/Reguły</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
-        <translation>&amp;Logi zdarzeń</translation>
     </message>
     <message>
         <location/>
@@ -1026,18 +1021,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation>&amp;Monitor zasobów</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Ustawienia systemu</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
-        <translation>Otwórz dziennik kontroli</translation>
     </message>
     <message>
         <location/>
@@ -1051,22 +1036,42 @@
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Dziennik kontroli</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1084,13 +1089,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Domyślny obrót:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>To jest kamera z obiektywem fish-eye</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>To jest kamera z obiektywem fish-eye</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1299,8 +1304,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Ta licencja wymaga wyższej wersji oprogramowania.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1861,6 +1866,11 @@
         <source>Check</source>
         <translation>Sprawdź</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1980,11 +1990,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Nie można sprawdzić aktualizacji za pośrednictwem internetu.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Dostępna aktualizacja:</translation>
     </message>
@@ -1992,6 +1997,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>W celu aktualziacji ręcznej pobierz plik z następującego linku:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2113,8 +2123,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Proszę czekać, połączenie jest przywracane...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2473,17 +2483,27 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2609,11 +2629,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>Porty WE/WY</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>Włącz audio</translation>
     </message>
@@ -2661,6 +2676,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Rybie oko</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2819,22 +2839,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2849,22 +2854,7 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">Harmonogram...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2873,6 +2863,71 @@
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished">Odznaczenie spowoduje zatrzymanie nagrywania.
 Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">Dodaj zewnętrzną przestrzeń dyskową...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2915,11 +2970,6 @@ Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</t
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Uwaga! Ustawienia kl/s i  jakosci w Harmonogramie Rejestracji nie będą działać!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(zalecane)</translation>
     </message>
@@ -2932,6 +2982,11 @@ Nie spowoduje  odmowy podczas próby skasowania najstarszych nagrań z dysku.</t
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Wyślij anonimowo statystyki użytkowania i uszkodzeń do programistów</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Ostrzeżenie! Spowoduje to, że ustawienie jakości i klatek na sekundę (FPS) w harmonogramie nagrywania będzie niesitotne.</translation>
     </message>
 </context>
 <context>

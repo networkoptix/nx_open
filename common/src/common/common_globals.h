@@ -3,13 +3,17 @@
 
 #include <cassert>
 
+#define __STDC_LIMIT_MACROS //< For compatibility with pre-std C++11.
+#include <cstdint>
+
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
 
-#include <utils/math/defines.h> /* For INT64_MAX. */
 #include <utils/common/unused.h>
 #include <utils/common/model_functions_fwd.h>
+
+#include <limits>
 
 /**
  * Same as <tt>Q_GADGET</tt>, but doesn't trigger MOC, and can be used in namespaces.
@@ -30,8 +34,8 @@ namespace Qn
 #ifdef Q_MOC_RUN
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole 
-            ConnectionRole ResourceStatus
+            PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
+            ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -39,9 +43,9 @@ namespace Qn
             FailoverPriority)
     Q_FLAGS(Borders Corners
             ResourceFlags
-            CameraCapabilities 
-            PtzDataFields PtzCapabilities PtzTraits 
-            MotionTypes TimePeriodTypes 
+            CameraCapabilities
+            PtzDataFields PtzCapabilities PtzTraits
+            MotionTypes TimePeriodTypes
             ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes)
 public:
 #else
@@ -84,8 +88,8 @@ public:
         PeriodicExtrapolation
     };
 
-    enum CameraCapability { 
-        NoCapabilities                      = 0x000, 
+    enum CameraCapability {
+        NoCapabilities                      = 0x000,
         PrimaryStreamSoftMotionCapability   = 0x004,
         RelayInputCapability                = 0x008,
         RelayOutputCapability               = 0x010,
@@ -106,7 +110,7 @@ public:
         GetDeviceLimitsPtzCommand,
         GetLogicalLimitsPtzCommand,
         GetFlipPtzCommand,
-        
+
         CreatePresetPtzCommand,
         UpdatePresetPtzCommand,
         RemovePresetPtzCommand,
@@ -151,7 +155,6 @@ public:
     Q_DECLARE_OPERATORS_FOR_FLAGS(PtzDataFields)
 
     enum RebuildState {
-        RebuildState_Unknown     = 0,
         RebuildState_None        = 1,
         RebuildState_FullScan    = 2,
         RebuildState_PartialScan = 3
@@ -179,7 +182,7 @@ public:
 
     enum PtzCapability {
         NoPtzCapabilities                   = 0x00000000,
-        
+
         ContinuousPanCapability             = 0x00000001,
         ContinuousTiltCapability            = 0x00000002,
         ContinuousZoomCapability            = 0x00000004,
@@ -237,21 +240,21 @@ public:
 
     enum StreamFpsSharingMethod {
         /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
-        BasicFpsSharing, 
+        BasicFpsSharing,
 
         /** If second stream is running whatever megapixel it has, first stream can get maxMegapixels - secondstreamPixels. */
-        PixelsFpsSharing, 
+        PixelsFpsSharing,
 
         /** Second stream does not affect first stream's fps. */
-        NoFpsSharing 
+        NoFpsSharing
     };
 
 
     enum MotionType {
-        MT_Default      = 0x0, 
-        MT_HardwareGrid = 0x1, 
-        MT_SoftwareGrid = 0x2, 
-        MT_MotionWindow = 0x4, 
+        MT_Default      = 0x0,
+        MT_HardwareGrid = 0x1,
+        MT_SoftwareGrid = 0x2,
+        MT_MotionWindow = 0x4,
         MT_NoMotion     = 0x8
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
@@ -261,8 +264,8 @@ public:
 
 
     enum PanicMode {
-        PM_None = 0, 
-        PM_BusinessEvents = 1, 
+        PM_None = 0,
+        PM_BusinessEvents = 1,
         PM_User = 2
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PanicMode)
@@ -271,7 +274,7 @@ public:
         CR_Default,         /// In client this flag is sufficient to receive both archive and live video
         CR_LiveVideo,
         CR_SecondaryLiveVideo,
-        CR_Archive 
+        CR_Archive
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
@@ -308,10 +311,10 @@ public:
 
         depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
-        io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
-        read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */ 
+        io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
+        read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
-        storage_fastscan = 0x8000000,   /**< Fast scan for storage in progress */
+        storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
 
         local_media = local | media,
         local_layout = local | layout,
@@ -330,7 +333,8 @@ public:
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
 
-    enum ResourceStatus {
+    enum ResourceStatus
+    {
         Offline,
         Unauthorized,
         Online,
@@ -342,7 +346,9 @@ public:
          * QnIncompatibleServerWatcher. Fake servers can also have Unauthorized status.
          * So if you want to check if the server is fake use QnMediaServerResource::isFakeServer().
          */
-        Incompatible
+        Incompatible,
+
+        AnyStatus
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceStatus)
 
@@ -351,10 +357,11 @@ public:
         BPG_Predefined,
         BPG_User
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     // TODO: #Elric #EC2 talk to Roma, write comments
-    enum ServerFlag { 
-        SF_None         = 0x0, 
+    enum ServerFlag {
+        SF_None         = 0x0,
         SF_Edge         = 0x1,
         SF_RemoteEC     = 0x2,
         SF_HasPublicIP  = 0x4,
@@ -423,7 +430,7 @@ public:
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)
     Q_DECLARE_OPERATORS_FOR_FLAGS(AuditRecordTypes)
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuditRecordType)
-    
+
     enum IODefaultState {
         IO_OpenCircuit,
         IO_GroundedCircuit
@@ -486,8 +493,8 @@ public:
         LayoutBoundingRectRole,                     /**< Role for layout's bounding rect. Value of type QRect. */
         LayoutSyncStateRole,                        /**< Role for layout's stream synchronization state. Value of type QnStreamSynchronizationState. */
         LayoutSearchStateRole,                      /**< Role for 'Preview Search' layout parameters. */
-        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */ 
-        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */ 
+        LayoutTimeLabelsRole,                       /**< Role for layout's time label display. Value of type bool. */
+        LayoutPermissionsRole,                      /**< Role for overriding layout's permissions. Value of type int (Qn::Permissions). */
         LayoutSelectionRole,                        /**< Role for layout's selected items. Value of type QVector<QnUuid>. */
         LayoutBookmarksModeRole,                    /**< Role for layout's bookmarks mode state. */
 
@@ -546,13 +553,14 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
 
         /* Others. */
         HelpTopicIdRole,                            /**< Role for item's help topic. Value of type int. */
-        
+
         TranslationRole,                            /**< Role for translations. Value of type QnTranslation. */
 
         ItemMouseCursorRole,                        /**< Role for item's mouse cursor. */
@@ -576,11 +584,11 @@ public:
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
 
         IOPortDataRole,                             /**< Return QnIOPortData object. Used in IOPortDataModel */
-        
+
         RecordingStatsDataRole,                     /**< Return QnCamRecordingStatsData object. Used in QnRecordingStatsModel */
         RecordingStatChartDataRole,                 /**< Return qreal for chart. Real value. Used in QnRecordingStatsModel */
         RecordingStatChartColorDataRole,            /**< Return QnRecordingStatsColors. Used in QnRecordingStatsModel */
-        
+
         AuditRecordDataRole,                        /**< Return QnAuditRecord object */
         ColumnDataRole,                             /**< convert index col count to column enumerator */
         DecorationHoveredRole,                      /**< Same as Qt::DecorationRole but for hovered item */
@@ -610,10 +618,10 @@ public:
 
 
     // TODO: #Elric #EC2 rename
-    enum SecondStreamQuality { 
-        SSQualityLow = 0, 
-        SSQualityMedium = 1, 
-        SSQualityHigh = 2, 
+    enum SecondStreamQuality {
+        SSQualityLow = 0,
+        SSQualityMedium = 1,
+        SSQualityHigh = 2,
         SSQualityNotDefined = 3,
         SSQualityDontUse = 4
     };
@@ -664,14 +672,14 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
-    enum PropertyDataType { 
-        PDT_None        = 0, 
-        PDT_Value       = 1, 
-        PDT_OnOff       = 2, 
-        PDT_Boolen      = 3, 
-        PDT_MinMaxStep  = 4, 
-        PDT_Enumeration = 5, 
-        PDT_Button      = 6 
+    enum PropertyDataType {
+        PDT_None        = 0,
+        PDT_Value       = 1,
+        PDT_OnOff       = 2,
+        PDT_Boolen      = 3,
+        PDT_MinMaxStep  = 4,
+        PDT_Enumeration = 5,
+        PDT_Button      = 6
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
 
@@ -693,16 +701,16 @@ public:
 
     enum TTHeaderFlag
     {
-        TT_None          = 0x0, 
+        TT_None          = 0x0,
         TT_ProxyToClient = 0x1
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(TTHeaderFlag)
     Q_DECLARE_FLAGS(TTHeaderFlags, TTHeaderFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(TTHeaderFlags)
 
-    enum LicenseType 
+    enum LicenseType
     {
-        LC_Trial,          
+        LC_Trial,
         LC_Analog,
         LC_Professional,
         LC_Edge,
@@ -710,21 +718,21 @@ public:
         LC_AnalogEncoder,
         LC_VideoWall,
 
-        /** 
+        /**
          * I/O Modules license.
          * Needs to be activated to enable I/O module features. One license channel per one module.
          */
-        LC_IO,                  
+        LC_IO,
 
         /**
          * Like a professional license.
          * Could not be activated on ARM devices.
-         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally, 
-         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid. 
+         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally,
+         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid.
          */
         LC_Start,
 
-        /** 
+        /**
          * Invalid license. Required when the correct license type is not known in current version.
          */
         LC_Invalid,
@@ -732,11 +740,23 @@ public:
         LC_Count
     };
 
+
     /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-    enum BookmarkSearchStrategy {
-        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+
+//    enum BookmarkSearchStrategy {
+//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+//    };
+
+    // All columns are sorted by database initially, except camera name and tags.
+    enum BookmarkSortField
+    {
+        BookmarkName
+        , BookmarkStartTime
+        , BookmarkDuration
+        , BookmarkTags          // Sorted manually!
+        , BookmarkCameraName    // Sorted manually!
     };
 
     /**
@@ -766,12 +786,12 @@ public:
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
     static_assert(FP_Medium == 2, "Value is hardcoded in SQL migration script.");
 
-    // TODO: #MSAPI move to api/model or even to common_globals, 
+    // TODO: #MSAPI move to api/model or even to common_globals,
     // add lexical serialization (see QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS)
-    // 
+    //
     // Check serialization/deserialization in QnMediaServerConnection::doRebuildArchiveAsync
     // and in handler.
-    // 
+    //
     // And name them sanely =)
     enum RebuildAction
     {
@@ -788,8 +808,8 @@ public:
     };
 
 
-    /** 
-     * backup settings 
+    /**
+     * backup settings
      */
     enum BackupType
     {
@@ -814,11 +834,11 @@ public:
     /**
      * Invalid value for a timezone UTC offset.
      */
-    static const qint64 InvalidUtcOffset = INT64_MAX;
+    static const qint64 InvalidUtcOffset = std::numeric_limits<qint64>::max();
 #define InvalidUtcOffset InvalidUtcOffset
 
-    /** 
-     * Helper function that can be used to 'place' macros into Qn namespace. 
+    /**
+     * Helper function that can be used to 'place' macros into Qn namespace.
      */
     template<class T>
     const T &_id(const T &value) { return value; }
@@ -832,15 +852,20 @@ enum {MD_WIDTH = 44, MD_HEIGHT = 32};
 
 
 /** Time value for 'now'. */
-#define DATETIME_NOW        INT64_MAX 
+#define DATETIME_NOW        std::numeric_limits<qint64>::max()
+
+// TODO: #rvasilenko Change to other constant - 0 is 1/1/1970
+// Note: -1 is used for invalid time
+// Now it is returning when no archive data and archive is played backward
+enum { kNoTimeValue = 0 };
 
 /** Time value for 'unknown' / 'invalid'. Same as AV_NOPTS_VALUE. Checked in ffmpeg.cpp. */
-#define DATETIME_INVALID    INT64_MIN
+#define DATETIME_INVALID    std::numeric_limits<qint64>::min()
 
 
-/** 
+/**
  * \def lit
- * Helper macro to mark strings that are not to be translated. 
+ * Helper macro to mark strings that are not to be translated.
  */
 #define QN_USE_QT_STRING_LITERALS
 #ifdef QN_USE_QT_STRING_LITERALS
@@ -860,9 +885,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
         (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)
+        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSearchStrategy)
+        (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)

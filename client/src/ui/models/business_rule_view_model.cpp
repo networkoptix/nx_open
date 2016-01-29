@@ -75,6 +75,27 @@ namespace QnBusiness {
             return filteredResources<QnUserResource>(resources);
         return QnResourceList();
     }
+
+    /**
+     *  This method must cleanup all action parameters that are not required for the given action.
+     *  For now it implements only handling of the deprecated CameraOutputOnceAction action.
+     *  //TODO: #GDM implement correct filtering
+     */
+    QnBusinessActionParameters filterActionParams(QnBusiness::ActionType actionType, const QnBusinessActionParameters &params)
+    {
+        QnBusinessActionParameters result(params);
+        switch (actionType)
+        {
+        case QnBusiness::CameraOutputOnceAction:
+            result.relayAutoResetTimeout = QnCameraOutputBusinessAction::kInstantActionAutoResetTimeoutMs;
+
+            break;
+        default:
+            break;
+        }
+
+        return result;
+    }
 }
 
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
@@ -329,7 +350,7 @@ QnBusinessEventRulePtr QnBusinessRuleViewModel::createRule() const {
     rule->setEventParams(m_eventParams); //TODO: #GDM #Business filtered
     rule->setActionType(m_actionType);
     rule->setActionResources(toIdList(filterActionResources(m_actionResources, m_actionType)));
-    rule->setActionParams(m_actionParams); //TODO: #GDM #Business filtered
+    rule->setActionParams(filterActionParams(m_actionType, m_actionParams));
     rule->setAggregationPeriod(m_aggregationPeriodSec);
     rule->setDisabled(m_disabled);
     rule->setComment(m_comments);
@@ -698,6 +719,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const {
         case QnBusiness::SayTextAction:
             return qnSkin->icon("events/sound.png");
 
+        case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         {
             bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -795,6 +817,7 @@ bool QnBusinessRuleViewModel::isValid(int column) const {
             return isResourcesListValid<QnExecPtzPresetPolicy>(QnBusiness::filteredResources<QnExecPtzPresetPolicy::resource_type>(m_actionResources)) &&
                     m_actionResources.size() == 1 &&
                    !m_actionParams.presetId.isEmpty();
+        case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
         {
             bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -923,6 +946,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const {
     case QnBusiness::ExecutePtzPresetAction:
         return QnExecPtzPresetPolicy::getText(resources, detailed);
 
+    case QnBusiness::ShowTextOverlayAction:
     case QnBusiness::ShowOnAlarmLayoutAction:
     {
         bool canUseSource = (m_actionParams.useSource && (m_eventType >= QnBusiness::UserDefinedEvent || requiresCameraResource(m_eventType)));
@@ -964,7 +988,7 @@ QString QnBusinessRuleViewModel::getAggregationText() const {
     const int DAY = HOUR * 24;
 
     if (QnBusiness::hasToggleState(m_actionType))
-        return tr("Not Applied");
+        return tr("N/A");
 
     if (m_aggregationPeriodSec <= 0)
         return tr("Instant");

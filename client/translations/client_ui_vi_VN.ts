@@ -99,11 +99,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>đến</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>Làm mới</translation>
     </message>
@@ -169,13 +164,18 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>Tất cả máy chủ đang offline. Dữ liệu kiểm toán không có sẵn.</translation>
+        <source>Audit Trail</source>
+        <translation>Đường mòn kiểm toán</translation>
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Đường mòn kiểm toán</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -228,6 +228,16 @@
         <source>Tags:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -266,11 +276,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
@@ -288,6 +293,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">Tất cả máy chủ đang offline. Logs là không có sẵn.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -478,18 +488,13 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
         <translation type="unfinished">loài</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
+        <translation type="unfinished">Làm mới</translation>
     </message>
 </context>
 <context>
@@ -1006,18 +1011,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation>&amp;Alarm/Event Rules</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
-        <translation>&amp;Event Log</translation>
     </message>
     <message>
         <location/>
@@ -1031,18 +1026,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation>&amp;Health Monitoring</translation>
-    </message>
-    <message>
-        <location/>
         <source>System Settings</source>
         <translation>Cài đặt hệ thống</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
-        <translation>Mở đường mòn kiểm toán log</translation>
     </message>
     <message>
         <location/>
@@ -1056,22 +1041,42 @@
     </message>
     <message>
         <location/>
-        <source>Audit Trail</source>
-        <translation>Đường mòn kiểm toán</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1089,13 +1094,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>Mặc định quay:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>Đây là một mắt cá (180 độ) camera</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>Đây là một mắt cá (180 độ) camera</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1304,8 +1309,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>Loại giấy phép này đòi hỏi phiên bản phần mềm cao hơn.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1866,6 +1871,11 @@
         <source>Check</source>
         <translation>kiểm tra</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1985,11 +1995,6 @@
     </message>
     <message>
         <location/>
-        <source>Unable to check updates via internet.</source>
-        <translation>Không thể kiểm tra cập nhật thông qua internet.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>Sẵn có:</translation>
     </message>
@@ -1997,6 +2002,11 @@
         <location/>
         <source>To update manually, download and use the archive file on the following link:</source>
         <translation>Để cập nhật bằng tay, tải về một kho lưu trữ với các liên kết sau đây:</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2118,8 +2128,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>Xin vui lòng chờ trong khi kết nối đang được phục hồi ...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2478,17 +2488,27 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2614,11 +2634,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>cổng IO</translation>
-    </message>
-    <message>
-        <location/>
         <source>Enable Audio</source>
         <translation>cho phép âm thanh</translation>
     </message>
@@ -2666,6 +2681,11 @@
         <location/>
         <source>Fisheye</source>
         <translation>Fisheye</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2824,22 +2844,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2854,22 +2859,7 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">lịch trình...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2878,6 +2868,71 @@
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished">Bỏ chọn lưu trữ sẽ gây ra gì, nhưng văn bản dừng.
 Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">Lưu trữ bên ngoài mới...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2920,11 +2975,6 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>Cảnh báo! Thiết lập FPS và chất lượng trong Schedule Recording sẽ không làm việc!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(đề nghị)</translation>
     </message>
@@ -2937,6 +2987,11 @@ Nó sẽ không từ chối cảnh lâu đời nhất loại bỏ từ ổ đĩa
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>Gửi sử dụng và crash thống kê vô danh với các nhà phát triển phần mềm</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">Cảnh báo! Điều này sẽ làm cho chất lượng và tỷ lệ khung hình (FPS) thiết lập trong Biểu ghi không liên quan.</translation>
     </message>
 </context>
 <context>

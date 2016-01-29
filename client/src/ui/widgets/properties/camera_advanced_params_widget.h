@@ -1,5 +1,4 @@
-#ifndef QN_CAMERA_ADVANCED_PARAMS_WIDGET_H
-#define QN_CAMERA_ADVANCED_PARAMS_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -29,6 +28,12 @@ public:
 
     void loadValues();
     void saveValues();
+
+    bool hasChanges() const;
+
+signals:
+    void hasChangesChanged();
+
 private:
     void initSplitter();
 
@@ -68,5 +73,3 @@ private:
     QnCameraAdvancedParamValueMap m_loadedValues;
     QnCameraAdvancedParamValueMap m_currentValues;
 };
-
-#endif //QN_CAMERA_ADVANCED_PARAMS_WIDGET_H

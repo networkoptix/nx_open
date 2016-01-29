@@ -757,8 +757,11 @@ void QnWorkbenchUi::at_activityStopped() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
+    {
+        widget->setOption(QnResourceWidget::ActivityPresence, false);
         if(!(widget->options() & QnResourceWidget::DisplayInfo))
             widget->setOverlayVisible(false);
+    }
 }
 
 void QnWorkbenchUi::at_activityStarted() {
@@ -767,8 +770,11 @@ void QnWorkbenchUi::at_activityStarted() {
     updateControlsVisibility(true);
 
     foreach(QnResourceWidget *widget, display()->widgets())
+    {
+        widget->setOption(QnResourceWidget::ActivityPresence, true);
         if(widget->isInfoVisible()) // TODO: #Elric wrong place?
             widget->setOverlayVisible(true);
+    }
 }
 
 void QnWorkbenchUi::at_display_widgetChanged(Qn::ItemRole role) {
@@ -2479,10 +2485,6 @@ void QnWorkbenchUi::createSliderWidget()
             || !accessController()->hasGlobalPermissions(Qn::GlobalEditCamerasPermission);
 
         bookmarksViewer->setReadOnly(readonly);
-
-
-        const bool userIsAdmin = accessController()->hasGlobalPermissions(Qn::GlobalAdminPermissions);
-        bookmarksViewer->setAllowClickOnTag(userIsAdmin);
     };
 
     connect(context()->accessController(), &QnWorkbenchAccessController::permissionsChanged
@@ -2526,13 +2528,8 @@ void QnWorkbenchUi::createSliderWidget()
     connect(bookmarksViewer, &QnBookmarksViewer::tagClicked, this
         , [this, bookmarksViewer](const QString &tag)
     {
-        const auto windowStart = m_sliderItem->timeSlider()->windowStart();
-        const auto window = QnTimePeriod(windowStart
-            , m_sliderItem->timeSlider()->windowEnd() - windowStart);
-
         QnActionParameters params;
         params.setArgument(Qn::BookmarkTagRole, tag);
-        params.setArgument(Qn::ItemSliderWindowRole, window);
         menu()->triggerIfPossible(Qn::OpenBookmarksSearchAction, params);
     });
 

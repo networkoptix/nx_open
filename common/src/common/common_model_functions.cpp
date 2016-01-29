@@ -14,6 +14,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RebuildState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PeerType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ResourceStatus)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, BitratePerGopType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ServerFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, TimeFlags)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraStatusFlags)
@@ -74,7 +75,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::PtzTrait,
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PropertyDataType)
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StreamQuality, 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::StreamQuality,
     (Qn::QualityLowest,     "lowest")
     (Qn::QualityLow,        "low")
     (Qn::QualityNormal,     "normal")
@@ -92,13 +93,17 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::SerializationFormat,
     (Qn::CompressedPeriodsFormat, "periods")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSearchStrategy,
-    (Qn::EarliestFirst,     "earliest")
-    (Qn::EarliestFirst,     "default")
-    (Qn::LatestFirst,       "latest")
-    (Qn::LatestFirst,       "reverse")
-    (Qn::LongestFirst,      "longest")
-    (Qn::LongestFirst,      "size")
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::BookmarkSortField,
+    (Qn::BookmarkName,          "name")
+    (Qn::BookmarkStartTime,     "startTime")
+    (Qn::BookmarkDuration,      "duration")
+    (Qn::BookmarkTags,          "tags")
+    (Qn::BookmarkCameraName,    "cameraName")
+)
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qt::SortOrder,
+    (Qt::AscendingOrder,     "asc")
+    (Qt::DescendingOrder,    "desc")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn::RebuildAction,

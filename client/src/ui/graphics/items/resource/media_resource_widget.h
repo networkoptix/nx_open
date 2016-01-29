@@ -124,6 +124,11 @@ public:
     virtual float visualAspectRatio() const;
     virtual float defaultVisualAspectRatio() const override;
 
+    /** Check if the widget has video. It can be absent in I/O Module, for example. */
+    bool hasVideo() const;
+    
+    QnCompositeTextOverlay *compositeTextOverlay();
+
 signals:
     void motionSelectionChanged();
     void displayChanged();
@@ -169,6 +174,9 @@ protected:
 
     void suspendHomePtzController();
     void resumeHomePtzController();
+
+    virtual void updateHud(bool animate);
+
 private slots:
     void at_resource_resourceChanged();
     void at_resource_propertyChanged(const QnResourcePtr &resource, const QString &key);

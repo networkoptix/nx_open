@@ -32,19 +32,19 @@ const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
 const QString hqFolder("hi_quality");
 
-bool recursiveClean(const QString &path) 
+bool recursiveClean(const QString &path)
 {
     QDir dir(path);
     QFileInfoList entryList = dir.entryInfoList(
-            QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot, 
-            QDir::DirsFirst); 
+            QDir::AllDirs | QDir::Files | QDir::NoDotAndDotDot,
+            QDir::DirsFirst);
 
     for (auto &entry : entryList) {
         auto tmp = entry.absoluteFilePath();
         if (entry.isDir()) {
              if (!recursiveClean(entry.absoluteFilePath()))
                 return false;
-        } 
+        }
         else if (entry.isFile()) {
             QFile f(entry.absoluteFilePath());
             f.setPermissions(QFile::ReadOther | QFile::WriteOther);
@@ -84,12 +84,12 @@ public:
               durationMs(-1)
         {}
 
-        TimePeriod(int64_t stime, int duration) 
+        TimePeriod(int64_t stime, int duration)
             : startTimeMs(stime),
               durationMs(duration)
         {}
 
-        bool operator == (const TimePeriod &other) const 
+        bool operator == (const TimePeriod &other) const
         {
             return startTimeMs == other.startTimeMs && durationMs == other.durationMs;
         }
@@ -103,11 +103,11 @@ public:
             assert(first.startTimeMs + first.durationMs > second.startTimeMs);
             TimePeriod ret;
             ret.startTimeMs = first.startTimeMs;
-            ret.durationMs = 
-                first.startTimeMs + first.durationMs > 
-                second.startTimeMs + second.durationMs ? first.durationMs : 
-                                                         second.startTimeMs - 
-                                                         first.startTimeMs + 
+            ret.durationMs =
+                first.startTimeMs + first.durationMs >
+                second.startTimeMs + second.durationMs ? first.durationMs :
+                                                         second.startTimeMs -
+                                                         first.startTimeMs +
                                                          second.durationMs;
             return ret;
         }
@@ -118,9 +118,9 @@ public:
         typedef std::list<TimePeriod> TimePeriodList;
         typedef TimePeriodList::iterator TimePeriodListIterator;
         friend class TestHelper;
-        
+
     public:
-        TimeLine(int timeGapMs) 
+        TimeLine(int timeGapMs)
             : m_timePoint(std::numeric_limits<int64_t>::max()),
               m_timeGapMs(timeGapMs)
         {}
@@ -143,8 +143,8 @@ public:
             bool firstToTheRight = true;
 
             for (auto it = m_timeLine.begin(); it != m_timeLine.end(); ++it) {
-                if (newPeriod.startTimeMs + newPeriod.durationMs > it->startTimeMs && 
-                    (newPeriod.startTimeMs <= it->startTimeMs || 
+                if (newPeriod.startTimeMs + newPeriod.durationMs > it->startTimeMs &&
+                    (newPeriod.startTimeMs <= it->startTimeMs ||
                      newPeriod.startTimeMs < it->startTimeMs + it->durationMs)) {
                     if (foundOverlapped) {
                         auto copyIt = it;
@@ -157,7 +157,7 @@ public:
                         m_timePoint = newPeriod.startTimeMs;
                     it = m_timeLine.erase(it);
                     it = m_timeLine.insert(it, newPeriod);
-                } else if (!foundOverlapped && firstToTheRight && 
+                } else if (!foundOverlapped && firstToTheRight &&
                            it->startTimeMs > newPeriod.startTimeMs) {
                     firstToTheRight = false;
                     insertIterator = it;
@@ -165,7 +165,7 @@ public:
             }
 
             if (!foundOverlapped) {
-               m_timeLine.insert(insertIterator, period); 
+               m_timeLine.insert(insertIterator, period);
                if (period.startTimeMs < m_timePoint)
                    m_timePoint = period.startTimeMs;
             }
@@ -181,18 +181,18 @@ public:
             if (time < m_timePoint)
                 return false;
 
-            //qDebug() << "current time period: (" 
-            //         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs 
+            //qDebug() << "current time period: ("
+            //         << m_currentIt->startTimeMs << " " << m_currentIt->durationMs
             //         << lit("%1 left to the end ) ")
-            //                .arg(m_currentIt->startTimeMs + 
-            //                     m_currentIt->durationMs - 
+            //                .arg(m_currentIt->startTimeMs +
+            //                     m_currentIt->durationMs -
             //                     m_timePoint)
             //         << "time: " << time << " m_time: " << m_timePoint
             //         << " diff: " << std::abs(time - m_timePoint);
 
             if (std::abs(time - m_timePoint) > m_timeGapMs) {
-                if (time > m_timePoint && m_currentIt->startTimeMs + 
-                                          m_currentIt->durationMs - 
+                if (time > m_timePoint && m_currentIt->startTimeMs +
+                                          m_currentIt->durationMs -
                                           m_timePoint < m_timeGapMs*2) {
                     // maybe next time period will do
                     ++m_currentIt;
@@ -201,7 +201,7 @@ public:
                     m_timePoint = m_currentIt->startTimeMs;
                     if (std::abs(time - m_timePoint) > m_timeGapMs)
                         return false;
-                } else 
+                } else
                     return false;
             }
 
@@ -228,7 +228,7 @@ public:
 public:
     TimeLine &getTimeLine() {return m_timeLine;}
 
-    void print() const 
+    void print() const
     {
         qDebug() << lit("We have %1 files, %2 time periods")
                         .arg(m_fileCount)
@@ -238,13 +238,13 @@ public:
         int prevDuration;
         qDebug() << "Time periods details: ";
 
-        for (auto it = m_timeLine.m_timeLine.cbegin(); 
-             it != m_timeLine.m_timeLine.cend(); 
+        for (auto it = m_timeLine.m_timeLine.cbegin();
+             it != m_timeLine.m_timeLine.cend();
              ++it) {
             qDebug() << it->startTimeMs << " " << it->durationMs;
             if (it != m_timeLine.m_timeLine.cbegin()) {
-                qDebug() << "\tGap from previous: " 
-                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms (" 
+                qDebug() << "\tGap from previous: "
+                         << it->startTimeMs - (prevStartTime + prevDuration) << "ms ("
                          << (it->startTimeMs - (prevStartTime + prevDuration))/1000
                          << "s )";
             }
@@ -301,15 +301,15 @@ private:
         {
             int curDuration = durationDist(gen) == 0 ? duration_1 : duration_2;
             bool isHole = normalOrHoleDist(gen) <= 3 ? true : false;
-            int64_t curStartTime = isHole ? holeStartDistMs(gen) + startTimeMs : 
+            int64_t curStartTime = isHole ? holeStartDistMs(gen) + startTimeMs :
                                             normalStartDistMs(gen) + startTimeMs;
             QString fileName = lit("%1_%2.mkv").arg(curStartTime).arg(curDuration);
-            QString pathString = QnStorageManager::dateTimeStr(curStartTime, 
-                                                               currentTimeZone()/60, 
+            QString pathString = QnStorageManager::dateTimeStr(curStartTime,
+                                                               currentTimeZone()/60,
                                                                lit("/"));
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             QDir(root).mkpath(pathString);
-            QString fullFileName = closeDirPath(root) + closeDirPath(pathString) 
+            QString fullFileName = closeDirPath(root) + closeDirPath(pathString)
                                                       + fileName;
             if (curDuration == duration_1)
                 testFile_1.copy(fullFileName);
@@ -351,20 +351,20 @@ private:
     void loadMedia()
     {
         for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan : 
+            QnStorageManager *manager = i % 2 == 0 ? qnNormalStorageMan :
                                                      qnBackupStorageMan;
-            manager->getFileCatalog(lit("%1").arg(cameraFolder), 
+            manager->getFileCatalog(lit("%1").arg(cameraFolder),
                                     QnServer::LowQualityCatalog);
 
             manager->getFileCatalog(lit("%1").arg(cameraFolder),
                                     QnServer::HiQualityCatalog);
             manager->m_rebuildCancelled = false;
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i], 
-                                                  QnServer::LowQualityCatalog, 0.0);
+            manager->loadFullFileCatalogFromMedia(m_storages[i],
+                                                  QnServer::LowQualityCatalog);
 
-            manager->loadFullFileCatalogFromMedia(m_storages[i], 
-                                                  QnServer::HiQualityCatalog, 0.0);
+            manager->loadFullFileCatalogFromMedia(m_storages[i],
+                                                  QnServer::HiQualityCatalog);
         }
     }
 
@@ -392,7 +392,7 @@ TEST(ServerArchiveDelegate_playback_test, TestHelper)
     tp3 = TestHelper::TimePeriod::merge(tp1, tp2);
     ASSERT_TRUE(tp3.startTimeMs == 0);
     ASSERT_TRUE(tp3.durationMs == 35);
-    
+
     tp1 = TestHelper::TimePeriod(5, 10);
     tp2 = TestHelper::TimePeriod(0, 20);
 
@@ -467,7 +467,7 @@ static void ffmpegInit()
     }
 }
 
-TEST(ServerArchiveDelegate_playback_test, Main) 
+TEST(ServerArchiveDelegate_playback_test, Main)
 {
     const QString storageUrl_1 = qApp->applicationDirPath() + lit("/tmp/path1");
     const QString storageUrl_2 = qApp->applicationDirPath() + lit("/tmp/path2");
@@ -540,7 +540,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
         else
             break;
-    } 
+    }
 
     archiveDelegate.setQuality(MEDIA_Quality_Low, true);
     archiveDelegate.seek(0, true);
@@ -552,7 +552,7 @@ TEST(ServerArchiveDelegate_playback_test, Main)
             ASSERT_TRUE(testHelper.getTimeLine().checkTime(data->timestamp/1000));
         else
             break;
-    } 
+    }
 }
 
 TEST(ServerArchiveDelegate_playback_test, Clean_after)

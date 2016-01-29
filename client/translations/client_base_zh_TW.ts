@@ -2,6 +2,33 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="zh_TW" sourcelanguage="en_US">
 <context>
+    <name>BackupCamerasDialogDelegate</name>
+    <message>
+        <source>Backup newly added devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup newly added cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BookmarkToolTipFrame</name>
     <message>
         <source>Zoom timeline
@@ -64,12 +91,12 @@ to view more bookmarks</source>
         <translation>月</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>所有資料</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>最後錄影流量:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -128,25 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -182,10 +190,6 @@ to view more bookmarks</source>
     <message>
         <source>Parameter 1 is null.</source>
         <translation>參數 1 為空值.</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">關閉</translation>
     </message>
 </context>
 <context>
@@ -695,32 +699,12 @@ to view more bookmarks</source>
         <translation>在新頁籤中開啟</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>顯示在新頁籤</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>在新視窗中開啟</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>顯示在新視窗</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>開啟新頁籤中的佈局</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>開啟佈局</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>在新視窗中開啟佈局</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>在新視窗中開啟目前佈局</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1059,10 +1043,6 @@ to view more bookmarks</source>
         <translation>拉伸至選擇區域</translation>
     </message>
     <message>
-        <source>Bookmark Selection...</source>
-        <translation>選擇書籤...</translation>
-    </message>
-    <message>
         <source>Edit Bookmark...</source>
         <translation>編輯書籤...</translation>
     </message>
@@ -1331,10 +1311,6 @@ to view more bookmarks</source>
         <translation>攝影機診斷...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation>IO模組診斷...</translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation>裝置列表</translation>
     </message>
@@ -1359,14 +1335,6 @@ to view more bookmarks</source>
         <translation>檢視攝影機問題...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>檢視IO模組問題...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>檢視IO模組問題...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>裝置規則...</translation>
     </message>
@@ -1381,14 +1349,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>攝影機規則...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>IO模組規則...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>IO模組規則...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1407,14 +1367,6 @@ to view more bookmarks</source>
         <translation>攝影機設定...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>IO模組設定...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>IO模組設定...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>伺服器裝置列表...</translation>
     </message>
@@ -1427,15 +1379,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1452,6 +1396,74 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1523,10 +1535,6 @@ to view more bookmarks</source>
         <translation>此時段無錄影資料</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>這資源已從系統中移除</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>匯出所選錄影資料至檔案</translation>
     </message>
@@ -1549,6 +1557,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>攝影機動作</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1696,10 +1708,6 @@ to view more bookmarks</source>
         <translation>點擊拓展</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>紅色標記表示錄影仍有效</translation>
-    </message>
-    <message>
         <source>E-mail settings changed</source>
         <translation>E-mail設定已變更</translation>
     </message>
@@ -1735,6 +1743,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>攝影機名稱</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1744,49 +1756,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nothing</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">低</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">高</translation>
-    </message>
-    <message>
-        <source>High + Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnBackupCamerasDialogDelegate</name>
-    <message>
-        <source>What to backup:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select devices to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select cameras to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new devices:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1846,17 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%n 個裝置中的 %1 個</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個裝置中的 %1 個</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%n 個攝影機中的 %1 個</translation>
-    </message>
-    <message>
-        <source>%1 of %n IO modules</source>
-        <translation>%n 個IO模組中的 %1 個</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個攝影機中的 %1 個</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1873,6 +1842,12 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">請選擇至少一個攝影機</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1905,10 +1880,6 @@ to view more bookmarks</source>
         <translation>
             <numerusform>%n 個伺服器</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Not Applied</source>
-        <translation>不適用</translation>
     </message>
     <message>
         <source>Instant</source>
@@ -1990,15 +1961,21 @@ to view more bookmarks</source>
         <source>Source and %n more cameras</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>於</translation>
     </message>
     <message>
         <source>to</source>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>到</translation>
     </message>
     <message>
@@ -2016,6 +1993,14 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">請選擇至少一個攝影機</translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished">裝置</translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished">攝影機</translation>
     </message>
 </context>
 <context>
@@ -2183,10 +2168,6 @@ to view more bookmarks</source>
         <translation>指定的 IP 位址不可大於 255.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>結束掃描…</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation>伺服器已離線, 搜尋失敗.</translation>
     </message>
@@ -2261,6 +2242,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation>掃瞄主機...(%1)</translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2308,20 +2293,12 @@ to view more bookmarks</source>
         <translation>診斷攝影機 %1</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>診斷IO模組 %1</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>裝置診斷</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>攝影機診斷</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO模組診斷</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2332,10 +2309,6 @@ to view more bookmarks</source>
         <translation>攝影機是否可連線確認中.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>IO模組是否可連線確認中.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>目標裝置是否可提供串流確認中.</translation>
     </message>
@@ -2344,8 +2317,20 @@ to view more bookmarks</source>
         <translation>目標攝影機是否可提供串流確認中.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>目標IO模組是否可提供串流確認中.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2396,17 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>攝影機列表</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>找到 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>找到 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>已找到 %n 個攝影機</translation>
-    </message>
-    <message>
-        <source>%n IO modules found</source>
-        <translation>已找到 %n 個IO模組</translation>
+        <translation type="unfinished">
+            <numerusform>已找到 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2415,6 +2400,12 @@ to view more bookmarks</source>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>匯出所選的攝影機至檔.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2528,20 +2519,20 @@ to view more bookmarks</source>
         <translation>警告! 過高的最小值可能降低其它攝影機的錄影長度.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>位移錄影已停用或是某些選擇的攝影機不支援. 請至位移設定頁面確認是否支援或已啟用.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>這支攝影機不支援雙串流.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>這支攝影機不支援雙串流與位移偵測.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>位移錄影已停用. 請至位移設定頁面設定位移與靈敏度.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2587,14 +2578,6 @@ to view more bookmarks</source>
         <translation>攝影機設定</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO模組設定</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>IO模組設定</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>裝置診斷</translation>
     </message>
@@ -2609,14 +2592,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>攝影機診斷</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO模組診斷</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>IO模組診斷</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2634,29 +2609,51 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>攝影機規則</translation>
     </message>
-    <message>
-        <source>IO Module Rules</source>
-        <translation>IO模組規則</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>IO模組規則</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>套用設定至以下 %n 個裝置?</translation>
+        <translation type="unfinished">
+            <numerusform>套用設定至以下 %n 個裝置?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>套用設定至以下 %n 個攝影機?</translation>
-    </message>
-    <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>套用設定至以下 %n 個IO模組?</translation>
+        <translation type="unfinished">
+            <numerusform>套用設定至以下 %n 個攝影機?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
         <translation>變更未被儲存</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2847,15 +2844,15 @@ to view more bookmarks</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Rule will work only for Generic Events that passes all filters. Empty fields don&apos;t affect the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server API</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2934,8 +2931,8 @@ to view more bookmarks</source>
         <translation>是否確認要還原資料庫? 所有新增的資料將遺失..</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>須連線至伺服器後才能做系統備份.</translation>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3106,12 +3103,31 @@ to view more bookmarks</source>
         <translation>僅管理者</translation>
     </message>
     <message>
-        <source>%1 times</source>
-        <translation>%1 次</translation>
-    </message>
-    <message>
         <source>All Users</source>
         <translation>全部使用者</translation>
+    </message>
+    <message>
+        <source>&lt;User removed&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is description of event. Will be replaced in runtime</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3235,27 +3251,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>開啟警報/事件規則管理...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>開啟事件記錄...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>開啟裝置列表...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>開啟攝影機列表...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3274,8 +3294,8 @@ to view more bookmarks</source>
         <translation>重要的性能提示</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>這可能導致客戶端軟體故障甚至崩潰.</translation>
+        <source>This may result in client software issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3446,10 +3466,6 @@ to view more bookmarks</source>
         <translation>匯出到 &quot;%1&quot;…</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>無法建立輸出檔案 %1.</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>無法匯出裝置 %1.</translation>
@@ -3459,8 +3475,16 @@ to view more bookmarks</source>
         <translation>無法匯出攝影機 %1.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>無法匯出IO模組 %1.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3526,12 +3550,12 @@ to view more bookmarks</source>
         <translation>無法執行測試.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>無任何一台伺服器已連線至網際網路.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>逾時</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">逾時</translation>
     </message>
 </context>
 <context>
@@ -3564,10 +3588,6 @@ to view more bookmarks</source>
         <translation>無法執行測試.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>無任何一台伺服器已連線至網際網路.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>無法讀取到使用者.</translation>
     </message>
@@ -3576,16 +3596,20 @@ to view more bookmarks</source>
         <translation>匯入使用者</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>逾時</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>讀取使用者時發生錯誤.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation>找不到新的使用者.</translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">逾時</translation>
     </message>
 </context>
 <context>
@@ -3845,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>使用類比授權瀏覽這 %n 支攝影機</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>使用授權在所選的 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>使用授權在所選的 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>使用授權在所選的 %n 支攝影機</translation>
+        <translation type="unfinished">
+            <numerusform>使用授權在所選的 %n 支攝影機</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>使用授權在所選的 %n 個IO模組</translation>
+    <message numerus="yes">
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4035,16 +4065,16 @@ to view more bookmarks</source>
         <translation>%1 (巡航 &quot;%2&quot; 正在執行)</translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation>I/O模組</translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation>放大窗格</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation>低解析度</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4355,20 +4385,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>開啟攝影機</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>開啟IO模組</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>裝置設定...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>攝影機設定...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>IO模組設定...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
@@ -4379,15 +4401,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>開啟攝影機網頁...</translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>開啟IO模組網頁...</translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4402,8 +4432,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>請使用其它電腦運行全功能模式.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>警告</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">警告!</translation>
     </message>
 </context>
 <context>
@@ -4467,16 +4497,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>若您移除, 這些巡航將無效.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>嘗試從攝影機 %1 取得位置時發生錯誤.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>請等候攝影機上線.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>嘗試設定攝影機 %1 之位置時發生錯誤.</translation>
     </message>
     <message>
         <source>Could not get position from camera.</source>
@@ -4491,16 +4513,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>移除預設點</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>管理 PTZ %1.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>PTZ 設定值未被儲存.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>變更未儲存。您確定要儲存他們嗎?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4744,10 +4774,6 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>第一段錄影到目前之錄影長度</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>平均錄影流量</translation>
     </message>
@@ -4779,17 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>空</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>共 %n 個裝置</translation>
+        <translation type="unfinished">
+            <numerusform>共 %n 個裝置</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>共 %n 個攝影機</translation>
-    </message>
-    <message>
-        <source>Total %n IO modules</source>
-        <translation>共 %n 個IO模組</translation>
+        <translation type="unfinished">
+            <numerusform>共 %n 個攝影機</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4814,6 +4840,20 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation>攝影機</translation>
+    </message>
+    <message>
+        <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4962,6 +5002,53 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">&lt;任何裝置&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;任何攝影機&gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5048,11 +5135,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>伺服器未儲存</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>套用設定到伺服器 %1?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5087,12 +5174,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>本伺服器已存在之攝影機數量超過設定的最大攝影機數</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>為避免錯誤發生 請調整最大裝置數量</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>為避免錯誤發生 請調整最大攝影機數量</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5309,18 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>請手動使用安裝包更新客戶端程式.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>更新成功.</translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation>找不到啟動程式.</translation>
-    </message>
-    <message>
-        <source>Update Cancelled</source>
-        <translation>更新取消</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>更新成功.</translation>
     </message>
@@ -5333,24 +5408,50 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>網路連線問題</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>於更新伺服器上未找到此版號.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>無法進行更新. 無法找到一個或多台伺服器的更新.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>無法進行更新. 無法找到客戶端的更新.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>無法解壓縮更新檔案.</translation>
     </message>
+    <message numerus="yes">
+        <source>Authentication failed for %n servers:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>無法開始更新. 不允許降級到舊版本.</translation>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5364,6 +5465,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>%n 個使用者</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5400,14 +5511,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>軟體位移偵測需要提供2FPS的子串流. 目前排程填入的FPS為%1. FPS將降至 %2.</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>無效的排程</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>攝影機的第二串流已關閉. 位移主碼錄影 + 全時子碼錄影選項無效. 請點擊 &quot;是&quot; 將錄影類型改成 &quot;全時錄影&quot; 或點擊 &quot;否&quot; 將第二串流開啟.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>確認重置位移偵測區域</translation>
     </message>
@@ -5436,8 +5539,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>攝影機設定</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO模組設定</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">無效的排程</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5473,16 +5584,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">無效資料</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">提供的參數無效，無法執行測試。</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">網路錯誤</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">無法進行測試. 您的伺服器並未連線至網際網路.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5507,6 +5610,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Success</source>
         <translation type="unfinished">成功</translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5579,36 +5690,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>請檢查攝影機設定裡的驗証資訊</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>請檢查IO模組設定裡的驗証資訊</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>By schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In realtime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On demand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">警告</translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">您正在運行例行的同步工作.</translation>
@@ -5616,10 +5703,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">請注意! 同步時將可能使您的硬碟忙碌! 根據資料大小的不同, 此工作可能持續數小時.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">只有在您的錄影資料夾被移動過, 被更名過或被取代過您才需要做這個動作. 您可隨時取消此重建動作而不會遺失任何資料.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5630,19 +5713,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In Realtime mode all data is backed up on continuously</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous footage will not be backed up!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one camera with archive to backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5651,10 +5722,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup is created up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5670,7 +5737,86 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">重建目錄完成。</translation>
     </message>
     <message>
-        <source>Archive backup is completed.</source>
+        <source>By Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup Schedule is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">警告!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5700,12 +5846,34 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Use as main storage</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 (Checking...)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Scanning... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Rebuilding... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">儲存空間 &apos;%1&apos; 的資料索引重建正在執行中</translation>
+        <source>Fast Archive Scan - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding Archive Index - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5734,16 +5902,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>系統中有其它伺服器使用相同的網路儲存裝置. 不建議多台伺服器共同相一組網路儲存裝置.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>警告</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>新增儲存裝置</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation>提供的儲存路徑沒有定義有效的外部儲存裝置。</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">警告!</translation>
     </message>
 </context>
 <context>
@@ -5864,14 +6032,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5885,6 +6045,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6528,10 +6696,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>找不到啟動程式.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>新增裝置正在進行中. 是否要取消?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6542,12 +6706,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
         <translation>
             <numerusform>無法移動這 %n 個攝影機到伺服器 %1. 伺服器無回應.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>無法移動這 %n 個IO模組到伺服器 %1. 伺服器無回應.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6563,12 +6721,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>伺服器 %1 無法找到及存取這 %n 個IO模組 確定您要移動他們嗎?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation>
             <numerusform>您確定要永久刪除這 %n 個檔案?</numerusform>
@@ -6580,47 +6732,81 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>您確定要從佈局中移除這 %n 個項目嗎?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>這 %n 個裝置是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>這 %n 個裝置是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>這 %n 個攝影機是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>這 %n 個攝影機是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>這 %n 個IO模組是被自動搜尋找到的. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 個裝置被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個裝置被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 個攝影機被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 個攝影機被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 個IO模組被自動搜尋找到. 刪除後可能會再被自動搜尋找回來. 您確定要刪除?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>您確定要刪除以下 %n 個裝置嗎?</translation>
+        <translation type="unfinished">
+            <numerusform>您確定要刪除以下 %n 個裝置嗎?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>您確定要刪除以下 %n 個攝影機嗎?</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>您確定要刪除以下 %n 個IO模組嗎?</translation>
+        <translation type="unfinished">
+            <numerusform>您確定要刪除以下 %n 個攝影機嗎?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation>
             <numerusform>您確定要刪除以下 %n 個項目嗎?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6634,10 +6820,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>書籤</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>是否確定刪除書籤 %1?</translation>
-    </message>
-    <message>
         <source>Bookmarks can only be added to an online server.</source>
         <translation>書籤僅能加入至有上線的伺服器.</translation>
     </message>
@@ -6648,6 +6830,22 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Confirm Deletion</source>
         <translation>移除確認</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this bookmark?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6797,20 +6995,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>%1 媒體檔案 (*.nov)</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>您正嘗試匯出超過 30 分鐘的影像.</translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation>這可能會需要超過 1GB 以上硬碟空間, 依據您網路速度的不同, 可能需時數分鐘.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
         <translation>請確認是否繼續?</translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>您正嘗試匯出多個影像, 總長度超過 30 分鐘.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
@@ -6893,7 +7083,15 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video to the &apos;.nov&apos; format. Do you want to continue?</source>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6940,10 +7138,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>無法更新所選伺服器.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation>您可以於系統管理中再次更新這些伺服器.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
@@ -6951,10 +7145,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>警告: 您將要合併有 START 授權的系統.
 每個系統僅能存在一組 START 授權.
 若您瞭解並要繼續執行請點擊合併鍵.</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>警告</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -6967,6 +7157,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation>所選伺服器已成功與系統連結!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">警告!</translation>
     </message>
 </context>
 <context>
@@ -7075,8 +7273,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>所有攝影機</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>所有IO模組</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7086,28 +7284,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>嘗試從攝影機 %1 取得位置時發生錯誤.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>請靜待攝影機上線.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>嘗試設定攝影機 %1 位置時發生錯誤.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
         <translation>無法從攝影機取得位置.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>無法設定攝影機的位置.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
-        <translation>無法設置攝影機的預設點.</translation>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7120,9 +7314,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>除了啟動授權 其它設定皆無法完成.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>下列 %n 個項目未被儲存.</translation>
+        <translation type="unfinished">
+            <numerusform>下列 %n 個項目未被儲存.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7134,9 +7330,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>錯誤</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>下列 %n 個項目未被刪除.</translation>
+        <translation type="unfinished">
+            <numerusform>下列 %n 個項目未被刪除.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7220,6 +7418,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">錯誤</translation>
+    </message>
+    <message>
+        <source>Error while taking screenshot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7356,14 +7562,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>其它使用者正在控制此畫面.</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>是否確認中斷電視牆?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>您必須手動開啟.</translation>
-    </message>
-    <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
         <translation>%1的螢幕</translation>
@@ -7371,10 +7569,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A control session is already running.</source>
         <translation>控制進程正在執行.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>非預期的錯誤發生. 無法儲存變更.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7404,9 +7598,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>已有相同名稱的電視牆.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n 物件</translation>
+        <translation type="unfinished">
+            <numerusform>%n 物件</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

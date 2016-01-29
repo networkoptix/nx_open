@@ -23,7 +23,10 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
     connect(ui->captionEdit,     &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
     connect(ui->descriptionEdit, &QLineEdit::textChanged, this, &QnCustomBusinessEventWidget::paramsChanged);
 
-    const QString description = tr("Rule will work only for Generic Events that passes all filters. Empty fields don't affect the result. Each filter passes if any of keyword is matched.");
+    const QString description = tr("Event will trigger only if Generic Event meets all the above conditions. "
+        "If a keyword field is empty, condition is always met. "
+        "If not, condition is met if the corresponding field of Generic Event contains any keyword.");
+
     const QString linkText = tr("Server API");
     const QString link = lit("<a href=\"api\">%1</a>").arg(linkText);
     const QString documentationHint = tr("To generate Generic Event, please refer to %1.").arg(link);

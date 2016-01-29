@@ -105,11 +105,6 @@
     </message>
     <message>
         <location/>
-        <source>till</source>
-        <translation>עד</translation>
-    </message>
-    <message>
-        <location/>
         <source>Refresh</source>
         <translation>רענן</translation>
     </message>
@@ -175,8 +170,13 @@
     </message>
     <message>
         <location/>
-        <source>All Servers are offline.  Audit data are not available.</source>
-        <translation>כל השרתים אינם מקוונים. נתוני הביקורת אינם זמינים.</translation>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>All Servers are offline. Audit data is not available.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -229,6 +229,16 @@
         <source>Tags:</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location/>
+        <source>Pre-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Post-recording:</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>BookmarkWidget</name>
@@ -267,11 +277,6 @@
     <name>BookmarksLog</name>
     <message>
         <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
-        <source>Bookmarks list</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>-</source>
         <translation type="unfinished">-</translation>
     </message>
@@ -289,6 +294,11 @@
         <location/>
         <source>All Servers are offline. Logs are not available.</source>
         <translation type="unfinished">כל השרתים אינם מקוונים. רשימות התיעוד אינן זמינות.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Bookmark Log</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -474,18 +484,13 @@
     <name>CameraAdvancedParamsWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
-        <source>Reload</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Save</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Category</source>
         <translation type="unfinished">קטגוריה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Refresh</source>
+        <translation type="unfinished">רענן</translation>
     </message>
 </context>
 <context>
@@ -1000,18 +1005,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Alarm/Event Rules</source>
-        <translation>&amp;כללי התרעה/אירוע</translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+E</source>
         <translation>Ctrl +E</translation>
-    </message>
-    <message>
-        <location/>
-        <source>&amp;Event Log</source>
-        <translation>&amp;רשימת תיעוד אירועים(log)</translation>
     </message>
     <message>
         <location/>
@@ -1025,23 +1020,8 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Health Monitoring</source>
-        <translation>&amp;ניטור תקינות</translation>
-    </message>
-    <message>
-        <location/>
         <source>Monitor All Servers on a Single Layout</source>
         <translation>נטר את כל השרתים בפריסה אחת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Audit Trail</source>
-        <translation>נתיב ביקורת</translation>
-    </message>
-    <message>
-        <location/>
-        <source>Open audit trail log</source>
-        <translation>פתח את תיעוד(log) נתיב הביקורת</translation>
     </message>
     <message>
         <location/>
@@ -1055,17 +1035,42 @@
     </message>
     <message>
         <location/>
-        <source>&amp;Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Ctrl+B</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks(&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&amp;Alarm/Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Health Monitoring...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Open Audit Trail Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&amp;Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Open Bookmarks List (&lt;span style=&quot; font-weight:600;&quot;&gt;Ctrl+B&lt;/span&gt;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1083,13 +1088,13 @@
     </message>
     <message>
         <location/>
-        <source>Default rotation:</source>
-        <translation>סיבוב ברירת-מחדל:</translation>
+        <source>This is a fish-eye lens camera</source>
+        <translation>זוהי מצלמת עדשת עין-הדג</translation>
     </message>
     <message>
         <location/>
-        <source>This is a fish-eye lens camera</source>
-        <translation>זוהי מצלמת עדשת עין-הדג</translation>
+        <source>Default Rotation:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1298,8 +1303,8 @@
     </message>
     <message>
         <location/>
-        <source>This license type requires higher software version.</source>
-        <translation>סוג רשיון זה דורש גירסת תוכנה גבוהה יותר.</translation>
+        <source>This license type requires a higher software version.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1860,6 +1865,11 @@
         <source>The new system will have password and name from the system:</source>
         <translation>המערכת החדשה תקבל שם וסיסמה מהמערכת:</translation>
     </message>
+    <message>
+        <location/>
+        <source>You will be reconnected.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnNotificationSoundManagerDialog</name>
@@ -1934,11 +1944,6 @@
     <name>QnServerUpdatesWidget</name>
     <message>
         <location filename="../src/ui/widgets/server_updates_widget.ui"/>
-        <source>Unable to check updates via internet.</source>
-        <translation>בדיקת עדכונים דרך האינטרנט נכשלה.</translation>
-    </message>
-    <message>
-        <location/>
         <source>Available Update:</source>
         <translation>עדכון זמין:</translation>
     </message>
@@ -1991,6 +1996,11 @@
         <location/>
         <source>Check for updates automatically</source>
         <translation>חפש עדכונים זמינים באופן אוטומטי</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Unable to check updates on the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2112,8 +2122,8 @@
     </message>
     <message>
         <location/>
-        <source>Please wait while the connection is restored...</source>
-        <translation>אנא המתן בזמן שהחיבור משוחזר...</translation>
+        <source>Please wait while the connection is being restored...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2472,17 +2482,27 @@
     <name>ShowTextOverlayActionWidget</name>
     <message>
         <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
-        <source>Fixed duration:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>seconds</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
-        <source>Custom Text:</source>
+        <source>Display text for:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Use custom text:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Rule will work only for prolonged events</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Also show on source camera</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2583,11 +2603,6 @@
     </message>
     <message>
         <location/>
-        <source>IO ports</source>
-        <translation>יציאות קלט/פלט</translation>
-    </message>
-    <message>
-        <location/>
         <source>Motion</source>
         <translation>תנועה</translation>
     </message>
@@ -2660,6 +2675,11 @@
         <location/>
         <source>Expert</source>
         <translation>מומחה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>I/O ports</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2818,22 +2838,7 @@
     <name>StorageConfigWidget</name>
     <message>
         <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
-        <source>Main Storages</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Add External Storage</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Rebuild Archive Index</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Backup Storages</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2848,22 +2853,7 @@
     </message>
     <message>
         <location/>
-        <source>Perform backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Schedule...</source>
-        <translation type="unfinished">לוח זמנים...</translation>
-    </message>
-    <message>
-        <location/>
         <source>Start Backup Now</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Storage backup is available if there are 2 or more storages in the system.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2872,6 +2862,71 @@
 It won&apos;t deny oldest footage removing from the drive.</source>
         <translation type="unfinished">ביטול הסימון מאחסון יגרום רק להפסקת הכתיבה.
 פעולה זו לא תמנע הסרת הקלטות ישנות מהכונן.</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Add External Storage...</source>
+        <translation type="unfinished">הוסף אחסון חיצוני...</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Main Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Storage Locations</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Execute Backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Set Schedule...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>You haven&apos;t configured any backup storage. Backup won&apos;t be performed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Storage backup is available if there are 2 or more valid storage drives in the system.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Global Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Archive From:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Quality:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>&lt;Select at least one camera&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Server Backup Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Backup Time Label</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2914,11 +2969,6 @@ It won&apos;t deny oldest footage removing from the drive.</source>
     <name>SystemSettingsWidget</name>
     <message>
         <location filename="../src/ui/widgets/settings/system_settings_widget.ui"/>
-        <source>Warning! FPS and quality settings in Recording Schedule will not work!</source>
-        <translation>אזהרה! הגדרות הפריימים לשניה והאיכות שב&quot;לוח זמני הקלטות&quot; לא יעבדו!</translation>
-    </message>
-    <message>
-        <location/>
         <source>(recommended)</source>
         <translation>(מומלץ)</translation>
     </message>
@@ -2931,6 +2981,11 @@ It won&apos;t deny oldest footage removing from the drive.</source>
         <location/>
         <source>Send anonymous usage and crash statistics to software developers</source>
         <translation>שלח סטטיסטיקות אנונימיות על נתוני שימוש וקריסות למפתחי התוכנה</translation>
+    </message>
+    <message>
+        <location/>
+        <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+        <translation type="unfinished">אזהרה! צעד זה יהפוך את הגדרות האיכות וקצב הפריימים(FPS) ב&quot;לוח זמני הקלטות&quot; ללא רלוונטיים.</translation>
     </message>
 </context>
 <context>

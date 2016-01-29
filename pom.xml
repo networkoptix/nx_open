@@ -119,7 +119,7 @@
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.2.1-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -414,14 +414,7 @@
                 </os>
             </activation>
             <modules>
-                <module>traytool</module>
-                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
                 <module>client.core</module>
-                <module>nxtool</module>
-                <module>client.bin</module>
-                <module>wixsetup</module>
             </modules>
             <properties>
                 <qt.dir>${libdir}/${arch}</qt.dir>
@@ -451,6 +444,28 @@
                 <script.extension>bat</script.extension>
                 <global.windows.defines>ENABLE_VMAX</global.windows.defines>
             </properties>
+        </profile>
+        <profile>
+            <id>windows-nomobile</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <modules>
+                <module>traytool</module>
+                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
+                <!--<module>vmaxproxy</module>  -->
+                <module>client</module>
+                <module>client.core</module>
+                <module>nxtool</module>
+                <module>client.bin</module>
+                <module>wixsetup</module>
+            </modules>
         </profile>
         <!-- Paxton stuff can be built only on Windows x86 -->
         <profile>
@@ -484,6 +499,10 @@
                 <file>
                     <missing>customization/${customization}/nxtool.skip</missing>
                 </file>
+                <property>
+                    <name>newmobile</name>
+                    <value>!true</value>
+                </property>
             </activation>
             <modules>
                 <module>nxtool</module>
@@ -726,6 +745,33 @@
             </modules>
         </profile>
         <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <modification>bananapi</modification>
+                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+            </properties>
+            <modules>
+                <!-- Banana pie uses same distro as rpi -->
+                <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>        
+        <profile>
             <id>linux-x64</id>
             <activation>
                 <os>
@@ -837,6 +883,7 @@
             </activation>
             <properties>
                 <qt.version>5.5.1-SNAPSHOT</qt.version>
+                <compile.options/>
             </properties>            
             <modules>
                 <module>client.core</module>

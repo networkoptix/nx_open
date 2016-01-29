@@ -145,6 +145,7 @@
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/handlers/get_hardware_info_rest_handler.h>
+#include <rest/handlers/system_settings_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -439,7 +440,9 @@ QnStorageResourcePtr createStorage(const QnUuid& serverId, const QString& path)
     storage->setName("Initial");
     storage->setParentId(serverId);
     storage->setUrl(path);
-    storage->setSpaceLimit( MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong() );
+
+    auto spaceLimit = QnFileStorageResource::calcSpaceLimit(path);
+    storage->setSpaceLimit(spaceLimit);
     storage->setUsedForWriting(storage->isWritable());
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
@@ -535,11 +538,10 @@ static QStringList listRecordFolders()
 QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
 {
     QnStorageResourceList result;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for (const auto& storage: storages)
     {
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace != QnStorageResource::UnknownSize && totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
     }
     return result;
@@ -551,14 +553,13 @@ QnStorageResourceList createStorages(const QnMediaServerResourcePtr mServer)
     QnStorageResourceList storages;
     //bool isBigStorageExist = false;
     qint64 bigStorageThreshold = 0;
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(nx_ms_conf::MIN_STORAGE_SPACE, nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE).toLongLong();
     for(const QString& folderPath: listRecordFolders())
     {
         if (!mServer->getStorageByUrl(folderPath).isNull())
             continue;
         QnStorageResourcePtr storage = createStorage(mServer->getId(), folderPath);
         const qint64 totalSpace = storage->getTotalSpace();
-        if (totalSpace == QnStorageResource::UnknownSize || totalSpace < defaultStorageSpaceLimit)
+        if (totalSpace == QnStorageResource::kUnknownSize || totalSpace < storage->getSpaceLimit())
             continue; // if storage size isn't known do not add it by default
 
 
@@ -1233,10 +1234,12 @@ void MediaServerProcess::updateStatisticsAllowedSettings() {
     /* Value set by installer has the greatest priority */
     const auto confStats = MSSettings::roSettings()->value(statisticsReportAllowed);
     if (!confStats.isNull()) {
-        setValue(confStats.toBool());
-        /* Cleanup installer value. */
-        MSSettings::roSettings()->remove(statisticsReportAllowed);
-        MSSettings::roSettings()->sync();
+        if (confStats.toString() != lit("")) {
+            setValue(confStats.toBool());
+            /* Cleanup installer value. */
+            MSSettings::roSettings()->setValue(statisticsReportAllowed, lit(""));
+            MSSettings::roSettings()->sync();
+        }
     } else
     /* If user didn't make the decision in the current version, check if he made it in the previous version */
     if (!qnGlobalSettings->isStatisticsAllowedDefined() && m_mediaServer && m_mediaServer->hasProperty(statisticsReportAllowed)) {
@@ -1372,29 +1375,20 @@ void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::Messa
     qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
 }
 
-void MediaServerProcess::at_archiveBackupFinished(qint64 backupedToMs, QnServer::BackupResultCode code) {
+void MediaServerProcess::at_archiveBackupFinished(
+    qint64                      backedUpToMs,
+    QnBusiness::EventReason     code
+)
+{
     if (isStopping())
         return;
-    QnBusiness::EventReason reason = QnBusiness::NoReason;
-    switch(code)
-    {
-        case QnServer::BackupResultCode::Failed:
-            reason = QnBusiness::BackupFailed;
-            break;
-        case QnServer::BackupResultCode::EndOfPeriod:
-            reason = QnBusiness::BackupEndOfPeriod;
-            break;
-        case QnServer::BackupResultCode::Done:
-            reason = QnBusiness::BackupDone;
-            break;
-        case QnServer::BackupResultCode::Cancelled:
-            reason = QnBusiness::BackupCancelled;
-            break;
-        default:
-            break;
-    }
 
-    qnBusinessRuleConnector->at_archiveBackupFinished(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, QString::number(backupedToMs));
+    qnBusinessRuleConnector->at_archiveBackupFinished(
+        m_mediaServer,
+        qnSyncTime->currentUSecsSinceEpoch(),
+        code,
+        QString::number(backedUpToMs)
+    );
 }
 
 void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList)
@@ -1464,6 +1458,7 @@ bool MediaServerProcess::initTcpListener()
     QnRestProcessorPool::instance()->registerHandler("api/logLevel", new QnLogLevelRestHandler(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/execute", new QnExecScript(), RestPermissions::adminOnly);
     QnRestProcessorPool::instance()->registerHandler("api/scriptList", new QnScriptListRestHandler(), RestPermissions::adminOnly);
+    QnRestProcessorPool::instance()->registerHandler("api/systemSettings", new QnSystemSettingsHandler(), RestPermissions::adminOnly);
 
     QnRestProcessorPool::instance()->registerHandler("api/cameraBookmarks", new QnCameraBookmarksRestHandler());
 
@@ -1658,8 +1653,6 @@ void MediaServerProcess::run()
     connect(qnNormalStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnNormalStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
 
-    // TODO: #akulikov #backup storages. Check if it is right.
-    connect(qnBackupStorageMan, &QnStorageManager::noStoragesAvailable, this, &MediaServerProcess::at_storageManager_noStoragesAvailable);
     connect(qnBackupStorageMan, &QnStorageManager::storageFailure, this, &MediaServerProcess::at_storageManager_storageFailure);
     connect(qnBackupStorageMan, &QnStorageManager::rebuildFinished, this, &MediaServerProcess::at_storageManager_rebuildFinished);
     connect(qnBackupStorageMan, &QnStorageManager::backupFinished, this, &MediaServerProcess::at_archiveBackupFinished);
@@ -1677,10 +1670,6 @@ void MediaServerProcess::run()
     qnCommon->setAdminPasswordData(settings->value(ADMIN_PSWD_HASH).toByteArray(), settings->value(ADMIN_PSWD_DIGEST).toByteArray());
 
     qnCommon->setModuleGUID(serverGuid());
-
-    qnCommon->setArecontRTSPEnabled(settings->value(
-        nx_ms_conf::ARECONT_RTSP_ENABLED,
-        nx_ms_conf::DEFAULT_ARECONT_RTSP_ENABLED).toBool());
 
     bool compatibilityMode = cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
@@ -2012,7 +2001,10 @@ void MediaServerProcess::run()
         server->setProperty(Qn::PUBLIC_IP, m_publicAddress.toString());
         server->setProperty(Qn::SYSTEM_RUNTIME, QnSystemInformation::currentSystemRuntime());
 
-
+        qnServerDb->setBookmarkCountController([server](size_t count){
+            server->setProperty(Qn::BOOKMARK_COUNT, QString::number(count));
+            propertyDictionary->saveParams(server->getId());
+        });
 
         propertyDictionary->saveParams(server->getId());
 
@@ -2197,7 +2189,6 @@ void MediaServerProcess::run()
     loadResourcesFromECS(messageProcessor.data());
     if (QnUserResourcePtr adminUser = qnResPool->getAdministrator())
     {
-        qnCommon->bindModuleinformation(adminUser);
         qnCommon->updateModuleInformation();
 
         hostSystemPasswordSynchronizer->syncLocalHostRootPasswordWithAdminIfNeeded( adminUser );
@@ -2232,7 +2223,7 @@ void MediaServerProcess::run()
         for (const auto& value: storagesToRemove)
             idList.push_back(value->getId());
         if (ec2Connection->getMediaServerManager()->removeStoragesSync(idList) != ec2::ErrorCode::ok)
-            qWarning() << "Failed to remove deprecated storages on startup. Postpone removing to the next start...";
+            qWarning() << "Failed to remove deprecated storage on startup. Postpone removing to the next start...";
         qnResPool->removeResources(storagesToRemove);
     }
 

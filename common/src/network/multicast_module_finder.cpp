@@ -230,6 +230,9 @@ bool QnMulticastModuleFinder::processDiscoveryResponse(UDPSocket *udpSocket) {
         return false;
     }
 
+    if (response->port == 0)
+        return true;
+
     emit responseReceived(*response, SocketAddress(remoteEndpoint.address.toString(), response->port));
 
     return true;

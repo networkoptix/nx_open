@@ -292,6 +292,15 @@ struct QnFailoverPriorityColors {
 };
 #define QnFailoverPriorityColors_Fields (never)(low)(medium)(high)
 
+struct QnGraphicsMessageBoxColors {
+    QnGraphicsMessageBoxColors();
+
+    QColor text;
+    QColor frame;
+    QColor window;
+};
+#define QnGraphicsMessageBoxColors_Fields (text)(frame)(window)
+
 #define QN_CLIENT_COLOR_TYPES                                                   \
     (QnTimeSliderColors)(QnTimeScrollBarColors)(QnBackgroundColors)(QnCalendarColors) \
     (QnStatisticsColors)(QnScheduleGridColors)(QnGridColors)(QnPtzManageModelColors) \
@@ -303,6 +312,7 @@ struct QnFailoverPriorityColors {
     (QnFailoverPriorityColors) \
     (QnBookmarkColors) \
     (QnCompositeTextOverlayColors) \
+    (QnGraphicsMessageBoxColors) \
 
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

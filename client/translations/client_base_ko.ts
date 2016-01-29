@@ -2,6 +2,33 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="ko" sourcelanguage="en">
 <context>
+    <name>BackupCamerasDialogDelegate</name>
+    <message>
+        <source>Backup newly added devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup newly added cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BookmarkToolTipFrame</name>
     <message>
         <source>Zoom timeline
@@ -64,12 +91,12 @@ to view more bookmarks</source>
         <translation>1달</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>전체데이터</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>마지막 데이터의 bitrate:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -128,25 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -182,10 +190,6 @@ to view more bookmarks</source>
     <message>
         <source>Parameter 1 is null.</source>
         <translation>변수 1은 null입니다.</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">닫기</translation>
     </message>
 </context>
 <context>
@@ -695,32 +699,12 @@ to view more bookmarks</source>
         <translation>새탭 열기</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>신규 탭 모니터</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>새 윈도우 열기</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>신규 윈도우 모니터</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>새탭으로 레이아웃 열기</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>레이아웃 열기</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>새 윈도우로 레이아웃 열기</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>현재 레이아웃 신규 윈도우로 열기</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1059,10 +1043,6 @@ to view more bookmarks</source>
         <translation>선택 영역 확대</translation>
     </message>
     <message>
-        <source>Bookmark Selection...</source>
-        <translation>북마크 선택...</translation>
-    </message>
-    <message>
         <source>Edit Bookmark...</source>
         <translation>북마크 조정...</translation>
     </message>
@@ -1331,10 +1311,6 @@ to view more bookmarks</source>
         <translation>카메라 상태확인...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation>I/O 장비상태 확인...</translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation>장치리스트</translation>
     </message>
@@ -1359,14 +1335,6 @@ to view more bookmarks</source>
         <translation>다수카메라 이슈 확인...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>I/O장비 이슈 확인...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>다수 I/O 장비 Issee 확인...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>장치 설정...</translation>
     </message>
@@ -1381,14 +1349,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>다수 카메라 설정...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>I/O장비  설정...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>다수 I/O장비 설정...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1407,14 +1367,6 @@ to view more bookmarks</source>
         <translation>다수 카메라 설정...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>I/O 장치 설정...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>다수 I/O장치 설정...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>서버별 장치 리스트...</translation>
     </message>
@@ -1427,15 +1379,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1452,6 +1396,74 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1523,10 +1535,6 @@ to view more bookmarks</source>
         <translation>왼쪽 부터 자료 없음</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>시스템에서 삭제됨</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>선택된 정보 파일로 저장</translation>
     </message>
@@ -1549,6 +1557,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>카메라 액션</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1696,10 +1708,6 @@ to view more bookmarks</source>
         <translation>클릭으로 확장</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>붉은색 표시는 데이터 있음을 표시</translation>
-    </message>
-    <message>
         <source>E-mail settings changed</source>
         <translation>이메일 설정 변경</translation>
     </message>
@@ -1735,6 +1743,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>카메라 이름</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1744,49 +1756,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nothing</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>High</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">높음</translation>
-    </message>
-    <message>
-        <source>High + Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnBackupCamerasDialogDelegate</name>
-    <message>
-        <source>What to backup:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select devices to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select cameras to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new devices:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1846,17 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%n 개중  %1 장비</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개중  %1 장비</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%n 개중  %1 카메라</translation>
-    </message>
-    <message>
-        <source>%1 of %n IO modules</source>
-        <translation>%n 개중  %1 I/O장비</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개중  %1 카메라</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1873,6 +1842,12 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">최소 한개 선택</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1905,10 +1880,6 @@ to view more bookmarks</source>
         <translation>
             <numerusform>%n 서버</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Not Applied</source>
-        <translation>적용안됨</translation>
     </message>
     <message>
         <source>Instant</source>
@@ -1990,15 +1961,21 @@ to view more bookmarks</source>
         <source>Source and %n more cameras</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>at</source>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>에</translation>
     </message>
     <message>
         <source>to</source>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>로</translation>
     </message>
     <message>
@@ -2016,6 +1993,14 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">최소 한개 선택</translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished">장치</translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished">카메라</translation>
     </message>
 </context>
 <context>
@@ -2183,10 +2168,6 @@ to view more bookmarks</source>
         <translation>지정된 IP주소의 범위가 255이상을 포함하고 있습니다.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>검색 종료...</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation>서버가 오프라인되어, 검색이 중단됨.</translation>
     </message>
@@ -2261,6 +2242,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation>호스트 검색중 (%1)</translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2308,20 +2293,12 @@ to view more bookmarks</source>
         <translation>%1카메라 검사</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>%1 I/O장치 검사</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>장치 검사</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>카메라 검사</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>I/O 장치 검사</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2332,10 +2309,6 @@ to view more bookmarks</source>
         <translation>카메라 연결 확인중.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>I/O장치 접속 확인중.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>선택된 장치 미디어 스트림 확인중.</translation>
     </message>
@@ -2344,8 +2317,20 @@ to view more bookmarks</source>
         <translation>선택된 카메라 미디어 스트림 확인중.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>선택된 IO장치 미디어스트림 확인중.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2396,17 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>카메라 리스트</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n 장치 검색됨</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치 검색됨</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n 카메라 검색됨</translation>
-    </message>
-    <message>
-        <source>%n IO modules found</source>
-        <translation>%n IO 장치 검색됨</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라 검색됨</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2415,6 +2400,12 @@ to view more bookmarks</source>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>선택된 카메라 파일로 저장.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2528,20 +2519,20 @@ to view more bookmarks</source>
         <translation>경고, 최대/최소값에 따라 카메라 녹화 일수 축소 가능.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>선태된 카메라에서 모션녹화 설정되어 있지 않거나 지원하지 않음, 모션 설정 페이지에서 설정 재확인 요망.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>듀얼 스트림 지원하지 않는 카메라임.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>듀얼스트림 및 모션 검색 지원하지 않는 카메라임.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>모션녹화 설정되지 않음, 카메라 모션설정에서 영역과 민감도 조정 필요.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2587,14 +2578,6 @@ to view more bookmarks</source>
         <translation>다수 카메라 설정</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO장치 설정</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>다수 IO 장치 설정</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>장치 검사</translation>
     </message>
@@ -2609,14 +2592,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>다수 카메라 검사</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>IO장치 검사</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>다수 IO장치 검사</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2634,29 +2609,51 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>다수 카메라 역할</translation>
     </message>
-    <message>
-        <source>IO Module Rules</source>
-        <translation>IO장치 역할</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>다수 IO 장치 역할</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>%n 개의 장치에 대한 설정 적용하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 장치에 대한 설정 적용하시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>%n 개의 카메라에 대한 설정 적용하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>%n 개의 IO장치에 대한 설정 적용하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 카메라에 대한 설정 적용하시겠습니까?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
         <translation>변경사항 저장되지 않음</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2847,15 +2844,15 @@ to view more bookmarks</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Rule will work only for Generic Events that passes all filters. Empty fields don&apos;t affect the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server API</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2934,8 +2931,8 @@ to view more bookmarks</source>
         <translation>DB복구 하시겠습니까? 모든 정보가 삭제됩니다.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>백업을 실행 하기 전 먼저 서버를 연결 하십시오.</translation>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3106,12 +3103,31 @@ to view more bookmarks</source>
         <translation>관리자만</translation>
     </message>
     <message>
-        <source>%1 times</source>
-        <translation>%1 회</translation>
-    </message>
-    <message>
         <source>All Users</source>
         <translation>모든 사용자</translation>
+    </message>
+    <message>
+        <source>&lt;User removed&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is description of event. Will be replaced in runtime</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3235,27 +3251,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>알람 이벤트 역할 관리 열기...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>이벤트 기록 열기...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>장치기록 열기...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>카메라 리스트 열기...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3274,8 +3294,8 @@ to view more bookmarks</source>
         <translation>중요한 성능 팁</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>소프트웨어 오동작 가능성 있음.</translation>
+        <source>This may result in client software issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3446,10 +3466,6 @@ to view more bookmarks</source>
         <translation>&quot;%1&quot;로 내보내기...</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>%1.의 내보내기 파일을 만들 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>%1 장치 백업 불가.</translation>
@@ -3459,8 +3475,16 @@ to view more bookmarks</source>
         <translation>%1 카메라 백업 불가.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>%1 IO장치 백업 불가.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3526,12 +3550,12 @@ to view more bookmarks</source>
         <translation>테스트 실행 실패.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>모든 서버가 인터넷에 연결되어 있지않음.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>시간제한</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">시간제한</translation>
     </message>
 </context>
 <context>
@@ -3564,10 +3588,6 @@ to view more bookmarks</source>
         <translation>테스트 실행 불가.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>모든서버가 인터넷에 연결되어 있지 않음.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>사용자 읽어 오기 실패.</translation>
     </message>
@@ -3576,16 +3596,20 @@ to view more bookmarks</source>
         <translation>사용자 불러오기</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>시간초과</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>사용자 읽어오기중 실패.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation>신규 사용자 없음.</translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">시간제한</translation>
     </message>
 </context>
 <context>
@@ -3845,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>%n 개의 카메라에  아날로그 라이센스 사용</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>%n 개의 장치에  라이센스 사용</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 장치에  라이센스 사용</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>%n 개의 카메라에  라이센스 사용</translation>
+        <translation type="unfinished">
+            <numerusform>%n 개의 카메라에  라이센스 사용</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>%n 개의 IO장치에  라이센스 사용</translation>
+    <message numerus="yes">
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4035,16 +4065,16 @@ to view more bookmarks</source>
         <translation>%1 (Tour &quot;%2&quot;연결)</translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation>IO장치</translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation>줌 영역</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation>저-해상도</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4355,20 +4385,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>카메라열기</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>IO장치열기</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>장치 열기...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>카메라 열기...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>IO장치 설정...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
@@ -4379,15 +4401,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>카메라 웹페이지 열기...</translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>IO장치 웹페이지 열기...</translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4402,8 +4432,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>전체 기능 모드 사용을 위해 다른 시스템을 이용해 주세요.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>주의</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">주의!</translation>
     </message>
 </context>
 <context>
@@ -4467,16 +4497,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>만약 삭제할 경우 이 투어는 잘못 동작할 수 있습니다.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>%1 카메라의 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Could not get position from camera.</source>
@@ -4491,16 +4513,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>프리셋 삭제</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>%1.의 PTZ 조정.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>PTZ 설정이 저장되지 않음.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>변경사항이 저장되지 않았습니다. 저장하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4744,10 +4774,6 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>최초 녹화 시점 부터 현재 까지 백업 영역</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>녹화기간녹화 평균 Bitrate</translation>
     </message>
@@ -4779,17 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>비었음</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>총 %n 개 장치</translation>
+        <translation type="unfinished">
+            <numerusform>총 %n 개 장치</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>총%n 개 카메라</translation>
-    </message>
-    <message>
-        <source>Total %n IO modules</source>
-        <translation>총 %n개 IO장치</translation>
+        <translation type="unfinished">
+            <numerusform>총%n 개 카메라</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4814,6 +4840,20 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation>카메라</translation>
+    </message>
+    <message>
+        <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4962,6 +5002,53 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished">모든 장치</translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">모든카메라</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5048,11 +5135,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>서버 저장되지 않음</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>서버 %1에 설정 저장?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5087,12 +5174,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>현재 서버 최대 치 임</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>최대 장치수 수정 요망</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>최대 카메라수 수정 요망</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5309,18 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>인스톨 패키지 파일을 이용해 Client SW를 수동 설치 하세요.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>업데이트 성공.</translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation>시작 프로세서를 찾을 수 없음.</translation>
-    </message>
-    <message>
-        <source>Update Cancelled</source>
-        <translation>업데이트 취소</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>업데이트 완료.</translation>
     </message>
@@ -5333,24 +5408,50 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>인터넷 연결 오류</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>업데이트 서버중 선택된 Build 넘버 존재 하지 않음.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>업데이트를 시작 할 수 없습니다. 하나 이상의 서버에 대한 업데이트를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>업데이트를 시작할 수 없습니다. 클라이언트에 대한 업데이트를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>업데이터 파일 추출 실패.</translation>
     </message>
+    <message numerus="yes">
+        <source>Authentication failed for %n servers:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>업데이트 시작 할수 없음, Downgrade는 권장하지 않음.</translation>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5364,6 +5465,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>%n 사용자</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5400,14 +5511,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation></translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>유효하지 않은 스케줄</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>카메라의 보조 스트림을 사용할 수 없습니다. Motion + LQ 옵션이 동작하지 않습니다. 보조 스트림을 활성화 하신 후에 녹화 설정을 &quot;항상&quot; 또는 &quot;아니오&quot;로 변경하려면 &quot;예&quot;를 누르세요.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>모션영역 초기화</translation>
     </message>
@@ -5436,8 +5539,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>카메라 설정</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO장치 설정</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">유효하지 않은 스케줄</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5473,16 +5584,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">잘못된 데이터</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">제공된 변수가 유효하지 않습니다.테스트를 시행할 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">네트워크 오류</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">테스트를 수행할 수 없습니다. 서버가 인터넷에 연결되어있지 않습니다.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5507,6 +5610,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Success</source>
         <translation type="unfinished">성공</translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5579,36 +5690,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>카메라설정에서 로그인 정보 확인</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>IO장치설정에서 로그인 정보 확인</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>By schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In realtime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On demand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished">주의</translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">저장기의 재동기화 절차가 시행 될 것입니다.</translation>
@@ -5616,10 +5703,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">주의! 재 동기화가 진행되는 동안 하드 디스크 사용량이 증가 됩니다. 저장기 전체 크기에 따라 몇 시간이 소요될 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">현 진행은 보관 폴더의 이동, 변경 및 교체를 할 경우 필요합니다. 데이터 손실 없이 작업의 재 구성을 위해 취소 할 수 있습니다.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5630,19 +5713,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In Realtime mode all data is backed up on continuously</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous footage will not be backed up!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one camera with archive to backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5651,10 +5722,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup is created up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5670,7 +5737,86 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">인덱스 보관소 재정리 완료.</translation>
     </message>
     <message>
-        <source>Archive backup is completed.</source>
+        <source>By Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup Schedule is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">주의!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5700,12 +5846,34 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Use as main storage</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 (Checking...)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Scanning... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Rebuilding... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished">읽는 중...</translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">검생데이터파일 재구성중 : %1</translation>
+        <source>Fast Archive Scan - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding Archive Index - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5734,16 +5902,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation></translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>주의</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>저장장치 추가</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation>외부 저장소 정보가 유효하지 않아 저장 경로를 사용할 수 없습니다.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">주의!</translation>
     </message>
 </context>
 <context>
@@ -5864,14 +6032,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5885,6 +6045,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6527,10 +6695,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>시작프로세서를 찾을 수 없음.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>장비 추가중입ㄴ디ㅏ.취소 하시겠습니까?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6544,12 +6708,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>서버에 응답이 없어 %nIO장치를%1서버에 추가 할수 없습니다.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Server %1 is unable to find and access these %n devices. Are you sure you would like to move them?</source>
         <translation>
             <numerusform>%n 장치를 %1서버에서 검색 및접속할 수 없습니다. 이동 하시겠습니다?</numerusform>
@@ -6557,12 +6715,6 @@ If you would like to disable this feature you can do so in the System Settings d
     </message>
     <message numerus="yes">
         <source>Server %1 is unable to find and access these %n cameras. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>%n 장치를 %1서버에서 검색 및접속할 수 없습니다. 이동 하시겠습니다?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
         <translation>
             <numerusform>%n 장치를 %1서버에서 검색 및접속할 수 없습니다. 이동 하시겠습니다?</numerusform>
         </translation>
@@ -6579,47 +6731,81 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>%n 아이템을 레이아웃에서 삭제 하시겠습니까?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 카메라는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n IO장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n 장치는 자동으로 검색되었습니다, 삭제후에도 다시 검색될수있습니다. 삭제 하시겠습니까?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>%n 장치를 지우시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 장치를 지우시겠습니까?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>%n 카메라를 지우시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>%n IO장치를 지우시겠습니까?</translation>
+        <translation type="unfinished">
+            <numerusform>%n 카메라를 지우시겠습니까?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation>
             <numerusform>%n 아아템을 지우시겠습니까?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6633,10 +6819,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>북마크</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>%1 북마크를 삭제 하시겠습니까?</translation>
-    </message>
-    <message>
         <source>Bookmarks can only be added to an online server.</source>
         <translation>북마크는 활성화된 서버에만 추가 됩니다.</translation>
     </message>
@@ -6647,6 +6829,22 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Confirm Deletion</source>
         <translation>삭제 확인</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this bookmark?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6796,20 +6994,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>&apos;%1&apos; Media File (*.nov)</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>추출하려는 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation>현 작업은 HDD의 공간이 기가바이트 이상이 필요 한 작업이며, 연결 속도에 따라 완료는데 다소 시간이 소요될 수 있습니다.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
         <translation>계속 진행 하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>추출하려는 여러 비디오 시퀀스가 30분 이상이 소요되는 데이터입니다.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
@@ -6892,7 +7082,15 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video to the &apos;.nov&apos; format. Do you want to continue?</source>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6939,19 +7137,11 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>선택된 서버를 업데이트 할 수 없습니다.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation>시스템 관리 설정에서 서버의 업데이트를 다시 시도할 수 있습니다.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
 </source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>주의</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -6964,6 +7154,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation>선택된 서버 시스템에 성공적으로 연결되었습니다!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">주의!</translation>
     </message>
 </context>
 <context>
@@ -7072,8 +7270,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>모든 카메라</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>모든 IO장치</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7083,28 +7281,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZ_교정_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>%1 카메라에서 현재 위치를 가져오는 동안 오류가 발생하였습니다.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>카메라를 연결하는 동안 잠시 기다려주세요.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>%1 카메라의 현재 위치를 설정하는 동안 오류가 발생하였습니다.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
         <translation>카메라 위치를 가져올 수 없음.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>카메라의 위치를 설정할 수 없음.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
-        <translation>카메라 위치 설정 불가.</translation>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7117,9 +7311,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>라이센스 인증외에는 변경 불가.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>%n 아이템 저장되지 않음.</translation>
+        <translation type="unfinished">
+            <numerusform>%n 아이템 저장되지 않음.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7131,9 +7327,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>오류</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>%n 아이템 삭제 되지 않음.</translation>
+        <translation type="unfinished">
+            <numerusform>%n 아이템 삭제 되지 않음.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7217,6 +7415,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished">오류</translation>
+    </message>
+    <message>
+        <source>Error while taking screenshot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7353,14 +7559,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>다른 사용자가 이 스크린을 제어하고 있습니다.</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>비디어 월의 정지하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>수동으로 시작해야 합니다.</translation>
-    </message>
-    <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
         <translation>%1의 화면</translation>
@@ -7368,10 +7566,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A control session is already running.</source>
         <translation>제어 세션이 이미 동작 중입니다.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>예상치 못한 오류가 발생하였습니다. 변경된 사항이 저장되지 않았습니다.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7401,9 +7595,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>동일한 이름의 비디오 월이 존재합니다.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n 아이템</translation>
+        <translation type="unfinished">
+            <numerusform>%n 아이템</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -2,6 +2,33 @@
 <!DOCTYPE TS>
 <TS version="2.1" language="th" sourcelanguage="en">
 <context>
+    <name>BackupCamerasDialogDelegate</name>
+    <message>
+        <source>Backup newly added devices</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup newly added cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras while backup process is running.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new devices because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot add new cameras because they store archive on external storage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BookmarkToolTipFrame</name>
     <message>
         <source>Zoom timeline
@@ -64,12 +91,12 @@ to view more bookmarks</source>
         <translation>เดือน</translation>
     </message>
     <message>
-        <source>All data</source>
-        <translation>ข้อมูล ทั้งหมด</translation>
+        <source>All Data</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bitrate for the last recorded:</source>
-        <translation>บิตเรตสำหรับการบันทึกที่ผ่านมา:</translation>
+        <source>Bitrate for the Last Recorded</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -128,25 +155,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>Impl</name>
-    <message>
-        <source>Open in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&lt;Any camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>camera(s)</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PtzOverlayWidget</name>
     <message>
         <source>Zoom In</source>
@@ -182,10 +190,6 @@ to view more bookmarks</source>
     <message>
         <source>None</source>
         <translation>None</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="unfinished">ปิด</translation>
     </message>
 </context>
 <context>
@@ -695,32 +699,12 @@ to view more bookmarks</source>
         <translation>เปิดในแท๊ปใหม่</translation>
     </message>
     <message>
-        <source>Monitor in a New Tab</source>
-        <translation>หน้าจอในแท๊ปใหม่</translation>
-    </message>
-    <message>
         <source>Open in New Window</source>
         <translation>เปิดหน้าต่างใหม่</translation>
     </message>
     <message>
-        <source>Monitor in a New Window</source>
-        <translation>หน้าจอในหน้าต่างใหม่</translation>
-    </message>
-    <message>
-        <source>Open Layout in a New Tab</source>
-        <translation>เปิดเค้าโครงในแท๊ปใหม่</translation>
-    </message>
-    <message>
         <source>Open Layouts</source>
         <translation>เปิดเคร้าโครง</translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in a New Window</source>
-        <translation>เปิดเค้าโครงในหน้าต่างใหม่</translation>
-    </message>
-    <message>
-        <source>Open Current Layout in a New Window</source>
-        <translation>เปิดเค้าโครงปัจจุบันในหน้าต่างใหม่</translation>
     </message>
     <message>
         <source>Open Layout(s)</source>
@@ -1059,10 +1043,6 @@ to view more bookmarks</source>
         <translation>ซูมที่จะเลือก</translation>
     </message>
     <message>
-        <source>Bookmark Selection...</source>
-        <translation>เลือกคั่นหน้า...</translation>
-    </message>
-    <message>
         <source>Edit Bookmark...</source>
         <translation>แก้ไขคั่นหน้า...</translation>
     </message>
@@ -1331,10 +1311,6 @@ to view more bookmarks</source>
         <translation>การตรวจสอบของกล้อง ...</translation>
     </message>
     <message>
-        <source>IO Module Diagnostics...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Devices List</source>
         <translation>รายชื่ออุปกรณ์</translation>
     </message>
@@ -1359,14 +1335,6 @@ to view more bookmarks</source>
         <translation>ตรวจสอบปัญหาที่กล้อง ...</translation>
     </message>
     <message>
-        <source>Check IO Module Issues...</source>
-        <translation>ตรวจสอบ IO โมดูล ...</translation>
-    </message>
-    <message>
-        <source>Check IO Modules Issues...</source>
-        <translation>ตรวจสอบ IO โมดูล ...</translation>
-    </message>
-    <message>
         <source>Device Rules...</source>
         <translation>ข้อกำหนดอุปกรณ์ ...</translation>
     </message>
@@ -1381,14 +1349,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Rules...</source>
         <translation>ข้อกำหนดกล้อง ...</translation>
-    </message>
-    <message>
-        <source>IO Module Rules...</source>
-        <translation>ข้อกำหนด IO ...</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules...</source>
-        <translation>ข้อกำหนด IO ...</translation>
     </message>
     <message>
         <source>Device Settings...</source>
@@ -1407,14 +1367,6 @@ to view more bookmarks</source>
         <translation>การตั้งค่ากล้อง ...</translation>
     </message>
     <message>
-        <source>IO Module Settings...</source>
-        <translation>IO โมดูลการตั้งค่า ...</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings...</source>
-        <translation>IO โมดูลการตั้งค่า ...</translation>
-    </message>
-    <message>
         <source>Devices List by Server...</source>
         <translation>รายชื่ออุปกรณ์โดยเซิร์ฟเวอร์ ...</translation>
     </message>
@@ -1427,15 +1379,7 @@ to view more bookmarks</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Ctrl+B</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in the Alarm Layout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1452,6 +1396,74 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Unpin Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout(s) in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Current Layout in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1523,10 +1535,6 @@ to view more bookmarks</source>
         <translation>ไม่มีข้อมูลที่เก็บสำหรับตำแหน่งที่เหลือ</translation>
     </message>
     <message>
-        <source>This resources already removed from the system</source>
-        <translation>ทรัพยากรนี้เอาออกแล้วจากระบบ</translation>
-    </message>
-    <message>
         <source>Export selected records to a file</source>
         <translation>ระเบียนที่เลือกส่งออกไปยังแฟ้ม</translation>
     </message>
@@ -1549,6 +1557,10 @@ to view more bookmarks</source>
     <message>
         <source>Camera actions</source>
         <translation>การกระทำของกล้อง</translation>
+    </message>
+    <message>
+        <source>This resources are already removed from the system</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1696,10 +1708,6 @@ to view more bookmarks</source>
         <translation>คลิกเพื่อขยาย</translation>
     </message>
     <message>
-        <source>Red mark means that an archive is still available</source>
-        <translation>เครื่องหมายสีแดงหมายถึงที่เก็บยังคงมีอยู่</translation>
-    </message>
-    <message>
         <source>E-mail settings changed</source>
         <translation>เปลี่ยนแปลงการตั้งค่าอีเมล</translation>
     </message>
@@ -1735,6 +1743,10 @@ to view more bookmarks</source>
         <source>Camera name</source>
         <translation>ชื่อกล้อง</translation>
     </message>
+    <message>
+        <source>Red mark means that the archive is still available</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBackupCamerasDialog</name>
@@ -1744,49 +1756,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Select Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Nothing</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">ต่ำ</translation>
-    </message>
-    <message>
-        <source>High</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished">สูง</translation>
-    </message>
-    <message>
-        <source>High + Low</source>
-        <comment>Cameras Backup</comment>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnBackupCamerasDialogDelegate</name>
-    <message>
-        <source>What to backup:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select devices to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select cameras to setup backup</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new devices:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default value for new cameras:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1846,17 +1815,17 @@ to view more bookmarks</source>
 </context>
 <context>
     <name>QnBusinessResourceValidationStrings</name>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n devices</source>
-        <translation>%1 ของ%n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%1 of %n cameras</source>
-        <translation>%1 ของ%n กล้อง</translation>
-    </message>
-    <message>
-        <source>%1 of %n IO modules</source>
-        <translation>%1 ของ%n โมดูล IO</translation>
+        <translation type="unfinished">
+            <numerusform>%1 ของ%n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>&lt;Any Device&gt;</source>
@@ -1873,6 +1842,12 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">เลือกอย่างน้อยหนึ่งกล้อง</translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1905,10 +1880,6 @@ to view more bookmarks</source>
         <translation>
             <numerusform>%n เซอร์ฟเวอร์</numerusform>
         </translation>
-    </message>
-    <message>
-        <source>Not Applied</source>
-        <translation>ไม่ถูกใช้</translation>
     </message>
     <message>
         <source>Instant</source>
@@ -1990,15 +1961,21 @@ to view more bookmarks</source>
         <source>Source and %n more cameras</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnBusinessRuleWidget</name>
     <message>
         <source>to</source>
+        <extracomment>&quot;to&quot; is from the sentence &quot;Send e-mail _to_:&quot;</extracomment>
         <translation>ถึง</translation>
     </message>
     <message>
         <source>at</source>
+        <extracomment>&quot;at&quot; is from the sentence &quot;Display the text _at_ these cameras&quot;</extracomment>
         <translation>ที่</translation>
     </message>
     <message>
@@ -2016,6 +1993,14 @@ to view more bookmarks</source>
     <message>
         <source>Select at least one camera</source>
         <translation type="unfinished">เลือกอย่างน้อยหนึ่งกล้อง</translation>
+    </message>
+    <message>
+        <source>Devices</source>
+        <translation type="unfinished">อุปกรณ์</translation>
+    </message>
+    <message>
+        <source>Cameras</source>
+        <translation type="unfinished">กล้อง</translation>
     </message>
 </context>
 <context>
@@ -2183,10 +2168,6 @@ to view more bookmarks</source>
         <translation>ระบุช่วงที่อยู่ IP ห้ามมากกว่า 255.</translation>
     </message>
     <message>
-        <source>Finished searching...</source>
-        <translation>ค้นหาเสร็จสิ้น....</translation>
-    </message>
-    <message>
         <source>Server went offline - search aborted.</source>
         <translation>เซิร์ฟเวอร์ออฟไลน์ยกเลิกการค้นหา.</translation>
     </message>
@@ -2261,6 +2242,10 @@ to view more bookmarks</source>
         <extracomment>Scanning host... (0 devices found)</extracomment>
         <translation>สแกนโฮสต์ ... (%1)</translation>
     </message>
+    <message>
+        <source>Finishing searching...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnCameraAdvancedParamsWidget</name>
@@ -2308,20 +2293,12 @@ to view more bookmarks</source>
         <translation>การตรวจสอบสำหรับกล้อง %1</translation>
     </message>
     <message>
-        <source>Diagnostics for IO module %1</source>
-        <translation>การตรวจสอบสำหรับโมดูล IO %1</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>การตรวจสอบของอุปกรณ์</translation>
     </message>
     <message>
         <source>Camera Diagnostics</source>
         <translation>การตรวจสอบของกล้อง</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>การตรวจสอบ IO โมดูล</translation>
     </message>
     <message>
         <source>Confirming device is accessible.</source>
@@ -2332,10 +2309,6 @@ to view more bookmarks</source>
         <translation>ยืนยันกล้องสามารถเข้าถึงได้.</translation>
     </message>
     <message>
-        <source>Confirming IO module is accessible.</source>
-        <translation>ยืนยันโมดูล IO ที่สามารถเข้าถึงได้.</translation>
-    </message>
-    <message>
         <source>Confirming target device provides media stream.</source>
         <translation>ยืนยันอุปกรณ์ที่จัดเตรียมให้ มีเดียสตรีม.</translation>
     </message>
@@ -2344,8 +2317,20 @@ to view more bookmarks</source>
         <translation>ยืนยันอุปกล้องที่จัดเตรียมให้ มีเดียสตรีม.</translation>
     </message>
     <message>
-        <source>Confirming target IO module provides media stream.</source>
-        <translation>ยืนยันโมดูล IO ที่จัดเตรียมให้ มีเดียสตรีม.</translation>
+        <source>Diagnostics for I/O module %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming I/O module is accessible.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirming target I/O module provides media stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2396,17 +2381,17 @@ to view more bookmarks</source>
         <source>Cameras List</source>
         <translation>รายชื่อกล้อง</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n devices found</source>
-        <translation>%n อุปกรณ์ที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n อุปกรณ์ที่พบ</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n cameras found</source>
-        <translation>%n กล้องที่พบ</translation>
-    </message>
-    <message>
-        <source>%n IO modules found</source>
-        <translation>%n โมดูล IO ที่พบ</translation>
+        <translation type="unfinished">
+            <numerusform>%n กล้องที่พบ</numerusform>
+        </translation>
     </message>
     <message>
         <source>Export selected devices to a file.</source>
@@ -2415,6 +2400,12 @@ to view more bookmarks</source>
     <message>
         <source>Export selected cameras to a file.</source>
         <translation>ส่งออกกล้องที่เลือกไปยังแฟ้ม.</translation>
+    </message>
+    <message numerus="yes">
+        <source>%n I/O modules found</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2528,20 +2519,20 @@ to view more bookmarks</source>
         <translation>คำเตือน! ค่าต่ำสุด สูงสุด สามารถลดกล้องอื่น ๆ &apos;ระยะเวลาในการบันทึก.</translation>
     </message>
     <message>
-        <source>Motion Recording is disabled or not supported by some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
-        <translation>การบันทึกการเคลื่อนไหวมีการยกเลิกหรือไม่ได้รับการสนับสนุนโดยบางส่วนของกล้องที่เลือก โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวเพื่อให้แน่ใจว่าได้รับการสนับสนุนและเปิดใช้งาน.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming is not supported by this camera.</source>
-        <translation>แบบ ดูอัล-สตรีมมิ่งไม่ได้รับการสนับสนุนโดยกล้องนี้.</translation>
-    </message>
-    <message>
-        <source>Dual-Streaming and Motion Detection are not available for this camera.</source>
-        <translation>แบบ ดูอัลl-สตรีมมิ่งและการตรวจจับการเคลื่อนไหวจะไม่สามารถใช้ได้สำหรับกล้องนี้.</translation>
-    </message>
-    <message>
         <source>Motion Recording is disabled. Please go to the motion setup page to setup the cameras&apos;s motion area and sensitivity.</source>
         <translation>การบันทึกการเคลื่อนไหวถูกปิดใช้งาน โปรดไปที่หน้าการตั้งค่าการเคลื่อนไหวที่จะติดตั้งในพื้นที่การเคลื่อนไหวของกล้องและความไว.</translation>
+    </message>
+    <message>
+        <source>Motion Recording is disabled or not supported on some of the selected cameras. Please go to the motion setup page to ensure it is supported and enabled.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming is not supported on this camera.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Dual-Streaming and Motion Detection are not available on this camera.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2587,14 +2578,6 @@ to view more bookmarks</source>
         <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>การตั้งค่าโมดูล IO</translation>
-    </message>
-    <message>
-        <source>IO Modules Settings</source>
-        <translation>การตั้งค่าโมดูล IO</translation>
-    </message>
-    <message>
         <source>Device Diagnostics</source>
         <translation>การตรวจสอบของอุปกรณ์</translation>
     </message>
@@ -2609,14 +2592,6 @@ to view more bookmarks</source>
     <message>
         <source>Cameras Diagnostics</source>
         <translation>การตรวจสอบของกล้อง</translation>
-    </message>
-    <message>
-        <source>IO Module Diagnostics</source>
-        <translation>การตรวจสอบของ IO โมดูล</translation>
-    </message>
-    <message>
-        <source>IO Modules Diagnostics</source>
-        <translation>การตรวจสอบของ IO โมดูล</translation>
     </message>
     <message>
         <source>Device Rules</source>
@@ -2634,29 +2609,51 @@ to view more bookmarks</source>
         <source>Cameras Rules</source>
         <translation>กฎระเบียบกล้อง</translation>
     </message>
-    <message>
-        <source>IO Module Rules</source>
-        <translation>กฎระเบียบ IO โมดูล</translation>
-    </message>
-    <message>
-        <source>IO Modules Rules</source>
-        <translation>กฎระเบียบ IO โมดูล</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n devices?</source>
-        <translation>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกับอุปกรณ์ดังต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Apply changes to the following %n cameras?</source>
-        <translation>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</translation>
-    </message>
-    <message>
-        <source>Apply changes to the following %n IO modules?</source>
-        <translation>ใช้การเปลี่ยนแปลงกับโมดูล IO ดังต่อไปนี้ %n?</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้การเปลี่ยนแปลงกล้องต่อไปนี้ %n?</numerusform>
+        </translation>
     </message>
     <message>
         <source>Changes are not saved</source>
         <translation>การเปลี่ยนแปลงจะไม่ถูกบันทึก</translation>
+    </message>
+    <message>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Diagnostics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Apply changes to the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -2847,15 +2844,15 @@ to view more bookmarks</source>
 <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
-        <source>Rule will work only for Generic Events that passes all filters. Empty fields don&apos;t affect the result. Each filter passes if any of keyword is matched.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Server API</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>To generate Generic Event, please refer to %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event will trigger only if Generic Event meets all the above conditions. If a keyword field is empty, condition is always met. If not, condition is met if the corresponding field of Generic Event contains any keyword.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2934,8 +2931,8 @@ to view more bookmarks</source>
         <translation>คุณแน่ใจว่าคุณต้องการที่จะเรียกคืนฐานข้อมูลหรือไม่ ข้อมูลที่มีอยู่ทั้งหมดจะหายไป.</translation>
     </message>
     <message>
-        <source>You need to connect to a server prior to performing a backup.</source>
-        <translation>คุณจำเป็นต้องเชื่อมต่อกับเซิร์ฟเวอร์ก่อนที่จะทำสำรองข้อมูล.</translation>
+        <source>You need to connect to a server prior to backup start.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3106,12 +3103,31 @@ to view more bookmarks</source>
         <translation>รายละเอียด</translation>
     </message>
     <message>
-        <source>%1 times</source>
-        <translation>%1 เวลา</translation>
-    </message>
-    <message>
         <source>All Users</source>
         <translation>ผู้ใช้ทุกคน</translation>
+    </message>
+    <message>
+        <source>&lt;User removed&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 (%n times)</source>
+        <comment>%1 is description of event. Will be replaced in runtime</comment>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>and %1 user(s) more...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3235,27 +3251,31 @@ to view more bookmarks</source>
 <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
-        <source>Open Alarm/Event Rules Management...</source>
-        <translation>เปิดปลุก /เหตุการณ์ กฎการบริหารจัดการ ...</translation>
-    </message>
-    <message>
-        <source>Open Event Log...</source>
-        <translation>เปิดบันทึกเหตุการณ์ ...</translation>
-    </message>
-    <message>
-        <source>Open Devices List...</source>
-        <translation>เปิดรายชื่ออุปกรณ์ ...</translation>
-    </message>
-    <message>
-        <source>Open Cameras List...</source>
-        <translation>เปิดรายชื่อกล้อง ...</translation>
-    </message>
-    <message>
         <source>Devices List...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Cameras List...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Alarm/Event Rules Management</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Event Log</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Bookmarks List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Cameras List</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3274,8 +3294,8 @@ to view more bookmarks</source>
         <translation>เคล็ดลับการปฏิบัติงานที่สำคัญ</translation>
     </message>
     <message>
-        <source>This could lead to client software malfunction including crash.</source>
-        <translation>ซึ่งอาจนำไปสู่ความผิดปกติซอฟต์แวร์ของลูกค้ารวมทั้งความผิดพลาด.</translation>
+        <source>This may result in client software issues (including unexpected crash).</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3446,10 +3466,6 @@ to view more bookmarks</source>
         <translation>กำลังส่งออก &quot;%1&quot;...</translation>
     </message>
     <message>
-        <source>Could not create output file %1.</source>
-        <translation>ไม่สามารถแสดงข้อมูลได้ %1.</translation>
-    </message>
-    <message>
         <source>Could not export device %1.</source>
         <extracomment>&quot;Could not export camera AXIS1334&quot;</extracomment>
         <translation>ไม่สามารถส่งออกอุปกรณ์ %1.</translation>
@@ -3459,8 +3475,16 @@ to view more bookmarks</source>
         <translation>ไม่สามารถส่งออก กล้อง %1.</translation>
     </message>
     <message>
-        <source>Could not export IO module %1.</source>
-        <translation>ไม่สามารถส่งออกโมดูล IO %1.</translation>
+        <source>Unknown error has occurred.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not export I/O module %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Could not create output file %1...</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3526,12 +3550,12 @@ to view more bookmarks</source>
         <translation>ไม่สามารถดำเนินการทดสอบ.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>ไม่พบเซิร์ฟเวอร์ของคุณที่เชื่อมต่อกับอินเทอร์เน็ต.</translation>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>หมดเวลา</translation>
+        <source>Timed Out</source>
+        <translation type="unfinished">หมดเวลา</translation>
     </message>
 </context>
 <context>
@@ -3564,10 +3588,6 @@ to view more bookmarks</source>
         <translation>ไม่สามารถดำเนินการทดสอบ.</translation>
     </message>
     <message>
-        <source>None of your servers is connected to the Internet.</source>
-        <translation>ไม่มีเซิร์ฟเวอร์ของคุณที่เชื่อมต่อกับอินเทอร์เน็ต.</translation>
-    </message>
-    <message>
         <source>Could not load users.</source>
         <translation>ไม่สามารถโหลดผู้ใช้.</translation>
     </message>
@@ -3576,16 +3596,20 @@ to view more bookmarks</source>
         <translation>นำเข้าผู้ใช้งาน</translation>
     </message>
     <message>
-        <source>Timed out</source>
-        <translation>หมดเวลา</translation>
-    </message>
-    <message>
         <source>Error while loading users.</source>
         <translation>ข้อผิดพลาดในขณะที่ผู้ใช้โหลด.</translation>
     </message>
     <message>
         <source>No new users found.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timed Out</source>
+        <translation type="unfinished">หมดเวลา</translation>
     </message>
 </context>
 <context>
@@ -3845,17 +3869,23 @@ to view more bookmarks</source>
             <numerusform>ใช้ใบอนุญาตแบบอะนาล็อกเพื่อดูกล้องเหล่านี้%n</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n devices</source>
-        <translation>Use licenses for selected %n cameras</translation>
+        <translation type="unfinished">
+            <numerusform>Use licenses for selected %n cameras</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Use licenses for selected %n cameras</source>
-        <translation>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</translation>
+        <translation type="unfinished">
+            <numerusform>ใช้ใบอนุญาตสำหรับการเลือกกล้อง %n</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>Use licenses for selected %n IO modules</source>
-        <translation>ใช้ใบอนุญาตสำหรับการเลือกโมดูล IO %n</translation>
+    <message numerus="yes">
+        <source>Use licenses for selected %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -4035,16 +4065,16 @@ to view more bookmarks</source>
         <translation>%1 (Tour &quot;%2&quot; is active)</translation>
     </message>
     <message>
-        <source>IO Module</source>
-        <translation>โมดูล IO</translation>
-    </message>
-    <message>
         <source>Zoom Window</source>
         <translation>หน้าต่างซูม</translation>
     </message>
     <message>
         <source>Low-Res</source>
         <translation>คุณภาพต่ำ</translation>
+    </message>
+    <message>
+        <source>I/O Module</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4355,20 +4385,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>เปิดกล้อง</translation>
     </message>
     <message>
-        <source>Open IO Module</source>
-        <translation>เปิด IO โมดูล</translation>
-    </message>
-    <message>
         <source>Device Settings...</source>
         <translation>การตั้งค่าอุปกรณ์ ...</translation>
     </message>
     <message>
         <source>Camera Settings...</source>
         <translation>การตั้งค่ากล้อง ...</translation>
-    </message>
-    <message>
-        <source>IO Module Settings...</source>
-        <translation>การตั้งค่า IO โมดูล...</translation>
     </message>
     <message>
         <source>Open Device Web Page...</source>
@@ -4379,15 +4401,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>เปิดหน้าเว็บกล้อง ...</translation>
     </message>
     <message>
-        <source>Open IO Module Web Page...</source>
-        <translation>เปิดหน้าเว็บ IO โมดูล ...</translation>
-    </message>
-    <message>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Open in the Alarm Layout</source>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open I/O Module Web Page...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4402,8 +4432,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>สำหรับโหมดเต็มรูปแบบกรุณาใช้คอมพิวเตอร์เครื่องอื่น.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>การเตือน</translation>
+        <source>Warning!</source>
+        <translation type="unfinished">คำเตือน!</translation>
     </message>
 </context>
 <context>
@@ -4459,16 +4489,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>อย่าแสดงอีกครั้ง.</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากกล้อง %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>โปรดรอสักครู่ สำหรับการออนไลน์ของกล้อง.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับ กล้อง %1.</translation>
     </message>
     <message>
         <source>This preset is used in some tours.</source>
@@ -4491,16 +4513,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ลบที่ตั้งไว้ล่วงหน้า</translation>
     </message>
     <message>
-        <source>Manage PTZ for %1.</source>
-        <translation>จัดการ PTZ สำหรับ %1.</translation>
-    </message>
-    <message>
         <source>PTZ configuration has not been saved.</source>
         <translation>การตั้งค่า PTZ ยังไม่ได้ทำการบันทึก.</translation>
     </message>
     <message>
         <source>Changes have not been saved. Would you like to save them?</source>
         <translation>การเปลี่ยนแปลงยังไม่ถูกบันทึก คุณต้องการที่จะบันทึกหรือไ่ม่?</translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4744,10 +4774,6 @@ If you understand this and would like to proceed please click Merge to continue.
         </translation>
     </message>
     <message>
-        <source>Archived duration in calendar days between the first record and the current moment</source>
-        <translation>ระยะเวลาที่เก็บไว้ในปฏิทินวันระหว่างระเบียนแรกและช่วงเวลาปัจจุบัน</translation>
-    </message>
-    <message>
         <source>Average bitrate for the recorded period</source>
         <translation>บิตเรตเฉลี่ยสำหรับระยะเวลาที่บันทึกไว้</translation>
     </message>
@@ -4779,17 +4805,17 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>empty</source>
         <translation>ว่างเปล่า</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n devices</source>
-        <translation>รวม %n อุปกรณ์</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n อุปกรณ์</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Total %n cameras</source>
-        <translation>รวม %n กล้อง</translation>
-    </message>
-    <message>
-        <source>Total %n IO modules</source>
-        <translation>รวม %n โมดูล IO</translation>
+        <translation type="unfinished">
+            <numerusform>รวม %n กล้อง</numerusform>
+        </translation>
     </message>
     <message>
         <source>Devices with non-empty archive</source>
@@ -4814,6 +4840,20 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Camera</source>
         <translation>กล้อง</translation>
+    </message>
+    <message>
+        <source>&lt;Cameras from other servers and removed cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Total %n I/O modules</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Archived duration in calendar days since the first recording</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4962,6 +5002,53 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
 </context>
 <context>
+    <name>QnSearchBookmarksDialogPrivate</name>
+    <message>
+        <source>Export bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search bookmarks by name, tag or description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Device&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;Any Camera&gt;</source>
+        <translation type="unfinished">&lt;กล้อง อื่น ๆ &gt;</translation>
+    </message>
+    <message>
+        <source>&lt;Any I/O Module&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Devices&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My Cameras&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;All My I/O Modules&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n device(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n camera(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&lt;%n I/O module(s)&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksModel</name>
     <message>
         <source>Name</source>
@@ -5048,11 +5135,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>เซิร์ฟเวอร์ไม่ได้ถูกบันทึก</translation>
     </message>
     <message>
-        <source>Apply changes to the server %1?</source>
-        <translation>ใช้การเปลี่ยนแปลงไปยังเซิร์ฟเวอร์ %1 หรือไม่?</translation>
+        <source>Storage Management</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storage Management</source>
+        <source>Apply changes to server %1?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5087,12 +5174,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>เซิร์ฟเวอร์นี้มีกล้องมากกว่าค่าสูงสุด</translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of devices</source>
-        <translation>เพื่อหลีกเลี่ยงความผิดปกติของการปรับจำนวนสูงสุดของอุปกรณ์</translation>
+        <source>To avoid issues adjust max number of devices</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>To avoid malfunction adjust max number of cameras</source>
-        <translation>เพื่อหลีกเลี่ยงความผิดปกติของการปรับจำนวนสูงสุดของกล้อง</translation>
+        <source>To avoid issues adjust max number of cameras</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5309,18 +5396,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>โปรดอัปเดตส่วน ไคลเอ็นต์ โดยตรง จากแพคเกจการติดตั้ง.</translation>
     </message>
     <message>
-        <source>Update Succeeded.</source>
-        <translation>ปรับปรุงประสบความสำเร็จ.</translation>
-    </message>
-    <message>
-        <source>Launcher process not found.</source>
-        <translation>ขั้นตอนการเปิดไม่พบ.</translation>
-    </message>
-    <message>
-        <source>Update Cancelled</source>
-        <translation>ยกเลิกการปรับปรุง</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>ปรับปรุงสำเร็จ.</translation>
     </message>
@@ -5333,24 +5408,50 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ปัญหาการเชื่อมต่ออินเทอร์เน็ต</translation>
     </message>
     <message>
-        <source>No such build available on update server.</source>
-        <translation>ไม่มีการสร้างดังกล่าวที่มีอยู่บนเซิร์ฟเวอร์การอัพเดท.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for one or more servers not found.</source>
-        <translation>ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับหนึ่งหรือเซิร์ฟเวอร์ไม่พบ.</translation>
-    </message>
-    <message>
-        <source>Unable to begin update. An update for the client was not found.</source>
-        <translation>ไม่สามารถเริ่มต้นการปรับปรุงการปรับปรุงสำหรับไคลแอนต์ไม่พบ.</translation>
-    </message>
-    <message>
         <source>Unable to extract update file.</source>
         <translation>ไม่สามารถที่จะดึงไฟล์อัพเดตได้.</translation>
     </message>
+    <message numerus="yes">
+        <source>Authentication failed for %n servers:</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>Unable to begin update. Downgrade to the previous release is prohibited.</source>
-        <translation>ไม่สามารถที่จะเริ่มต้นการปรับปรุง ปรับคำแนะนำที่จะปล่อยก่อนหน้านี้เป็นสิ่งต้องห้าม.</translation>
+        <source>Update Succeeded</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Downgrade to any previous release is prohibited.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Launcher process was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No such build is available on update server.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Updates for one or more servers were not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5364,6 +5465,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">
             <numerusform>%n ผู้ใช้งาน(s)</numerusform>
         </translation>
+    </message>
+</context>
+<context>
+    <name>QnShowTextOverlayActionWidget</name>
+    <message>
+        <source>Html tags could be used within custom text:
+&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
+        <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
+&apos; sequence</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5400,14 +5511,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>ซอฟแวร์สำหรับการเคลื่อนไหว 2 เฟรมต่อวินาทีสงวนไว้สำหรับกระแสรอง เฟรมต่อวินาทีปัจจุบันในตารางกำหนดการคือ%1 fps ถูกลดลงไป %2.</translation>
     </message>
     <message>
-        <source>Invalid schedule</source>
-        <translation>ตารางเวลาที่ไม่ถูกต้อง</translation>
-    </message>
-    <message>
-        <source>Second stream is disabled on this camera. Motion + LQ option has no effect.Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
-        <translation>สตรีมมิ่งสำรองถูกปิดใช้งานในกล้องนี้ การเคลื่อนไหว + LQ ไม่มี effect.Press &quot;ตกลง&quot; เพื่อเปลี่ยนประเภทการบันทึกเพื่อ &quot;ตลอดไป&quot; หรือ &quot;ไม่&quot; เพื่อเปิดใช้งานสตรีมมิ่งสำรอง.</translation>
-    </message>
-    <message>
         <source>Confirm motion regions reset</source>
         <translation>ยืนยันการตั้งค่าพื้นที่ที่เคลื่อนไหว</translation>
     </message>
@@ -5436,8 +5539,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>การตั้งค่ากล้อง</translation>
     </message>
     <message>
-        <source>IO Module Settings</source>
-        <translation>IO การตั้งค่าโมดูล</translation>
+        <source>I/O Module Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid Schedule</source>
+        <translation type="unfinished">ตารางเวลาที่ไม่ถูกต้อง</translation>
+    </message>
+    <message>
+        <source>Second stream is disabled on this camera. Motion + LQ option has no effect. Press &quot;Yes&quot; to change recording type to &quot;Always&quot; or &quot;No&quot; to re-enable second stream.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5473,16 +5584,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">ข้อมูลไม่ถูกต้อง</translation>
     </message>
     <message>
-        <source>Provided parameters not valid. Could not perform test.</source>
-        <translation type="unfinished">พารามิเตอร์ให้ไว้ไม่ถูกต้อง ไม่สามารถดำเนินการทดสอบ.</translation>
-    </message>
-    <message>
         <source>Network Error</source>
         <translation type="unfinished">เครือข่ายล้มเหลว</translation>
-    </message>
-    <message>
-        <source>Could not perform a test. None of your servers is connected to the Internet.</source>
-        <translation type="unfinished">ไม่สามารถดำเนินการทดสอบ ไม่มีเซิร์ฟเวอร์ของคุณเชื่อมต่อกับอินเทอร์เน็ต.</translation>
     </message>
     <message>
         <source>TLS</source>
@@ -5507,6 +5610,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Success</source>
         <translation type="unfinished">สำเร็จ</translation>
+    </message>
+    <message>
+        <source>Could not perform a test. None of your servers are connected to the Internet.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The provided parameters are not valid. Could not perform a test.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5579,36 +5690,12 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบ ในการตั้งค่ากล้อง</translation>
     </message>
     <message>
-        <source>Please check authentication information in IO module settings</source>
-        <translation>กรุณาตรวจสอบข้อมูลการตรวจสอบการตั้งค่าใน IO โมดูล</translation>
+        <source>Please check authentication information in I/O module settings</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>QnStorageConfigWidget</name>
-    <message>
-        <source>By schedule</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>In realtime</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>On demand</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>You are about to launch the archive re-synchronization routine.</source>
         <translation type="unfinished">คุณกำลังจะเปิดอีกครั้งกับการเก็บข้อมูลให้ตรงกัน.</translation>
@@ -5616,10 +5703,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>ATTENTION! Your hard disk usage will be increased during re-synchronization process! Depending on the total size of archive it can take several hours.</source>
         <translation type="unfinished">สนใจ! การใช้งานบนฮาร์ดดิสก์ของคุณจะเพิ่มขึ้นในระหว่างขั้นตอนการประสานอีกครั้ง! ทั้งนี้ขึ้นอยู่กับขนาดของข้อมูลที่เก็บอาจจะใช้เวลาหลายชั่วโมง.</translation>
-    </message>
-    <message>
-        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without loosing data.</source>
-        <translation type="unfinished">ขั้นตอนนี้เป็นเพียงสิ่งที่จำเป็นถ้าโฟลเดอร์ที่เก็บถาวรของคุณได้ถูกย้ายเปลี่ยนชื่อหรือเปลี่ยน คุณสามารถยกเลิกการสร้างการดำเนินงานในช่วงเวลาใดโดยไม่สูญเสียข้อมูล.</translation>
     </message>
     <message>
         <source>Are you sure you want to continue?</source>
@@ -5630,19 +5713,7 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>In Realtime mode all data is backed up on continuously</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Previous footage will not be backed up!</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Select at least one backup storage.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Select at least one camera with archive to backup</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5651,10 +5722,6 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>(%1 before now)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Archive backup is created up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -5670,7 +5737,86 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished">ดัชนีเก็บสร้างใหม่เป็นที่เรียบร้อยแล้ว.</translation>
     </message>
     <message>
-        <source>Archive backup is completed.</source>
+        <source>By Schedule</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On Demand</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup Schedule is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No devices selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No cameras selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Real-Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hi-Res Streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All streams</source>
+        <comment>Cameras Backup</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">คำเตือน!</translation>
+    </message>
+    <message>
+        <source>This process is only necessary if your archive folders have been moved, renamed or replaced. You can cancel rebuild operation at any moment without data loss.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one device to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select at least one camera to start backup.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot start backup while archive index rebuild is in progress.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notice: Only further recording will be backed up. Backup process will ignore existing footage.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Camera(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%n Device(s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Backup is finished</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In Real-Time mode all data is backed up continuously.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Archive backup is completed up to: %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5700,12 +5846,34 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Use as main storage</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>%1 (Checking...)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Scanning... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (Rebuilding... %2%)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Loading...</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
     <message>
-        <source>Rebuild archive index for storage &apos;%1&apos; is in progress</source>
-        <translation type="unfinished">สร้างดัชนีเก็บสำหรับการจัดเก็บ &apos;%1&apos; ที่อยู่ในความคืบหน้า</translation>
+        <source>Fast Archive Scan - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rebuilding Archive Index - %p%</source>
+        <comment>%p is a placeholder for percent value, must be kept.</comment>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -5734,16 +5902,16 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>มีระบบเซิร์ฟเวอร์อื่น (s) โดยใช้เส้นทางการจัดเก็บเครือข่ายเดียวกัน การบันทึกข้อมูลจากหลายเซิร์ฟเวอร์ ไปยังสถานที่เดียวกันว่าไม่แนะนำให้ใช้.</translation>
     </message>
     <message>
-        <source>Warning</source>
-        <translation>คำเตือน</translation>
-    </message>
-    <message>
         <source>Add storage</source>
         <translation>เพิ่มพื้นที่การจัดเก็บข้อมูล</translation>
     </message>
     <message>
         <source>Provided storage path does not point to a valid external storage location.</source>
         <translation>เส้นทางการจัดเก็บที่มีให้ไม่ได้กำหนดจัดเก็บข้อมูลภายนอกที่ถูกต้อง.</translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">คำเตือน!</translation>
     </message>
 </context>
 <context>
@@ -5864,14 +6032,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Storages are full on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Storages are not configured on the following Server:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>You have no licenses.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5885,6 +6045,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>Rebuilding archive index is canceled by user on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is full on the following Server:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Storage is not configured on the following Server:</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6528,10 +6696,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Launcher process not found.</source>
         <translation>กระบวนการเปิดไม่พบ.</translation>
     </message>
-    <message>
-        <source>Device addition is already in progress.Are you sure you want to cancel current process?</source>
-        <translation>อุปกรณ์ที่มีอยู่แล้วอยู่ระหว่างดำเนินการ คุณแน่ใจหรือว่าต้องการยกเลิกการดำเนินการปัจจุบันหรือไม่?</translation>
-    </message>
     <message numerus="yes">
         <source>Cannot move these %n devices to server %1. Server is unresponsive.</source>
         <translation>
@@ -6542,12 +6706,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <source>Cannot move these %n cameras to server %1. Server is unresponsive.</source>
         <translation>
             <numerusform>ไม่สามารถย้ายกล้องเหล่านี้ %n ไปยังเซิร์ฟเวอร์ %1 เซิร์ฟเวอร์ไม่ตอบสนอง.</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Cannot move these %n IO modules to server %1. Server is unresponsive.</source>
-        <translation>
-            <numerusform>ไม่สามารถย้ายโมดูล IOเหล่านี้ %n ไปยังเซิร์ฟเวอร์ %1 เซิร์ฟเวอร์ไม่ตอบสนอง.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -6563,12 +6721,6 @@ If you would like to disable this feature you can do so in the System Settings d
         </translation>
     </message>
     <message numerus="yes">
-        <source>Server %1 is unable to find and access these %n IO modules. Are you sure you would like to move them?</source>
-        <translation>
-            <numerusform>เซิร์ฟเวอร์ %1 ไม่สามารถค้นหาและเข้าถึงโมดูล IOเหล่านี้ %n คุณแน่ใจหรือว่าต้องการที่จะย้ายพวกเขา?</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
         <source>Are you sure you want to permanently delete these %n files?</source>
         <translation>
             <numerusform>คุณแน่ใจหรือว่าต้องการที่จะลบไฟล์เหล่านี้ %n?</numerusform>
@@ -6580,47 +6732,81 @@ If you would like to disable this feature you can do so in the System Settings d
             <numerusform>คุณแน่ใจหรือว่าต้องการลบรายการเหล่านี้ %n  จากรูปแบบ?</numerusform>
         </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>อุปกรณ์ %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>อุปกรณ์ %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>These %n cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>กล้อง %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>These %n IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>โมดูล IO %n เหล่านี้ถูกค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these devices are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ของอุปกรณ์เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>%n ของอุปกรณ์เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n of these cameras are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ของกล้องเหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
+        <translation type="unfinished">
+            <numerusform>%n ของกล้องเหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</numerusform>
+        </translation>
     </message>
-    <message>
-        <source>%n of these IO modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
-        <translation>%n ของโมดูล IO เหล่านี้ได้รับการค้นพบโดยอัตโนมัติ พวกเขาอาจจะค้นพบอัตโนมัติอีกครั้งหลังจากที่ถูกลบออก คุณแน่ใจหรือว่าต้องการลบพวกเขา?</translation>
-    </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n devices?</source>
-        <translation>จริงๆคุณต้องการลบอุปกรณ์ %n ต่อไปนี้หรือไม่?</translation>
+        <translation type="unfinished">
+            <numerusform>จริงๆคุณต้องการลบอุปกรณ์ %n ต่อไปนี้หรือไม่?</numerusform>
+        </translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>Do you really want to delete the following %n cameras?</source>
-        <translation>จริงๆคุณต้องการลบกล้อง %n ต่อไปนี้หรือไม่?</translation>
-    </message>
-    <message>
-        <source>Do you really want to delete the following %n IO modules?</source>
-        <translation>จริงๆคุณต้องการลบโมดูล IO %n ต่อไปนี้หรือไม่?</translation>
+        <translation type="unfinished">
+            <numerusform>จริงๆคุณต้องการลบกล้อง %n ต่อไปนี้หรือไม่?</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Do you really want to delete the following %n items?</source>
         <translation>
             <numerusform>คุณต้องการที่จะลบรายการ %n ต่อไปนี้หรือไม่?</numerusform>
         </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot move these %n I/O modules to server %1. Server is unresponsive.</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server %1 is unable to find and access these %n I/O modules. Are you sure you would like to move them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>These %n I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%n of these I/O modules are auto-discovered. They may be auto-discovered again after removing. Are you sure you want to delete them?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Do you really want to delete the following %n I/O modules?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Device addition is already in progress. Are you sure you want to cancel current process?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6634,10 +6820,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>บุ๊คมาร์ค</translation>
     </message>
     <message>
-        <source>Are you sure you want to delete this bookmark %1?</source>
-        <translation>คุณแน่ใจว่าคุณต้องการลบบุ๊คมาร์ค นี้หรือไม่ %1?</translation>
-    </message>
-    <message>
         <source>Bookmarks can only be added to an online server.</source>
         <translation>บุ๊คมาร์ค สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
     </message>
@@ -6648,6 +6830,22 @@ If you would like to disable this feature you can do so in the System Settings d
     <message>
         <source>Confirm Deletion</source>
         <translation>ยืนยันการลบ</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete this bookmark?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete bookmark &quot;%1&quot;?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Press %1 to search bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Are you sure you want to delete these %n bookmarks?</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6797,20 +6995,12 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>%1 สื่อไฟล์ (* .nov)</translation>
     </message>
     <message>
-        <source>You are about to export a video sequence that is longer than 30 minutes.</source>
-        <translation>คุณกำลังจะส่งออกลำดับวิดีโอที่มีความยาวกว่า 30 นาที.</translation>
-    </message>
-    <message>
         <source>It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.</source>
         <translation>มันอาจต้องการมากกว่ากิกะไบต์ของพื้นที่ฮาร์ดดิสก์และขึ้นอยู่กับความเร็วในการเชื่อมต่อของคุณ อาจต้องใช้เวลาหลายนาที.</translation>
     </message>
     <message>
         <source>Do you want to continue?</source>
         <translation>คุณต้องการที่จะดำเนินการต่อหรือไม่?</translation>
-    </message>
-    <message>
-        <source>You are about to export several video sequences with a total length exceeding 30 minutes.</source>
-        <translation>คุณกำลังจะส่งออกลำดับวิดีโอหลายที่มีความยาวรวมเกิน 30 นาที.</translation>
     </message>
     <message>
         <source>Apply filters: Rotation, Dewarping, Image Enhancement, Custom Aspect Ratio (requires transcoding)</source>
@@ -6893,7 +7083,15 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video to the &apos;.nov&apos; format. Do you want to continue?</source>
+        <source>Selected format is not recommended for this camera due to video downscaling. We recommend to export selected video either to the &apos;.nov&apos; or &apos;.exe&apos; format. Do you want to continue?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export a video that is longer than 30 minutes.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You are about to export several videos with a total length exceeding 30 minutes.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6940,10 +7138,6 @@ If you would like to disable this feature you can do so in the System Settings d
         <translation>ไม่สามารถปรับปรุงเซิร์ฟเวอร์ที่เลือก.</translation>
     </message>
     <message>
-        <source>You can try to update the servers again in the System Administration.</source>
-        <translation>คุณสามารถที่จะปรับปรุงเซิร์ฟเวอร์อีกครั้งในระบบการบริหาร.</translation>
-    </message>
-    <message>
         <source>Warning: You are about to merge Systems with START licenses.
 As only 1 START license is allowed per System after your merge you will only have 1 START license remaining.
 If you understand this and would like to proceed please click Merge to continue.
@@ -6951,10 +7145,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>คำเตือน: คุณกำลังจะผสานระบบที่มีใบอนุญาตเริ่มต้น.
 ในฐานะที่เป็นเพียง 1 ใบอนุญาตเริ่มต้นที่ได้รับอนุญาตต่อของระบบหลังจากที่ผสานของคุณคุณจะมีใบอนุญาตเริ่มต้น 1 ที่เหลือ.
 ถ้าคุณเข้าใจเรื่องนี้และต้องการที่จะดำเนินการต่อไปกรุณาคลิกผสานเพื่อดำเนินการต่อ.</translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation>คำเตือน</translation>
     </message>
     <message>
         <source>Merge</source>
@@ -6967,6 +7157,14 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>Rejoice! Selected servers have been successfully connected to your system!</source>
         <translation>เซิร์ฟเวอร์ที่เลือกได้รับการเชื่อมต่อสำเร็จกับระบบของคุณ!</translation>
+    </message>
+    <message>
+        <source>You can try to update the servers again in the System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Warning!</source>
+        <translation type="unfinished">คำเตือน!</translation>
     </message>
 </context>
 <context>
@@ -7075,8 +7273,8 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>กล้องทั้งหมด</translation>
     </message>
     <message>
-        <source>All IO Modules</source>
-        <translation>โมดูล IO ทั้งหมด</translation>
+        <source>All I/O Modules</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7086,28 +7284,24 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>PTZ_CALIBRATION_%1.jpg</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get current position from camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่จะได้รับตำแหน่งปัจจุบันจากอกล้อง %1.</translation>
-    </message>
-    <message>
         <source>Please wait for the camera to go online.</source>
         <translation>โปรดรอสักครู่สำหรับกล้องที่จะไออนไลน์.</translation>
-    </message>
-    <message>
-        <source>An error has occurred while trying to set current position for camera %1.</source>
-        <translation>เกิดข้อผิดพลาดในขณะที่พยายามที่จะตั้งตำแหน่งปัจจุบันสำหรับกล้อง %1.</translation>
     </message>
     <message>
         <source>Unable to get position from camera.</source>
         <translation>ไม่สามารถได้รับตำแหน่งจากกล้อง.</translation>
     </message>
     <message>
-        <source>Unable to set position for camera.</source>
-        <translation>ไม่สามารถกำหนดตำแหน่งกล้อง.</translation>
+        <source>Unable to set position on camera.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Unable to set position of camera.</source>
-        <translation>ไม่สามารถตั้งค่าตำแหน่งของกล้อง.</translation>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -7120,9 +7314,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>It is not allowed to make any changes except license activation.</source>
         <translation>มันไม่ได้รับอนุญาตให้ทำการเปลี่ยนแปลงใด ๆ ยกเว้นใบอนุญาตการเปิดใช้งาน.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not saved.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกบันทึก.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not save the following %n items to Server.</source>
@@ -7134,9 +7330,11 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>Error</source>
         <translation>ข้อผิดพลาด</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>The following %n items are not deleted.</source>
-        <translation>รายการต่อไปนี้ %n จะไม่ถูกลบ.</translation>
+        <translation type="unfinished">
+            <numerusform>รายการต่อไปนี้ %n จะไม่ถูกลบ.</numerusform>
+        </translation>
     </message>
     <message numerus="yes">
         <source>Could not delete the following %n items from Server.</source>
@@ -7220,6 +7418,14 @@ If you understand this and would like to proceed please click Merge to continue.
     </message>
     <message>
         <source>An error occurred while saving screenshot &apos;%1&apos;.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Error while taking screenshot</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7356,14 +7562,6 @@ If you understand this and would like to proceed please click Merge to continue.
         <translation>มีผู้ใช้อื่นทำการควบคุมหน้าจอนี้.</translation>
     </message>
     <message>
-        <source>Are you sure you want to stop the Video Wall?</source>
-        <translation>คุณแน่ใจว่าคุณต้องการที่จะหยุด วีดีโอวอลล์ ?</translation>
-    </message>
-    <message>
-        <source>You&apos;ll have to start it manually.</source>
-        <translation>คุณจะต้องเริ่มต้นด้วยตนเอง.</translation>
-    </message>
-    <message>
         <source>%1&apos;s Screen</source>
         <comment>%1 means user&apos;s name</comment>
         <translation>หน้าจอ %1 s</translation>
@@ -7371,10 +7569,6 @@ If you understand this and would like to proceed please click Merge to continue.
     <message>
         <source>A control session is already running.</source>
         <translation>การควบคุมเซสชั่นกำลังทำงาน.</translation>
-    </message>
-    <message>
-        <source>An unexpected error has occured. Changes cannot be applied.</source>
-        <translation>เกิดข้อผิดพลาดที่ไม่คาดคิดขึ้น การเปลี่ยนแปลงไม่สามารถบันทึกได้.</translation>
     </message>
     <message>
         <source>There are no offline video wall items attached to this computer.</source>
@@ -7404,9 +7598,23 @@ If you understand this and would like to proceed please click Merge to continue.
         <source>A Video Wall with the same name already exists.</source>
         <translation>จอแสดงผล มีชื่อเดียวกันกับที่มีอยู่แล้ว.</translation>
     </message>
-    <message>
+    <message numerus="yes">
         <source>%n items</source>
-        <translation>%n รายการ</translation>
+        <translation type="unfinished">
+            <numerusform>%n รายการ</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Are you sure you want to stop Video Wall?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You will have to start it manually.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>The changes cannot be applied. Unexpected error occurred.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -36,6 +36,7 @@ namespace ec2 {
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
     struct ApiLicenseStatistics;
+    struct ApiUserDataStatistics;
     struct ApiLockData;
     struct ApiMediaServerData;
     struct ApiMediaServerUserAttributesData;
@@ -75,7 +76,6 @@ namespace ec2 {
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
-    struct ApiModuleData;
     struct ApiLoginData;
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
@@ -84,6 +84,7 @@ namespace ec2 {
     struct ApiTransactionData;
     struct ApiSystemStatistics;
     struct ApiStatisticsServerInfo;
+    struct ApiDiscoveredServerData;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -119,8 +120,8 @@ namespace ec2 {
     typedef std::vector<ApiStorageData> ApiStorageDataList;
     typedef std::vector<ApiStorageDataStatistics> ApiStorageDataStatisticsList;
     typedef std::vector<ApiUserData> ApiUserDataList;
+    typedef std::vector<ApiUserDataStatistics> ApiUserDataStatisticsList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
-    typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
@@ -130,6 +131,7 @@ namespace ec2 {
     typedef std::vector<ApiServerFootageData> ApiServerFootageDataList;
     typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
     typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
+    typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -195,7 +197,7 @@ namespace ec2 {
     (ApiUpdateInstallData)\
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
-    (ApiModuleData)\
+    (ApiUserDataStatistics)\
     (ApiLoginData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
@@ -208,6 +210,7 @@ namespace ec2 {
     (ApiLicenseOverflowData)\
     (ApiSystemStatistics)\
     (ApiStatisticsServerInfo)\
+    (ApiDiscoveredServerData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

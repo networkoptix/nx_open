@@ -55,7 +55,7 @@ namespace Qn {
          */
         ShowFpsAction,
 
-        /** 
+        /**
          * Shows / hides debug overlay.
          */
         ShowDebugOverlayAction,
@@ -142,7 +142,7 @@ namespace Qn {
         MessageBoxAction,
 
         /**
-         * Displays version mismatch dialog, pulling mismatch data from 
+         * Displays version mismatch dialog, pulling mismatch data from
          * <tt>QnWorkbenchVersionMismatchWatcher</tt>. Displays nothing if there
          * is no mismatches.
          */
@@ -155,7 +155,7 @@ namespace Qn {
         BetaVersionMessageAction,
 
 
-        /** 
+        /**
          * Displays dialog asking about statistics reporting.
          */
         AllowStatisticsReportMessageAction,
@@ -335,12 +335,12 @@ namespace Qn {
          */
         ExitAction,
 
-        /** 
+        /**
          * Forcibly closes the client asynchronously.
          */
         DelayedForcedExitAction,
 
-        /** 
+        /**
          * Notifies all modules about client closing.
          */
         BeforeExitAction,
@@ -351,6 +351,13 @@ namespace Qn {
          * Opens web client in the default browser.
          */
         WebClientAction,
+
+        /**
+         * Opens web client in the default browser. Placed in submenu
+         * TODO: #ynikitenkov Add ability to add action both in submenu and context menu,
+         * now it is not available
+         */
+        WebClientActionSubMenu,
 
         /**
          * Opens business events editing dialog.
@@ -830,8 +837,8 @@ namespace Qn {
          */
         IdentifyVideoWallAction,
 
-        /** 
-         * Save current videowall matrix. 
+        /**
+         * Save current videowall matrix.
          */
         SaveVideowallMatrixAction,
 
@@ -917,7 +924,7 @@ namespace Qn {
          */
         ExportLayoutAction,
 
-        /** 
+        /**
          * Bookmark selected range.
          */
         AddCameraBookmarkAction,
@@ -931,6 +938,11 @@ namespace Qn {
          * Remove selected bookmark.
          */
         RemoveCameraBookmarkAction,
+
+        /**
+         * Batch bookmarks deleting.
+         */
+        RemoveBookmarksAction,
 
         /**
          * Opens new layout for Quick Search.
@@ -976,7 +988,7 @@ namespace Qn {
          */
         PinCalendarAction,
 
-        /** 
+        /**
          * Minimazes day/time view
          */
         MinimizeDayTimeViewAction,

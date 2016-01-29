@@ -94,7 +94,7 @@ public:
     void setSystemName(const QString &systemName);
 
     QnModuleInformation getModuleInformation() const;
-    void setModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
+    void setFakeServerModuleInformation(const QnModuleInformationWithAddresses &moduleInformation);
 
     QString getAuthKey() const;
     void setAuthKey(const QString& value);

@@ -92,7 +92,7 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
     {
         setNeedKeyData();
         ++mFramesLost;
-        m_stat[0].onData(0);
+        m_stat[0].onData(0, false);
         m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
         if (mFramesLost == MAX_LOST_FRAME) // if we lost 2 frames => connection is lost for sure (2)
@@ -139,7 +139,9 @@ bool QnAbstractMediaStreamDataProvider::afterGetData(const QnAbstractDataPacketP
         data->dataProvider = this;
 
     if (videoData)
-        m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(data->dataSize()));
+        m_stat[videoData->channelNumber].onData(
+            static_cast<unsigned int>(data->dataSize()),
+            videoData->flags & AV_PKT_FLAG_KEY);
 
     return true;
 
@@ -157,6 +159,26 @@ float QnAbstractMediaStreamDataProvider::getBitrateMbps() const
     for (int i = 0; i < m_numberOfchannels; ++i)
         rez += m_stat[i].getBitrateMbps();
     return rez;
+}
+
+float QnAbstractMediaStreamDataProvider::getFrameRate() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getFrameRate();
+
+    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
+}
+
+float QnAbstractMediaStreamDataProvider::getAverageGopSize() const
+{
+    float rez = 0;
+    for (int i = 0; i < m_numberOfchannels; ++i)
+        rez += m_stat[i].getAverageGopSize();
+
+    Q_ASSERT_X(m_numberOfchannels, Q_FUNC_INFO, "No channels?");
+    return rez / (m_numberOfchannels ? m_numberOfchannels : 1);
 }
 
 void QnAbstractMediaStreamDataProvider::resetTimeCheck()
@@ -181,7 +203,12 @@ void QnAbstractMediaStreamDataProvider::checkTime(const QnAbstractMediaDataPtr& 
             // if timeDiff < -N it may be time correction or dayling time change
             if (timeDiff >=-TIME_RESYNC_THRESHOLD  && timeDiff < MIN_FRAME_DURATION)
             {
-                NX_LOG(QLatin1String("Timestamp correction"), cl_logWARNING);
+                //most likely, timestamp reported by camera are not that good
+                NX_LOG(lit("Timestamp correction. ts diff %1, camera %2, %3 stream").
+                    arg(timeDiff).
+                    arg(m_mediaResource ? m_mediaResource->getName() : QString()).
+                    arg((media->flags & QnAbstractMediaData::MediaFlags_LowQuality) ? lit("low") : lit("high")),
+                    cl_logDEBUG1);
 
                 media->timestamp = m_lastMediaTime[media->channelNumber] + MIN_FRAME_DURATION;
             }

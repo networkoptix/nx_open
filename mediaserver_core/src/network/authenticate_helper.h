@@ -104,7 +104,8 @@ private:
     void addAuthHeader(
         nx_http::Response& responseHeaders,
         const QnUserResourcePtr& userRes,
-        bool isProxy );
+        bool isProxy,
+        bool isDigest = true);
     QByteArray getNonce();
     bool isNonceValid(const QByteArray& nonce);
     Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
