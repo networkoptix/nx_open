@@ -70,6 +70,12 @@ angular.module('cloudApp')
             nativeClient.open(systemId);
         };
 
+        function reloadSystems(){
+            cloudApi.systems('clearCache').then(function(){
+               $location.path("/systems");
+            });
+        }
+
         // Unbind or unshare from me
         $scope.delete = function(){
             //1. Determine, if I am the owner
@@ -82,21 +88,17 @@ angular.module('cloudApp')
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.delete(systemId);
-                        }).then(function(){
-                            $location.path("/systems");
-                        });
+                        }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
 
             }else{
                 // User is not owner. Deleting means he'll lose access to it
-                dialogs.confirm("You are going to disconnect your system from your account. You will lose an access for this system. Are you sure?").
+                dialogs.confirm("You are going to disconnect this system from your account. You will lose an access for this system. Are you sure?").
                     then(function(){
                         $scope.deletingSystem = process.init(function(){
                             return cloudApi.unshare(systemId, $scope.account.email);
-                        }).then(function(){
-                            $location.path("/systems");
-                        });
+                        }).then(reloadSystems);
                         $scope.deletingSystem.run();
                     });
             }

@@ -8,28 +8,43 @@ angular.module('cloudApp')
         function cacheGet(url, cacheForever){
             var cachedResult = null;
             var cacheReceived = 0;
-            return function(fromCache) {
+            return function(command) {
+
+                var fromCache = command == 'fromCache';
+                var forceReload = command == 'reload';
+                var clearCache = command == 'clearCache';
+
                 var defer = $q.defer();
                 var now = (new Date()).getTime();
 
-                if(!fromCache && (cachedResult === null || !cacheForever && (now - cacheReceived) > Config.cacheTimeout)){
-                    $http.get(url).then(function(response){
-                        cachedResult = response;
-                        cacheReceived  = now;
-                        defer.resolve(cachedResult);
-                    },function(error){
-                        cachedResult = null;
-                        cacheReceived = 0;
-                        defer.reject(error);
-                        return null
-                    })
-                }else{
+                //Check for cache availability
+                var cacheMiss = cachedResult === null || // clear cache miss
+                    forceReload || // ignore cache
+                    !cacheForever && (now - cacheReceived) > Config.cacheTimeout; // outdated cache
+
+
+                if(clearCache){
+                    cachedResult = null;
+                    cacheReceived = 0;
+                    defer.resolve(null);
+                }else  if(fromCache || !cacheMiss){
                     if(cachedResult !== null) {
                         defer.resolve(cachedResult);
                     }else{
                         defer.reject(cachedResult);
                     }
+                }else {
+                    $http.get(url).then(function (response) {
+                        cachedResult = response;
+                        cacheReceived = now;
+                        defer.resolve(cachedResult);
+                    }, function (error) {
+                        cachedResult = null;
+                        cacheReceived = 0;
+                        defer.reject(error);
+                    });
                 }
+
                 return defer.promise;
             }
         }
@@ -115,7 +130,7 @@ angular.module('cloudApp')
                     });
                 }
 
-                getSystems(true).then(function(systemsCache){
+                getSystems('fromCache').then(function(systemsCache){
                     //Search our system in cache
                     var system = _.find(systemsCache.data,function(system){
                         return system.id == systemId;
