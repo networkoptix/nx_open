@@ -1,9 +1,11 @@
 #ifndef NX_CC_CLOUD_TUNNEL_H
 #define NX_CC_CLOUD_TUNNEL_H
 
-#include "address_resolver.h"
-
 #include <queue>
+
+#include "address_resolver.h"
+#include "nx/network/socket_attributes_cache.h"
+
 
 namespace nx {
 namespace network {
@@ -35,8 +37,10 @@ public:
 
     /** Creates new connection to peer or returns current with false in case if real
      *  tunneling is notsupported by used method */
-    virtual void connect(std::chrono::milliseconds timeout,
-                         SocketHandler handler) = 0;
+    virtual void connect(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        SocketHandler handler) = 0;
 
     /** Accepts new connection from peer (like socket)
      *  \note not all of the AbstractTunnelConnection can really accept connections */
@@ -52,7 +56,7 @@ class AbstractTunnelConnector
     public QnStoppableAsync
 {
 public:
-    /** Helps to decide which method shell be used first */
+    /** Helps to decide which method shall be used first */
     virtual uint32_t getPriority() = 0;
 
     /** Creates connected AbstractTunnelConnection */
@@ -110,10 +114,13 @@ public:
                                std::unique_ptr<AbstractStreamSocket>)> SocketHandler;
 
     /** Establish new connection
-     *  \note This method is re-enterable. So, it can be called in
+     * \param socketAttributes attribute values to apply to a newly-created socket
+     * \note This method is re-enterable. So, it can be called in
      *        different threads simultaneously */
-    void connect(std::chrono::milliseconds timeout,
-                 SocketHandler handler);
+    void connect(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        SocketHandler handler);
 
     /** Accept new incoming connection on the tunnel */
     void accept(SocketHandler handler);
@@ -141,10 +148,12 @@ class TunnelPool
     : public QnStoppableAsync
 {
 public:
-    void connect(const String& peerId,
-                 std::vector<CloudConnectType> connectTypes,
-                 std::shared_ptr<StreamSocketOptions> options,
-                 Tunnel::SocketHandler handler);
+    std::shared_ptr<Tunnel> getTunnel(const String& hostName);
+
+    //void connect(const String& peerId,
+    //             std::vector<CloudConnectType> connectTypes,
+    //             std::shared_ptr<StreamSocketOptions> options,
+    //             Tunnel::SocketHandler handler);
 
     /** Creates new tunnel with connected \param connection */
     void newTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
@@ -156,7 +165,6 @@ public:
     void pleaseStop(std::function<void()> handler) override;
 
 private:
-    std::shared_ptr<Tunnel> getTunnel(const String& peerId);
     void acceptTunnel(const String& peerId);
     void removeTunnel(const String& peerId);
 

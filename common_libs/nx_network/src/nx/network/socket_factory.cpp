@@ -11,20 +11,9 @@
 
 #include "utils/common/cpp14.h"
 
-std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket(
-    NatTraversalType natTraversalRequired )
+std::unique_ptr< AbstractDatagramSocket > SocketFactory::createDatagramSocket()
 {
-    switch( natTraversalRequired )
-    {
-        case NatTraversalType::nttAuto:
-        case NatTraversalType::nttEnabled:
-            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( true ) );
-
-        case NatTraversalType::nttDisabled:
-            return std::unique_ptr< AbstractDatagramSocket >( new UDPSocket( false ) );
-    };
-
-    return std::unique_ptr< AbstractDatagramSocket >();
+    return std::unique_ptr< AbstractDatagramSocket >(new UDPSocket(false));
 }
 
 static std::unique_ptr< AbstractStreamSocket > streamSocket(

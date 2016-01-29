@@ -17,7 +17,7 @@ CloudServerSocket::CloudServerSocket(
     , m_socketOptions(new StreamSocketOptions())
     , m_ioThreadSocket(SocketFactory::createStreamSocket())
 {
-    // TODO: #mu default values for m_socketOptions shell match default
+    // TODO: #mu default values for m_socketOptions shall match default
     //           system vales: think how to implement this...
     m_socketOptions->recvTimeout = 0;
 }

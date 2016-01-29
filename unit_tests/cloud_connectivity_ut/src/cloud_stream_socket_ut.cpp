@@ -1,16 +1,15 @@
+
 #include <gtest/gtest.h>
 
-#include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/cloud_server_socket.h>
 
-#include "simple_socket_test_helper.h"
 
 namespace nx {
-namespace cc {
-namespace test {
+namespace network {
+namespace cloud {
 
 // TODO: #mux
 
-} // namespace test
-} // namespace cc
+} // namespace cloud
+} // namespace network
 } // namespace nx

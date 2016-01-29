@@ -75,8 +75,10 @@ public:
         // TODO: create m_tunnelSocket and open randevous connection
     }
 
-    void connect(std::chrono::milliseconds timeout,
-                 SocketHandler handler) override
+    void connect(
+        std::chrono::milliseconds timeout,
+        SocketAttributes socketAttributes,
+        SocketHandler handler) override
     {
         QnMutexLocker lk(&m_mutex);
         if (m_tunnelSocket)

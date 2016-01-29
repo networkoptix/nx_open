@@ -83,11 +83,12 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    bool m_nonBlockingMode;
-    std::shared_ptr<StreamSocketOptions> m_socketOptions;
     std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncGuard;
+    /** Used to tie this to aio thread.
+    //TODO #ak replace with aio thread timer */
+    std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
 };
 
 } // namespace cloud

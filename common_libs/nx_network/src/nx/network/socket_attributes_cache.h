@@ -24,9 +24,12 @@ public:
     boost::optional<unsigned int> recvBufferSize;
     boost::optional<unsigned int> recvTimeout;
     boost::optional<unsigned int> sendTimeout;
+    boost::optional<aio::AbstractAioThread*> aioThread;
 
     void applyTo(AbstractSocket* const targetSocket)
     {
+        if (aioThread)
+            targetSocket->bindToAioThread(*aioThread);
         if (reuseAddrFlag)
             targetSocket->setReuseAddrFlag(*reuseAddrFlag);
         if (nonBlockingMode)
@@ -62,31 +65,31 @@ public:
     virtual bool setReuseAddrFlag(bool val) override
     {
         return setAttributeValue(
-            &m_socketOptions.reuseAddrFlag,
+            &m_socketAttributes.reuseAddrFlag,
             &AbstractSocket::setReuseAddrFlag,
             val);
     }
     virtual bool getReuseAddrFlag(bool* val) const override
     {
         return getAttributeValue(
-            m_socketOptions.reuseAddrFlag,
+            m_socketAttributes.reuseAddrFlag,
             &AbstractSocket::getReuseAddrFlag,
-            decltype(m_socketOptions.reuseAddrFlag)(false),
+            decltype(m_socketAttributes.reuseAddrFlag)(false),
             val);
     }
     virtual bool setNonBlockingMode(bool val) override
     {
         return setAttributeValue(
-            &m_socketOptions.nonBlockingMode,
+            &m_socketAttributes.nonBlockingMode,
             &AbstractSocket::setNonBlockingMode,
             val);
     }
     virtual bool getNonBlockingMode(bool* val) const override
     {
         return getAttributeValue(
-            m_socketOptions.nonBlockingMode,
+            m_socketAttributes.nonBlockingMode,
             &AbstractSocket::getNonBlockingMode,
-            decltype(m_socketOptions.nonBlockingMode)(false),
+            decltype(m_socketAttributes.nonBlockingMode)(false),
             val);
     }
     virtual bool getMtu(unsigned int* mtuValue) const
@@ -101,61 +104,61 @@ public:
     virtual bool setSendBufferSize(unsigned int val) override
     {
         return setAttributeValue(
-            &m_socketOptions.sendBufferSize,
+            &m_socketAttributes.sendBufferSize,
             &AbstractSocket::setSendBufferSize,
             val);
     }
     virtual bool getSendBufferSize(unsigned int* val) const override
     {
         return getAttributeValue(
-            m_socketOptions.sendBufferSize,
+            m_socketAttributes.sendBufferSize,
             &AbstractSocket::getSendBufferSize,
-            decltype(m_socketOptions.sendBufferSize)(),
+            decltype(m_socketAttributes.sendBufferSize)(),
             val);
     }
     virtual bool setRecvBufferSize(unsigned int val) override
     {
         return setAttributeValue(
-            &m_socketOptions.recvBufferSize,
+            &m_socketAttributes.recvBufferSize,
             &AbstractSocket::setRecvBufferSize,
             val);
     }
     virtual bool getRecvBufferSize(unsigned int* val) const override
     {
         return getAttributeValue(
-            m_socketOptions.recvBufferSize,
+            m_socketAttributes.recvBufferSize,
             &AbstractSocket::getRecvBufferSize,
-            decltype(m_socketOptions.recvBufferSize)(),
+            decltype(m_socketAttributes.recvBufferSize)(),
             val);
     }
     virtual bool setRecvTimeout(unsigned int millis) override
     {
         return setAttributeValue(
-            &m_socketOptions.recvTimeout,
+            &m_socketAttributes.recvTimeout,
             &AbstractSocket::setRecvTimeout,
             millis);
     }
     virtual bool getRecvTimeout(unsigned int* millis) const override
     {
         return getAttributeValue(
-            m_socketOptions.recvTimeout,
+            m_socketAttributes.recvTimeout,
             &AbstractSocket::getRecvTimeout,
-            decltype(m_socketOptions.recvTimeout)(0),
+            decltype(m_socketAttributes.recvTimeout)(0),
             millis);
     }
     virtual bool setSendTimeout(unsigned int millis) override
     {
         return setAttributeValue(
-            &m_socketOptions.sendTimeout,
+            &m_socketAttributes.sendTimeout,
             &AbstractSocket::setSendTimeout,
             millis);
     }
     virtual bool getSendTimeout(unsigned int* millis) const override
     {
         return getAttributeValue(
-            m_socketOptions.sendTimeout,
+            m_socketAttributes.sendTimeout,
             &AbstractSocket::getSendTimeout,
-            decltype(m_socketOptions.sendTimeout)(0),
+            decltype(m_socketAttributes.sendTimeout)(0),
             millis);
     }
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override
@@ -171,18 +174,18 @@ public:
     void setDelegate(ParentType* _delegate)
     {
         m_delegate = _delegate;
-        m_socketOptions.applyTo(m_delegate);
+        m_socketAttributes.applyTo(m_delegate);
     }
 
-    SocketAttributesHolderType getSocketOptions() const
+    SocketAttributesHolderType getSocketAttributes() const
     {
-        return m_socketOptions;
+        return m_socketAttributes;
     }
 
 protected:
     ParentType* m_delegate;
 
-    SocketAttributesHolderType m_socketOptions;
+    SocketAttributesHolderType m_socketAttributes;
 
     template<typename AttributeType, typename SocketClassType>
     bool setAttributeValue(
@@ -259,16 +262,16 @@ public:
     virtual bool setNoDelay(bool val) override
     {
         return this->setAttributeValue(
-            &m_socketOptions.noDelay,
+            &m_socketAttributes.noDelay,
             &AbstractStreamSocket::setNoDelay,
             val);
     }
     virtual bool getNoDelay(bool* val) const override
     {
         return this->getAttributeValue(
-            m_socketOptions.noDelay,
+            m_socketAttributes.noDelay,
             &AbstractStreamSocket::getNoDelay,
-            decltype(m_socketOptions.noDelay)(false),
+            decltype(m_socketAttributes.noDelay)(false),
             val);
     }
     virtual bool toggleStatisticsCollection(bool val) override
@@ -288,16 +291,16 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > val) override
     {
         return this->setAttributeValue(
-            &m_socketOptions.keepAlive,
+            &m_socketAttributes.keepAlive,
             &AbstractStreamSocket::setKeepAlive,
             val);
     }
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* val) const override
     {
         return this->getAttributeValue(
-            m_socketOptions.keepAlive,
+            m_socketAttributes.keepAlive,
             &AbstractStreamSocket::getKeepAlive,
-            decltype(m_socketOptions.keepAlive)(),
+            decltype(m_socketAttributes.keepAlive)(),
             val);
     }
 };

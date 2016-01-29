@@ -70,17 +70,22 @@ void Tunnel::setStateHandler(std::function<void(State)> handler)
     m_stateHandler = std::move(handler);
 }
 
-void Tunnel::connect(std::chrono::milliseconds timeout,
-                     SocketHandler handler)
+void Tunnel::connect(
+    std::chrono::milliseconds timeout,
+    SocketAttributes socketAttributes,
+    SocketHandler handler)
 {
     QnMutexLocker lk(&m_mutex);
     if (m_state == State::kConnected)
     {
         lk.unlock();
-        return m_connection->connect(timeout, [this, handler]
-            (SystemError::ErrorCode code,
-             std::unique_ptr<AbstractStreamSocket> socket,
-             bool stillValid)
+        return m_connection->connect(
+            timeout,
+            std::move(socketAttributes),
+            [this, handler](
+                SystemError::ErrorCode code,
+                std::unique_ptr<AbstractStreamSocket> socket,
+                bool stillValid)
         {
             handler(code, std::move(socket));
             if (stillValid)
@@ -169,27 +174,27 @@ void Tunnel::pleaseStop(std::function<void()> handler)
         m_connection->pleaseStop(barrier.fork());
 }
 
-void TunnelPool::connect(const String& peerId,
-                         std::vector<CloudConnectType> connectTypes,
-                         std::shared_ptr<StreamSocketOptions> options,
-                         Tunnel::SocketHandler handler)
-{
-    std::chrono::milliseconds timeout(0);
-    if (const auto to = options->recvTimeout)
-        timeout = std::chrono::milliseconds(*to);
-
-    const auto tunnel = getTunnel(peerId);
-    tunnel->addConnectionTypes(connectTypes);
-    tunnel->connect(timeout, [this, peerId, handler, options]
-        (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
-    {
-        if (code != SystemError::noError)
-            return handler(code, nullptr);
-
-        SocketRequest request = { std::move(options), std::move(handler) };
-        waitConnectingSocket(std::move(socket), std::move(request));
-    });
-}
+//void TunnelPool::connect(const String& peerId,
+//                         std::vector<CloudConnectType> connectTypes,
+//                         std::shared_ptr<StreamSocketOptions> options,
+//                         Tunnel::SocketHandler handler)
+//{
+//    std::chrono::milliseconds timeout(0);
+//    if (const auto to = options->recvTimeout)
+//        timeout = std::chrono::milliseconds(*to);
+//
+//    const auto tunnel = getTunnel(peerId);
+//    tunnel->addConnectionTypes(connectTypes);
+//    tunnel->connect(timeout, [this, peerId, handler, options]
+//        (SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
+//    {
+//        if (code != SystemError::noError)
+//            return handler(code, nullptr);
+//
+//        SocketRequest request = { std::move(options), std::move(handler) };
+//        waitConnectingSocket(std::move(socket), std::move(request));
+//    });
+//}
 
 void TunnelPool::newTunnel(std::unique_ptr<AbstractTunnelConnection> connection)
 {
@@ -219,7 +224,7 @@ void TunnelPool::accept(
 
         if (const auto timeout = options->recvTimeout)
         {
-            // TODO: #mux The timeout timer shell be set
+            // TODO: #mux The timeout timer shall be set
             static_cast<void>(*timeout);
         }
 
@@ -243,25 +248,28 @@ void TunnelPool::pleaseStop(std::function<void()> handler)
         tunnel.second->pleaseStop(barrier.fork());
 }
 
-std::shared_ptr<Tunnel> TunnelPool::getTunnel(const String& peerId)
+std::shared_ptr<Tunnel> TunnelPool::getTunnel(const String& hostName)
 {
     QnMutexLocker lock(&m_mutex);
-    const auto it = m_pool.find(peerId);
+    const auto it = m_pool.find(hostName);
     if (it != m_pool.end())
         return it->second;
 
-    const auto tunnel = std::make_shared<Tunnel>(peerId);
-    tunnel->setStateHandler([this, peerId](Tunnel::State state)
+    const auto tunnel = std::make_shared<Tunnel>(hostName);
+    tunnel->setStateHandler([this, hostName](Tunnel::State state)
     {
         switch (state)
         {
-            case Tunnel::State::kConnected: return acceptTunnel(peerId);
-            case Tunnel::State::kClosed:    return removeTunnel(peerId);
+            case Tunnel::State::kConnected: return acceptTunnel(hostName);
+            case Tunnel::State::kClosed:    return removeTunnel(hostName);
             default:                        return; // nothing to be done
         };
     });
 
-    Q_ASSERT(m_pool.insert(std::make_pair(peerId, tunnel)).second);
+    if (!m_pool.insert(std::make_pair(hostName, tunnel)).second)
+    {
+        Q_ASSERT(false);
+    }
     return tunnel;
 }
 
@@ -301,8 +309,8 @@ void TunnelPool::waitConnectingSocket(
         std::unique_ptr<AbstractStreamSocket> socket,
         SocketRequest request)
 {
-    // TODO: #mux Here socket shell wait for indication and call handler
-    //            only after it's recieved (apply result shell also be checked)
+    // TODO: #mux Here socket shall wait for indication and call handler
+    //            only after it's recieved (apply result shall also be checked)
 
     // TODO: #mux Replace assert with error handling
     Q_ASSERT(request.options->apply(socket.get()));
@@ -313,8 +321,8 @@ void TunnelPool::indicateAcceptedSocket(
         std::unique_ptr<AbstractStreamSocket> socket,
         SocketRequest request)
 {
-    // TODO: #mux Here socket shell write indication and call handler
-    //            only after it's recieved (apply result shell also be checked)
+    // TODO: #mux Here socket shall write indication and call handler
+    //            only after it's recieved (apply result shall also be checked)
 
     // TODO: #mux Replace assert with error handling
     Q_ASSERT(request.options->apply(socket.get()));
