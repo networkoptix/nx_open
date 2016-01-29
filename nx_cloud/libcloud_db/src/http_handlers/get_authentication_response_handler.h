@@ -41,7 +41,7 @@ public:
     }
 };
 
-}
-}
+}  //cdb
+}  //nx
 
 #endif  //GET_AUTHENTICATION_RESPONSE_HANDLER_H

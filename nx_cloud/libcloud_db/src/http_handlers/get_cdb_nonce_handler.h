@@ -40,7 +40,7 @@ public:
     }
 };
 
-}
-}
+}   //cdb
+}   //nx
 
 #endif  //GET_CDB_NONCE_HANDLER_H

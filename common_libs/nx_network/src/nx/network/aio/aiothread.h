@@ -83,7 +83,6 @@ public:
     }
 };
 
-
 /*!
     This class is intended for use only with aio::AIOService
     \todo make it nested in aio::AIOService?
@@ -1005,10 +1004,16 @@ template<> struct get<Pollable> { typedef PollSet value; };
 template<> struct get<UdtSocket> { typedef UdtPollSet value; };
 }
 
+class AbstractAioThread
+{
+public:
+    virtual ~AbstractAioThread() {}
+};
 
 template<class SocketType>
 class AIOThread
 :
+    public AbstractAioThread,
     public detail::AIOThread<
         SocketType,
         typename socket_to_pollset_static_map::get<SocketType>::value>

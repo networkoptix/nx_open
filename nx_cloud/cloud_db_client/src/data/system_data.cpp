@@ -14,14 +14,6 @@ namespace nx {
 namespace cdb {
 namespace api {
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
-    (SystemAccessRole::none, "none")
-    (SystemAccessRole::owner, "owner")
-    (SystemAccessRole::maintenance, "maintenance")
-    (SystemAccessRole::viewer, "viewer")
-    (SystemAccessRole::editor, "editor")
-    (SystemAccessRole::editorWithSharing, "editorWithSharing"));
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemStatus,
     (ssInvalid, "invalid")
     (ssNotActivated, "notActivated")
@@ -59,6 +51,20 @@ void serializeToUrlQuery(const SystemRegistrationData& data, QUrlQuery* const ur
         data.customization.c_str());
 }
 
+
+////////////////////////////////////////////////////////////
+//// system sharing data
+////////////////////////////////////////////////////////////
+
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(SystemAccessRole,
+    (SystemAccessRole::none, "none")
+    (SystemAccessRole::liveViewer, "liveViewer")
+    (SystemAccessRole::viewer, "viewer")
+    (SystemAccessRole::advancedViewer, "advancedViewer")
+    (SystemAccessRole::localAdmin, "localAdmin")
+    (SystemAccessRole::cloudAdmin, "cloudAdmin")
+    (SystemAccessRole::maintenance, "maintenance")
+    (SystemAccessRole::owner, "owner"));
 
 ////////////////////////////////////////////////////////////
 //// class SystemSharing
@@ -106,6 +112,16 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery)
 //// class SystemID
 ////////////////////////////////////////////////////////////
 
+SystemID::SystemID()
+{
+}
+
+SystemID::SystemID(std::string systemIDStr)
+:
+    systemID(QnUuid::fromStringSafe(QByteArray(systemIDStr.c_str())))
+{
+}
+
 MAKE_FIELD_NAME_STR_CONST(SystemID, systemID)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemID* const systemID)
@@ -128,7 +144,8 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     _Fields);
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (SystemDataList)(SystemSharingList),
+    (SystemDataEx)(SystemDataList)(SystemDataExList)(SystemSharingList)(SystemSharingEx) \
+        (SystemSharingExList)(SystemAccessRoleData)(SystemAccessRoleList),
     (json),
     _Fields);
 

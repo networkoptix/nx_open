@@ -9,9 +9,9 @@
 #include <recording/stream_recorder.h>
 
 class QnlTimeSource;
-class QnStatistics;
+class QnMediaStreamStatistics;
 class QnResource;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnTimePeriod;
 
 class QnClientVideoCamera : public QObject {
@@ -44,7 +44,7 @@ public:
 
     QnAbstractStreamDataProvider* getStreamreader();
 
-    const QnStatistics* getStatistics(int channel = 0);
+    const QnMediaStreamStatistics* getStatistics(int channel = 0);
     QnCamDisplay* getCamDisplay();
 
     qint64 getCurrentTime() const;
@@ -72,7 +72,7 @@ public:
     bool isDisplayStarted() const { return m_displayStarted; }
 signals:
     void exportProgress(int progress);
-    void exportFinished(int status, const QString &fileName);
+    void exportFinished(QnStreamRecorder::ErrorStruct reason, const QString &fileName);
     void exportStopped();
 
 public slots:
@@ -89,7 +89,7 @@ private:
 
     QnlTimeSource* m_extTimeSrc;
     QnStreamRecorder* m_exportRecorder;
-    QnAbstractArchiveReader* m_exportReader;
+    QnAbstractArchiveStreamReader* m_exportReader;
     QSharedPointer<QBuffer> m_motionFileList[CL_MAX_CHANNELS];
     bool m_displayStarted;
 };

@@ -35,8 +35,11 @@ public:
 
     void clear();
 
-    /** Create new rule. */
-    void createRule();
+    /**
+     * @brief           Create new rule.
+     * @returns         Row where the rule was added.
+     */
+    int createRule();
 
     /** Add existing rule to the model. */
     void addOrUpdateRule(const QnBusinessEventRulePtr &rule);
@@ -56,7 +59,11 @@ private:
     QString columnTitle(QnBusiness::Columns column) const;
     QSize columnSizeHint(QnBusiness::Columns column) const;
 
-    void addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel);
+    /**
+     * @brief           Add new rule to the list.
+     * @returns         Row where the rule was added.
+     */
+    int addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel);
 
 private slots:
     void at_rule_dataChanged(const QnUuid &id, QnBusiness::Fields fields);

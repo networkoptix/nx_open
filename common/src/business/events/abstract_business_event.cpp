@@ -65,22 +65,22 @@ namespace QnBusiness
         default:
             break;
         }
-        
+
         return result;
     }
 
     QList<EventType> allEvents() {
         QList<EventType> result;
-        result 
+        result
             << CameraMotionEvent
             << CameraInputEvent
-            << CameraDisconnectEvent 
-            << StorageFailureEvent 
-            << NetworkIssueEvent 
-            << CameraIpConflictEvent 
-            << ServerFailureEvent 
-            << ServerConflictEvent 
-            << ServerStartEvent 
+            << CameraDisconnectEvent
+            << StorageFailureEvent
+            << NetworkIssueEvent
+            << CameraIpConflictEvent
+            << ServerFailureEvent
+            << ServerConflictEvent
+            << ServerStartEvent
             << LicenseIssueEvent
             << BackupFinishedEvent
             << UserDefinedEvent;
@@ -136,6 +136,37 @@ namespace QnBusiness
         }
         return false;
     }
+
+    bool isSourceCameraRequired(EventType eventType)
+    {
+        switch (eventType)
+        {
+        case QnBusiness::CameraMotionEvent:
+        case QnBusiness::CameraInputEvent:
+        case QnBusiness::CameraDisconnectEvent:
+        case QnBusiness::NetworkIssueEvent:
+            return true;
+        default:
+            break;
+        }
+        return false;
+    }
+
+    bool isSourceServerRequired(EventType eventType)
+    {
+        switch (eventType)
+        {
+        case QnBusiness::StorageFailureEvent:
+        case QnBusiness::BackupFinishedEvent:
+        case QnBusiness::ServerFailureEvent:
+        case QnBusiness::ServerStartEvent:
+            return true;
+        default:
+            break;
+        }
+        return false;
+    }
+
 }
 
 QnAbstractBusinessEvent::QnAbstractBusinessEvent(QnBusiness::EventType eventType, const QnResourcePtr& resource, QnBusiness::EventState toggleState, qint64 timeStampUsec):

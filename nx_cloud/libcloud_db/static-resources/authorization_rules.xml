@@ -62,34 +62,44 @@
                         <set resName="authorized" resValue="false"/>
                         -->
                     </sequence>
-                    <sequence value="/system/share">
-                        <set resName="authorized" resValue="false"/>
-                        <condition resName="auth.accountRightsOnSystem">
-                            <set value="owner" resName="authorized" resValue="true"/>
-                            <set value="editorWithSharing" resName="authorized" resValue="true"/>
-                            <condition value="maintenance" resName="systemAccessRole">
-                                <!-- integrator can share system being monitored to other integrator account -->
-                                <set value="maintenance" resName="authorized" resValue="true"/>
-                            </condition>
-                        </condition>
-                    </sequence>
                     <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
                             <set resName="authorized" resValue="false"/>
                             <condition resName="auth.accountRightsOnSystem">
                                 <set value="owner" resName="authorized" resValue="true"/>
-                                <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
                                 <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>
                             </condition>
                         </sequence>
                         <!-- request is allowed for account only -->
                     </condition>
-                    <sequence value="/system/update_sharing">
+                    <condition value="/system/get_access_role_list" resName="systemID" matchType="presence">
+                        <sequence value="false">
+                            <set resName="authorized" resValue="false"/>
+                            <set resName="resultCode" resValue="badRequest"/>
+                        </sequence>
+                        <sequence value="true">
+                            <set resName="authorized" resValue="false"/>
+                            <condition resName="auth.accountRightsOnSystem">
+                                <set value="owner" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
+                        </sequence>
+                    </condition>
+                    <sequence value="/system/share">
                         <set resName="authorized" resValue="false"/>
                         <condition resName="auth.accountRightsOnSystem">
                             <set value="owner" resName="authorized" resValue="true"/>
-                            <set value="editorWithSharing" resName="authorized" resValue="true"/>
+                            <sequence value="cloudAdmin">
+                                <set resName="authorized" resValue="true"/>
+                                <condition resName="systemAccessRole">
+                                    <!-- only system owner and integrator can share system to another integrator -->
+                                    <set value="maintenance" resName="authorized" resValue="false"/>
+                                </condition>
+                            </sequence>
                             <condition value="maintenance" resName="systemAccessRole">
                                 <!-- integrator can share system being monitored to other integrator account -->
                                 <set value="maintenance" resName="authorized" resValue="true"/>

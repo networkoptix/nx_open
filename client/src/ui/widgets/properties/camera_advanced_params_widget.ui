@@ -12,18 +12,11 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0,1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,1">
      <item>
       <widget class="QPushButton" name="loadButton">
        <property name="text">
-        <string>Reload</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="saveButton">
-       <property name="text">
-        <string>Save</string>
+        <string>Refresh</string>
        </property>
       </widget>
      </item>

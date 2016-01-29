@@ -41,7 +41,7 @@ public:
 
     static const struct Timeouts { uint send, recv, reconnect; } DEFAULT_TIMEOUTS;
 
-    AsyncClient( Timeouts timeouts = DEFAULT_TIMEOUTS );
+    AsyncClient(Timeouts timeouts = DEFAULT_TIMEOUTS);
     ~AsyncClient();
 
     Q_DISABLE_COPY( AsyncClient );
@@ -60,7 +60,7 @@ public:
         \param handler Will be called for each indication message
         \return true on success, false if this methed is already monitored
     */
-    bool monitorIndications( int method, IndicationHandler handler );
+    bool setIndicationHandler( int method, IndicationHandler handler );
 
     //!Stops monitoring for certain indications
     /*!
@@ -81,7 +81,12 @@ public:
     */
     void sendRequest( Message request, RequestHandler handler );
 
-    //! \note Required by \a nx_api::BaseServerConnection
+    //!Returns local address if client is connected to the server
+    SocketAddress localAddress() const;
+
+    /*!
+        \note Required by \a nx_api::BaseServerConnection
+    */
     virtual void closeConnection(
             SystemError::ErrorCode errorCode,
             BaseConnectionType* connection = nullptr ) override;
@@ -109,7 +114,7 @@ private:
 private:
     const Timeouts m_timeouts;
 
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     boost::optional<SocketAddress> m_endpoint;
     bool m_useSsl;
     State m_state;

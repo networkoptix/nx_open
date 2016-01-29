@@ -7,11 +7,11 @@
 #include <utils/media/externaltimesource.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
 #include <core/resource/resource_media_layout.h>
 
-#include <decoders/video/abstractdecoder.h>
+#include <decoders/video/abstract_video_decoder.h>
 
 #include "video_stream_display.h"
 #include <map>
@@ -68,7 +68,6 @@ public:
     bool doDelayForAudio(QnConstCompressedAudioDataPtr ad, float speed);
     bool isAudioBuffering() const;
     void playAudio(bool play);
-    void setSpeed(float speed);
     float getSpeed() const;
 
     // schedule to clean up buffers all; 
@@ -136,6 +135,7 @@ signals:
 
 protected:
     void setSingleShotMode(bool single);
+    virtual void setSpeed(float speed) override;
 
     bool haveAudio(float speed) const;
 

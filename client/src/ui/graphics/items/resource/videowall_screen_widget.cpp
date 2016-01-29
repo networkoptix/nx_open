@@ -48,11 +48,11 @@ QnVideowallScreenWidget::QnVideowallScreenWidget(QnWorkbenchContext *context, Qn
     m_thumbnailManager = context->instance<QnCameraThumbnailManager>();
     connect(m_thumbnailManager, &QnCameraThumbnailManager::thumbnailReady, this, &QnVideowallScreenWidget::at_thumbnailReady);
 
+    setOption(QnResourceWidget::WindowRotationForbidden, true);
+
     updateItems();
     updateButtonsVisibility();
     updateTitleText();
-
-    setOption(QnResourceWidget::WindowRotationForbidden, true);
     setInfoVisible(true, false);
 }
 

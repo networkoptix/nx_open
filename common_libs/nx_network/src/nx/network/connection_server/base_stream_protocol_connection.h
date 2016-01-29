@@ -149,29 +149,31 @@ namespace nx_api
         /*!
             Initiates asynchoronous message send
         */
-        template<class Handler>
-        void sendMessage( MessageType msg, Handler&& handler )
+        void sendMessage(
+            MessageType msg,
+            std::function<void(SystemError::ErrorCode)> handler)
         {
             auto newTask = std::make_shared<SendTask>(
-                std::move( msg ),
-                std::forward<Handler>( handler ) ); //TODO #ak get rid of shared_ptr here when generic lambdas are available
-            addNewTaskToQueue( std::move( newTask ) );
+                std::move(msg),
+                std::move(handler)); //TODO #ak get rid of shared_ptr here when generic lambdas are available
+            addNewTaskToQueue(std::move(newTask));
         }
 
-        void sendMessage( MessageType msg ) // template cannot be resolved by default value
+        void sendMessage(MessageType msg) // template cannot be resolved by default value
         {
             sendMessage(
                 std::move(msg),
-                std::function< void( SystemError::ErrorCode ) >() );
+                std::function< void(SystemError::ErrorCode) >());
         }
 
-        template<class BufferType, class Handler>
-        void sendData( BufferType&& data, Handler&& handler )
+        void sendData(
+            nx::Buffer data,
+            std::function<void(SystemError::ErrorCode)> handler)
         {
             auto newTask = std::make_shared<SendTask>(
-                std::forward<BufferType>( data ),
-                std::forward<Handler>( handler ) );
-            addNewTaskToQueue( std::move( newTask ) );
+                std::move(data),
+                std::move(handler));
+            addNewTaskToQueue(std::move(newTask));
         }
 
     private:
@@ -180,38 +182,36 @@ namespace nx_api
         public:
             SendTask()
             :
-                asyncSendIssued( false )
+                asyncSendIssued(false)
             {
             }
 
-            template<typename HandlerRefType>
-                SendTask(
-                    MessageType&& _msg,
-                    HandlerRefType&& _handler )
+            SendTask(
+                MessageType _msg,
+                std::function<void(SystemError::ErrorCode)> _handler)
             :
-                msg( std::move(_msg) ),
-                handler( std::forward<HandlerRefType>(_handler) ),
-                asyncSendIssued( false )
+                msg(std::move(_msg)),
+                handler(std::move(_handler)),
+                asyncSendIssued(false)
             {
             }
 
-            template<typename HandlerRefType>
-                SendTask(
-                    nx::Buffer&& _buf,
-                    HandlerRefType&& _handler )
+            SendTask(
+                nx::Buffer _buf,
+                std::function<void(SystemError::ErrorCode)> _handler)
             :
-                buf( std::move(_buf) ),
-                handler( std::forward<HandlerRefType>(_handler) ),
-                asyncSendIssued( false )
+                buf(std::move(_buf)),
+                handler(std::move(_handler)),
+                asyncSendIssued(false)
             {
             }
 
-            SendTask( SendTask&& right )
+            SendTask(SendTask&& right)
             :
-                msg( std::move( right.msg ) ),
-                buf( std::move( right.buf ) ),
-                handler( std::move( right.handler ) ),
-                asyncSendIssued( right.asyncSendIssued )
+                msg(std::move(right.msg)),
+                buf(std::move(right.buf)),
+                handler(std::move(right.handler)),
+                asyncSendIssued(right.asyncSendIssued)
             {
             }
 

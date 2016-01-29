@@ -4,42 +4,61 @@ QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkL
     setBookmarkList(bookmarkList);
 }
 
-void QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark) {
+bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
+{
+    // Searches the place to insert new bookmark (by startTimeMs)
     auto it = std::lower_bound(m_bookmarkList.begin(), m_bookmarkList.end(), bookmark);
 
-    if (it->guid == bookmark.guid) {
-        *it = bookmark;
-    } else {
-        if (m_bookmarkIds.contains(bookmark.guid)) {
-            auto predicate = [&bookmark](const QnCameraBookmark &other) {
-                return bookmark.guid == other.guid;
-            };
-            auto oldIt = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), predicate);
+    if (it->guid == bookmark.guid)
+    {
+        if (*it == bookmark)
+            return false;
 
-            Q_ASSERT(oldIt != m_bookmarkList.end());
-            if (oldIt != m_bookmarkList.end()) {
-                if (oldIt < it) {
-                    /* For optimization purposes we suppose the iterator behaves like a pointer.
-                     * So if we removed something before 'it' then 'it' should be decreased. */
-                    --it;
-                }
-                m_bookmarkList.erase(oldIt);
-            }
-        } else {
-            m_bookmarkIds.insert(bookmark.guid);
-        }
-        m_bookmarkList.insert(it, bookmark);
+        *it = bookmark;
+        return true;
     }
+
+    if (m_bookmarkIds.contains(bookmark.guid))
+    {
+        const auto predicate = [&bookmark](const QnCameraBookmark &other)
+            { return bookmark.guid == other.guid; };
+
+        auto oldIt = std::find_if(m_bookmarkList.begin(), m_bookmarkList.end(), predicate);
+
+        Q_ASSERT(oldIt != m_bookmarkList.end());
+        if (oldIt != m_bookmarkList.end())
+        {
+            if (oldIt < it)
+            {
+                /* For optimization purposes we suppose the iterator behaves like a pointer.
+                    * So if we removed something before 'it' then 'it' should be decreased. */
+                --it;
+            }
+            m_bookmarkList.erase(oldIt);
+        }
+    }
+    else
+    {
+        m_bookmarkIds.insert(bookmark.guid);
+    }
+
+    m_bookmarkList.insert(it, bookmark);
+    return true;
 }
 
-void QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &bookmarkList) {
+bool QnCameraBookmarkAggregation::mergeBookmarkList(const QnCameraBookmarkList &bookmarkList)
+{
     if (m_bookmarkList.isEmpty())
-        setBookmarkList(bookmarkList);
-    else 
     {
-        for (const QnCameraBookmark &bookmark: bookmarkList)
-            addBookmark(bookmark);
+        setBookmarkList(bookmarkList);
+        return !bookmarkList.empty();
     }
+
+    bool result = false;
+    for (const QnCameraBookmark &bookmark: bookmarkList)
+        result |= addBookmark(bookmark);
+
+    return result;
 }
 
 bool QnCameraBookmarkAggregation::removeBookmark(const QnUuid &bookmarkId) {

@@ -85,6 +85,35 @@ QnMutexLockerBase::~QnMutexLockerBase()
     }
 }
 
+QnMutexLockerBase::QnMutexLockerBase(QnMutexLockerBase&& rhs)
+:
+    m_mtx(rhs.m_mtx),
+    m_sourceFile(rhs.m_sourceFile),
+    m_sourceLine(rhs.m_sourceLine),
+    m_locked(rhs.m_locked),
+    m_relockCount(rhs.m_relockCount)
+{
+    rhs.m_mtx = nullptr;
+    rhs.m_locked = false;
+}
+
+QnMutexLockerBase& QnMutexLockerBase::operator=(QnMutexLockerBase&& rhs)
+{
+    if (this == &rhs)
+        return *this;
+
+    m_mtx = rhs.m_mtx;
+    m_sourceFile = rhs.m_sourceFile;
+    m_sourceLine = rhs.m_sourceLine;
+    m_locked = rhs.m_locked;
+    m_relockCount = rhs.m_relockCount;
+
+    rhs.m_mtx = nullptr;
+    rhs.m_locked = false;
+
+    return *this;
+}
+
 QnMutex* QnMutexLockerBase::mutex()
 {
     return m_mtx;

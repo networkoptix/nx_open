@@ -72,7 +72,7 @@ angular.module('webadminApp', [
             controller: 'LogCtrl'
         })
         .otherwise({
-            redirectTo: '/settings'
+            redirectTo: '/view'
         });
 });
 

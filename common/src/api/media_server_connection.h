@@ -132,7 +132,7 @@ public:
     int searchCameraAsyncStatus(const QnUuid &processUuid, QObject *target, const char *slot);
     int searchCameraAsyncStop(const QnUuid &processUuid, QObject *target = NULL, const char *slot = NULL);
 
-    int addCameraAsync(const QnManualCameraSearchCameraList& cameras, const QString &username, const QString &password, QObject *target, const char *slot);
+    int addCameraAsync(const QnManualResourceSearchList& cameras, const QString &username, const QString &password, QObject *target, const char *slot);
 
     int ptzContinuousMoveAsync(const QnNetworkResourcePtr &camera, const QVector3D &speed, const QnUuid &sequenceId, int sequenceNumber, QObject *target, const char *slot);
     int ptzContinuousFocusAsync(const QnNetworkResourcePtr &camera, qreal speed, QObject *target, const char *slot);
@@ -161,9 +161,10 @@ public:
     int ptzGetDataAsync(const QnNetworkResourcePtr &camera, Qn::PtzDataFields query, QObject *target, const char *slot);
 
     /*!
+        \param fastRequest          Request information about existing storages only. Getting full info may be quite slow.
         \returns information about storages space.
     */
-    int getStorageSpaceAsync(QObject *target, const char *slot);
+    int getStorageSpaceAsync(bool fastRequest, QObject *target, const char *slot);
 
     int getStorageStatusAsync(const QString &storageUrl, QObject *target, const char *slot);
 

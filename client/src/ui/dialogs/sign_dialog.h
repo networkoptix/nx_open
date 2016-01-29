@@ -13,7 +13,7 @@ class QStandardItemModel;
 class QUrl;
 
 class QnWorkbenchContext;
-class QnAbstractArchiveReader;
+class QnAbstractArchiveStreamReader;
 class QnResourceWidgetRenderer;
 class QnSignDialogGlWidget;
 class QnCamDisplay;
@@ -50,7 +50,7 @@ private:
     QnSharedResourcePointer<QnAviResource> m_resource;
 
     QnCamDisplay *m_camDispay;
-    QnAbstractArchiveReader *m_reader;
+    QnAbstractArchiveStreamReader *m_reader;
     QnResourceWidgetRenderer *m_renderer;
     QnSignDialogGlWidget *m_glWindow;
     QnSignInfo* m_srcVideoInfo;

@@ -17,9 +17,9 @@ extern "C"
 
 #include <core/ptz/item_dewarping_params.h>
 
-#include <core/dataconsumer/abstract_data_consumer.h>
-#include <core/datapacket/audio_data_packet.h>
-#include <core/datapacket/video_data_packet.h>
+#include <nx/streaming/abstract_data_consumer.h>
+#include <nx/streaming/audio_data_packet.h>
+#include <nx/streaming/video_data_packet.h>
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -51,8 +51,28 @@ public:
         AudioStreamAllocationError,
         InvalidAudioCodecError,
         IncompatibleCodecError,
+        FileWriteError,
 
         LastError
+    };
+
+    struct ErrorStruct
+    {
+        int                   lastError;
+        QnStorageResourcePtr  storage;
+
+        ErrorStruct(
+            int                         lastError,
+            const QnStorageResourcePtr  &storage
+        )
+            : lastError(lastError),
+              storage(storage)
+        {}
+
+        ErrorStruct()
+            : lastError(0),
+              storage(QnStorageResourcePtr())
+        {}
     };
 
     struct RecordingContext
@@ -60,6 +80,7 @@ public:
         QString                 fileName;
         AVFormatContext         *formatCtx;
         QnStorageResourcePtr    storage;
+        qint64                  totalWriteTimeNs;
 
         RecordingContext(
             const QString               &fname, 
@@ -67,7 +88,8 @@ public:
         ) :
             fileName(fname),
             formatCtx(nullptr),
-            storage(st)
+            storage(st),
+            totalWriteTimeNs(0)
         {}
     };
 
@@ -145,7 +167,7 @@ public:
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(int status, const QString &fileName);
+    void recordingFinished(const ErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -189,7 +211,7 @@ private:
 
     bool m_forceDefaultCtx;
     bool m_packetWrited;
-    int  m_lastError;
+    ErrorStruct m_lastError;
     qint64 m_currentChunkLen;
 
     qint64 m_startOffset;

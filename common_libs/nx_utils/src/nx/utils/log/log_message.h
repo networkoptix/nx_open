@@ -83,7 +83,9 @@ public:
         return arg(containerString(a, QLatin1String(", "), QLatin1String(""), QLatin1String("") ));
     }
 
-    operator QString() const;
+    operator QString() const; 
+
+    inline std::string toStdString() { return m_str.toStdString(); }
 
 private:
     QString m_str;

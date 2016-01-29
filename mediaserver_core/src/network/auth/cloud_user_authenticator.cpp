@@ -172,8 +172,8 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
     switch (cloudAccessRole)
     {
         case nx::cdb::api::SystemAccessRole::owner:
-        case nx::cdb::api::SystemAccessRole::editorWithSharing:
-        case nx::cdb::api::SystemAccessRole::editor:
+        case nx::cdb::api::SystemAccessRole::cloudAdmin:
+        case nx::cdb::api::SystemAccessRole::localAdmin:
             return qnResPool->getAdministrator();
 
         //TODO #ak resolve maintenance and viewer roles

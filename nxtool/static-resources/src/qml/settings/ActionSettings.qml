@@ -11,7 +11,7 @@ Expandable.GenericSettingsPanel
 {
     id: thisComponent;
 
-    property int flags: NxRtu.Constants.NoCommands;
+    property int flags: NxRtu.RestApiConstants.NoCommands;
 
     propertiesGroupName: qsTr("Actions");
 
@@ -78,7 +78,7 @@ Expandable.GenericSettingsPanel
             Base.Button
             {
                 enabled: (rtuContext.selection.SystemCommands
-                    & NxRtu.Constants.RebootCmd);
+                    & NxRtu.RestApiConstants.RebootCmd);
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
@@ -112,8 +112,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: ((rtuContext.selection.SystemCommands & NxRtu.Constants.FactoryDefaultsCmd)
-                    && (rtuContext.selection.flags & NxRtu.Constants.HasHdd));
+                enabled: ((rtuContext.selection.SystemCommands & NxRtu.RestApiConstants.FactoryDefaultsCmd)
+                    && (rtuContext.selection.flags & NxRtu.RestApiConstants.HasHdd));
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;
@@ -133,8 +133,8 @@ Expandable.GenericSettingsPanel
 
             Base.Button
             {
-                enabled: ((rtuContext.selection.SystemCommands & NxRtu.Constants.FactoryDefaultsButNetworkCmd)
-                    && (rtuContext.selection.flags & NxRtu.Constants.HasHdd));
+                enabled: ((rtuContext.selection.SystemCommands & NxRtu.RestApiConstants.FactoryDefaultsButNetworkCmd)
+                    && (rtuContext.selection.flags & NxRtu.RestApiConstants.HasHdd));
 
                 thin: true;
                 height: Common.SizeManager.clickableSizes.medium;

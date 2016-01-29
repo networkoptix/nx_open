@@ -81,5 +81,10 @@ QnPopup {
         if (timeout.interval > 0)
             timeout.start()
     }
+
+    function restartTimer() {
+        if (timeout.interval > 0)
+            timeout.restart()
+    }
 }
 

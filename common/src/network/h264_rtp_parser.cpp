@@ -2,15 +2,14 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "rtp_stream_parser.h"
-#include "rtpsession.h"
-#include "utils/common/synctime.h"
+#include <nx/streaming/rtp_stream_parser.h>
+#include <nx/streaming/rtsp_client.h>
+#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
 
 static const char H264_NAL_PREFIX[4] = {0x00, 0x00, 0x00, 0x01};
 static const char H264_NAL_SHORT_PREFIX[3] = {0x00, 0x00, 0x01};
 //static const int DEFAULT_SLICE_SIZE = 1024 * 1024;
-static const int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 CLH264RtpParser::CLH264RtpParser():
         QnRtpVideoStreamParser(),
@@ -21,6 +20,7 @@ CLH264RtpParser::CLH264RtpParser():
         m_builtinSpsFound(false),
         m_builtinPpsFound(false),
         m_keyDataExists(false),
+        m_idrFound(false),
         m_frameExists(false),
         m_firstSeqNum(0),
         m_packetPerNal(0),
@@ -156,13 +156,26 @@ void CLH264RtpParser::decodeSpsInfo(const QByteArray& data)
     }
 }
 
-QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime, const RtspStatistic& statistics)
+QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(
+    const quint8            *rtpBuffer,
+    quint32                 rtpTime,
+    const QnRtspStatistic   &statistics
+)
 {
-    int addheaderSize = 0;
+    int addHeaderSize = 0;
     if (m_keyDataExists && (!m_builtinSpsFound || !m_builtinPpsFound))
-        addheaderSize = getSpsPpsSize();
+        addHeaderSize = getSpsPpsSize();
 
-    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameSize + addheaderSize));
+    int totalSize = m_videoFrameSize + addHeaderSize;
+    if (totalSize > MAX_ALLOWED_FRAME_SIZE)
+        return QnCompressedVideoDataPtr();
+
+    QnWritableCompressedVideoDataPtr result = QnWritableCompressedVideoDataPtr(
+        new QnWritableCompressedVideoData(
+            CL_MEDIA_ALIGNMENT,
+            totalSize
+        )
+    );
     result->compressionType = CODEC_ID_H264;
     result->width = m_spsInitialized ? m_sps.getWidth() : -1;
     result->height = m_spsInitialized ? m_sps.getHeight() : -1;
@@ -189,7 +202,7 @@ QnCompressedVideoDataPtr CLH264RtpParser::createVideoData(const quint8* rtpBuffe
 
     if( (spsNaluStartOffset != (size_t)-1) )
         //decoding sps to detect stream resolution change
-        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, spsNaluSize ) );
+        decodeSpsInfo( QByteArray::fromRawData( result->m_data.constData() + spsNaluStartOffset, (int) spsNaluSize ) );
 
     if (m_timeHelper) {
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_frequency);
@@ -217,7 +230,36 @@ bool CLH264RtpParser::clearInternalBuffer()
     return false;
 }
 
-void CLH264RtpParser::updateNalFlags(int nalUnitType)
+bool isIFrame(const quint8* data, int dataLen)
+{
+    if (dataLen < 2)
+        return false;
+
+    quint8 nalType = *data & 0x1f;
+    bool isSlice = nalType >= nuSliceNonIDR && nalType <= nuSliceIDR;
+    if (!isSlice)
+        return false;
+
+    if (nalType == nuSliceIDR)
+        return true;
+
+    BitStreamReader bitReader;
+    bitReader.setBuffer(data+1, data + dataLen);
+    try {
+        /*int first_mb_in_slice =*/ NALUnit::extractUEGolombCode(bitReader);
+
+        int slice_type = NALUnit::extractUEGolombCode(bitReader);
+        if (slice_type >= 5)
+            slice_type -= 5; // +5 flag is: all other slice at this picture must be same type
+
+        return (slice_type == SliceUnit::I_TYPE || slice_type == SliceUnit::SI_TYPE);
+    }
+    catch (...) {
+        return false;
+    }
+}
+
+void CLH264RtpParser::updateNalFlags(int nalUnitType, const quint8* data, int dataLen)
 {
     if (nalUnitType == nuSPS)
         m_builtinSpsFound = true;
@@ -226,12 +268,17 @@ void CLH264RtpParser::updateNalFlags(int nalUnitType)
     else if (nalUnitType >= nuSliceNonIDR && nalUnitType <= nuSliceIDR)
     {
         m_frameExists = true;
-        if (nalUnitType == nuSliceIDR)
+        if (nalUnitType == nuSliceIDR) {
             m_keyDataExists = true;
+            m_idrFound = true;
+        }
+        else if (!m_idrFound && isIFrame(data, dataLen)) {
+            m_keyDataExists = true;
+        }
     }
 }
 
-bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const RtspStatistic& statistics, bool& gotData)
+bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int readed, const QnRtspStatistic& statistics, bool& gotData)
 {
     gotData = false;
     quint8* rtpBuffer = rtpBufferBase + bufferOffset;
@@ -271,7 +318,8 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         isPacketLost = true;
     }
 
-    if (isPacketLost) {
+    auto processPacketLost = [this, sequenceNum]()
+    {
         if (m_timeHelper) {
             NX_LOG(QString(lit("RTP Packet loss detected for camera %1. Old seq=%2, new seq=%3"))
                 .arg(m_timeHelper->getResID()).arg(m_prevSequenceNum).arg(sequenceNum), cl_logWARNING);
@@ -281,7 +329,11 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         }
         clearInternalBuffer();
         emit packetLostDetected(m_prevSequenceNum, sequenceNum);
-    }
+    };
+
+    if (isPacketLost)
+        processPacketLost();
+
     m_prevSequenceNum = sequenceNum;
     if (isPacketLost)
         return false;
@@ -316,7 +368,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
                 //m_videoBuffer.write((const char*)curPtr, nalUnitLen);
                 m_chunks.push_back(Chunk(curPtr-rtpBufferBase, nalUnitLen, true));
                 m_videoFrameSize += nalUnitLen + 4;
-                updateNalFlags(nalUnitType);
+                updateNalFlags(nalUnitType, curPtr, bufferEnd - curPtr);
                 curPtr += nalUnitLen;
             }
             break;
@@ -325,7 +377,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             if (bufferEnd-curPtr < 1)
                 return clearInternalBuffer();
             nalUnitType = *curPtr & 0x1f;
-            updateNalFlags(nalUnitType);
+            updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
             if (*curPtr  & 0x80) // FU_A first packet
             {
                 m_firstSeqNum = sequenceNum;
@@ -374,7 +426,7 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
             //m_videoBuffer.write((const char*) curPtr, bufferEnd - curPtr);
             m_chunks.push_back(Chunk(curPtr-rtpBufferBase, bufferEnd - curPtr, true));
             m_videoFrameSize += bufferEnd - curPtr + 4;
-            updateNalFlags(nalUnitType);
+            updateNalFlags(nalUnitType,  curPtr, bufferEnd - curPtr);
             break; // ignore unknown data
     }
 
@@ -382,7 +434,16 @@ bool CLH264RtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int r
         return clearInternalBuffer();
 
     if (rtpHeader->marker && m_frameExists) {
-        m_mediaData = createVideoData(rtpBufferBase, ntohl(rtpHeader->timestamp), statistics); // last packet
+        m_mediaData = createVideoData(
+            rtpBufferBase,
+            ntohl(rtpHeader->timestamp),
+            statistics
+        ); // last packet
+        if (!m_mediaData)
+        {
+            processPacketLost();
+            return false;
+        }
         gotData = true;
     }
     return true;

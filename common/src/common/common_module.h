@@ -18,7 +18,7 @@ class QnResourceDataPool;
 
 /**
  * Storage for common module's global state.
- * 
+ *
  * All singletons and initialization/deinitialization code goes here.
  */
 class QnCommonModule: public QObject, public QnInstanceStorage, public Singleton<QnCommonModule> {
@@ -32,7 +32,6 @@ public:
     using QnInstanceStorage::store;
 
     void bindModuleinformation(const QnMediaServerResourcePtr &server);
-    void bindModuleinformation(const QnUserResourcePtr &adminUser);
 
     QnResourceDataPool *dataPool() const {
         return m_dataPool;
@@ -100,10 +99,6 @@ public:
     inline void setAllowedPeers(const QSet<QnUuid> &peerList) { m_allowedPeers = peerList; }
     inline QSet<QnUuid> allowedPeers() const { return m_allowedPeers; }
 
-    //TODO #ak move these out of here in 2.5
-    void setArecontRTSPEnabled(bool val) { m_arecontRTSPEnabled = val; }
-    bool isArecontRTSPEnabled() const { return m_arecontRTSPEnabled; }
-
     void setLocalPeerType(Qn::PeerType peerType);
     Qn::PeerType localPeerType() const;
 
@@ -115,6 +110,7 @@ signals:
     void moduleInformationChanged();
     void remoteIdChanged(const QnUuid &id);
     void systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
+    void runningInstanceGUIDChanged();
 
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
@@ -133,9 +129,8 @@ private:
     mutable QnMutex m_mutex;
     bool m_transcodingDisabled;
     QSet<QnUuid> m_allowedPeers;
-    bool m_arecontRTSPEnabled;
     qint64 m_systemIdentityTime;
-    
+
     QByteArray m_adminPaswdHash;
     QByteArray m_adminPaswdDigest;
     bool m_lowPriorityAdminPassword;

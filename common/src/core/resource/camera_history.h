@@ -19,21 +19,21 @@
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
- *  Terms: 
+ *  Terms:
  *  \li Footage - part of the camera archive.
  *  \li Camera footage data - list of servers, that have this camera footage
  *  \li Server footage data - list of cameras, that have footage on this server
- *  \li Camera history - list of camera movements from one server to another. 
- *  Main task for this class is to provide info, which server contains footage for the given 
- *  camera for the given moment of time. 
- *  
+ *  \li Camera history - list of camera movements from one server to another.
+ *  Main task for this class is to provide info, which server contains footage for the given
+ *  camera for the given moment of time.
+ *
  *  Footage data is stored in the database, so it is received and updated almost instantly.
  *  All methods that operates only footage data are reliable.
- *  
- *  Camera history is not received instantly, so using signals is encouraged. It can also be 
+ *
+ *  Camera history is not received instantly, so using signals is encouraged. It can also be
  *  changed in runtime, e.g. when server containing footage goes online or offline.
  *  All methods that require camera history to operate are non-reliable.
- * 
+ *
  */
 class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
     Q_OBJECT
@@ -90,41 +90,47 @@ public:
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
+    enum class StartResult 
+    {
+        ommited,    //< request doesn't start because of data is up to date, callback wont called.
+        started,    //< async IO started success. callback will called.
+        failed      //< async IO can't start. callback wont called.
+    };
     /**
      * Update camera history for the given camera.
      * \param camera                Target camera
      * \param callback              Callback function that will be executed when request finished.
      * \returns                     True if request was successful, false otherwise.
      */
-    bool updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
+    StartResult updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
 
     /**
      * \brief                       Check if camera history is valid for the given camera.
-     * \param camera                Target camera.      
+     * \param camera                Target camera.
      * \returns                     True if the camera history for the given camera is already loaded, false otherwise.
      */
     bool isCameraHistoryValid(const QnVirtualCameraResourcePtr &camera) const;
 
     /**
      * \brief                       Update camera history for the given camera. Function returns immediately if currently loaded information is up to date
-     * \param camera                Target camera.      
+     * \param camera                Target camera.
      * \returns                     True if no error.
      */
     bool updateCameraHistorySync(const QnVirtualCameraResourcePtr &camera);
 signals:
-    /** 
+    /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
      *                              Usually it means that camera chunks must be updated (if needed).
      */
     void cameraFootageChanged(const QnVirtualCameraResourcePtr &camera);
 
-    /** 
+    /**
      * \brief                       Notify that camera in no longer valid - a server was added or goes online.
      *                              Usually it means that camera history must be updated (if needed).
      */
     void cameraHistoryInvalidated(const QnVirtualCameraResourcePtr &camera);
 
-    /** 
+    /**
      * \brief                       Notify about changes in the camera history.
      *                              Usually it means that all who use camera history should update their info.
      */
@@ -143,7 +149,8 @@ private:
 
 private:
     void checkCameraHistoryDelayed(QnVirtualCameraResourcePtr cam);
-    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera) const;
+    QnMediaServerResourceList dtsCamFootageData(const QnVirtualCameraResourcePtr &camera
+        , bool filterOnlineServers = false) const;
 private:
 
     mutable QnMutex m_mutex;

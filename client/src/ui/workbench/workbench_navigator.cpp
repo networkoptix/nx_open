@@ -24,7 +24,6 @@ extern "C"
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
-#include <camera/resource_display.h>
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_bookmark.h>
@@ -35,14 +34,18 @@ extern "C"
 #include <core/resource/camera_history.h>
 #include <core/resource/storage_resource.h>
 
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <plugins/resource/avi/avi_resource.h>
+
+#include <camera/resource_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/loaders/caching_camera_data_loader.h>
+#include <camera/thumbnails_loader.h>
 #include <camera/cam_display.h>
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>
 #include <camera/camera_bookmarks_manager.h>
 #include <camera/camera_bookmarks_query.h>
-#include <camera/camera_bookmark_aggregation.h>
 
 #include <server/server_storage_manager.h>
 
@@ -57,6 +60,9 @@ extern "C"
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
 
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workbench/watchers/current_layout_items_watcher.h>
+
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
@@ -69,7 +75,7 @@ extern "C"
 #include "workbench_layout_snapshot_manager.h"
 
 #include "camera/thumbnails_loader.h"
-#include "plugins/resource/archive/abstract_archive_stream_reader.h"
+#include "nx/streaming/abstract_archive_stream_reader.h"
 #include "redass/redass_controller.h"
 
 #include <utils/common/delayed.h>
@@ -89,6 +95,14 @@ namespace {
     enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
     QAtomicInt qn_threadedMergeHandle(1);
+
+
+    QnVirtualCameraResourcePtr extractCamera(QnWorkbenchItem *item)
+    {
+        const auto layoutItemData = item->data();
+        const auto id = layoutItemData.resource.id;
+        return qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    };
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -121,12 +135,10 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     m_startSelectionAction(new QAction(this)),
     m_endSelectionAction(new QAction(this)),
     m_clearSelectionAction(new QAction(this)),
-    m_bookmarkQueries(),
-    m_currentQuery(),
-    m_bookmarkAggregation(new QnCameraBookmarkAggregation()),
     m_sliderBookmarksRefreshOperation(new QnPendingOperation([this](){ updateSliderBookmarks(); }, updateBookmarksInterval, this)),
     m_cameraDataManager(NULL),
-    m_chunkMergingProcessHandle(0)
+    m_chunkMergingProcessHandle(0),
+    m_hasArchive(false)
 {
     /* We'll be using this one, so make sure it's created. */
     context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -172,7 +184,7 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
 
             if (timePeriodType == Qn::MotionContent) {
                 foreach(QnMediaResourceWidget *widget, m_syncedWidgets) {
-                    QnAbstractArchiveReader  *archiveReader = widget->display()->archiveReader();
+                    QnAbstractArchiveStreamReader  *archiveReader = widget->display()->archiveReader();
                     if (archiveReader)
                         archiveReader->setPlaybackMask(result);
                 }
@@ -211,11 +223,6 @@ QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, [this](const QnResourcePtr &resource) {
         if (QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>())
             QnRunnableCleanup::cleanup(m_thumbnailLoaderByResource.take(mediaRes));
-    });
-
-    connect(qnCameraBookmarksManager, &QnCameraBookmarksManager::bookmarkRemoved, this, [this](const QnUuid &bookmarkId){
-        m_bookmarkAggregation->removeBookmark(bookmarkId);
-        updateSliderBookmarks();
     });
 }
 
@@ -330,37 +337,16 @@ bool QnWorkbenchNavigator::bookmarksModeEnabled() const {
     return m_timeSlider->isBookmarksVisible();
 }
 
-QnCameraBookmarksQueryPtr QnWorkbenchNavigator::refreshQueryFilter(const QnVirtualCameraResourcePtr &camera)
+void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
 {
-    if (!camera)
-        return QnCameraBookmarksQueryPtr();
-
-    const auto query = m_bookmarkQueries.getQuery(camera);
-
-    auto currentFilter = query->filter();
-    currentFilter.startTimeMs = m_timeSlider->windowStart();
-    currentFilter.endTimeMs = m_timeSlider->windowEnd();
-
-    m_bookmarkQueries.updateQuery(camera, currentFilter);
-    return query;
+    if (hasArchive())
+        updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::updateBookmarksModeState()
+void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
 {
-    if (bookmarksModeEnabled() && m_currentWidget)
-    {
-        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
-        const auto query = refreshQueryFilter(camera);
-        setCurrentBookmarkQuery(query);
-    }
-    else
-    {
-        resetCurrentBookmarkQuery();
-
-        m_bookmarkAggregation->clear();
-        m_timeSlider->setBookmarks(QnCameraBookmarkList());
-        m_timeSlider->bookmarksViewer()->resetBookmarks();
-    }
+    if (!hasArchive())
+        updateHasArchiveState();
 }
 
 void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
@@ -369,8 +355,6 @@ void QnWorkbenchNavigator::setBookmarksModeEnabled(bool enabled)
         return;
 
     m_timeSlider->setBookmarksVisible(enabled);
-    updateBookmarksModeState();
-
     emit bookmarksModeEnabledChanged();
 }
 
@@ -383,63 +367,23 @@ void QnWorkbenchNavigator::initialize() {
     if (!isValid())
         return;
 
-    /// Clears bookmarks caches for current layout
-    connect(workbench(), &QnWorkbench::currentLayoutAboutToBeChanged, this, [this]()
+    const auto itemsWatcher = context()->instance<QnCurrentLayoutItemsWatcher>();
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
+        , this, &QnWorkbenchNavigator::onItemAdded);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
+        , this, &QnWorkbenchNavigator::updateArchiveState);
+    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
+        , this, &QnWorkbenchNavigator::updateArchiveState);
+
+    connect(workbench(), &QnWorkbench::currentLayoutChanged
+        , this, &QnWorkbenchNavigator::updateSliderOptions);
+
+    connect(qnCameraHistoryPool, &QnCameraHistoryPool::cameraFootageChanged
+        , this, [this](const QnVirtualCameraResourcePtr & /* camera */)
     {
-        const auto layout = workbench()->currentLayout();
-        if (!layout)
-            return;
-
-        disconnect(layout, nullptr, this, nullptr);
-
-        resetCurrentBookmarkQuery();
-        m_bookmarkQueries.clearQueries();
+        updateHasArchiveState();
     });
 
-    connect(workbench(), &QnWorkbench::currentLayoutChanged, this, [this]()
-    {
-        const auto layout = workbench()->currentLayout();
-        if (!layout)
-            return;
-
-        const auto extractCamera = [this](QnWorkbenchItem *item)
-        {
-            const auto layoutItemData = item->data();
-            const auto id = layoutItemData.resource.id;
-            return qnResPool->getResourceById<QnVirtualCameraResource>(id);
-        };
-
-        const auto processLayoutItem = [this, extractCamera](QnWorkbenchItem *item)
-        {
-            const auto camera = extractCamera(item);
-            if (camera)
-                refreshQueryFilter(camera);
-        };
-
-        const auto items = layout->items();
-        for (const auto item: items)
-            processLayoutItem(item);
-
-        connect(layout, &QnWorkbenchLayout::itemAdded, this, processLayoutItem);
-
-        connect(layout, &QnWorkbenchLayout::itemRemoved, this
-            , [this, layout, extractCamera](QnWorkbenchItem *item)
-        {
-            const auto camera = extractCamera(item);
-            if (!camera)
-                return;
-
-            const bool hasSameCameras = !layout->items(camera->getUniqueId()).isEmpty();
-            const auto query = m_bookmarkQueries.getQuery(camera);
-            if ((query == m_currentQuery) && !hasSameCameras)
-                resetCurrentBookmarkQuery();
-
-            m_bookmarkQueries.removeQuery(camera);
-        });
-
-    });
-
-    connect(workbench(),                        SIGNAL(currentLayoutChanged()),                     this,   SLOT(updateSliderOptions()));
 
     connect(display(),                          SIGNAL(widgetChanged(Qn::ItemRole)),                this,   SLOT(at_display_widgetChanged(Qn::ItemRole)));
     connect(display(),                          SIGNAL(widgetAdded(QnResourceWidget *)),            this,   SLOT(at_display_widgetAdded(QnResourceWidget *)));
@@ -458,16 +402,6 @@ void QnWorkbenchNavigator::initialize() {
     connect(m_timeSlider,                       SIGNAL(selectionPressed()),                         this,   SLOT(at_timeSlider_selectionPressed()));
     connect(m_timeSlider,                       SIGNAL(thumbnailsVisibilityChanged()),              this,   SLOT(updateTimeSliderWindowSizePolicy()));
     connect(m_timeSlider,                       SIGNAL(thumbnailClicked()),                         this,   SLOT(at_timeSlider_thumbnailClicked()));
-
-    connect(m_timeSlider,   &QnTimeSlider::windowChanged,                   this,   [this](qint64 windowStart, qint64 windowEnd) {
-        if (!m_currentWidget)
-            return;
-
-        const auto startTimeMs = qMax(m_timeSlider->minimum(), windowStart);
-        const auto endTimeMs = qMin(m_timeSlider->maximum(), windowEnd);
-        const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
-        m_bookmarkQueries.updateQueryTimeWindow(camera, startTimeMs, endTimeMs);
-    });
 
     m_timeSlider->setLineCount(SliderLineCount);
     m_timeSlider->setLineStretch(CurrentLine, 1.5);
@@ -514,10 +448,6 @@ void QnWorkbenchNavigator::deinitialize() {
 
     disconnect(context()->instance<QnWorkbenchServerTimeWatcher>(), NULL, this, NULL);
     disconnect(qnSettings->notifier(QnClientSettings::TIME_MODE), NULL, this, NULL);
-
-
-    resetCurrentBookmarkQuery();
-    m_bookmarkAggregation->clear();
 
     m_currentWidget = NULL;
     m_currentWidgetFlags = 0;
@@ -596,7 +526,7 @@ bool QnWorkbenchNavigator::setPlaying(bool playing) {
     m_pausedOverride = false;
     m_autoPaused = false;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     QnCamDisplay *camDisplay = m_currentMediaWidget->display()->camDisplay();
     if(playing) {
         if (reader->isRealTimeSource()) {
@@ -625,7 +555,7 @@ qreal QnWorkbenchNavigator::speed() const {
     if(!isPlayingSupported())
         return 0.0;
 
-    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+    if(QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader())
         return reader->getSpeed();
 
     return 1.0;
@@ -639,7 +569,7 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
     if(!m_currentMediaWidget)
         return;
 
-    if(QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()) {
+    if(QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader()) {
         reader->setSpeed(speed);
 
         setPlaying(!qFuzzyIsNull(speed));
@@ -648,16 +578,41 @@ void QnWorkbenchNavigator::setSpeed(qreal speed) {
     }
 }
 
+bool QnWorkbenchNavigator::hasArchive() const
+{
+    return m_hasArchive;
+}
+
+bool QnWorkbenchNavigator::layoutHasAchive()
+{
+    const auto layout = workbench()->currentLayout();
+    if (!layout)
+        return false;
+
+    const auto items = layout->items();
+    return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
+    {
+        const auto camera = extractCamera(item);
+        if (!camera)
+            return false;
+
+        const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+        return camHasArchive;
+    });
+}
+
+void QnWorkbenchNavigator::updateHasArchiveState()
+{
+    const bool newValue = layoutHasAchive();
+    if (m_hasArchive == newValue)
+        return;
+
+    m_hasArchive = newValue;
+    emit hasArchiveChanged();
+}
+
 bool QnWorkbenchNavigator::hasVideo() const {
-    if (!m_currentMediaWidget)
-        return false;
-
-    auto reader = m_currentMediaWidget->display()->archiveReader();
-    if (!reader)
-        return false;
-
-    //TODO: #GDM archiveReader()->hasVideo() cannot be used because always returns true for online sources
-    return m_currentMediaWidget->resource()->hasVideo(reader);
+    return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
 
@@ -665,7 +620,7 @@ qreal QnWorkbenchNavigator::minimalSpeed() const {
     if (!isPlayingSupported())
         return 0.0;
 
-    if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader())
+    if (QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader())
         if (!reader->isNegativeSpeedSupported())
             return 0.0;
 
@@ -694,7 +649,7 @@ void QnWorkbenchNavigator::setPosition(qint64 positionUsec) {
     if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -748,7 +703,8 @@ void QnWorkbenchNavigator::removeSyncedWidget(QnMediaResourceWidget *widget) {
     m_motionIgnoreWidgets.remove(widget);
     m_updateHistoryQueue.remove(widget->resource().dynamicCast<QnVirtualCameraResource>());
 
-    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false)) {
+    if(QnCachingCameraDataLoader *loader = m_cameraDataManager->loader(syncedResource, false))
+    {
         loader->setMotionRegions(QList<QRegion>());
         if (!m_syncedResources.contains(syncedResource))
             loader->setEnabled(false);
@@ -834,7 +790,7 @@ void QnWorkbenchNavigator::jumpBackward() {
     if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -869,7 +825,7 @@ void QnWorkbenchNavigator::jumpForward() {
     if (!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -911,7 +867,7 @@ void QnWorkbenchNavigator::stepBackward() {
     if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -932,7 +888,7 @@ void QnWorkbenchNavigator::stepForward() {
     if(!m_currentMediaWidget)
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if(!reader)
         return;
 
@@ -1011,16 +967,8 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
 
     if (m_currentWidget)
     {
-        connect(m_currentWidget->resource(), &QnResource::nameChanged, this, &QnWorkbenchNavigator::updateLines);
-        m_bookmarkAggregation->clear();
-
-        if (bookmarksModeEnabled())
-        {
-            /* For non-cameras widgets query will be properly reset here. */
-            const auto camera = m_currentWidget->resource().dynamicCast<QnVirtualCameraResource>();
-            setCurrentBookmarkQuery(m_bookmarkQueries.getQuery(camera));
-        }
-
+        connect(m_currentWidget->resource(), &QnResource::nameChanged
+            , this, &QnWorkbenchNavigator::updateLines);
     }
 
     m_pausedOverride = false;
@@ -1056,38 +1004,12 @@ void QnWorkbenchNavigator::updateCurrentWidget() {
     updateSpeedRange();
     updateSpeed();
     updateThumbnailsLoader();
-    updateBookmarksModeState();
 
     emit currentWidgetChanged();
 }
 
-void QnWorkbenchNavigator::resetCurrentBookmarkQuery()
+void QnWorkbenchNavigator::updateLocalOffset()
 {
-    setCurrentBookmarkQuery(QnCameraBookmarksQueryPtr());
-}
-
-void QnWorkbenchNavigator::setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query)
-{
-    if (m_currentQuery == query)
-        return;
-
-    if (m_currentQuery)
-        disconnect(m_currentQuery, nullptr, this, nullptr);
-
-    m_currentQuery = query;
-    if (!m_currentQuery)
-        return;
-
-    const auto updateBookmarks = [this](const QnCameraBookmarkList &bookmarks)
-    {
-        at_bookmarkQuery_bookmarksChanged(bookmarks, false);
-    };
-
-    connect(m_currentQuery, &QnCameraBookmarksQuery::bookmarksChanged, this, updateBookmarks);
-    at_bookmarkQuery_bookmarksChanged(qnCameraBookmarksManager->cachedBookmarks(m_currentQuery), true);
-}
-
-void QnWorkbenchNavigator::updateLocalOffset() {
     qint64 localOffset = m_currentMediaWidget
         ? context()->instance<QnWorkbenchServerTimeWatcher>()->displayOffset(m_currentMediaWidget->resource())
         : 0;
@@ -1155,7 +1077,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
     if (m_timeSlider->isSliderDown())
         return;
 
-    QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader();
+    QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader();
     if (!reader)
         return;
 #ifdef Q_OS_MAC
@@ -1196,7 +1118,7 @@ void QnWorkbenchNavigator::updateSliderFromReader(bool keepInWindow) {
             startTimeMSec =  endTimeMSec - timelineWindowNearLive;
 
             /* And then try to read saved value - it was valid someday. */
-            if (qnSettings->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
+            if (qnRuntime->isActiveXMode()) { //TODO: #gdm refactor this safety check sometime
                 if (QnWorkbenchItem *item = m_currentMediaWidget->item()) {
                     QnTimePeriod window = item->data(Qn::ItemSliderWindowRole).value<QnTimePeriod>();
                     if (window.isValid()) {
@@ -1387,7 +1309,7 @@ void QnWorkbenchNavigator::updateLines() {
             QnCameraDeviceStringSet(
                 tr("All Devices"),
                 tr("All Cameras"),
-                tr("All IO Modules")
+                tr("All I/O Modules")
                 ), syncedCameras
             ));
     } else {
@@ -1539,20 +1461,44 @@ void QnWorkbenchNavigator::updateThumbnailsLoader() {
     if (!m_timeSlider)
         return;
 
-    QnCachingCameraDataLoader *loader = loaderByWidget(m_currentMediaWidget, false);
+    auto canLoadThumbnailsForWidget = [this] (QnMediaResourceWidget* widget) {
+        /* Widget must exist. */
+        if (!widget)
+            return false;
 
-    if (
-           !m_currentMediaWidget
-        || !m_currentMediaWidget->resource()
-        || !m_currentMediaWidget->hasAspectRatio()
-        || m_currentMediaWidget->display()->isStillImage()
-        || m_currentMediaWidget->channelLayout()->size().width() > 1            // disable thumbnails for panoramic cameras
-        || m_currentMediaWidget->channelLayout()->size().height() > 1
-        || !loader
-        || loader->periods(Qn::RecordingContent).empty()                        // no recording for this camera
-        )
+        /* Widget must have associated resource, supported by thumbnails loader. */
+        if (!QnThumbnailsLoader::supportedResource(widget->resource()))
+            return false;
+
+        /* First frame is not loaded yet, we must know it for setting up correct aspect ratio. */
+        if (!widget->hasAspectRatio())
+            return false;
+
+        /* Thumbnails for panoramic cameras are disabled for now. */
+        if (widget->channelLayout()->size().width() > 1
+         || widget->channelLayout()->size().height() > 1)
+            return false;
+
+        /* Thumbnails for I/O modules and sound files are disabled. */
+        if (!widget->hasVideo())
+            return false;
+
+        /* Further checks must be skipped for local files. */
+        QnAviResourcePtr aviFile = widget->resource().dynamicCast<QnAviResource>();
+        if (aviFile)
+            return true;
+
+        /* Check if the camera has recorded periods. */
+        QnCachingCameraDataLoader *loader = loaderByWidget(widget, false);
+        if (!loader || loader->periods(Qn::RecordingContent).empty())
+            return false;
+
+        return true;
+    };
+
+    if (!canLoadThumbnailsForWidget(m_currentMediaWidget))
     {
-        m_timeSlider->setThumbnailsLoader(NULL, -1);
+        m_timeSlider->setThumbnailsLoader(nullptr, -1);
         return;
     }
 
@@ -1638,7 +1584,9 @@ void QnWorkbenchNavigator::at_timeSlider_customContextMenuRequested(const QPoint
     parameters.setArgument(Qn::TimePeriodRole, selection);
     parameters.setArgument(Qn::TimePeriodsRole, m_timeSlider->timePeriods(CurrentLine, Qn::RecordingContent)); // TODO: #Elric move this out into global scope!
     parameters.setArgument(Qn::MergedTimePeriodsRole, m_timeSlider->timePeriods(SyncedLine, Qn::RecordingContent));
-    QnCameraBookmarkList bookmarks = m_timeSlider->bookmarksAtPosition(position);
+
+    const auto watcher = context()->instance<QnTimelineBookmarksWatcher>();
+    QnCameraBookmarkList bookmarks = watcher->bookmarksAtPosition(position);
     if (!bookmarks.isEmpty())
         parameters.setArgument(Qn::CameraBookmarkRole, bookmarks.first()); // TODO: #dklychkov Implement sub-menus for the case when there're more than 1 bookmark at the position
 
@@ -1735,7 +1683,7 @@ void QnWorkbenchNavigator::at_timeSlider_valueChanged(qint64 value) {
 
     /* Update reader position. */
     if(m_currentMediaWidget && !m_updatingSliderFromReader) {
-        if (QnAbstractArchiveReader *reader = m_currentMediaWidget->display()->archiveReader()){
+        if (QnAbstractArchiveStreamReader *reader = m_currentMediaWidget->display()->archiveReader()){
             if (value == DATETIME_NOW) {
                 reader->jumpTo(DATETIME_NOW, 0);
             } else {
@@ -1813,17 +1761,6 @@ void QnWorkbenchNavigator::at_timeSlider_thumbnailClicked() {
     m_preciseNextSeek = true;
 }
 
-void QnWorkbenchNavigator::at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks
-    , bool immediately)
-{
-    m_bookmarkAggregation->mergeBookmarkList(bookmarks);
-
-    if (immediately)
-        updateSliderBookmarks();
-    else
-        m_sliderBookmarksRefreshOperation->requestOperation();
-}
-
 void QnWorkbenchNavigator::at_display_widgetChanged(Qn::ItemRole role) {
     if(role == Qn::CentralRole)
         updateCentralWidget();
@@ -1875,6 +1812,8 @@ void QnWorkbenchNavigator::at_widget_optionsChanged(QnResourceWidget *widget) {
     int oldSize = m_motionIgnoreWidgets.size();
     if(widget->options() & QnResourceWidget::DisplayMotion) {
         m_motionIgnoreWidgets.insert(widget);
+        if (widget == m_currentMediaWidget)
+            at_widget_motionSelectionChanged(m_currentMediaWidget);
     } else {
         m_motionIgnoreWidgets.remove(widget);
     }
@@ -1963,15 +1902,18 @@ void QnWorkbenchNavigator::updateHistoryForCamera(QnVirtualCameraResourcePtr cam
     if (qnCameraHistoryPool->isCameraHistoryValid(camera))
         return;
 
-    qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success) {
+    QnCameraHistoryPool::StartResult result = qnCameraHistoryPool->updateCameraHistoryAsync(camera, [this, camera] (bool success)
+    {
         if (!success)
-            m_updateHistoryQueue.insert(camera);
+            m_updateHistoryQueue.insert(camera); //< retry loading
     });
+    if (result == QnCameraHistoryPool::StartResult::failed)
+        m_updateHistoryQueue.insert(camera); //< retry loading
 }
 
 void QnWorkbenchNavigator::updateSliderBookmarks() {
     if (!bookmarksModeEnabled())
         return;
 
-    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
+//    m_timeSlider->setBookmarks(m_bookmarkAggregation->bookmarkList());
 }

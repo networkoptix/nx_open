@@ -1,8 +1,12 @@
+
+#include <memory>
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
 #include <common/common_globals.h>
 #include <nx/network/connection_server/multi_address_server.h>
+#include <nx/network/cloud/data/result_code.h>
 #include <nx/network/stun/async_client.h>
 #include <utils/thread/sync_queue.h>
 #include <nx/network/stun/server_connection.h>
@@ -12,8 +16,15 @@
 #include <nx/network/http/httpclient.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
+#include <utils/crypt/linux_passwd_crypt.h>
+#include <utils/common/cpp14.h>
+
+#include <listening_peer_pool.h>
+#include <peer_registrator.h>
 
 #include "mediator_mocks.h"
+#include "socket_globals_holder.h"
+
 
 namespace nx {
 namespace hpm {
@@ -23,21 +34,38 @@ class ConnectTest : public testing::Test
 {
 protected:
     ConnectTest()
-        : address( lit( "127.0.0.1"), 10001 + (qrand() % 50000) )
-        , listeningPeerPool( &cloud, &stunMessageDispatcher )
-        , server( false, SocketFactory::NatTraversalType::nttDisabled )
     {
-        EXPECT_TRUE( server.bind( std::list< SocketAddress >( 1, address ) ) );
-        EXPECT_TRUE( server.listen() );
-        SocketGlobals::mediatorConnector().mockupAddress( address );
+        SocketGlobalsHolder::instance()->reinitialize();
+
+        m_address = SocketAddress(HostAddress::localhost, 10001 + (qrand() % 50000));
+        listeningPeerRegistrator = std::make_unique<PeerRegistrator>(
+            &cloud,
+            &stunMessageDispatcher,
+            &listeningPeerPool);
+        server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
+            stunMessageDispatcher,
+            false,
+            SocketFactory::NatTraversalType::nttDisabled);
+
+        EXPECT_TRUE(server->bind(std::list< SocketAddress >(1, m_address)));
+        EXPECT_TRUE(server->listen());
+        network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
     }
 
-    const SocketAddress address;
-    stun::MessageDispatcher stunMessageDispatcher;
+    nx::stun::MessageDispatcher stunMessageDispatcher;
 
     CloudDataProviderMock cloud;
     ListeningPeerPool listeningPeerPool;
-    MultiAddressServer< stun::SocketServer > server;
+    std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
+    std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
+
+    SocketAddress address() const
+    {
+        return m_address;
+    }
+
+private:
+    SocketAddress m_address;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
@@ -53,7 +81,7 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
-    msClient.connect( address );
+    msClient.connect( address() );
     {
         stun::Message request( stun::Header( stun::MessageClass::request,
                                              stun::cc::methods::bind ) );
@@ -76,8 +104,8 @@ TEST_F( ConnectTest, BindConnect )
 
     nx_http::HttpClient client;
     {
-        ASSERT_TRUE( client.doGet( lit("http://%1/test")
-                                   .arg( QString::fromUtf8( SYSTEM_ID ) ) ) );
+        ASSERT_TRUE(client.doGet(lit("http://%1.%2/test")
+            .arg(QString::fromUtf8(SERVER_ID)).arg(QString::fromUtf8(SYSTEM_ID))));
         ASSERT_EQ( client.response()->statusLine.statusCode, nx_http::StatusCode::ok );
         ASSERT_EQ( client.fetchMessageBodyBuffer(), "test" );
     }

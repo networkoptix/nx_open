@@ -78,9 +78,9 @@ SystemError::ErrorCode convertToSystemError(int udtErrorCode)
     else if (udtErrorCode == CUDTException::EASYNCFAIL)
         return SystemError::ioError;
     else if (udtErrorCode == CUDTException::EASYNCSND)
-        return SystemError::ioError;
+        return SystemError::wouldBlock;
     else if (udtErrorCode == CUDTException::EASYNCRCV)
-        return SystemError::ioError;
+        return SystemError::wouldBlock;
     else if (udtErrorCode == CUDTException::EPEERERR)
         return SystemError::ioError;
     else if (udtErrorCode == CUDTException::EUNKNOWN)

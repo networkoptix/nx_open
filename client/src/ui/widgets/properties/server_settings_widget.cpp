@@ -241,8 +241,8 @@ void QnServerSettingsWidget::updateFailoverLabel() {
 
         if (!m_server->isRedundancy() && !m_maxCamerasAdjusted)
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                tr("To avoid malfunction adjust max number of devices"),
-                tr("To avoid malfunction adjust max number of cameras")
+                tr("To avoid issues adjust max number of devices"),
+                tr("To avoid issues adjust max number of cameras")
             );
 
         return QString();

@@ -736,7 +736,10 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutChanged() {
 
 void QnResourceBrowserWidget::at_workbench_itemChanged(Qn::ItemRole /*role*/) {
     /* Raised state has changed. */
-    ui->resourceTreeWidget->update();
+    if (ui->tabWidget->currentWidget() == ui->resourcesTab)
+        ui->resourceTreeWidget->update();
+    else
+        ui->searchTreeWidget->update();
 }
 
 void QnResourceBrowserWidget::at_layout_itemAdded(QnWorkbenchItem *) {

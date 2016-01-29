@@ -18,11 +18,33 @@
 
 #include <QString>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 #include "utils/common/hash.h"
 
 
-namespace nx { class DnsResolver; }
+namespace nx {
+
+class DnsResolver;
+
+namespace network {
+
+enum class TransportProtocol
+{
+    udp,
+    tcp,
+    udt
+};
+
+static const size_t kUDPHeaderSize = 8;
+static const size_t kIPHeaderSize = 20;
+static const size_t kMaxUDPDatagramSize = 64*1024 - kUDPHeaderSize - kIPHeaderSize;
+
+static const size_t kTypicalMtuSize = 1500;
+
+}   //network
+}   //nx
 
 //!Represents ipv4 address. Supports conversion to QString and to uint32
 /*!

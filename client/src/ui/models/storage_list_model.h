@@ -42,6 +42,9 @@ public:
     void updateStorage(const QnStorageModelInfo& storage);
     void removeStorage(const QnStorageModelInfo& storage);
 
+    QnMediaServerResourcePtr server() const;
+    void setServer(const QnMediaServerResourcePtr& server);
+
     QnStorageModelInfo storage(const QModelIndex &index) const;
     QnStorageModelInfoList storages() const;
 
@@ -52,6 +55,14 @@ public:
 
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo &data) const;
+
+    /**
+     *  Check if storage is active on the server.
+     *  Inactive storages are:
+     *      - newly added remote storages, until changes are applied
+     *      - auto-found server-side partitions without storage
+     */
+    bool storageIsActive(const QnStorageModelInfo &data) const;
 
     virtual int rowCount(const QModelIndex &parent) const override;
     virtual int columnCount(const QModelIndex &parent) const override;
@@ -80,6 +91,7 @@ private:
     bool isStorageInRebuild(const QnStorageModelInfo& storage) const;
 
 private:
+    QnMediaServerResourcePtr m_server;
     QnStorageModelInfoList m_storages;
     std::array<QnStorageScanData, static_cast<int>(QnServerStoragesPool::Count)> m_rebuildStatus;
 

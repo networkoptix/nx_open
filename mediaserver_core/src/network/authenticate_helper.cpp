@@ -183,6 +183,15 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                         nx_http::insertOrReplaceHeader(
                             &response.headers,
                             nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+                        if (!userResource->isLdap())
+                        {
+                            addAuthHeader(
+                                response,
+                                userResource,
+                                isProxy,
+                                false); //requesting Basic authorization
+                            return authResult;
+                        }
                     }
                     else if( userResource->isLdap() &&
                         userResource->passwordExpired())
@@ -243,12 +252,12 @@ Qn::AuthResult QnAuthHelper::authenticate(const nx_http::Request& request, nx_ht
                 }
             }
 
-            if( userResource->getDigest().isEmpty() )
+            if (userResource->getDigest().isEmpty() && userResource->isLdap())
             {
-                if (userResource->isLdap())
-                    nx_http::insertOrReplaceHeader(
-                        &response.headers,
-                        nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
+                //requesting client to calculate users's digest
+                nx_http::insertOrReplaceHeader(
+                    &response.headers,
+                    nx_http::HttpHeader( Qn::REALM_HEADER_NAME, desiredRealm.toLatin1() ) );
 
                 return Qn::Auth_WrongDigest;   //user has no password yet
             }
@@ -610,7 +619,8 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
 void QnAuthHelper::addAuthHeader(
     nx_http::Response& response,
     const QnUserResourcePtr& userResource,
-    bool isProxy)
+    bool isProxy,
+    bool isDigest)
 {
     QString realm;
     if( userResource ) {
@@ -622,7 +632,10 @@ void QnAuthHelper::addAuthHeader(
     else
         realm = QnAppInfo::realm();
 
-    const QString auth(lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5"));
+    const QString auth(
+        isDigest
+            ? lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
+            : lit("Basic realm=\"%1\""));
     //QString auth(lit("Digest realm=\"%1\",nonce=\"%2\",algorithm=MD5,qop=\"auth\""));
     const QByteArray headerName = isProxy ? "Proxy-Authenticate" : "WWW-Authenticate";
     nx_http::insertOrReplaceHeader( &response.headers, nx_http::HttpHeader(

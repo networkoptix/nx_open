@@ -3,8 +3,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "core/datapacket/video_data_packet.h"
-#include "decoders/video/ffmpeg.h"
+#include "nx/streaming/video_data_packet.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 #include "filters/abstract_image_filter.h"
 #include "filters/crop_image_filter.h"
 #include "utils/common/util.h"
@@ -56,7 +56,7 @@ QnFfmpegVideoTranscoder::~QnFfmpegVideoTranscoder()
 
 void QnFfmpegVideoTranscoder::close()
 {
-    QnFfmpegHelper::deleteCodecContext(m_encoderCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     m_encoderCtx = 0;
 
     for (int i = 0; i < m_videoDecoders.size(); ++i) {
@@ -120,7 +120,7 @@ bool QnFfmpegVideoTranscoder::open(const QnConstCompressedVideoDataPtr& video)
 
     if (avcodec_open2(m_encoderCtx, avCodec, 0) < 0)
     {
-        m_lastErrMessage = tr("Could not initialise video encoder.");
+        m_lastErrMessage = tr("Could not initialize video encoder.");
         return false;
     }
 
@@ -155,9 +155,9 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
     
-    CLFFmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
+    QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
     if (!decoder)
-        decoder = m_videoDecoders[video->channelNumber] = new CLFFmpegVideoDecoder(video->compressionType, video, m_mtMode);
+        decoder = m_videoDecoders[video->channelNumber] = new QnFfmpegVideoDecoder(video->compressionType, video, m_mtMode);
 
     if (result)
         *result = QnCompressedVideoDataPtr();

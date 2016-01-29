@@ -144,7 +144,7 @@ void QnDesktopStreamreader::closeStream()
     delete m_grabber;
     m_grabber = 0;
 
-    QnFfmpegHelper::deleteCodecContext(m_videoCodecCtx);
+    QnFfmpegHelper::deleteAvCodecContext(m_videoCodecCtx);
     m_videoCodecCtx = 0;
     if (m_frame)
         av_free(m_frame);

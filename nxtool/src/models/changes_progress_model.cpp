@@ -4,6 +4,8 @@
 #include <base/apply_changes_task.h>
 #include <helpers/model_change_helper.h>
 
+namespace api = nx::mediaserver::api;
+
 namespace
 {
     enum
@@ -117,7 +119,7 @@ void rtu::ChangesProgressModel::removeByTask(ApplyChangesTask *task)
     removeByIndex(it - m_tasks.begin());
 }
 
-void rtu::ChangesProgressModel::serverDiscovered(const rtu::BaseServerInfo &info)
+void rtu::ChangesProgressModel::serverDiscovered(const api::BaseServerInfo &info)
 {
     for (const auto &task: m_tasks)
         task->serverDiscovered(info);

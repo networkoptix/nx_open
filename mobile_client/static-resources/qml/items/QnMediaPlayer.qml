@@ -22,8 +22,8 @@ QnObject {
     readonly property bool hasTimestamp: d.mediaPlayer && d.mediaPlayer.hasTimestamp
 
     readonly property var mediaPlayer: d.mediaPlayer
-    readonly property var chunkProvider: chunkProvider
-    readonly property var resourceHelper: resourceHelper
+    readonly property alias chunkProvider: resourceHelper.chunkProvider
+    readonly property alias resourceHelper: resourceHelper
 
     readonly property alias resourceName: resourceHelper.resourceName
 
@@ -63,14 +63,14 @@ QnObject {
         repeat: false
         running: false
         onTriggered: {
-            if (!d.paused && d.startPosition == d.mediaPlayer.position) {
+            if (d.mediaPlayer && !d.paused && d.startPosition == d.mediaPlayer.position) {
                 d.failed = true
                 d.mediaPlayer.stop()
             }
         }
 
         function updateTimer() {
-            if (d.paused) {
+            if (d.paused || !d.mediaPlayer) {
                 stop()
                 return
             }
@@ -84,15 +84,12 @@ QnObject {
 
     Loader {
         id: playerLoader
-        sourceComponent: resourceHelper.protocol != QnMediaResourceHelper.Mjpeg ? qtPlayer : mjpegPlayer
     }
 
     Component {
-        id: qtPlayer
+        id: qtPlayerComponent
 
         MediaPlayer {
-            source: resourceHelper.mediaUrl
-
             autoPlay: !d.paused
 
             onPositionChanged: {
@@ -101,19 +98,19 @@ QnObject {
                 if (d.position < 0)
                     return
 
-                if (d.prevPlayerPosition == 0 && d.mediaPlayer.position > d.maximumInitialPosition) {
+                if (d.prevPlayerPosition == 0 && position > d.maximumInitialPosition) {
                     /* A workaround for Android issue 11590
                        Sometimes Android MediaPlayer returns invalid position so we can't calculate the real timestamp.
                        To make the approximate timestamp a bit closer to the real timestamp we assign a magic number to d.position found experimentally.
                      */
                     d.position += 300
                 } else {
-                    d.position += d.mediaPlayer.position - d.prevPlayerPosition
+                    d.position += position - d.prevPlayerPosition
                 }
-                d.prevPlayerPosition = d.mediaPlayer.position
+                d.prevPlayerPosition = position
 
                 if (d.chunkEnd >= 0 && d.position >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
@@ -127,6 +124,11 @@ QnObject {
                 // A workaround for inconsistent playbackState changes of Qt MediaPlayer
                 if (playbackState == MediaPlayer.PlayingState && d.paused)
                     pause()
+            }
+
+            onStatusChanged: {
+                if (!d.paused && source && status == MediaPlayer.EndOfMedia)
+                    player.play(d.chunkEnd + 1)
             }
 
             readonly property bool hasTimestamp: false
@@ -154,11 +156,9 @@ QnObject {
     }
 
     Component {
-        id: mjpegPlayer
+        id: mjpegPlayerComponent
 
         QnMjpegPlayer {
-            source: resourceHelper.mediaUrl
-
             readonly property bool hasTimestamp: true
             readonly property bool loading: playbackState == QnMjpegPlayer.PlayingState && mediaStatus != QnMjpegPlayer.BufferedMedia
             readonly property bool playing: playbackState == QnMjpegPlayer.PlayingState && mediaStatus == QnMjpegPlayer.BufferedMedia
@@ -177,12 +177,12 @@ QnObject {
                     return
 
                 if (d.chunkEnd >= 0 && timestamp >= d.chunkEnd) {
-                    seek(d.chunkEnd + 1)
+                    player.seek(d.chunkEnd + 1)
                     return
                 }
 
-                if (mediaPlayer.timestamp >= 0) {
-                    d.position = mediaPlayer.timestamp
+                if (timestamp >= 0) {
+                    d.position = timestamp
                     timelineCorrectionRequest(d.position)
                 }
             }
@@ -218,11 +218,6 @@ QnObject {
         }
     }
 
-    QnCameraChunkProvider {
-        id: chunkProvider
-        resourceId: player.resourceId
-    }
-
     Timer {
         interval: 30000
         triggeredOnStart: true
@@ -243,6 +238,8 @@ QnObject {
                 if (d.resetUrlOnConnect) {
                     d.resetUrlOnConnect = false
                     resourceHelper.position = position
+                    if (d.mediaPlayer)
+                        d.mediaPlayer.source = resourceHelper.mediaUrl
                 }
             } else {
                 d.resetUrlOnConnect = true
@@ -274,19 +271,23 @@ QnObject {
             return
         }
 
+        if (!pos)
+            pos = d.position
+
         var live = (new Date()).getTime()
         var aligned = -1
-        if (pos && pos > 0 && live - pos > d.lastMinuteLength) {
+        if (pos > 0 && live - pos > d.lastMinuteLength) {
             aligned = alignedPosition(pos)
             if (live - aligned <= d.lastMinuteLength)
                 aligned = -1
         }
 
-        d.mediaPlayer.stop()
+        if (d.mediaPlayer)
+            d.mediaPlayer.stop()
 
         d.position = aligned >= 0 ? Math.max(aligned, pos) : -1
 
-        d.chunkEnd = (d.position >= 0) ? d.mediaPlayer.getFinalTimestamp(pos) : -1
+        d.chunkEnd = (d.position >= 0 && d.mediaPlayer) ? d.mediaPlayer.getFinalTimestamp(pos) : -1
 
         timelinePositionRequest(d.position)
         d.updateTimeline = true
@@ -300,6 +301,9 @@ QnObject {
             resourceHelper.position = d.position
         }
 
+        playerLoader.sourceComponent = (resourceHelper.protocol == QnMediaResourceHelper.Mjpeg) ? mjpegPlayerComponent : qtPlayerComponent
+        d.mediaPlayer.source = resourceHelper.mediaUrl
+
         d.prevPlayerPosition = 0
         d.mediaPlayer.play()
         failureTimer.updateTimer()
@@ -309,12 +313,16 @@ QnObject {
 
     function pause() {
         d.paused = true
-        d.mediaPlayer.pause()
+
+        if (d.mediaPlayer)
+            d.mediaPlayer.pause()
     }
 
     function stop() {
         d.dirty = true
-        d.mediaPlayer.stop()
+
+        if (d.mediaPlayer)
+            d.mediaPlayer.stop()
     }
 
     function seek(pos) {

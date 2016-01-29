@@ -34,6 +34,7 @@
 #include "http_handlers/update_account_handler.h"
 #include "http_handlers/reset_password_handler.h"
 #include "http_handlers/reactivate_account_handler.h"
+#include "http_handlers/get_access_role_list.h"
 #include "http_handlers/get_cloud_users_of_system.h"
 #include "http_handlers/get_systems_handler.h"
 #include "http_handlers/get_cdb_nonce_handler.h"
@@ -41,7 +42,6 @@
 #include "http_handlers/ping.h"
 #include "http_handlers/unbind_system_handler.h"
 #include "http_handlers/share_system_handler.h"
-#include "http_handlers/update_system_sharing_handler.h"
 #include "managers/account_manager.h"
 #include "managers/temporary_account_password_manager.h"
 #include "managers/auth_provider.h"
@@ -186,6 +186,7 @@ int CloudDBProcess::executeApplication()
             return 0;
     
         NX_LOG( lit( "%1 has been started" ).arg(QN_APPLICATION_NAME), cl_logALWAYS );
+        std::cout << QN_APPLICATION_NAME <<" has been started" << std::endl;
 
         //TODO #ak remove qt event loop
         //application's main loop
@@ -329,17 +330,17 @@ void CloudDBProcess::registerApiHandlers(
             return std::make_unique<ShareSystemHttpHandler>(systemManager, authorizationManager);
         } );
 
-    msgDispatcher->registerRequestProcessor<UpdateSystemSharingHandler>(
-        UpdateSystemSharingHandler::kHandlerPath,
-        [systemManager, &authorizationManager]() -> std::unique_ptr<UpdateSystemSharingHandler> {
-            return std::make_unique<UpdateSystemSharingHandler>(systemManager, authorizationManager);
-        });
-
     msgDispatcher->registerRequestProcessor<GetCloudUsersOfSystemHandler>(
         GetCloudUsersOfSystemHandler::kHandlerPath,
         [systemManager, &authorizationManager]() -> std::unique_ptr<GetCloudUsersOfSystemHandler> {
             return std::make_unique<GetCloudUsersOfSystemHandler>(systemManager, authorizationManager);
         } );
+
+    msgDispatcher->registerRequestProcessor<GetAccessRoleListHandler>(
+        GetAccessRoleListHandler::kHandlerPath,
+        [systemManager, &authorizationManager]() -> std::unique_ptr<GetAccessRoleListHandler> {
+            return std::make_unique<GetAccessRoleListHandler>(systemManager, authorizationManager);
+        });
 
     //authentication
     msgDispatcher->registerRequestProcessor<GetCdbNonceHandler>(
@@ -433,6 +434,7 @@ bool CloudDBProcess::updateDB(nx::db::DBManager* const dbManager)
     dbStructureUpdater.addUpdateScript(db::kAddCustomizationToAccount);
     dbStructureUpdater.addUpdateScript(db::kAddTemporaryAccountPassword);
     dbStructureUpdater.addUpdateScript(db::kAddIsEmailCodeToTemporaryAccountPassword);
+    dbStructureUpdater.addUpdateScript(db::kRenameSystemAccessRoles);
     return dbStructureUpdater.updateStructSync();
 }
 

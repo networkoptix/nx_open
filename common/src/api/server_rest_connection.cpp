@@ -137,18 +137,30 @@ Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(Re
 
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
 {
-    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
+    QPointer<QThread> targetThreadGuard(targetThread);
+    return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
     {
+        Q_UNUSED(contentType)
+
         bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+
+        if (targetThread && targetThreadGuard.isNull())
+            return;
+
         invoke(callback, targetThread, success, id, msgBody);
     });
 }
 
 Handle ServerConnection::executeRequest(const Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
 {
-    return sendRequest(request, [callback, targetThread] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
+    QPointer<QThread> targetThreadGuard(targetThread);
+    return sendRequest(request, [callback, targetThread, targetThreadGuard] (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
     {
         bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+
+        if (targetThread && targetThreadGuard.isNull())
+            return;
+
         invoke(callback, targetThread, success, id, EmptyResponseType());
     });
 }

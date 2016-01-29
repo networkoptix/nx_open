@@ -376,7 +376,7 @@ void QnPlOnvifResource::checkIfOnlineAsync( std::function<void(bool)> completion
     if( deviceUrl.isEmpty() )
     {
         //calling completionHandler(false)
-        nx::SocketGlobals::aioService().post(std::bind(completionHandler, false));
+        nx::network::SocketGlobals::aioService().post(std::bind(completionHandler, false));
         return;
     }
 

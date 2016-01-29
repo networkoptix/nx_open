@@ -88,9 +88,9 @@ private:
 class EMailManagerFactory
 {
 public:
-    static AbstractEmailManager* create(const conf::Settings& settings);
+    static std::unique_ptr<AbstractEmailManager> create(const conf::Settings& settings);
     static void setFactory(
-        std::function<AbstractEmailManager*(
+        std::function<std::unique_ptr<AbstractEmailManager>(
             const conf::Settings& settings)> factoryFunc);
 };
 

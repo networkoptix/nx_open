@@ -5,9 +5,12 @@
 
 #include <base/types.h>
 
+namespace nx { namespace mediaserver { namespace api {
+    struct BaseServerInfo;
+}}}
+
 namespace rtu
 {
-    struct BaseServerInfo;
     class ModelChangeHelper;
 
     class ChangesProgressModel : public QAbstractListModel
@@ -25,13 +28,15 @@ namespace rtu
         int completedCount() const;
 
     public:
+        typedef nx::mediaserver::api::BaseServerInfo BaseServerInfo;
+
         bool addChangeProgress(const ApplyChangesTaskPtr &task);
 
         void removeByIndex(int index);
 
         void removeByTask(ApplyChangesTask *task);
 
-        void serverDiscovered(const rtu::BaseServerInfo &info);
+        void serverDiscovered(const BaseServerInfo &info);
         
         void serversDisappeared(const IDsVector &ids);
 

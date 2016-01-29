@@ -1394,6 +1394,63 @@ namespace nx_http
             }
             return result;
         }
+
+
+        //////////////////////////////////////////////
+        //   Keep-Alive
+        //////////////////////////////////////////////
+
+        KeepAlive::KeepAlive()
+        :
+            timeout(0)
+        {
+        }
+
+        KeepAlive::KeepAlive(
+            std::chrono::seconds _timeout,
+            boost::optional<int> _max)
+        :
+            timeout(std::move(_timeout)),
+            max(std::move(_max))
+        {
+        }
+
+        bool KeepAlive::parse(const nx_http::StringType& strValue)
+        {
+            max.reset();
+
+            const auto params = strValue.split(',');
+            bool timeoutFound = false;
+            for (auto param: params)
+            {
+                param = param.trimmed();
+                const int sepPos = param.indexOf('=');
+                if (sepPos == -1)
+                    continue;
+                const auto paramName = ConstBufferRefType(param, 0, sepPos);
+                const auto paramValue = ConstBufferRefType(param, sepPos + 1).trimmed();
+
+                if (paramName == "timeout")
+                {
+                    timeout = std::chrono::seconds(paramValue.toUInt());
+                    timeoutFound = true;
+                }
+                else if(paramName == "max")
+                {
+                    max = paramValue.toUInt();
+                }
+            }
+
+            return timeoutFound;
+        }
+
+        StringType KeepAlive::toString() const
+        {
+            StringType result = "timeout="+StringType::number((unsigned int)timeout.count());
+            if (max)
+                result += ", max="+StringType::number(*max);
+            return result;
+        }
     }
 
 
@@ -1548,24 +1605,24 @@ namespace nx_http
 
 
 #if defined(_WIN32)
-#   define COMMON_SERVER "Apache/2.4.10 (MSWin)"
+#   define COMMON_SERVER "Apache/2.4.16 (MSWin)"
 #   if defined(_WIN64)
 #       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; WOW64)"
 #   else
 #       define COMMON_USER_AGENT "Mozilla/5.0 (Windows NT 6.1; Win32)"
 #   endif
 #elif defined(__linux__)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   ifdef __LP64__
 #       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:36.0)"
 #   else
 #       define COMMON_USER_AGENT "Mozilla/5.0 (X11; Ubuntu; Linux x86; rv:36.0)"
 #   endif
 #elif defined(__APPLE__)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   define COMMON_USER_AGENT "Mozilla/5.0 (Macosx x86_64)"
 #else   //some other unix (e.g., FreeBSD)
-#   define COMMON_SERVER "Apache/2.4.10 (Unix)"
+#   define COMMON_SERVER "Apache/2.4.16 (Unix)"
 #   define COMMON_USER_AGENT "Mozilla/5.0"
 #endif
 

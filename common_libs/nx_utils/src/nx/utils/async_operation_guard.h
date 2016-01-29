@@ -1,6 +1,8 @@
 #ifndef ASYNC_OPERATION_GUARD_H
 #define ASYNC_OPERATION_GUARD_H
 
+#include <memory>
+
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -71,11 +73,14 @@ public:
 
     const std::shared_ptr<SharedGuard>& sharedGuard();
 
+    /** Terminates current async guard and creates a new one */
+    void reset();
+
     /** Forward all of the sharedGuard public methods */
     SharedGuard* operator->() const;
 
 private:
-    std::shared_ptr<AsyncOperationGuard::SharedGuard> m_sharedGuard;
+    std::shared_ptr<SharedGuard> m_sharedGuard;
 };
 
 } // namespace utils

@@ -21,12 +21,12 @@ struct QnModuleInformation {
     int port;
     QnUuid id;
     bool sslAllowed;
-    QByteArray authHash;
     int protoVersion;
     QnUuid runtimeId;
     Qn::ServerFlags serverFlags;
     QString realm;
     bool ecDbReadOnly;
+    QnUuid cloudSystemId;
 
     QnModuleInformation()
         : port(0), sslAllowed(false), protoVersion(0), serverFlags(0), realm(QnAppInfo::realm()), ecDbReadOnly(false)
@@ -35,6 +35,7 @@ struct QnModuleInformation {
     bool isCompatibleToCurrentSystem() const;
     bool hasCompatibleVersion() const;
     void fixRuntimeId();
+    QString cloudId() const;
 
     static QString nxMediaServerId();
     static QString nxECId();
@@ -49,7 +50,10 @@ struct QnModuleInformationWithAddresses : QnModuleInformation {
     {}
 };
 
-#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation)(systemName)(name)(port)(id)(sslAllowed)(authHash)(protoVersion)(runtimeId)(serverFlags)(realm)(ecDbReadOnly)
+#define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \
+    (systemName)(name)(port)(id)(sslAllowed)(protoVersion)(runtimeId) \
+    (serverFlags)(realm)(ecDbReadOnly)(cloudSystemId)
+
 #define QnModuleInformationWithAddresses_Fields QnModuleInformation_Fields(remoteAddresses)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnModuleInformation, (ubjson)(xml)(json)(metatype)(eq))

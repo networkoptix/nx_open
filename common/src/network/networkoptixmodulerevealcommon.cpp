@@ -54,7 +54,6 @@ QByteArray RevealResponse::serialize() {
     map[lit("systemInformation")] = systemInformation.toString();
     map[lit("sslAllowed")] = sslAllowed;
     map[lit("port")] = port;
-    map[lit("authHash")] = authHash.toBase64();
     map[lit("protoVersion")] = protoVersion;
     map[lit("runtimeId")] = runtimeId.toString();
     map[lit("flags")] = QnLexical::serialized(serverFlags);
@@ -78,7 +77,6 @@ bool RevealResponse::deserialize(const quint8 *bufStart, const quint8 *bufEnd) {
     id = QnUuid::fromStringSafe(map.value(lit("seed")).toString());
     sslAllowed = map.value(lit("sslAllowed")).toBool();
     port = static_cast<quint16>(map.value(lit("port")).toUInt());
-    authHash = QByteArray::fromBase64(map.value(lit("authHash")).toByteArray());
     protoVersion = map.value(lit("protoVersion"), nx_ec::INITIAL_EC2_PROTO_VERSION).toInt();
     runtimeId = QnUuid::fromStringSafe(map.value(lit("runtimeId")).toString());
     serverFlags = QnLexical::deserialized<Qn::ServerFlags>(map.value(lit("flags")).toString(), Qn::SF_None);

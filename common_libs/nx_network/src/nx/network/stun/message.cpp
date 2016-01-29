@@ -4,9 +4,11 @@
 ***********************************************************/
 
 #include "message.h"
+#include "message_parser.h"
 #include "message_serializer.h"
 
 #include <openssl/hmac.h>
+
 
 static const size_t DEFAULT_BUFFER_SIZE = 4 * 1024;
 
@@ -20,6 +22,22 @@ Header::Header()
 {
 }
 
+Header::Header(const Header& right)
+:
+    messageClass(right.messageClass),
+    method(right.method),
+    transactionId(right.transactionId)
+{
+}
+
+Header::Header(Header&& right)
+:
+    messageClass(std::move(right.messageClass)),
+    method(std::move(right.method)),
+    transactionId(std::move(right.transactionId))
+{
+}
+         
 Header::Header( MessageClass messageClass_ , int method_)
     : messageClass( messageClass_ )
     , method( method_ )
@@ -33,6 +51,17 @@ Header::Header( MessageClass messageClass_ , int method_,
     , method( method_ )
     , transactionId( std::move( transactionId_ ) )
 {
+}
+
+Header& Header::operator=(Header&& rhs)
+{
+    if (this != &rhs)
+    {
+        messageClass = std::move(rhs.messageClass);
+        method = std::move(rhs.method);
+        transactionId = std::move(rhs.transactionId);
+    }
+    return *this;
 }
 
 static Buffer randomBuffer( int size )
@@ -70,18 +99,23 @@ namespace attrs
     }
 
     BufferedValue::BufferedValue( nx::Buffer buffer_ )
-        : buffer( std::move( buffer_ ) )
+        : m_buffer( std::move( buffer_ ) )
     {
     }
 
     const Buffer& BufferedValue::getBuffer() const
     {
-        return buffer;
+        return m_buffer;
+    }
+
+    void BufferedValue::setBuffer(Buffer buf)
+    {
+        m_buffer = std::move(buf);
     }
 
     String BufferedValue::getString() const
     {
-        return bufferToString( buffer );
+        return bufferToString(m_buffer);
     }
 
     UserName::UserName( const String& value )
@@ -116,6 +150,35 @@ namespace attrs
         , userType( userType_ )
     {
     }
+
+
+    ////////////////////////////////////////////////////////////
+    //// IntAttribute
+    ////////////////////////////////////////////////////////////
+
+    IntAttribute::IntAttribute(int userType, int value)
+    :
+        Unknown(userType)
+    {
+        const int valueInNetworkByteOrder = htonl(value);
+        setBuffer(
+            Buffer(
+                reinterpret_cast<const char*>(&valueInNetworkByteOrder),
+                sizeof(valueInNetworkByteOrder)));
+    }
+
+    int IntAttribute::value() const
+    {
+        const auto& buf = getBuffer();
+        int valueInNetworkByteOrder = 0;
+        if (buf.size() != sizeof(valueInNetworkByteOrder))
+            return 0;
+        memcpy(
+            &valueInNetworkByteOrder,
+            buf.constData(),
+            sizeof(valueInNetworkByteOrder));
+        return ntohl(valueInNetworkByteOrder);
+    }
 }
 
 // provided by http://wiki.qt.io/HMAC-SHA1
@@ -144,9 +207,11 @@ static Buffer hmacSha1( const String& key, const Message* message )
 
     size_t bytes;
     MessageSerializer serializer;
-    serializer.setMessage( message );
-    Q_ASSERT( serializer.serialize( &buffer, &bytes )
-              == nx_api::SerializerState::done );
+    serializer.setMessage(message);
+    if (serializer.serialize(&buffer, &bytes) != nx_api::SerializerState::done)
+    {
+        Q_ASSERT(false);
+    }
 
     return hmacSha1( key, buffer );
 }

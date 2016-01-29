@@ -1,6 +1,8 @@
 #include "elided_label.h"
 
-#include <QtWidgets/5.2.1/QtWidgets/private/qlabel_p.h>
+#include <utils/common/qt_private_headers.h>
+#include QT_WIDGETS_PRIVATE_HEADER(qlabel_p.h)
+
 #include <QtWidgets/QStyleOption>
 
 QnElidedLabel::QnElidedLabel(QWidget *parent) :

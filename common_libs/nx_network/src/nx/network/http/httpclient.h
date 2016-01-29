@@ -6,7 +6,9 @@
 #ifndef HTTPCLIENT_H
 #define HTTPCLIENT_H
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/thread/mutex.h>

@@ -76,7 +76,6 @@ namespace ec2 {
     struct ApiUpdateUploadData;
     struct ApiUpdateUploadResponceData;
     struct ApiUpdateInstallData;
-    struct ApiModuleData;
     struct ApiLoginData;
     struct ApiDiscoveryData;
     struct ApiDiscoverPeerData;
@@ -85,6 +84,8 @@ namespace ec2 {
     struct ApiTransactionData;
     struct ApiSystemStatistics;
     struct ApiStatisticsServerInfo;
+    struct ApiWebPageData;
+    struct ApiDiscoveredServerData;
 
     struct ApiTimeData;
     struct ApiPeerSystemTimeData;
@@ -122,7 +123,6 @@ namespace ec2 {
     typedef std::vector<ApiUserData> ApiUserDataList;
     typedef std::vector<ApiUserDataStatistics> ApiUserDataStatisticsList;
     typedef std::vector<ApiVideowallData> ApiVideowallDataList;
-    typedef std::vector<ApiModuleData> ApiModuleDataList;
     typedef std::vector<ApiDiscoveryData> ApiDiscoveryDataList;
     typedef std::vector<ApiStoredFilePath> ApiStoredDirContents;
     typedef std::vector<ApiResourceParamWithRefData> ApiResourceParamWithRefDataList;
@@ -132,6 +132,8 @@ namespace ec2 {
     typedef std::vector<ApiServerFootageData> ApiServerFootageDataList;
     typedef std::vector<ApiCameraHistoryData> ApiCameraHistoryDataList;
     typedef std::vector<ApiCameraHistoryItemData> ApiCameraHistoryItemDataList;
+    typedef std::vector<ApiWebPageData> ApiWebPageDataList;
+    typedef std::vector<ApiDiscoveredServerData> ApiDiscoveredServerDataList;
 
 #define QN_EC2_API_DATA_TYPES \
     (ApiBusinessActionData)\
@@ -198,7 +200,6 @@ namespace ec2 {
     (ApiUpdateUploadData)\
     (ApiUpdateUploadResponceData)\
     (ApiUserDataStatistics)\
-    (ApiModuleData)\
     (ApiLoginData)\
     (ApiDiscoveryData)\
     (ApiDiscoverPeerData)\
@@ -211,6 +212,8 @@ namespace ec2 {
     (ApiLicenseOverflowData)\
     (ApiSystemStatistics)\
     (ApiStatisticsServerInfo)\
+    (ApiWebPageData)\
+    (ApiDiscoveredServerData)\
 
 #ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
@@ -218,7 +221,7 @@ namespace ec2 {
         (ubjson)(xml)(json)(sql_record)(csv_record)
     );
 #endif
-    
+
 } // namespace ec2
 
 #endif // QN_EC2_API_FWD_H

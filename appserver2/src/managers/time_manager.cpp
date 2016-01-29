@@ -159,9 +159,15 @@ namespace ec2
         if( right_internetFlagSet < internetFlagSet )
             return false;
 
+        if (sequence != right.sequence)
+        {
+            //taking into account sequence overflow. it should be same as "sequence < right.sequence" 
+                //but with respect to sequence overflow
+            return ((quint16)(right.sequence - sequence)) <
+                   (std::numeric_limits<decltype(sequence)>::max() / 2);
+        }
+
         return
-            sequence < right.sequence ? true :
-            sequence > right.sequence ? false :
             flags < right.flags ? true :
             flags > right.flags ? false :
             seed < right.seed;
@@ -1131,7 +1137,7 @@ namespace ec2
             peerSystemTimeData.peerSysTime = QDateTime::currentMSecsSinceEpoch();
             peerSystemTimeReceivedNonSafe( peerSystemTimeData );
 
-            NX_LOGX( lit("Successfully restored time priority key %1 from DB").arg(restoredPriorityKeyVal), cl_logWARNING );
+            NX_LOGX( lit("Successfully restored time priority key 0x%1 from DB").arg(restoredPriorityKeyVal, 0, 16), cl_logWARNING );
         }
 
         if( m_timeSynchronized )

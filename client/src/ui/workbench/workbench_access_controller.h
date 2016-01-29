@@ -31,7 +31,7 @@ private:
  */
 class QnWorkbenchAccessController: public Connective<QObject>, public QnWorkbenchContextAware {
     Q_OBJECT
-    
+
     typedef Connective<QObject> base_type;
 public:
     QnWorkbenchAccessController(QObject *parent = NULL);
@@ -51,7 +51,7 @@ public:
      *                                  include required permissions.
      */
     bool hasPermissions(const QnResourcePtr &resource, Qn::Permissions requiredPermissions) const;
-    
+
     /**
      * \param resources                 List of resources to get combined permissions for.
      * \returns                         Bitwise AND combination of permissions for the provided resources.
@@ -94,14 +94,14 @@ public:
 
 signals:
     /**
-     * \param resource                  Resource for which permissions have changed. 
+     * \param resource                  Resource for which permissions have changed.
      *                                  Guaranteed not to be null.
      */
     void permissionsChanged(const QnResourcePtr &resource);
 
 protected slots:
     void updatePermissions(const QnResourcePtr &resource);
-    
+
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 private:
@@ -110,12 +110,14 @@ private:
     void setPermissionsInternal(const QnResourcePtr &resource, Qn::Permissions permissions);
 
     Qn::Permissions calculatePermissions(const QnResourcePtr &resource) const;
-    Qn::Permissions calculatePermissions(const QnUserResourcePtr &user) const;
-    Qn::Permissions calculatePermissions(const QnLayoutResourcePtr &layout) const;
-    Qn::Permissions calculatePermissions(const QnVirtualCameraResourcePtr &camera) const;
-    Qn::Permissions calculatePermissions(const QnAbstractArchiveResourcePtr &archive) const;
-    Qn::Permissions calculatePermissions(const QnMediaServerResourcePtr &server) const;
-    Qn::Permissions calculatePermissions(const QnVideoWallResourcePtr &videoWall) const;
+
+    Qn::Permissions calculatePermissionsInternal(const QnUserResourcePtr &user) const;
+    Qn::Permissions calculatePermissionsInternal(const QnLayoutResourcePtr &layout) const;
+    Qn::Permissions calculatePermissionsInternal(const QnVirtualCameraResourcePtr &camera) const;
+    Qn::Permissions calculatePermissionsInternal(const QnAbstractArchiveResourcePtr &archive) const;
+    Qn::Permissions calculatePermissionsInternal(const QnMediaServerResourcePtr &server) const;
+    Qn::Permissions calculatePermissionsInternal(const QnVideoWallResourcePtr &videoWall) const;
+    Qn::Permissions calculatePermissionsInternal(const QnWebPageResourcePtr &webPage) const;
 
 private:
     struct PermissionsData {

@@ -56,7 +56,7 @@ namespace stree
             }
             if (untypedValue.canConvert<QString>())
             {
-                *value = untypedValue.value<QString>();
+                *value = QnUuid::fromStringSafe(untypedValue.value<QString>());
                 return true;
             }
             return false;
