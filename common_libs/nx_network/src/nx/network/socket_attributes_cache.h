@@ -238,15 +238,15 @@ public:
     }
     virtual bool toggleStatisticsCollection(bool val) override
     {
-        if (m_delegate)
-            return m_delegate->toggleStatisticsCollection(val);
+        if (this->m_delegate)
+            return this->m_delegate->toggleStatisticsCollection(val);
         SystemError::setLastErrorCode(SystemError::notSupported);
         return false;
     }
     virtual bool getConnectionStatistics(StreamSocketInfo* info) override
     {
-        if (m_delegate)
-            return m_delegate->getConnectionStatistics(info);
+        if (this->m_delegate)
+            return this->m_delegate->getConnectionStatistics(info);
         SystemError::setLastErrorCode(SystemError::notSupported);
         return false;
     }
@@ -271,9 +271,9 @@ public:
         this->AbstractSocketAttributesCache<ParentType>::setDelegate(_delegate);
 
         if (m_noDelay)
-            m_delegate->setNoDelay(*m_noDelay);
+            this->m_delegate->setNoDelay(*m_noDelay);
         if (m_keepAlive)
-            m_delegate->setKeepAlive(*m_keepAlive);
+            this->m_delegate->setKeepAlive(*m_keepAlive);
     }
 
 private:
