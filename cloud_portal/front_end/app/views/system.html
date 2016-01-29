@@ -67,7 +67,7 @@
                     <tbody>
                     <tr ng-repeat="user in system.users" class="hoverable">
                         <td>{{user.fullName}}</td>
-                        <td><a ng-href="mail-to:{{user.accountEmail}}">{{user.accountEmail}}</a></td>
+                        <td>{{user.accountEmail}}</td>
                         <td>{{Config.accessRoles.settings[user.accessRole].label || user.accessRole}}</td>
                         <td><a href='' class="hover-visible" ng-if="user.accountEmail != account.email && user.accessRole!=Config.accessRoles.owner"
                                ng-click="editShare(user)"><span class="glyphicon glyphicon-pencil"></span></a></td>
