@@ -4,24 +4,23 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
+#include <recording/time_period.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <ui/utils/timeline_bookmark_item.h>
+#include <core/resource/camera_bookmark.h>
+#include <camera/camera_bookmarks_manager_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
-
 #include <utils/common/connective.h>
 
-class QTimer;
-class QnCameraBookmarkAggregation;
-class QnWorkbenchBookmarksCache;
+class QnUuid;
 class QnBookmarkMergeHelper;
+class QnBookmarkQueriesCache;
+class QnCameraBookmarksQuery;
+class QnCameraBookmarkAggregation;
 
-// @brief Caches bookmarks for each item on current layout and constrains
-// count of them to reasonable (large) number. Gives access to merged bookmarks
-// for current selected item. Gives access to bookmarks of each layout item
-
-// TODO: #ynikitenkov TBD reasonable count of bookmarks for timeline
-
+// @brief Caches specified count of bookmarks for all cameras.
+// Gives access to merged bookmarks for current selected item.
+// Gives access to bookmarks of each layout item.
 class QnTimelineBookmarksWatcher : public Connective<QObject>
     , public QnWorkbenchContextAware
 {
@@ -43,10 +42,14 @@ public:
         , qint64 positionMs);
 
 private:
+    void onResourceAdded(const QnResourcePtr &resource);
+
+    void onResourceRemoved(const QnResourcePtr &resource);
+
+private:
     void updateCurrentCamera();
     void onBookmarkRemoved(const QnUuid &id);
-    void onBookmarksChanged(const QnVirtualCameraResourcePtr &camera
-        , const QnCameraBookmarkList &bookmarks);
+    void tryUpdateTimelineBookmarks(const QnVirtualCameraResourcePtr &camera);
     void onTimelineWindowChanged(qint64 startTimeMs
         , qint64 endTimeMs);
 
@@ -54,15 +57,19 @@ private:
     void setCurrentCamera(const QnVirtualCameraResourcePtr &camera);
 
 private:
-    typedef QScopedPointer<QnWorkbenchBookmarksCache> QnCurrentLayoutBookmarksCachePtr;
+    typedef QScopedPointer<QTimer> TimerPtr;
+    typedef QScopedPointer<QnBookmarkQueriesCache> QnBookmarkQueriesCachePtr;
     typedef QScopedPointer<QnCameraBookmarkAggregation> QnCameraBookmarkAggregationPtr;
     typedef QSharedPointer<QnBookmarkMergeHelper> QnBookmarkMergeHelperPtr;
-    typedef QScopedPointer<QTimer> QTimerPtr;
-    const QnCurrentLayoutBookmarksCachePtr m_bookmarksCache;
-    const QnBookmarkMergeHelperPtr m_mergeHelper;
-    const QnCameraBookmarkAggregationPtr m_aggregation;
 
+    const QnCameraBookmarkAggregationPtr m_aggregation;
+    const QnBookmarkMergeHelperPtr m_mergeHelper;
+    const QnBookmarkQueriesCachePtr m_queriesCache;     // Holds queries for hole timeline window
+    QnCameraBookmarksQueryPtr m_timelineQuery;     // Holds query for current selected item
     QnVirtualCameraResourcePtr m_currentCamera;
-    QTimerPtr m_delayedTimer;
+
+    TimerPtr m_updateStaticQueriesTimer;
+    TimerPtr m_delayedTimer;
     QElapsedTimer m_delayedUpdateCounter;
+    QnCameraBookmarkSearchFilter m_timlineFilter;
 };

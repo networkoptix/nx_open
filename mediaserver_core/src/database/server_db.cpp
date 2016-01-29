@@ -889,12 +889,14 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
                      book.description as description, \
                      book.timeout as timeout, \
                      book.unique_id as cameraId, \
-                     tag.name as tagName \
+                     group_concat(tag.name) as tags \
                      FROM bookmarks book \
                      LEFT JOIN bookmark_tags tag \
                      ON book.guid = tag.bookmark_guid \
-                     %1 %2"
-                     ).arg(filterText, createBookmarksFilterSortPart(filter)) ;
+                     %1 %2 %3"
+                     ).arg(filterText
+                     , "GROUP BY guid, startTimeMs, durationMs, endTimeMs, name, description, timeout, cameraId"
+                     , createBookmarksFilterSortPart(filter)) ;
 
     {
         QWriteLocker lock(&m_mutex);
@@ -937,22 +939,14 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
         QnSqlIndexMapping mapping = QnSql::mapping<QnCameraBookmark>(query);
 
         QSqlRecord queryInfo = query.record();
-        int guidFieldIdx = queryInfo.indexOf("guid");
-        int tagNameFieldIdx = queryInfo.indexOf("tagName");
+        const int tagsFiledIdx = queryInfo.indexOf("tags");
 
-        QnUuid prevGuid;
-
-        while (query.next()) {
-            QnUuid guid = QnUuid::fromRfc4122(query.value(guidFieldIdx).toByteArray());
-            if (guid != prevGuid) {
-                prevGuid = guid;
-                result.push_back(QnCameraBookmark());
-                QnSql::fetch(mapping, query.record(), &result.back());
-            }
-
-            QString tag = query.value(tagNameFieldIdx).toString();
-            if (!tag.isEmpty())
-                result.back().tags.insert(tag);
+        while (query.next())
+        {
+            QnCameraBookmark bookmark;
+            QnSql::fetch(mapping, query.record(), &bookmark);
+            bookmark.tags = query.value(tagsFiledIdx).toString().split(lit(",")).toSet();
+            result.push_back(std::move(bookmark));
 
             if (result.size() > limit)
                 break;  // We can't use LIMIT keyword in queries with JOIN.

@@ -61,7 +61,7 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/current_layout_items_watcher.h>
+#include <ui/workbench/watchers/workbench_items_watcher.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -341,7 +341,7 @@ void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
         updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
+void QnWorkbenchNavigator::onShowItem(QnWorkbenchItem *item)
 {
     if (!hasArchive())
         updateHasArchiveState();
@@ -365,12 +365,10 @@ void QnWorkbenchNavigator::initialize() {
     if (!isValid())
         return;
 
-    const auto itemsWatcher = context()->instance<QnCurrentLayoutItemsWatcher>();
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
-        , this, &QnWorkbenchNavigator::onItemAdded);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnWorkbenchNavigator::updateArchiveState);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
+    const auto itemsWatcher = context()->instance<QnWorkbenchItemsWatcher>();
+    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemShown
+        , this, &QnWorkbenchNavigator::onShowItem);
+    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemHidden
         , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged
