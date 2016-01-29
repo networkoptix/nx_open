@@ -28,23 +28,25 @@ namespace nx
 
 			/** Register video decoder plugin */
 			template <class Decoder>
-            void addPlugin(std::unique_ptr<AbstractResourceAllocator> allocator = std::unique_ptr<AbstractResourceAllocator>())
+            void addPlugin(std::shared_ptr<AbstractResourceAllocator> allocator = std::shared_ptr<AbstractResourceAllocator>())
             {
-                m_plugins.push_back(MetadataImpl<Decoder>(std::move(allocator)));
+                m_plugins.push_back(MetadataImpl<Decoder>(allocator));
             }
 
 		private:
 			struct Metadata
 			{
+                Metadata::Metadata() {}
+
 				std::function<AbstractVideoDecoder* ()> instance;
 				std::function<bool(const QnConstCompressedVideoDataPtr& frame)> isCompatible;
-                std::unique_ptr<AbstractResourceAllocator> allocator;
+                std::shared_ptr<AbstractResourceAllocator> allocator;
 			};
 
 			template <class Decoder>
 			struct MetadataImpl : public Metadata
 			{
-                MetadataImpl(std::unique_ptr<AbstractResourceAllocator> allocator)
+                MetadataImpl(std::shared_ptr<AbstractResourceAllocator> allocator)
 				{
 					instance = []() { return new Decoder(); };
 					isCompatible = &Decoder::isCompatible;

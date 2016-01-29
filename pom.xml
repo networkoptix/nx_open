@@ -418,16 +418,6 @@
                     <family>Windows</family>
                 </os>
             </activation>
-            <modules>
-                <module>traytool</module>
-                <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
-                <!--<module>vmaxproxy</module>  -->
-                <module>client</module>
-                <module>client.core</module>
-                <module>nxtool</module>
-                <module>client.bin</module>
-                <module>wixsetup</module>
-            </modules>
             <properties>
                 <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
@@ -446,7 +436,7 @@
                 <!-- <qt.spec>win32-msvc2012</qt.spec>
                 <PlatformToolSet>v110</PlatformToolSet>
                 <modification>win78</modification> -->
-                <qt.spec>win32-msvc2012xp</qt.spec>
+                <qt.spec>win32-msvc2013</qt.spec>
                 <PlatformToolSet>v110_xp</PlatformToolSet>
                 <modification>winxp</modification>
 
@@ -930,6 +920,7 @@
                 <android.ndk.host>linux-x86_64</android.ndk.host>
                 <android.toolchain.version>4.8</android.toolchain.version>
                 <openssl.version>1.0.2d-SNAPSHOT</openssl.version>
+                <additional.defines>DISABLE_FFMPEG</additional.defines>
                 <compile.option1/>
             </properties>
         </profile>

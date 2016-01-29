@@ -42,9 +42,11 @@
 void initDecoders(QQuickWindow *window)
 {
     using namespace nx::media;
-    std::unique_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
+#if defined(Q_OS_ANDROID)
+    std::shared_ptr<AbstractResourceAllocator> allocator(new ResourceAllocator(window));
     VideoDecoderRegistry::instance()->addPlugin<AndroidDecoder>(std::move(allocator));
-#ifdef ENABLE_FFMPEG
+#endif
+#ifndef DISABLE_FFMPEG
     VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
 #endif
 }

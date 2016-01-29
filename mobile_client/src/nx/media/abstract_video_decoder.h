@@ -22,7 +22,6 @@ namespace nx
             AbstractVideoDecoder() {}
 			virtual ~AbstractVideoDecoder() {}
             virtual void setAllocator(AbstractResourceAllocator* /*allocator */) {}
-            virtual void setSharedGlContext(QOpenGLContext* context ) {}
 
 			/*
 			* \param context	codec context.

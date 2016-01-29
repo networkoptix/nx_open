@@ -1,5 +1,7 @@
 #include "resource_allocator.h"
 
+#if defined(Q_OS_ANDROID)
+
 ResourceAllocator::ResourceAllocator(QQuickWindow *window):
     nx::media::AbstractResourceAllocator(),
     m_window(window),
@@ -34,3 +36,5 @@ void ResourceAllocator::execAtGlThread(std::function<void (void*)> lambda, void*
     while (m_lambda)
         m_waitCond.wait(&m_mutex);
 }
+
+#endif // #if defined(Q_OS_ANDROID)

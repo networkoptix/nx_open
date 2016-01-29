@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(Q_OS_ANDROID)
+
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtQuick/QQuickWindow>
@@ -29,3 +31,5 @@ private:
     void* m_opaque;
     bool m_connected;
 };
+
+#endif // #if defined(Q_OS_ANDROID)

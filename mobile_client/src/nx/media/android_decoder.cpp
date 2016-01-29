@@ -1,8 +1,6 @@
 #include "android_decoder.h"
 
 #include <utils/thread/mutex.h>
-#include <QAndroidJniObject>
-#include <QAndroidJniEnvironment>
 #include "abstract_resource_allocator.h"
 #include <utils/media/h264_utils.h>
 #include <QtGui/QOpenGLContext>
@@ -15,8 +13,10 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/qopengl.h>
 
-
 #if defined(Q_OS_ANDROID)
+
+#include <QAndroidJniObject>
+#include <QAndroidJniEnvironment>
 
 namespace nx {
 namespace media {
