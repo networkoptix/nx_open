@@ -8,6 +8,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <recording/time_period.h>
+#include <recording/stream_recorder.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -91,7 +92,10 @@ private slots:
     bool exportMediaResource(const QnMediaResourcePtr& resource);
 
     void at_camera_progressChanged(int progress);
-    void at_camera_exportFinished(int status, const QString &filename);
+    void at_camera_exportFinished(
+        const QnStreamRecorder::ErrorStruct &status,
+        const QString                       &filename
+    );
     void at_camera_exportStopped();
 
 private:

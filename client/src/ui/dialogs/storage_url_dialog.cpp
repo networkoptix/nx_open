@@ -14,10 +14,16 @@
 
 #include <ui/dialogs/message_box.h>
 
-QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags):
-    base_type(parent, windowFlags),
-    ui(new Ui::StorageUrlDialog()),
-    m_server(server)
+QnStorageUrlDialog::QnStorageUrlDialog(const QnMediaServerResourcePtr &server, QWidget *parent, Qt::WindowFlags windowFlags)
+    : base_type(parent, windowFlags)
+    , ui(new Ui::StorageUrlDialog())
+    , m_server(server)
+    , m_protocols()
+    , m_descriptions()
+    , m_urlByProtocol()
+    , m_lastProtocol()
+    , m_storage()
+    , m_currentServerStorages()
 {
     ui->setupUi(this);
 
@@ -85,8 +91,8 @@ QnStorageUrlDialog::ProtocolDescription QnStorageUrlDialog::protocolDescription(
         result.name = tr("Network Shared Resource");
         result.urlTemplate = tr("\\\\<Computer Name>\\<Folder>");
         result.urlPattern = lit("\\\\\\\\%1\\\\.+").arg(validHostnamePattern);
-    } 
-    //else if(protocol == lit("coldstore")) 
+    }
+    //else if(protocol == lit("coldstore"))
     //{
     //    result.protocol = protocol;
     //    result.name = tr("Coldstore Network Storage");
@@ -118,12 +124,12 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
     return url.toString();
 }
 
-void QnStorageUrlDialog::accept() 
+void QnStorageUrlDialog::accept()
 {
     QnConnectionRequestResult result;
     QString protocol = qvariant_cast<QString>(ui->protocolComboBox->currentData());
     QString urlText = ui->urlEdit->text();
-    
+
     if (protocol == lit("smb"))
     {
         if(!urlText.startsWith(lit("\\\\")))
@@ -154,7 +160,7 @@ void QnStorageUrlDialog::accept()
         QString message = tr("System has other server(s) using the same network storage path. "\
                              "Recording data by multiple servers to exactly same place is not recommended.");
 
-        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning"), message, QnMessageBox::Cancel);
+        QnMessageBox messageBox(QnMessageBox::Warning, 0, tr("Warning!"), message, QnMessageBox::Cancel);
         messageBox.addButton(tr("Add storage"), QnMessageBox::AcceptRole);
 
         if (messageBox.exec() == QnMessageBox::Cancel)
@@ -172,7 +178,7 @@ void QnStorageUrlDialog::updateComboBox() {
     ui->protocolComboBox->clear();
     for(const ProtocolDescription &description: m_descriptions) {
         ui->protocolComboBox->addItem(description.name, description.protocol);
-        
+
         if(description.protocol == lastProtocol)
             ui->protocolComboBox->setCurrentIndex(ui->protocolComboBox->count() - 1);
     }
@@ -183,7 +189,7 @@ void QnStorageUrlDialog::updateComboBox() {
 
 void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
     m_urlByProtocol[m_lastProtocol] = ui->urlEdit->text().trimmed();
-    
+
     int index = ui->protocolComboBox->currentIndex();
     QString url, placeholder;
     if(index == -1) {
@@ -200,9 +206,31 @@ void QnStorageUrlDialog::at_protocolComboBox_currentIndexChanged() {
 
 bool QnStorageUrlDialog::storageAlreadyUsed(const QString &path) const {
     QnMediaServerResourceList servers = qnResPool->getResources<QnMediaServerResource>();
+    servers.removeOne(m_server);
 
-    return boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
+    bool usedOnOtherServers = boost::algorithm::any_of(servers, [path](const QnMediaServerResourcePtr &server) {
         return !server->getStorageByUrl(path).isNull();
     });
 
+    bool usedOnCurrentServer = boost::algorithm::any_of(m_currentServerStorages, [path](const QnStorageModelInfo &info) {
+        return info.url == path;
+    });
+
+    if (usedOnOtherServers)
+        qDebug() << "storage" << path << "is used on other servers";
+
+    if (usedOnCurrentServer)
+        qDebug() << "storage" << path << "is used on current server";
+
+    return usedOnOtherServers || usedOnCurrentServer;
+}
+
+QnStorageModelInfoList QnStorageUrlDialog::currentServerStorages() const
+{
+    return m_currentServerStorages;
+}
+
+void QnStorageUrlDialog::setCurrentServerStorages(const QnStorageModelInfoList &storages)
+{
+    m_currentServerStorages = storages;
 }

@@ -38,6 +38,5 @@ private slots:
 
 private:
     QHash<int, QnMediaServerResourcePtr> m_serverByRequestHandle;
-    QString m_adminPassword;
     QPair<ErrorCode, QnModuleInformation> m_foundModule;
 };

@@ -75,6 +75,8 @@ QnDialog {
         }
     }
 
+    footer: undefined
+
     onShown: {
         ensureVisible(content.selectedY, content.selectedY + dp(56))
     }

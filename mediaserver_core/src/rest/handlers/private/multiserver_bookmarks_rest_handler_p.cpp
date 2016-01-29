@@ -19,6 +19,7 @@
 #include <utils/network/http/asynchttpclient.h>
 #include <utils/thread/mutex.h>
 #include <utils/thread/wait_condition.h>
+#include <database/server_db.h>
 
 namespace
 {
@@ -79,9 +80,12 @@ namespace
         runMultiserverDownloadRequest(apiUrl, server, requestCompletionFunc, ctx);
     }
 
-    void getBookmarksLocal(QnMultiServerCameraBookmarkList& outputData, QnGetBookmarksRequestContext* ctx) {
-        auto bookmarks = QnBookmarksRequestHelper::loadBookmarks(ctx->request());
-        if (!bookmarks.empty()) {
+    void getBookmarksLocal(QnMultiServerCameraBookmarkList& outputData, QnGetBookmarksRequestContext* ctx)
+    {
+        const auto request = ctx->request();
+        QnCameraBookmarkList bookmarks;
+        if (qnServerDb->getBookmarks(request.cameras, request.filter, bookmarks) && !bookmarks.empty())
+        {
             ctx->executeGuarded([bookmarks, &outputData]()
             {
                 outputData.push_back(std::move(bookmarks));
@@ -117,8 +121,9 @@ namespace
         runMultiserverDownloadRequest(apiUrl, server, requestCompletionFunc, ctx);
     }
 
-    void getBookmarkTagsLocal(QnMultiServerCameraBookmarkTagList& outputData, QnGetBookmarkTagsRequestContext* ctx) {
-        auto tags = QnBookmarksRequestHelper::loadTags(ctx->request());
+    void getBookmarkTagsLocal(QnMultiServerCameraBookmarkTagList& outputData, QnGetBookmarkTagsRequestContext* ctx)
+    {
+        auto tags = qnServerDb->getBookmarkTags(ctx->request().limit);
         if (!tags.empty()) {
             ctx->executeGuarded([tags, &outputData]()
             {
@@ -179,7 +184,10 @@ QnCameraBookmarkList QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(QnGe
         }
         context.waitForDone();
     }
-    return QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.limit, request.filter.strategy);
+    const auto result = QnCameraBookmark::mergeCameraBookmarks(outputData, request.filter.orderBy
+        , request.filter.sparsing, request.filter.limit);
+
+    return result;
 }
 
 

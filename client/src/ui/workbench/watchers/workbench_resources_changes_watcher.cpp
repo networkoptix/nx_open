@@ -20,12 +20,12 @@ QnWorkbenchResourcesChangesWatcher::~QnWorkbenchResourcesChangesWatcher() {
 }
 
 void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList &resources) {
-    QString errorMessage = qnCommon->isReadOnly() 
+    QString errorMessage = qnCommon->isReadOnly()
         ? tr("The system is in Safe Mode.")
-            + L'\n' 
-            + tr("It is not allowed to make any changes except license activation.") 
-            + L'\n' 
-            + tr("The following %n items are not saved.", nullptr, resources.size())
+            + L'\n'
+            + tr("It is not allowed to make any changes except license activation.")
+            + L'\n'
+            + tr("The following %n items are not saved.", "", resources.size())
         : tr("Could not save the following %n items to Server.", "", resources.size());
 
     QnResourceListDialog::exec(
@@ -38,12 +38,12 @@ void QnWorkbenchResourcesChangesWatcher::showWarningDialog(const QnResourceList 
 }
 
 void QnWorkbenchResourcesChangesWatcher::showDeleteErrorDialog(const QnResourceList &resources) {
-    QString errorMessage = qnCommon->isReadOnly() 
+    QString errorMessage = qnCommon->isReadOnly()
         ? tr("The system is in Safe Mode.")
-        + L'\n' 
-        + tr("It is not allowed to make any changes except license activation.") 
-        + L'\n' 
-        + tr("The following %n items are not deleted.", nullptr, resources.size())
+        + L'\n'
+        + tr("It is not allowed to make any changes except license activation.")
+        + L'\n'
+        + tr("The following %n items are not deleted.", "", resources.size())
         : tr("Could not delete the following %n items from Server.", "", resources.size());
 
     QnResourceListDialog::exec(

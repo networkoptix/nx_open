@@ -15,6 +15,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
@@ -46,24 +47,24 @@
 #include "action_parameter_types.h"
 #include "action_manager.h"
 
-QnActionCondition::QnActionCondition(QObject *parent): 
+QnActionCondition::QnActionCondition(QObject *parent):
     QObject(parent),
     QnWorkbenchContextAware(parent)
 {}
 
-Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) { 
-    return Qn::InvisibleAction; 
+Qn::ActionVisibility QnActionCondition::check(const QnResourceList &) {
+    return Qn::InvisibleAction;
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) { 
+Qn::ActionVisibility QnActionCondition::check(const QnLayoutItemIndexList &layoutItems) {
     return check(QnActionParameterTypes::resources(layoutItems));
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets) { 
+Qn::ActionVisibility QnActionCondition::check(const QnResourceWidgetList &widgets) {
     return check(QnActionParameterTypes::layoutItems(widgets));
 }
 
-Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts) { 
+Qn::ActionVisibility QnActionCondition::check(const QnWorkbenchLayoutList &layouts) {
     return check(QnActionParameterTypes::resources(layouts));
 }
 
@@ -248,7 +249,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
         if(widget == NULL)
             continue;
 
-        bool isUnsupported = 
+        bool isUnsupported =
             (widget->resource()->flags() & (Qn::network | Qn::still_image | Qn::server)) ||
             !(widget->resource()->flags() & Qn::utc); // TODO: #GDM #Common this is wrong, we need a flag for exported files.
         if(isUnsupported)
@@ -257,7 +258,7 @@ Qn::ActionVisibility QnCheckFileSignatureActionCondition::check(const QnResource
     return Qn::EnabledAction;
 }
 
-QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent): 
+QnResourceActionCondition::QnResourceActionCondition(const QnResourceCriterion &criterion, Qn::MatchMode matchMode, QObject *parent):
     QnActionCondition(parent),
     m_criterion(criterion),
     m_matchMode(matchMode)
@@ -506,9 +507,9 @@ Qn::ActionVisibility QnExportActionCondition::check(const QnActionParameters &pa
 
     // Export selection
     if (m_centralItemRequired) {
-        
+
         const auto containsAvailablePeriods = parameters.hasArgument(Qn::TimePeriodsRole);
-        
+
         /// If parameters contain periods it means we need current selected item
         if (containsAvailablePeriods && !context()->workbench()->item(Qn::CentralRole))
             return Qn::DisabledAction;
@@ -556,6 +557,17 @@ Qn::ActionVisibility QnAddBookmarkActionCondition::check(const QnActionParameter
 Qn::ActionVisibility QnModifyBookmarkActionCondition::check(const QnActionParameters &parameters) {
     if(!parameters.hasArgument(Qn::CameraBookmarkRole))
         return Qn::InvisibleAction;
+    return Qn::EnabledAction;
+}
+
+Qn::ActionVisibility QnRemoveBookmarksActionCondition::check(const QnActionParameters &parameters)
+{
+    if (!parameters.hasArgument(Qn::CameraBookmarkListRole))
+        return Qn::InvisibleAction;
+
+    if (parameters.argument(Qn::CameraBookmarkListRole).value<QnCameraBookmarkList>().isEmpty())
+        return Qn::InvisibleAction;
+
     return Qn::EnabledAction;
 }
 
@@ -656,7 +668,7 @@ Qn::ActionVisibility QnLayoutSettingsActionCondition::check(const QnResourceList
 Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWidgetList &widgets) {
     if(widgets.size() != 1)
         return Qn::InvisibleAction;
-    
+
     // TODO: #Elric there probably exists a better way to check it all.
 
     QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
@@ -668,7 +680,7 @@ Qn::ActionVisibility QnCreateZoomWindowActionCondition::check(const QnResourceWi
 
     /*if(widget->display()->videoLayout() && widget->display()->videoLayout()->channelCount() > 1)
         return Qn::InvisibleAction;*/
-    
+
     return Qn::EnabledAction;
 }
 
@@ -776,7 +788,7 @@ Qn::ActionVisibility QnShowcaseActionCondition::check(const QnActionParameters &
 }
 
 Qn::ActionVisibility QnPtzActionCondition::check(const QnActionParameters &parameters) {
-    bool isPreviewSearchMode = 
+    bool isPreviewSearchMode =
         parameters.scope() == Qn::SceneScope &&
         context()->workbench()->currentLayout()->isSearchLayout();
     if (isPreviewSearchMode)
@@ -800,7 +812,7 @@ Qn::ActionVisibility QnPtzActionCondition::check(const QnResourceWidgetList &wid
         QnMediaResourceWidget *mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget);
         if(!mediaWidget)
             return Qn::InvisibleAction;
-        
+
         if(!check(mediaWidget->ptzController()))
             return Qn::InvisibleAction;
 
@@ -820,7 +832,7 @@ bool QnPtzActionCondition::check(const QnPtzControllerPtr &controller) {
 
 Qn::ActionVisibility QnNonEmptyVideowallActionCondition::check(const QnResourceList &resources) {
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(Qn::videowall)) 
+        if(!resource->hasFlags(Qn::videowall))
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -843,7 +855,7 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
             layouts << workbench()->currentLayout()->resource();
     } else {
         foreach(const QnResourcePtr &resource, resources) {
-            if(!resource->hasFlags(Qn::videowall)) 
+            if(!resource->hasFlags(Qn::videowall))
                 continue;
 
             QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -870,7 +882,7 @@ Qn::ActionVisibility QnSaveVideowallReviewActionCondition::check(const QnResourc
 Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceList &resources) {
     bool hasNonEmptyVideowall = false;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(Qn::videowall)) 
+        if(!resource->hasFlags(Qn::videowall))
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -887,7 +899,7 @@ Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceLi
         return Qn::EnabledAction;
     }
 
-    return hasNonEmptyVideowall 
+    return hasNonEmptyVideowall
         ? Qn::DisabledAction
         : Qn::InvisibleAction;
 }
@@ -895,12 +907,12 @@ Qn::ActionVisibility QnRunningVideowallActionCondition::check(const QnResourceLi
 
 Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList &resources) {
     QnUuid pcUuid = qnSettings->pcUuid();
-    if (pcUuid.isNull()) 
+    if (pcUuid.isNull())
         return Qn::InvisibleAction;
 
     bool hasAttachedItems = false;
     foreach(const QnResourcePtr &resource, resources) {
-        if(!resource->hasFlags(Qn::videowall)) 
+        if(!resource->hasFlags(Qn::videowall))
             continue;
 
         QnVideoWallResourcePtr videowall = resource.dynamicCast<QnVideoWallResource>();
@@ -921,7 +933,7 @@ Qn::ActionVisibility QnStartVideowallActionCondition::check(const QnResourceList
         }
     }
 
-    return hasAttachedItems 
+    return hasAttachedItems
         ? Qn::DisabledAction
         : Qn::InvisibleAction;
 }
@@ -1040,14 +1052,14 @@ Qn::ActionVisibility QnDesktopCameraActionCondition::check(const QnActionParamet
     /* Do not check real pointer type to speed up check. */
     QnResourcePtr desktopCamera = qnResPool->getResourceByUniqueId(qnCommon->moduleGUID().toString());
 #ifdef DESKTOP_CAMERA_DEBUG
-    Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()), 
-        Q_FUNC_INFO, 
+    Q_ASSERT_X(!desktopCamera || (desktopCamera->hasFlags(Qn::desktop_camera) && desktopCamera->getParentId() == qnCommon->remoteGUID()),
+        Q_FUNC_INFO,
         "Desktop camera must have correct flags and parent (if exists)");
 #endif
     if (desktopCamera && desktopCamera->hasFlags(Qn::desktop_camera))
         return Qn::EnabledAction;
-    
-    return Qn::DisabledAction;  
+
+    return Qn::DisabledAction;
 #else
     return Qn::InvisibleAction;
 #endif
@@ -1130,8 +1142,8 @@ Qn::ActionVisibility QnMergeToCurrentSystemActionCondition::check(const QnResour
         found = true;
     }
 
-    return found 
-        ? Qn::EnabledAction 
+    return found
+        ? Qn::EnabledAction
         : Qn::InvisibleAction;
 }
 

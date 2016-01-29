@@ -26,28 +26,47 @@ int QnMultiserverBookmarksRestHandler::executeGet(const QString& path,
     case QnBookmarkOperation::Add:
     case QnBookmarkOperation::Update:
         {
+            QnRestResult execResult;
             auto request = QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
-            if (!request.isValid())
+            if (!request.isValid()) {
+                execResult.error = QnRestResult::MissingParameter;
+                execResult.errorString = lit("missing parameter(s)");
+                QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
                 return nx_http::StatusCode::badRequest;
+            }
 
             QnUpdateBookmarkRequestContext context(request, ownerPort);
-            bool result = op == QnBookmarkOperation::Add
+            bool ok = op == QnBookmarkOperation::Add
                 ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
                 : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
-
-            return result
+            if (!ok) {
+                execResult.error = QnRestResult::CantProcessRequest;
+                execResult.errorString = lit("Can't %1 bookmark").arg(op == QnBookmarkOperation::Add ? lit("add") : lit("update"));
+            }
+            QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
+            return ok
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }
 
     case QnBookmarkOperation::Delete:
         {
+            QnRestResult execResult;
             auto request = QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
-            if (!request.isValid())
+            if (!request.isValid()) {
+                execResult.error = QnRestResult::MissingParameter;
+                execResult.errorString = lit("missing parameter(s)");
+                QnFusionRestHandlerDetail::serialize(execResult, result, contentType, request.format, request.extraFormatting);
                 return nx_http::StatusCode::badRequest;
+            }
 
             QnDeleteBookmarkRequestContext context(request, ownerPort);
-            return QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context)
+            bool ok = QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context);
+            if (!ok) {
+                execResult.error = QnRestResult::CantProcessRequest;
+                execResult.errorString = lit("Can't delete bookmark");
+            }
+            return ok
                 ? nx_http::StatusCode::ok
                 : nx_http::StatusCode::internalServerError;
         }

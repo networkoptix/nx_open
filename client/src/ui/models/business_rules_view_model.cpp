@@ -172,7 +172,7 @@ QSize QnBusinessRulesViewModel::columnSizeHint(QnBusiness::Columns column) const
     return QSize(m_forcedWidthByColumn[column], 1);
 }
 
-void QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel) {
+int QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel) {
     QnUuid id = ruleModel->id();
     connect(ruleModel, &QnBusinessRuleViewModel::dataChanged, this, [this, id](QnBusiness::Fields fields) {
         at_rule_dataChanged(id, fields);
@@ -184,6 +184,7 @@ void QnBusinessRulesViewModel::addRuleModelInternal(const QnBusinessRuleViewMode
     endInsertRows();
 
     emit dataChanged(index(row, 0), index(row, QnBusiness::allColumns().last()));
+    return row;
 }
 
 void QnBusinessRulesViewModel::clear() {
@@ -192,10 +193,10 @@ void QnBusinessRulesViewModel::clear() {
     endResetModel();
 }
 
-void QnBusinessRulesViewModel::createRule() {
+int QnBusinessRulesViewModel::createRule() {
     QnBusinessRuleViewModelPtr ruleModel(new QnBusinessRuleViewModel(this));
     ruleModel->setModified(true);
-    addRuleModelInternal(ruleModel);
+    return addRuleModelInternal(ruleModel);
 }
 
 void QnBusinessRulesViewModel::addOrUpdateRule(const QnBusinessEventRulePtr &rule) {

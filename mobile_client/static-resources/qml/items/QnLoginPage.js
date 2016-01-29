@@ -50,5 +50,4 @@ function deleteSesion(sessionId) {
         Main.gotoNewSession()
     else
         Main.gotoMainScreen()
-    sideNavigation.show()
 }

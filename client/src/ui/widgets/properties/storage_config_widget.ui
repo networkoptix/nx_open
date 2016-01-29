@@ -6,17 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>769</width>
-    <height>570</height>
+    <width>794</width>
+    <height>549</height>
    </rect>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0">
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="9,9,0,0">
    <item>
     <widget class="QGroupBox" name="storagesGroupBox">
      <property name="title">
       <string>Main Storage Locations</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0,0">
       <item>
        <widget class="QnTableView" name="mainStoragesTable">
         <property name="autoFillBackground">
@@ -78,6 +78,13 @@
          <widget class="QnStorageRebuildWidget" name="rebuildMainWidget" native="true"/>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="backupStoragesAbsentLabel">
+        <property name="text">
+         <string>You haven't configured any backup storage. Backup won't be performed.</string>
+        </property>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="backupOptionLabel">
@@ -284,27 +291,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="3">
-            <widget class="QLabel" name="backupWarningLabel">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Backup Warning Label 
-</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-             </property>
-             <property name="wordWrap">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2" colspan="3">
+           <item row="0" column="2" colspan="2">
             <spacer name="horizontalSpacer_2">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -343,7 +330,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="4">
+           <item row="1" column="3">
             <widget class="QPushButton" name="backupStartButton">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
@@ -357,15 +344,12 @@
             </widget>
            </item>
            <item row="1" column="2">
-            <widget class="QLabel" name="spacerLabel">
-             <property name="text">
-              <string notr="true"/>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::PlainText</enum>
-             </property>
-             <property name="textInteractionFlags">
-              <set>Qt::NoTextInteraction</set>
+            <widget class="QnWordWrappedLabel" name="backupWarningLabel" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>200</width>
+               <height>26</height>
+              </size>
              </property>
             </widget>
            </item>
@@ -384,14 +368,6 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item>
-           <widget class="QLabel" name="storagesWarningLabel">
-            <property name="text">
-             <string>Unchecking the storage will cause nothing but writing stop.
-It won't deny oldest footage removing from the drive.</string>
-            </property>
-           </widget>
-          </item>
           <item>
            <widget class="QLabel" name="backupTimeLabel">
             <property name="text">
@@ -438,6 +414,38 @@ It won't deny oldest footage removing from the drive.</string>
      </layout>
     </widget>
    </item>
+   <item>
+    <widget class="QStackedWidget" name="storagesWarningStackedWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="pageStoragesWarning">
+      <layout class="QVBoxLayout" name="verticalLayout_8">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="storagesWarningLabel">
+         <property name="text">
+          <string>Unchecking the storage will cause nothing but writing stop.
+It won't deny oldest footage removing from the drive.</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="pageSpacer"/>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -450,6 +458,12 @@ It won't deny oldest footage removing from the drive.</string>
    <class>QnStorageRebuildWidget</class>
    <extends>QWidget</extends>
    <header location="global">ui/widgets/properties/storage_rebuild_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnWordWrappedLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">ui/widgets/word_wrapped_label.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

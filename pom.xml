@@ -119,7 +119,7 @@
         <resources.phase>generate-sources</resources.phase>
         <qt.version>5.2.1-SNAPSHOT</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -744,6 +744,33 @@
                 <module>edge_firmware/rpi</module>
             </modules>
         </profile>
+        <profile>
+            <id>linux-arm-bananapi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bananapi</value>
+                </property>
+            </activation>
+            <properties>
+                <quazip.version>0.7-SNAPSHOT</quazip.version>
+                <toolchain.version>rpi</toolchain.version>
+                <compiler>bpi</compiler>
+                <openssl.version>1.0.0j-SNAPSHOT</openssl.version>
+                <ffmpeg.version>0.11.5-SNAPSHOT</ffmpeg.version>
+                <modification>bananapi</modification>
+                <qt.classifier>${platform}-${arch}-bpi</qt.classifier>
+            </properties>
+            <modules>
+                <!-- Banana pie uses same distro as rpi -->
+                <module>edge_firmware/rpi</module>
+            </modules>
+        </profile>        
         <profile>
             <id>linux-x64</id>
             <activation>

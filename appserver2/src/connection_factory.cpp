@@ -256,10 +256,10 @@ namespace ec2
         //AbstractUpdatesManager::installUpdate
         registerUpdateFuncHandler<ApiUpdateInstallData>( restProcessorPool, ApiCommand::installUpdate );
 
-        //AbstractMiscManager::moduleInfo
-        registerUpdateFuncHandler<ApiModuleData>(restProcessorPool, ApiCommand::moduleInfo);
-        //AbstractMiscManager::moduleInfoList
-        registerUpdateFuncHandler<ApiModuleDataList>(restProcessorPool, ApiCommand::moduleInfoList);
+        //AbstractDiscoveryManager::discoveredServerChanged
+        registerUpdateFuncHandler<ApiDiscoveredServerData>(restProcessorPool, ApiCommand::discoveredServerChanged);
+        //AbstractDiscoveryManager::discoveredServersList
+        registerUpdateFuncHandler<ApiDiscoveredServerDataList>(restProcessorPool, ApiCommand::discoveredServersList);
 
         //AbstractDiscoveryManager::discoverPeer
         registerUpdateFuncHandler<ApiDiscoverPeerData>(restProcessorPool, ApiCommand::discoverPeer);
