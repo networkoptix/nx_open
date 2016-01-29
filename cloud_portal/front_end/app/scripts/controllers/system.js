@@ -12,7 +12,11 @@ angular.module('cloudApp')
             info:{name:''}
         };
 
-
+        function loadUsers(){
+            if($scope.system.info.sharingPermissions.length) { // User can share - means he can view users
+                $scope.gettingSystemUsers.run();
+            }
+        }
         account.requireLogin().then(function(account){
             $scope.account = account;
         });
@@ -24,10 +28,10 @@ angular.module('cloudApp')
             forbidden: Config.errorCodes.systemForbidden,
             notFound: Config.errorCodes.systemNotFound
         }).then(function(result){
-
             $scope.system.info = result.data[0];
-
             $scope.isOwner = $scope.system.info.ownerAccountEmail == $scope.account.email;
+
+            loadUsers();
         });
         $scope.gettingSystem.run();
 
@@ -70,7 +74,8 @@ angular.module('cloudApp')
 
 
         });
-        $scope.gettingSystemUsers.run();
+
+
 
         $scope.open = function(){
             nativeClient.open(systemId);
@@ -113,16 +118,12 @@ angular.module('cloudApp')
 
         $scope.share = function(){
             // Call share dialog, run process inside
-            return dialogs.share(systemId, $scope.isOwner).then(function(){
-                $scope.gettingSystemUsers.run();
-            });
+            return dialogs.share(systemId, $scope.isOwner).then(loadUsers);
         };
 
         $scope.editShare = function(user){
             //Pass user inside
-            return dialogs.share(systemId, $scope.isOwner, user).then(function(){
-                $scope.gettingSystemUsers.run();
-            });
+            return dialogs.share(systemId, $scope.isOwner, user).then(loadUsers);
         };
 
         $scope.unshare = function(user){
