@@ -39,14 +39,21 @@ int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionP
 {
     ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
     int handle = ec2Connection->getBusinessEventManager()->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
+
+    QnMutexLocker lock(&m_mutex);
     m_sendingActions.insert(handle, bAction);
     return 0;
 }
 
 void QnBusinessMessageBus::at_DeliveryBusinessActionFinished( int handle, ec2::ErrorCode errorCode )
 {
-    QnAbstractBusinessActionPtr action = m_sendingActions.value(handle);
-    m_sendingActions.remove(handle);
+    QnAbstractBusinessActionPtr action;
+    {
+        QnMutexLocker lock(&m_mutex);
+        action = m_sendingActions.value(handle);
+        m_sendingActions.remove(handle);
+    }
+
     if (errorCode == ec2::ErrorCode::ok)
         emit actionDelivered(action);
     else {

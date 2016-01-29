@@ -8,6 +8,7 @@ QnVideoWallResource::QnVideoWallResource() :
     m_matrices(new QnThreadsafeItemStorage<QnVideoWallMatrix>(&m_mutex, this))
 {
     addFlags(Qn::videowall | Qn::remote);
+    setTypeId(qnResTypePool->getFixedResourceTypeId(QnResourceTypePool::kVideoWallTypeId));
 }
 
 Qn::ResourceStatus QnVideoWallResource::getStatus() const {

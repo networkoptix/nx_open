@@ -4,7 +4,8 @@
 #include <QObject>
 
 #include <base/types.h>
-#include <base/requests.h>
+#include <nx/mediaserver/api/client.h>
+#include <helpers/time_helper.h>
 
 namespace rtu
 {
@@ -13,21 +14,23 @@ namespace rtu
         Q_OBJECT
     public:
         /// Creates shared pointer to chagneset with helpers::qml_objects_parent() parent
-        static ChangesetPointer create(); 
+        static ChangesetPointer create();
 
         ~Changeset();
 
     public:
+        typedef nx::mediaserver::api::Client Client;
+
         /// Getters
         const IntPointer &port() const;
 
         const StringPointer &password() const;
-        
+
         const StringPointer &systemName() const;
 
         const DateTimePointer &dateTime() const;
 
-        const ItfUpdateInfoContainerPointer &itfUpdateInfo() const;
+        const Client::ItfUpdateInfoContainerPtr &itfUpdateInfo() const;
 
         ///
 
@@ -85,14 +88,14 @@ namespace rtu
 
         void preparePropChangesData();
 
-        ItfUpdateInfo &getItfUpdateInfo(const QString &name);
+        Client::ItfUpdateInfo &getItfUpdateInfo(const QString &name);
 
     private:
         IntPointer m_port;
         StringPointer m_password;
         StringPointer m_systemName;
         DateTimePointer m_dateTime;
-        ItfUpdateInfoContainerPointer m_itfUpdateInfo;
+        Client::ItfUpdateInfoContainerPtr m_itfUpdateInfo;
 
         bool m_softRestart;
         bool m_osRestart;

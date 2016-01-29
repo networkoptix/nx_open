@@ -55,7 +55,7 @@ QnMediaServerResource::QnMediaServerResource(const QnResourceTypePool* resTypePo
         std::bind(&QnMediaServerResource::calculatePanicMode, this),
         &m_mutex )
 {
-    setTypeId(resTypePool->getFixedResourceTypeId(lit("Server")));
+    setTypeId(resTypePool->getFixedResourceTypeId(QnResourceTypePool::kServerTypeId));
     addFlags(Qn::server | Qn::remote);
     removeFlags(Qn::media); // TODO: #Elric is this call needed here?
 

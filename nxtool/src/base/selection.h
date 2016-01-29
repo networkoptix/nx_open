@@ -4,8 +4,7 @@
 #include <QObject>
 #include <QDateTime>
 
-#include <base/constants.h>
-#include <base/server_info.h>
+#include <nx/mediaserver/api/server_info.h>
 
 namespace rtu
 {

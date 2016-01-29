@@ -8,6 +8,7 @@
 #include <utils/common/connective.h>
 
 // TODO: #ynikitenkov Move caching from QnWorkbenchHandler to this class
+
 class QnWorkbenchBookmarksWatcher : public Connective<QObject>
 {
     Q_OBJECT
@@ -24,6 +25,8 @@ public:
 
     virtual ~QnWorkbenchBookmarksWatcher();
 
+    //
+
 signals:
     void firstBookmarkUtcTimeMsChanged();
 
@@ -37,5 +40,4 @@ private:
     const QnCameraBookmarksQueryPtr m_minBookmarkTimeQuery;
 
     qint64 m_firstBookmarkUtcTimeMs;
-
 };

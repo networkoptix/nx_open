@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>hdwitness</artifactId>
     <packaging>pom</packaging>
@@ -114,14 +114,16 @@
         <compiler.arguments />
 
         <libdir>${root.dir}/build_environment/target</libdir>
+        <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}/${box}/${build.configuration}</qt.path>
+        <qt.dir>${environment.dir}/${qt.path}</qt.dir>
         <ClientHelpSourceDir>${environment.dir}/help/${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}/${customization}</ClientHelpSourceDir>
         <ClientBgSourceDir>${libdir}/backgrounds</ClientBgSourceDir>
         <ClientVoxSourceDir>${environment.dir}/festival.vox/lib</ClientVoxSourceDir>
         <unpack.skip>false</unpack.skip>
         <resources.phase>generate-sources</resources.phase>
-        <qt.version>5.2.1-SNAPSHOT</qt.version>
+        <qt.version>5.2.1</qt.version>
         <ffmpeg.version>0.11.4-SNAPSHOT</ffmpeg.version>
-        <openssl.version>1.0.0j-custom-SNAPSHOT</openssl.version>
+        <openssl.version>1.0.2e-SNAPSHOT</openssl.version>
         <openldap.version>2.4.42-SNAPSHOT</openldap.version>
         <sasl2.version>2.1.26-SNAPSHOT</sasl2.version>
         <protobuf.version>2.5.0-SNAPSHOT</protobuf.version>
@@ -160,7 +162,7 @@
         <qtlib16>Qml</qtlib16>
         <qtlib17>Positioning</qtlib17>
         <qtlib18>Sensors</qtlib18>
-        <!--qtlib19 is for desktop only-->
+        <!-- qtlib19 is replaced with DBus in the client profile -->
         <qtlib19></qtlib19>
         <qtlib20>XmlPatterns</qtlib20>
 
@@ -427,7 +429,7 @@
                 <module>wixsetup</module>
             </modules>
             <properties>
-                <qt.dir>${libdir}/${arch}</qt.dir>
+                <qt.path>artifacts/qt/${qt.version}/${platform}/${arch}</qt.path>
                 <environment.dir>${env.ENVIRONMENT}</environment.dir>
                 <init.python.dir>${environment.dir}/python/${arch}</init.python.dir>
                 <python.dir>${libdir}/${arch}/python/scripts</python.dir>
@@ -534,7 +536,6 @@
                 <python.executable>python2</python.executable>
                 <python.virtualenv>virtualenv2</python.virtualenv>
                 <buildenv.script>get_buildenv.sh</buildenv.script>
-                <qt.dir>${libdir}</qt.dir>
                 <common.platform>unix</common.platform>
                 <compiler>gcc</compiler>
                 <profile.classifier>${platform}-${arch}</profile.classifier>
@@ -892,7 +893,7 @@
                 </property>               
             </activation>
             <properties>
-                <qt.version>5.5.1-SNAPSHOT</qt.version>
+                <qt.version>5.5.1</qt.version>
                 <compile.options/>
             </properties>            
             <modules>

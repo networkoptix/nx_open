@@ -7,6 +7,7 @@
 #include <business/actions/recording_business_action.h>
 #include <business/actions/sendmail_business_action.h>
 #include <business/actions/common_business_action.h>
+#include <business/actions/bookmark_business_action.h>
 
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -71,14 +72,14 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
         case QnBusiness::CameraRecordingAction:     return QnAbstractBusinessActionPtr(new QnRecordingBusinessAction(runtimeParams));
         case QnBusiness::PanicRecordingAction:      return QnAbstractBusinessActionPtr(new QnPanicBusinessAction(runtimeParams));
         case QnBusiness::SendMailAction:            return QnAbstractBusinessActionPtr(new QnSendMailBusinessAction(runtimeParams));
-        
-        case QnBusiness::BookmarkAction:
+        case QnBusiness::BookmarkAction:            return QnAbstractBusinessActionPtr(new QnBookmarkBusinessAction(runtimeParams));
+
         case QnBusiness::ExecutePtzPresetAction:
         case QnBusiness::ShowTextOverlayAction:
         case QnBusiness::ShowOnAlarmLayoutAction:
-            break; 
+            break;
 
-        default: 
+        default:
             Q_ASSERT_X(false, Q_FUNC_INFO, "All action types must be handled.");
             break;
     }

@@ -5,7 +5,11 @@
 // DO NOT INCLUDE THIS FILE UNLESS YOU KNOW WHAT ARE YOU DOING
 
 #include "api_fwd.h"
+
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/seq/to_tuple.hpp>
+#endif
+
 #include <utils/common/model_functions.h>
 
 
@@ -23,7 +27,7 @@ inline void serialize_field(const ec2::ApiPeerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiRuntimeData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiPeerAliveData &, QVariant *) { return; }
 inline void serialize_field(const ec2::QnTranState &, QVariant *) { return; }
-inline void serialize_field(const ec2::ApiModuleData &, QVariant *) { return; }
+inline void serialize_field(const ec2::ApiDiscoveredServerData &, QVariant *) { return; }
 inline void serialize_field(const ec2::ApiClientInfoData &, QVariant *) { return; }
 
 template<class T, class Allocator>

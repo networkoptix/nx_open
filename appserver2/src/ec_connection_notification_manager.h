@@ -22,6 +22,7 @@ namespace ec2
     class QnBusinessEventNotificationManager;
     class QnLayoutNotificationManager;
     class QnVideowallNotificationManager;
+    class QnWebPageNotificationManager;
     class QnStoredFileNotificationManager;
     class QnUpdatesNotificationManager;
     class QnMiscNotificationManager;
@@ -43,6 +44,7 @@ namespace ec2
             QnBusinessEventNotificationManager* businessEventManager,
             QnLayoutNotificationManager* layoutManager,
             QnVideowallNotificationManager* videowallManager,
+            QnWebPageNotificationManager *webPageManager,
             QnStoredFileNotificationManager* storedFileManager,
             QnUpdatesNotificationManager* updatesManager,
             QnMiscNotificationManager* miscManager,
@@ -57,6 +59,7 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiCameraAttributesDataList>& tran );
         void triggerNotification( const QnTransaction<ApiBusinessActionData>& tran );
         void triggerNotification( const QnTransaction<ApiVideowallData>& tran );
+        void triggerNotification( const QnTransaction<ApiWebPageData>& tran );
         void triggerNotification( const QnTransaction<ApiIdData>& tran );
         void triggerNotification( const QnTransaction<ApiIdDataList>& tran );
         void triggerNotification( const QnTransaction<ApiMediaServerData>& tran );
@@ -84,8 +87,8 @@ namespace ec2
         void triggerNotification( const QnTransaction<ApiUpdateInstallData>& tran );
         void triggerNotification( const QnTransaction<ApiUpdateUploadData>& tran );
         void triggerNotification( const QnTransaction<ApiUpdateUploadResponceData>& tran );
-        void triggerNotification( const QnTransaction<ApiModuleData>& tran );
-        void triggerNotification( const QnTransaction<ApiModuleDataList>& tran );
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerData> &tran );
+        void triggerNotification(const QnTransaction<ApiDiscoveredServerDataList> &tran );
         void triggerNotification( const QnTransaction<ApiDiscoveryData>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoveryDataList>& tran );
         void triggerNotification( const QnTransaction<ApiDiscoverPeerData>& tran );
@@ -128,6 +131,7 @@ namespace ec2
         QnBusinessEventNotificationManager* m_businessEventManager;
         QnLayoutNotificationManager* m_layoutManager;
         QnVideowallNotificationManager* m_videowallManager;
+        QnWebPageNotificationManager *m_webPageManager;
         QnStoredFileNotificationManager* m_storedFileManager;
         QnUpdatesNotificationManager* m_updatesManager;
         QnMiscNotificationManager* m_miscManager;

@@ -10,7 +10,9 @@
 #include <memory>
 #include <atomic>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <utils/common/singleton.h>
 

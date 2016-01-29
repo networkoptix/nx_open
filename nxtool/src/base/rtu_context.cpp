@@ -3,17 +3,16 @@
 
 #include <version.h>
 
+#include <base/constants.h>
 #include <base/selection.h>
 #include <base/servers_finder.h>
 #include <base/changes_manager.h>
 #include <base/apply_changes_task.h>
-#include <models/time_zones_model.h>
-#include <models/ip_settings_model.h>
 #include <models/changes_progress_model.h>
 #include <models/servers_selection_model.h>
 
 #include <helpers/time_helper.h>
-#include <helpers/rest_client.h>
+#include <nx/mediaserver/api/client.h>
 #include <helpers/itf_helpers.h>
 
 class rtu::RtuContext::Impl : public QObject
@@ -22,11 +21,11 @@ public:
     Impl(RtuContext *parent);
 
     virtual ~Impl();
-    
+
     rtu::ServersSelectionModel *selectionModel();
-    
+
     rtu::ChangesManager *changesManager();
-    
+
     ApplyChangesTask *progressTask();
 
     void showProgressTask(const ApplyChangesTaskPtr &task);
@@ -38,15 +37,15 @@ public:
     void removeProgressTask(int index);
 
     ///
-    
+
     void setCurrentPage(rtu::Constants::Pages pageId);
-    
+
     bool showWarnings() const;
 
     void setShowWarnings(bool show);
 
     rtu::Constants::Pages currentPage() const;
-    
+
     Selection *selection() const;
 
 private:
@@ -54,7 +53,7 @@ private:
 
     rtu::RtuContext * const m_owner;
     rtu::ServersSelectionModel * const m_selectionModel;
-    
+
     SelectionPointer m_selection;
     const rtu::ServersFinder::Holder m_serversFinder;
     rtu::ChangesManager * const m_changesManager;
@@ -108,13 +107,14 @@ rtu::RtuContext::Impl::Impl(RtuContext *parent)
         , m_selectionModel, &ServersSelectionModel::unknownRemoved);
     QObject::connect(m_serversFinder.data(), &ServersFinder::serverDiscovered
         , m_selectionModel, &ServersSelectionModel::serverDiscovered);
- 
-    QObject::connect(RestClient::instance(), &RestClient::accessMethodChanged
-        , [this](const QUuid &id, bool byHttp) { m_selectionModel->changeAccessMethod(id, byHttp); });
+
+    typedef nx::mediaserver::api::Client Client;
+    QObject::connect(&Client::instance(), &Client::accessMethodChanged,
+        m_selectionModel, &ServersSelectionModel::changeAccessMethod);
 }
 
 rtu::RtuContext::Impl::~Impl()
-{   
+{
 }
 
 rtu::ServersSelectionModel *rtu::RtuContext::Impl::selectionModel()
@@ -203,7 +203,7 @@ void rtu::RtuContext::Impl::setCurrentPage(rtu::Constants::Pages pageId)
 {
     if (m_currentPageIndex == pageId)
         return;
-    
+
     m_currentPageIndex = pageId;
 
     emit m_owner->currentPageChanged();
@@ -318,7 +318,7 @@ QDateTime rtu::RtuContext::applyTimeZone(const QDate &date
     {
         return QDateTime(date, time);
     }
-    
+
     return convertDateTime(date, time, prevTimeZone, nextTimeZone).toLocalTime();
 }
 
@@ -326,7 +326,7 @@ void rtu::RtuContext::tryLoginWith(const QString &primarySystem
     , const QString &password)
 {
     return m_impl->selectionModel()->tryLoginWith(primarySystem, password
-        , [this, primarySystem]() 
+        , [this, primarySystem]()
     {
         emit this->loginOperationFailed(primarySystem);
     });

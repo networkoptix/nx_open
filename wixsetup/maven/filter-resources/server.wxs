@@ -39,6 +39,13 @@
                         <RegistryValue Type="string" Name="systemName" Value="[SYSTEM_NAME]"/>
                         <RegistryValue Type="string" Name="port" Value="[SERVER_PORT]"/>
                         <RegistryValue Type="string" Name="cameraSettingsOptimization" Value="[ALLOW_CAMERA_CHANGES]"/>
+                    </RegistryKey>
+                </Component>
+
+                <Component Id="ServerConfigurationStatisticsFlag">
+                    <Condition>STATISTICS_REPORT_ALLOWED</Condition>
+
+                    <RegistryKey Root="HKLM" Key="Software\[Manufacturer]\${mediaserver.name}">
                         <RegistryValue Type="string" Name="statisticsReportAllowed" Value="[STATISTICS_REPORT_ALLOWED]"/>
                     </RegistryKey>
                 </Component>
@@ -205,6 +212,7 @@
 
             <ComponentRef Id="dbsync221versionpy"/>
             <ComponentRef Id='ServerConfiguration'/>
+            <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>
 
             <ComponentRef Id="ServerExecutable" />

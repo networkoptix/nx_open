@@ -6,6 +6,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/webpage_resource.h>
 
 #include <media_server/server_update_tool.h>
 #include <media_server/settings.h>
@@ -21,6 +22,7 @@
 #include "nx_ec/data/api_connection_data.h"
 #include "api/app_server_connection.h"
 #include "network/router.h"
+#include <network/module_finder.h>
 
 #include <utils/common/app_info.h>
 #include "core/resource/storage_resource.h"
@@ -44,8 +46,9 @@ void QnServerMessageProcessor::updateResource(const QnResourcePtr &resource)
     const bool isVideowall = dynamic_cast<const QnVideoWallResource*>(resource.data()) != nullptr;
     const bool isStorage = dynamic_cast<const QnStorageResource*>(resource.data()) != nullptr;
     const bool isLayout = !resource.dynamicCast<QnLayoutResource>().isNull();
+    const bool isWebPage = !resource.dynamicCast<QnWebPageResource>().isNull();
 
-    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout)
+    if (!isServer && !isCamera && !isUser && !isVideowall && !isStorage && !isLayout && !isWebPage)
         return;
 
     //storing all servers' cameras too
@@ -149,6 +152,9 @@ void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData
         res->setStatus(Qn::Online);
     else
         m_delayedOnlineStatus << data.peer.id;
+
+    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+        moduleFinder->setModuleStatus(data.peer.id, Qn::Online);
 }
 
 void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
@@ -163,6 +169,9 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
         }
     }
     m_delayedOnlineStatus.remove(data.peer.id);
+
+    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+        moduleFinder->setModuleStatus(data.peer.id, Qn::Offline);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus status)
@@ -227,6 +236,9 @@ void QnServerMessageProcessor::at_remotePeerUnauthorized(const QnUuid& id)
     QnResourcePtr mServer = qnResPool->getResourceById(id);
     if (mServer)
         mServer->setStatus(Qn::Unauthorized);
+
+    if (QnModuleFinder *moduleFinder = QnModuleFinder::instance())
+        moduleFinder->setModuleStatus(id, Qn::Unauthorized);
 }
 
 bool QnServerMessageProcessor::canRemoveResource(const QnUuid& resourceId)

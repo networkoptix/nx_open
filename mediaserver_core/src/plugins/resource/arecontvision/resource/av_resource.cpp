@@ -10,6 +10,7 @@
 
 #include <memory>
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/concurrent.h>
 #include <utils/common/log.h>
@@ -781,7 +782,7 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 bool QnPlAreconVisionResource::isRTSPSupported() const
 {
     return isH264() &&
-           qnCommon->isArecontRTSPEnabled() &&
+           QnGlobalSettings::instance()->arecontRtspEnabled() &&
            qnCommon->dataPool()->data(toSharedPointer(this)).
                value<bool>(lit("isRTSPSupported"), true);
 }

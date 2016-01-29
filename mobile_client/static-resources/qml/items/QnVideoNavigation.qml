@@ -253,6 +253,8 @@ Item {
                     enabled: timeline.startBound > 0
                     opacity: enabled ? 1.0 : 0.15
                     onClicked: {
+                        calendarLoader.active = true
+                        var calendarPanel = calendarLoader.item
                         calendarPanel.date = timeline.positionDate
                         calendarPanel.show()
                     }
@@ -380,13 +382,19 @@ Item {
         height: navigationPanel.height
     }
 
-    QnCalendarPanel {
-        id: calendarPanel
+    Loader {
+        id: calendarLoader
 
+        active: false
+
+        sourceComponent: QnCalendarPanel
+        {
         chunkProvider: chunkProvider
-        onDatePicked: {
-            hide()
-            mediaPlayer.seek(date.getTime())
+            onDatePicked:
+            {
+                hide()
+                mediaPlayer.seek(date.getTime())
+            }
         }
     }
 

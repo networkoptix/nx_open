@@ -39,7 +39,8 @@ public:
     void addParamType(const QString& name, const QString& defaultValue);
     bool hasParam(const QString& name) const;
 
-    const ParamTypeMap& paramTypeList() const;
+    const ParamTypeMap& paramTypeListUnsafe() const;
+    const ParamTypeMap paramTypeList() const;
 
     QString defaultValue(const QString& key) const;
 private:
@@ -66,6 +67,10 @@ public:
     typedef QMap<QnUuid, QnResourceTypePtr> QnResourceTypeMap;
 
     static const QString desktopCameraTypeName;
+    static const QString kLayoutTypeId;
+    static const QString kServerTypeId;
+    static const QString kVideoWallTypeId;
+    static const QString kWebPageTypeId;
 
     static QnResourceTypePool *instance();
 

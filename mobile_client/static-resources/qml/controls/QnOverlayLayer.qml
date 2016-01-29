@@ -1,5 +1,7 @@
 import QtQuick 2.4
 
+import "../main.js" as Main
+
 Item {
     id: overlayLayer
 
@@ -40,7 +42,7 @@ Item {
         if (!blocking)
             return
 
-        if (event.key === Qt.Key_Back) {
+        if (Main.keyIsBack(event.key)) {
             if (visible) {
                 overlayLayer.closeRequested()
                 event.accepted = true

@@ -54,10 +54,14 @@ void QnClientVideoCameraExportTool::stop() {
     m_camera->stopExport();
 }
 
-void QnClientVideoCameraExportTool::at_camera_exportFinished(int status, const QString &filename) {
+void QnClientVideoCameraExportTool::at_camera_exportFinished(
+    const QnStreamRecorder::ErrorStruct &status,
+    const QString                       &filename
+) 
+{
     Q_UNUSED(filename)
-    m_status = status;
-    finishExport(status == QnClientVideoCamera::NoError);
+    m_status = status.lastError;
+    finishExport(status.lastError == QnClientVideoCamera::NoError);
 }
 
 void QnClientVideoCameraExportTool::at_camera_exportStopped() {

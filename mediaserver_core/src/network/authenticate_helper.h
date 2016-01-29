@@ -2,6 +2,7 @@
 #define __QN_AUTH_HELPER__
 
 #include <map>
+#include <tuple>
 
 #include <QAuthenticator>
 #include <QtCore/QMap>
@@ -18,6 +19,11 @@
 #include "utils/network/auth_restriction_list.h"
 
 #include "ldap/ldap_manager.h"
+#include "network/auth/abstract_nonce_provider.h"
+#include "network/auth/abstract_user_data_provider.h"
+
+
+#define USE_USER_RESOURCE_PROVIDER
 
 
 struct QnLdapDigestAuthContext;
@@ -38,8 +44,6 @@ public:
     //!Authenticates request on server side
     Qn::AuthResult authenticate(const nx_http::Request& request, nx_http::Response& response, bool isProxy = false, QnUuid* authUserId = 0, AuthMethod::Value* usedAuthMethod = 0);
     
-    Qn::AuthResult authenticate(const QString& login, const QByteArray& digest) const;
-
     QnAuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
@@ -55,9 +59,11 @@ public:
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
+#ifndef USE_USER_RESOURCE_PROVIDER
 private slots:
     void at_resourcePool_resourceAdded(const QnResourcePtr &);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &);
+#endif
 
 private:
     class TempAuthenticationKeyCtx
@@ -104,35 +110,43 @@ private:
     void addAuthHeader(
         nx_http::Response& responseHeaders,
         const QnUserResourcePtr& userRes,
-        bool isProxy );
-    QByteArray getNonce();
-    bool isNonceValid(const QByteArray& nonce);
-    Qn::AuthResult doDigestAuth(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, bool isProxy, QnUuid* authUserId, char delimiter, 
-                      std::function<bool(const QByteArray&)> checkNonceFunc, QnUserResourcePtr* const outUserResource = nullptr);
-    Qn::AuthResult doBasicAuth(const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
+        bool isProxy,
+        bool isDigest = true);
+    Qn::AuthResult doDigestAuth(
+        const QByteArray& method,
+        const nx_http::header::Authorization& authorization,
+        nx_http::Response& responseHeaders,
+        bool isProxy,
+        QnUuid* authUserId,
+        QnUserResourcePtr* const outUserResource = nullptr);
+    Qn::AuthResult doBasicAuth(
+        const QByteArray& method,
+        const nx_http::header::Authorization& authorization,
+        nx_http::Response& responseHeaders,
+        QnUuid* authUserId);
     Qn::AuthResult doCookieAuthorization(const QByteArray& method, const QByteArray& authData, nx_http::Response& responseHeaders, QnUuid* authUserId);
 
     mutable QnMutex m_mutex;
     static QnAuthHelper* m_instance;
-    //QMap<QByteArray, QElapsedTimer> m_nonces;
+#ifndef USE_USER_RESOURCE_PROVIDER
     QMap<QnUuid, QnUserResourcePtr> m_users;
     QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
+#endif
     QnAuthMethodRestrictionList m_authMethodRestrictionList;
-
-    //map<nonce, nonce creation timestamp usec>
-    QMap<qint64, qint64> m_cookieNonceCache;
-    mutable QnMutex m_cookieNonceCacheMutex;
-
-    QCache<QByteArray, QElapsedTimer> m_digestNonceCache;
-    mutable QnMutex m_nonceMtx;
-
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
+    std::unique_ptr<AbstractNonceProvider> m_nonceProvider;
+    std::unique_ptr<AbstractUserDataProvider> m_userDataProvider;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     /*!
         \param authDigest base64(username : nonce : MD5(ha1, nonce, MD5(METHOD :)))
     */
-    Qn::AuthResult authenticateByUrl( const QByteArray& authRecord, const QByteArray& method, QnUuid* authUserId, std::function<bool(const QByteArray&)> checkNonceFunc) const;
+    Qn::AuthResult authenticateByUrl(
+        const QByteArray& authRecord,
+        const QByteArray& method,
+        nx_http::Response& response,
+        QnUuid* authUserId,
+        QnUserResourcePtr* const outUserResource = nullptr) const;
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
     void applyClientCalculatedPasswordHashToResource(
         const QnUserResourcePtr& userResource,

@@ -321,7 +321,8 @@ public:
                     // not data to process left
                     m_owner->updateCameraHistory();
                     m_owner->setRebuildInfo(QnStorageScanData(Qn::RebuildState_None, QString(), 0.0, 0.0));
-                    if (fullscanProcessed) {
+                    if (fullscanProcessed) 
+                    {
                         if (!QnResource::isStopping())
                             ArchiveScanPosition::reset(m_owner->m_role); // do not reset position if server is going to restart
                         if (!m_fullScanCanceled)
@@ -389,7 +390,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
-    m_firstStorageTestDone(false)
+    m_firstStoragesTestDone(false)
 {
     m_storageDbPoolRef = qnStorageDbPool->create();
 
@@ -1575,7 +1576,7 @@ QSet<QnStorageResourcePtr> QnStorageManager::getWritableStorages() const
 
 void QnStorageManager::testStoragesDone()
 {
-    m_firstStorageTestDone = true;
+    m_firstStoragesTestDone = true;
     ArchiveScanPosition rebuildPos(m_role);
     rebuildPos.load();
     if (!rebuildPos.isEmpty())
@@ -1786,8 +1787,19 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
         result = storagesInfo[dis(gen)].storage;
     }
 
+    auto hasFastScanned = [this]
+    {
+        auto allStorages = getAllStorages();
+        for (auto it = allStorages.cbegin(); it != allStorages.cend(); ++it)
+        {
+            if (it.value()->hasFlags(Qn::storage_fastscan))
+                return true;
+        }
+        return false;
+    };
+
     if (!result) {
-        if (!m_warnSended && m_firstStorageTestDone) {
+        if (!m_warnSended && !hasFastScanned() && m_firstStoragesTestDone) {
             if (m_role == QnServer::StoragePool::Normal)
             {   // 'noStorageAvailbale' signal results in client notification.
                 // For backup storages No Available Storage error is translated to

@@ -35,7 +35,7 @@ namespace Qn
     Q_GADGET
     Q_ENUMS(Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
             PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent ItemDataRole
-            ConnectionRole ResourceStatus
+            ConnectionRole ResourceStatus BitratePerGopType
             StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
             BookmarkSearchStrategy
             ServerFlag BackupType CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
@@ -278,6 +278,7 @@ public:
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
 
+    //TODO: #GDM split to server-only and client-only flags as they are always local
     enum ResourceFlag {
         network                     = 0x1,          /**< Has ip and mac. */
         url                         = 0x2,          /**< Has url, e.g. file name. */
@@ -311,7 +312,7 @@ public:
 
         depend_on_parent_status     = 0x1000000,    /**< Resource status depend on parent resource status */
         search_upd_only             = 0x2000000,    /**< Disable to insert new resource during discovery process, allow update only */
-        io_module                   = 0x4000000,    /**< It's IO module camera (camera subtype) */
+        io_module                   = 0x4000000,    /**< It's I/O module camera (camera subtype) */
         read_only                   = 0x8000000,    /**< Resource is read-only by design, e.g. server in safe mode. */
 
         storage_fastscan            = 0x10000000,   /**< Fast scan for storage in progress */
@@ -327,8 +328,10 @@ public:
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        ARCHIVE = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        SINGLE_SHOT = url | local | media | still_image | streamprovider    /**< Local still image file. */
+        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+
+        web_page = url | remote,   /**< Web-page resource */
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -357,6 +360,7 @@ public:
         BPG_Predefined,
         BPG_User
     };
+    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BitratePerGopType)
 
     // TODO: #Elric #EC2 talk to Roma, write comments
     enum ServerFlag {
@@ -552,6 +556,7 @@ public:
         UrlRole,                                    /**< Role for target url. Used in BrowseUrlAction and ConnectAction. */
         ForceRole,                                  /**< Role for 'forced' flag. Used in DisconnectAction */
         CameraBookmarkRole,                         /**< Role for the selected camera bookmark (if any). Used in Edit/RemoveCameraBookmarkAction */
+        CameraBookmarkListRole,                     /**< Role for the list of bookmarks. Used in RemoveBookmarksAction */
         BookmarkTagRole,                            /**< Role for bookmark tag. Used in OpenBookmarksSearchAction */
         UuidRole,                                   /**< Role for target uuid. Used in LoadVideowallMatrixAction. */
         KeyboardModifiersRole,                      /**< Role for keyboard modifiers. Used in some Drop actions. */
@@ -738,11 +743,23 @@ public:
         LC_Count
     };
 
+
     /** Strategy of the bookmarks search. Used when we are limiting request result size by a fixed number. */
-    enum BookmarkSearchStrategy {
-        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
-        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
-        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+
+//    enum BookmarkSearchStrategy {
+//        EarliestFirst,  /*< Standard way: select bookmarks by time in direct order. */
+//        LatestFirst,    /*< Select bookmarks by time in reverse order so the latest bookmarks will be returned. */
+//        LongestFirst    /*< Select bookmarks by length. The longest bookmarks will be returned. */
+//    };
+
+    // All columns are sorted by database initially, except camera name and tags.
+    enum BookmarkSortField
+    {
+        BookmarkName
+        , BookmarkStartTime
+        , BookmarkDuration
+        , BookmarkTags          // Sorted manually!
+        , BookmarkCameraName    // Sorted manually!
     };
 
     /**
@@ -871,9 +888,9 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)
         (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)
+        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
         (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSearchStrategy)
+        (Qn::BookmarkSortField)(Qt::SortOrder)
         (Qn::RebuildAction)(Qn::BackupAction)
         (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
         (Qn::FailoverPriority)

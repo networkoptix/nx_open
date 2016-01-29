@@ -19,6 +19,7 @@ IMPROVEMENTS
     Implemented "Advanced" Settings for DWC-BVI2IR cameras - VMS-415
     Better support of ISD Panzilla cameras - VMS-1465, VMS-936, VMS-1351
     Vista VK2-1080XVRDPTPMF camera is mapped for advanced PTZ - VISTA-76
+*   PTZ improvements for camera ACTi PTZ Dome I98 - VISTA-80
     Arecont RTSP camera support - VMS-1166
     Digital I/O support for Arecont cameras - VMS-1343
     Added "Connect" button to the "Connection Test" dialog - VMS-263

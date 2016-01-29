@@ -39,7 +39,8 @@ angular.module('webadminApp')
             smtpTimeout: {label:"SMTP timeout", type:"number"},
             smptPassword: {label:"SMTP password", type:"text"},
             smtpUser: {label:"SMTP user", type:"text"},
-            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"}
+            updateNotificationsEnabled: {label:"Update notifications enabled", type:"checkbox"},
+            arecontRtspEnabled: {label:"Arecont RTSP Enabled", type:"checkbox"}
         };
 
         mediaserver.systemSettings().then(function(r){
@@ -167,7 +168,7 @@ angular.module('webadminApp')
 
                     _.each($scope.storages,function(storageinfo){
                         var storageToUpdate = _.findWhere(info.storages, {id: storageinfo.storageId});
-                        if(storageToUpdate!==null) {
+                        if(storageToUpdate) {
                             storageToUpdate.spaceLimit = storageinfo.reservedSpace;
                             storageToUpdate.usedForWriting = storageinfo.isUsedForWriting;
                         }

@@ -3,7 +3,9 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include <QtCore/QByteArray>
 #include <QtCore/QMap>
@@ -33,6 +35,7 @@ private:
     bool m_builtinSpsFound;
     bool m_builtinPpsFound;
     bool m_keyDataExists;
+    bool m_idrFound;
     bool m_frameExists;
     quint16 m_firstSeqNum;
     quint16 m_packetPerNal;
@@ -47,11 +50,11 @@ private:
     QnCompressedVideoDataPtr createVideoData(
         const quint8            *rtpBuffer,
         quint32                 rtpTime,
-        const RtspStatistic     &statistics
+        const QnRtspStatistic     &statistics
     );
 
     bool clearInternalBuffer(); // function always returns false to convenient exit from main routine
-    void updateNalFlags(int nalUnitType);
+    void updateNalFlags(int nalUnitType, const quint8* data, int dataLen);
     int getSpsPpsSize() const;
 };
 

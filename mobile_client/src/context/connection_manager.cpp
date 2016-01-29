@@ -22,7 +22,7 @@ namespace {
 
     const QnSoftwareVersion minimalSupportedVersion(2, 5, 0, 0);
 
-    enum { invalidHandle = -1 };
+    enum { kInvalidHandle = -1 };
 
     bool isCompatibleProducts(const QString &product1, const QString &product2) {
         return  product1.isEmpty() ||
@@ -78,6 +78,9 @@ QnConnectionManager::State QnConnectionManager::connectionState() const {
     if (d->suspended)
         return Suspended;
 
+    if (d->connectionHandle != kInvalidHandle)
+        return Connecting;
+
     switch (qnClientMessageProcessor->connectionState()) {
     case QnConnectionState::Connecting:
     case QnConnectionState::Reconnecting:
@@ -111,6 +114,14 @@ void QnConnectionManager::connectToServer(const QUrl &url) {
 void QnConnectionManager::disconnectFromServer(bool force) {
     Q_D(QnConnectionManager);
 
+    if (d->connectionHandle != kInvalidHandle)
+    {
+        d->connectionHandle = kInvalidHandle;
+        d->url = QUrl();
+        emit connectionStateChanged();
+        return;
+    }
+
     d->doDisconnect(force);
 
     d->url = QUrl();
@@ -127,7 +138,7 @@ QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager *pare
     , q_ptr(parent)
     , suspended(false)
     , suspendTimer(new QTimer(this))
-    , connectionHandle(invalidHandle)
+    , connectionHandle(kInvalidHandle)
 {
     enum { suspendInterval = 2 * 60 * 1000 };
     suspendTimer->setInterval(suspendInterval);
@@ -181,13 +192,16 @@ void QnConnectionManagerPrivate::doConnect() {
     connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
         url, ec2::ApiClientInfoData(), result, &QnEc2ConnectionRequestResult::processEc2Reply);
 
+    Q_Q(QnConnectionManager);
+    emit q->connectionStateChanged();
+
     connect(result, &QnEc2ConnectionRequestResult::replyProcessed, this, [this, result]() {
         result->deleteLater();
 
         if (connectionHandle != result->handle())
             return;
 
-        connectionHandle = invalidHandle;
+        connectionHandle = kInvalidHandle;
 
         ec2::ErrorCode errorCode = ec2::ErrorCode(result->status());
 
@@ -209,6 +223,7 @@ void QnConnectionManagerPrivate::doConnect() {
         Q_Q(QnConnectionManager);
 
         if (status != QnConnectionManager::Success) {
+            emit q->connectionStateChanged();
             emit q->connectionFailed(status, infoParameter);
             return;
         }

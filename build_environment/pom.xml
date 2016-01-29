@@ -3,12 +3,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>2.5.0-SNAPSHOT</version>
+        <version>2.6.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.6.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>build_environment</artifactId>
     <packaging>pom</packaging>
@@ -31,29 +31,6 @@
             <scope>system</scope>
             <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
-
-        <!-- <dependency>
-            <groupId>com.google</groupId>
-            <artifactId>protobuf</artifactId>
-            <version>${protobuf.version}</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!-- <dependency>
-            <groupId>net.sourceforge</groupId>
-            <artifactId>udt</artifactId>
-            <version>4.11-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${profile.classifier}-${additional.compiler}</classifier>
-        </dependency> -->
-        <!--
-        <dependency>
-            <groupId>com.nokia.qt.addons</groupId>
-            <artifactId>qtcolorpicker</artifactId>
-            <version>2.6.1-SNAPSHOT</version>
-            <type>tar.gz</type>
-            <classifier>${platform}</classifier>
-        </dependency>                      -->
     </dependencies>
 
     <profiles>
@@ -133,6 +110,10 @@
                                         <exec dir="${environment.dir}" executable="${environment.dir}/${buildenv.script}" failifexecutionfails="true">
                                             <arg line="${arch} ${toolchain.version} noqt4 qt542"/>
                                         </exec>
+                                        <chmod file="${project.build.directory}/update_artifacts.${script.extension}" perm="755"/>
+                                        <exec dir="${environment.dir}" executable="${project.build.directory}/update_artifacts.${script.extension}" failifexecutionfails="true">
+                                            <arg line=""/>
+                                        </exec>                                        
                                     </target>
                                     <skip>${rsync.skip}</skip>
                                 </configuration>
@@ -219,7 +200,7 @@
                     <type>tar.gz</type>
                     <classifier>${platform}-x64</classifier>
                 </dependency>
-                <dependency>
+                <!-- <dependency>
                     <groupId>com.digia</groupId>
                     <version>${qt.version}</version>
                     <artifactId>qt</artifactId>
@@ -232,7 +213,7 @@
                     <artifactId>qt</artifactId>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-x64${compile.options}</classifier>
-                </dependency>
+                </dependency> -->
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>
@@ -300,7 +281,7 @@
         </profile>
         <profile>
             <!-- Common Profile for Linux (PC / ARM), Mac -->
-            <id>unix</id>
+            <!-- <id>unix</id>
             <activation>
                 <os>
                     <family>unix</family>
@@ -314,7 +295,7 @@
                     <type>tar.gz</type>
                     <classifier>${qt.classifier}${compile.options}</classifier>
                 </dependency>
-            </dependencies>
+            </dependencies> -->
         </profile>
         <profile>
             <id>desktop</id>
@@ -663,14 +644,7 @@
                     <version>${openldap.version}</version>
                     <type>tar.gz</type>
                     <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
-                <dependency>
-                    <groupId>org.cyrus</groupId>
-                    <artifactId>sasl2</artifactId>
-                    <version>${sasl2.version}</version>
-                    <type>tar.gz</type>
-                    <classifier>${profile.classifier}-${compiler}</classifier>
-                </dependency>            
+                </dependency>                     
                 <dependency>
                     <groupId>org.openssl</groupId>
                     <artifactId>openssl</artifactId>

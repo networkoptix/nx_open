@@ -65,7 +65,7 @@ void QnClientPullMediaStreamProvider::run()
         {
             setNeedKeyData();
             mFramesLost++;
-            m_stat[0].onData(0);
+            m_stat[0].onData(0, false);
             m_stat[0].onEvent(CL_STAT_FRAME_LOST);
 
             if (mFramesLost % MAX_LOST_FRAME == 0) // if we lost MAX_LOST_FRAME frames => connection is lost for sure 
@@ -135,9 +135,12 @@ void QnClientPullMediaStreamProvider::run()
         QnLiveStreamProvider* lp = dynamic_cast<QnLiveStreamProvider*>(this);
         if (videoData)
         {
-            m_stat[videoData->channelNumber].onData(static_cast<unsigned int>(videoData->dataSize()));
+            m_stat[videoData->channelNumber].onData(
+                static_cast<unsigned int>(videoData->dataSize()),
+                videoData->flags & AV_PKT_FLAG_KEY);
+
             if (lp)
-                lp->onGotVideoFrame(videoData, getLiveParams(), false);
+                lp->onGotVideoFrame(videoData, getLiveParams(), isCameraControlRequired());
 
         }
 

@@ -362,11 +362,10 @@ void QnResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList&
     for (QFuture<QnResourceList>::const_iterator itr = results.constBegin(); itr != results.constEnd(); ++itr)
     {
         QnResourceList foundResources = *itr;
-        for (int i = 0; i < foundResources.size(); ++i) {
-            QnSecurityCamResourcePtr camera = qSharedPointerDynamicCast<QnSecurityCamResource>(foundResources.at(i));
-            if (camera)
+        for (const QnResourcePtr &resource: foundResources) {
+            if (const QnSecurityCamResourcePtr &camera = resource.dynamicCast<QnSecurityCamResource>())
                 camera->setManuallyAdded(true);
-            resources << camera;
+            resources << resource;
         }
     }
 }
@@ -548,21 +547,25 @@ void QnResourceDiscoveryManager::fillManualCamInfo(QnManualCameraInfoMap& camera
     }
 }
 
-bool QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
+int QnResourceDiscoveryManager::registerManualCameras(const QnManualCameraInfoMap& cameras)
 {
     QnMutexLocker lock( &m_searchersListMutex );
+    int added = 0;
     for (QnManualCameraInfoMap::const_iterator itr = cameras.constBegin(); itr != cameras.constEnd(); ++itr)
     {
-        for (int i = 0; i < m_searchersList.size(); ++i)
+        for (QnAbstractResourceSearcher* searcher: m_searchersList)
         {
-            if (m_searchersList[i]->isResourceTypeSupported(itr.value().resType->getId()))
-            {
-                QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
-                inserted.value().searcher = m_searchersList[i];
-            }
+            if (!searcher->isResourceTypeSupported(itr.value().resType->getId()))
+                continue;
+
+            QnManualCameraInfoMap::iterator inserted = m_manualCameraMap.insert(itr.key(), itr.value());
+            inserted.value().searcher = searcher;
+            ++added;
+            break;
         }
     }
-    return true;
+
+    return added;
 }
 
 void QnResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& resource)

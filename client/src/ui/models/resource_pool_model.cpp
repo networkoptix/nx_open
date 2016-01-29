@@ -15,6 +15,7 @@
 #include <core/resource/media_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
@@ -68,7 +69,7 @@ namespace {
 // QnResourcePoolModel :: contructors, destructor and helpers.
 // -------------------------------------------------------------------------- //
 QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
-    base_type(parent), 
+    base_type(parent),
     QnWorkbenchContextAware(parent),
     m_urlsShown(true),
     m_scope(scope)
@@ -81,7 +82,7 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
         m_allNodes.append(m_rootNodes[t]);
     }
 
-    
+
     Qn::NodeType parentNodeType = scope == FullScope ? Qn::RootNode : Qn::BastardNode;
     Qn::NodeType rootNodeType = rootNodeTypeForScope(m_scope);
 
@@ -99,7 +100,7 @@ QnResourcePoolModel::QnResourcePoolModel(Scope scope, QObject *parent):
     connect(qnCommon,           &QnCommonModule::readOnlyChanged,                   this,   &QnResourcePoolModel::rebuildTree, Qt::QueuedConnection);
     connect(QnGlobalSettings::instance(),   &QnGlobalSettings::serverAutoDiscoveryChanged,  this,   &QnResourcePoolModel::at_serverAutoDiscoveryEnabledChanged);
 
-    QnResourceList resources = resourcePool()->getResources(); 
+    QnResourceList resources = resourcePool()->getResources();
 
     rebuildTree();
 
@@ -303,7 +304,7 @@ QnResourcePoolModelNode *QnResourcePoolModel::expectedParent(QnResourcePoolModel
         if (m_scope == CamerasScope)
             return m_rootNodes[Qn::BastardNode];
         else
-        return m_rootNodes[Qn::RootNode];
+            return m_rootNodes[Qn::RootNode];
     }
 
     QnResourcePtr parentResource = resourcePool()->getResourceById(node->resource()->getParentId());
@@ -565,7 +566,7 @@ bool QnResourcePoolModel::dropMimeData(const QMimeData *mimeData, Qt::DropAction
                 continue; /* Can drop only layout resources on user. */
 
             menu()->trigger(
-                Qn::SaveLayoutAsAction, 
+                Qn::SaveLayoutAsAction,
                 QnActionParameters(layout).
                 withArgument(Qn::UserResourceRole, user).
                 withArgument(Qn::ResourceNameRole, layout->getName())
@@ -715,7 +716,7 @@ void QnResourcePoolModel::rebuildTree() {
 
 void QnResourcePoolModel::at_snapshotManager_flagsChanged(const QnLayoutResourcePtr &resource) {
     QnVideoWallResourcePtr videowall = resource->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
-    QnResourcePoolModelNode *node = videowall 
+    QnResourcePoolModelNode *node = videowall
         ? this->node(videowall)
         : this->node(resource);
 

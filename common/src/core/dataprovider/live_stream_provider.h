@@ -67,6 +67,8 @@ public:
     // I assume this function is called once per video frame 
     bool needMetaData(); 
 
+    void onStreamReopen();
+
     virtual void onGotVideoFrame(const QnCompressedVideoDataPtr& videoData,
                                  const QnLiveStreamParams& currentLiveParams,
                                  bool isCameraControlRequired);
@@ -141,8 +143,8 @@ private:
         QSize* const newResolution,
         std::map<QString, QString>* const customStreamParams = nullptr );
     void saveMediaStreamParamsIfNeeded( const QnCompressedVideoDataPtr& videoData );
-    void saveBitrateIfNotExists( const QnCompressedVideoDataPtr& videoData,
-                                 const QnLiveStreamParams& liveParams );
+    void saveBitrateIfNeeded( const QnCompressedVideoDataPtr& videoData,
+                              const QnLiveStreamParams& liveParams );
 
 private:
     QnAbstractVideoCamera* m_owner;

@@ -60,6 +60,7 @@ QString QnStreamRecorder::errorString(int errCode) {
     case AudioStreamAllocationError:    return tr("Could not allocate output audio stream.");
     case InvalidAudioCodecError:        return tr("Invalid audio codec information.");
     case IncompatibleCodecError:        return tr("Video or audio codec is incompatible with the selected format.");
+    case FileWriteError:                return tr("File write error. Not enough free space.");
     default:                            return QString();
     }
 }
@@ -247,7 +248,10 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& nonConstData)
                 isOk = addSignatureFrame();
 
             if (isOk)
-                m_lastError = NoError;
+                m_lastError = ErrorStruct(
+                    NoError,
+                    QnStorageResourcePtr()
+                );
 
             m_recordingFinished = true;
             m_endOfData = true;
@@ -467,7 +471,35 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
             NX_LOG(QLatin1String("Timestamp error: PTS < DTS. Fixed."), cl_logWARNING);
         }
 
-        if (av_write_frame(m_recordingContextVector[i].formatCtx, &avPkt) < 0) 
+        auto startWriteTime = std::chrono::high_resolution_clock::now();
+        int ret = av_write_frame(
+            m_recordingContextVector[i].formatCtx,
+            &avPkt
+        );
+        auto endWriteTime = std::chrono::high_resolution_clock::now();
+
+        m_recordingContextVector[i].totalWriteTimeNs += 
+            std::chrono::duration_cast<std::chrono::nanoseconds>(
+                endWriteTime - startWriteTime
+            ).count();
+
+        if (m_recordingContextVector[i].formatCtx->pb->error == -1)
+        {   // pb->error == -1 means that pb->write_data returned -1
+            // (see libavformat::aviobuf.c writeout() function)
+            // that in order means that ffmpegHelper::ffmpegWritePacket returned -1
+            // that in order means that QIOdevice::writeData() implementation for example
+            // in QnBufferedFile or QnLayoutFile returned -1
+            // that in order means that disk write operation failed.
+            m_recordingFinished = true;
+            m_lastError = ErrorStruct(
+                FileWriteError,
+                m_recordingContextVector[i].storage
+            );
+            m_needStop = true;
+            return; 
+        }
+
+        if (ret < 0)  
         {
             NX_LOG(QLatin1String("AV packet write error"), cl_logWARNING);
         }
@@ -503,7 +535,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
     AVOutputFormat * outputCtx = av_guess_format(m_container.toLatin1().data(), NULL, NULL);
     if (outputCtx == 0)
     {
-        m_lastError = ContainerNotFoundError;
+        m_lastError = ErrorStruct(
+            ContainerNotFoundError,
+            QnStorageResourcePtr()
+        );
         NX_LOG(lit("No %1 container in FFMPEG library.").arg(m_container), cl_logERROR);
         return false;
     }
@@ -535,7 +570,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
         );
 
         if (err < 0) {
-            m_lastError = FileCreateError;            
+            m_lastError = ErrorStruct(
+                FileCreateError,
+                m_recordingContextVector[i].storage
+            );            
             NX_LOG(lit("Can't create output file '%1' for video recording.")
                 .arg(m_recordingContextVector[i].fileName), cl_logERROR);
 
@@ -637,7 +675,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
 
             int videoChannels = isTranscode ? 1 : layout->channelCount();
-            QnConstCompressedVideoDataPtr vd = std::dynamic_pointer_cast<const QnCompressedVideoData>(mediaData);
+            QnConstCompressedVideoDataPtr vd = 
+                std::dynamic_pointer_cast<const QnCompressedVideoData>(
+                    mediaData
+                );
             for (int j = 0; j < videoChannels && vd; ++j) 
             {
                 AVStream* videoStream = avformat_new_stream(
@@ -646,7 +687,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 );
 
                 if (videoStream == 0) {
-                    m_lastError = VideoStreamAllocationError;
+                    m_lastError = ErrorStruct(
+                        VideoStreamAllocationError,
+                        m_recordingContextVector[i].storage
+                    );
                     NX_LOG(lit("Can't allocate output stream for recording."), cl_logERROR);
                     return false;
                 }
@@ -722,7 +766,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 );
 
                 if (!audioStream) {
-                    m_lastError = AudioStreamAllocationError;
+                    m_lastError = ErrorStruct(
+                        AudioStreamAllocationError,
+                        m_recordingContextVector[i].storage
+                    );
                     NX_LOG(lit("Can't allocate output audio stream."), cl_logERROR);
                     return false;
                 }
@@ -731,7 +778,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 CodecID srcAudioCodec = CODEC_ID_NONE;
                 QnConstMediaContextPtr mediaContext = audioLayout->getAudioTrackInfo(j).codecContext;
                 if (!mediaContext) {
-                    m_lastError = InvalidAudioCodecError;
+                    m_lastError = ErrorStruct(
+                        InvalidAudioCodecError,
+                        m_recordingContextVector[i].storage
+                    );
                     NX_LOG(lit("Invalid audio codec information."), cl_logERROR);
                     return false;
                 }
@@ -765,7 +815,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             if (m_recordingContextVector[i].formatCtx->pb == 0)
             {
                 avformat_close_input(&m_recordingContextVector[i].formatCtx);
-                m_lastError = FileCreateError;
+                m_lastError = ErrorStruct(
+                    FileCreateError,
+                    m_recordingContextVector[i].storage
+                );
                 NX_LOG(lit("Can't create output file '%1'.").arg(url), cl_logERROR);
                 msleep(500); // avoid createFile flood
                 return false;
@@ -777,7 +830,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
                 m_recordingContextVector[i].formatCtx->pb = nullptr;
                 avformat_close_input(&m_recordingContextVector[i].formatCtx);
-                m_lastError = IncompatibleCodecError;
+                m_lastError = ErrorStruct(
+                    IncompatibleCodecError,
+                    m_recordingContextVector[i].storage
+                );
                 NX_LOG(lit("Video or audio codec is incompatible with %1 format. Try another format. Ffmpeg error: %2").
                     arg(m_container).arg(QnFfmpegHelper::getErrorStr(rez)), cl_logERROR);
                 return false;

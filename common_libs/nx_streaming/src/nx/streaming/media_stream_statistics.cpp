@@ -43,7 +43,7 @@ void QnMediaStreamStatistics::stop()
     m_runing = false;
 }
 
-void QnMediaStreamStatistics::onData(unsigned int datalen)
+void QnMediaStreamStatistics::onData(unsigned int datalen, bool isKeyFrame)
 {
     if (!m_runing) return; 
     QnMutexLocker locker( &m_mutex );
@@ -51,6 +51,9 @@ void QnMediaStreamStatistics::onData(unsigned int datalen)
     if (datalen)
     {
         ++m_frames;
+        if (isKeyFrame)
+            ++m_keyFrames;
+
         m_dataTotal+=datalen;
         m_connectionLost = false;
     }
@@ -119,6 +122,15 @@ float QnMediaStreamStatistics::getFrameRate() const
 int QnMediaStreamStatistics::getFrameSize() const
 {
     return getBitrateMbps()/8*1024 / getFrameRate();
+}
+
+float QnMediaStreamStatistics::getAverageGopSize() const
+{
+    QnMutexLocker locker( &m_mutex );
+    if ( m_keyFrames == 0 )
+        return 0; // didn't have any frames yet
+
+    return static_cast<float>( m_frames ) / static_cast<float>( m_keyFrames );
 }
 
 void QnMediaStreamStatistics::onBadSensor()

@@ -119,7 +119,7 @@ QMessageBox::StandardButton QnServerSettingsDialog::showConfirmationDialog() {
 
     return QMessageBox::question(this,
         tr("Server not saved"),
-        tr("Apply changes to the server %1?")
+        tr("Apply changes to server %1?")
         .arg(m_server
             ? m_server->getName()
             : QString()),

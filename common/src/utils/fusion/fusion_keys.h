@@ -1,12 +1,14 @@
 #ifndef QN_FUSION_KEYS_H
 #define QN_FUSION_KEYS_H
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/cat.hpp>
+#endif
 
 /**
  * This macro defines a new fusion key. It must be used in global namespace.
  * Defined key can then be accessed from the QnFusion namespace.
- * 
+ *
  * \param KEY                           Key to define.
  */
 #define QN_FUSION_DEFINE_KEY(KEY)                                               \
@@ -54,7 +56,7 @@ QN_FUSION_DEFINE_KEY(optional)
 #define QN_FUSION_PROPERTY_TYPE_FOR_sql_placeholder_name QString
 
 #define QN_FUSION_PROPERTY_IS_EXTENDED_FOR_setter true
-#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type())) 
+#define QN_FUSION_PROPERTY_EXTENSION_FOR_setter(KEY, VALUE) (setter, VALUE)(setter_tag, QnFusionDetail::make_access_setter_category(access_type()))
 
 #define QN_FUSION_PROPERTY_IS_TYPED_FOR_classname true
 #define QN_FUSION_PROPERTY_TYPE_FOR_classname QString
@@ -71,7 +73,7 @@ QN_FUSION_DEFINE_KEY(optional)
 
 /**
  * \internal
- * 
+ *
  * Produces a <tt>QStringLiteral</tt> from the given character literals.
  * Works around a MSVC bug that prevents us to simply use <tt>QStringLiteral("a" "b")</tt>.
  */

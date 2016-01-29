@@ -121,4 +121,4 @@ private:
 
 #endif // ENABLE_DATA_PROVIDERS
 
-#endif FFMPEG_VIDEO_DECODER_H
+#endif //FFMPEG_VIDEO_DECODER_H

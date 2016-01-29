@@ -837,9 +837,9 @@ namespace nx_http
             *dstBuffer += serializedCredentials.toBase64();
         }
 
-        bool DigestCredentials::parse( const BufferType& str )
+        bool DigestCredentials::parse( const BufferType& str, char separator )
         {
-            parseDigestAuthParams( str, &params );
+            parseDigestAuthParams( str, &params, separator );
             auto usernameIter = params.find( "username" );
             if( usernameIter != params.cend() )
                 userid = usernameIter.value();

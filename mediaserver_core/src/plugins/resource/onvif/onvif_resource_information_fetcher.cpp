@@ -317,8 +317,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(const QStri
     resource->setMAC(macAddr);
     resource->setFirmware(firmware);
 
-	resource->setPhysicalId(uniqId);
-
+    resource->setPhysicalId(uniqId);
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
@@ -357,7 +356,8 @@ QString OnvifResourceInformationFetcher::fetchSerial(const DeviceInfoResp& respo
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManufacture(const QString& manufacture)
 {
     QnPlOnvifResourcePtr resource;
-    if (manufacture.toLower().contains(QLatin1String("digital watchdog")))
+    if (manufacture.toLower().contains(QLatin1String("digital watchdog")) || 
+            manufacture.toLower().contains(QLatin1String("digitalwatchdog")))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());
     else if (manufacture.toLower() == QLatin1String("panoramic"))
         resource = QnPlOnvifResourcePtr(new QnDigitalWatchdogResource());

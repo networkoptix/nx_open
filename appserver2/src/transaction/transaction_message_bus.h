@@ -74,7 +74,7 @@ namespace ec2
         //!Blocks till connection \a connectionGuid is ready to accept new transactions
         void waitForNewTransactionsReady( const QnUuid& connectionGuid );
         void connectionFailure( const QnUuid& connectionGuid );
-        
+
         ApiPeerData localPeer() const;
 
         void start();
@@ -109,7 +109,7 @@ namespace ec2
         {
             RoutingRecord(): distance(0), lastRecvTime(0) {}
             RoutingRecord(int distance, qint64 lastRecvTime): distance(distance), lastRecvTime(lastRecvTime) {}
-            
+
             int distance;
             qint64 lastRecvTime;
         };
@@ -120,7 +120,7 @@ namespace ec2
             AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server)  {  }
             AlivePeerInfo(const ApiPeerData &peer): peer(peer) { }
             ApiPeerData peer;
-            
+
             RoutingInfo routingInfo; // key: route throw, value - distance in hops
             //QSet<QnUuid> proxyVia;
             //bool directAccess;
@@ -139,9 +139,9 @@ namespace ec2
         AlivePeersMap aliveClientPeers() const;
 
         /*
-        * Return routing information: how to access to a dstPeer. 
-        * if peer can be access directly then return same value as input. 
-        * If can't find route info then return null value. 
+        * Return routing information: how to access to a dstPeer.
+        * if peer can be access directly then return same value as input.
+        * If can't find route info then return null value.
         * Otherwise return route gateway.
         */
         QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
@@ -183,10 +183,10 @@ namespace ec2
             for (QnConnectionMap::iterator itr = m_connections.begin(); itr != m_connections.end(); ++itr)
             {
                 QnTransactionTransport* transport = *itr;
-                if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id)) 
+                if (!sendToAll && !header.dstPeers.contains(transport->remotePeer().id))
                     continue;
 
-                if (!transport->isReadyToSend(tran.command)) 
+                if (!transport->isReadyToSend(tran.command))
                     continue;
 
                 transport->sendTransaction(tran, header);
@@ -213,7 +213,7 @@ namespace ec2
 
         template <class T>
         void sendTransactionToTransport(const QnTransaction<T> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader &transportHeader);
-        
+
         template <class T>
         void gotTransaction(const QnTransaction<T> &tran, QnTransactionTransport* sender, const QnTransactionTransportHeader &transportHeader);
 
@@ -226,7 +226,7 @@ namespace ec2
         void connectToPeerEstablished(const ApiPeerData &peerInfo);
         void connectToPeerLost(const QnUuid& id);
         void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
-        QnTransaction<ApiModuleDataList> prepareModulesDataTransaction() const;
+        QnTransaction<ApiDiscoveredServerDataList> prepareModulesDataTransaction() const;
         bool isPeerUsing(const QUrl& url);
         void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
         bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
@@ -256,7 +256,7 @@ namespace ec2
         void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
         void sendDelayedAliveTran();
         void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
-    
+
     private slots:
         void at_stateChanged(QnTransactionTransport::State state);
         void at_timer();
@@ -271,7 +271,7 @@ namespace ec2
         void emitRemotePeerUnauthorized(const QnUuid& id);
     private:
         /** Info about us. */
-        const ApiPeerData m_localPeer;
+        ApiPeerData m_localPeer;
 
         //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
         QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
@@ -301,7 +301,7 @@ namespace ec2
         QElapsedTimer m_currentTimeTimer;
         std::unique_ptr<QnRuntimeTransactionLog> m_runtimeTransactionLog;
         bool m_restartPending;
-        
+
         struct DelayedAliveData
         {
             QnTransaction<ApiPeerAliveData> tran;

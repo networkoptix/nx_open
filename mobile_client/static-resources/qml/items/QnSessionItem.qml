@@ -17,7 +17,7 @@ QnSideNavigationItem {
     property string password
 
     width: parent.width
-    height: dp(104)
+    height: dp(72)
 
     Column {
         anchors.verticalCenter: parent.verticalCenter
@@ -50,17 +50,6 @@ QnSideNavigationItem {
         }
 
         Text {
-            text: address
-            font.pixelSize: dp(15)
-            font.weight: Font.DemiBold
-            color: QnTheme.listSubText
-            width: parent.width
-            height: dp(24)
-            verticalAlignment: Text.AlignVCenter
-            elide: Text.ElideRight
-        }
-
-        Text {
             text: user
             font.pixelSize: dp(15)
             font.weight: Font.DemiBold
@@ -77,6 +66,10 @@ QnSideNavigationItem {
             connectionManager.disconnectFromServer(false)
             mainWindow.currentSystemName = systemName
             LoginDialog.connectToServer(sessionId, address, port, user, password)
+            if (stackView.depth > 1) {
+                stackView.setFadeTransition()
+                Main.gotoResources()
+            }
         } else {
             sideNavigation.hide()
         }

@@ -8,6 +8,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/app_server_notification_cache.h>
+#include <utils/math/math.h>
 
 
 QnBusinessRulesViewModel::QnBusinessRulesViewModel(QObject *parent) :

@@ -8,7 +8,9 @@
 
 #include <mutex>
 
+#ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
+#endif
 
 #include "httptypes.h"
 #include "linesplitter.h"
@@ -24,7 +26,7 @@ namespace nx_http
         \note Supports chunked stream
         \note Thread safety: only message body buffer - related functionality is thread-safe (required by \a AsyncHttpClient class). All other methods are NOT thread-safe
         \note Assumes that any message is followed by message body
-        \note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes 
+        \note If message body encoding is unknown, assumes identity. If Content-Length is unknown, assumes
             infinite content-length (even when identity encoding is used)
     */
     class HttpStreamReader
@@ -72,7 +74,7 @@ namespace nx_http
         void resetState();
         //!Flush all internal buffers (if any), so that all data is available through public API
         void flush();
-        /*! 
+        /*!
             By default \a true.
             \param val If \a false, chunked message is not decoded and returned as-is by \a AsyncHttpClient::fetchMessageBodyBuffer
         */

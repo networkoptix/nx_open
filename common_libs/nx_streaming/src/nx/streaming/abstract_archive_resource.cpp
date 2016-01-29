@@ -4,7 +4,7 @@ QnAbstractArchiveResource::QnAbstractArchiveResource()
 {
     QnMediaResource::initMediaResource();
 
-    addFlags(Qn::ARCHIVE);
+    addFlags(Qn::local_video);
     m_localStatus = Qn::Online;
 }
 

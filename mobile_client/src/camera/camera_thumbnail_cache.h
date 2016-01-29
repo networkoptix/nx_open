@@ -54,4 +54,5 @@ private:
     QHash<QnUuid, ThumbnailData> m_thumbnailByResourceId;
     QHash<QString, QPixmap> m_pixmaps;
     QnThumbnailRequestData m_request;
+    QThread *m_decompressThread;
 };

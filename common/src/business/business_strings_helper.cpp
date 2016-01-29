@@ -126,7 +126,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
-                tr("IO Module %1 was disconnected")
+                tr("I/O Module %1 was disconnected")
             ), camera
         ).arg(resourceName);
 
@@ -240,7 +240,7 @@ QString QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters &p
         break;
     }
     case CameraIpConflictEvent: {
-        result += tr("Conflict Address: %1").arg(params.caption);
+        result += tr("Conflicting Address: %1").arg(params.caption);
         result += delimiter;
         int n = 0;
         for (const QString& mac: params.description.split(QnIPConflictBusinessEvent::Delimiter)) {
@@ -337,7 +337,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         bool isPrimaryStream = QnNetworkIssueBusinessEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
         QnVirtualCameraResourcePtr camera = eventSource(params).dynamicCast<QnVirtualCameraResource>();
-        if (!camera->hasVideo(nullptr))
+        if (camera && !camera->hasVideo(nullptr))
             result = tr("Connection to device was unexpectedly closed.");
         else if (isPrimaryStream)
             result = tr("Connection to camera (primary stream) was unexpectedly closed.");
@@ -376,16 +376,31 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
         break;
     }
-
-    case BackupFailed: {
-        result = tr("Archive backup failed because of no backup storage available");
+    case BackupFailedNoBackupStorageError: {
+        result = tr("Archive backup failed: No available backup storages with sufficient free space");
+        break;
+    }
+    case BackupFailedSourceStorageError: {
+        result = tr("Archive backup failed: Target storage failure");
+        break;
+    }
+    case BackupFailedSourceFileError: {
+        result = tr("Archive backup failed: Source file open/read error");
+        break;
+    }
+    case BackupFailedTargetFileError: {
+        result = tr("Archive backup failed: Target file create/write error");
+        break;
+    }
+    case BackupFailedChunkError: {
+        result = tr("Archive backup failed: File catalog error");
         break;
     }
     case BackupEndOfPeriod: {
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup finished, but isn't fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
     }
     case BackupDone: {
         result = tr("Archive backup is successfully completed");
@@ -395,7 +410,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
         qint64 timeStampMs = params.description.toLongLong();
         QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
         // todo: #gdm add server/client timezone conversion
-        result = tr("Archive backup is canceled by user. Data is backuped up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
+        result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
         break;
     }
 
@@ -410,7 +425,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
                 QnCameraDeviceStringSet(
                     tr("Recording on devices is disabled:"),
                     tr("Recording on cameras is disabled:"),
-                    tr("Recording on IO modules is disabled:")
+                    tr("Recording on I/O modules is disabled:")
                 ),
                 disabledCameras
             );
@@ -476,7 +491,7 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
         }
     }
 
-    QString result(lit("http://%1:%2/static/index.html/#/view/%3?time=%4"));
+    QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
     result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
 
     return result;
