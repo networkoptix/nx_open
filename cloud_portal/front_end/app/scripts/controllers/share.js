@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ShareCtrl', function ($scope, cloudApi, process, dialogs, $q) {
+    .controller('ShareCtrl', function ($scope, cloudApi, process, dialogs, $q, account) {
+
 
         // TODO: We must replace this hack with something more angular-way,
         // but I can't figure out yet, how to implement dialog service and pass parameters to controllers
@@ -21,6 +22,14 @@ angular.module('cloudApp')
             accountEmail:'',
             accessRole: Config.accessRoles.default
         };
+
+        if($scope.lockEmail) {
+            account.get().then(function (account) {
+                if(account.email == $scope.share.accountEmail) {
+                    $scope.$parent.cancel('Can\'t edit yourself');
+                }
+            });
+        }
 
         function processAccessRoles(roles){
             var filteredRoles = _.filter(roles,function(role){
