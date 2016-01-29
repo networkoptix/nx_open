@@ -19,8 +19,8 @@ namespace
 {
     enum
     {
-        kMaxStaticBookmarksCount = 10000    // TODO: !set appropriate!
-        , kMaxTimelineBookmarksConut = 1000
+        kMaxStaticBookmarksCount = 5000
+        , kMaxTimelineBookmarksConut = 500
     };
 
     void updateQueryWindowExtended(const QnCameraBookmarksQueryPtr &query

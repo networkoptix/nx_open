@@ -78,7 +78,6 @@ class QnWorkbenchItemBookmarksWatcher::WidgetData : public Connective<QObject>
 {
     typedef Connective<QObject> base_type;
 
-    typedef QPointer<QnMediaResourceWidget> QnMediaResourceWidgetPtr;
     typedef QPointer<QnTimelineBookmarksWatcher> QnTimelineBookmarksWatcherPtr;
 public:
     static WidgetDataPtr create(QnMediaResourceWidget *widget
@@ -104,9 +103,10 @@ private:
     void sendBookmarksToCompositeOverlay();
 
 private:
+    const QnTimelineBookmarksWatcherPtr m_timelineWatcher;
+    const QnVirtualCameraResourcePtr m_camera;
     QnWorkbenchItemBookmarksWatcher * const m_parent;
-    QnTimelineBookmarksWatcherPtr m_timelineWatcher;
-    const QnMediaResourceWidgetPtr m_mediaWidget;
+    QnMediaResourceWidget * const m_mediaWidget;
 
     qint64 m_posMs;
     QnCameraBookmarkList m_bookmarks;
@@ -136,8 +136,9 @@ QnWorkbenchItemBookmarksWatcher::WidgetData::WidgetData(const QnVirtualCameraRes
     , QnTimelineBookmarksWatcher *timelineWatcher
     , QnWorkbenchItemBookmarksWatcher *parent)
     : base_type(parent)
-    , m_parent(parent)
     , m_timelineWatcher(timelineWatcher)
+    , m_camera(camera)
+    , m_parent(parent)
     , m_mediaWidget(resourceWidget)
     , m_posMs(DATETIME_INVALID)
     , m_bookmarks()
@@ -174,8 +175,8 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updatePos(qint64 posMs)
 void QnWorkbenchItemBookmarksWatcher::WidgetData::updateQueryFilter()
 {
     const auto newWindow = (m_posMs == DATETIME_INVALID
-        ? helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset)
-        : QnTimePeriod::fromInterval(DATETIME_INVALID, DATETIME_INVALID));
+        ? QnTimePeriod::fromInterval(DATETIME_INVALID, DATETIME_INVALID)
+        : helpers::extendTimeWindow(m_posMs, m_posMs, kLeftOffset, kRightOffset));
 
     auto filter = m_query->filter();
     const bool changed = helpers::isTimeWindowChanged(newWindow.startTimeMs, newWindow.endTimeMs()
@@ -196,7 +197,7 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarksAtPosition()
 
     m_bookmarksAtPos.setBookmarkList(bookmarks);
     if (m_timelineWatcher)
-        m_bookmarksAtPos.mergeBookmarkList(m_timelineWatcher->bookmarksAtPosition(m_posMs));
+        m_bookmarksAtPos.mergeBookmarkList(m_timelineWatcher->rawBookmarksAtPosition(m_camera, m_posMs));
 
     sendBookmarksToCompositeOverlay();
 }
@@ -209,9 +210,6 @@ void QnWorkbenchItemBookmarksWatcher::WidgetData::updateBookmarks(const QnCamera
 
 void QnWorkbenchItemBookmarksWatcher::WidgetData::sendBookmarksToCompositeOverlay()
 {
-    if (!m_mediaWidget)
-        return;
-
     const auto compositeTextOverlay = m_mediaWidget->compositeTextOverlay();
     if (!compositeTextOverlay)
         return;
