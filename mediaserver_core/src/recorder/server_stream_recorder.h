@@ -5,13 +5,13 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include "recording/stream_recorder.h"
-#include "core/misc/schedule_task.h"
-#include "recorder/device_file_catalog.h"
-#include "recording/time_period.h"
-#include "motion/motion_estimation.h"
-#include "core/dataprovider/media_streamdataprovider.h"
-#include "dualstreaming_helper.h"
+#include <recording/stream_recorder.h>
+#include <core/misc/schedule_task.h>
+#include <recorder/device_file_catalog.h>
+#include <recording/time_period.h>
+#include <motion/motion_estimation.h>
+#include <nx/streaming/abstract_media_stream_data_provider.h>
+#include <recorder/dualstreaming_helper.h>
 
 #include <business/business_fwd.h>
 
@@ -83,7 +83,10 @@ private:
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
 private slots:
-    void at_recordingFinished(int status, const QString &filename);
+    void at_recordingFinished(
+        const ErrorStruct   &status,
+        const QString       &filename
+    );
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
     const size_t m_maxRecordQueueSizeBytes;

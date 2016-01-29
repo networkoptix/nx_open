@@ -22,34 +22,30 @@ class SystemManager
     public AsyncRequestsExecutor
 {
 public:
-    SystemManager(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    SystemManager(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
-    //!Implementation of \a SystemManager::bindSystem
     virtual void bindSystem(
         api::SystemRegistrationData registrationData,
         std::function<void(api::ResultCode, api::SystemData)> completionHandler) override;
-    //!Implementation of \a SystemManager::unbindSystem
     virtual void unbindSystem(
         const std::string& systemID,
         std::function<void(api::ResultCode)> completionHandler) override;
-    //!Implementation of \a SystemManager::getSystems
     virtual void getSystems(
-        std::function<void(api::ResultCode, api::SystemDataList)> completionHandler ) override;
-    //!Implementation of \a SystemManager::shareSystem
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler ) override;
+    virtual void getSystem(
+        const std::string& systemID,
+        std::function<void(api::ResultCode, api::SystemDataExList)> completionHandler) override;
     virtual void shareSystem(
         api::SystemSharing sharingData,
         std::function<void(api::ResultCode)> completionHandler) override;
-    //!Implementation of \a SystemManager::getCloudUsersOfSystem
     virtual void getCloudUsersOfSystem(
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
-    //!Implementation of \a SystemManager::getCloudUsersOfSystem
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
     virtual void getCloudUsersOfSystem(
         const std::string& systemID,
-        std::function<void(api::ResultCode, api::SystemSharingList)> completionHandler) override;
-    //!Implementation of \a SystemManager::updateSharing
-    virtual void updateSharing(
-        api::SystemSharing sharing,
-        std::function<void(api::ResultCode)> completionHandler) override;
+        std::function<void(api::ResultCode, api::SystemSharingExList)> completionHandler) override;
+    virtual void getAccessRoleList(
+        const std::string& systemID,
+        std::function<void(api::ResultCode, api::SystemAccessRoleList)> completionHandler) override;
 };
 
 }   //cl

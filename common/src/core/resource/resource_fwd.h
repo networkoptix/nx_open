@@ -8,16 +8,16 @@
 
 /**
  * \file
- * 
+ *
  * This header file contains common typedefs for different resource types.
- * 
+ *
  * It is to be included from headers that use these typedefs in declarations,
  * but don't need the definitions of the actual resource classes.
  */
 
 // TODO: #Elric move out?
 // <--
-class QnScheduleTask; 
+class QnScheduleTask;
 
 struct QnCameraHistoryItem;
 
@@ -176,6 +176,10 @@ typedef QList<QnVideoWallMatrixIndex> QnVideoWallMatrixIndexList;
 
 class QnAviResource;
 typedef QnSharedResourcePointer<QnAviResource> QnAviResourcePtr;
+
+class QnWebPageResource;
+typedef QnSharedResourcePointer<QnWebPageResource> QnWebPageResourcePtr;
+typedef QnSharedResourcePointerList<QnWebPageResource> QnWebPageResourceList;
 
 
 #endif // QN_RESOURCE_FWD_H

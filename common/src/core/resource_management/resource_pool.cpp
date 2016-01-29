@@ -333,11 +333,20 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &m
     return result;
 }
 
-QnMediaServerResourceList QnResourcePool::getAllServers() const
+QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus status) const
 {
     QnMutexLocker lock( &m_resourcesMtx ); //m_resourcesMtx is recursive
     ensureCache();
-    return m_cache.serversList;
+
+    if (status == Qn::AnyStatus)
+        return m_cache.serversList;
+
+    const auto statusFilter = [status](const QnMediaServerResourcePtr &serverResource)
+    {
+        return (serverResource->getStatus() == status);
+    };
+
+    return m_cache.serversList.filtered(statusFilter);
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const

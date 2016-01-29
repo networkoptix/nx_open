@@ -41,7 +41,7 @@ public:
     }
 };
 
-}
-}
+}   //cdb
+}   //nx
 
 #endif  //GET_ACCOUNT_HANDLER_H

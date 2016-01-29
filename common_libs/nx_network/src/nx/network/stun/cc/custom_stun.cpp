@@ -4,7 +4,62 @@
 namespace nx {
 namespace stun {
 namespace cc {
+
+namespace methods {
+    nx::String toString(Value val)
+    {
+        switch (val)
+        {
+            case ping:
+                return "ping";
+            case bind:
+                return "bind";
+            case listen:
+                return "listen";
+            case connectionAck:
+                return "connectionAck";
+            case resolve:
+                return "resolve";
+            case connect:
+                return "connect";
+            case connectionResult:
+                return "connectionResult";
+            default:
+                return "unknown";
+        };
+    }
+}
+
 namespace attrs {
+
+
+const char* toString(AttributeType val)
+{
+    switch (val)
+    {
+        case systemId:
+            return "systemId";
+        case serverId:
+            return "serverId";
+        case peerId:
+            return "peerId";
+        case connectionId:
+            return "connectionId";
+        case hostName:
+            return "hostName";
+        case publicEndpointList:
+            return "publicEndpointList";
+        case tcpHpEndpointList:
+            return "tcpHpEndpointList";
+        case udtHpEndpointList:
+            return "udtHpEndpointList";
+        case connectionMethods:
+            return "connectionMethods";
+        default:
+            return "unknown";
+    }
+}
+
 
 StringAttribute::StringAttribute( int userType, const String& value )
     : stun::attrs::Unknown( userType, stringToBuffer( value ) )

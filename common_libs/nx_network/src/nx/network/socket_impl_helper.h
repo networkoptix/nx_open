@@ -34,6 +34,8 @@ public:
     virtual SocketAddress getLocalAddress() const override { return m_abstractSocketProvider()->getLocalAddress(); }
     //!Implementation of AbstractSocket::close
     virtual void close() override { return m_abstractSocketProvider()->close(); }
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown() override { return m_abstractSocketProvider()->shutdown(); }
     //!Implementation of AbstractSocket::isClosed
     virtual bool isClosed() const override { return m_abstractSocketProvider()->isClosed(); }
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -66,10 +68,14 @@ public:
     virtual bool getLastError(SystemError::ErrorCode* errorCode) const override { return m_abstractSocketProvider()->getLastError(errorCode); }
     //!Implementation of AbstractSocket::handle
     virtual AbstractSocket::SOCKET_HANDLE handle() const override { return m_abstractSocketProvider()->handle(); }
-    //!Implementation of AbstractSocket::postImpl
-    virtual void postImpl( std::function<void()>&& handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
-    //!Implementation of AbstractSocket::dispatchImpl
-    virtual void dispatchImpl( std::function<void()>&& handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
+    //!Implementation of AbstractSocket::post
+    virtual void post( std::function<void()> handler ) override { m_abstractSocketProvider()->post( std::move(handler) ); }
+    //!Implementation of AbstractSocket::dispatch
+    virtual void dispatch( std::function<void()> handler ) override { m_abstractSocketProvider()->dispatch( std::move(handler) ); }
+    //!Implementation of AbstractSocket::getAioThread
+    virtual aio::AbstractAioThread* getAioThread() override { return m_abstractSocketProvider()->getAioThread(); }
+    //!Implementation of AbstractSocket::bindToAioThread
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override { m_abstractSocketProvider()->bindToAioThread( aioThread ); }
 
 private:
     AbstractSocketProviderType m_abstractSocketProvider;
@@ -197,21 +203,33 @@ public:
     virtual SocketAddress getForeignAddress() const override { return this->m_implDelegate.getForeignAddress(); }
     //!Implementation of AbstractCommunicatingSocket::isConnected
     virtual bool isConnected() const override { return this->m_implDelegate.isConnected(); }
-    //!Implementation of AbstractCommunicatingSocket::connectAsyncImpl
-    virtual void connectAsyncImpl( const SocketAddress& addr, std::function<void( SystemError::ErrorCode )>&& handler ) override {
-        return this->m_implDelegate.connectAsyncImpl( addr, std::move(handler) );
+    //!Implementation of AbstractCommunicatingSocket::connectAsync
+    virtual void connectAsync(
+        const SocketAddress& addr,
+        std::function<void( SystemError::ErrorCode )> handler ) override
+    {
+        return this->m_implDelegate.connectAsync( addr, std::move(handler) );
     }
-    //!Implementation of AbstractCommunicatingSocket::recvAsyncImpl
-    virtual void recvAsyncImpl( nx::Buffer* const buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override {
-        return this->m_implDelegate.recvAsyncImpl( buf, std::move( handler ) );
+    //!Implementation of AbstractCommunicatingSocket::readSomeAsync
+    virtual void readSomeAsync(
+        nx::Buffer* const buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override
+    {
+        return this->m_implDelegate.readSomeAsync( buf, std::move( handler ) );
     }
-    //!Implementation of AbstractCommunicatingSocket::sendAsyncImpl
-    virtual void sendAsyncImpl( const nx::Buffer& buf, std::function<void( SystemError::ErrorCode, size_t )>&& handler ) override {
-        return this->m_implDelegate.sendAsyncImpl( buf, std::move( handler ) );
+    //!Implementation of AbstractCommunicatingSocket::sendAsync
+    virtual void sendAsync(
+        const nx::Buffer& buf,
+        std::function<void( SystemError::ErrorCode, size_t )> handler ) override
+    {
+        return this->m_implDelegate.sendAsync( buf, std::move( handler ) );
     }
-    //!Implementation of AbstractCommunicatingSocket::registerTimerImpl
-    virtual void registerTimerImpl( unsigned int timeoutMs, std::function<void()>&& handler ) override {
-        return this->m_implDelegate.registerTimerImpl( timeoutMs, std::move( handler ) );
+    //!Implementation of AbstractCommunicatingSocket::registerTimer
+    virtual void registerTimer(
+        unsigned int timeoutMs,
+        std::function<void()> handler ) override
+    {
+        return this->m_implDelegate.registerTimer( timeoutMs, std::move( handler ) );
     }
     virtual void cancelIOAsync(
         aio::EventType eventType,

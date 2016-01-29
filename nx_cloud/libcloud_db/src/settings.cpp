@@ -96,6 +96,7 @@ Settings::Settings()
 #endif
     m_showHelp( false )
 {
+    fillSupportedCmdParameters();
 }
 
 bool Settings::showHelp() const

@@ -5,7 +5,7 @@
 #include <libavformat/avio.h>
 #include "core/resource/storage_resource.h"
 #include <utils/common/app_info.h>
-
+#include <platform/platform_abstraction.h>
 
 /*
 * QnFileStorageResource uses custom implemented IO access
@@ -49,6 +49,13 @@ public:
     {
         return m_localPath.isEmpty() ? getPath() : m_localPath;
     }
+
+    // true if storage is located on local disks
+    static bool isLocal(const QString &url);
+    // calculate space limit judging by storage URL
+    static qint64 calcSpaceLimit(const QString &url);
+    // calculate space limit judging by partition type 
+    static qint64 calcSpaceLimit(QnPlatformMonitor::PartitionType ptype);
 
 private:
     virtual QString getPath() const override;

@@ -20,6 +20,7 @@ QnNavigationDrawer {
         width: panel.width
         anchors.top: parent.top
         anchors.bottom: bottomButtons.top
+        clip: true
 
         flickableDirection: Flickable.VerticalFlick
         contentHeight: content.height
@@ -114,6 +115,7 @@ QnNavigationDrawer {
             onClicked: {
                 panel.hide()
                 Main.gotoNewSession()
+                stackView.currentItem.scrollTop()
             }
         }
 

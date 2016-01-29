@@ -37,6 +37,7 @@ namespace ec2 {
         ApiCameraDataStatistics(ApiCameraDataEx&& data);
 
 		const static std::set<QString> EXCEPT_PARAMS;
+        const static std::set<QString> RESOURCE_PARAMS;
     };
 #define ApiCameraDataStatistics_Fields (id)(parentId)(status)(addParams) \
     (manuallyAdded)(model)(statusFlags)(vendor) \

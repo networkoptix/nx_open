@@ -13,9 +13,34 @@
 
 #include <utils/common/model_functions_fwd.h>
 
+struct QnBookmarkSortOrder
+{
+    Qn::BookmarkSortField column;
+    Qt::SortOrder order;
+
+    explicit QnBookmarkSortOrder(Qn::BookmarkSortField column = Qn::BookmarkStartTime
+        , Qt::SortOrder order = Qt::AscendingOrder);
+
+    static const QnBookmarkSortOrder defaultOrder;
+};
+#define QnBookmarkSortOrder_Fields (column)(order)
+
+struct QnBookmarkSparsingOptions
+{
+    bool used;
+    int minVisibleLengthMs;
+
+    explicit QnBookmarkSparsingOptions(bool used = false
+        , qint64 minVisibleLengthMs = 0);
+
+    static const QnBookmarkSparsingOptions kNosparsing;
+};
+#define QnBookmarkSparsingOptions_Fileds (used)(minVisibleLengthMs)
+
 /**
  * @brief The QnCameraBookmark struct               Bookmarked part of the camera archive.
  */
+
 struct QnCameraBookmark {
     /** Unique id. */
     QnUuid guid;
@@ -38,7 +63,6 @@ struct QnCameraBookmark {
     /** \returns End time in milliseconds since epoch. */
     qint64 endTimeMs() const;
 
-
     /** List of tags attached to the bookmark. */
     QnCameraBookmarkTags tags;
 
@@ -59,7 +83,13 @@ struct QnCameraBookmark {
 
     static QString tagsToString(const QnCameraBookmarkTags &tags, const QString &delimiter = lit(", "));
 
-    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source, int limit = std::numeric_limits<int>().max(), Qn::BookmarkSearchStrategy strategy = Qn::EarliestFirst);
+    static void sortBookmarks(QnCameraBookmarkList &bookmarks
+        , const QnBookmarkSortOrder orderBy);
+
+    static QnCameraBookmarkList mergeCameraBookmarks(const QnMultiServerCameraBookmarkList &source
+        , const QnBookmarkSortOrder &sortOrder = QnBookmarkSortOrder::defaultOrder
+        , const QnBookmarkSparsingOptions &sparsing = QnBookmarkSparsingOptions()
+        , int limit = std::numeric_limits<int>().max());
 };
 #define QnCameraBookmark_Fields (guid)(name)(description)(timeout)(startTimeMs)(durationMs)(tags)(cameraId)
 
@@ -67,7 +97,9 @@ struct QnCameraBookmark {
  * @brief The QnCameraBookmarkSearchFilter struct   Bookmarks search request parameters. Used for loading bookmarks for the fixed time period
  *                                                  with length exceeding fixed minimal, with name and/or tags containing fixed string.
  */
-struct QnCameraBookmarkSearchFilter {
+
+struct QnCameraBookmarkSearchFilter
+{
     /** Minimum start time for the bookmark. */
     qint64 startTimeMs;
 
@@ -79,7 +111,9 @@ struct QnCameraBookmarkSearchFilter {
 
     int limit; //TODO: #GDM #Bookmarks works in merge function only
 
-    Qn::BookmarkSearchStrategy strategy; //TODO: #GDM #Bookmarks works in merge function only
+    QnBookmarkSparsingOptions sparsing;
+
+    QnBookmarkSortOrder orderBy;
 
     QnCameraBookmarkSearchFilter();
 
@@ -88,10 +122,13 @@ struct QnCameraBookmarkSearchFilter {
     bool checkBookmark(const QnCameraBookmark &bookmark) const;
 
     static QnCameraBookmarkSearchFilter invalidFilter();
-};
-#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(strategy)
 
-struct QnCameraBookmarkTag {
+    static const int kNoLimit;
+};
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)
+
+struct QnCameraBookmarkTag
+{
     QString name;
     int count;
 
@@ -121,6 +158,8 @@ Q_DECLARE_METATYPE(QnCameraBookmarkList)
 Q_DECLARE_METATYPE(QnCameraBookmarkTags)
 Q_DECLARE_METATYPE(QnCameraBookmarkTagList)
 
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSortOrder, (json)(metatype)(eq))
+QN_FUSION_DECLARE_FUNCTIONS(QnBookmarkSparsingOptions, (json)(metatype)(eq))
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmarkSearchFilter, (json)(metatype)(eq))
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraBookmark,    (sql_record)(json)(ubjson)(xml)(csv_record)(metatype)(eq))

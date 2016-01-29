@@ -1,5 +1,4 @@
-#ifndef MEDIA_RESOURCE_HELPER_H
-#define MEDIA_RESOURCE_HELPER_H
+#pragma once
 
 #include <QtCore/QObject>
 
@@ -7,7 +6,10 @@
 #include <core/resource/camera_resource.h>
 #include <utils/common/connective.h>
 
-class QnMediaResourceHelper : public Connective<QObject> {
+class QnCameraChunkProvider;
+
+class QnMediaResourceHelper : public Connective<QObject>
+{
     Q_OBJECT
 
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
@@ -23,6 +25,7 @@ class QnMediaResourceHelper : public Connective<QObject> {
     Q_PROPERTY(qreal rotatedAspectRatio READ rotatedAspectRatio NOTIFY rotatedAspectRatioChanged)
     Q_PROPERTY(int rotation READ rotation NOTIFY rotationChanged)
     Q_PROPERTY(qint64 finalTimestamp READ finalTimestamp NOTIFY finalTimestampChanged)
+    Q_PROPERTY(QnCameraChunkProvider* chunkProvider READ chunkProvider NOTIFY chunkProviderChanged)
 
     Q_ENUMS(Protocol)
     Q_ENUMS(Qn::ResourceStatus)
@@ -30,7 +33,8 @@ class QnMediaResourceHelper : public Connective<QObject> {
     typedef Connective<QObject> base_type;
 
 public:
-    enum Protocol {
+    enum Protocol
+    {
         Webm,
         Rtsp,
         Hls,
@@ -47,6 +51,8 @@ public:
     QUrl mediaUrl() const;
 
     QString resourceName() const;
+
+    QnCameraChunkProvider *chunkProvider() const;
 
     qint64 position() const;
     void setPosition(qint64 position);
@@ -75,6 +81,7 @@ signals:
     void resourceStatusChanged();
     void mediaUrlChanged();
     void resourceNameChanged();
+    void chunkProviderChanged();
     void positionChanged();
     void resolutionsChanged();
     void resolutionChanged();
@@ -87,9 +94,8 @@ signals:
 
 private:
     void updateMediaStreams();
+    void updateCurrentStream();
     void at_resource_parentIdChanged(const QnResourcePtr &resource);
-
-private:
     void updateStardardResolutions();
     void setUrl(const QUrl &url);
     int nativeStreamIndex(const QString &resolution) const;
@@ -99,6 +105,7 @@ private:
     int maximumResolution() const;
     void updateFinalTimestamp();
     void setFinalTimestamp(qint64 finalTimestamp);
+    QnMediaServerResourcePtr serverAtCurrentPosition() const;
 
 private:
     QnVirtualCameraResourcePtr m_camera;
@@ -111,10 +118,10 @@ private:
     int m_nativeStreamIndex;
     QMap<int, QString> m_nativeResolutions;
     bool m_transcodingSupported;
+    bool m_useTranscoding;
     Protocol m_transcodingProtocol;
     Protocol m_nativeProtocol;
     int m_maxTextureSize;
     int m_maxNativeResolution;
+    QnCameraChunkProvider *m_chunkProvider;
 };
-
-#endif // MEDIA_RESOURCE_HELPER_H

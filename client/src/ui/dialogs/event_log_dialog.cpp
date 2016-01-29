@@ -6,8 +6,6 @@
 #include <QtWidgets/QMenu>
 #include <QtGui/QMouseEvent>
 
-#include <utils/common/event_processors.h>
-
 #include <core/resource/resource_name.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
@@ -35,8 +33,16 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workaround/widgets_signals_workaround.h>
 
+#include <utils/common/event_processors.h>
+#include <utils/common/delayed.h>
+
 namespace {
     const int ProlongedActionRole = Qt::UserRole + 2;
+
+    const int kQueryTimeoutMs = 15000;
+
+    /* Really here can be any number, that is not equal to zero (success code). */
+    const int kTimeoutStatus = -1;
 }
 
 
@@ -246,21 +252,29 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
 {
     m_requests.clear();
     m_allEvents.clear();
+    QPointer<QnEventLogDialog> guard(this);
 
-
-    auto mediaServerList = qnResPool->getAllServers();
-    for (const QnMediaServerResourcePtr& mserver: mediaServerList)
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for(const QnMediaServerResourcePtr& mserver: onlineServers)
     {
-        if (mserver->getStatus() == Qn::Online)
+        int handle = mserver->apiConnection()->getEventLogAsync(
+            fromMsec, toMsec,
+            m_filterCameraList,
+            eventType,
+            actionType,
+            QnUuid(),
+            this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
+
+        m_requests << handle;
+
+        executeDelayed([this, handle, guard]
         {
-            m_requests << mserver->apiConnection()->getEventLogAsync(
-                fromMsec, toMsec,
-                m_filterCameraList,
-                eventType,
-                actionType,
-                QnUuid(),
-                this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
-        }
+            if (!guard)
+                return;
+
+            at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+
+        }, kQueryTimeoutMs);
     }
 }
 
@@ -336,11 +350,12 @@ void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataLi
     if (!m_requests.contains(requestNum))
         return;
     m_requests.remove(requestNum);
-    if (httpStatus == 0 && !events->empty())
+
+    if (httpStatus == 0 && events && !events->empty())
         m_allEvents << events;
-    if (m_requests.isEmpty()) {
+
+    if (m_requests.isEmpty())
         requestFinished();
-    }
 }
 
 void QnEventLogDialog::requestFinished()

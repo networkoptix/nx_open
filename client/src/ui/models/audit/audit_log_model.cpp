@@ -803,7 +803,7 @@ QString QnAuditLogModel::descriptionTooltip(const QnAuditRecord *record) const
         return result;
     if (!result.isEmpty())
         result += lit("\n");
-    result += tr("Red mark means that an archive is still available");
+    result += tr("Red mark means that the archive is still available");
     return result;
 }
 

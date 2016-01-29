@@ -12,7 +12,7 @@
 
 #include "pluginusagerecord.h"
 #include "videodecoderplugintypes.h"
-#include "../../decoders/video/abstractdecoder.h"
+#include "../../decoders/video/abstract_video_decoder.h"
 #include "../../utils/ipc/namedmutex.h"
 
 

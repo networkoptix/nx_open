@@ -6,7 +6,7 @@
 #include "pollable.h"
 
 #include <utils/common/systemerror.h>
-
+#include <nx/network/socket_global.h>
 
 Pollable::Pollable(
     AbstractSocket::SOCKET_HANDLE fd,
@@ -52,4 +52,14 @@ bool Pollable::getLastError( SystemError::ErrorCode* /*errorCode*/ ) const
 {
     SystemError::setLastErrorCode( SystemError::notImplemented );
     return false;
+}
+
+aio::AbstractAioThread* Pollable::getAioThread()
+{
+    return nx::network::SocketGlobals::aioService().getSocketAioThread(this);
+}
+
+void Pollable::bindToAioThread(aio::AbstractAioThread* aioThread)
+{
+    nx::network::SocketGlobals::aioService().bindSocketToAioThread(this, aioThread);
 }

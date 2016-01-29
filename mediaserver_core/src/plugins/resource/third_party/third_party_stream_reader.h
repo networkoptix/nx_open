@@ -63,7 +63,7 @@ private:
     std::shared_ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;
-    QnMediaContextPtr m_audioContext;
+    QnConstMediaContextPtr m_audioContext;
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;

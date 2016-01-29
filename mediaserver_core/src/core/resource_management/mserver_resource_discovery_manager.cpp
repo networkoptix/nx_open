@@ -102,7 +102,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
             ++itr;
         }
     }
-    if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES) 
+    if (++m_foreignResourcesRetryCount >= RETRY_COUNT_FOR_FOREIGN_RESOURCES)
     {
         m_foreignResourcesRetryCount = 0;
 
@@ -110,12 +110,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         auto foreignResources = m_tmpForeignResources.values();
         const QnUuid ownGuid = qnCommon->moduleGUID();
         std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid] (const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
-        { 
+        {
             bool leftOwnServer = leftCam->preferedServerId() == ownGuid;
             bool rightOwnServer = rightCam->preferedServerId() == ownGuid;
             if (leftOwnServer != rightOwnServer)
                 return leftOwnServer > rightOwnServer;
-            
+
             // arrange cameras by failover priority order
             return leftCam->failoverPriority() > rightCam->failoverPriority();
         });
@@ -149,7 +149,9 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         QnNetworkResourcePtr newNetRes = (*it).dynamicCast<QnNetworkResource>();
         if (!newNetRes) {
-            it = resources.erase(it); // do not need to investigate OK resources
+            //TODO: #rvasilenko please make sure we can safely continue here
+            //it = resources.erase(it); // do not need to investigate OK resources
+            ++it;
             continue;
         }
 
@@ -165,7 +167,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
         if (rpResource->hasFlags(Qn::foreigner))
         {
-            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size())) 
+            if (!canTakeForeignCamera(rpResource.dynamicCast<QnSecurityCamResource>(), extraResources.size()))
             {
                 it = resources.erase(it); // do not touch foreign resource
                 continue;
@@ -229,11 +231,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
     // ========================= send conflict info =====================
     for (QMap<quint32, QSet<QnNetworkResourcePtr> >::iterator itr = ipsList.begin(); itr != ipsList.end(); ++itr)
     {
-        if (itr.value().size() > 1) 
+        if (itr.value().size() > 1)
         {
             QHostAddress hostAddr(itr.key());
             QStringList conflicts;
-            for(const QnNetworkResourcePtr& camRes: itr.value()) 
+            for(const QnNetworkResourcePtr& camRes: itr.value())
             {
                 conflicts << camRes->getPhysicalId();
                 QnVirtualCameraResource* cam = dynamic_cast<QnVirtualCameraResource*>(camRes.data());
@@ -244,7 +246,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
 
-    // ==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing 
+    // ==========if resource is not discovered last minute and we do not record it and do not see live => readers not runing
     markOfflineIfNeeded(discoveredResources);
     // ======================
 

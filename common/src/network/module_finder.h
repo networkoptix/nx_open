@@ -1,13 +1,16 @@
-#ifndef NETWORKOPTIXMODULEFINDER_H
-#define NETWORKOPTIXMODULEFINDER_H
+#pragma once
+
+#include <chrono>
 
 #include <QtCore/QHash>
 #include <QtCore/QElapsedTimer>
 #include <QtNetwork/QHostAddress>
 
+#include <core/resource/resource_fwd.h>
+#include <nx_ec/data/api_discovery_data.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/socket_common.h>
-#include <core/resource/resource_fwd.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "module_information.h"
 
@@ -26,7 +29,7 @@ public:
     bool isCompatibilityMode() const;
 
     QList<QnModuleInformation> foundModules() const;
-    QList<QnModuleInformationWithAddresses> foundModulesWithAddresses() const;
+    ec2::ApiDiscoveredServerDataList discoveredServers() const;
 
     QnModuleInformation moduleInformation(const QnUuid &moduleId) const;
     QSet<SocketAddress> moduleAddresses(const QnUuid &id) const;
@@ -39,12 +42,15 @@ public:
       * to EC will be used as primary address.
       */
     SocketAddress primaryAddress(const QnUuid &id) const;
+    Qn::ResourceStatus moduleStaus(const QnUuid &id) const;
 
     QnMulticastModuleFinder *multicastModuleFinder() const;
     QnDirectModuleFinder *directModuleFinder() const;
     QnDirectModuleFinderHelper *directModuleFinderHelper() const;
 
-    int pingTimeout() const;
+    std::chrono::milliseconds pingTimeout() const;
+
+    void setModuleStatus(const QnUuid &moduleId, Qn::ResourceStatus status);
 
 public slots:
     void start();
@@ -64,7 +70,9 @@ private:
 
     void removeAddress(const SocketAddress &address, bool holdItem, const QSet<QUrl> &ignoredUrls = QSet<QUrl>());
     void handleSelfResponse(const QnModuleInformation &moduleInformation, const SocketAddress &address);
-    void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, bool isAlive);
+    void sendModuleInformation(const QnModuleInformation &moduleInformation, const SocketAddress &address, Qn::ResourceStatus status);
+
+    void removeModule(const QnUuid &id);
 
 private:
     /* Mutex prevents concurrent reading/wrighting of m_moduleItemById content.
@@ -90,11 +98,13 @@ private:
         int conflictResponseCount;
         QSet<SocketAddress> addresses;
         SocketAddress primaryAddress;
+        Qn::ResourceStatus status;
 
         ModuleItem() :
             lastResponse(0),
             lastConflictResponse(0),
-            conflictResponseCount(0)
+            conflictResponseCount(0),
+            status(Qn::Incompatible)
         {}
     };
 
@@ -102,11 +112,6 @@ private:
     QHash<SocketAddress, QnUuid> m_idByAddress;
     QHash<SocketAddress, qint64> m_lastResponse;
 
-    QnMutex m_connectedPeersMutex;
-    QSet<QnUuid> m_connectedPeers;
-
     qint64 m_lastSelfConflict;
     int m_selfConflictCount;
 };
-
-#endif  //NETWORKOPTIXMODULEFINDER_H

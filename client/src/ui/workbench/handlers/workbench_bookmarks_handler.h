@@ -26,6 +26,7 @@ private slots:
     void at_addCameraBookmarkAction_triggered();
     void at_editCameraBookmarkAction_triggered();
     void at_removeCameraBookmarkAction_triggered();
+    void at_removeBookmarksAction_triggered();
     void at_bookmarksModeAction_triggered();
 
 private:

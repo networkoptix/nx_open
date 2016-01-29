@@ -20,7 +20,7 @@ namespace {
 
 QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(Unknown,                 QIcon());
-    m_cache.insert(Local,                   qnSkin->icon("tree/home.png"));
+    m_cache.insert(LocalServer,             qnSkin->icon("tree/home.png"));
     m_cache.insert(Server,                  qnSkin->icon("tree/server.png"));
     m_cache.insert(Servers,                 qnSkin->icon("tree/servers.png"));
     m_cache.insert(Layout,                  qnSkin->icon("tree/layout.png"));
@@ -36,6 +36,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallMatrix,         qnSkin->icon("tree/matrix.png"));
     m_cache.insert(OtherSystem,             qnSkin->icon("tree/system.png"));
     m_cache.insert(OtherSystems,            qnSkin->icon("tree/other_systems.png"));
+    m_cache.insert(WebPage,                 qnSkin->icon("tree/webpage.png"));
 
     m_cache.insert(Media | Offline,         qnSkin->icon("tree/media_offline.png"));
     m_cache.insert(Image | Offline,         qnSkin->icon("tree/snapshot_offline.png"));
@@ -51,6 +52,7 @@ QnResourceIconCache::QnResourceIconCache(QObject *parent): QObject(parent) {
     m_cache.insert(VideoWallItem | Offline, qnSkin->icon("tree/screen_offline.png"));
     m_cache.insert(IOModule | Offline,      qnSkin->icon("tree/io_offline.png"));
     m_cache.insert(IOModule | Unauthorized, qnSkin->icon("tree/io_unauthorized.png"));
+    m_cache.insert(WebPage | Offline,       qnSkin->icon("tree/webpage.png"));
 
     /* Read-only server that is auto-discovered. */
     m_cache.insert(Server | Incompatible | ReadOnly,    qnSkin->icon("tree/server_incompatible_readonly.png"));
@@ -72,7 +74,7 @@ QnResourceIconCache *QnResourceIconCache::instance() {
 }
 
 QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
-    /* This function will be called from GUI thread only, 
+    /* This function will be called from GUI thread only,
      * so no synchronization is needed. */
 
     if((key & TypeMask) == Unknown && !unchecked)
@@ -80,7 +82,7 @@ QIcon QnResourceIconCache::icon(Key key, bool unchecked) {
 
     if(m_cache.contains(key))
         return m_cache.value(key);
-    
+
     QIcon icon = m_cache.value(key & TypeMask);
     QIcon overlay = m_cache.value(key & StatusMask);
     if(!icon.isNull() && !overlay.isNull()) {
@@ -121,31 +123,32 @@ QnResourceIconCache::Key QnResourceIconCache::key(const QnResourcePtr &resource)
     }
 
     Qn::ResourceFlags flags = resource->flags();
-    if ((flags & Qn::local_server) == Qn::local_server) {
-        key = Local;
-    } else if ((flags & Qn::server) == Qn::server) {
+    if (flags.testFlag(Qn::local_server))
+        key = LocalServer;
+    else if (flags.testFlag(Qn::server))
         key = Server;
-    } else if ((flags & Qn::layout) == Qn::layout) {
+    else if (flags.testFlag(Qn::layout))
         key = Layout;
-    } else if ((flags & Qn::live_cam) == Qn::live_cam) {
-        if (flags & Qn::io_module)
-            key = IOModule;
-        else
-            key = Camera;
-    } else if ((flags & Qn::SINGLE_SHOT) == Qn::SINGLE_SHOT) {
+    else if (flags.testFlag(Qn::io_module))
+        key = IOModule;
+    else if (flags.testFlag(Qn::live_cam))
+        key = Camera;
+    else if (flags.testFlag(Qn::local_image))
         key = Image;
-    } else if ((flags & Qn::ARCHIVE) == Qn::ARCHIVE) {
+    else if (flags.testFlag(Qn::local_video))
         key = Media;
-    } else if ((flags & Qn::server_archive) == Qn::server_archive) {
+    else if (flags.testFlag(Qn::server_archive))
         key = Media;
-    } else if ((flags & Qn::user) == Qn::user) {
+    else if (flags.testFlag(Qn::user))
         key = User;
-    } else if ((flags & Qn::videowall) == Qn::videowall) {
+    else if (flags.testFlag(Qn::videowall))
         key = VideoWall;
-    } 
+    else if (flags.testFlag(Qn::web_page))
+        key = WebPage;
+
 
     Key status = Unknown;
-    
+
     if (QnLayoutResourcePtr layout = resource.dynamicCast<QnLayoutResource>()) {
         if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
             key = VideoWall;

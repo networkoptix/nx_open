@@ -16,7 +16,7 @@
 
 int main( int argc, char **argv )
 {
-	nx::SocketGlobals::InitGuard sgGuard;
+	nx::network::SocketGlobals::InitGuard sgGuard;
 
     ::testing::InitGoogleMock(&argc, argv);
 

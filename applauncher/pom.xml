@@ -18,27 +18,28 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>applauncher</artifactId>
     <packaging>pom</packaging>
-    <name>HD Witness Launcher</name>    
+    <name>HD Witness Launcher</name>
 
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>           
-    </dependencies>         
-    
+        </dependency>
+    </dependencies>
+
     <properties>
         <guid>${applauncher.guid}</guid>
-        <product.title>${applauncher.name}</product.title>  
+        <product.title>${applauncher.name}</product.title>
         <product.display.title>${applauncher.display.name}</product.display.title>
         <!--Global libs-->      
         <template>app</template>
         <qt.libs>core gui network xml widgets</qt.libs>
-        <global.libs>-lcommon -lquazip -ludt</global.libs>
+        <ffmpeg.libs></ffmpeg.libs>
+        <global.libs>-lcommon -lnx_streaming -lquazi -ludtp</global.libs>
         <!--Specific os libs used-->
         <windows.oslibs>DbgHelp.lib ssleay32.lib libeay32.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <windows.oslibs.release></windows.oslibs.release> 

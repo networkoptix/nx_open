@@ -30,6 +30,7 @@ namespace ec2
         virtual AbstractUserManagerPtr getUserManager() override;
         virtual AbstractLayoutManagerPtr getLayoutManager() override;
         virtual AbstractVideowallManagerPtr getVideowallManager() override;
+        virtual AbstractWebPageManagerPtr getWebPageManager() override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager() override;
         virtual AbstractUpdatesManagerPtr getUpdatesManager() override;
         virtual AbstractMiscManagerPtr getMiscManager() override;

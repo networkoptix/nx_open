@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <nx/utils/thread/mutex.h>
 #include <QtCore/QObject>
 
@@ -60,6 +62,30 @@ public:
     bool isStatisticsAllowedDefined() const;
     bool isStatisticsAllowed() const;
     void setStatisticsAllowed(bool value);
+
+    std::chrono::seconds connectionKeepAliveTimeout() const;
+    void setConnectionKeepAliveTimeout(std::chrono::seconds newTimeout);
+
+    int keepAliveProbeCount() const;
+    void setKeepAliveProbeCount(int newProbeCount);
+
+    std::chrono::seconds aliveUpdateInterval() const;
+    void setAliveUpdateInterval(std::chrono::seconds newInterval) const;
+
+    std::chrono::seconds serverDiscoveryPingTimeout() const;
+    void setServerDiscoveryPingTimeout(std::chrono::seconds newInterval) const;
+
+    std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
+
+    bool arecontRtspEnabled() const;
+    void setArecontRtspEnabled(bool newVal) const;
+
+    /*!
+        \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
+        \note returned list is not changed during \a QnGlobalSettings instance life-time
+    */
+    const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
+
 signals:
     void disabledVendorsChanged();
     void auditTrailEnableChanged();
@@ -69,6 +95,7 @@ signals:
     void ldapSettingsChanged();
     void statisticsAllowedChanged();
     void updateNotificationsChanged();
+    void ec2ConnectionSettingsChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -110,6 +137,12 @@ private:
     QnResourcePropertyAdaptor<QString> *m_ldapSearchBaseAdaptor;
     QnResourcePropertyAdaptor<QString> *m_ldapSearchFilterAdaptor;
 
+    QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor;
+    QnResourcePropertyAdaptor<int>* m_ec2KeepAliveProbeCountAdaptor;
+    QnResourcePropertyAdaptor<int>* m_ec2AliveUpdateIntervalAdaptor;
+    QnResourcePropertyAdaptor<int>* m_serverDiscoveryPingTimeout;
+
+    QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabled;
 
     AdaptorList m_allAdaptors;
 

@@ -14,6 +14,7 @@ class QnActiveCameraThumbnailLoaderPrivate : public QObject {
     QnActiveCameraThumbnailLoader *q_ptr;
 public:
     QnActiveCameraThumbnailLoaderPrivate(QnActiveCameraThumbnailLoader *parent);
+    ~QnActiveCameraThumbnailLoaderPrivate();
 
     mutable QMutex thumbnailMutex;
 
@@ -34,6 +35,8 @@ public:
     int requestId;
     bool requestNextAfterReply;
     QElapsedTimer fetchTimer;
+
+    QThread *decompressThread;
 
     QPixmap thumbnail() const;
     void clear();

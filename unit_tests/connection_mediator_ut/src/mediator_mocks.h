@@ -3,7 +3,6 @@
 
 #include <gmock.h>
 
-#include <listening_peer_pool.h>
 #include <mediaserver_api.h>
 
 #include "custom_printers.h"
@@ -13,7 +12,7 @@ namespace hpm {
 namespace test {
 
 class CloudDataProviderMock
-        : public CloudDataProviderBase
+        : public AbstractCloudDataProvider
 {
 public:
     MOCK_CONST_METHOD1( getSystem, boost::optional< System >( const String& ) );
@@ -39,8 +38,8 @@ public:
     MOCK_METHOD3( pingServer, void( const SocketAddress&, const String&,
                                     std::function< void( SocketAddress, bool ) > ) );
 
-    MediaserverApiMock( CloudDataProviderBase* cloudData,
-                        stun::MessageDispatcher* dispatcher )
+    MediaserverApiMock( AbstractCloudDataProvider* cloudData,
+                        nx::stun::MessageDispatcher* dispatcher )
         : MediaserverApiBase( cloudData, dispatcher ) {}
 
     inline

@@ -15,6 +15,19 @@ namespace stun {
 
 using namespace attrs;
 
+MessageSerializer::MessageSerializer()
+:
+    m_message(nullptr),
+    m_initialized(false)
+{
+}
+
+void MessageSerializer::setMessage(const Message* message)
+{
+    m_message = message;
+    m_initialized = true;
+}
+
 class MessageSerializer::MessageSerializerBuffer {
 public:
     MessageSerializerBuffer( nx::Buffer* buffer ) :
@@ -379,11 +392,17 @@ bool MessageSerializer::checkMessageIntegratiy() {
     return true;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const user_buffer, size_t* const bytesWritten ) {
+nx_api::SerializerState::Type MessageSerializer::serialize(
+    nx::Buffer* const user_buffer,
+    size_t* const bytesWritten )
+{
     for( int i = 0; ; ++i ) //TODO #ak ensure loop is not inifinite
     {
         if( i > 0 )
+        {
+            user_buffer->resize(0);
             user_buffer->reserve( user_buffer->capacity() * 2 );
+        }
 
         Q_ASSERT(m_initialized && checkMessageIntegratiy());
         Q_ASSERT(user_buffer->size() == 0 && user_buffer->capacity() != 0);
@@ -402,6 +421,17 @@ nx_api::SerializerState::Type MessageSerializer::serialize( nx::Buffer* const us
         *bytesWritten = user_buffer->size() - *bytesWritten;
         return nx_api::SerializerState::done;
     }
+}
+
+nx::Buffer MessageSerializer::serialized(const Message& message)
+{
+    MessageSerializer serializator;
+    serializator.setMessage(&message);
+    nx::Buffer serializedMessage;
+    serializedMessage.reserve(100);
+    size_t bytesWritten = 0;
+    serializator.serialize(&serializedMessage, &bytesWritten);
+    return serializedMessage;
 }
 
 } // namespase stun

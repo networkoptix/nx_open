@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv)
 {
-	nx::SocketGlobals::InitGuard sgGuard;
+	nx::network::SocketGlobals::InitGuard sgGuard;
     QCoreApplication app(argc, argv);
 
     ::testing::InitGoogleTest(&argc, argv);

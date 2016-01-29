@@ -18,14 +18,14 @@ extern "C"
 #include "core/resource/camera_resource.h"
 #include "core/resource/camera_history.h"
 
-#include "decoders/video/ffmpeg.h"
+#include "decoders/video/ffmpeg_video_decoder.h"
 
 #include "ui/common/geometry.h"
 
 #include "plugins/resource/avi/thumbnails_archive_delegate.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 
-#include "plugins/resource/archive/rtsp_client_archive_delegate.h"
+#include "nx/streaming/rtsp_client_archive_delegate.h"
 
 #include "utils/media/frame_info.h"
 
@@ -88,11 +88,15 @@ QnThumbnailsLoader::~QnThumbnailsLoader() {
     stop();
     if (m_scaleContext)
         sws_freeContext(m_scaleContext);
-    
+
     qFreeAligned(m_scaleBuffer);
 }
 
 bool QnThumbnailsLoader::supportedResource(const QnMediaResourcePtr &resource) {
+    /* Images are not supported. */
+    if (resource->toResourcePtr()->flags().testFlag(Qn::still_image))
+        return false;
+
     QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>();
     QnAviResourcePtr aviFile = resource.dynamicCast<QnAviResource>();
     return camera || aviFile;
@@ -214,7 +218,7 @@ void QnThumbnailsLoader::pleaseStop() {
     {
         QnMutexLocker locker( &m_mutex );
 
-        foreach(QnAbstractArchiveDelegatePtr client, m_delegates) 
+        foreach(QnAbstractArchiveDelegatePtr client, m_delegates)
             client->beforeClose();
     }
 
@@ -229,7 +233,7 @@ qreal QnThumbnailsLoader::getAspectRatio()
 
     if (m_scaleSourceSize.isEmpty())
         return QnGeometry::aspectRatio(m_scaleSourceSize);
-    if (m_cachedAspectRatio == 0) 
+    if (m_cachedAspectRatio == 0)
         m_cachedAspectRatio = QnGeometry::aspectRatio(m_scaleSourceSize);
     return m_cachedAspectRatio;
 }
@@ -410,12 +414,12 @@ void QnThumbnailsLoader::process() {
     QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
 
     if (camera) {
-        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);        
+        QnMediaServerResourceList servers = qnCameraHistoryPool->getCameraFootageData(camera, period);
         for(const QnMediaServerResourcePtr &server: servers)
         {
             if (server->getStatus() != Qn::Online)
                 continue;
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(0));
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(nullptr));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true);
@@ -440,7 +444,7 @@ void QnThumbnailsLoader::process() {
 
 
     bool invalidated = false;
-    for( const QnAbstractArchiveDelegatePtr &client: delegates) 
+    for( const QnAbstractArchiveDelegatePtr &client: delegates)
     {
         client->setRange(period.startTimeMs * 1000, period.endTimeMs() * 1000, timeStep * 1000);
 #ifdef QN_PREVIEW_SEARCH_DEBUG
@@ -458,7 +462,7 @@ void QnThumbnailsLoader::process() {
         QnCompressedVideoDataPtr frame = std::dynamic_pointer_cast<QnCompressedVideoData>(client->getNextData());
         if (frame)
         {
-            CLFFmpegVideoDecoder decoder(frame->compressionType, frame, false);
+            QnFfmpegVideoDecoder decoder(frame->compressionType, frame, false);
             QSharedPointer<CLVideoDecoderOutput> outFrame( new CLVideoDecoderOutput() );
             outFrame->setUseExternalData(false);
 
@@ -470,7 +474,7 @@ void QnThumbnailsLoader::process() {
                 frameFlags << frame->flags;
 
                 if(m_mode == Mode::Default) {
-                    if (decoder.decode(frame, &outFrame)) 
+                    if (decoder.decode(frame, &outFrame))
                     {
                         outFrame->pkt_dts = timingsQueue.dequeue();
                         thumbnail = generateThumbnail(*outFrame, boundingSize, timeStep, generation);
@@ -504,7 +508,7 @@ void QnThumbnailsLoader::process() {
             if(!invalidated && m_mode == Mode::Default) { // TODO: #Elric mode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
                 QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1, 0));
-                while (decoder.decode(emptyData, &outFrame)) 
+                while (decoder.decode(emptyData, &outFrame))
                 {
                     if(timingsQueue.isEmpty()) {
                         qnWarning("Time queue was emptied unexpectedly.");
@@ -550,13 +554,13 @@ void QnThumbnailsLoader::addThumbnail(const QnThumbnail &thumbnail) {
 void QnThumbnailsLoader::ensureScaleContextLocked(int lineSize, const QSize &sourceSize, const QSize &boundingSize, int format) {
     Q_UNUSED(boundingSize)
     bool needsReallocation = false;
-    
+
     if(m_scaleSourceSize != sourceSize) {
         m_scaleSourceSize = sourceSize;
         m_scaleSourceFormat = format;
         m_scaleSourceLine = lineSize;
         updateTargetSizeLocked(false);
-        
+
         m_mutex.unlock();
         emit sourceSizeChanged();
         m_mutex.lock();
@@ -619,7 +623,7 @@ qint64 QnThumbnailsLoader::processThumbnail(const QnThumbnail &thumbnail, qint64
     if(ignorePeriod) {
         emit m_helper->thumbnailLoaded(thumbnail);
         return qCeil(thumbnail.actualTime(), thumbnail.timeStep());
-    } else {      
+    } else {
         for(qint64 time = startTime; time <= endTime; time += thumbnail.timeStep())
             emit m_helper->thumbnailLoaded(QnThumbnail(thumbnail, time));
         return qMax(startTime, endTime + thumbnail.timeStep());

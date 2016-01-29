@@ -1,7 +1,7 @@
 #include "sync_dialog_display.h"
 #include "export/sign_helper.h"
 #include "utils/common/synctime.h"
-#include "plugins/resource/archive/archive_stream_reader.h"
+#include "nx/streaming/archive_stream_reader.h"
 #include "plugins/resource/avi/avi_archive_delegate.h"
 
 QnSignDialogDisplay::QnSignDialogDisplay(QnMediaResourcePtr resource): 
@@ -43,7 +43,7 @@ void QnSignDialogDisplay::finilizeSign()
                 QList<QByteArray> patternParams = baPattern.split(QnSignHelper::getSignPatternDelim());
 
                 baPattern.replace(0, magic.size(), magic);
-                QnSignHelper::updateDigest(0, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
+                QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*) baPattern.data(), baPattern.size());
                 calculatedSign = m_mdctx.result();
 
                 signFromPicture = QnSignHelper::getDigestFromSign(patternParams[0]);
@@ -102,14 +102,13 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         // update digest from current frame
         if (media && media->dataSize() > 4) {
             const quint8* data = (const quint8*) media->data();
-            AVCodecContext* avCtx = media->context ? media->context->ctx() : 0;
-            QnSignHelper::updateDigest(avCtx, m_mdctx, data, media->dataSize());
+            QnSignHelper::updateDigest(media->context, m_mdctx, data, media->dataSize());
         }
 #else
         // update digest from previous frames because of last frame it is sign frame itself
         if (m_prevFrame && m_prevFrame->data.size() > 4) {
             const quint8* data = (const quint8*) m_prevFrame->data.data();
-            QnSignHelper::updateDigest(m_prevFrame->context->ctx(), m_mdctx, data, m_prevFrame->data.size());
+            QnSignHelper::updateDigest(m_prevFrame->context, m_mdctx, data, m_prevFrame->data.size());
         }
 #endif
         if (video) 

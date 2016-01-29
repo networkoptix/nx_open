@@ -21,7 +21,48 @@ template<class SocketServerType>
     class MultiAddressServer
 {
 public:
-    //TODO #ak introduce genericc implementation when variadic templates available
+    //TODO #ak introduce generic implementation when variadic templates available
+    template<typename Arg1>
+    MultiAddressServer(Arg1 arg1)
+    {
+        m_socketServerFactory =
+            [arg1]() -> std::unique_ptr<SocketServerType>
+        {
+            return std::make_unique<SocketServerType>(
+                std::move(arg1));
+        };
+    }
+
+    template<typename Arg1, typename Arg2>
+    MultiAddressServer(
+        Arg1 arg1,
+        Arg2 arg2)
+    {
+        m_socketServerFactory =
+            [arg1, arg2]() -> std::unique_ptr<SocketServerType>
+        {
+            return std::make_unique<SocketServerType>(
+                std::move(arg1),
+                std::move(arg2));
+        };
+    }
+
+    template<typename Arg1, typename Arg2, typename Arg3>
+    MultiAddressServer(
+        Arg1 arg1,
+        Arg2 arg2,
+        Arg3 arg3)
+    {
+        m_socketServerFactory =
+            [arg1, arg2, arg3]() -> std::unique_ptr<SocketServerType>
+        {
+            return std::make_unique<SocketServerType>(
+                std::move(arg1),
+                std::move(arg2),
+                std::move(arg3));
+        };
+    }
+
     template<typename Arg1, typename Arg2, typename Arg3, typename Arg4>
     MultiAddressServer(
         Arg1 arg1,
@@ -37,20 +78,6 @@ public:
                     std::move(arg2),
                     std::move(arg3),
                     std::move(arg4));
-            };
-    }
-
-    template<typename Arg1, typename Arg2>
-    MultiAddressServer(
-        Arg1 arg1,
-        Arg2 arg2 )
-    {
-        m_socketServerFactory = 
-            [arg1, arg2]() -> std::unique_ptr<SocketServerType>
-            {
-                return std::make_unique<SocketServerType>(
-                    std::move(arg1),
-                    std::move(arg2));
             };
     }
 

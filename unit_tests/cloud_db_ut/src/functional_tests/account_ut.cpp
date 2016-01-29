@@ -28,14 +28,14 @@ namespace cdb {
 
 TEST_F(CdbFunctionalTest, account_activation)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -75,14 +75,14 @@ TEST_F(CdbFunctionalTest, account_activation)
 
 TEST_F(CdbFunctionalTest, account_reactivation)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -99,9 +99,12 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     ASSERT_TRUE(!activationCode.code.empty());
 
     //reactivating account (e.g. we lost activation code)
-    result = reactivateAccount(account1.email, &activationCode);
+    api::AccountConfirmationCode activationCode2;
+    result = reactivateAccount(account1.email, &activationCode2);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_TRUE(!activationCode.code.empty());
+    ASSERT_TRUE(!activationCode2.code.empty());
+
+    ASSERT_EQ(activationCode.code, activationCode2.code);
 
     std::string email;
     result = activateAccount(activationCode, &email);
@@ -112,19 +115,30 @@ TEST_F(CdbFunctionalTest, account_reactivation)
     ASSERT_EQ(api::ResultCode::ok, result);
     ASSERT_EQ(QN_CUSTOMIZATION_NAME, account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
+
+    //subsequent activation MUST fail
+    for (int i = 0; i < 2; ++i)
+    {
+        std::string email;
+        result = activateAccount(activationCode, &email);
+        ASSERT_EQ(api::ResultCode::notFound, result);
+
+        if (i == 0)
+            restart();
+    }
 }
 
 //reactivation of already activated account must fail
 TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -149,14 +163,14 @@ TEST_F(CdbFunctionalTest, account_reactivation_activated_account)
 
 TEST_F(CdbFunctionalTest, account_general)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(3);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     //waiting for cloud_db initialization
@@ -184,7 +198,7 @@ TEST_F(CdbFunctionalTest, account_general)
 
     {
         //fetching account1 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account1.email, account1Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 1);
@@ -193,26 +207,26 @@ TEST_F(CdbFunctionalTest, account_general)
 
     {
         //fetching account2 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 0);
     }
 
     {
-        //sharing system to account2 with "editor" permission
+        //sharing system to account2 with "localAdmin" permission
         const auto result = shareSystem(
             account1.email,
             account1Password,
             system1.id,
             account2.email,
-            api::SystemAccessRole::editor);
+            api::SystemAccessRole::localAdmin);
         ASSERT_EQ(result, api::ResultCode::ok);
     }
 
     {
         //fetching account2 systems
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         const auto result = getSystems(account2.email, account2Password, &systems);
         ASSERT_EQ(result, api::ResultCode::ok);
         ASSERT_EQ(systems.size(), 1);
@@ -232,21 +246,21 @@ TEST_F(CdbFunctionalTest, account_general)
             account2Password,
             system1.id,
             account3.email,
-            api::SystemAccessRole::editor);
+            api::SystemAccessRole::localAdmin);
         ASSERT_EQ(result, api::ResultCode::forbidden);
     }
 }
 
 TEST_F(CdbFunctionalTest, account_badRegistration)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(1);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -375,14 +389,14 @@ TEST_F(CdbFunctionalTest, account_update)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_general)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(4);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     startAndWaitUntilStarted();
@@ -434,14 +448,14 @@ TEST_F(CdbFunctionalTest, account_resetPassword_general)
 
 TEST_F(CdbFunctionalTest, account_resetPassword_expiration)
 {
-    MockEmailManager mockedEmailManager;
+    EmailManagerMocked mockedEmailManager;
     EXPECT_CALL(
         mockedEmailManager,
         sendAsyncMocked(QByteArray())).Times(2);
 
     EMailManagerFactory::setFactory(
         [&mockedEmailManager](const conf::Settings& /*settings*/) {
-            return new EmailManagerStub(&mockedEmailManager);
+            return std::make_unique<EmailManagerStub>(&mockedEmailManager);
         });
 
     const std::chrono::seconds expirationPeriod(5);
@@ -541,22 +555,22 @@ TEST_F(CdbFunctionalTest, account_resetPassword_authorization)
             &system2);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
-        std::vector<api::SystemData> systems;
+        std::vector<api::SystemDataEx> systems;
         result = getSystems(account1.email, tmpPassword, &systems);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
-        std::vector<api::SystemSharing> sharings;
+        std::vector<api::SystemSharingEx> sharings;
         result = getSystemSharings(account1.email, tmpPassword, &sharings);
         ASSERT_EQ(api::ResultCode::notAuthorized, result);
 
         {
-            //sharing system to account2 with "editor" permission
+            //sharing system to account2 with "localAdmin" permission
             const auto result = shareSystem(
                 account1.email,
                 tmpPassword,
                 system1.id,
                 account2.email,
-                api::SystemAccessRole::editor);
+                api::SystemAccessRole::localAdmin);
             ASSERT_EQ(api::ResultCode::notAuthorized, result);
         }
     }

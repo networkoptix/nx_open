@@ -128,7 +128,7 @@ namespace nx_api
         }
 
     protected:
-        SocketAddress getForeignAddress()
+        SocketAddress getForeignAddress() const
         {
             return m_streamSocket->getForeignAddress();
         }

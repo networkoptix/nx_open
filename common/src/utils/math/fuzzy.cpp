@@ -4,6 +4,7 @@
 
 #include <QtCore/QtNumeric>
 
+#if QT_VERSION == 0x050201
 static inline quint32 f2i(float f)
 {
     quint32 i;
@@ -87,6 +88,7 @@ quint64 qFloatDistance(double a, double b)
     // finally do the common integer subtraction
     return a > b ? d2i(a) - d2i(b) : d2i(b) - d2i(a);
 }
+#endif
 
 float qFuzzyFloor(float value) {
     float result = std::floor(value);
@@ -129,7 +131,7 @@ double qFuzzyCeil(double value) {
 }
 
 bool qFuzzyContains(const QRectF &rect, const QPointF &point) {
-    return 
+    return
         qFuzzyBetween(rect.left(), point.x(), rect.right()) &&
         qFuzzyBetween(rect.top(), point.y(), rect.bottom());
 }

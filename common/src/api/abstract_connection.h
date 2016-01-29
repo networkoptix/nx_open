@@ -3,7 +3,9 @@
 
 #include <cassert>
 
+#ifndef Q_MOC_RUN
 #include <boost/preprocessor/stringize.hpp>
+#endif
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
@@ -25,7 +27,7 @@ namespace QnStringizeTypeDetail { template<class T> void check_type() {} }
 /**
  * Macro that stringizes the given type name and checks at compile time that
  * the given type is actually defined.
- * 
+ *
  * \param TYPE                          Type to stringize.
  */
 #define QN_STRINGIZE_TYPE(TYPE) (QnStringizeTypeDetail::check_type<TYPE>(), BOOST_PP_STRINGIZE(TYPE))
@@ -45,7 +47,7 @@ public:
 
     /**
      * Starts an event loop waiting for the reply.
-     * 
+     *
      * \returns                         Received request status.
      */
     int exec() {
@@ -118,7 +120,7 @@ protected:
 
     QnLexicalSerializer *serializer() const;
     void setSerializer(QnLexicalSerializer *serializer);
-    
+
     QString objectName(int object) const;
 
     const QnRequestHeaderList &extraHeaders() const;

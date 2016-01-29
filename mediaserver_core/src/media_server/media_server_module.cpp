@@ -34,5 +34,4 @@ QnMediaServerModule::~QnMediaServerModule() {
 
 void QnMediaServerModule::initServerMetaTypes()
 {
-    qRegisterMetaType<QnServer::BackupResultCode>("QnServer::BackupResultCode");
 }

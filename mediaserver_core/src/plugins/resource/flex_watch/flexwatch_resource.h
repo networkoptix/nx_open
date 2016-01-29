@@ -6,7 +6,7 @@
 #include "core/resource/security_cam_resource.h"
 #include "core/resource/camera_resource.h"
 #include <nx/network/simple_http_client.h>
-#include "core/datapacket/media_data_packet.h"
+#include "nx/streaming/media_data_packet.h"
 #include "../onvif/onvif_resource.h"
 
 class onvifXsd__H264Configuration;

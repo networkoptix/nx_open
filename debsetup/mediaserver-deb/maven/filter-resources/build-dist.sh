@@ -2,7 +2,7 @@
 
 COMPANY_NAME=${deb.customization.company.name}
 
-PACKAGENAME=$COMPANY_NAME-mediaserver
+PACKAGENAME=${installer.name}-mediaserver
 VERSION=${release.version}
 ARCHITECTURE=${os.arch}
 

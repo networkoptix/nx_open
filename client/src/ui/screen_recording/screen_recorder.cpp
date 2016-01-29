@@ -12,7 +12,6 @@
 #include <nx/utils/log/log.h>
 #include "plugins/resource/desktop_win/desktop_file_encoder.h"
 #include "plugins/resource/desktop_win/desktop_resource.h"
-#include "recording/stream_recorder.h"
 #include "core/resource_management/resource_pool.h"
 #include <utils/common/string.h>
 
@@ -106,12 +105,16 @@ void QnScreenRecorder::cleanupRecorder()
     m_dataProvider = 0;
 }
 
-void QnScreenRecorder::at_recorder_recordingFinished(int status, const QString &filename) {
+void QnScreenRecorder::at_recorder_recordingFinished(
+    const QnStreamRecorder::ErrorStruct &status,
+    const QString                       &filename
+)
+{
     Q_UNUSED(filename)
-    if (status == QnStreamRecorder::NoError)
+    if (status.lastError == QnStreamRecorder::NoError)
         return;
 
-    emit error(QnStreamRecorder::errorString(status));
+    emit error(QnStreamRecorder::errorString(status.lastError));
     cleanupRecorder();
 }
 

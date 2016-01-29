@@ -385,44 +385,54 @@ db::DBResult AccountManager::issueAccountActivationCode(
     data::AccountConfirmationCode* const resultData)
 {
     //removing already-existing activation codes
-    QSqlQuery deleteActivationCodesQuery(*connection);
-    deleteActivationCodesQuery.prepare(
-        "DELETE FROM email_verification "
+    QSqlQuery fetchActivationCodesQuery(*connection);
+    fetchActivationCodesQuery.prepare(
+        "SELECT verification_code "
+        "FROM email_verification "
         "WHERE account_id=(SELECT id FROM account WHERE email=?)");
-    deleteActivationCodesQuery.bindValue(
+    fetchActivationCodesQuery.bindValue(
         0,
         QnSql::serialized_field(accountEmail));
-    if (!deleteActivationCodesQuery.exec())
+    if (!fetchActivationCodesQuery.exec())
     {
-        NX_LOG(lit("Could not delete account activation codes from DB. %1").
-            arg(connection->lastError().text()), cl_logDEBUG1);
+        NX_LOG(lm("Could not fetch account %1 activation codes from DB. %2").
+            arg(accountEmail).arg(connection->lastError().text()), cl_logDEBUG1);
         return db::DBResult::ioError;
     }
-
-    //inserting email verification code
-    const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
-    QSqlQuery insertEmailVerificationQuery( *connection );
-    insertEmailVerificationQuery.prepare( 
-        "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
-                               "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )" );
-    insertEmailVerificationQuery.bindValue(
-        0,
-        QnSql::serialized_field(accountEmail));
-    insertEmailVerificationQuery.bindValue(
-        1,
-        emailVerificationCode);
-    insertEmailVerificationQuery.bindValue(
-        2,
-        QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
-    if( !insertEmailVerificationQuery.exec() )
+    if (fetchActivationCodesQuery.next())
     {
-        NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
-            arg( connection->lastError().text() ), cl_logDEBUG1 );
-        return db::DBResult::ioError;
+        //returning existing verification code
+        resultData->code = 
+            fetchActivationCodesQuery.
+                value(lit("verification_code")).toString().toStdString();
     }
-    resultData->code.assign(
-        emailVerificationCode.constData(),
-        emailVerificationCode.size());
+    else
+    {
+        //inserting email verification code
+        const auto emailVerificationCode = QnUuid::createUuid().toByteArray().toHex();
+        QSqlQuery insertEmailVerificationQuery( *connection );
+        insertEmailVerificationQuery.prepare( 
+            "INSERT INTO email_verification( account_id, verification_code, expiration_date ) "
+                                   "VALUES ( (SELECT id FROM account WHERE email=?), ?, ? )" );
+        insertEmailVerificationQuery.bindValue(
+            0,
+            QnSql::serialized_field(accountEmail));
+        insertEmailVerificationQuery.bindValue(
+            1,
+            emailVerificationCode);
+        insertEmailVerificationQuery.bindValue(
+            2,
+            QDateTime::currentDateTimeUtc().addSecs(kUnconfirmedAccountExpirationSec.count()));
+        if( !insertEmailVerificationQuery.exec() )
+        {
+            NX_LOG( lit( "Could not insert account verification code into DB. %1" ).
+                arg( connection->lastError().text() ), cl_logDEBUG1 );
+            return db::DBResult::ioError;
+        }
+        resultData->code.assign(
+            emailVerificationCode.constData(),
+            emailVerificationCode.size());
+    }
 
     //sending confirmation email
     ActivateAccountNotification notification;

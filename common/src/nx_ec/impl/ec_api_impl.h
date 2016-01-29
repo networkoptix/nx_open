@@ -82,7 +82,7 @@
 
 namespace ec2
 {
-    const int INVALID_REQ_ID = -1;  
+    const int INVALID_REQ_ID = -1;
 
     // TODO: #Elric #enum
     enum class ErrorCode
@@ -189,7 +189,9 @@ namespace ec2
             void emitConnectDone( int reqID, const ErrorCode p1, const AbstractECConnectionPtr &p2 ) { emit onConnectDone( reqID, p1, p2 ); }
             void emitAddVideowallDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onAddVideowallDone( reqID, p1, p2 ); }
             void emitGetVideowallsDone( int reqID, const ErrorCode p1, const QnVideoWallResourceList& p2 ) { emit onGetVideowallsDone( reqID, p1, p2 ); }
-        
+            void emitAddWebPageDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onAddWebPageDone( reqID, p1, p2 ); }
+            void emitGetWebPagesDone( int reqID, const ErrorCode p1, const QnWebPageResourceList& p2 ) { emit onGetWebPagesDone( reqID, p1, p2 ); }
+
         signals:
             void onSimpleDone( int reqID, const ErrorCode );
             void onGetResourceTypesDone( int reqID, const ErrorCode, const QnResourceTypeList& );
@@ -224,6 +226,8 @@ namespace ec2
             void onConnectDone( int reqID, const ErrorCode, const AbstractECConnectionPtr &);
             void onAddVideowallDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
             void onGetVideowallsDone( int reqID, const ErrorCode, const QnVideoWallResourceList& );
+            void onAddWebPageDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
+            void onGetWebPagesDone( int reqID, const ErrorCode, const QnWebPageResourceList& );
         };
 
 
@@ -296,6 +300,12 @@ namespace ec2
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER( GetVideowalls, ErrorCode, QnVideoWallResourceList )
         DEFINE_TWO_ARG_HANDLER( AddVideowall, ErrorCode, QnVideoWallResourceList )
+
+        //////////////////////////////////////////////////////////
+        ///////// Handlers for AbstractWebPageManager
+        //////////////////////////////////////////////////////////
+        DEFINE_TWO_ARG_HANDLER( GetWebPages, ErrorCode, QnWebPageResourceList )
+        DEFINE_TWO_ARG_HANDLER( AddWebPage, ErrorCode, QnWebPageResourceList )
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractStoredFileManager

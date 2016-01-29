@@ -25,7 +25,7 @@ class AuthProvider
     public AsyncRequestsExecutor
 {
 public:
-    AuthProvider(cc::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
+    AuthProvider(network::cloud::CloudModuleEndPointFetcher* const cloudModuleEndPointFetcher);
 
     virtual void getCdbNonce(
         std::function<void(api::ResultCode, api::NonceData)> completionHandler) override;

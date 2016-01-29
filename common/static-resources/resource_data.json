@@ -36,7 +36,7 @@
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04",
+                "*|DW-CP04", "*|DW-CP16",
                 "Avigilon|ENC-*",
                 "ACTI|V32",
                 "BOSCH|VIP-X1600-XFM4"
@@ -108,8 +108,8 @@
                 "ACTI|KCM8111", "*|FW3471-PS-E",
                 "*|FW3471-PS-E",
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04",
-                "ACTI|I96"
+                "*|DW-CP04", "*|DW-CP16",
+                "ACTI|I96","ACTI|I98"
             ],
             "ptzTraits": "EightWayPtz"
         },

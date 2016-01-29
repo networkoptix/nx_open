@@ -18,7 +18,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <plugins/resource/archive/archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/storage/file_storage/layout_storage_resource.h>
 
@@ -269,7 +269,7 @@ void QnWorkbenchExportHandler::exportTimeSelection(
             QMessageBox::warning(
                 mainWindow(),
                 tr("Warning!"),
-                tr("You are about to export a video sequence that is longer than 30 minutes.") + L'\n'
+                tr("You are about to export a video that is longer than 30 minutes.") + L'\n'
               + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
               + tr("Do you want to continue?"),
                 QMessageBox::Yes | QMessageBox::No,
@@ -760,7 +760,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
         int button = QMessageBox::question(
             mainWindow(),
             tr("Warning!"),
-            tr("You are about to export several video sequences with a total length exceeding 30 minutes.") + L'\n'
+            tr("You are about to export several videos with a total length exceeding 30 minutes.") + L'\n'
           + tr("It may require over a gigabyte of HDD space, and, depending on your connection speed, may also take several minutes to complete.") + L'\n'
           + tr("Do you want to continue?"),
                QMessageBox::Yes | QMessageBox::No

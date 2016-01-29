@@ -2,6 +2,7 @@
 
 #include <QtCore/QTimer>
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 
 #include <network/module_information.h>
@@ -17,13 +18,16 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/async_http_client_reply.h>
 
+
+using std::chrono::duration_cast;
+using std::chrono::seconds;
+using std::chrono::milliseconds;
+
 namespace {
 
-    const int defaultMaxConnections = 30;
-    const int discoveryCheckIntervalMs = 60 * 1000;
-    const int aliveCheckIntervalMs = 7 * 1000;
-    const int timerIntervalMs = 1000;
-    const int maxPingTimeoutMs = 15 * 1000;
+    const int kDefaultMaxConnections = 30;
+    const std::chrono::seconds kDiscoveryCheckInterval(60);
+    const int kTimerIntervalMs = 1000;
 
     QUrl trimmedUrl(const QUrl &url) {
         QUrl result;
@@ -44,13 +48,14 @@ namespace {
 
 } // anonymous namespace
 
-QnDirectModuleFinder::QnDirectModuleFinder(QObject *parent) :
+QnDirectModuleFinder::QnDirectModuleFinder(QObject* parent)
+:
     QObject(parent),
     m_compatibilityMode(false),
-    m_maxConnections(defaultMaxConnections),
+    m_maxConnections(kDefaultMaxConnections),
     m_checkTimer(new QTimer(this))
 {
-    m_checkTimer->setInterval(timerIntervalMs);
+    m_checkTimer->setInterval(kTimerIntervalMs);
     connect(m_checkTimer, &QTimer::timeout, this, &QnDirectModuleFinder::at_checkTimer_timeout);
 }
 
@@ -184,16 +189,34 @@ void QnDirectModuleFinder::at_checkTimer_timeout() {
     qint64 currentTime = m_elapsedTimer.elapsed();
 
     for (const QUrl &url: m_urls) {
-        bool alive = currentTime - m_lastPingByUrl.value(url) < maxPingTimeoutMs;
-        qint64 lastCheck = m_lastCheckByUrl.value(url);
+        const bool alive = currentTime - m_lastPingByUrl.value(url) < maxPingTimeout().count();
+        const qint64 lastCheck = m_lastCheckByUrl.value(url);
         if (alive) {
-            if (currentTime - lastCheck < aliveCheckIntervalMs)
+            if (currentTime - lastCheck < aliveCheckInterval().count())
                 continue;
         } else {
-            if (currentTime - lastCheck < discoveryCheckIntervalMs)
+            if (currentTime - lastCheck < discoveryCheckInterval().count())
                 continue;
         }
         enqueRequest(url);
     }
     activateRequests();
+}
+
+std::chrono::milliseconds QnDirectModuleFinder::maxPingTimeout() const
+{
+    return QnGlobalSettings::instance()->serverDiscoveryAliveCheckTimeout();
+}
+
+std::chrono::milliseconds QnDirectModuleFinder::aliveCheckInterval() const
+{
+    const auto maxPingTimeoutLocal = maxPingTimeout();
+    return maxPingTimeoutLocal > seconds(4)
+        ? (maxPingTimeoutLocal / 2) - seconds(1)
+        : seconds(1);
+}
+
+std::chrono::milliseconds QnDirectModuleFinder::discoveryCheckInterval() const
+{
+    return QnGlobalSettings::instance()->serverDiscoveryPingTimeout();
 }

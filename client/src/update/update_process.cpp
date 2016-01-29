@@ -209,7 +209,15 @@ void QnUpdateProcess::setIncompatiblePeersStage(QnPeerUpdateStage stage) {
 }
 
 void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* task, const QnCheckForUpdateResult &result) {
-    if (result.result != QnCheckForUpdateResult::UpdateFound) {
+    switch (result.result)
+    {
+    case QnCheckForUpdateResult::UpdateFound:
+        break;
+    case QnCheckForUpdateResult::NoNewerVersion:
+        setAllPeersStage(QnPeerUpdateStage::Init);
+        finishUpdate(QnUpdateResult::AlreadyUpdated);
+        return;
+    default:
         setAllPeersStage(QnPeerUpdateStage::Init);
         finishUpdate(QnUpdateResult::DownloadingFailed);
         return;

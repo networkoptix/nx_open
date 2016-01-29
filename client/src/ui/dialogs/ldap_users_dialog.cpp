@@ -44,10 +44,9 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
     }
 
     QnMediaServerConnectionPtr serverConnection;
-    for (const QnMediaServerResourcePtr server: qnResPool->getAllServers()) {
-        if (server->getStatus() != Qn::Online)
-            continue;
-
+    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    for (const QnMediaServerResourcePtr server: onlineServers)
+    {
         if (!(server->getServerFlags() & Qn::SF_HasPublicIP))
             continue;
 
@@ -56,7 +55,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
     }
 
     if (!serverConnection) {
-        stopTesting(tr("None of your servers is connected to the Internet.") + lit("\n") + tr("Could not load users."));
+        stopTesting(tr("None of your servers are connected to the Internet.") + lit("\n") + tr("Could not load users."));
         return;
     }
 
@@ -68,7 +67,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget *parent)
     ui->buttonBox->showProgress();
     m_timeoutTimer->setInterval(testLdapTimeoutMSec);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this]{
-        stopTesting(tr("Timed out"));
+        stopTesting(tr("Timed Out"));
     });
     m_timeoutTimer->start();
 
@@ -118,7 +117,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
             usersModel->setCheckState(state, user.login);
     });
 
-    ui->usersTable->setModel(sortModel);  
+    ui->usersTable->setModel(sortModel);
     ui->usersTable->setHorizontalHeader(header);
 
     header->setVisible(true);
@@ -144,7 +143,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
     };
 
     connect(ui->usersTable, &QTableView::clicked, this,  [usersModel, updateSelection] (const QModelIndex &index) {
-        if (index.column() != QnLdapUserListModel::CheckBoxColumn) 
+        if (index.column() != QnLdapUserListModel::CheckBoxColumn)
             return;
 
         QString login = index.data(QnLdapUserListModel::LoginRole).toString();
@@ -154,7 +153,7 @@ void QnLdapUsersDialog::at_testLdapSettingsFinished(int status, const QnLdapUser
         /* Invert current state */
         usersModel->setCheckState(index.data(Qt::CheckStateRole).toBool() ? Qt::Unchecked : Qt::Checked, login);
         updateSelection();
-        
+
     });
 
     m_importButton->setVisible(true);
@@ -200,7 +199,7 @@ void QnLdapUsersDialog::updateExistingUsers(const QnLdapUsers &users) {
 
     auto importedUsers = qnResPool->getResources().filtered<QnUserResource>([](const QnUserResourcePtr &user) {
         return user->isLdap();
-    });  
+    });
 
     for (const QnLdapUser &ldapUser: users) {
         auto it = std::find_if(importedUsers.cbegin(), importedUsers.cend(), [ldapUser](const QnUserResourcePtr &user) {
