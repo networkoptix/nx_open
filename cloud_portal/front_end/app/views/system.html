@@ -2,12 +2,14 @@
 <div class="auth-visible" process-loading="gettingSystem">
     <div class="row">
         <div class="col-md-6">
-            <h1>
+            <h1 ng-if="gettingSystem.success">
                 <a href="#/systems">Systems</a> > {{system.info.name}}
                 <small><span ng-if="system.info.status!=Config.systemStatuses.onlineStatus" class="label"
                       ng-class="Config.systemStatuses[system.info.status].style || Config.systemStatuses.default.style">
                       {{Config.systemStatuses[system.info.status].label||system.info.status}}</span></small>
             </h1>
+            <process-alert process="gettingSystem"
+                           error-prefix="'System info is unavailable:'"></process-alert>
         </div>
         <div class="col-md-6">
             <div class="pull-right">
@@ -25,11 +27,10 @@
             </div>
         </div>
 
-        <process-alert process="gettingSystem"
-                       error-prefix="'System info is unavailable:'"></process-alert>
+
 
     </div>
-    <div class="row">
+    <div class="row"  ng-if="gettingSystem.success">
         <div class="col-md-8">
 
             <div class="panel panel-default"
@@ -78,7 +79,7 @@
             </div>
 
         </div>
-        <div class="col-md-4" ng-if="typeof(isOwner) != 'undefined' ">
+        <div class="col-md-4">
 
             <div class="panel panel-default" ng-if="isOwner">
                 <div class="panel-body">

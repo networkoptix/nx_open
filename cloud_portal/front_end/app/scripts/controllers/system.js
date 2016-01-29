@@ -20,6 +20,9 @@ angular.module('cloudApp')
         // Retrieve system info
         $scope.gettingSystem = process.init(function(){
             return cloudApi.system(systemId);
+        },{
+            forbidden: Config.errorCodes.systemForbidden,
+            notFound: Config.errorCodes.systemNotFound
         }).then(function(result){
             $scope.system.info = result.data[0];
         });

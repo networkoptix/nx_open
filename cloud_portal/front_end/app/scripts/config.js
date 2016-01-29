@@ -138,6 +138,10 @@ var Config = {
         accountAlreadyActivated: 'Your account was already activated',
         emailNotFound: 'Email isn\'t registered in portal',
         emailAlreadyExists: 'Email is already registered in portal',
-        oldPasswordMistmatch: 'Current password doesn\'t match'
+        oldPasswordMistmatch: 'Current password doesn\'t match',
+
+        systemForbidden: 'You have no access to this system',
+        systemNotFound: 'This system wasn\'t found'
+
     }
 };
