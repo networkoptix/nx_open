@@ -13,8 +13,8 @@ Item {
     signal pressAndHold
     signal showClicked
 
-    width: parent ? parent.width : 0
-    height: dp(56)
+    implicitWidth: parent ? parent.width : 0
+    implicitHeight: dp(56)
 
     readonly property bool offline: status == QnCameraListModel.Offline ||
                                     status == QnCameraListModel.NotDefined ||
@@ -59,7 +59,7 @@ Item {
 
         width: Math.max(implicitWidth, dp(80))
         anchors.right: parent.right
-        anchors.rightMargin: dp(8)
+        anchors.rightMargin: dp(4)
         anchors.verticalCenter: parent.verticalCenter
 
         text: qsTr("Show")
