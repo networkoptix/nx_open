@@ -39,18 +39,18 @@ angular.module('cloudApp', [
             templateUrl: 'views/systems.html',
             controller: 'SystemsCtrl'
         })
-        .when('/system/:systemId', {
+        .when('/systems/:systemId', {
             templateUrl: 'views/system.html',
             controller: 'SystemCtrl'
         })
-        .when('/system/:systemId/share', {
+        .when('/systems/:systemId/share', {
             templateUrl: 'views/system.html',
             controller: 'SystemCtrl',
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
         })
-        .when('/system/:systemId/share/:shareEmail', {
+        .when('/systems/:systemId/share/:shareEmail', {
             templateUrl: 'views/system.html',
             controller: 'SystemCtrl',
             resolve: {

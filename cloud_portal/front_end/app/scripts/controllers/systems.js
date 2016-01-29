@@ -22,7 +22,7 @@ angular.module('cloudApp')
         };
 
         $scope.openSystem = function(system){
-            $location.path('/system/' + system.id);
+            $location.path('/systems/' + system.id);
         };
 
         $scope.getSystemOwnerName = function(system) {

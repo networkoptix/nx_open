@@ -31,6 +31,11 @@ angular.module('cloudApp')
         });
         $scope.gettingSystem.run();
 
+        function cleanUrl(){
+            console.log("clean url");
+            $location.path('/systems/' + systemId, false);
+        }
+
         //Retrieve users list
         $scope.gettingSystemUsers = process.init(function(){
             return cloudApi.users(systemId);
@@ -41,6 +46,7 @@ angular.module('cloudApp')
                 return - Config.accessRoles.order.indexOf(user.accessRole);
             });
 
+            console.log("callShare", $routeParams.callShare);
 
             if($routeParams.callShare){
 
@@ -50,15 +56,15 @@ angular.module('cloudApp')
                        return user.accountEmail == emailWith;
                     });
                     if(user) {
-                        $scope.editShare(user);
+                        $scope.editShare(user).finally(cleanUrl);
                     }else{
                         $scope.editShare({
                             accountEmail:emailWith,
                             accessRole: Config.accessRoles.default
-                        });
+                        }).finally(cleanUrl);
                     }
                 }else {
-                    $scope.share();
+                    $scope.share().finally(cleanUrl);
                 }
             }
 
@@ -107,14 +113,14 @@ angular.module('cloudApp')
 
         $scope.share = function(){
             // Call share dialog, run process inside
-            dialogs.share(systemId, $scope.isOwner).then(function(){
+            return dialogs.share(systemId, $scope.isOwner).then(function(){
                 $scope.gettingSystemUsers.run();
             });
         };
 
         $scope.editShare = function(user){
             //Pass user inside
-            dialogs.share(systemId, $scope.isOwner, user).then(function(){
+            return dialogs.share(systemId, $scope.isOwner, user).then(function(){
                 $scope.gettingSystemUsers.run();
             });
         };
