@@ -22,6 +22,13 @@ class AbstractTunnelConnection
     public QnStoppableAsync
 {
 public:
+    AbstractTunnelConnection(String remotePeerId)
+        : m_remotePeerId(std::move(remotePeerId))
+    {
+    }
+
+    const String& getRemotePeerId() const { return m_remotePeerId; }
+
     typedef std::function<void(SystemError::ErrorCode,
                                std::unique_ptr<AbstractStreamSocket>,
                                bool /*stillValid*/)> SocketHandler;
@@ -34,6 +41,9 @@ public:
     /** Accepts new connection from peer (like socket)
      *  \note not all of the AbstractTunnelConnection can really accept connections */
     virtual void accept(SocketHandler handler) = 0;
+
+private:
+    const String m_remotePeerId;
 };
 
 /** Creates outgoing specialized AbstractTunnelConnections */
@@ -57,8 +67,7 @@ class AbstractTunnelAcceptor
 {
 public:
     virtual void accept(
-        std::function<void(String,
-                           std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
+        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) = 0;
 };
 
 //!Tunnel between two peers. Tunnel can be established by backward TCP connection or by hole punching UDT connection
@@ -82,16 +91,17 @@ class Tunnel
     public QnStoppableAsync
 {
 public:
-    Tunnel(String peerId);
+    Tunnel(String remotePeerId);
+
+    Tunnel(std::unique_ptr<AbstractTunnelConnection> connection);
+
+    const String& getRemotePeerId() const { return m_remotePeerId; }
 
     enum class State { kInit, kConnecting, kConnected, kClosed };
     static QString stateToString(State state);
 
     /** Creates resposable \class AbstractTunnelConnector if not connected yet */
     void addConnectionTypes(std::vector<CloudConnectType> type);
-
-    /** Addopts external connection */
-    void adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection);
 
     /** Indicates tonnel state */
     void setStateHandler(std::function<void(State)> handler);
@@ -115,7 +125,7 @@ private:
     void startConnectors(QnMutexLockerBase* lock);
     void changeState(State state, QnMutexLockerBase* lock);
 
-    const String m_peerId;
+    const String m_remotePeerId;
     typedef std::chrono::system_clock Clock;
 
     QnMutex m_mutex;
@@ -131,12 +141,13 @@ class TunnelPool
     : public QnStoppableAsync
 {
 public:
-    TunnelPool();
-
     void connect(const String& peerId,
                  std::vector<CloudConnectType> connectTypes,
                  std::shared_ptr<StreamSocketOptions> options,
                  Tunnel::SocketHandler handler);
+
+    /** Creates new tunnel with connected \param connection */
+    void newTunnel(std::unique_ptr<AbstractTunnelConnection> connection);
 
     void accept(std::shared_ptr<StreamSocketOptions> options,
                 Tunnel::SocketHandler handler);

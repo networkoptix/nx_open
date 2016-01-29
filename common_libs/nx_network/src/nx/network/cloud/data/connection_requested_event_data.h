@@ -20,8 +20,8 @@ class NX_NETWORK_API ConnectionRequestedEvent
 public:
     nx::String connectSessionID;
     nx::String originatingPeerID;
-    std::list<SocketAddress> udpEndpointList;
-    ConnectionMethods connectionMethods;
+    std::list<SocketAddress> udpEndpointList;   ///< Peer UDP addresses
+    ConnectionMethods connectionMethods;        ///< All requestd connection types
 
     ConnectionRequestedEvent();
 

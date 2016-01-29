@@ -85,7 +85,7 @@ public:
 
     operator QString() const; 
 
-    inline std::string toStdString() { return m_str.toStdString(); }
+    std::string toStdString() { return m_str.toStdString(); }
 
 private:
     QString m_str;

@@ -8,8 +8,15 @@ namespace network {
 namespace cloud {
 
 Tunnel::Tunnel(String peerId)
-    : m_peerId(std::move(peerId))
+    : m_remotePeerId(std::move(peerId))
     , m_state(State::kInit)
+{
+}
+
+Tunnel::Tunnel(std::unique_ptr<AbstractTunnelConnection> connection)
+    : m_remotePeerId(connection->getRemotePeerId())
+    , m_state(State::kConnected)
+    , m_connection(std::move(connection))
 {
 }
 
@@ -41,7 +48,7 @@ void Tunnel::addConnectionTypes(std::vector<CloudConnectType> types)
         switch(type)
         {
             case CloudConnectType::udtHp:
-                connector = std::make_unique<UdtTunnelConnector>(m_peerId);
+                connector = std::make_unique<UdtTunnelConnector>(m_remotePeerId);
 
             default:
                 // Probably just log the ERROR
@@ -54,24 +61,6 @@ void Tunnel::addConnectionTypes(std::vector<CloudConnectType> types)
             m_connectors.emplace(type, std::move(connector));
         }
     }
-}
-
-void Tunnel::adoptConnection(std::unique_ptr<AbstractTunnelConnection> connection)
-{
-    QnMutexLocker lock(&m_mutex);
-    if (m_state == State::kConnecting)
-    {
-        const auto self = SocketGlobals::mediatorConnector().getSystemCredentials();
-        if( self->serverId > m_peerId )
-            std::swap(m_connection, connection);
-
-        std::shared_ptr<AbstractTunnelConnection> shared(connection.release());
-        lock.unlock();
-        shared->pleaseStop([shared]() mutable { shared.reset(); });
-    }
-
-    m_connection = std::move(connection);
-    changeState(State::kConnected, &lock);
 }
 
 void Tunnel::setStateHandler(std::function<void(State)> handler)
@@ -180,19 +169,6 @@ void Tunnel::pleaseStop(std::function<void()> handler)
         m_connection->pleaseStop(barrier.fork());
 }
 
-TunnelPool::TunnelPool()
-{
-    // TODO: add other acceptor types
-    m_acceptors.push_back(std::make_unique<UdtTunnelAcceptor>());
-
-    for (auto& acceptor : m_acceptors)
-        acceptor->accept([this](String peerId,
-                                std::unique_ptr<AbstractTunnelConnection> connection)
-        {
-            getTunnel(peerId)->adoptConnection(std::move(connection));
-        });
-}
-
 void TunnelPool::connect(const String& peerId,
                          std::vector<CloudConnectType> connectTypes,
                          std::shared_ptr<StreamSocketOptions> options,
@@ -213,6 +189,16 @@ void TunnelPool::connect(const String& peerId,
         SocketRequest request = { std::move(options), std::move(handler) };
         waitConnectingSocket(std::move(socket), std::move(request));
     });
+}
+
+void TunnelPool::newTunnel(std::unique_ptr<AbstractTunnelConnection> connection)
+{
+    auto tunnel = std::make_unique<Tunnel>(std::move(connection));
+    // TODO: #mux tunnel->onDie([](){ remove from map });
+
+    QnMutexLocker lk(&m_mutex);
+    const auto insert = m_pool.emplace(tunnel->getRemotePeerId(), std::move(tunnel));
+    Q_ASSERT(insert.second);
 }
 
 void TunnelPool::accept(

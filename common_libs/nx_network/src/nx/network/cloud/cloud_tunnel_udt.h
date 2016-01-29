@@ -11,9 +11,9 @@ class UdtTunnelConnector
         : public AbstractTunnelConnector
 {
 public:
-    UdtTunnelConnector(String peerId_)
-        : peerId(std::move(peerId_))
+    UdtTunnelConnector(String targetId)
     {
+        // TODO: save ids and run UdtTunnelConnection
     }
 
     uint32_t getPriority() override
@@ -32,22 +32,25 @@ public:
     {
         // TODO: cancel all async operations
     }
-
-private:
-    const String peerId;
 };
 
 class UdtTunnelAcceptor
         : public AbstractTunnelAcceptor
 {
 public:
-    UdtTunnelAcceptor()
+    UdtTunnelAcceptor(String connectionId, String selfId, String targetId)
     {
+        // TODO: save ids and run UdtTunnelConnection
+    }
+
+    void setTargetAddresses(std::list<SocketAddress> addresses)
+    {
+        // Save addresses
+        static_cast<void>(addresses);
     }
 
     void accept(
-        std::function<void(String,
-                           std::unique_ptr<AbstractTunnelConnection>)> handler) override
+        std::function<void(std::unique_ptr<AbstractTunnelConnection>)> handler) override
     {
         // TODO: listen for mediator indcations and initiate UdtTunnelConnection
     }
@@ -56,6 +59,10 @@ public:
     {
         // TODO: cancel all async operations
     }
+
+    const String m_connectionId;
+    const String m_selfId;
+    const String m_targetId;
 };
 
 class UdtTunnelConnection
@@ -63,8 +70,7 @@ class UdtTunnelConnection
 {
 public:
     UdtTunnelConnection(String peerId_, SocketAddress address_)
-        : peerId(peerId_)
-        , address(address_)
+        : AbstractTunnelConnection(peerId_)
     {
         // TODO: create m_tunnelSocket and open randevous connection
     }
