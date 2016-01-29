@@ -16,7 +16,9 @@ angular.module('cloudApp')
             requireLogin:function(){
                 var res = get();
                 res.catch(function(){
-                    dialogs.login(true);
+                    dialogs.login(true).catch(function(){
+                        $location.path(Config.redirectUnauthorised);
+                    });
                 });
                 return res;
             },

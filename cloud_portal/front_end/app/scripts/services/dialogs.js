@@ -2,7 +2,7 @@
 
 angular.module('cloudApp')
     .factory('dialogs', function ($http, $modal, $q, $location) {
-        function openDialog(title, template, url, content, hasFooter, cancellable, params){
+        function openDialog(title, template, url, content, hasFooter, cancellable, params, closable){
 
             // Check 401 against offline
             var modalInstance = $modal.open({
@@ -18,7 +18,8 @@ angular.module('cloudApp')
                             hasFooter: hasFooter,
                             content:content,
                             cancellable: cancellable,
-                            params: params
+                            params: params,
+                            closable: closable || cancellable
                         };
                     },
                     params:function(){
@@ -65,7 +66,7 @@ angular.module('cloudApp')
                 return openDialog(title, null, null, message, true, false).result;
             },
             login:function(force){
-                return openDialog('Login', 'views/login.html', 'login', null, false, !force).result;
+                return openDialog('Login', 'views/login.html', 'login', null, false, !force, null, true).result;
             },
             share:function(systemId, isOwner, share){
 
