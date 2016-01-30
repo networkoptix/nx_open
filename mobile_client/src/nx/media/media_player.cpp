@@ -43,8 +43,8 @@ class PlayerPrivate: public QObject
 public:
     Player::State state;                                  //< Holds QT property value
     Player::MediaStatus mediaStatus;                      //< Holds QT property value
-	bool hasAudio;                                        //< Either media has audio stream or not. Holds QT property value
-    bool liveMode;                                        //< Either media on live or archive position. Holds QT property value
+    bool hasAudio;                                        //< Either media has audio stream or not. Holds QT property value
+    bool liveMode;                                        //< Either media is on live or archive position. Holds QT property value
     qint64 position;                                      //< UTC Playback position at msec. Holds QT property value
     QAbstractVideoSurface* videoSurface;                  //< Video surface to render. Holds QT property value
     QUrl url;                                             //< media URL to play. Holds QT property value
