@@ -14,12 +14,17 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/qopengl.h>
+#include <QCache>
 
 
 #if defined(Q_OS_ANDROID)
 
 namespace nx {
 namespace media {
+
+namespace {
+    static const int kFrameQueueMaxSize = 32; //< max java decoder internal queue size
+}
 
 static const GLfloat g_vertex_data[] = {
     -1.f, 1.f,
@@ -106,7 +111,8 @@ public:
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
-        m_program(nullptr)
+        m_program(nullptr),
+        frameNumToPtsCache(kFrameQueueMaxSize)
 
 	{
         registerNativeMethods();
@@ -166,6 +172,8 @@ private:
 
     QMutex m_mutex;
     QOpenGLShaderProgram *m_program;
+
+    QCache<int, qint64> frameNumToPtsCache;
 };
 
 void renderFrameToFbo(void* opaque)
@@ -359,10 +367,11 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     }
 
 
+    d->frameNumToPtsCache.insert(d->frameNumber, new qint64(frame->timestamp));
     jlong outFrameNum = d->javaDecoder.callMethod<jlong>("decodeFrame", "(JIJ)J",
                                                          (jlong) frame->data(),
                                                          (jint) frame->dataSize(),
-                                                         (jlong) ++d->frameNumber);
+                                                         (jlong) ++d->frameNumber); //< put input frames in range [1..N]
     if (outFrameNum <= 0)
         return outFrameNum;
 
@@ -374,15 +383,13 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->m_currentFbo));
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
-
-    /*
-    QImage image = d->m_fbo->toImage();
-    QImage image2 = image.convertToFormat(QImage::Format_RGB32);
-    QVideoFrame* videoFrame = new QVideoFrame(image2);
-    */
+    qint64* pts = d->frameNumToPtsCache.object(outFrameNum);
+    if (pts)
+        videoFrame->setStartTime(*pts);
+    d->frameNumToPtsCache.remove(outFrameNum);
 
     result->reset(videoFrame);
-    return (int) outFrameNum - 1;
+    return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
 }
 
 } // namespace media
