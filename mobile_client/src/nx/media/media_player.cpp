@@ -211,6 +211,11 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 	}
 	else 
 	{
+        if (pts - ptsTimerBase < -kMaxDelayForResyncMs)
+            qDebug() << "--- resync data because of late frame";
+        if (liveMode && usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts > kMaxLiveBufferMs)
+            qDebug() << "--- resync data because of late frame";
+
         FrameMetadata metadata = FrameMetadata::deserialize(frame);
 		// Calculate time to present next frame
 		if (!lastVideoPts.is_initialized() ||                                    //< first time
