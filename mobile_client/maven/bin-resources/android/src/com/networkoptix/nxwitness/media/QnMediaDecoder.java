@@ -69,7 +69,7 @@ public class QnMediaDecoder {
     {
         try
         {
-            final long timeoutUs = 1000*10000;
+            final long timeoutUs = 1000 * 3000; //< 3 second
             int inputBufferId = codec.dequeueInputBuffer(timeoutUs);
             if (inputBufferId >= 0)
             {
@@ -86,23 +86,25 @@ public class QnMediaDecoder {
 
             MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
             int outputBufferId = codec.dequeueOutputBuffer(info, 0);
-            if (outputBufferId >= 0)
+            //System.out.println("dequee buffer result=" + outputBufferId);
+            switch (outputBufferId)
             {
-              long outFrameNum = info.presentationTimeUs;
-              codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
-              return outFrameNum;
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+                //System.out.println("MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED");
+                return 0; // no error
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+                format = codec.getOutputFormat(); // option B
+                //System.out.println("MediaCodec.INFO_OUTPUT_FORMAT_CHANGED");
+                return 0; // no error
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                //System.out.println("MediaCodec.INFO_TRY_AGAIN_LATER");
+                return 0; // no error
+            default:
+                long outFrameNum = info.presentationTimeUs;
+                codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
+                return outFrameNum;
             }
-            else if (outputBufferId == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
-            {
-              // Subsequent data will conform to new format.
-              // Can ignore if using getOutputFormat(outputBufferId)
-              format = codec.getOutputFormat(); // option B
-              return 0;
-            }
-            else {
-                System.out.println("error getting outputBufferId");
-                return 0; //< no data available
-            }
+
         }
         catch(IllegalStateException e)
         {
@@ -128,12 +130,13 @@ public class QnMediaDecoder {
         surfaceTexture.getTransformMatrix(mtx);
     }
 
-    protected void finalize()
+    public void releaseDecoder()
     {
         if (codec != null)
         {
             codec.stop();
             codec.release();
+            System.out.println("Decoder release");
         }
     }
 

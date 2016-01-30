@@ -114,6 +114,7 @@ public:
 
     ~AndroidDecoderPrivate()
     {
+        javaDecoder.callMethod<void>("releaseDecoder");
 	}
 
     void updateTexImage()
