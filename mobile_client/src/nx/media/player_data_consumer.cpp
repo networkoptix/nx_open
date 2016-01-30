@@ -24,7 +24,7 @@ PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamRead
     m_noDelayState(NoDelayState::Disabled)
 {
     connect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,   this, &PlayerDataConsumer::onBeforeJump,   Qt::DirectConnection);
-    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,  this, &PlayerDataConsumer::onJumpOccured,  Qt::DirectConnection);
+    connect(archiveReader.get(), &QnArchiveStreamReader::jumpOccured,  this, &PlayerDataConsumer::onJumpOccurred,  Qt::DirectConnection);
     connect(archiveReader.get(), &QnArchiveStreamReader::jumpCanceled, this, &PlayerDataConsumer::onJumpCanceled, Qt::DirectConnection);
 }
 
@@ -179,7 +179,7 @@ void PlayerDataConsumer::onJumpCanceled(qint64 /*timeUsec*/)
     Q_ASSERT(m_awaitJumpCounter >= 0);
 }
 
-void PlayerDataConsumer::onJumpOccured(qint64 /* timeUsec */)
+void PlayerDataConsumer::onJumpOccurred(qint64 /* timeUsec */)
 {
     // This function is called directly from an archiveReader thread. Should be thread safe.
     clearUnprocessedData(); //< Clear input (undecoded) data queue

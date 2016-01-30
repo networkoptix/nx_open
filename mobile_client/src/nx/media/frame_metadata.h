@@ -22,7 +22,7 @@ struct FrameMetadata
             
     QnAbstractMediaData::MediaFlags flags; //< various flags passed from compressed video data
     bool noDelay; //< display frame immediately with no delay
-    int frameNum; //< frame number in range [0..int_max]
+    int frameNum; //< frame number in range [0..INT_MAX]
 };
 
 }

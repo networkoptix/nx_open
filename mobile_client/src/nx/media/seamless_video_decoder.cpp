@@ -35,7 +35,7 @@ namespace
         }
     }
 
-	/** This data is used to compare current and previous frame so as to reset video decoder if need */
+	/** This data is used to compare current and previous frame so as to reset video decoder if needed */
 	struct FrameBasicInfo
 	{
 		FrameBasicInfo(): 
@@ -182,7 +182,7 @@ bool SeamlessVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, Qn
 	}
 
 	if (d->queue.empty())
-		return decodedFrameNum >= 0; //< return false if decode failure and no queued frame left
+		return decodedFrameNum >= 0; //< Return false if decoding fails and no queued frames are left.
 
 	*result = d->queue.front();
 	d->queue.pop_front();

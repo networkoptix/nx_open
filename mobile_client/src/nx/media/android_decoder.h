@@ -24,7 +24,7 @@ public:
 
 	static bool isCompatible(const QnConstCompressedVideoDataPtr& frame);
     virtual int decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr) override;
-    virtual void setAllocator(AbstractResourceAllocator* allocator ) override;
+    virtual void setAllocator(AbstractResourceAllocator* allocator) override;
 private:
     QScopedPointer<AndroidDecoderPrivate> d_ptr;
     Q_DECLARE_PRIVATE(AndroidDecoder);

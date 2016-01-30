@@ -11,7 +11,7 @@ namespace nx {
 namespace media {
 
 /*
-* This class encapsulate common logic related to any video decoder. It guarantee seamless decoding in case of compressed frame
+* This class encapsulates common logic related to any video decoder. It guarantees seamless decoding in case of compressed frame
 * has changed resolution or codecId. VideoDecoder uses PhysicalDecoderFactory to instantiate compatible PhysicalDecoder to decode next frame
 * if video parameters have changed.
 */
@@ -34,7 +34,7 @@ public:
 	*/
     bool decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFramePtr* result = nullptr);
 
-    /** Returns current frame number in range [0..int_max]. This number will be used for the next frame on 'decode' call */
+    /** Returns current frame number in range [0..INT_MAX]. This number will be used for the next frame on 'decode' call */
     int currentFrameNumber() const;
 
     void pleaseStop();

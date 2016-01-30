@@ -15,11 +15,14 @@
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
 
+namespace nx {
+namespace media {
+
 namespace {
-	static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
-	static const qint64 kLivePosition = -1;
+    static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
+    static const qint64 kLivePosition = -1;
     static const int kMaxDelayForResyncMs = 200; //< resync playback timer if video frame late
-    static const int kMaxLiveBufferMs = 200; //< maximum durartion for live buffer
+    static const int kMaxLiveBufferMs = 200; //< maximum duration for live buffer
 
     static qint64 msecToUsec(qint64 posMs)
     {
@@ -31,10 +34,6 @@ namespace {
         return posUsec == DATETIME_NOW ? kLivePosition : posUsec / 1000ll;
     }
 }
-
-namespace nx {
-namespace media {
-
 
 class PlayerPrivate: public QObject
 {
@@ -177,7 +176,7 @@ void PlayerPrivate::presentNextFrame()
 
     setMediaStatus(Player::MediaStatus::Loaded);
 
-    /* update video surface's pixel format if need */
+    /* update video surface's pixel format if needed */
 	if (videoSurface)
 	{
 		if (videoSurface->isActive() && videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat())
@@ -231,7 +230,8 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 			ptsTimer.restart();
 			return 0ll;
 		}
-		else {
+		else 
+        {
 			lastVideoPts = pts;
 			return pts - ptsTimerBase;
 		}
@@ -242,7 +242,8 @@ bool PlayerPrivate::initDataProvider()
 {
     QnUuid id(url.path().mid(1));
     QnResourcePtr camera = qnResPool->getResourceById(id);
-    if (!camera) {
+    if (!camera) 
+    {
         setMediaStatus(Player::MediaStatus::NoMedia);
         return false;
     }

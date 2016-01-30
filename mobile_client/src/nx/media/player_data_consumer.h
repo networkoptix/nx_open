@@ -40,11 +40,13 @@ signals:
 private slots:
     void onBeforeJump(qint64 timeUsec);
     void onJumpCanceled(qint64 timeUsec);
-    void onJumpOccured(qint64 timeUsec);
+    void onJumpOccurred(qint64 timeUsec);
 protected:
 	virtual bool canAcceptData() const override;
 	virtual bool processData(const QnAbstractDataPacketPtr& data) override;
     virtual void putData(const QnAbstractDataPacketPtr& data) override;
+    
+    /** Ask thread to stop. It's non blocking call. Thread will be stopped latter. */
     virtual void pleaseStop() override;
 private:
     bool processEmptyFrame(const QnEmptyMediaDataPtr& data);
@@ -70,7 +72,7 @@ private:
     {
         Disabled,        //< noDelay state isn't used
         Activated,       //< noDelay state is activated
-        WaitForNextBOF   //< noDelay will be disabled as soon as next BOF frame will be received
+        WaitForNextBOF   //< noDelay will be disabled as soon as next BOF frame is received
     };
     NoDelayState m_noDelayState;
 };

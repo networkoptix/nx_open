@@ -95,7 +95,7 @@ private:
 
 void fillInputBuffer(JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize)
 {
-    void *bytes = env->GetDirectBufferAddress(buffer);
+    void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*) srcDataPtr;
     memcpy(bytes, srcData, dataSize);
 }
@@ -111,7 +111,7 @@ public:
         frameNumber(0),
         initialized(false),
         javaDecoder("com/networkoptix/nxwitness/media/QnMediaDecoder"),
-        m_program(nullptr),
+        program(nullptr),
         frameNumToPtsCache(kFrameQueueMaxSize)
 
 	{
@@ -151,9 +151,10 @@ public:
 
         QAndroidJniEnvironment env;
         jclass objectClass = env->GetObjectClass(javaDecoder.object<jobject>());
-        env->RegisterNatives(objectClass,
-                             methods,
-                             sizeof(methods) / sizeof(methods[0]));
+        env->RegisterNatives(
+            objectClass,
+            methods,
+            sizeof(methods) / sizeof(methods[0]));
         env->DeleteLocalRef(objectClass);
     }
 
@@ -167,11 +168,9 @@ private:
     AbstractResourceAllocator* allocator;
     QSize frameSize;
 
-    std::unique_ptr<FboManager> m_fboManager;
-    FboPtr m_currentFbo;
-
-    QMutex m_mutex;
-    QOpenGLShaderProgram *m_program;
+    std::unique_ptr<FboManager> fboManager;
+    FboPtr currentFbo;
+    QOpenGLShaderProgram *program;
 
     QCache<int, qint64> frameNumToPtsCache;
 };
@@ -184,11 +183,9 @@ void renderFrameToFbo(void* opaque)
 
 void AndroidDecoderPrivate::renderFrameToFbo()
 {
-    QMutexLocker locker(&m_mutex);
-
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
-    m_currentFbo = createGLResources();
+    currentFbo = createGLResources();
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
@@ -216,25 +213,25 @@ void AndroidDecoderPrivate::renderFrameToFbo()
     if (blendEnabled)
         glDisable(GL_BLEND);
 
-    m_currentFbo->bind();
+    currentFbo->bind();
 
     glViewport(0, 0, frameSize.width(), frameSize.height());
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
-    m_program->bind();
+    program->bind();
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
-    m_program->enableAttributeArray(0);
+    program->enableAttributeArray(0);
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
-    m_program->enableAttributeArray(1);
+    program->enableAttributeArray(1);
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
-    m_program->setUniformValue("frameTexture", GLuint(0));
+    program->setUniformValue("frameTexture", GLuint(0));
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
-    m_program->setUniformValue("texMatrix", getTransformMatrix());
+    program->setUniformValue("texMatrix", getTransformMatrix());
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
@@ -243,14 +240,14 @@ void AndroidDecoderPrivate::renderFrameToFbo()
 
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-    m_program->disableAttributeArray(0);
-    m_program->disableAttributeArray(1);
+    program->disableAttributeArray(0);
+    program->disableAttributeArray(1);
 
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, 0);
     if (funcs->glGetError())
         qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
-    m_currentFbo->release();
+    currentFbo->release();
 
     // restore render states
     if (stencilTestEnabled)
@@ -269,43 +266,45 @@ FboPtr AndroidDecoderPrivate::createGLResources()
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOpenGLFunctions *funcs = ctx->functions();
 
-    if (!m_fboManager)
-        m_fboManager.reset(new FboManager(frameSize));
-    FboPtr fbo = m_fboManager->getFbo();
+    if (!fboManager)
+        fboManager.reset(new FboManager(frameSize));
+    FboPtr fbo = fboManager->getFbo();
 
-    if (!m_program)
+    if (!program)
     {
-        m_program = new QOpenGLShaderProgram;
+        program = new QOpenGLShaderProgram;
 
-        QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, m_program);
-        vertexShader->compileSourceCode("attribute highp vec4 vertexCoordsArray; \n" \
-                                        "attribute highp vec2 textureCoordArray; \n" \
-                                        "uniform   highp mat4 texMatrix; \n" \
-                                        "varying   highp vec2 textureCoords; \n" \
-                                        "void main(void) \n" \
-                                        "{ \n" \
-                                        "    gl_Position = vertexCoordsArray; \n" \
-                                        "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n" \
-                                        "}\n");
-        m_program->addShader(vertexShader);
+        QOpenGLShader *vertexShader = new QOpenGLShader(QOpenGLShader::Vertex, program);
+        vertexShader->compileSourceCode(
+            "attribute highp vec4 vertexCoordsArray; \n" \
+            "attribute highp vec2 textureCoordArray; \n" \
+            "uniform   highp mat4 texMatrix; \n" \
+            "varying   highp vec2 textureCoords; \n" \
+            "void main(void) \n" \
+            "{ \n" \
+            "    gl_Position = vertexCoordsArray; \n" \
+            "    textureCoords = (texMatrix * vec4(textureCoordArray, 0.0, 1.0)).xy; \n" \
+            "}\n");
+        program->addShader(vertexShader);
         if (funcs->glGetError())
             qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
-        QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, m_program);
-        fragmentShader->compileSourceCode("#extension GL_OES_EGL_image_external : require \n" \
-                                          "varying highp vec2         textureCoords; \n" \
-                                          "uniform samplerExternalOES frameTexture; \n" \
-                                          "void main() \n" \
-                                          "{ \n" \
-                                          "    gl_FragColor = texture2D(frameTexture, textureCoords); \n" \
-                                          "}\n");
-        m_program->addShader(fragmentShader);
+        QOpenGLShader *fragmentShader = new QOpenGLShader(QOpenGLShader::Fragment, program);
+        fragmentShader->compileSourceCode(
+            "#extension GL_OES_EGL_image_external : require \n" \
+            "varying highp vec2         textureCoords; \n" \
+            "uniform samplerExternalOES frameTexture; \n" \
+            "void main() \n" \
+            "{ \n" \
+            "    gl_FragColor = texture2D(frameTexture, textureCoords); \n" \
+            "}\n");
+        program->addShader(fragmentShader);
         if (funcs->glGetError())
             qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
 
-        m_program->bindAttributeLocation("vertexCoordsArray", 0);
-        m_program->bindAttributeLocation("textureCoordArray", 1);
-        m_program->link();
+        program->bindAttributeLocation("vertexCoordsArray", 0);
+        program->bindAttributeLocation("textureCoordArray", 1);
+        program->link();
         if (funcs->glGetError())
             qDebug() << "gl error: " << funcs->glGetString(funcs->glGetError());
     }
@@ -325,7 +324,7 @@ AndroidDecoder::~AndroidDecoder()
 {
 }
 
-void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator )
+void AndroidDecoder::setAllocator(AbstractResourceAllocator* allocator)
 {
     Q_D(AndroidDecoder);
     d->allocator = allocator;
@@ -361,9 +360,11 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
-        d->initialized = d->javaDecoder.callMethod<jboolean>("init", "(Ljava/lang/String;II)Z",
-                         jCodecName.object<jstring>(), d->frameSize.width(), d->frameSize.height()
-        );
+        d->initialized = d->javaDecoder.callMethod<jboolean>(
+            "init", "(Ljava/lang/String;II)Z",
+            jCodecName.object<jstring>(), 
+            d->frameSize.width(), 
+            d->frameSize.height());
         if (!d->initialized)
             return 0; //< wait for I frame
     }
@@ -372,10 +373,11 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     if (frame)
     {
         d->frameNumToPtsCache.insert(d->frameNumber, new qint64(frame->timestamp));
-        outFrameNum = d->javaDecoder.callMethod<jlong>("decodeFrame", "(JIJ)J",
-                                                      (jlong) frame->data(),
-                                                      (jint) frame->dataSize(),
-                                                      (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+        outFrameNum = d->javaDecoder.callMethod<jlong>(
+            "decodeFrame", "(JIJ)J",
+            (jlong) frame->data(),
+            (jint) frame->dataSize(),
+            (jlong) ++d->frameNumber); //< put input frames in range [1..N]
     }
     else {
         outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "()J");
@@ -387,10 +389,10 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     // got frame
 
     d->allocator->execAtGlThread(renderFrameToFbo, d);
-    if (!d->m_currentFbo)
+    if (!d->currentFbo)
         return 0; //< can't decode now. skip frame
 
-    QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->m_currentFbo));
+    QAbstractVideoBuffer* buffer = new TextureBuffer (std::move(d->currentFbo));
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
     qint64* pts = d->frameNumToPtsCache.object(outFrameNum);
     if (pts)
@@ -398,7 +400,7 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     d->frameNumToPtsCache.remove(outFrameNum);
 
     result->reset(videoFrame);
-    return (int) outFrameNum - 1; //< convert range [1..N] to [0..N]
+    return (int)outFrameNum - 1; //< convert range [1..N] to [0..N]
 }
 
 } // namespace media

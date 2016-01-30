@@ -31,10 +31,11 @@ public:
 			qCritical() << "Failed to register ffmpeg lock manager";
 	}
 	
-	static int lockmgr(void **mtx, enum AVLockOp op)
+	static int lockmgr(void** mtx, enum AVLockOp op)
 	{
 		QnMutex** qMutex = (QnMutex**)mtx;
-		switch (op) {
+		switch (op) 
+        {
 		case AV_LOCK_CREATE:
 			*qMutex = new QnMutex();
 			return 0;
@@ -47,8 +48,9 @@ public:
 		case AV_LOCK_DESTROY:
 			delete *qMutex;
 			return 0;
+        default:
+            return 1;
 		}
-		return 1;
 	}
 
 };
@@ -64,7 +66,7 @@ public:
 		codecContext(nullptr),
 		frame(avcodec_alloc_frame()),
 		scaleContext(nullptr),
-		lastPTS(AV_NOPTS_VALUE)
+        lastPts(AV_NOPTS_VALUE)
 	{
 	}
 
@@ -80,7 +82,7 @@ public:
 	AVCodecContext* codecContext;
 	AVFrame* frame;
 	SwsContext* scaleContext;
-	qint64 lastPTS;
+	qint64 lastPts;
     QSize scaleContextSize;
 };
 
@@ -156,9 +158,9 @@ int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFra
 	}
 	else 
 	{
-		// there is known a ffmpeg bug. It returns below time for the very last packet while flusing internal buffer.
+		// there is known a ffmpeg bug. It returns below time for the very last packet while flushing internal buffer.
 		// So, repeat this time for the empty packet in order to aviod the bug
-		avpkt.pts = avpkt.dts = d->lastPTS;
+        avpkt.pts = avpkt.dts = d->lastPts;
         avpkt.data = nullptr;
         avpkt.size = 0;
 	}
@@ -166,7 +168,7 @@ int FfmpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFra
 	int gotData = 0;
 	avcodec_decode_video2(d->codecContext, d->frame, &gotData, &avpkt);
 	if (gotData <= 0)
-		return gotData; //< negative value means error. zerro value is buffering
+		return gotData; //< negative value means error. zero value is buffering
 
     ffmpegToQtVideoFrame(result);
 	return d->frame->coded_picture_number;
@@ -181,9 +183,10 @@ void FfmpegDecoder::ffmpegToQtVideoFrame(QnVideoFramePtr* result)
     {
         d->scaleContextSize = size;
         sws_freeContext(d->scaleContext);
-        d->scaleContext = sws_getContext(d->frame->width, d->frame->height, (PixelFormat) d->frame->format,
-                                         d->frame->width, d->frame->height, PIX_FMT_BGRA,
-                                         SWS_BICUBIC, NULL, NULL, NULL);
+        d->scaleContext = sws_getContext(
+            d->frame->width, d->frame->height, (PixelFormat) d->frame->format,
+            d->frame->width, d->frame->height, PIX_FMT_BGRA,
+            SWS_BICUBIC, NULL, NULL, NULL);
     }
     const int alignedWidth = qPower2Ceil((unsigned)d->frame->width, (unsigned)kMediaAlignment);
     const int numBytes = avpicture_get_size(PIX_FMT_BGRA, alignedWidth, d->frame->height);
