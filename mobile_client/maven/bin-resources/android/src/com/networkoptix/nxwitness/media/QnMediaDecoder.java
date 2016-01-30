@@ -120,6 +120,40 @@ public class QnMediaDecoder {
         }
     }
 
+    public long flushFrame()
+    {
+        try
+        {
+            //codec.flush();
+
+            MediaCodec.BufferInfo info = new MediaCodec.BufferInfo();
+            int outputBufferId = codec.dequeueOutputBuffer(info, 0);
+            switch (outputBufferId)
+            {
+            case MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED:
+            case MediaCodec.INFO_OUTPUT_FORMAT_CHANGED:
+            case MediaCodec.INFO_TRY_AGAIN_LATER:
+                return 0; // no more frames left
+            default:
+                long outFrameNum = info.presentationTimeUs;
+                codec.releaseOutputBuffer(outputBufferId, true); // true means buffer will be send to render surface
+                return outFrameNum;
+            }
+        }
+        catch(IllegalStateException e)
+        {
+            System.out.println("IllegalStateException" + e.toString());
+            System.out.println("IllegalStateException" + e.getMessage());
+            return -1;
+        }
+        catch(Exception e)
+        {
+            System.out.println("Exception" + e.toString());
+            System.out.println("Exception" + e.getMessage());
+            return -1;
+        }
+    }
+
     public void updateTexImage()
     {
         surfaceTexture.updateTexImage();

@@ -353,6 +353,8 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
 
     if (!d->initialized)
     {
+        if (!frame)
+            return 0;
         extractSpsPps(frame, &d->frameSize, nullptr);
         if (d->frameSize.isNull())
             return 0; //< wait for I frame
@@ -366,12 +368,19 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
             return 0; //< wait for I frame
     }
 
+    jlong outFrameNum;
+    if (frame)
+    {
+        d->frameNumToPtsCache.insert(d->frameNumber, new qint64(frame->timestamp));
+        outFrameNum = d->javaDecoder.callMethod<jlong>("decodeFrame", "(JIJ)J",
+                                                      (jlong) frame->data(),
+                                                      (jint) frame->dataSize(),
+                                                      (jlong) ++d->frameNumber); //< put input frames in range [1..N]
+    }
+    else {
+        outFrameNum = d->javaDecoder.callMethod<jlong>("flushFrame", "()J");
+    }
 
-    d->frameNumToPtsCache.insert(d->frameNumber, new qint64(frame->timestamp));
-    jlong outFrameNum = d->javaDecoder.callMethod<jlong>("decodeFrame", "(JIJ)J",
-                                                         (jlong) frame->data(),
-                                                         (jint) frame->dataSize(),
-                                                         (jlong) ++d->frameNumber); //< put input frames in range [1..N]
     if (outFrameNum <= 0)
         return outFrameNum;
 
