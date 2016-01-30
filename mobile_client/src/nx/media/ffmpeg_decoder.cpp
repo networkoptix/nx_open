@@ -13,14 +13,12 @@ extern "C"
 
 #include "aligned_mem_video_buffer.h"
 
-namespace
-{
-	int kMediaAlignment = 32;
-}
-
 namespace nx {
 namespace media {
 
+namespace {
+    int kMediaAlignment = 32;
+}
 
 class InitFfmpegLib
 {
