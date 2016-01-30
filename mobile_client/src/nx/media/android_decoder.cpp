@@ -394,7 +394,7 @@ int AndroidDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QnVideoFr
     QVideoFrame* videoFrame = new QVideoFrame(buffer, d->frameSize, QVideoFrame::Format_BGR32);
     qint64* pts = d->frameNumToPtsCache.object(outFrameNum);
     if (pts)
-        videoFrame->setStartTime(*pts);
+        videoFrame->setStartTime(*pts / 1000); //< usec to msec
     d->frameNumToPtsCache.remove(outFrameNum);
 
     result->reset(videoFrame);
