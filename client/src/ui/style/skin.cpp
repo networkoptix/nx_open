@@ -118,8 +118,10 @@ QPixmap QnSkin::pixmap(const char *name, const QSize &size, Qt::AspectRatioMode 
     return pixmap(QLatin1String(name), size, aspectMode, mode); 
 }
 
-QStyle *QnSkin::newStyle() {
-    return new QnNoptixStyle(new QnNxStyle());
+QStyle *QnSkin::newStyle(const QnGenericPalette &genericPalette) {
+    QnNxStyle *style = new QnNxStyle();
+    style->setGenericPalette(genericPalette);
+    return new QnNoptixStyle(style);
 }
 
 QMovie *QnSkin::newMovie(const QString &name, QObject *parent) {

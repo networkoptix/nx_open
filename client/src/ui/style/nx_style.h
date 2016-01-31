@@ -2,6 +2,8 @@
 
 #include <QCommonStyle>
 
+#include <ui/style/generic_palette.h>
+
 class QnNxStylePrivate;
 class QnNxStyle : public QCommonStyle {
     Q_OBJECT
@@ -10,6 +12,10 @@ class QnNxStyle : public QCommonStyle {
 
 public:
     QnNxStyle();
+
+    void setGenericPalette(const QnGenericPalette &palette);
+
+    QnPaletteColor findColor(const QColor &color) const;
 
     virtual void drawPrimitive(PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget = 0) const override;
     virtual void drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const override;
@@ -24,4 +30,7 @@ public:
 
 protected:
     QnNxStyle(QnNxStylePrivate &dd);
+
+private:
+    QnGenericPalette m_palette;
 };

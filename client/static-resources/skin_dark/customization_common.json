@@ -133,78 +133,6 @@
         }
     },
 
-    "QAbstractButton": {
-        "palette": {
-            "default": {
-                "midlight": "dark11",
-                "dark": "dark8",
-                "mid": "dark9"
-            },
-            "disabled" : {
-                "midlight": "dark11.setAlpha(75)",
-                "dark": "dark8.setAlpha(75)",
-                "mid": "dark9.setAlpha(75)"
-            }
-        }
-    },
-
-    "QLineEdit": {
-        "palette": {
-            "default": {
-                "base": "dark4",
-                "shadow": "dark3"
-            }
-        }
-    },
-
-    "QComboBox": {
-        "palette": {
-            "default": {
-                "midlight": "dark11",
-                "dark": "dark8",
-                "mid": "dark9",
-                "base": "dark4",
-                "shadow": "dark3"
-            },
-            "disabled" : {
-                "midlight": "dark11.setAlpha(75)",
-                "dark": "dark8.setAlpha(75)",
-                "mid": "dark9.setAlpha(75)"
-            }
-        }
-    },
-
-    "QSpinBox": {
-        "palette": {
-            "default": {
-                "base": "dark4",
-                "shadow": "dark3"
-            }
-        }
-    },
-
-    "QCheckBox": {
-        "palette": {
-            "default": {
-                "midlight": "light8"
-            },
-            "disabled": {
-                "midlight": "light8.setAlpha(75)"
-            }
-        }
-    },
-
-    "QRadioButton": {
-        "palette": {
-            "default": {
-                "midlight": "light8"
-            },
-            "disabled": {
-                "midlight": "light8.setAlpha(75)"
-            }
-        }
-    },
-
     "QTabBar": {
         "palette": {
             "default": {
@@ -215,15 +143,6 @@
             },
             "disabled": {
                 "windowText": "dark12"
-            }
-        }
-    },
-
-    "QGroupBox": {
-        "palette": {
-            "default": {
-                "shadow": "dark10",
-                "midlight": "light16"
             }
         }
     },

@@ -1,5 +1,7 @@
 #include "customizer.h"
 
+#include <algorithm>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsObject>
 
@@ -10,6 +12,7 @@
 #include <utils/common/flat_map.h>
 #include <utils/common/property_storage.h>
 #include <utils/common/evaluator.h>
+#include <utils/common/string.h>
 
 #include "palette_data.h"
 #include "pen_data.h"
@@ -298,6 +301,35 @@ private:
 
 
 // -------------------------------------------------------------------------- //
+// Palette extraction
+// -------------------------------------------------------------------------- //
+namespace
+{
+    QnColorList extractColors(const QString &group, const QnCustomizationDataHash &globals)
+    {
+        QnColorList colors;
+
+        auto colorLess = [](const QColor &c1, const QColor &c2)
+        {
+            return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
+        };
+
+        for (auto it = globals.begin(); it != globals.end(); ++it)
+        {
+            if (!it.key().startsWith(group))
+                continue;
+
+            QString colorName = it->json.toString();
+            QColor color(colorName);
+            colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
+        }
+
+        return colors;
+    }
+}
+
+
+// -------------------------------------------------------------------------- //
 // QnCustomizerPrivate
 // -------------------------------------------------------------------------- //
 class QnCustomizerPrivate {
@@ -329,6 +361,7 @@ public:
     QScopedPointer<QnJsonSerializer> customizationHashSerializer;
     QnFlatMap<int, QnJsonSerializer *> serializerByType;
     QnJsonContext serializationContext;
+    QnGenericPalette genericPalette;
 
     QSet<QObject *> customObjects;
 };
@@ -505,12 +538,20 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
 
     /* Load globals. */
     auto pos = d->dataByClassName.find(QLatin1String("globals"));
-    if(pos != d->dataByClassName.end()) {
+    if (pos != d->dataByClassName.end())
+    {
         QnCustomizationDataHash globals;
-        if(!QJson::deserialize(&d->serializationContext, pos->json, &globals)) {
+        if (!QJson::deserialize(&d->serializationContext, pos->json, &globals))
+        {
             qnWarning("Could not deserialize global constants block.");
-        } else {
+        }
+        else
+        {
             d->colorSerializer->setGlobals(globals);
+
+            d->genericPalette.setColors(lit("dark"), extractColors(lit("dark"), globals));
+            d->genericPalette.setColors(lit("light"), extractColors(lit("light"), globals));
+            d->genericPalette.setColors(lit("blue"), extractColors(lit("blue"), globals));
         }
     }
 
@@ -529,5 +570,10 @@ void QnCustomizer::customize(QObject *object) {
     }
 
     d->customize(object);
+}
+
+QnGenericPalette QnCustomizer::genericPalette() const
+{
+    return d->genericPalette;
 }
 

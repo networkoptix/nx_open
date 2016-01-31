@@ -148,6 +148,16 @@ QnNxStylePrivate::QnNxStylePrivate() :
 
 QnNxStyle::QnNxStyle() {}
 
+void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
+{
+    m_palette = palette;
+}
+
+QnPaletteColor QnNxStyle::findColor(const QColor &color) const
+{
+    return m_palette.color(color);
+}
+
 void QnNxStyle::drawPrimitive(
         PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
 {
@@ -162,21 +172,23 @@ void QnNxStyle::drawPrimitive(
         const bool pressed = option->state & State_Sunken;
         const bool hovered = option->state & State_MouseOver;
 
-        QBrush buttonBrush = option->palette.button();
-        QColor shadowColor = option->palette.color(QPalette::Dark);
+        QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Button));
+
+        QColor buttonColor = mainColor;
+        QColor shadowColor = mainColor.darker(2);
 
         if (pressed)
         {
-            buttonBrush = option->palette.mid();
+            buttonColor = mainColor.darker(1);
         }
         else if (hovered)
         {
-            buttonBrush = option->palette.midlight();
-            shadowColor = option->palette.color(QPalette::Mid);
+            buttonColor = mainColor.lighter(1);
+            shadowColor = mainColor.darker(1);
         }
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(buttonBrush);
+        painter->setBrush(buttonColor);
         painter->setRenderHint(QPainter::Antialiasing);
         painter->drawRoundedRect(option->rect.adjusted(0, 0, 0, -1), 2, 2);
         painter->setRenderHint(QPainter::Antialiasing, false);
@@ -210,14 +222,16 @@ void QnNxStyle::drawPrimitive(
 
             painter->save();
 
-            QPen pen(option->palette.color(QPalette::Shadow));
+            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Base));
+
+            QPen pen(mainColor.darker(3));
             painter->setPen(pen);
 
-            QBrush brush = option->palette.base();
+            QColor base = mainColor.darker(2);
             if (option->state & State_MouseOver)
-                brush = option->palette.shadow();
+                base = mainColor.darker(3);
 
-            painter->setBrush(brush);
+            painter->setBrush(base);
             painter->setRenderHint(QPainter::Antialiasing);
 
             painter->drawRoundedRect(QRectF(option->rect).adjusted(0.5, 0.5, -0.5, -0.5), 1, 1);
@@ -368,20 +382,21 @@ void QnNxStyle::drawComplexControl(
 
                 QRect buttonRect = subControlRect(control, option, SC_ComboBoxArrow, widget);
 
-                QPalette::ColorRole buttonColorRole = QPalette::NoRole;
+                QnPaletteColor mainColor = findColor(comboBox->palette.color(QPalette::Button));
+                QnPaletteColor buttonColor;
 
                 if (comboBox->state.testFlag(State_On))
                 {
-                    buttonColorRole = QPalette::Mid;
+                    buttonColor = mainColor.darker(1);
                 }
                 else if (comboBox->activeSubControls.testFlag(SC_ComboBoxArrow))
                 {
-                    buttonColorRole = QPalette::Midlight;
+                    buttonColor = mainColor.lighter(1);
                 }
 
-                if (buttonColorRole != QPalette::NoRole)
+                if (buttonColor.isValid())
                 {
-                    painter->setBrush(comboBox->palette.brush(buttonColorRole));
+                    painter->setBrush(QBrush(buttonColor));
                     painter->setPen(Qt::NoPen);
                     painter->setRenderHint(QPainter::Antialiasing);
                     painter->drawRoundedRect(buttonRect, 2, 2);
@@ -546,14 +561,20 @@ void QnNxStyle::drawComplexControl(
 
             QRect labelRect = subControlRect(CC_GroupBox, &opt, SC_GroupBoxLabel, widget);
 
-            if (groupBox->subControls & SC_GroupBoxFrame) {
+            if (groupBox->subControls & SC_GroupBoxFrame)
+            {
                 QRect rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget).adjusted(0, 0, -1, -1);
 
-                if (flat) {
-                    painter->setPen(groupBox->palette.color(QPalette::Shadow));
+                QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark));
+
+                if (flat)
+                {
+                    painter->setPen(mainColor.lighter(2));
                     painter->drawLine(rect.topLeft(), rect.topRight());
-                } else {
-                    painter->setPen(groupBox->palette.color(QPalette::Dark));
+                }
+                else
+                {
+                    painter->setPen(mainColor);
                     QPainterPath path;
                     path.moveTo(labelRect.left() - dp(8), rect.top());
                     path.lineTo(rect.topLeft());
@@ -565,11 +586,13 @@ void QnNxStyle::drawComplexControl(
                 }
             }
 
-            if (groupBox->subControls & SC_GroupBoxLabel) {
-                QPalette::ColorRole textRole = flat ? QPalette::WindowText : QPalette::Midlight;
+            if (groupBox->subControls & SC_GroupBoxLabel)
+            {
+                QnPaletteColor mainColor = findColor(option->palette.color(QPalette::WindowText));
+                painter->setPen(flat ? mainColor : mainColor.darker(12));
                 drawItemText(painter, labelRect, Qt::AlignCenter,
                              groupBox->palette, groupBox->state & QStyle::State_Enabled,
-                             groupBox->text, textRole);
+                             groupBox->text);
             }
 
             painter->restore();
