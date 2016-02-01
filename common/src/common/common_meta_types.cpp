@@ -52,6 +52,7 @@
 
 #include <recording/time_period.h>
 #include <recording/time_period_list.h>
+#include <recording/stream_recorder.h>
 
 #include <core/misc/schedule_task.h>
 #include <core/ptz/ptz_mapper.h>
@@ -274,6 +275,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
+    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 

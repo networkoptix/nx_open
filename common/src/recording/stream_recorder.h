@@ -164,7 +164,7 @@ public:
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(const ErrorStruct &status, const QString &fileName);
+    void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -245,6 +245,8 @@ private:
     Role m_role;
     QnImageFilterHelper m_extraTranscodeParams;
 };
+
+Q_DECLARE_METATYPE(QnStreamRecorder::ErrorStruct)
 
 #endif // ENABLE_DATA_PROVIDERS
 
