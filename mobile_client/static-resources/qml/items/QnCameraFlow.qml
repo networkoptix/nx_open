@@ -153,16 +153,15 @@ Item {
 
         Item {
             width: cameraFlow.width
-            height: hiddenCamerasContent.height
+            height: visible ? hiddenCamerasContent.height : 0
+            visible: hiddenCamerasList.count > 0
 
             Column {
                 id: hiddenCamerasContent
 
                 property bool collapsed: true
 
-                width: parent.width - cameraGrid.spacing * 2
-                x: cameraGrid.spacing
-                visible: hiddenCamerasList.count > 0
+                width: parent.width
 
                 Item {
                     height: dp(24)
@@ -170,7 +169,6 @@ Item {
 
                     Rectangle {
                         anchors.verticalCenter: parent.bottom
-                        anchors.verticalCenterOffset: -dp(8)
                         width: parent.width
                         height: dp(1)
                         color: QnTheme.listSeparator
@@ -192,7 +190,7 @@ Item {
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
-                        x: dp(72)
+                        x: dp(56)
                         text: qsTr("Hidden cameras")
                         font.pixelSize: sp(16)
                         font.weight: Font.DemiBold
@@ -219,39 +217,57 @@ Item {
                     height: 0
                     clip: true
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: expandAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: hiddenCamerasColumn.height
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: hiddenCamerasColumn.height
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                target: cameraGrid
+                                property: "contentY"
+                                to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
-                        NumberAnimation {
-                            target: cameraGrid
-                            property: "contentY"
-                            to: cameraGrid.contentY + Math.min(hiddenCamerasColumn.height, cameraGrid.height - dp(56))
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = Qt.binding(function() { return hiddenCamerasColumn.height })
+                            }
                         }
                     }
 
-                    ParallelAnimation {
+                    SequentialAnimation {
                         id: collapseAnimation
-                        NumberAnimation {
-                            target: hiddenList
-                            property: "height"
-                            to: 0
-                            duration: 500
-                            easing.type: Easing.OutCubic
+
+                        ScriptAction {
+                            script: {
+                                hiddenList.height = hiddenList.height // kill the binding
+                            }
+                        }
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: hiddenList
+                                property: "height"
+                                to: 0
+                                duration: 500
+                                easing.type: Easing.OutCubic
+                            }
                         }
                     }
 
                     Column {
                         id: hiddenCamerasColumn
-                        width: parent.width - cameraGrid.leftMargin - cameraGrid.rightMargin
-                        x: cameraGrid.leftMargin
+
+                        width: parent.width
 
                         Repeater {
                             id: hiddenCamerasList
@@ -299,11 +315,17 @@ Item {
     QnToast {
         id: hiddenCamerasPopup
 
-        property bool isShown: d.hiddenItems.length > 0
+        property int prevCount: 0
+        property int count: d.hiddenItems.length
+        property bool isShown: count > 0
 
         timeout: 5000
 
-        text: qsTr("%n cameras are hidden", "", d.hiddenItems.length)
+        onCountChanged: {
+            if (count > prevCount)
+                text = qsTr("%n cameras are hidden", "", count)
+        }
+
         mainButton {
             icon: "image://icon/undo.png"
             color: "transparent"
@@ -311,10 +333,12 @@ Item {
         }
 
         onIsShownChanged: {
-            if (isShown)
+            if (isShown) {
                 show()
-            else
+            } else {
                 hide()
+                prevCount = 0
+            }
         }
 
         onHidden: {

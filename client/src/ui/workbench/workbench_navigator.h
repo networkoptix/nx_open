@@ -19,7 +19,6 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/long_runnable.h>
-#include <camera/bookmark_queries_cache.h>
 
 class QAction;
 
@@ -40,7 +39,6 @@ class QnResourceDisplay;
 class QnSearchQueryStrategy;
 class QnThreadedChunksMergeTool;
 class QnPendingOperation;
-class QnCameraBookmarkAggregation;
 
 class QnWorkbenchNavigator: public Connective<QObject>, public QnWorkbenchContextAware, public QnActionTargetProvider {
     Q_OBJECT;
@@ -84,8 +82,9 @@ public:
     Q_SLOT bool setPlaying(bool playing);
     bool isPlayingSupported() const;
 
-    bool hasVideo() const;
+    bool currentWidgetHasVideo() const;
 
+    /** Any of the syncable widgets on the layout has archive. */
     bool hasArchive() const;
 
     qreal speed() const;
@@ -146,7 +145,7 @@ protected:
     QnThumbnailsLoader *thumbnailLoader(const QnMediaResourcePtr &resource);
     QnThumbnailsLoader *thumbnailLoaderByWidget(QnMediaResourceWidget *widget);
 
-    protected slots:
+protected slots:
     void updateCentralWidget();
     void updateCurrentWidget();
     void updateSliderFromReader(bool keepInWindow = true);
@@ -206,9 +205,6 @@ protected slots:
     void updateTimeSliderWindowSizePolicy();
     void at_timeSlider_thumbnailClicked();
 
-    void at_bookmarkQuery_bookmarksChanged(const QnCameraBookmarkList &bookmarks
-        , bool immediately);
-
     void at_timeScrollBar_sliderPressed();
     void at_timeScrollBar_sliderReleased();
 
@@ -223,28 +219,11 @@ private:
     void updateHistoryForCamera(QnVirtualCameraResourcePtr camera);
     void updateSliderBookmarks();
 
-    void updateBookmarksModeState();
+    void onItemAdded(QnWorkbenchItem *item);
 
-    void resetCurrentBookmarkQuery();
-
-    void setCurrentBookmarkQuery(const QnCameraBookmarksQueryPtr &query);
-
-    QnCameraBookmarksQueryPtr refreshQueryFilter(const QnVirtualCameraResourcePtr &camera);
-
-    void onCurrentLayoutChanged();
-
-    void onCurrentLayoutAboutToBeChanged();
-
-    void onItemAdded(QnWorkbenchLayout *layout
-        , QnWorkbenchItem *item);
-
-    void onItemRemoved(QnWorkbenchLayout *layout
-        , QnWorkbenchItem *item);
+    void updateArchiveState(QnWorkbenchItem *item);
 
     void updateHasArchiveState();
-
-    bool layoutHasAchive();
-
 private:
     QnWorkbenchStreamSynchronizer *m_streamSynchronizer;
     QTime m_updateSliderTimer;
@@ -293,10 +272,6 @@ private:
 
     QScopedPointer<QCompleter> m_bookmarkTagsCompleter;
 
-    QnBookmarkQueriesCache m_bookmarkQueries;
-    QnCameraBookmarksQueryPtr m_currentQuery;
-
-    QScopedPointer<QnCameraBookmarkAggregation> m_bookmarkAggregation;
     QnPendingOperation *m_sliderBookmarksRefreshOperation;
 
     QnCameraDataManager* m_cameraDataManager;
@@ -306,6 +281,7 @@ private:
     /** Set of cameras, for which history was not loaded and should be updated again. */
     QSet<QnVirtualCameraResourcePtr> m_updateHistoryQueue;
 
+    /** At least one of the synced widgets has archive. */
     bool m_hasArchive;
 };
 

@@ -35,15 +35,15 @@ namespace {
 }
 
 /** Allow to use 'master' license type instead of 'child' type if there are not enough child licenses. */
-struct LicenseCompatibility 
+struct LicenseCompatibility
 {
     LicenseCompatibility(Qn::LicenseType master, Qn::LicenseType child): master(master), child(child) {}
     Qn::LicenseType master;
     Qn::LicenseType child;
 };
 
-/* Compatibility tree: 
- * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder) 
+/* Compatibility tree:
+ * Trial -> Edge -> Professional -> Analog -> (VMAX, AnalogEncoder)
  * Trial -> IO
  * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
  */
@@ -117,7 +117,7 @@ int QnLicenseUsageHelper::borrowLicenses(const LicenseCompatibility &compat, lic
 
     auto borrowLicenseFromClass = [] (int& srcUsed, int srcTotal, int& dstUsed, int dstTotal) {
         int borrowed = 0;
-        if (dstUsed > dstTotal) { 
+        if (dstUsed > dstTotal) {
             int donatorRest = srcTotal - srcUsed;
             if (donatorRest > 0) {
                 borrowed = qMin(donatorRest, dstUsed - dstTotal);
@@ -152,10 +152,10 @@ QString QnLicenseUsageHelper::getProposedUsageMsg() const {
 }
 
 QString QnLicenseUsageHelper::getRequiredText(Qn::LicenseType licenseType) const {
-    if (requiredLicenses(licenseType) > 0) 
+    if (requiredLicenses(licenseType) > 0)
         return tr("Activate %n more %2. ", "", requiredLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
-    if (isValid() && proposedLicenses(licenseType) > 0)        
+    if (isValid() && proposedLicenses(licenseType) > 0)
         return tr("%n more %2 will be used. ", "", proposedLicenses(licenseType)).arg(QnLicense::longDisplayName(licenseType));
 
     return QString();
@@ -183,7 +183,7 @@ void QnLicenseUsageHelper::updateCache() const {
 
     /* Used licenses without proposed cameras. */
     licensesArray basicUsedLicenses;
-    
+
 
     /* Borrowed licenses count without proposed cameras. */
     licensesArray basicBorrowedLicenses;
@@ -271,7 +271,7 @@ QString QnLicenseUsageHelper::activationMessage(const QJsonObject& errorMessage)
     if(messageId == lit("DatabaseError")) {
         message = tr("There was a problem activating your license key. A database error occurred.");  //TODO: Feature #3629 case J
     } else if(messageId == lit("InvalidData")) {
-        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report issue.");
+        message = tr("There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.");
     } else if(messageId == lit("InvalidKey")) {
         message = tr("The license key you have entered is invalid. Please check that license key is entered correctly. "
             "If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.");
@@ -420,12 +420,12 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
 
-    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>()) 
+    for (const QnVirtualCameraResourcePtr &camera: qnResPool->getResources<QnVirtualCameraResource>())
     {
         QnResourcePtr server = camera->getParentResource();
         if (!server || server->getStatus() != Qn::Online)
             continue;
-        
+
         Qn::LicenseType lt = camera->licenseType();
         bool requiresLicense = camera->isLicenseUsed();
         if (requiresLicense)
@@ -442,8 +442,8 @@ void QnCamLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsedLice
 
 QnSingleCamLicenceStatusHelper::QnSingleCamLicenceStatusHelper(const QnVirtualCameraResourcePtr &camera)
     : m_camera(camera)
-    , m_helper(camera 
-        ? new QnCamLicenseUsageHelper(camera, true, QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher(camera))) 
+    , m_helper(camera
+        ? new QnCamLicenseUsageHelper(camera, true, QnCamLicenseUsageWatcherPtr(new QnCamLicenseUsageWatcher(camera)))
         : nullptr)
 {
     if (!camera)
@@ -529,7 +529,7 @@ void QnVideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUs
 
     int usedScreens = 0;
     int controlSessions = 0;
-    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>()) 
+    for (const QnVideoWallResourcePtr &videowall: qnResPool->getResources<QnVideoWallResource>())
     {
         /* Calculating total screens. */
         usedScreens += videowall->items()->getItems().size();

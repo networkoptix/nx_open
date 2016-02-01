@@ -531,17 +531,16 @@ void QnWorkbenchActionHandler::submitInstantDrop() {
 // -------------------------------------------------------------------------- //
 
 void QnWorkbenchActionHandler::at_context_userChanged(const QnUserResourcePtr &user) {
-	if (!qnRuntime->isActiveXMode()) {
-		if (!user) {
-	        context()->instance<QnWorkbenchUpdateWatcher>()->stop();
-			return;
-		}
-
-		if (user->isAdmin())
+	if (qnRuntime->isDesktopMode())
+    {
+		if (user && user->isAdmin())
 	        context()->instance<QnWorkbenchUpdateWatcher>()->start();
-	    else
-			context()->instance<QnWorkbenchUpdateWatcher>()->stop();
+        else
+            context()->instance<QnWorkbenchUpdateWatcher>()->stop();
 	}
+
+    if (!user)
+        return;
 
     // we should not change state when using "Open in New Window"
     if (m_delayedDrops.isEmpty() && !qnRuntime->isVideoWallMode() && !qnRuntime->isActiveXMode()) {
@@ -1146,7 +1145,7 @@ qint64 QnWorkbenchActionHandler::getFirstBookmarkTimeMs()
     const auto nowMs = qnSyncTime->currentMSecsSinceEpoch();
     const auto bookmarksWatcher = context()->instance<QnWorkbenchBookmarksWatcher>();
     const auto firstBookmarkUtcTimeMs = bookmarksWatcher->firstBookmarkUtcTimeMs();
-    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == bookmarksWatcher->kUndefinedTime);
+    const bool firstTimeIsNotKnown = (firstBookmarkUtcTimeMs == QnWorkbenchBookmarksWatcher::kUndefinedTime);
     return (firstTimeIsNotKnown ? nowMs - kOneYearOffsetMs : firstBookmarkUtcTimeMs);
 }
 
