@@ -258,6 +258,9 @@ int launchFile(const wstring& executePath)
             wchar_t* arch = sizeof(char*) == 4 ? L"x86" : L"x64";
             wsprintf(buffer, L"\"%s\\vcredist_%s.exe\" /q", toNativeSeparator(dstDir).c_str(), arch);
             int result = _wsystem(buffer);
+
+            // give ms antivirus enough time to have installed redist checked
+            Sleep(5000);
         }
 
         // start client
