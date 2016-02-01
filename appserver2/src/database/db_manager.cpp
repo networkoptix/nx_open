@@ -2739,7 +2739,7 @@ bool QnDbManager::saveMiscParam( const QByteArray& name, const QByteArray& value
 
 bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 {
-    QWriteLocker lock( &m_mutex );   //locking it here since this method is public
+    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -2754,7 +2754,7 @@ bool QnDbManager::readMiscParam( const QByteArray& name, QByteArray* value )
 
 ErrorCode QnDbManager::readSettings(ApiResourceParamDataList& settings)
 {
-    QWriteLocker lock( &m_mutex );   //locking it here since this method is public
+    QnWriteLocker lock( &m_mutex );   //locking it here since this method is public
 
     ApiResourceParamWithRefDataList params;
     ErrorCode rez = doQueryNoLock(m_adminUserID, params);
@@ -3635,7 +3635,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentT
 // dumpDatabase
 ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& data)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     //have to close/open DB to dump journals to .db file
     m_sdb.close();
@@ -3670,7 +3670,7 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
 ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, qint64& dumpFileSize)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     //have to close/open DB to dump journals to .db file
     m_sdb.close();
