@@ -2850,6 +2850,7 @@ void QnDbManager::loadResourceTypeXML(const QString& fileName, ApiResourceTypeDa
     QXmlInputSource xmlSrc( &xmlData );
     if(!reader.parse( &xmlSrc )) {
         qWarning() << "Can't parse XML file " << fileName << "with additional resource types. Check XML file syntax.";
+        Q_ASSERT_X(0, Q_FUNC_INFO, "Can't parse XML file");
     }
 }
 
