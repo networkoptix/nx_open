@@ -64,7 +64,12 @@ libavdevice.so.54.0.100 \
 libavfilter.so.2.77.100 \
 libavformat.so.54.6.100 \
 libavutil.so.51.54.100 \
+libudt.so.4110.0.0 \
 libcommon.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libcloud_db_client.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_network.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_streaming.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
+libnx_utils.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libnx_email.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libappserver2.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
 libmediaserver_core.so.$MAJOR_VERSION$MINOR_VERSION$BUILD_VERSION.0.0 \
