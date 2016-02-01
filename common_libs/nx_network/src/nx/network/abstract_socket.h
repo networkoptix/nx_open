@@ -50,14 +50,12 @@ public:
     typedef int SOCKET_HANDLE;
 #endif
 
-    virtual ~AbstractSocket() {}
-
     //!Bind to local address/port
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
     */
     virtual bool bind( const SocketAddress& localAddress ) = 0;
-    bool bind( const QString& localAddress, unsigned short localPort ) { return bind( SocketAddress( localAddress, localPort ) ); };
+    bool bind( const QString& localAddress, unsigned short localPort );
     //!Bind to local network interface by its name
     /*!
         \return false on error. Use \a SystemError::getLastOSErrorCode() to get error code
@@ -190,8 +188,6 @@ class NX_NETWORK_API AbstractCommunicatingSocket
     public AbstractSocket
 {
 public:
-    virtual ~AbstractCommunicatingSocket() {}
-
     static const int DEFAULT_TIMEOUT_MILLIS = 3000;
 
     //!Establish connection to specified foreign address
@@ -206,18 +202,10 @@ public:
     bool connect(
         const QString& foreignAddress,
         unsigned short foreignPort,
-        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS )
-    {
-        //TODO #ak this method MUST replace the previous one
-        return connect( SocketAddress(foreignAddress, foreignPort), timeoutMillis );
-    }
+        unsigned int timeoutMillis = DEFAULT_TIMEOUT_MILLIS );
     bool connect(
         const SocketAddress& remoteSocketAddress,
-        std::chrono::milliseconds timeoutMillis)
-    {
-        //TODO #ak this method MUST replace the previous one
-        return connect(remoteSocketAddress, timeoutMillis.count());
-    }
+        std::chrono::milliseconds timeoutMillis);
     //!Read into the given \a buffer up to \a bufferLen bytes data from this socket
     /*!
         Call \a AbstractCommunicatingSocket::connect() before calling \a AbstractCommunicatingSocket::recv()
@@ -237,8 +225,8 @@ public:
         \note If socket is in non-blocking mode and non-blocking send is not possible, method will return -1 and set error code to \a SystemError::wouldBlock
     */
     virtual int send( const void* buffer, unsigned int bufferLen ) = 0;
-    int send( const QByteArray& data )  { return send( data.constData(), data.size() ); }
-    int send( const QnByteArray& data ) { return send( data.constData(), data.size() ); }
+    int send( const QByteArray& data );
+    int send( const QnByteArray& data );
     //!Returns host address/port of remote host, socket has been connected to
     /*!
         Get the foreign address.  Call connect() before calling recv()
@@ -298,10 +286,7 @@ public:
         std::function<void()> handler) = 0;
     void registerTimer(
         std::chrono::milliseconds timeout,
-        std::function<void()> handler)
-    {
-        return registerTimer(timeout.count(), std::move(handler));
-    }
+        std::function<void()> handler);
 
     //!Cancel async socket operation. \a cancellationDoneHandler is invoked when cancelled
     /*!
@@ -314,18 +299,10 @@ public:
     /*!
         \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
     */
-    void cancelIOSync(aio::EventType eventType)
-    {
-        std::promise< bool > promise;
-        cancelIOAsync( eventType, [ & ](){ promise.set_value( true ); } );
-        promise.get_future().wait();
-    }
+    void cancelIOSync(aio::EventType eventType);
 
     //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop( std::function< void() > handler ) override
-    {
-        cancelIOAsync( aio::EventType::etNone, std::move( handler ) );
-    }
+    virtual void pleaseStop( std::function< void() > handler ) override;
 };
 
 struct NX_NETWORK_API StreamSocketInfo
@@ -364,8 +341,6 @@ class NX_NETWORK_API AbstractStreamSocket
     public AbstractCommunicatingSocket
 {
 public:
-    virtual ~AbstractStreamSocket() {}
-
     //!Reopenes previously closed socket
     /*!
         TODO #ak this class is not a right place for this method
@@ -440,8 +415,6 @@ class NX_NETWORK_API AbstractStreamServerSocket
     public AbstractSocket
 {
 public:
-    virtual ~AbstractStreamServerSocket() {}
-
     //!Start listening for incoming connections
     /*!
         \note Method returns immediately
@@ -468,8 +441,6 @@ public:
     virtual void acceptAsync(std::function<void(
         SystemError::ErrorCode,
         AbstractStreamSocket*)> handler) = 0;
-
-protected:
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));
@@ -487,18 +458,14 @@ public:
     static const int MAX_IP_HEADER_SIZE = 60;
     static const int MAX_DATAGRAM_SIZE = 64*1024 - 1 - UDP_HEADER_SIZE - MAX_IP_HEADER_SIZE;
 
-    virtual ~AbstractDatagramSocket() {}
-
     //!Set destination address for use by \a AbstractCommunicatingSocket::send() method
     /*!
         Difference from \a AbstractCommunicatingSocket::connect() method is this method does not enable filtering incoming datagrams by (\a foreignAddress, \a foreignPort),
             and \a AbstractCommunicatingSocket::connect() does
     */
     virtual bool setDestAddr( const SocketAddress& foreignEndpoint ) = 0;
-    //TODO #ak drop following method
-    bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort ) {
-        return setDestAddr( SocketAddress( foreignAddress, foreignPort ) );
-    }
+    //TODO #ak drop following overload
+    bool setDestAddr( const QString& foreignAddress, unsigned short foreignPort );
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         \param buffer buffer to be written
@@ -512,10 +479,7 @@ public:
         const void* buffer,
         unsigned int bufferLen,
         const QString& foreignAddress,
-        unsigned short foreignPort )
-    {
-        return sendTo( buffer, bufferLen, SocketAddress( foreignAddress, foreignPort ) );
-    }
+        unsigned short foreignPort );
     //!Send the given \a buffer as a datagram to the specified address/port
     /*!
         Same as previous method
@@ -526,10 +490,7 @@ public:
         const SocketAddress& foreignAddress ) = 0;
     bool sendTo(
         const nx::Buffer& buf,
-        const SocketAddress& foreignAddress)
-    {
-        return sendTo(buf.constData(), buf.size(), foreignAddress);
-    }
+        const SocketAddress& foreignAddress);
     /*!
         \param completionHandler (errorCode, resolved target address, bytesSent)
     */
