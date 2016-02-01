@@ -556,7 +556,7 @@ void QnNxStyle::drawComplexControl(
 
             QRect labelRect = subControlRect(CC_GroupBox, &opt, SC_GroupBoxLabel, widget);
 
-            if (groupBox->subControls & SC_GroupBoxFrame)
+            if (groupBox->subControls.testFlag(SC_GroupBoxFrame))
             {
                 QRect rect = subControlRect(CC_GroupBox, groupBox, SC_GroupBoxFrame, widget).adjusted(0, 0, -1, -1);
 
@@ -569,25 +569,36 @@ void QnNxStyle::drawComplexControl(
                 }
                 else
                 {
-                    painter->setPen(mainColor);
+                    const int radius = dp(2);
+                    const int spacing = dp(8);
+                    const qreal penWidth = 1.0;
+
                     QPainterPath path;
-                    path.moveTo(labelRect.left() - dp(8), rect.top());
-                    path.lineTo(rect.topLeft());
-                    path.lineTo(rect.bottomLeft());
-                    path.lineTo(rect.bottomRight());
-                    path.lineTo(rect.topRight());
-                    path.lineTo(labelRect.right() + dp(8), rect.top());
+                    path.moveTo(labelRect.left() - spacing, rect.top());
+                    path.lineTo(rect.left() + radius, rect.top());
+                    path.quadTo(rect.left(), rect.top(), rect.left(), rect.top() + radius);
+                    path.lineTo(rect.left(), rect.bottom() - radius);
+                    path.quadTo(rect.left(), rect.bottom(), rect.left() + radius, rect.bottom());
+                    path.lineTo(rect.right() - radius, rect.bottom());
+                    path.quadTo(rect.right(), rect.bottom(), rect.right(), rect.bottom() - radius);
+                    path.lineTo(rect.right(), rect.top() + radius);
+                    path.quadTo(rect.right(), rect.top(), rect.right() - radius, rect.top());
+                    path.lineTo(labelRect.right() + spacing, rect.top());
+
+                    painter->save();
+                    painter->translate(penWidth / 2, penWidth / 2);
+                    painter->setPen(mainColor);
+                    painter->setRenderHint(QPainter::Antialiasing);
                     painter->drawPath(path);
+                    painter->restore();
                 }
             }
 
-            if (groupBox->subControls & SC_GroupBoxLabel)
+            if (groupBox->subControls.testFlag(SC_GroupBoxLabel))
             {
-                QnPaletteColor mainColor = findColor(option->palette.color(QPalette::WindowText));
-                painter->setPen(flat ? mainColor : mainColor.darker(12));
                 drawItemText(painter, labelRect, Qt::AlignCenter,
-                             groupBox->palette, groupBox->state & QStyle::State_Enabled,
-                             groupBox->text);
+                             groupBox->palette, groupBox->state.testFlag(QStyle::State_Enabled),
+                             groupBox->text, flat ? QPalette::Text : QPalette::WindowText);
             }
 
             painter->restore();
