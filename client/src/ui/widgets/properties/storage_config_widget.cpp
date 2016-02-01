@@ -135,7 +135,6 @@ QnStorageConfigWidget::QnStorageConfigWidget(QWidget* parent)
     ui->comboBoxBackupType->addItem(tr("On Demand"),   Qn::Backup_Manual);
 
     setWarningStyle(ui->storagesWarningLabel);
-    ui->storagesWarningLabel->hide();
 
     setWarningStyle(ui->backupStoragesAbsentLabel);
     ui->backupStoragesAbsentLabel->hide();
@@ -378,7 +377,7 @@ void QnStorageConfigWidget::loadDataToUi() {
     updateBackupInfo();
     updateBackupWidgetsVisibility();
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
 }
 
@@ -447,7 +446,9 @@ void QnStorageConfigWidget::at_eventsGrid_clicked(const QModelIndex& index)
     }
     else if (index.column() == QnStorageListModel::CheckBoxColumn) {
         if (index.data(Qt::CheckStateRole) == Qt::Unchecked && hasChanges())
-            ui->storagesWarningLabel->show();
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageStoragesWarning);
+        else if (!hasChanges())
+            ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     }
 
     emit hasChangesChanged();
@@ -614,13 +615,26 @@ void QnStorageConfigWidget::applyChanges()
     if (!storagesToRemove.empty())
         qnServerStorageManager->deleteStorages(storagesToRemove);
 
-    if (m_backupSchedule != m_server->getBackupSchedule()) {
+    /* Make sure scheduled backup will stop in no backup storages left after 'Apply' button. */
+    bool backupStoragesExist = any_of(m_model->storages(), [](const QnStorageModelInfo &info)
+    {
+        return info.isBackup;
+    });
+    if (!backupStoragesExist)
+    {
+        m_backupSchedule.backupType = Qn::Backup_Manual;
+        const auto backupTypeIndex = ui->comboBoxBackupType->findData(m_backupSchedule.backupType);
+        ui->comboBoxBackupType->setCurrentIndex(backupTypeIndex);
+    }
+
+    if (m_backupSchedule != m_server->getBackupSchedule())
+    {
         qnResourcesChangesManager->saveServer(m_server, [this](const QnMediaServerResourcePtr &server) {
             server->setBackupSchedule(m_backupSchedule);
         });
     }
 
-    ui->storagesWarningLabel->hide();
+    ui->storagesWarningStackedWidget->setCurrentWidget(ui->pageSpacer);
     ui->backupStoragesAbsentLabel->hide();
     emit hasChangesChanged();
 }

@@ -230,10 +230,13 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     params = QnActionParameters();
 
     QModelIndexList selection = m_ui->gridBookmarks->selectionModel()->selectedRows();
+    QSet<int> selectedRows;
+    for (const QModelIndex &index: selection)
+        selectedRows << index.row();
 
     /* Update selection - add current item if we have clicked on not selected item with Ctrl or Shift. */
     const auto currentIndex = m_ui->gridBookmarks->currentIndex();
-    if (currentIndex.isValid() && !selection.contains(currentIndex))
+    if (currentIndex.isValid() && !selectedRows.contains(currentIndex.row()))
     {
         const int row = currentIndex.row();
         QItemSelection selectionItem(currentIndex.sibling(row, 0), currentIndex.sibling(row, QnSearchBookmarksModel::kColumnsCount - 1));
@@ -243,11 +246,16 @@ bool QnSearchBookmarksDialogPrivate::fillActionParameters(QnActionParameters &pa
     }
 
     QnCameraBookmarkList bookmarks;
+    QSet<QnUuid> bookmarkIds;   /*< Make sure we will have no duplicates in all cases. */
     for (const QModelIndex &index: selection)
     {
         const auto bookmark = bookmarkFromIndex(index);
         if (!bookmark.isValid())
             continue;
+
+        if (bookmarkIds.contains(bookmark.guid))
+            continue;
+        bookmarkIds << bookmark.guid;
 
         bookmarks << bookmark;
     }

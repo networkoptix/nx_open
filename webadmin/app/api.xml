@@ -325,7 +325,7 @@
                             <optional>true</optional>
                             <description>
                                 Start time of interval with bookmarks (milliseconds since epoch).
-                                Default value is 0. Should be greater than endTime.
+                                Default value is 0. Should be less than endTime.
                             </description>
                         </param>
                         <param>
@@ -333,15 +333,15 @@
                             <optional>true</optional>
                             <description>
                                 End time of interval with bookmarks (milliseconds since epoch).
-                                Default value is current time. Should be less than startTime.
+                                Default value is current time. Should be greater than startTime.
                             </description>
                         </param>
 
                         <param>
-                            <name>sortField</name>
+                            <name>sortBy</name>
                             <optional>true</optional>
                             <description>
-                                Sorting field name.
+                                Sorts result by specified value. Default value is 'startTime'.
                             </description>
                             <values>
                                 <value>
@@ -357,21 +357,17 @@
                                     <description>Sorts bookmarks by duration</description>
                                 </value>
                                 <value>
-                                    <name>tags</name>
-                                    <description>Sorts bookmarks by tags</description>
-                                </value>
-                                <value>
                                     <name>cameraName</name>
                                     <description>Sorts bookmarks by camera name</description>
                                 </value>
                             </values>
                         </param>
-                        
+
                         <param>
                             <name>sortOrder</name>
                             <optional>true</optional>
                             <description>
-                                Sort order
+                                Sort order. Default order is ascending.
                             </description>
                             <values>
                                 <value>
@@ -384,39 +380,13 @@
                                 </value>
                             </values>
                         </param>
-                        
-                        <param>
-                            <name>useSparsing</name>
-                            <optional>true</optional>
-                            <description>
-                                Shows if bookmarks are sparse. It means that instead of
-                                returning 'limit' number of bookmarks from the start or the end of time window, they will be evenly
-                                thined out.
-                            </description>
-                            <values>
-                                <value>
-                                    <name>true</name>
-                                    <description>Thin out bookmarks</description>
-                                </value>
-                                <value>
-                                    <name>false</name>
-                                    <description>Do not thin out bookmarks</description>
-                                </value>
-                            </values>
-                        </param>
-                        <param>
-                            <name>minVisibleLength</name>
-                            <optional>true</optional>
-                            <description>
-                                Minimal length of bookmark (in milliseconds) that could be visible on the screen.
-                                When useSparsing parameter is 'true' this field is used as a hint to thin out algorithm.
-                            </description>
-                        </param>
-                      
+
                         <param>
                             <name>limit</name>
                             <optional>true</optional>
-                            <description>Maximum number of bookmarks which will be returned.</description>
+                            <description>Maximum number of bookmarks which will be returned.
+                            Unlimited by default.
+                            </description>
                         </param>
                         <param>
                             <name>filter</name>

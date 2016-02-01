@@ -61,7 +61,7 @@ extern "C"
 #include <ui/widgets/day_time_widget.h>
 
 #include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
-#include <ui/workbench/watchers/current_layout_items_watcher.h>
+#include <ui/workbench/watchers/workbench_items_watcher.h>
 
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_server_time_watcher.h"
@@ -341,7 +341,7 @@ void QnWorkbenchNavigator::updateArchiveState(QnWorkbenchItem *item)
         updateHasArchiveState();
 }
 
-void QnWorkbenchNavigator::onItemAdded(QnWorkbenchItem *item)
+void QnWorkbenchNavigator::onShowItem(QnWorkbenchItem *item)
 {
     if (!hasArchive())
         updateHasArchiveState();
@@ -365,12 +365,10 @@ void QnWorkbenchNavigator::initialize() {
     if (!isValid())
         return;
 
-    const auto itemsWatcher = context()->instance<QnCurrentLayoutItemsWatcher>();
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemAdded
-        , this, &QnWorkbenchNavigator::onItemAdded);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemRemoved
-        , this, &QnWorkbenchNavigator::updateArchiveState);
-    connect(itemsWatcher, &QnCurrentLayoutItemsWatcher::itemHidden
+    const auto itemsWatcher = context()->instance<QnWorkbenchItemsWatcher>();
+    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemShown
+        , this, &QnWorkbenchNavigator::onShowItem);
+    connect(itemsWatcher, &QnWorkbenchItemsWatcher::itemHidden
         , this, &QnWorkbenchNavigator::updateArchiveState);
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged
@@ -581,27 +579,14 @@ bool QnWorkbenchNavigator::hasArchive() const
     return m_hasArchive;
 }
 
-bool QnWorkbenchNavigator::layoutHasAchive()
-{
-    const auto layout = workbench()->currentLayout();
-    if (!layout)
-        return false;
-
-    const auto items = layout->items();
-    return std::any_of(items.begin(), items.end(), [](QnWorkbenchItem *item)
-    {
-        const auto camera = extractCamera(item);
-        if (!camera)
-            return false;
-
-        const bool camHasArchive = !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
-        return camHasArchive;
-    });
-}
-
 void QnWorkbenchNavigator::updateHasArchiveState()
 {
-    const bool newValue = layoutHasAchive();
+    const bool newValue = boost::algorithm::any_of(m_syncedWidgets, [](QnMediaResourceWidget* widget)
+    {
+        auto camera = widget->resource()->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
+        return camera && !qnCameraHistoryPool->getCameraFootageData(camera, true).empty();
+    });
+
     if (m_hasArchive == newValue)
         return;
 
@@ -609,7 +594,7 @@ void QnWorkbenchNavigator::updateHasArchiveState()
     emit hasArchiveChanged();
 }
 
-bool QnWorkbenchNavigator::hasVideo() const {
+bool QnWorkbenchNavigator::currentWidgetHasVideo() const {
     return m_currentMediaWidget && m_currentMediaWidget->hasVideo();
 }
 
@@ -622,7 +607,7 @@ qreal QnWorkbenchNavigator::minimalSpeed() const {
         if (!reader->isNegativeSpeedSupported())
             return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? -16.0
         : 0.0;
 }
@@ -631,7 +616,7 @@ qreal QnWorkbenchNavigator::maximalSpeed() const {
     if (!isPlayingSupported())
         return 0.0;
 
-    return hasVideo()
+    return currentWidgetHasVideo()
         ? 16.0
         : 1.0;
 }
