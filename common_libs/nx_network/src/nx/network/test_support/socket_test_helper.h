@@ -18,8 +18,12 @@
 #include <nx/utils/thread/mutex.h>
 
 
+namespace nx {
+namespace network {
+namespace test {
+
 //!Reads/writes random data to/from connection
-class TestConnection
+class NX_NETWORK_API TestConnection
 :
     public QnStoppable
 {
@@ -76,7 +80,7 @@ private:
 /*!
     \note This class is not thread-safe
 */
-class RandomDataTcpServer
+class NX_NETWORK_API RandomDataTcpServer
 :
     public QnStoppable,
     public QnJoinable
@@ -106,7 +110,7 @@ private:
 /*!
     \note This class is not thread-safe
 */
-class ConnectionsGenerator
+class NX_NETWORK_API ConnectionsGenerator
 :
     public QnStoppable,
     public QnJoinable
@@ -148,5 +152,9 @@ private:
 
     void onConnectionFinished( int id, ConnectionsContainer::iterator connectionIter );
 };
+
+}   //test
+}   //network
+}   //nx
 
 #endif  //SOCKET_TEST_HELPER_H

@@ -4,8 +4,8 @@
 #include <nx/network/multiple_server_socket.h>
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/test_support/simple_socket_test_helper.h>
 
-#include "simple_socket_test_helper.h"
 
 namespace nx {
 namespace network {

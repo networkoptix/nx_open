@@ -12,9 +12,12 @@
 #include <nx/network/socket.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/network/udt/udt_pollset.h>
+#include <nx/network/test_support/simple_socket_test_helper.h>
 
-#include "simple_socket_test_helper.h"
 
+namespace nx {
+namespace network {
+namespace test {
 
 class TestHandler
 :
@@ -120,3 +123,7 @@ TEST(SocketUdt_UdtPollSet, general)
 NX_SIMPLE_SOCKET_TESTS(SocketUdt,
                        &std::make_unique<UdtStreamServerSocket>,
                        &std::make_unique<UdtStreamSocket>)
+
+}   //test
+}   //network
+}   //nx

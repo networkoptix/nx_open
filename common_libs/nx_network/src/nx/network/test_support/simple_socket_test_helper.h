@@ -10,12 +10,19 @@
 // Template multitype socket tests to ensure that every common_ut run checks
 // TCP and UDT basic functionality
 
+
+namespace nx {
+namespace network {
+namespace test {
+
 namespace /* anonimous */ {
 
 const SocketAddress kServerAddress("127.0.0.1:12345");
 const QByteArray kTestMessage("Ping");
 const int kClientCount(3);
 const std::chrono::milliseconds kTestTimeout(500);
+
+}
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
@@ -171,8 +178,10 @@ void socketSimpleAsync(
     stopSocket(std::move(server));
 }
 
+namespace {
 void pleaseStopSync(std::unique_ptr<QnStoppableAsync> socket) {
     socket->pleaseStopSync();
+}
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>
@@ -337,6 +346,8 @@ void socketAcceptTimeoutAsync(
     TEST(test, AcceptTimeoutAsync)  { socketAcceptTimeoutAsync(mkServer); }         \
 
 
-} // namespace /* anonimous */
+}   //test
+}   //network
+}   //nx
 
 #endif  //SIMPLE_SOCKET_TEST_HELPER_H

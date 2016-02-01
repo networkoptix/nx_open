@@ -7,6 +7,12 @@
 
 #include <atomic>
 
+#include <iostream>
+
+
+namespace nx {
+namespace network {
+namespace test {
 
 ////////////////////////////////////////////////////////////
 //// class TestConnection
@@ -455,3 +461,7 @@ void ConnectionsGenerator::onConnectionFinished(int id, ConnectionsContainer::it
         ++m_totalConnectionsEstablished;
     }
 }
+
+}   //test
+}   //network
+}   //nx
