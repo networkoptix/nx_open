@@ -336,10 +336,13 @@ int QnFileStorageResource::mountTmpDrive() const
     QString uncString = url.host() + url.path();
     uncString.replace(lit("/"), lit("\\"));
 
+    QString password = url.password();
+    password = password.isEmpty() ? "123" : password;
+
     QString cifsOptionsString =
         lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
-            .arg(url.password())
+            .arg(password)
             .arg(uncString);
 
     QString srcString = lit("//") + url.host() + url.path();
@@ -477,7 +480,7 @@ QnFileStorageResource::~QnFileStorageResource()
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif
-        rmdir(m_locaPath.toLatin1().constData());
+        rmdir(m_localPath.toLatin1().constData());
     }
 #endif
 }
@@ -777,7 +780,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
     QString localPathCopy;
     {
         QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath
+        localPathCopy = m_localPath;
     }
 
     if (!localPathCopy.isEmpty()) // smb
@@ -798,7 +801,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
 
         QString srcString = lit("//") + url.host() + url.path();
 
-        auto badResultHandler = [this]()
+        auto badResultHandler = [this, &localPathCopy]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
             // Will try to unmount, remove local mount point directory
