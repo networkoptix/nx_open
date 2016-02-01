@@ -176,6 +176,7 @@ void QnCommonMetaTypes::initialize() {
 
 #ifdef ENABLE_DATA_PROVIDERS
     qRegisterMetaType<QnMetaDataV1Ptr>();
+    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 #endif
 
     qRegisterMetaType<QnAbstractBusinessActionPtr>();
@@ -297,7 +298,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
-    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
