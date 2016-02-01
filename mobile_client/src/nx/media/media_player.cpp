@@ -17,12 +17,14 @@
 
 namespace nx {
 namespace media {
-
+    
 namespace {
     static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
     static const qint64 kLivePosition = -1;
-    static const int kMaxDelayForResyncMs = 200; //< resync playback timer if video frame late
-    static const int kMaxLiveBufferMs = 200; //< maximum duration for live buffer
+    static const int kMaxDelayForResyncMs = 15; //< resync playback timer if video frame late
+    static const int kInitialLiveBufferMs = 200; //< initial duration for live buffer
+    static const int kMaxLiveBufferMs = 600;     //< maximum duration for live buffer. Live buffer can be extended dynamically
+    static const int kMaxCounterForWrongLiveBuffer = 2; //< Max allowed amount of underflow/overflow issues in Live mode before extending live buffer
 
     static qint64 msecToUsec(qint64 posMs)
     {
@@ -58,6 +60,18 @@ public:
     std::unique_ptr<PlayerDataConsumer> dataConsumer;     //< separate thread. This class decodes compressed AV data
     QTimer* execTimer;                                    //< timer for delayed call 'presentFrame'
     qint64 lastSeekTimeMs;                                //< last seek position. UTC time in msec
+    int liveBufferMs;                                     //< current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs]
+
+    enum class BufferState
+    {
+        NoIssue,
+        Underflow,
+        Overflow
+    };
+
+    BufferState liveBufferState;        //< live buffer state for the last frame
+    int underflowCounter;               //< live buffer underflow counter
+    int overflowCounter;                //< live buffer overflow counter
 private:
     PlayerPrivate(Player *parent);
 
@@ -72,6 +86,9 @@ private:
 	void setMediaStatus(Player::MediaStatus status);
     void setLiveMode(bool value);
     void setPosition(qint64 value);
+
+    void resetLiveBufferState();
+    void updateLiveBufferState(BufferState value);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -80,13 +97,17 @@ PlayerPrivate::PlayerPrivate(Player *parent):
 	state(Player::State::Stopped),
     mediaStatus(Player::MediaStatus::NoMedia),
     hasAudio(false),
-    liveMode(false),
+    liveMode(true),
 	position(0),
     videoSurface(0),
 	maxTextureSize(QnTextureSizeHelper::instance()->maxTextureSize()),
     ptsTimerBase(0),
     execTimer(new QTimer(this)),
-    lastSeekTimeMs(AV_NOPTS_VALUE)
+    lastSeekTimeMs(AV_NOPTS_VALUE),
+    liveBufferMs(kInitialLiveBufferMs),
+    liveBufferState(BufferState::NoIssue),
+    underflowCounter(0),
+    overflowCounter(0)
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -131,7 +152,6 @@ void PlayerPrivate::setPosition(qint64 value)
     position = value;
     Q_Q(Player);
     emit q->positionChanged();
-    at_hurryUp(); //< renew receiving frames
 }
 
 void PlayerPrivate::at_hurryUp()
@@ -200,6 +220,30 @@ void PlayerPrivate::presentNextFrame()
     QTimer::singleShot(0, this, &PlayerPrivate::at_gotVideoFrame); //< calculate next time to render
 }
 
+void PlayerPrivate::resetLiveBufferState()
+{
+    overflowCounter = underflowCounter = 0;
+    liveBufferState = BufferState::NoIssue;
+    liveBufferMs = kInitialLiveBufferMs;
+}
+
+void PlayerPrivate::updateLiveBufferState(BufferState value)
+{
+    if (liveBufferState == value)
+        return; //< do not take into account same state several times in a row
+    liveBufferState = value;
+
+    if (liveBufferState == BufferState::Overflow)
+        overflowCounter++;
+    else if (liveBufferState == BufferState::Underflow)
+        underflowCounter++;
+    else
+        return;
+
+    if (underflowCounter >= kMaxCounterForWrongLiveBuffer && overflowCounter >= kMaxCounterForWrongLiveBuffer)
+        liveBufferMs = qMin(liveBufferMs* 1.5, kMaxLiveBufferMs); //< too much underflow/overflow issues. extend live buffer
+}
+
 qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 {
     const qint64 pts = frame->startTime();
@@ -210,19 +254,31 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 	}
 	else 
 	{
-        if (pts - ptsTimerBase < -kMaxDelayForResyncMs)
-            qDebug() << "--- resync data because of late frame";
-        if (liveMode && usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts > kMaxLiveBufferMs)
-            qDebug() << "--- resync data because of late frame";
-
         FrameMetadata metadata = FrameMetadata::deserialize(frame);
-		// Calculate time to present next frame
-		if (!lastVideoPts.is_initialized() ||                                    //< first time
+        
+        // Calculate time to present next frame
+        qint64 mediaQueueLen = usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts;
+        bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && (pts - ptsTimerBase < -kMaxDelayForResyncMs);
+        bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
+
+        if (liveMode)
+        {
+            if (metadata.noDelay)
+            {
+                resetLiveBufferState(); //< reset live statstics because of seek or FCZ frames
+            }
+            else {
+                auto value = liveBufferUnderflow ? BufferState::Underflow : liveBufferOverflow ? BufferState::Overflow : BufferState::NoIssue;
+                updateLiveBufferState(value);
+            }
+        }
+
+        if (!lastVideoPts.is_initialized() ||                                    //< first time
             !qBetween(*lastVideoPts, pts, *lastVideoPts + kMaxFrameDuration) ||  //< pts discontinue
             metadata.noDelay                                                 ||  //< jump occurred
             pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
-            pts - ptsTimerBase < -kMaxDelayForResyncMs                       ||    //< resync because of video frame is late more than threshold
-            (liveMode && usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts > kMaxLiveBufferMs) //< live buffer overflow
+            liveBufferUnderflow                                              ||  //< resync because of video frame is late more than threshold
+            liveBufferOverflow                                                   //< live buffer overflow
             )
 		{
 			// Reset timer
@@ -235,7 +291,7 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
 			lastVideoPts = pts;
 			return pts - ptsTimerBase;
 		}
-	}
+    }
 }
 
 bool PlayerPrivate::initDataProvider()
@@ -316,10 +372,13 @@ void Player::setPosition(qint64 value)
 {
 	Q_D(Player);
     d->lastSeekTimeMs = value;
+
     if (d->archiveReader)
         d->archiveReader->jumpTo(msecToUsec(value), 0);
     else
         d->position = value;
+
+    d->at_hurryUp(); //< renew receiving frames
 }
 
 void Player::play()
