@@ -83,7 +83,7 @@
                 "windowText":       "light16",
                 "button":           "dark10",
                 "light":            "light10",
-                "midlight":         "dark16",
+                "midlight":         "dark12",
                 "dark":             "dark8",
                 "mid":              "dark9",
                 "text":             "light4",
@@ -104,7 +104,7 @@
                 "windowText":       "light16.setAlpha(75)",
                 "button":           "dark10.setAlpha(75)",
                 "light":            "light10.setAlpha(75)",
-                "midlight":         "dark16.setAlpha(75)",
+                "midlight":         "dark12.setAlpha(75)",
                 "dark":             "dark8.setAlpha(75)",
                 "mid":              "dark9.setAlpha(75)",
                 "text":             "light4.setAlpha(75)",
@@ -134,17 +134,6 @@
             },
             "disabled": {
                 "windowText": "dark12"
-            }
-        }
-    },
-
-    "QScrollBar": {
-        "palette": {
-            "default": {
-                "base": "dark8",
-                "button": "dark12",
-                "mid": "dark13",
-                "midligh": "dark14"
             }
         }
     },

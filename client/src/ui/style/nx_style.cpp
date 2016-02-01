@@ -617,27 +617,33 @@ void QnNxStyle::drawComplexControl(
         }
         break;
     case CC_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
+        {
             QRect scrollBarSlider = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
             QRect scrollBarGroove = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
 
-            QBrush sliderBrush = scrollBar->palette.button();
-            QBrush grooveBrush = scrollBar->palette.base();
+            QBrush grooveBrush = scrollBar->palette.dark();
+
+            QnPaletteColor mainSliderColor = findColor(scrollBar->palette.color(QPalette::Midlight));
+            QColor sliderColor = mainSliderColor;
 
             if (scrollBar->state.testFlag(State_Sunken))
             {
-                sliderBrush = scrollBar->palette.mid();
+                sliderColor = mainSliderColor.lighter(1);
             }
             else if (scrollBar->state.testFlag(State_MouseOver))
             {
-                sliderBrush = scrollBar->palette.midlight();
+                if (scrollBar->activeSubControls.testFlag(SC_ScrollBarSlider))
+                    sliderColor = mainSliderColor.lighter(2);
+                else
+                    sliderColor = mainSliderColor.lighter(1);
             }
 
             if (scrollBar->subControls & SC_ScrollBarGroove)
                 painter->fillRect(scrollBarGroove, grooveBrush);
 
             if (scrollBar->subControls & SC_ScrollBarSlider)
-                painter->fillRect(scrollBarSlider, sliderBrush);
+                painter->fillRect(scrollBarSlider, sliderColor);
 
             return;
         }
