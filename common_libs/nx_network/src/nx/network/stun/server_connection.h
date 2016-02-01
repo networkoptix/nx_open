@@ -48,6 +48,7 @@ public:
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
 
+    //!Implementation of \a AbstractServerConnection::sendMessage
     virtual void sendMessage(
         nx::stun::Message message,
         std::function<void(SystemError::ErrorCode)> handler) override;
