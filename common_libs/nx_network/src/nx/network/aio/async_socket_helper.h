@@ -85,10 +85,8 @@ public:
         m_recvHandlerTerminatedFlag( nullptr ),
         m_timerHandlerTerminatedFlag( nullptr ),
         m_threadHandlerIsRunningIn( NULL ),
-        m_natTraversalEnabled( _natTraversalEnabled )
-#ifdef _DEBUG
-        , m_asyncSendIssued( false )
-#endif
+        m_natTraversalEnabled( _natTraversalEnabled ),
+        m_asyncSendIssued( false )
     {
         assert( this->m_socket );
         assert( m_abstractSocketPtr );
