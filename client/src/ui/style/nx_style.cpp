@@ -176,10 +176,12 @@ void QnNxStyle::drawPrimitive(
 
         QColor buttonColor = mainColor;
         QColor shadowColor = mainColor.darker(2);
+        int shadowShift = 1;
 
         if (pressed)
         {
             buttonColor = mainColor.darker(1);
+            shadowShift = -1;
         }
         else if (hovered)
         {
@@ -188,24 +190,15 @@ void QnNxStyle::drawPrimitive(
         }
 
         painter->setPen(Qt::NoPen);
-        painter->setBrush(buttonColor);
         painter->setRenderHint(QPainter::Antialiasing);
-        painter->drawRoundedRect(option->rect.adjusted(0, 0, 0, -1), 2, 2);
-        painter->setRenderHint(QPainter::Antialiasing, false);
 
-        QPen shadowPen(shadowColor);
-        painter->setPen(shadowPen);
+        QRect rect = option->rect.adjusted(0, 0, 0, -1);
 
-        if (pressed)
-        {
-            painter->drawLine(option->rect.left() + 1, option->rect.top() + 0.5,
-                              option->rect.right() - 1, option->rect.top() + 0.5);
-        }
-        else
-        {
-            painter->drawLine(option->rect.left() + 1, option->rect.bottom(),
-                              option->rect.right() - 1, option->rect.bottom());
-        }
+        painter->setBrush(shadowColor);
+        painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
+
+        painter->setBrush(buttonColor);
+        painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
 
         painter->restore();
         return;
