@@ -242,13 +242,9 @@ int QnFileStorageResource::getCapabilities() const
 
 QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
 {
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+    QnMutexLocker lk(&m_mutex);
 
-    if (localPathCopy.isEmpty())
+    if (m_localPath.isEmpty())
         return url;
     else
     {
@@ -258,24 +254,20 @@ QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
             tmpPath.clear();
         else
             tmpPath = tmpPath.mid(storagePath.size());
-        tmpPath = localPathCopy + tmpPath;
+        tmpPath = m_localPath + tmpPath;
         return tmpPath;
     }
 }
 
 QString QnFileStorageResource::translateUrlToRemote(const QString &url) const
 {
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+    QnMutexLocker lk(&m_mutex);
 
-    if (localPathCopy.isEmpty())
+    if (m_localPath.isEmpty())
         return url;
     else
     {
-        QString ret = getUrl() + url.mid(localPathCopy.size());
+        QString ret = getUrl() + url.mid(m_localPath.size());
         return ret;
     }
 }
@@ -449,10 +441,9 @@ int QnFileStorageResource::mountTmpDrive() const
     if (!updatePermissions())
         return -1;
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_localPath = path;
-    }
+    QnMutexLocker lk(&m_mutex);
+    m_localPath = path;
+
     return 0;
 }
 #endif
@@ -460,10 +451,8 @@ int QnFileStorageResource::mountTmpDrive() const
 void QnFileStorageResource::setUrl(const QString& url)
 {
     QnStorageResource::setUrl(url);
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_dirty = true;
-    }
+    QnMutexLocker lk(&m_mutex);
+    m_dirty = true;
 }
 
 QnFileStorageResource::QnFileStorageResource():
@@ -479,20 +468,16 @@ QnFileStorageResource::QnFileStorageResource():
 
 QnFileStorageResource::~QnFileStorageResource()
 {
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+    QnMutexLocker lk(&m_mutex);
 #ifndef _WIN32
-    if (!localPathCopy.isEmpty())
+    if (!m_localPath.isEmpty())
     {
 #if __linux__
-        umount(localPathCopy.toLatin1().constData());
+        umount(m_localPath.toLatin1().constData());
 #elif __APPLE__
-        unmount(localPathCopy.toLatin1().constData(), 0);
+        unmount(m_localPath.toLatin1().constData(), 0);
 #endif
-        rmdir(locaPathCopy.toLatin1().constData());
+        rmdir(m_locaPath.toLatin1().constData());
     }
 #endif
 }
