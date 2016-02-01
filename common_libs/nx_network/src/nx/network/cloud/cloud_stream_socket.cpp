@@ -4,7 +4,7 @@
 
 #include <utils/common/systemerror.h>
 
-#include "cloud_tunnel.h"
+#include "tunnel/outgoing_tunnel.h"
 #include "../socket_global.h"
 #include "../system_socket.h"
 
