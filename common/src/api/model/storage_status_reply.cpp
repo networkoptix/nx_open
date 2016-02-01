@@ -23,7 +23,7 @@ QnStorageSpaceData::QnStorageSpaceData( const QnStorageResourcePtr &storage, boo
     , freeSpace         (fastCreate ? QnStorageResource::kSizeDetectionOmitted : storage->getFreeSpace())
     , reservedSpace     (storage->getSpaceLimit())
     , isExternal        (storage->isExternal())
-    , isWritable        (storage->isWritable()) //TODO: #GDM check if it is really fast
+    , isWritable        (fastCreate ? true : storage->isWritable())
     , isUsedForWriting  (storage->isUsedForWriting())
     , isBackup          (storage->isBackup())
     , isOnline          (storage->getStatus() == Qn::Online)

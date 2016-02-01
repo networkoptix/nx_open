@@ -66,7 +66,7 @@ namespace
             for (auto it = mergeDataIt + 1; it != mergeData.end(); ++it)
             {
                 const QnCameraBookmark *currentBookmark= it->first;
-                if (!pred(*minBookmark, *currentBookmark))
+                if (!pred(*currentBookmark, *minBookmark))
                     continue;
 
                 mergeDataIt = it;

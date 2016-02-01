@@ -35,6 +35,7 @@ class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsume
     Q_OBJECT
     Q_ENUMS(StreamRecorderError)
     Q_ENUMS(Role)
+
 public:
     // TODO: #Elric #enum
     enum Role {Role_ServerRecording, Role_FileExport, Role_FileExportWithEmptyContext};
@@ -79,7 +80,7 @@ public:
         qint64                  totalWriteTimeNs;
 
         RecordingContext(
-            const QString               &fname, 
+            const QString               &fname,
             const QnStorageResourcePtr  &st
         ) :
             fileName(fname),
@@ -100,11 +101,11 @@ public:
     void setTruncateInterval(int seconds);
 
     void addRecordingContext(
-        const QString               &fileName, 
+        const QString               &fileName,
         const QnStorageResourcePtr  &storage
     );
 
-    // Sets default file name and tries to get relevant 
+    // Sets default file name and tries to get relevant
     // storage.
     bool addRecordingContext(const QString &fileName);
 
@@ -114,9 +115,9 @@ public:
     void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
 
     void close();
-    
+
     qint64 duration() const  { return m_endDateTime - m_startDateTime; }
-    
+
     virtual bool processData(const QnAbstractDataPacketPtr& data) override;
 
     void setStartOffset(qint64 value);
@@ -137,7 +138,7 @@ public:
 #endif
 
     /*
-    * Return hash value 
+    * Return hash value
     */
     QByteArray getSignature() const;
 
@@ -163,7 +164,7 @@ public:
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(const ErrorStruct &status, const QString &fileName);
+    void recordingFinished(const QnStreamRecorder::ErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -219,7 +220,7 @@ private:
     int m_lastProgress;
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
-    
+
     QnCryptographicHash m_mdctx;
 #ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
@@ -244,6 +245,8 @@ private:
     Role m_role;
     QnImageFilterHelper m_extraTranscodeParams;
 };
+
+Q_DECLARE_METATYPE(QnStreamRecorder::ErrorStruct)
 
 #endif // ENABLE_DATA_PROVIDERS
 
