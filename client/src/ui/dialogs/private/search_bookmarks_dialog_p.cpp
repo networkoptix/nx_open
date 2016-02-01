@@ -100,6 +100,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
     m_ui->setupUi(m_owner);
     m_ui->gridBookmarks->setModel(m_model);
 
+
     const auto updateFilterText = [this]()
     {
         m_model->setFilterText(m_ui->filterLineEdit->lineEdit()->text());
@@ -153,8 +154,7 @@ QnSearchBookmarksDialogPrivate::QnSearchBookmarksDialogPrivate(const QString &fi
         if (!fillActionParameters(params, window))
             return;
 
-        if (menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params))
-            refresh();
+        menu()->triggerIfPossible(Qn::RemoveBookmarksAction, params);
     });
 
     setParameters(filterText, utcStartTimeMs, utcFinishTimeMs);
