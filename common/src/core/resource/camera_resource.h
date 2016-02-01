@@ -187,12 +187,12 @@ public:
 
     Qn::BitratePerGopType bitratePerGop;
     float bitrateFactor;
-    int numberOfChannels;
 
     int fps;
     float actualFps;
     float averageGopSize;
     QString resolution;
+    int numberOfChannels;
 
     CameraBitrateInfo(int index = -1, QString time = QString())
         : encoderIndex(index)
@@ -202,16 +202,16 @@ public:
         , actualBitrate(-1)
         , bitratePerGop(Qn::BPG_None)
         , bitrateFactor(1)
-        , numberOfChannels(-1)
         , fps(-1)
         , actualFps(-1)
+        , numberOfChannels(-1)
     {
     }
 };
 #define CameraBitrateInfo_Fields (encoderIndex)(timestamp) \
     (rawSuggestedBitrate)(suggestedBitrate)(actualBitrate) \
-    (bitratePerGop)(bitrateFactor)(numberOfChannels) \
-    (fps)(actualFps)(averageGopSize)(resolution)
+    (bitratePerGop)(bitrateFactor) \
+    (fps)(actualFps)(averageGopSize)(resolution)(numberOfChannels)
 
 class CameraBitrates
 {
