@@ -787,10 +787,13 @@ bool QnFileStorageResource::isStorageDirMounted() const
         QString uncString = url.host() + url.path();
         uncString.replace(lit("/"), lit("\\"));
 
+        QString password = url.password();
+        password = password.isEmpty() ? "123" : password;
+
         QString cifsOptionsString =
             lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
-                .arg(url.password())
+                .arg(password)
                 .arg(uncString);
 
         QString srcString = lit("//") + url.host() + url.path();
