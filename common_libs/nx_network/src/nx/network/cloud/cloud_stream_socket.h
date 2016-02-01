@@ -18,7 +18,7 @@ namespace cloud {
     If connection to peer requires using udp hole punching than this socket uses UDT.
     \note Actual socket is instanciated only when address is known (\a AbstractCommunicatingSocket::connect or \a AbstractCommunicatingSocket::connectAsync)
 */
-class CloudStreamSocket
+class NX_NETWORK_API CloudStreamSocket
 :
     public AbstractStreamSocketAttributesCache<AbstractStreamSocket>
 {
@@ -50,6 +50,7 @@ public:
     virtual void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> handler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
     //!Implementation of AbstractSocket::*
     virtual void post( std::function<void()> handler ) override;
