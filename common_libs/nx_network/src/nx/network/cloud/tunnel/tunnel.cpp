@@ -16,9 +16,9 @@ Tunnel::Tunnel(String remotePeerId)
 }
 
 Tunnel::Tunnel(std::unique_ptr<AbstractTunnelConnection> connection)
-    : m_remotePeerId(connection->getRemotePeerId())
-    , m_state(State::kConnected)
+    : m_state(State::kConnected)
     , m_connection(std::move(connection))
+    , m_remotePeerId(connection->getRemotePeerId())
 {
 }
 

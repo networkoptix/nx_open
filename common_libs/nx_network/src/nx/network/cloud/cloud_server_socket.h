@@ -4,7 +4,7 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/network/abstract_socket.h>
 
-#include "cloud_tunnel.h"
+#include "tunnel/incoming_tunnel.h"
 
 namespace nx {
 namespace network {

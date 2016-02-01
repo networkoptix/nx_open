@@ -262,16 +262,16 @@ public:
     virtual bool setNoDelay(bool val) override
     {
         return this->setAttributeValue(
-            &m_socketAttributes.noDelay,
+            &this->m_socketAttributes.noDelay,
             &AbstractStreamSocket::setNoDelay,
             val);
     }
     virtual bool getNoDelay(bool* val) const override
     {
         return this->getAttributeValue(
-            m_socketAttributes.noDelay,
+            this->m_socketAttributes.noDelay,
             &AbstractStreamSocket::getNoDelay,
-            decltype(m_socketAttributes.noDelay)(false),
+            decltype(this->m_socketAttributes.noDelay)(false),
             val);
     }
     virtual bool toggleStatisticsCollection(bool val) override
@@ -291,16 +291,16 @@ public:
     virtual bool setKeepAlive(boost::optional< KeepAliveOptions > val) override
     {
         return this->setAttributeValue(
-            &m_socketAttributes.keepAlive,
+            &this->m_socketAttributes.keepAlive,
             &AbstractStreamSocket::setKeepAlive,
             val);
     }
     virtual bool getKeepAlive(boost::optional< KeepAliveOptions >* val) const override
     {
         return this->getAttributeValue(
-            m_socketAttributes.keepAlive,
+            this->m_socketAttributes.keepAlive,
             &AbstractStreamSocket::getKeepAlive,
-            decltype(m_socketAttributes.keepAlive)(),
+            decltype(this->m_socketAttributes.keepAlive)(),
             val);
     }
 };
