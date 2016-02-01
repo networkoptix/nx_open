@@ -277,8 +277,6 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnOptionalBool>();
     qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 
-    qRegisterMetaType<QnStreamRecorder::ErrorStruct>("QnStreamRecorder::ErrorStruct");
-
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
