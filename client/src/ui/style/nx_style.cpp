@@ -323,13 +323,15 @@ void QnNxStyle::drawPrimitive(
         }
     case PE_FrameTabBarBase: {
         if (const QStyleOptionTabBarBase *tabBar = qstyleoption_cast<const QStyleOptionTabBarBase*>(option)) {
+            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(2);
+
             QRect rect = tabBar->tabBarRect;
             rect.setLeft(tabBar->rect.left());
             rect.setRight(tabBar->rect.right());
-            painter->fillRect(rect, option->palette.window());
+            painter->fillRect(rect, mainColor);
 
             painter->save();
-            painter->setPen(tabBar->palette.color(QPalette::Dark));
+            painter->setPen(mainColor.darker(1));
             painter->drawLine(rect.topLeft(), rect.topRight());
             painter->restore();
             return;
@@ -735,18 +737,19 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             switch (tab->shape)
             {
             case QTabBar::TriangularNorth:
-                if (!(tab->state & QStyle::State_Selected) && (tab->state & QStyle::State_MouseOver))
+                if (!tab->state.testFlag(QStyle::State_Selected) && tab->state.testFlag(QStyle::State_MouseOver))
                 {
                     painter->save();
 
-                    painter->fillRect(tab->rect, tab->palette.mid());
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(3);
 
-                    painter->setPen(tab->palette.color(QPalette::Window));
+                    painter->fillRect(tab->rect, mainColor);
+
+                    painter->setPen(mainColor.lighter(2));
                     painter->drawLine(tab->rect.topLeft(), tab->rect.topRight());
 
                     painter->restore();
                 }
-
                 return;
             default:
                 break;
@@ -766,30 +769,32 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             }
 
             int textFlags = Qt::AlignCenter | Qt::TextHideMnemonic;
-            QPalette::ColorRole colorRole = QPalette::WindowText;
+            QnPaletteColor mainColor = findColor(tab->palette.color(QPalette::Light)).darker(2);
+            QColor color = mainColor;
 
             if (tab->state & QStyle::State_Selected)
             {
-                colorRole = QPalette::Highlight;
+                color = tab->palette.color(QPalette::Highlight);
 
                 if (tab->shape == QTabBar::TriangularNorth)
                 {
                     QFontMetrics fm(painter->font());
-                    QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
 
+                    QRect rect = fm.boundingRect(tab->rect, textFlags, tab->text);
                     rect.setTop(tab->rect.bottom() - 2);
                     rect.setBottom(tab->rect.bottom() - 1);
-                    painter->fillRect(rect, tab->palette.brush(colorRole));
+
+                    painter->fillRect(rect, color);
                 }
             }
             else if (tab->state & State_MouseOver)
             {
-                colorRole = QPalette::Light;
+                color = mainColor.lighter(1);
             }
 
+            painter->setPen(color);
             drawItemText(painter, tab->rect, Qt::AlignCenter | Qt::TextHideMnemonic,
-                         tab->palette, tab->state & QStyle::State_Enabled, tab->text,
-                         colorRole);
+                         tab->palette, tab->state & QStyle::State_Enabled, tab->text);
 
             painter->restore();
             return;

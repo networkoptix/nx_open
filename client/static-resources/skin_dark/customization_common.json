@@ -123,28 +123,6 @@
             }
         }
     },
-    
-    "QTabBar": {
-        "palette": {
-            "default": {
-                "window": "dark8",
-                "dark": "dark7",
-                "windowText": "light12",
-                "light": "light11"
-            },
-            "disabled": {
-                "windowText": "dark12"
-            }
-        }
-    },
-
-    "QHeaderView": {
-        "palette": {
-            "default": {
-                "dark": "dark8"
-            }
-        }
-    },
 
     "QnPanel": {
         "palette": {
