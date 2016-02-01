@@ -36,8 +36,9 @@ PACKAGE=$CUSTOMIZATION-$MODULE_NAME-$BOX_NAME-$VERSION
 PACKAGE_NAME=$PACKAGE$BETA.tar.gz
 UPDATE_NAME=server-update-$BOX_NAME-${arch}-$VERSION
 
-BUILD_DIR="`mktemp -d`"
-DEBUG_DIR="/${project.build.directory}/hdw_"$BOX_NAME"_build_debug.tmp"
+TEMP_DIR="`mktemp -d`"
+BUILD_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_app.tmp"
+DEBUG_DIR="$TEMP_DIR/hdw_"$BOX_NAME"_build_debug.tmp"
 PREFIX_DIR=/opt/$CUSTOMIZATION
 
 BUILD_OUTPUT_DIR=${libdir}
