@@ -38,8 +38,9 @@ namespace {
 //        return color.toHsl().lightness() < 128;
 //    }
 
-    const int kMenuItemHPadding = dp(8);
-    const int kMenuItemVPadding = dp(6);
+    const int kMenuItemHPadding = dp(12);
+    const int kMenuItemVPadding = dp(5);
+    const int kMenuItemTextLeftPadding = dp(28);
     const int kArrowSize = dp(8);
     const int kMenuCheckSize = dp(16);
     const int kMinimumButtonWidth = dp(80);
@@ -340,12 +341,18 @@ void QnNxStyle::drawPrimitive(
     }
     case PE_FrameTabWidget:
         return;
-    case PE_PanelMenu: {
+    case PE_PanelMenu:
+    {
+        const int radius = dp(3);
+        QnPaletteColor backgroundColor = findColor(option->palette.color(QPalette::Window));
         painter->save();
-        painter->setPen(Qt::NoPen);
-        painter->setBrush(option->palette.window());
+
+        painter->setPen(backgroundColor.darker(3));
+        painter->setBrush(QBrush(backgroundColor));
         painter->setRenderHint(QPainter::Antialiasing);
-        painter->drawRoundedRect(option->rect, dp(2), dp(2));
+
+        painter->drawRoundedRect(option->rect, radius, radius);
+
         painter->restore();
         return;
     }
@@ -832,61 +839,84 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         }
         break;
     case CE_MenuItem:
-        if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option)) {
-            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator) {
+        if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
+        {
+            if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
+            {
                 painter->save();
-                QColor color = menuItem->palette.color(QPalette::Mid);
-                color.setAlpha(100);
-                painter->setPen(color);
+
                 int y = menuItem->rect.top() + menuItem->rect.height() / 2;
+                painter->setPen(findColor(menuItem->palette.color(QPalette::Window)).darker(2));
                 painter->drawLine(kMenuItemHPadding, y, menuItem->rect.right() - kMenuItemHPadding, y);
+
                 painter->restore();
                 break;
             }
 
             painter->save();
 
-            bool enabled = menuItem->state & State_Enabled;
-            bool selected = enabled && (menuItem->state & State_Selected);
+            bool enabled = menuItem->state.testFlag(State_Enabled);
+            bool selected = enabled && menuItem->state.testFlag(State_Selected);
 
-            if (selected) {
-                painter->fillRect(menuItem->rect, menuItem->palette.highlight());
+            QColor textColor = menuItem->palette.color(QPalette::WindowText);
+            QColor backgroundColor = menuItem->palette.color(QPalette::Window);
+            QColor shortcutColor = menuItem->palette.color(QPalette::Midlight);
+
+            if (selected)
+            {
+                textColor = menuItem->palette.color(QPalette::HighlightedText);
+                backgroundColor = menuItem->palette.color(QPalette::Highlight);
+                shortcutColor = textColor;
             }
 
-            int xPos = kMenuItemHPadding + dp(16);
+            if (selected)
+                painter->fillRect(menuItem->rect, backgroundColor);
+
+            int xPos = kMenuItemTextLeftPadding;
             int y = menuItem->rect.y();
 
             int textFlags = Qt::AlignVCenter | Qt::TextShowMnemonic | Qt::TextDontClip | Qt::TextSingleLine;
             if (!styleHint(SH_UnderlineShortcut, menuItem, widget, nullptr))
                 textFlags |= Qt::TextHideMnemonic;
 
-            QRect textRect(xPos, y + kMenuItemVPadding, menuItem->rect.width() - xPos - kMenuItemHPadding, menuItem->rect.height() - 2 * kMenuItemVPadding);
+            QRect textRect(xPos,
+                           y + kMenuItemVPadding,
+                           menuItem->rect.width() - xPos - kMenuItemHPadding,
+                           menuItem->rect.height() - 2 * kMenuItemVPadding);
 
-            if (!menuItem->text.isEmpty()) {
+            if (!menuItem->text.isEmpty())
+            {
                 QString text = menuItem->text;
                 QString shortcut;
                 int tabPosition = text.indexOf(QLatin1Char('\t'));
-                if (tabPosition >= 0) {
+                if (tabPosition >= 0)
+                {
                     shortcut = text.mid(tabPosition + 1);
                     text = text.left(tabPosition);
 
-                    painter->setPen(menuItem->palette.color(QPalette::Mid));
+                    painter->setPen(shortcutColor);
                     painter->drawText(textRect, textFlags | Qt::AlignRight, shortcut);
                 }
 
-                painter->setPen(menuItem->palette.color(QPalette::WindowText));
+                painter->setPen(textColor);
                 painter->drawText(textRect, textFlags | Qt::AlignLeft, text);
             }
 
-            if (menuItem->checked) {
-                drawMenuCheckMark(painter, QRect(kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
-                                  menuItem->palette.color(selected ? QPalette::HighlightedText : QPalette::WindowText));
+            if (menuItem->checked)
+            {
+                drawMenuCheckMark(
+                        painter,
+                        QRect(kMenuItemHPadding, menuItem->rect.y(), dp(16), menuItem->rect.height()),
+                        textColor);
             }
 
-            if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu) {
-                drawArrow(Right, painter,
-                          QRect(menuItem->rect.right() - kMenuItemVPadding - kArrowSize, menuItem->rect.top(), kArrowSize, menuItem->rect.height()),
-                          menuItem->palette.color(selected ? QPalette::HighlightedText : QPalette::WindowText));
+            if (menuItem->menuItemType == QStyleOptionMenuItem::SubMenu)
+            {
+                drawArrow(Right,
+                          painter,
+                          QRect(menuItem->rect.right() - kMenuItemVPadding - kArrowSize, menuItem->rect.top(),
+                                kArrowSize, menuItem->rect.height()),
+                          textColor);
             }
 
             painter->restore();
@@ -1100,6 +1130,8 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
     case PM_TabBarTabShiftHorizontal:
         return 0;
     case PM_DefaultFrameWidth:
+        if (qobject_cast<const QMenu *>(widget))
+            return 0;
         return 1;
     case PM_SliderThickness:
         return dp(18);
@@ -1122,6 +1154,10 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
         return 8;
     case PM_ScrollBarSliderMin:
         return 8;
+    case PM_SubMenuOverlap:
+        return 0;
+    case PM_MenuVMargin:
+        return dp(2);
     default:
         break;
     }
@@ -1203,15 +1239,6 @@ void QnNxStyle::polish(QWidget *widget)
 
     if (qobject_cast<QMenu*>(widget))
     {
-        QPalette palette = widget->palette();
-        palette.setColor(QPalette::Window, QColor("#e1e7ea"));
-        palette.setColor(QPalette::WindowText, QColor("#121517"));
-        palette.setColor(QPalette::Disabled, QPalette::WindowText, QColor("#80121517"));
-        palette.setColor(QPalette::Mid, QColor("#698796"));
-        palette.setColor(QPalette::Disabled, QPalette::Mid, QColor("#80698796"));
-        palette.setColor(QPalette::Highlight, QColor("#e1e7ea").darker(120));
-        palette.setColor(QPalette::HighlightedText, QColor("#121517"));
-        widget->setPalette(palette);
         widget->setAttribute(Qt::WA_TranslucentBackground);
 #ifdef Q_OS_WIN
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
@@ -1224,12 +1251,6 @@ void QnNxStyle::unpolish(QWidget *widget) {
         || qobject_cast<QTabBar*>(widget))
     {
         widget->setFont(qApp->font());
-    }
-
-    if (qobject_cast<QAbstractItemView*>(widget)
-        || qobject_cast<QMenu*>(widget))
-    {
-        widget->setPalette(qApp->palette());
     }
 
     base_type::unpolish(widget);

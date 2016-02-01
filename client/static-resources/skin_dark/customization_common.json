@@ -124,6 +124,19 @@
         }
     },
 
+    "QMenu": {
+        "palette": {
+            "default": {
+                "window":           "light4",
+                "windowText":       "dark4",
+                "midlight":         "light16"
+            },
+            "disabled": {
+                "windowText":       "dark4.setAlpha(75)"
+            }
+        }
+    },
+
     "QnPanel": {
         "palette": {
             "default": {
