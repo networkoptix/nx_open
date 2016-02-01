@@ -79,6 +79,7 @@ private:
 
     void setLocalPathSafe(const QString &path) const;
     QString getLocalPathSafe() const;
+
 public:
     // Try to remove old temporary dirs if any.
     // This could happen if server crashed and ~FileStorageResource

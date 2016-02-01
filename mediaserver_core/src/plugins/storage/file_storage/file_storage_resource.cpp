@@ -61,6 +61,13 @@ namespace aux
     {
         return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
     }
+
+    QString passwordFromUrl(const QUrl &url)
+    {   // On some linux distribution (nx1) mount chokes on
+        // empty password. So let's give it a non-empty one.
+        QString password = url.password();
+        return password.isEmpty() ? "123" : password;
+    }
 }
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
@@ -354,13 +361,10 @@ int QnFileStorageResource::mountTmpDrive() const
     QString uncString = url.host() + url.path();
     uncString.replace(lit("/"), lit("\\"));
 
-    QString password = url.password();
-    password = password.isEmpty() ? "123" : password;
-
     QString cifsOptionsString =
         lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
-            .arg(password)
+            .arg(passwordFromUrl(url))
             .arg(uncString);
 
     QString srcString = lit("//") + url.host() + url.path();
@@ -781,6 +785,7 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     return true;
 }
 
+
 bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString localPathCopy = getLocalPathSafe();
@@ -792,13 +797,10 @@ bool QnFileStorageResource::isStorageDirMounted() const
         QString uncString = url.host() + url.path();
         uncString.replace(lit("/"), lit("\\"));
 
-        QString password = url.password();
-        password = password.isEmpty() ? "123" : password;
-
         QString cifsOptionsString =
             lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
-                .arg(password)
+                .arg(passwordFromUrl(url))
                 .arg(uncString);
 
         QString srcString = lit("//") + url.host() + url.path();
