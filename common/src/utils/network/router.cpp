@@ -49,17 +49,17 @@ QnRoute QnRouter::routeTo(const QnUuid &id)
     if (routeVia.isNull())
         return result; // can't route
 
-    if (routeVia == id) {
-        // peer accesible directly, but no address avaliable (bc of NAT),
-        // so we need backwards connection
-        result.reverseConnect = true;
-        return result;
-    }
+    //if (routeVia == id) {
+    //    // peer accesible directly, but no address avaliable (bc of NAT),
+    //    // so we need backwards connection
+    //    result.reverseConnect = true;
+    //    return result;
+    //}
 
     // route gateway is found
     result.gatewayId = routeVia;
     result.addr = m_moduleFinder->primaryAddress(routeVia);
-    if (result.addr.isNull())
-        result.reverseConnect = true;
+    //if (result.addr.isNull())
+    //    result.reverseConnect = true;
     return result;
 }
