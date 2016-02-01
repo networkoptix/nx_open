@@ -125,7 +125,7 @@ struct QnCameraBookmarkSearchFilter
 
     static const int kNoLimit;
 };
-#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)
+#define QnCameraBookmarkSearchFilter_Fields (startTimeMs)(endTimeMs)(text)(limit)(orderBy)(sparsing)
 
 struct QnCameraBookmarkTag
 {

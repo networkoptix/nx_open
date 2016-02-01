@@ -90,7 +90,7 @@ namespace {
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 
 void QnCommonMetaTypes::initialize() {
-    /* Note that running the code twice is perfectly OK, 
+    /* Note that running the code twice is perfectly OK,
      * so we don't need heavyweight synchronization here. */
     if(qn_commonMetaTypes_initialized)
         return;
@@ -107,14 +107,14 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<SocketAddress>();
 
     //qRegisterMetaType<QnParam>();
-    
+
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
-    
+
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
     qRegisterMetaType<QnMediaServerResourcePtr>();
@@ -246,16 +246,16 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnFullResourceData>( "QnFullResourceData" );
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
-    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" ); 
-    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" ); 
-    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" ); 
+    qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
+    qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
+    qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
     qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
     qRegisterMetaType<ec2::ApiDiscoveredServerDataList>("ApiDiscoveredServerDataList");
     qRegisterMetaType<ec2::ApiReverseConnectionData>( "ApiReverseConnectionData" );
-    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" ); 
-    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" ); 
-    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" ); 
-    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" ); 
+    qRegisterMetaType<ec2::ApiRuntimeData>( "ApiRuntimeData" );
+    qRegisterMetaType<ec2::ApiDatabaseDumpData>( "ApiDatabaseDumpData" );
+    qRegisterMetaType<ec2::ApiLockData>( "ApiLockData" );
+    qRegisterMetaType<ec2::ApiResourceParamWithRefData>( "ApiResourceParamWithRefData" );
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ApiResourceParamWithRefDataList");
 
     qRegisterMetaType<ec2::ApiResourceParamData>("ApiResourceParamData");
@@ -275,8 +275,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnAuditRecordList>();
 
     qRegisterMetaType<QnOptionalBool>();
-
-    qRegisterMetaType<QnStreamRecorder::ErrorStruct>("QnStreamRecorder::ErrorStruct");
+    qRegisterMetaType<QnStreamRecorder::ErrorStruct>();
 
     qRegisterMetaType<QnSystemHealth::MessageType>("QnSystemHealth::MessageType");
 

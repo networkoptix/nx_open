@@ -102,6 +102,15 @@ bool QnBookmarkQueriesCache::updateDataImpl(const QnVirtualCameraResourcePtr &ca
     return true;
 }
 
+void QnBookmarkQueriesCache::refreshQueries()
+{
+    for (auto queryData: m_queries)
+    {
+        auto &query = queryData.second;
+        query->refresh();
+    }
+}
+
 bool QnBookmarkQueriesCache::updateFilterTimeWindow(QnCameraBookmarkSearchFilter &filter
     , qint64 startTimeMs
     , qint64 endTimeMs)
