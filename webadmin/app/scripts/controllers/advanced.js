@@ -17,8 +17,8 @@ angular.module('webadminApp')
         });
 
         $scope.settingsConfig = {
-            //auditTrailEnabled: {label:"Audit trail enabled", type:"checkbox"},
-            //cameraSettingsOptimization: {label:"Camera settings optimization", type:"checkbox"},
+            auditTrailEnabled: {label:"Audit trail enabled", type:"checkbox"},
+            cameraSettingsOptimization: {label:"Camera settings optimization", type:"checkbox"},
             disabledVendors: {label:"Disabled vendors", type:"text"},
             ec2AliveUpdateIntervalSec: {label:"System alive update interval", type:"number"},
             ec2ConnectionKeepAliveTimeoutSec: {label:"Connection keep alive timeout", type:"number"},
