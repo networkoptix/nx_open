@@ -281,29 +281,35 @@ public:
         auto cancelImpl = [=]()
         {
             // cancelIOSync will be instant from socket's IO thread
-            nx::network::SocketGlobals::aioService().dispatch( this->m_socket, [=]()
-            {
-                stopPollingSocket( this->m_socket, eventType );
-                std::atomic_thread_fence( std::memory_order_acquire );
-
-                //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
-                //  avoiding unnecessary removeFromWatch calls in eventTriggered
-
-                if (eventType == aio::etRead || eventType == aio::etNone)
-                    ++m_recvAsyncCallCounter;
-                if (eventType == aio::etWrite || eventType == aio::etNone)
-                    ++m_connectSendAsyncCallCounter;
-                if (eventType == aio::etTimedOut || eventType == aio::etNone)
-                    ++m_registerTimerCallCounter;
-
-                handler();
-            });
+            nx::network::SocketGlobals::aioService().dispatch(
+                this->m_socket,
+                [=]()
+                {
+                    cancelAsyncIOWhileInAioThread(eventType);
+                    handler();
+                });
         };
 
         if (eventType == aio::etWrite || eventType == aio::etNone)
             nx::network::SocketGlobals::addressResolver().cancel(this, std::move(cancelImpl));
         else
             cancelImpl();
+    }
+
+    void cancelAsyncIOWhileInAioThread(const aio::EventType eventType)
+    {
+        stopPollingSocket(eventType);
+        std::atomic_thread_fence(std::memory_order_acquire);    //TODO #ak looks like it is not needed
+
+        //we are in aio thread, CommunicatingSocketImpl::eventTriggered is down the stack
+        //  avoiding unnecessary removeFromWatch calls in eventTriggered
+
+        if (eventType == aio::etRead || eventType == aio::etNone)
+            ++m_recvAsyncCallCounter;
+        if (eventType == aio::etWrite || eventType == aio::etNone)
+            ++m_connectSendAsyncCallCounter;
+        if (eventType == aio::etTimedOut || eventType == aio::etNone)
+            ++m_registerTimerCallCounter;
     }
 
 private:
@@ -610,18 +616,16 @@ private:
     }
 
     //!Call this from within aio thread only
-    void stopPollingSocket(
-        SocketType* sock,
-        const aio::EventType eventType)
+    void stopPollingSocket(const aio::EventType eventType)
     {
         //TODO #ak move this method to aioservice?
-        nx::network::SocketGlobals::aioService().cancelPostedCalls(sock, true);
+        nx::network::SocketGlobals::aioService().cancelPostedCalls(m_socket, true);
         if (eventType == aio::etNone || eventType == aio::etRead)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etRead, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(m_socket, aio::etRead, true);
         if (eventType == aio::etNone || eventType == aio::etWrite)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etWrite, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(m_socket, aio::etWrite, true);
         if (eventType == aio::etNone || eventType == aio::etTimedOut)
-            nx::network::SocketGlobals::aioService().removeFromWatch(sock, aio::etTimedOut, true);
+            nx::network::SocketGlobals::aioService().removeFromWatch(m_socket, aio::etTimedOut, true);
     }
 };
 

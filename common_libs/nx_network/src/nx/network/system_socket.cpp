@@ -770,6 +770,20 @@ void CommunicatingSocket::cancelIOAsync(
     m_aioHelper->cancelIOAsync(eventType, std::move(cancellationDoneHandler));
 }
 
+void CommunicatingSocket::cancelIOSync(aio::EventType eventType)
+{
+    if (impl()->aioThread.load() == QThread::currentThread())
+    {
+        m_aioHelper->cancelAsyncIOWhileInAioThread(eventType);
+    }
+    else
+    {
+        std::promise< bool > promise;
+        cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+        promise.get_future().wait();
+    }
+}
+
 void CommunicatingSocket::connectAsync(
     const SocketAddress& addr,
     std::function<void( SystemError::ErrorCode )> handler )

@@ -49,13 +49,6 @@ void AbstractCommunicatingSocket::registerTimer(
     return registerTimer(timeout.count(), std::move(handler));
 }
 
-void AbstractCommunicatingSocket::cancelIOSync(aio::EventType eventType)
-{
-    std::promise< bool > promise;
-    cancelIOAsync(eventType, [&]() { promise.set_value(true); });
-    promise.get_future().wait();
-}
-
 void AbstractCommunicatingSocket::pleaseStop(std::function< void() > handler)
 {
     cancelIOAsync(aio::EventType::etNone, std::move(handler));

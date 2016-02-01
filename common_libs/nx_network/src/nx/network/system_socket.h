@@ -206,6 +206,7 @@ public:
     void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler);
+    void cancelIOSync(aio::EventType eventType);
 
     virtual void close() override;
     virtual void shutdown() override;

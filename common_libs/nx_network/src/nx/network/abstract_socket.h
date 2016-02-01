@@ -292,14 +292,16 @@ public:
     /*!
         \param eventType event to cancel
     */
-    virtual void cancelIOAsync( aio::EventType eventType,
-                                std::function< void() > handler) = 0;
+    virtual void cancelIOAsync(
+        aio::EventType eventType,
+        std::function< void() > handler) = 0;
 
     //!Cancels async operation and blocks until cancellation is stopped
     /*!
         \note It is guaranteed that no handler with \a eventType is running or will be called after return of this method
+        \note If invoked within socket's aio thread, cancels immediately, without blocking
     */
-    void cancelIOSync(aio::EventType eventType);
+    virtual void cancelIOSync(aio::EventType eventType) = 0;
 
     //!Implementation of QnStoppable::pleaseStop
     virtual void pleaseStop( std::function< void() > handler ) override;

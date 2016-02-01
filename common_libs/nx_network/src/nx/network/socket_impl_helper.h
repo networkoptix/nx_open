@@ -237,6 +237,10 @@ public:
     {
         return this->m_implDelegate.cancelIOAsync(eventType, std::move(cancellationDoneHandler));
     }
+    virtual void cancelIOSync(aio::EventType eventType) override
+    {
+        return this->m_implDelegate.cancelIOSync(eventType);
+    }
 };
 
 #endif  //SOCKET_IMPL_HELPER_H

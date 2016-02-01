@@ -75,17 +75,22 @@ public:
 private:
     int recvImpl(nx::Buffer* const buf);
 
+    void onAddressResolved(
+        std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
+        int remotePort,
+        SystemError::ErrorCode osErrorCode,
+        std::vector<AddressEntry> dnsEntries);
     bool startAsyncConnect(
         //const SocketAddress& originalAddress,
         std::vector<AddressEntry> dnsEntries,
         int port);
-    void cloudConnectDone(
+    void onCloudConnectDone(
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
     std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
-    nx::utils::AsyncOperationGuard m_asyncGuard;
+    nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;

@@ -714,8 +714,23 @@ void UdtStreamSocket::cancelIOAsync(
     aio::EventType eventType,
     std::function<void()> cancellationDoneHandler)
 {
-    return m_aioHelper->cancelIOAsync(eventType,
-                                      std::move(cancellationDoneHandler));
+    return m_aioHelper->cancelIOAsync(
+        eventType,
+        std::move(cancellationDoneHandler));
+}
+
+void UdtStreamSocket::cancelIOSync(aio::EventType eventType)
+{
+    if (impl()->aioThread.load() == QThread::currentThread())
+    {
+        m_aioHelper->cancelAsyncIOWhileInAioThread(eventType);
+    }
+    else
+    {
+        std::promise< bool > promise;
+        cancelIOAsync(eventType, [&]() { promise.set_value(true); });
+        promise.get_future().wait();
+    }
 }
 
 void UdtStreamSocket::post( std::function<void()> handler )

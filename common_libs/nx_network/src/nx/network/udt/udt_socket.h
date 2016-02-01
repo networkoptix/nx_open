@@ -102,6 +102,7 @@ public:
     virtual void cancelIOAsync(
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler) override;
+    virtual void cancelIOSync(aio::EventType eventType) override;
 
     // AbstractStreamSocket ------ interface
     virtual bool reopen() override;

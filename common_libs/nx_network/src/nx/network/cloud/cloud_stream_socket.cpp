@@ -28,7 +28,7 @@ CloudStreamSocket::~CloudStreamSocket()
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
     //TODO #ak 
-    return false;
+    return true;
 }
 
 SocketAddress CloudStreamSocket::getLocalAddress() const
@@ -90,10 +90,15 @@ bool CloudStreamSocket::connect(
     unsigned int timeoutMillis)
 {
     std::promise<SystemError::ErrorCode> promise;
-    connectAsync(remoteAddress, [&](SystemError::ErrorCode code)
-    {
-        promise.set_value(code);
-    });
+    connectAsync(
+        remoteAddress,
+        [this, &promise](SystemError::ErrorCode code)
+        {
+            //to ensure that socket is not used by aio sub-system anymore, we use post
+            m_aioThreadBinder->post([code, &promise](){
+                promise.set_value(code);
+            });
+        });
 
     auto future = promise.get_future();
     if (!waitFutureMs(future, timeoutMillis))
@@ -137,9 +142,11 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     sendAsync(
         nx::Buffer(static_cast<const char*>(buffer), bufferLen),
-        [&](SystemError::ErrorCode code, size_t size)
+        [&promise, this](SystemError::ErrorCode code, size_t size)
         {
-            promise.set_value(std::make_pair(code, size));
+            m_aioThreadBinder->post([code, size, &promise]() {
+                promise.set_value(std::make_pair(code, size));
+            });
         });
 
     auto future = promise.get_future();
@@ -183,10 +190,21 @@ void CloudStreamSocket::cancelIOAsync(
     std::function<void()> handler)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
-        m_asyncGuard->terminate(); // breaks outgoing connects
+        m_asyncConnectGuard->terminate(); // breaks outgoing connects
 
     if (m_socketDelegate)
-        m_socketDelegate->cancelIOAsync(eventType, std::move(handler));
+    {
+        assert(m_aioThreadBinder->getAioThread() == m_socketDelegate->getAioThread());
+    }
+
+    m_aioThreadBinder->cancelIOAsync(
+        eventType,
+        [this, eventType, handler]()   //TODO #ak #msvc2015 move to lambda
+        {
+            if (m_socketDelegate)
+                m_socketDelegate->cancelIOSync(eventType);
+            handler();
+        });
 }
 
 void CloudStreamSocket::post( std::function<void()> handler )
@@ -205,31 +223,14 @@ void CloudStreamSocket::connectAsync(
 {
     m_connectHandler = std::move(handler);
 
-    auto sharedOperationGuard = m_asyncGuard.sharedGuard();
+    using namespace std::placeholders;
+    auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
     const auto remotePort = address.port;
     nx::network::SocketGlobals::addressResolver().resolveAsync(
         address.address,
-        [this, remotePort, sharedOperationGuard](
-            SystemError::ErrorCode osErrorCode,
-            std::vector<AddressEntry> dnsEntries)
-        {
-            auto operationLock = sharedOperationGuard->lock();
-            if (!operationLock)
-                return; //operation has been cancelled
-
-            if (osErrorCode != SystemError::noError)
-            {
-                auto connectHandlerBak = std::move(m_connectHandler);
-                connectHandlerBak(osErrorCode);
-                return;
-            }
-
-            if (!startAsyncConnect(std::move(dnsEntries), remotePort))
-            {
-                auto connectHandlerBak = std::move(m_connectHandler);
-                connectHandlerBak(SystemError::getLastOSErrorCode());
-            }
-        },
+        std::bind(
+            &CloudStreamSocket::onAddressResolved,
+            this, sharedOperationGuard, remotePort, _1, _2),
         true,
         this);   //TODO #ak resolve cancellation
 }
@@ -271,6 +272,30 @@ void CloudStreamSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     m_aioThreadBinder->bindToAioThread(aioThread);
 }
 
+void CloudStreamSocket::onAddressResolved(
+    std::shared_ptr<nx::utils::AsyncOperationGuard::SharedGuard> sharedOperationGuard,
+    int remotePort,
+    SystemError::ErrorCode osErrorCode,
+    std::vector<AddressEntry> dnsEntries)
+{
+    auto operationLock = sharedOperationGuard->lock();
+    if (!operationLock)
+        return; //operation has been cancelled
+
+    if (osErrorCode != SystemError::noError)
+    {
+        auto connectHandlerBak = std::move(m_connectHandler);
+        connectHandlerBak(osErrorCode);
+        return;
+    }
+
+    if (!startAsyncConnect(std::move(dnsEntries), remotePort))
+    {
+        auto connectHandlerBak = std::move(m_connectHandler);
+        connectHandlerBak(SystemError::getLastOSErrorCode());
+    }
+}
+
 bool CloudStreamSocket::startAsyncConnect(
     std::vector<AddressEntry> dnsEntries,
     int port)
@@ -309,7 +334,7 @@ bool CloudStreamSocket::startAsyncConnect(
             unsigned int sendTimeoutMillis = 0;
             if (!getSendTimeout(&sendTimeoutMillis))
                 return false;
-            auto sharedOperationGuard = m_asyncGuard.sharedGuard();
+            auto sharedOperationGuard = m_asyncConnectGuard.sharedGuard();
             tunnel->connect(
                 std::chrono::milliseconds(sendTimeoutMillis),
                 getSocketAttributes(),
@@ -320,7 +345,7 @@ bool CloudStreamSocket::startAsyncConnect(
                     auto operationLock = sharedOperationGuard->lock();
                     if (!operationLock)
                         return; //operation has been cancelled
-                    cloudConnectDone(
+                    onCloudConnectDone(
                         errorCode,
                         std::move(cloudConnection));
                 });
@@ -338,9 +363,11 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
     sendAsync(
         *buf,
-        [&](SystemError::ErrorCode code, size_t size)
+        [this, &promise](SystemError::ErrorCode code, size_t size)
         {
-            promise.set_value(std::make_pair(code, size));
+            m_aioThreadBinder->post([code, size, &promise]() {
+                promise.set_value(std::make_pair(code, size));
+            });
         });
 
     auto future = promise.get_future();
@@ -363,7 +390,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
     return result.second;
 }
 
-void CloudStreamSocket::cloudConnectDone(
+void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
