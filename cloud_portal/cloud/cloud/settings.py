@@ -156,7 +156,7 @@ REST_FRAMEWORK = {
 }
 
 CLOUD_CONNECT = {
-    'url': 'http://cloud-demo.hdw.mx:3346',
+    'url': 'http://cloud-demo.hdw.mx:3346/cdb',
     # 'url': 'http://localhost:3346',
     # 'url': 'http://10.0.3.41:3346',
     'customization': 'default',
