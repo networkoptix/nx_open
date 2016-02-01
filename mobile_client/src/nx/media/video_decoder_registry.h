@@ -36,7 +36,7 @@ public:
 private:
 	struct Metadata
 	{
-        Metadata::Metadata() {}
+        Metadata() {}
 
 		std::function<AbstractVideoDecoder* ()> instance;
 		std::function<bool(const QnConstCompressedVideoDataPtr& frame)> isCompatible;

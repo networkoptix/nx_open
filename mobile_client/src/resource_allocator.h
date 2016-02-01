@@ -13,9 +13,6 @@ class GlContextThreadExecutor;
 
 class ResourceAllocator: public QObject, public nx::media::AbstractResourceAllocator
 {
-    Q_OBJECT
-signals:
-    void execAsync(std::function<void (void*)> lambda, void* opaque);
 public:
     ResourceAllocator(QQuickWindow *window);
 
