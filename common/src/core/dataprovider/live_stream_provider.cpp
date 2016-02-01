@@ -558,10 +558,11 @@ void QnLiveStreamProvider::saveBitrateIfNeeded( const QnCompressedVideoDataPtr& 
                 liveParams.quality, resoulution, liveParams.fps) / 1024;
     info.suggestedBitrate = static_cast<float>(m_cameraRes->suggestBitrateKbps(
         liveParams.quality, resoulution, liveParams.fps)) / 1024;
-    info.actualBitrate = getBitrateMbps();
+    info.actualBitrate = getBitrateMbps() / getNumberOfChannels();
 
     info.bitratePerGop = m_cameraRes->bitratePerGopType();
     info.bitrateFactor = 1; // TODO: #mux Pass actual value when avaliable [2.6]
+    info.numberOfChannels = getNumberOfChannels();
 
     info.fps = liveParams.fps;
     info.actualFps = getFrameRate();
