@@ -477,7 +477,7 @@ QnFileStorageResource::~QnFileStorageResource()
 #elif __APPLE__
         unmount(m_localPath.toLatin1().constData(), 0);
 #endif
-        rmdir(m_locaPath.toLatin1().constData());
+        rmdir(m_localPath.toLatin1().constData());
     }
 #endif
 }
@@ -777,7 +777,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
     QString localPathCopy;
     {
         QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath
+        localPathCopy = m_localPath;
     }
 
     if (!localPathCopy.isEmpty()) // smb
@@ -798,7 +798,7 @@ bool QnFileStorageResource::isStorageDirMounted() const
 
         QString srcString = lit("//") + url.host() + url.path();
 
-        auto badResultHandler = [this]()
+        auto badResultHandler = [this, localPathCopy]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
             // Will try to unmount, remove local mount point directory
