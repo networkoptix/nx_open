@@ -10,15 +10,21 @@ class QnGenericPalette;
 class QnPaletteColor
 {
 public:
+    static const int kMaxAlpha;
+
     QnPaletteColor();
 
     QnPaletteColor(const QString &group,
                    const int index,
-                   const QnColorList &palette);
+                   const QnColorList &palette,
+                   const int alpha = kMaxAlpha);
 
     QString group() const;
     int index() const;
     QColor color() const;
+
+    int alpha() const;
+    void setAlpha(int alpha);
 
     bool isValid() const;
 
@@ -33,6 +39,7 @@ private:
     QString m_group;
     int m_index;
     QnColorList m_palette;
+    int m_alpha;
 };
 
 class QnGenericPalette
@@ -44,7 +51,7 @@ public:
     void setColors(const QString &group, const QnColorList &colors);
 
     QnPaletteColor color(const QColor &color) const;
-    QnPaletteColor color(const QString &group, int index) const;
+    QnPaletteColor color(const QString &group, int index, int alpha = QnPaletteColor::kMaxAlpha) const;
 
 private:
     void removeColors(const QString &group);

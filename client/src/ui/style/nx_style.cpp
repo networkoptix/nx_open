@@ -659,27 +659,29 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             {
             case QFrame::HLine:
                 {
-                    QPalette::ColorRole topRole = QPalette::Dark;
-                    QPalette::ColorRole bottomRole = QPalette::NoRole;
+                    QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Dark)).darker(1);
+
+                    QColor topColor = mainColor.darker(2);
+                    QColor bottomColor;
 
                     if (frame->state.testFlag(State_Sunken))
                     {
-                        bottomRole = QPalette::Mid;
+                        bottomColor = mainColor;
                     }
                     else if (frame->state.testFlag(State_Raised))
                     {
-                        topRole = QPalette::Mid;
-                        bottomRole = QPalette::Dark;
+                        bottomColor = topColor;
+                        topColor = mainColor;
                     }
 
                     painter->save();
 
-                    painter->setPen(frame->palette.color(topRole));
+                    painter->setPen(topColor);
                     painter->drawLine(frame->rect.topLeft(), frame->rect.topRight());
 
-                    if (bottomRole != QPalette::NoRole)
+                    if (bottomColor.isValid())
                     {
-                        painter->setPen(frame->palette.color(bottomRole));
+                        painter->setPen(bottomColor);
                         painter->drawLine(frame->rect.left(), frame->rect.top() + 1,
                                           frame->rect.right(), frame->rect.top() + 1);
                     }
@@ -706,19 +708,20 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
         {
             QStyleOptionButton opt = *button;
 
-            QColor color = opt.palette.color(QPalette::Light);
+            QnPaletteColor mainColor = findColor(button->palette.color(QPalette::Text));
+            QColor color = mainColor.darker(6);
 
             if (opt.state & State_Off)
             {
                 if (opt.state & State_MouseOver)
-                    color = opt.palette.color(QPalette::Midlight);
+                    color = mainColor.darker(4);
             }
             else if (opt.state & State_On || opt.state & State_NoChange)
             {
                 if (element != CE_RadioButton && opt.state & State_MouseOver)
-                    color = opt.palette.color(QPalette::BrightText);
+                    color = mainColor.lighter(3);
                 else
-                    color = opt.palette.color(QPalette::Text);
+                    color = mainColor;
             }
 
             opt.palette.setColor(QPalette::WindowText, color);

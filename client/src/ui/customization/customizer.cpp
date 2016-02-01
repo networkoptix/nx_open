@@ -244,6 +244,10 @@ public:
         m_globals = globals;
     }
 
+    QVariant globalConstant(const QString &name) const {
+        return resolveConstant(name);
+    }
+
 protected:
     virtual void serializeInternal(QnJsonContext *ctx, const void *value, QJsonValue *target) const override {
         QJson::serialize(ctx, *static_cast<const QColor *>(value), target);
@@ -305,7 +309,7 @@ private:
 // -------------------------------------------------------------------------- //
 namespace
 {
-    QnColorList extractColors(const QString &group, const QnCustomizationDataHash &globals)
+    QnColorList extractColors(const QString &group, const QnCustomizationSerializer &serializer)
     {
         QnColorList colors;
 
@@ -314,13 +318,15 @@ namespace
             return c1.convertTo(QColor::Hsl).lightness() < c2.convertTo(QColor::Hsl).lightness();
         };
 
-        for (auto it = globals.begin(); it != globals.end(); ++it)
+        for (const QString &constant: serializer.globals().keys())
         {
-            if (!it.key().startsWith(group))
+            if (!constant.startsWith(group))
                 continue;
 
-            QString colorName = it->json.toString();
-            QColor color(colorName);
+            QColor color = serializer.globalConstant(constant).value<QColor>();
+            if (!color.isValid())
+                continue;
+
             colors.insert(std::lower_bound(colors.begin(), colors.end(), color, colorLess), color);
         }
 
@@ -549,9 +555,9 @@ void QnCustomizer::setCustomization(const QnCustomization &customization) {
         {
             d->colorSerializer->setGlobals(globals);
 
-            d->genericPalette.setColors(lit("dark"), extractColors(lit("dark"), globals));
-            d->genericPalette.setColors(lit("light"), extractColors(lit("light"), globals));
-            d->genericPalette.setColors(lit("blue"), extractColors(lit("blue"), globals));
+            d->genericPalette.setColors(lit("dark"), extractColors(lit("dark"), *d->colorSerializer));
+            d->genericPalette.setColors(lit("light"), extractColors(lit("light"), *d->colorSerializer));
+            d->genericPalette.setColors(lit("blue"), extractColors(lit("blue"), *d->colorSerializer));
         }
     }
 

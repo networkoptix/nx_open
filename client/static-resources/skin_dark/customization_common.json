@@ -80,7 +80,7 @@
             "_": "Main application palette. See http://qt-project.org/doc/qt-5.1/qtgui/qpalette.html#ColorRole-enum.",
         
             "default": {
-                "windowText":       "light4",
+                "windowText":       "light16",
                 "button":           "dark10",
                 "light":            "light10",
                 "midlight":         "dark16",
@@ -101,7 +101,7 @@
                 "toolTipText":      "#222222"
             },
             "disabled": {
-                "windowText":       "light4.setAlpha(75)",
+                "windowText":       "light16.setAlpha(75)",
                 "button":           "dark10.setAlpha(75)",
                 "light":            "light10.setAlpha(75)",
                 "midlight":         "dark16.setAlpha(75)",
@@ -124,15 +124,6 @@
         }
     },
     
-    "QFrame": {
-        "palette": {
-            "default": {
-                "mid": "dark7",
-                "dark": "dark5"
-            }
-        }
-    },
-
     "QTabBar": {
         "palette": {
             "default": {

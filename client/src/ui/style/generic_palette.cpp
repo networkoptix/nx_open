@@ -1,5 +1,7 @@
 #include "generic_palette.h"
 
+const int QnPaletteColor::kMaxAlpha = 255;
+
 uint qHash(const QColor &color)
 {
     return qHash(color.name());
@@ -7,16 +9,17 @@ uint qHash(const QColor &color)
 
 QnPaletteColor::QnPaletteColor()
     : m_index(-1)
+    , m_alpha(kMaxAlpha)
 {
 }
 
-QnPaletteColor::QnPaletteColor(
-        const QString &group,
+QnPaletteColor::QnPaletteColor(const QString &group,
         const int index,
-        const QnColorList &palette)
+        const QnColorList &palette, const int alpha)
     : m_group(group)
     , m_index(index)
     , m_palette(palette)
+    , m_alpha(alpha)
 {
 }
 
@@ -24,7 +27,6 @@ QnPaletteColor::operator QColor() const
 {
     return color();
 }
-
 
 QString QnPaletteColor::group() const
 {
@@ -41,7 +43,19 @@ QColor QnPaletteColor::color() const
     if (!isValid())
         return QColor();
 
-    return m_palette[m_index];
+    QColor result = m_palette[m_index];
+    result.setAlpha(m_alpha);
+    return result;
+}
+
+int QnPaletteColor::alpha() const
+{
+    return m_alpha;
+}
+
+void QnPaletteColor::setAlpha(int alpha)
+{
+    m_alpha = alpha;
 }
 
 bool QnPaletteColor::isValid() const
@@ -54,7 +68,7 @@ QnPaletteColor QnPaletteColor::darker(int shift) const
     if (!isValid())
         return QnPaletteColor();
 
-    return QnPaletteColor(m_group, qBound(0, m_index - shift, m_palette.size() - 1), m_palette);
+    return QnPaletteColor(m_group, qBound(0, m_index - shift, m_palette.size() - 1), m_palette, m_alpha);
 }
 
 QnPaletteColor QnPaletteColor::lighter(int shift) const
@@ -67,6 +81,7 @@ QnPaletteColor &QnPaletteColor::operator =(const QnPaletteColor &other)
     m_group = other.m_group;
     m_index = other.m_index;
     m_palette = other.m_palette;
+    m_alpha = other.m_alpha;
     return *this;
 }
 
@@ -88,16 +103,21 @@ void QnGenericPalette::setColors(const QString &group, const QnColorList &colors
 
 QnPaletteColor QnGenericPalette::color(const QColor &color) const
 {
-    return m_colorByQColor.value(color);
+    QColor searchColor = color;
+    searchColor.setAlpha(QnPaletteColor::kMaxAlpha);
+
+    QnPaletteColor result = m_colorByQColor.value(searchColor);
+    result.setAlpha(color.alpha());
+    return result;
 }
 
-QnPaletteColor QnGenericPalette::color(const QString &group, int index) const
+QnPaletteColor QnGenericPalette::color(const QString &group, int index, int alpha) const
 {
     QnColorList colors = m_colorsByGroup.value(group);
     if (index >= colors.size())
         return QnPaletteColor();
 
-    return QnPaletteColor(group, index, colors);
+    return QnPaletteColor(group, index, colors, alpha);
 }
 
 void QnGenericPalette::removeColors(const QString &group)
