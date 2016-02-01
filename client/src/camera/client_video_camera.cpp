@@ -49,7 +49,7 @@ QnClientVideoCamera::QnClientVideoCamera(const QnMediaResourcePtr &resource, QnA
             connect(m_reader, SIGNAL(jumpCanceled(qint64)), &m_camdispay, SLOT(onJumpCanceled(qint64)), Qt::DirectConnection);
             connect(m_reader, SIGNAL(skipFramesTo(qint64)), &m_camdispay, SLOT(onSkippingFrames(qint64)), Qt::DirectConnection);
         }
-    }    
+    }
 
 }
 
@@ -134,8 +134,8 @@ void QnClientVideoCamera::setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val
 }
 
 void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod,
-												  const  QString& fileName, const QString& format, 
-                                            QnStorageResourcePtr storage, 
+												  const  QString& fileName, const QString& format,
+                                            QnStorageResourcePtr storage,
                                             QnStreamRecorder::Role role,
                                             qint64 serverTimeZoneMs,
                                             QnImageFilterHelper transcodeParams)
@@ -171,7 +171,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
             // it is required for av_streams in output file - we should know all codec context immediately
             QnVirtualCameraResourcePtr camera = m_resource->toResourcePtr().dynamicCast<QnVirtualCameraResource>();
             rtspClient->setCamera(camera);
-            rtspClient->setPlayNowModeAllowed(false); 
+            rtspClient->setPlayNowModeAllowed(false);
             rtspClient->setAdditionalAttribute(Qn::EC2_MEDIA_ROLE, "export");
         }
         if (role == QnStreamRecorder::Role_FileExport)
@@ -198,7 +198,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
     m_exportRecorder->clearUnprocessedData();
     m_exportRecorder->setEofDateTime(endTimeUs);
-    
+
     if (storage)
         m_exportRecorder->addRecordingContext(
             fileName,
