@@ -24,6 +24,11 @@ public:
         nttDisabled
     };
 
+    typedef std::function<std::unique_ptr< AbstractStreamSocket >(
+        bool /*sslRequired*/,
+        NatTraversalType /*natTraversalRequired*/)> CreateStreamSocketFuncType;
+
+
     static std::unique_ptr< AbstractDatagramSocket > createDatagramSocket();
 
     /*!
@@ -48,6 +53,8 @@ public:
      *  \note DEBUG use ONLY! */
     static void enforceStreamSocketType( SocketType type );
     static bool isStreamSocketTypeEnforced();
+
+    static void setCreateStreamSocketFunc(CreateStreamSocketFuncType);
 
 private:
     SocketFactory();

@@ -60,10 +60,17 @@ static std::unique_ptr< AbstractStreamSocket > streamSocket(
     };
 }
 
+namespace {
+SocketFactory::CreateStreamSocketFuncType createStreamSocketFunc;
+}
+
 std::unique_ptr< AbstractStreamSocket > SocketFactory::createStreamSocket(
     bool sslRequired,
     SocketFactory::NatTraversalType natTraversalRequired )
 {
+    if (createStreamSocketFunc)
+        return createStreamSocketFunc(sslRequired, natTraversalRequired);
+
     auto result = streamSocket( natTraversalRequired,
                                 s_enforcedStreamSocketType );
 
@@ -130,6 +137,11 @@ void SocketFactory::enforceStreamSocketType( SocketType type )
 bool SocketFactory::isStreamSocketTypeEnforced()
 {
     return s_enforcedStreamSocketType != SocketType::Default;
+}
+
+void SocketFactory::setCreateStreamSocketFunc(CreateStreamSocketFuncType func)
+{
+    createStreamSocketFunc = std::move(func);
 }
 
 std::atomic< SocketFactory::SocketType >

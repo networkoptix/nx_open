@@ -86,7 +86,9 @@ class NX_NETWORK_API RandomDataTcpServer
     public QnJoinable
 {
 public:
-    RandomDataTcpServer( size_t bytesToSendThrough );
+    RandomDataTcpServer(size_t randomBytesToSendThrough);
+    /** In this mode it sends \a dataToSend through connection and closes connection */
+    RandomDataTcpServer(const QByteArray& dataToSend);
     virtual ~RandomDataTcpServer();
 
     virtual void pleaseStop() override;

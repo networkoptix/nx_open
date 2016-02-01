@@ -75,14 +75,19 @@ bool CloudStreamSocket::reopen()
     return false;
 }
 
+/** returns \a false if timeout  */
 template<typename Future>
 bool waitFutureMs(Future& future, const boost::optional<unsigned int>& timeoutMillis)
 {
     if (!timeoutMillis)
         return true;
 
-    const auto timeout = std::chrono::milliseconds(*timeoutMillis);
-    return future.wait_for(timeout) == std::future_status::ready;
+    //TODO #ak #msvc2015 ignoring timeout for now since future.wait_for implementation is buggy in msvc2012
+
+    //const auto timeout = std::chrono::milliseconds(*timeoutMillis);
+    //return future.wait_for(timeout) == std::future_status::ready;
+    future.wait();
+    return true;
 }
 
 bool CloudStreamSocket::connect(
@@ -153,7 +158,7 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
     unsigned int sendTimeout = 0;
     if (!getSendTimeout(&sendTimeout))
         return -1;
-    if (waitFutureMs(future, sendTimeout))
+    if (!waitFutureMs(future, sendTimeout))
     {
         SystemError::setLastErrorCode(SystemError::timedOut);
         return -1;
@@ -207,12 +212,22 @@ void CloudStreamSocket::cancelIOAsync(
         });
 }
 
-void CloudStreamSocket::post( std::function<void()> handler )
+void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
+{
+    //TODO #ak this implementation looks buggy
+    if (eventType == aio::etWrite || eventType == aio::etNone)
+        m_asyncConnectGuard->terminate(); // breaks outgoing connects
+    m_aioThreadBinder->cancelIOSync(eventType);
+    if (m_socketDelegate)
+        m_socketDelegate->cancelIOSync(eventType);
+}
+
+void CloudStreamSocket::post(std::function<void()> handler)
 {
     m_aioThreadBinder->post(std::move(handler));
 }
 
-void CloudStreamSocket::dispatch( std::function<void()> handler )
+void CloudStreamSocket::dispatch(std::function<void()> handler)
 {
     m_aioThreadBinder->dispatch(std::move(handler));
 }
@@ -314,6 +329,13 @@ bool CloudStreamSocket::startAsyncConnect(
             //using tcp connection
             m_socketDelegate.reset(new TCPSocket(true));
             setDelegate(m_socketDelegate.get());
+            if (!m_socketDelegate->setNonBlockingMode(true))
+                return false;
+            for (const auto& attr: dnsEntry.attributes)
+            {
+                if (attr.type == AddressAttributeType::nxApiPort)
+                    port = static_cast<quint16>(attr.value);
+            }
             m_socketDelegate->connectAsync(
                 SocketAddress(std::move(dnsEntry.host), port),
                 m_connectHandler);
@@ -361,8 +383,8 @@ bool CloudStreamSocket::startAsyncConnect(
 int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
 {
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
-    sendAsync(
-        *buf,
+    readSomeAsync(
+        buf,
         [this, &promise](SystemError::ErrorCode code, size_t size)
         {
             m_aioThreadBinder->post([code, size, &promise]() {
@@ -374,7 +396,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
     unsigned int recvTimeout = 0;
     if (!getRecvTimeout(&recvTimeout))
         return -1;
-    if (waitFutureMs(future, recvTimeout))
+    if (!waitFutureMs(future, recvTimeout))
     {
         SystemError::setLastErrorCode(SystemError::timedOut);
         return -1;

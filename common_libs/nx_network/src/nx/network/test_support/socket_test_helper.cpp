@@ -283,7 +283,11 @@ bool RandomDataTcpServer::start()
 
 SocketAddress RandomDataTcpServer::addressBeingListened() const
 {
-    return m_serverSocket->getLocalAddress();
+    const auto localAddress = m_serverSocket->getLocalAddress();
+    return 
+        localAddress.address == HostAddress::anyHost
+        ? SocketAddress(HostAddress::localhost, localAddress.port)
+        : localAddress;
 }
 
 void RandomDataTcpServer::onNewConnection(
