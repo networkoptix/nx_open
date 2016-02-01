@@ -73,7 +73,7 @@ void serializeToUrlQuery(const SystemSharing& data, QUrlQuery* const urlQuery);
 #define SystemAccessRoleData_Fields (accessRole)
 #define SystemAccessRoleList_Fields (accessRoles)
 
-#define SystemDataEx_Fields SystemData_Fields(accessRole)(sharingPermissions)
+#define SystemDataEx_Fields SystemData_Fields(ownerFullName)(accessRole)(sharingPermissions)
 #define SystemDataExList_Fields (systems)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

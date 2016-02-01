@@ -51,6 +51,15 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>nx_streaming</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+ 
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>nx_utils</artifactId>
             <version>${project.version}</version>
             <type>pom</type>

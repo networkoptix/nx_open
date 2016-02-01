@@ -90,13 +90,19 @@ public:
     QnMediaServerResourcePtr getNextMediaServerAndPeriodOnTime(const QnVirtualCameraResourcePtr &camera, qint64 timestamp, bool searchForward, QnTimePeriod* foundPeriod) const;
 
     typedef std::function<void(bool success)> callbackFunction;
+    enum class StartResult 
+    {
+        ommited,    //< request doesn't start because of data is up to date, callback wont called.
+        started,    //< async IO started success. callback will called.
+        failed      //< async IO can't start. callback wont called.
+    };
     /**
      * Update camera history for the given camera.
      * \param camera                Target camera
      * \param callback              Callback function that will be executed when request finished.
      * \returns                     True if request was successful, false otherwise.
      */
-    bool updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
+    StartResult updateCameraHistoryAsync(const QnVirtualCameraResourcePtr &camera, callbackFunction callback);
 
     /**
      * \brief                       Check if camera history is valid for the given camera.

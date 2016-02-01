@@ -183,6 +183,7 @@ class SystemDataEx
     public SystemData
 {
 public:
+    std::string ownerFullName;
     SystemAccessRole accessRole;
     /** permissions, account can share current system with */
     std::vector<SystemAccessRoleData> sharingPermissions;

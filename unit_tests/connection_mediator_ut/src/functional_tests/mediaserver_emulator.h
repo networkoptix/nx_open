@@ -19,6 +19,13 @@ namespace hpm {
 class MediaServerEmulator
 {
 public:
+    enum class ActionToTake
+    {
+        proceedWithConnection,
+        ignoreIndication,
+        closeConnectionToMediator
+    };
+
     /**
         \param serverName If empty, name is generated
     */
@@ -42,20 +49,22 @@ public:
     /** server's UDP address for hole punching */
     SocketAddress udpHolePunchingEndpoint() const;
 
+    /** if \a handler returns \a false then no indication will NOT be processed */
     void setOnConnectionRequestedHandler(
-        std::function<void(api::ConnectionRequestedEvent)> handler);
+        std::function<ActionToTake(api::ConnectionRequestedEvent)> handler);
     void setConnectionAckResponseHandler(
         std::function<void(api::ResultCode)> handler);
 
 private:
-    hpm::api::MediatorConnector m_mediatorConnector;
+    std::unique_ptr<hpm::api::MediatorConnector> m_mediatorConnector;
     nx_http::MessageDispatcher m_httpMessageDispatcher;
     nx_http::HttpStreamSocketServer m_httpServer;
     AbstractCloudDataProvider::System m_systemData;
     nx::String m_serverId;
     std::shared_ptr<nx::hpm::api::MediatorServerTcpConnection> m_serverClient;
     nx::hpm::api::MediatorServerUdpConnection m_mediatorUdpClient;
-    std::function<void(nx::hpm::api::ConnectionRequestedEvent)> m_onConnectionRequestedHandler;
+    std::function<ActionToTake(nx::hpm::api::ConnectionRequestedEvent)>
+        m_onConnectionRequestedHandler;
     std::function<void(api::ResultCode)> m_connectionAckResponseHandler;
 
     void onConnectionRequested(

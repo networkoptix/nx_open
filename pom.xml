@@ -345,11 +345,7 @@
                 <module>common_libs/nx_network</module>
                 <module>common_libs/nx_utils</module>
                 <module>common_libs/udt</module>
-                <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/cloud_db_client</module>
-                <module>nx_cloud/connection_mediator</module>
-                <module>nx_cloud/libcloud_db</module>
-                <module>nx_cloud/libconnection_mediator</module>
                 <module>common_libs/nx_streaming</module>
                 <module>appserver2</module>
                 <!-- <module>testcamera</module> -->
@@ -418,6 +414,10 @@
                 <module>client</module>
                 <module>client.core</module>
                 <module>client.bin</module>
+                <module>nx_cloud/cloud_db</module>
+                <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/libcloud_db</module>
+                <module>nx_cloud/libconnection_mediator</module>
             </modules>
         </profile>
         <profile>

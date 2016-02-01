@@ -154,7 +154,7 @@ void CloudDataProvider::updateSystemsAsync()
             NX_LOGX( lm("Error: %1")
                      .arg( m_connectionFactory->toString( code ) ), cl_logERROR );
 
-            // TODO: shell we m_systemCache.clear() after a few failing attempts?
+            // TODO: shall we m_systemCache.clear() after a few failing attempts?
         }
         else
         {

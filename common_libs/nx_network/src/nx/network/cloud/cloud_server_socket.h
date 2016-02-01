@@ -4,7 +4,7 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/network/abstract_socket.h>
 
-#include "cloud_tunnel.h"
+#include "tunnel/incoming_tunnel.h"
 
 namespace nx {
 namespace network {
@@ -20,7 +20,9 @@ class NX_NETWORK_API CloudServerSocket
     public AbstractStreamServerSocket
 {
 public:
-    CloudServerSocket();
+    CloudServerSocket(
+        std::shared_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
+        IncomingTunnelPool* tunnelPool);
 
     //!Implementation of AbstractSocket::*
     bool bind(const SocketAddress& localAddress) override;
@@ -59,8 +61,17 @@ public:
         std::function<void(SystemError::ErrorCode,
                            AbstractStreamSocket*)> handler) override;
 
+protected:
+    void startAcceptor(
+        std::unique_ptr<AbstractTunnelAcceptor> connector,
+        std::shared_ptr<utils::AsyncOperationGuard::SharedGuard> sharedGuard);
+
 private:
-    void postAcceptImpl();
+    const std::shared_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
+    IncomingTunnelPool* const m_tunnelPool;
+
+    typedef AbstractTunnelAcceptor Acceptor;
+    std::map<Acceptor*, std::unique_ptr<Acceptor>> m_acceptors;
 
     bool m_isAcceptingTunnelPool;
     mutable SystemError::ErrorCode m_lastError;
@@ -68,7 +79,7 @@ private:
     std::unique_ptr<AbstractCommunicatingSocket> m_ioThreadSocket;
     std::function<void(SystemError::ErrorCode, AbstractStreamSocket*)> m_acceptHandler;
     std::unique_ptr<AbstractStreamSocket> m_acceptedSocket;
-    nx::utils::AsyncOperationGuard m_asyncGuard;
+    utils::AsyncOperationGuard m_asyncGuard;
 };
 
 } // namespace cloud

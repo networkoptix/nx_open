@@ -49,7 +49,7 @@ public:
     //!Asynchronously openes connection to the server
     /*!
         \param endpoint Address to use
-        \note shell be called only once (to provide address) reconnect will
+        \note shall be called only once (to provide address) reconnect will
               happen automatically
     */
     void connect( SocketAddress endpoint, bool useSsl = false );

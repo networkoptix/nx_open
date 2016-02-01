@@ -377,7 +377,7 @@ void QnPtzManageDialog::at_savePositionButton_clicked() {
         QMessageBox::critical(
             this,
             tr("Could not get position from camera."),
-            tr("An error has occurred while trying to get a current position from camera %1.").arg(m_resource->getName()) + L'\n'
+            tr("An error has occurred while trying to get the current position from camera %1.").arg(m_resource->getName()) + L'\n'
           + tr("Please wait for the camera to go online.")
             );
         return;

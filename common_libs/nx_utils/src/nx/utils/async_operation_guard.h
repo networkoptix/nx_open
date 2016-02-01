@@ -1,6 +1,8 @@
 #ifndef ASYNC_OPERATION_GUARD_H
 #define ASYNC_OPERATION_GUARD_H
 
+#include <memory>
+
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -22,7 +24,7 @@ public:
     AsyncOperationGuard();
     ~AsyncOperationGuard();
 
-    /** The guard shell be passed in every async operation handler to be able to
+    /** The guard shall be passed in every async operation handler to be able to
      *  find out if master object has been deleted */
     class NX_UTILS_API SharedGuard
     {
@@ -34,7 +36,7 @@ public:
 
     public:
         /** This lock is supposed to be held as long as operation is in progress
-         *  \note the lock should be verified right after asquration to find
+         *  \note the lock must be verified right after obtaining to find
          *        out if operation has been canceled */
         class NX_UTILS_API Lock
         {
@@ -49,6 +51,7 @@ public:
 
             void unlock();
             operator bool() const;
+            bool operator!() const;
             ~Lock();
 
         private:

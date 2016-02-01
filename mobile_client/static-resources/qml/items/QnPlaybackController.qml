@@ -145,6 +145,7 @@ Item {
             id: circleBackground
 
             anchors.centerIn: circle
+            anchors.alignWhenCentered: false
             width: dp(76)
             height: dp(76)
             color: QnTheme.playPauseBackground
@@ -169,6 +170,7 @@ Item {
             id: preloader
 
             anchors.centerIn: circle
+            anchors.alignWhenCentered: false
             width: circle.width - dp(6)
             height: circle.height - dp(6)
             color: QnTheme.playPause

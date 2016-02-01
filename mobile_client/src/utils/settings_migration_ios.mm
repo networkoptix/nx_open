@@ -24,6 +24,19 @@
     return [_host length] > 0;
 }
 
+- (instancetype)initWithCoder:(NSCoder *)decoder
+{
+    if ((self = [super init]))
+    {
+        self.name = [decoder decodeObjectForKey:@"name"];
+        self.host = [decoder decodeObjectForKey:@"host"];
+        self.port = [decoder decodeObjectForKey:@"port"];
+        self.login = [decoder decodeObjectForKey:@"login"];
+        self.password = [decoder decodeObjectForKey:@"password"];
+    }
+    return self;
+}
+
 @end
 
 QnMigratedSessionList getMigratedSessions(bool *success)

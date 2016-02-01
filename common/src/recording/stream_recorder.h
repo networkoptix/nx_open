@@ -56,11 +56,31 @@ public:
         LastError
     };
 
+    struct ErrorStruct
+    {
+        int                   lastError;
+        QnStorageResourcePtr  storage;
+
+        ErrorStruct(
+            int                         lastError,
+            const QnStorageResourcePtr  &storage
+        )
+            : lastError(lastError),
+              storage(storage)
+        {}
+
+        ErrorStruct()
+            : lastError(0),
+              storage(QnStorageResourcePtr())
+        {}
+    };
+
     struct RecordingContext
     {
         QString                 fileName;
         AVFormatContext         *formatCtx;
         QnStorageResourcePtr    storage;
+        qint64                  totalWriteTimeNs;
 
         RecordingContext(
             const QString               &fname, 
@@ -68,7 +88,8 @@ public:
         ) :
             fileName(fname),
             formatCtx(nullptr),
-            storage(st)
+            storage(st),
+            totalWriteTimeNs(0)
         {}
     };
 
@@ -146,7 +167,7 @@ public:
 signals:
     void recordingStarted();
     void recordingProgress(int progress);
-    void recordingFinished(int status, const QString &fileName);
+    void recordingFinished(const ErrorStruct &status, const QString &fileName);
 protected:
     virtual void endOfRun();
     bool initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData);
@@ -190,7 +211,7 @@ private:
 
     bool m_forceDefaultCtx;
     bool m_packetWrited;
-    int  m_lastError;
+    ErrorStruct m_lastError;
     qint64 m_currentChunkLen;
 
     qint64 m_startOffset;

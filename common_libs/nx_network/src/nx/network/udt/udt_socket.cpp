@@ -149,6 +149,7 @@ public:
     SocketAddress GetLocalAddress() const;
     SocketAddress GetPeerAddress() const;
     bool Close();
+    bool Shutdown();
     bool IsClosed() const;
     bool IsConnected() const {
         return state_ == ESTABLISHED;
@@ -245,6 +246,16 @@ bool UdtSocketImpl::Close() {
     udtHandle = UDT::INVALID_SOCK;
     state_ = CLOSED;
     return ret == 0;
+}
+
+bool UdtSocketImpl::Shutdown() {
+    // UDT Reference: Functions: close():
+    //  In UDT, shutdown is not supported.
+    //  All sockets should be closed if they are not used any more.
+
+    // TODO: implement somehow or remove from API
+    Q_ASSERT(false);
+    return false;
 }
 
 bool UdtSocketImpl::IsClosed() const {
@@ -578,6 +589,10 @@ void UdtStreamSocket::close() {
     m_impl->Close();
 }
 
+void UdtStreamSocket::shutdown() {
+    m_impl->Shutdown();
+}
+
 bool UdtStreamSocket::isClosed() const {
     return m_impl->IsClosed();
 }
@@ -836,6 +851,10 @@ SocketAddress UdtStreamServerSocket::getLocalAddress() const {
 
 void UdtStreamServerSocket::close() {
     m_impl->Close();
+}
+
+void UdtStreamServerSocket::shutdown() {
+    m_impl->Shutdown();
 }
 
 bool UdtStreamServerSocket::isClosed() const {

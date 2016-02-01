@@ -83,7 +83,10 @@ private:
     bool isPanicMode() const;
     bool isRedundantSyncOn() const;
 private slots:
-    void at_recordingFinished(int status, const QString &filename);
+    void at_recordingFinished(
+        const ErrorStruct   &status,
+        const QString       &filename
+    );
     void at_camera_propertyChanged(const QnResourcePtr &, const QString &);
 private:
     const size_t m_maxRecordQueueSizeBytes;

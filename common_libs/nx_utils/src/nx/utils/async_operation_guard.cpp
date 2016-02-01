@@ -45,6 +45,11 @@ AsyncOperationGuard::SharedGuard::Lock::operator bool() const
     return m_locked;
 }
 
+bool AsyncOperationGuard::SharedGuard::Lock::operator!() const
+{
+    return !m_locked;
+}
+
 AsyncOperationGuard::SharedGuard::Lock::~Lock()
 {
     unlock();

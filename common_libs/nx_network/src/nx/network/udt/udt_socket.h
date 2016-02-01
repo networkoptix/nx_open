@@ -27,7 +27,8 @@ class UdtSocketImpl;
 }// namespace detail
 
 // Adding a level indirection to make C++ type system happy.
-class NX_NETWORK_API UdtSocket {
+class NX_NETWORK_API UdtSocket
+{
 public:
     UdtSocket();
     virtual ~UdtSocket();
@@ -53,7 +54,10 @@ protected:
 
 // BTW: Why some getter function has const qualifier, and others don't have this in AbstractStreamSocket ??
 
-class NX_NETWORK_API UdtStreamSocket : public UdtSocket , public AbstractStreamSocket {
+class NX_NETWORK_API UdtStreamSocket
+        : public UdtSocket
+        , public AbstractStreamSocket
+{
 public:
     UdtStreamSocket(bool natTraversal = true);
     UdtStreamSocket(detail::UdtSocketImpl* impl);
@@ -66,6 +70,7 @@ public:
     virtual bool bind( const SocketAddress& localAddress ) override;
     virtual SocketAddress getLocalAddress() const override;
     virtual void close() override;
+    virtual void shutdown() override;
     virtual bool isClosed() const override;
     virtual bool setReuseAddrFlag( bool reuseAddr ) override;
     virtual bool getReuseAddrFlag( bool* val ) const override;
@@ -166,6 +171,7 @@ public:
     virtual bool bind(const SocketAddress& localAddress);
     virtual SocketAddress getLocalAddress() const;
     virtual void close();
+    virtual void shutdown();
     virtual bool isClosed() const;
     virtual bool setReuseAddrFlag( bool reuseAddr );
     virtual bool getReuseAddrFlag( bool* val ) const;

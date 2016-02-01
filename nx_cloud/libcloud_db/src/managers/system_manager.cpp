@@ -195,6 +195,10 @@ void SystemManager::getSystems(
     {
         for (auto& systemDataEx: resultData.systems)
         {
+            const auto accountData = 
+                m_accountManager.findAccountByUserName(systemDataEx.ownerAccountEmail);
+            if (accountData)
+                systemDataEx.ownerFullName = accountData->fullName;
             systemDataEx.accessRole = getAccountRightsForSystem(
                 *accountEmail,
                 systemDataEx.id);

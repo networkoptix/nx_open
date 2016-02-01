@@ -4523,15 +4523,15 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>A változások nincsenek elmentve. Szeretné menteni őket?</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Manage PTZ for %1...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5072,10 +5072,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <source>Camera</source>
         <translation type="unfinished">Kamera</translation>
     </message>
-    <message>
-        <source>&lt;Removed camera&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>QnSearchLineEdit</name>
@@ -5402,10 +5398,6 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation>Kérem frissítse a kliens manuálisan a telepítő csomag használatával.</translation>
     </message>
     <message>
-        <source>Update Cancelled</source>
-        <translation>Frissítés megszakítva</translation>
-    </message>
-    <message>
         <source>Update unsuccessful.</source>
         <translation>A frissítés sikeres.</translation>
     </message>
@@ -5449,6 +5441,18 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
     </message>
     <message>
         <source>Unable to begin update. Client update was not found.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update cancelled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update is not needed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All servers are already updated.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7295,11 +7299,11 @@ Ha megértette és szeretné véghez vinni, kérem kattintson az Összevonásra 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to get a current position from camera %1.</source>
+        <source>An error has occurred while trying to set the current position for camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>An error has occurred while trying to set the current position for camera %1.</source>
+        <source>An error has occurred while trying to get the current position from camera %1.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

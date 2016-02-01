@@ -70,13 +70,13 @@ void UDPHolePunchingConnectionInitiationFsm::onConnectRequest(
                 api::ResultCode::serverConnectionBroken));
             return;
         }
-        serverConnectionStrongRef->sendMessage(std::move(indication));
+        serverConnectionStrongRef->sendMessage(std::move(indication));  //TODO #ak check sendMessage result
         m_timer->registerTimer(
             kUdpHolePunchingSessionTimeout,
             std::bind(
                 &UDPHolePunchingConnectionInitiationFsm::done,
                 this,
-                api::ResultCode::timedout));
+                api::ResultCode::noReplyFromServer));
         m_state = State::waitingServerPeerUDPAddress;
     });
 }
@@ -146,6 +146,8 @@ void UDPHolePunchingConnectionInitiationFsm::done(api::ResultCode result)
         connectResponseSender(
             result,
             api::ConnectResponse());
+
+        //TODO #ak saving connection result
     }
     m_state = State::fini;
 

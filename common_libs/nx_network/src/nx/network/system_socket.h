@@ -66,6 +66,9 @@ public:
     SocketAddress getLocalAddress() const;
     //!Implementation of AbstractSocket::close
     virtual void close();
+    //!Implementation of AbstractSocket::shutdown
+    virtual void shutdown();
+
     //!Implementation of AbstractSocket::isClosed
     bool isClosed() const;
     //!Implementation of AbstractSocket::setReuseAddrFlag
@@ -204,8 +207,8 @@ public:
         aio::EventType eventType,
         std::function<void()> cancellationDoneHandler);
 
-    void shutdown();
     virtual void close() override;
+    virtual void shutdown() override;
 
     //! Filters out \fn connect calls (DEBUG ONLY!)
     static QList<QString> connectFilters;

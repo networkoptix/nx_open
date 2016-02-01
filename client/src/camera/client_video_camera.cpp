@@ -154,7 +154,13 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         if (!m_exportReader)
         {
             delete tmpReader;
-            emit exportFinished(InvalidResourceType, fileName);
+            emit exportFinished(
+                QnStreamRecorder::ErrorStruct(
+                    InvalidResourceType,
+                    QnStorageResourcePtr()
+                ),
+                fileName
+            );
             return;
         }
         connect(m_exportReader, SIGNAL(finished()), m_exportReader, SLOT(deleteLater()));

@@ -62,6 +62,11 @@
                         <set resName="authorized" resValue="false"/>
                         -->
                     </sequence>
+                    <condition value="/system/get" resName="systemID" matchType="presence">
+                        <condition value="true" resName="auth.accountRightsOnSystem">
+                            <set value="none" resName="authorized" resValue="false"/>
+                        </condition>
+                    </condition>
                     <condition value="/system/get_cloud_users" resName="systemID" matchType="presence">
                         <sequence value="true">
                             <set resName="authorized" resValue="false"/>

@@ -52,7 +52,9 @@ TEST_F(CdbFunctionalTest, system_unbind)
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system0) != systems.end());
             ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
             ASSERT_EQ(account1.email, systems[0].ownerAccountEmail);
+            ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
             ASSERT_EQ(account1.email, systems[1].ownerAccountEmail);
+            ASSERT_EQ(account1.fullName, systems[1].ownerFullName);
         }
 
         //sharing system1 with account2 as viewer
@@ -124,6 +126,12 @@ TEST_F(CdbFunctionalTest, system_get)
         api::ResultCode::ok,
         addActivatedAccount(&account1, &account1Password));
 
+    api::AccountData account2;
+    std::string account2Password;
+    ASSERT_EQ(
+        api::ResultCode::ok,
+        addActivatedAccount(&account2, &account2Password));
+
     //adding system2 to account1
     api::SystemData system1;
     ASSERT_EQ(
@@ -137,13 +145,22 @@ TEST_F(CdbFunctionalTest, system_get)
             getSystem(account1.email, account1Password, system1.id.toStdString(), &systems));
         ASSERT_EQ(1, systems.size());
         ASSERT_TRUE(std::find(systems.begin(), systems.end(), system1) != systems.end());
+        ASSERT_EQ(account1.fullName, systems[0].ownerFullName);
+    }
+
+    //requesting system1 using account2 credentials
+    {
+        std::vector<api::SystemDataEx> systems;
+        ASSERT_EQ(
+            api::ResultCode::forbidden,
+            getSystem(account2.email, account2Password, system1.id.toStdString(), &systems));
     }
 
     {
         //requesting unknown system
         std::vector<api::SystemDataEx> systems;
         ASSERT_EQ(
-            api::ResultCode::notFound,
+            api::ResultCode::forbidden,
             getSystem(account1.email, account1Password, "unknown_system_id", &systems));
         ASSERT_TRUE(systems.empty());
     }

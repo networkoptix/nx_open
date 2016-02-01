@@ -10,21 +10,25 @@
 #include <utils/common/string.h>
 
 
-namespace {
-    const QString startTimeKey      (lit("startTime"));
-    const QString endTimeKey        (lit("endTime"));
-    const QString strategyKey       (lit("strategy"));
-    const QString filterKey         (lit("filter"));
-    const QString physicalIdKey     (lit("physicalId"));
-    const QString macKey            (lit("mac"));
-    const QString cameraIdKey       (lit("cameraId"));
-    const QString limitKey          (lit("limit"));
-    const QString guidKey           (lit("guid"));
-    const QString nameKey           (lit("name"));
-    const QString descriptionKey    (lit("description"));
-    const QString timeoutKey        (lit("timeout"));
-    const QString durationKey       (lit("duration"));
-    const QString tagKey            (lit("tag"));
+namespace
+{
+    const QString startTimeKey                  (lit("startTime"));
+    const QString endTimeKey                    (lit("endTime"));
+    const QString sortColumnKey                 (lit("sortField"));
+    const QString sortOrderKey                  (lit("sortOrder"));
+    const QString useSparsing                   (lit("useSparsing"));
+    const QString minVisibleLengthMs            (lit("minVisibleLength"));
+    const QString filterKey                     (lit("filter"));
+    const QString physicalIdKey                 (lit("physicalId"));
+    const QString macKey                        (lit("mac"));
+    const QString cameraIdKey                   (lit("cameraId"));
+    const QString limitKey                      (lit("limit"));
+    const QString guidKey                       (lit("guid"));
+    const QString nameKey                       (lit("name"));
+    const QString descriptionKey                (lit("description"));
+    const QString timeoutKey                    (lit("timeout"));
+    const QString durationKey                   (lit("duration"));
+    const QString tagKey                        (lit("tag"));
 
     const QChar tagsDelimiter = L',';
     const qint64 USEC_PER_MS = 1000;
@@ -49,7 +53,11 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
     if (params.contains(endTimeKey))
         filter.endTimeMs = parseDateTime(params.value(endTimeKey))  / USEC_PER_MS;
 
-    QnLexical::deserialize(params.value(strategyKey), &filter.strategy);
+    QnLexical::deserialize(params.value(sortColumnKey), &filter.orderBy.column);
+    QnLexical::deserialize(params.value(sortOrderKey), &filter.orderBy.order);
+
+    QnLexical::deserialize(params.value(useSparsing), &filter.sparsing.used);
+    QnLexical::deserialize(params.value(minVisibleLengthMs), &filter.sparsing.minVisibleLengthMs);
 
     if (params.contains(limitKey))
         filter.limit = qMax(0LL, params.value(limitKey).toLongLong());
@@ -81,7 +89,12 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const {
     result.insert(endTimeKey,       QnLexical::serialized(filter.endTimeMs));
     result.insert(filterKey,        QnLexical::serialized(filter.text));
     result.insert(limitKey,         QnLexical::serialized(filter.limit));
-    result.insert(strategyKey,      QnLexical::serialized(filter.strategy));
+
+    result.insert(sortColumnKey,    QnLexical::serialized(filter.orderBy.column));
+    result.insert(sortOrderKey,     QnLexical::serialized(filter.orderBy.order));
+
+    result.insert(useSparsing,          QnLexical::serialized(filter.sparsing.used));
+    result.insert(minVisibleLengthMs,   QnLexical::serialized(filter.sparsing.minVisibleLengthMs));
 
     for (const auto &camera: cameras)
         result.insert(physicalIdKey,QnLexical::serialized(camera->getPhysicalId()));

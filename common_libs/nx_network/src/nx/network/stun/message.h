@@ -257,17 +257,6 @@ public:
     explicit Message( Header header_ = Header(),
                       AttributesMap attributes_ = AttributesMap() );
 
-    //TODO #ak #msvc2015 remove following macro conditions
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-    // auto generated copy and move
-#else
-    Message( Message&& message ) = default;
-    Message& operator=( Message&& message ) = default;
-
-    Message( const Message& ) = default;
-    Message& operator=( const Message& ) = default;
-#endif
-
     void clear();
     void addAttribute( AttributePtr&& attribute );
 

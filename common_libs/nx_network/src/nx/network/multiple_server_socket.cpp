@@ -84,6 +84,12 @@ void MultipleServerSocket::close()
         socket->close();
 }
 
+void MultipleServerSocket::shutdown()
+{
+    for (auto& socket : m_serverSockets)
+        socket->shutdown();
+}
+
 bool MultipleServerSocket::isClosed() const
 {
     for (auto& socket : m_serverSockets)

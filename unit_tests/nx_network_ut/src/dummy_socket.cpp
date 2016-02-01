@@ -212,6 +212,11 @@ void BufferSocket::close()
     m_isOpened = false;
 }
 
+void BufferSocket::shutdown()
+{
+    m_isOpened = false;
+}
+
 bool BufferSocket::isClosed() const
 {
     return !m_isOpened;

@@ -741,9 +741,13 @@ QnRtspClient::TrackMap QnRtspClient::play(qint64 positionStart, qint64 positionE
 
 bool QnRtspClient::stop()
 {
-    QnMutexLocker lock( &m_sockMutex );
     m_tcpSock->close();
     return true;
+}
+
+void QnRtspClient::shutdown()
+{
+    m_tcpSock->shutdown();
 }
 
 bool QnRtspClient::isOpened() const
@@ -833,11 +837,6 @@ bool QnRtspClient::sendRequestInternal(nx_http::Request&& request)
     m_outStreamFile.write( requestBuf.constData(), requestBuf.size() );
 #endif
     return m_tcpSock->send(requestBuf.constData(), requestBuf.size()) > 0;
-}
-
-AbstractStreamSocket* QnRtspClient::tcpSock()
-{
-    return m_tcpSock.get();
 }
 
 bool QnRtspClient::sendDescribe()
@@ -1921,6 +1920,11 @@ bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QB
 QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const
 {
     return m_sdpTracks;
+}
+
+AbstractStreamSocket* QnRtspClient::tcpSock()
+{
+    return m_tcpSock.get();
 }
 
 #endif // ENABLE_DATA_PROVIDERS
