@@ -400,26 +400,37 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::chunkFromFile(
 
 void DeviceFileCatalog::setLastSyncTime(int64_t time)
 {
-    QnMutexLocker lk(&m_mutex);
-    m_lastSyncTime = time;
     qnServerDb->setLastBackupTime(
         m_storagePool,
         qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
         m_catalog,
-        m_lastSyncTime
+        time 
     );
+
+    QnMutexLocker lk(&m_mutex);
+    m_lastSyncTime = time;
+}
+
+int64_t DeviceFileCatalog::getLastSyncTimeFromDBNoLock() const
+{
+    int64_t ret = qnServerDb->getLastBackupTime(
+        m_storagePool,
+        qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
+        m_catalog
+    );
+    return ret;
 }
 
 int64_t DeviceFileCatalog::getLastSyncTime() const
 {
     QnMutexLocker lk(&m_mutex);
     if (m_lastSyncTime == 0)
-    {
-        m_lastSyncTime = qnServerDb->getLastBackupTime(
-            m_storagePool,
-            qnResPool->getResourceByUniqueId(m_cameraUniqueId)->getId(),
-            m_catalog
-        );
+    {   // need to unlock here to fetch data from DB.
+        lk.unlock();
+        int64_t dbLastSyncTime = getLastSyncTimeFromDBNoLock();
+        // locking again
+        lk.relock();
+        m_lastSyncTime = dbLastSyncTime;
         if (m_lastSyncTime == 0)
             m_lastSyncTime = 1;
     }

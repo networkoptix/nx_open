@@ -251,7 +251,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
 }
 
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog() {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     QVector<DeviceFileCatalogPtr> result;
 

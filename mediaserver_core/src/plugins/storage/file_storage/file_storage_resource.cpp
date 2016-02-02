@@ -61,6 +61,13 @@ namespace aux
     {
         return prefix + NX_TEMP_FOLDER_NAME + QString::number(qHash(url), 16);
     }
+
+    QString passwordFromUrl(const QUrl &url)
+    {   // On some linux distribution (nx1) mount chokes on
+        // empty password. So let's give it a non-empty one.
+        QString password = url.password();
+        return password.isEmpty() ? "123" : password;
+    }
 }
 
 QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode openMode)
@@ -74,9 +81,18 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     int ffmpegBufferSize = 0;
 
     int systemFlags = 0;
-    if (openMode & QIODevice::WriteOnly) {
-        ioBlockSize = MSSettings::roSettings()->value( nx_ms_conf::IO_BLOCK_SIZE, nx_ms_conf::DEFAULT_IO_BLOCK_SIZE ).toInt();
-        ffmpegBufferSize = MSSettings::roSettings()->value( nx_ms_conf::FFMPEG_BUFFER_SIZE, nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE ).toInt();;
+    if (openMode & QIODevice::WriteOnly)
+    {
+        ioBlockSize = MSSettings::roSettings()->value(
+            nx_ms_conf::IO_BLOCK_SIZE,
+            nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
+        ).toInt();
+
+        ffmpegBufferSize = MSSettings::roSettings()->value(
+            nx_ms_conf::FFMPEG_BUFFER_SIZE,
+            nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
+        ).toInt();;
+
 #ifdef Q_OS_WIN
         if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
@@ -105,6 +121,18 @@ QIODevice* QnFileStorageResource::open(const QString& url, QIODevice::OpenMode o
     return rez.release();
 }
 
+void QnFileStorageResource::setLocalPathSafe(const QString &path) const
+{
+    QnMutexLocker lk(&m_mutex);
+    m_localPath = path;
+}
+
+QString QnFileStorageResource::getLocalPathSafe() const
+{
+    QnMutexLocker lk(&m_mutex);
+    return m_localPath;
+}
+
 QString QnFileStorageResource::getPath() const
 {
     QString url = getUrl();
@@ -129,7 +157,7 @@ bool QnFileStorageResource::initOrUpdate() const
         dirty = m_dirty;
         valid = m_valid;
     }
-    
+
     if (dirty)
     {
         dirty = false;
@@ -202,11 +230,8 @@ bool QnFileStorageResource::checkDBCap() const
 #ifdef _WIN32
     return true;
 #else
-    {
-        QnMutexLocker lk(&m_mutex);
-        if (!m_localPath.isEmpty())
-            return false;
-    }
+    if (getLocalPathSafe().isEmpty())
+        return false;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
@@ -339,16 +364,13 @@ int QnFileStorageResource::mountTmpDrive() const
     QString cifsOptionsString =
         lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
             .arg(url.userName())
-            .arg(url.password())
+            .arg(aux::passwordFromUrl(url))
             .arg(uncString);
 
     QString srcString = lit("//") + url.host() + url.path();
     QString localPathCopy = aux::genLocalPath(getUrl());
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_localPath = localPathCopy;
-    }
+    setLocalPathSafe(localPathCopy);
 
     umount(localPathCopy.toLatin1().constData());
     rmdir(localPathCopy.toLatin1().constData());
@@ -441,8 +463,7 @@ int QnFileStorageResource::mountTmpDrive() const
     if (!updatePermissions())
         return -1;
 
-    QnMutexLocker lk(&m_mutex);
-    m_localPath = path;
+    setLocalPathSafe(path);
 
     return 0;
 }
@@ -528,11 +549,7 @@ bool QnFileStorageResource::isFileExists(const QString& url)
 
 qint64 QnFileStorageResource::getFreeSpace()
 {
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+    QString localPathCopy = getLocalPathSafe();
 
     if (!initOrUpdate())
         return QnStorageResource::kUnknownSize;
@@ -540,7 +557,7 @@ qint64 QnFileStorageResource::getFreeSpace()
     return getDiskFreeSpace(
         localPathCopy.isEmpty() ?
         getPath() :
-        localPathCopy 
+        localPathCopy
     );
 }
 
@@ -549,16 +566,12 @@ qint64 QnFileStorageResource::getTotalSpace()
     if (!initOrUpdate())
         return QnStorageResource::kUnknownSize;
 
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
-    
+    QString localPathCopy = getLocalPathSafe();
+
     QnMutexLocker locker (&m_writeTestMutex);
     if (m_cachedTotalSpace <= 0)
         m_cachedTotalSpace = getDiskTotalSpace(
-            localPathCopy.isEmpty() ? getPath() : localPathCopy 
+            localPathCopy.isEmpty() ? getPath() : localPathCopy
         );
     return m_cachedTotalSpace;
 }
@@ -637,7 +650,7 @@ bool QnFileStorageResource::isAvailable() const
         m_dirty = true;
     }
     m_cachedTotalSpace = getDiskTotalSpace(
-        localPathCopy.isEmpty() ? getPath() : localPathCopy 
+        localPathCopy.isEmpty() ? getPath() : localPathCopy
     ); // update cached value periodically
     return *m_writeCapCached;
 
@@ -772,13 +785,10 @@ static bool readTabFile( const QString& filePath, QStringList* const mountPoints
     return true;
 }
 
+
 bool QnFileStorageResource::isStorageDirMounted() const
 {
-    QString localPathCopy;
-    {
-        QnMutexLocker lk(&m_mutex);
-        localPathCopy = m_localPath;
-    }
+    QString localPathCopy = getLocalPathSafe();
 
     if (!localPathCopy.isEmpty()) // smb
     {
@@ -787,18 +797,15 @@ bool QnFileStorageResource::isStorageDirMounted() const
         QString uncString = url.host() + url.path();
         uncString.replace(lit("/"), lit("\\"));
 
-        QString password = url.password();
-        password = password.isEmpty() ? "123" : password;
-
         QString cifsOptionsString =
             lit("sec=ntlm,username=%1,password=%2,unc=\\\\%3")
                 .arg(url.userName())
-                .arg(password)
+                .arg(aux::passwordFromUrl(url))
                 .arg(uncString);
 
         QString srcString = lit("//") + url.host() + url.path();
 
-        auto badResultHandler = [this, localPathCopy]()
+        auto badResultHandler = [this, &localPathCopy]()
         {   // Treat every unexpected test result the same way.
             // Cleanup attempt will be performed.
             // Will try to unmount, remove local mount point directory
