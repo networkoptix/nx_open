@@ -30,7 +30,4 @@ public:
 
 protected:
     QnNxStyle(QnNxStylePrivate &dd);
-
-private:
-    QnGenericPalette m_palette;
 };

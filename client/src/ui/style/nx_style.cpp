@@ -158,16 +158,20 @@ QnNxStylePrivate::QnNxStylePrivate() :
 {
 }
 
-QnNxStyle::QnNxStyle() {}
+QnNxStyle::QnNxStyle() :
+    base_type(*(new QnNxStylePrivate()))
+{}
 
 void QnNxStyle::setGenericPalette(const QnGenericPalette &palette)
 {
-    m_palette = palette;
+    Q_D(QnNxStyle);
+    d->palette = palette;
 }
 
 QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 {
-    return m_palette.color(color);
+    Q_D(const QnNxStyle);
+    return d->palette.color(color);
 }
 
 void QnNxStyle::drawPrimitive(
