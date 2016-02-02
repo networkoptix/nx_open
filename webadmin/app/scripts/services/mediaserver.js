@@ -265,6 +265,19 @@ angular.module('webadminApp')
                     '&periodsType=' + periodsType +
                     (limit?'&limit=' + limit:'') +
                     '&flat&keepSmallChunks');
+            },
+            debugFunctionUrl:function(url,getParams){
+                var delimeter = url.indexOf('?')>=0? '&':'?';
+                return proxy + url + delimeter + $.param(getParams)
+            },
+            debugFunction:function(method,url,getParams,postParams){
+                switch(method){
+                    case "GET":
+                        return $http.get(this.debugFunctionUrl(url,getParams));
+                    case "POST":
+                        return $http.post(this.debugFunctionUrl(url,getParams), postParams);
+
+                }
             }
         };
     });
