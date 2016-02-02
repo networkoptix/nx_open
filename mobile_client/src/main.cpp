@@ -31,6 +31,7 @@
 #include <nx/media/video_decoder_registry.h>
 #include <nx/media/ffmpeg_decoder.h>
 #include <nx/media/android_decoder.h>
+#include <nx/media/jpeg_decoder.h>
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
@@ -39,7 +40,7 @@
 
 #include "version.h"
 
-void initDecoders(QQuickWindow *window)
+void initDecoders()
 {
     using namespace nx::media;
 #if defined(Q_OS_ANDROID)
@@ -49,6 +50,7 @@ void initDecoders(QQuickWindow *window)
 #ifndef DISABLE_FFMPEG
     VideoDecoderRegistry::instance()->addPlugin<FfmpegDecoder>();
 #endif
+    VideoDecoderRegistry::instance()->addPlugin<JpegDecoder>();
 }
 
 int runUi(QGuiApplication *application) {
@@ -113,7 +115,7 @@ int runUi(QGuiApplication *application) {
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    initDecoders(mainWindow.data());
+    initDecoders();
 
     return application->exec();
 }

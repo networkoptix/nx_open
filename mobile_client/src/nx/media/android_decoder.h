@@ -13,7 +13,7 @@ namespace nx {
 namespace media {
 
 /*
-* This class implements ffmpeg video decoder
+* This class implements hardware android video decoder
 */
 class AndroidDecoderPrivate;
 class AndroidDecoder : public AbstractVideoDecoder

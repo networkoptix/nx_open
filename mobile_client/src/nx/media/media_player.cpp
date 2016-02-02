@@ -89,6 +89,8 @@ private:
 
     void resetLiveBufferState();
     void updateLiveBufferState(BufferState value);
+
+    QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
@@ -189,6 +191,26 @@ void PlayerPrivate::at_gotVideoFrame()
 		presentNextFrame();
 }
 
+QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame)
+{
+    if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
+        return videoFrame; //< scale isn't required
+
+    QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(videoFrame->pixelFormat());
+    videoFrame->map(QAbstractVideoBuffer::ReadOnly);
+    QImage img(
+        videoFrame->bits(),
+        videoFrame->width(),
+        videoFrame->height(),
+        videoFrame->bytesPerLine(),
+        imageFormat);
+    QVideoFrame* scaledFrame = new QVideoFrame(img.scaled(maxTextureSize, maxTextureSize, Qt::KeepAspectRatio));
+    videoFrame->unmap();
+
+    scaledFrame->setStartTime(videoFrame->startTime());
+    return QnVideoFramePtr(scaledFrame);
+}
+
 void PlayerPrivate::presentNextFrame()
 {
 	if (!videoFrameToRender)
@@ -208,8 +230,8 @@ void PlayerPrivate::presentNextFrame()
 		}
 	}
 
-	if (videoSurface && videoSurface->isActive())
-		videoSurface->present(*videoFrameToRender);
+    if (videoSurface && videoSurface->isActive())
+        videoSurface->present(*scaleFrame(videoFrameToRender));
 
     setPosition(videoFrameToRender->startTime());
 
@@ -261,8 +283,6 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
         const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
         bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < -kMaxDelayForResyncMs;
         bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
-
-        qDebug() << "live buffer length" << mediaQueueLen;
 
         if (liveMode)
         {
