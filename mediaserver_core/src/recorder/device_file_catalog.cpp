@@ -790,13 +790,12 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
     Chunk deletedChunk;
     {
         QnMutexLocker lock( &m_mutex );
-        storageIndex = m_chunks[0].storageIndex;
 
         if (m_chunks.empty())
             return deletedChunk;
-
-        if (!m_chunks.empty())
+        else
         {
+            storageIndex = m_chunks[0].storageIndex;
             delFileName = fullFileName(m_chunks[0]);
             deletedChunk = m_chunks[0];
 
