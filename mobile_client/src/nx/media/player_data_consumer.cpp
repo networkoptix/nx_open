@@ -6,8 +6,8 @@
 
 namespace 
 {
-	static const int kLiveMediaQueueLen = 20;       //< default media queue line
-	static const int kMaxDecodedVideoQueueSize = 2; //< max queue len for decoded video awaiting to be rendered
+    static const int kMaxMediaQueueLen = 90;        //< max queue length for compressed data (about 3 second)
+    static const int kMaxDecodedVideoQueueSize = 2; //< max queue length for decoded video which is awaiting to be rendered
 }
 
 namespace nx {
@@ -15,7 +15,7 @@ namespace media {
 
 
 PlayerDataConsumer::PlayerDataConsumer(const std::unique_ptr<QnArchiveStreamReader>& archiveReader):
-    QnAbstractDataConsumer(kLiveMediaQueueLen),
+    QnAbstractDataConsumer(kMaxMediaQueueLen),
     m_decoder(new SeamlessVideoDecoder()),
     m_awaitJumpCounter(0),
     m_buffering(0),
