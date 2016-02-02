@@ -43,7 +43,6 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
-    bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawBranchPrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
@@ -62,7 +61,6 @@ private:
     QnSkin *m_skin;
     QnCustomizer *m_customizer;
     QIcon m_branchClosed, m_branchOpen, m_closeTab;
-    QPixmap m_grooveBorder, m_grooveBody, m_sliderHandleHovered, m_sliderHandle;
 };
 
 

@@ -60,11 +60,6 @@ QnNoptixStyle::QnNoptixStyle(QStyle *style):
     m_branchClosed = m_skin->icon("tree/branch_closed.png");
     m_branchOpen = m_skin->icon("tree/branch_open.png");
     m_closeTab = m_skin->icon("titlebar/close_tab.png");
-
-    m_grooveBorder = m_skin->pixmap("slider/slider_groove_lborder.png");
-    m_grooveBody = m_skin->pixmap("slider/slider_groove_body.png");
-    m_sliderHandleHovered = m_skin->pixmap("slider/slider_handle_hovered.png");
-    m_sliderHandle = m_skin->pixmap("slider/slider_handle.png");
 }
 
 QnNoptixStyle::~QnNoptixStyle() {
@@ -111,10 +106,6 @@ int QnNoptixStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, c
 
 void QnNoptixStyle::drawComplexControl(ComplexControl control, const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
     switch (control) {
-    case CC_Slider:
-        if(drawSliderComplexControl(option, painter, widget))
-            return;
-        break;
     case CC_TitleBar:
         {
             /* Draw background in order to avoid painting artifacts. */
@@ -179,10 +170,6 @@ int QnNoptixStyle::styleHint(StyleHint hint, const QStyleOption *option, const Q
     switch(hint) {
     case SH_ToolTipLabel_Opacity:
         return 255;
-    case SH_Slider_AbsoluteSetButtons:
-        return Qt::LeftButton;
-    case SH_Slider_StopMouseOverSlider:
-        return true;
     default:
         return base_type::styleHint(hint, option, widget, returnData);
     }
@@ -285,66 +272,6 @@ bool QnNoptixStyle::drawItemViewItemControl(const QStyleOption *option, QPainter
     localOption->text = QString();
     base_type::drawControl(CE_ItemViewItem, option, painter, widget);
     localOption->text = text;
-    return true;
-}
-
-bool QnNoptixStyle::drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const {
-    /* Bespin's slider painting is way too slow, so we do it our way. */
-    const QStyleOptionSlider *sliderOption = qstyleoption_cast<const QStyleOptionSlider *>(option);
-    if (!sliderOption) 
-        return false;
-
-    QRect grooveRect = subControlRect(CC_Slider, option, SC_SliderGroove, widget);
-    QRect handleRect = subControlRect(CC_Slider, option, SC_SliderHandle, widget);
-
-    const bool hovered = (option->state & State_Enabled) && (option->activeSubControls & SC_SliderHandle);
-
-    QPixmap grooveBorderPic;
-    QPixmap grooveBodyPic;
-    QPixmap handlePic;
-    if(!widget) {
-        grooveBorderPic = m_grooveBorder;
-        grooveBodyPic = m_grooveBody;
-        handlePic = hovered ? m_sliderHandleHovered : m_sliderHandle;
-    } else {
-        grooveBorderPic = m_skin->pixmap("slider/slider_groove_lborder.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        grooveBodyPic = m_skin->pixmap("slider/slider_groove_body.png", grooveRect.size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        handlePic = m_skin->pixmap(hovered ? "slider/slider_handle_hovered.png" : "slider/slider_handle.png", handleRect.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    }
-
-    bool vertical = sliderOption->orientation != Qt::Horizontal;
-
-    QTransform horizontalTransform(painter->transform());
-    if (vertical){
-        int x,y,w,h;
-        sliderOption->rect.getRect(&x, &y, &w, &h);
-
-        QTransform transform(horizontalTransform);
-        painter->setTransform(transform.translate(w, 0.0).rotate(90));
-
-        grooveRect.getRect(&x, &y, &w, &h);
-        grooveRect = QRect(y, x, h, w);
-
-        handleRect.getRect(&x, &y, &w, &h);
-        handleRect = QRect(y, x, h, w);
-    }
-
-    int d = grooveRect.height();
-    painter->drawPixmap(grooveRect.adjusted(d, 0, -d, 0), grooveBodyPic, grooveBodyPic.rect());
-
-    painter->drawPixmap(QRectF(grooveRect.topLeft(), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
-    {
-        QTransform transform(painter->transform());
-        transform.translate(grooveRect.left() + grooveRect.width(), grooveRect.top()).scale(-1.0, 1.0);
-
-        QnScopedPainterTransformRollback transformRollback(painter, transform); Q_UNUSED(transformRollback)
-        painter->drawPixmap(QRectF(QPointF(0, 0), QSizeF(d, d)), grooveBorderPic, grooveBorderPic.rect());
-    }
-
-    painter->drawPixmap(handleRect, handlePic);
-    if (vertical)
-        painter->setTransform(horizontalTransform);
-
     return true;
 }
 

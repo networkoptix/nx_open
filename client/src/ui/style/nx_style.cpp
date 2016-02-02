@@ -460,52 +460,49 @@ void QnNxStyle::drawComplexControl(
         if (const QStyleOptionSlider *slider =
                 qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
-            QRect groove = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
-            QRect handle = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
+            QRect grooveRect = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
+            QRect handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
-            painter->save();
+            const bool horizontal = slider->orientation == Qt::Horizontal;
+
+            QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
+            QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
+
+            QnScopedPainterPenRollback penRollback(painter);
+            QnScopedPainterBrushRollback brushRollback(painter);
 
             if (slider->subControls.testFlag(SC_SliderGroove))
             {
-                painter->setPen(QPen(slider->palette.mid(), 1));
-                painter->setBrush(slider->palette.light());
+                painter->setPen(mainDark.darker(1));
+                painter->setBrush(QBrush(mainDark.lighter(5)));
 
-                if (slider->orientation == Qt::Horizontal)
+                painter->drawRect(grooveRect.adjusted(0, 0, -1, -1));
+
+                QRect rect = grooveRect.adjusted(1, 1, -1, -1);
+
+                int pos = sliderPositionFromValue(
+                              slider->minimum,
+                              slider->maximum,
+                              slider->sliderPosition,
+                              horizontal ? rect.width() : rect.height(),
+                              slider->upsideDown);
+
+                if (horizontal)
                 {
                     if (slider->upsideDown)
-                    {
-                        int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.width());
-                        mid = groove.width() - mid;
-                        painter->drawRect(mid, groove.y(), groove.width() - mid, groove.height());
-                        painter->setBrush(slider->palette.mid());
-                        painter->drawRect(groove.x(), groove.y(), mid, groove.height());
-                    }
+                        rect.setLeft(pos);
                     else
-                    {
-                        int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.width());
-                        painter->drawRect(groove.x(), groove.y(), mid, groove.height());
-                        painter->setBrush(slider->palette.mid());
-                        painter->drawRect(mid, groove.y(), groove.width() - mid, groove.height());
-                    }
+                        rect.setRight(pos);
                 }
                 else
                 {
                     if (slider->upsideDown)
-                    {
-                        int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.height());
-                        mid = groove.height() - mid;
-                        painter->drawRect(groove.x(), mid, groove.width(), groove.height() - mid);
-                        painter->setBrush(slider->palette.mid());
-                        painter->drawRect(groove.x(), groove.y(), groove.width(), mid);
-                    }
+                        rect.setTop(pos);
                     else
-                    {
-                        int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.height());
-                        painter->drawRect(groove.x(), groove.y(), groove.width(), mid);
-                        painter->setBrush(slider->palette.mid());
-                        painter->drawRect(groove.x(), mid, groove.width(), groove.height() - mid);
-                    }
+                        rect.setBottom(pos);
                 }
+
+                painter->fillRect(rect, mainLight);
             }
 
             if (slider->subControls.testFlag(SC_SliderTickmarks))
@@ -583,20 +580,22 @@ void QnNxStyle::drawComplexControl(
 
             if (slider->subControls.testFlag(SC_SliderHandle))
             {
-                QPen pen(slider->palette.light(), 2);
-                painter->setPen(pen);
+                QColor borderColor = mainLight;
+                QColor fillColor = mainDark;
+
+                if (option->activeSubControls.testFlag(SC_SliderHandle))
+                    borderColor = mainLight.lighter(4);
 
                 if (option->state.testFlag(State_Sunken))
-                    painter->setBrush(pen.brush());
-                else
-                    painter->setBrush(slider->palette.dark());
+                    fillColor = mainDark.lighter(3);
 
-                painter->setRenderHint(QPainter::Antialiasing);
-                painter->drawEllipse(handle.adjusted(1, 1, -1, -1));
-                painter->setRenderHint(QPainter::Antialiasing, false);
+                painter->setPen(QPen(borderColor, dp(2)));
+                painter->setBrush(QBrush(fillColor));
+
+                QnScopedPainterAntialiasingRollback rollback(painter, true);
+                painter->drawEllipse(handleRect.adjusted(1, 1, -1, -1));
             }
 
-            painter->restore();
             return;
         }
         break;
@@ -1164,38 +1163,47 @@ QRect QnNxStyle::subControlRect(
             switch (subControl)
             {
             case SC_SliderHandle:
-                if (slider->orientation == Qt::Horizontal)
                 {
-                    rect.setHeight(proxy()->pixelMetric(PM_SliderControlThickness));
-                    rect.setWidth(proxy()->pixelMetric(PM_SliderLength));
-                    int centerY = slider->rect.center().y() - rect.height() / 2;
-                    if (slider->tickPosition & QSlider::TicksAbove)
-                        centerY += tickSize;
-                    if (slider->tickPosition & QSlider::TicksBelow)
-                        centerY -= tickSize;
-                    rect.moveTop(centerY);
-                }
-                else
-                {
-                    rect.setWidth(proxy()->pixelMetric(PM_SliderControlThickness));
-                    rect.setHeight(proxy()->pixelMetric(PM_SliderLength));
-                    int centerX = slider->rect.center().x() - rect.width() / 2;
-                    if (slider->tickPosition & QSlider::TicksAbove)
-                        centerX += tickSize;
-                    if (slider->tickPosition & QSlider::TicksBelow)
-                        centerX -= tickSize;
-                    rect.moveLeft(centerX);
+                    if (slider->orientation == Qt::Horizontal)
+                    {
+                        rect.setHeight(proxy()->pixelMetric(PM_SliderControlThickness));
+                        rect.setWidth(proxy()->pixelMetric(PM_SliderLength));
+
+                        int cy = slider->rect.top() + slider->rect.height() / 2;
+
+                        if (slider->tickPosition & QSlider::TicksAbove)
+                            cy += tickSize;
+                        if (slider->tickPosition & QSlider::TicksBelow)
+                            cy -= tickSize;
+
+                        rect.moveTop(cy - rect.height() / 2);
+                    }
+                    else
+                    {
+                        rect.setWidth(proxy()->pixelMetric(PM_SliderControlThickness));
+                        rect.setHeight(proxy()->pixelMetric(PM_SliderLength));
+
+                        int cx = slider->rect.left() + slider->rect.width() / 2;
+
+                        if (slider->tickPosition & QSlider::TicksAbove)
+                            cx += tickSize;
+                        if (slider->tickPosition & QSlider::TicksBelow)
+                            cx -= tickSize;
+
+                        rect.moveLeft(cx - rect.width() / 2);
+                    }
                 }
                 break;
 
             case SC_SliderGroove:
                 {
+                    const int kGrooveWidth = dp(4);
+
                     QPoint grooveCenter = slider->rect.center();
-                    const int grooveThickness = dp(3);
 
                     if (slider->orientation == Qt::Horizontal)
                     {
-                        rect.setHeight(grooveThickness);
+                        rect.setHeight(kGrooveWidth);
                         if (slider->tickPosition & QSlider::TicksAbove)
                             grooveCenter.ry() += tickSize;
                         if (slider->tickPosition & QSlider::TicksBelow)
@@ -1203,12 +1211,13 @@ QRect QnNxStyle::subControlRect(
                     }
                     else
                     {
-                        rect.setWidth(grooveThickness);
+                        rect.setWidth(kGrooveWidth);
                         if (slider->tickPosition & QSlider::TicksAbove)
                             grooveCenter.rx() += tickSize;
                         if (slider->tickPosition & QSlider::TicksBelow)
                             grooveCenter.rx() -= tickSize;
                     }
+
                     rect.moveCenter(grooveCenter);
                 }
                 break;
@@ -1542,6 +1551,10 @@ int QnNxStyle::styleHint(
         return QFrame::NoFrame;
     case QStyle::SH_DialogButtonBox_ButtonsHaveIcons:
         return 0;
+    case SH_Slider_AbsoluteSetButtons:
+        return Qt::LeftButton;
+    case SH_Slider_StopMouseOverSlider:
+        return true;
     default:
         break;
     }
@@ -1568,6 +1581,7 @@ void QnNxStyle::polish(QWidget *widget)
         qobject_cast<QCheckBox*>(widget) ||
         qobject_cast<QRadioButton*>(widget) ||
         qobject_cast<QTabBar*>(widget) ||
+        qobject_cast<QSlider*>(widget) ||
         qobject_cast<QScrollBar*>(widget))
     {
         widget->setAttribute(Qt::WA_Hover);
