@@ -1606,7 +1606,7 @@
                         <param>
                             <name>mainPool</name>
                             <description>1 (for the main storage) or 0 (for the backup storage)</description>
-                            <optional/>
+                            <optional>false</optional>
                             <values/>
                         </param>
                     </params>
