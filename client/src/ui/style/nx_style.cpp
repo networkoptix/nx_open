@@ -17,12 +17,12 @@
 #include <private/qfont_p.h>
 #include <QtMath>
 
-#include <QDebug>
-
 #include <utils/common/scoped_painter_rollback.h>
 
-namespace {
-    qreal dpr(qreal value) {
+namespace
+{
+    qreal dpr(qreal value)
+    {
     #ifdef Q_OS_MAC
         // On mac the DPI is always 72 so we should not scale it
         return value;
@@ -32,11 +32,13 @@ namespace {
     #endif
     }
 
-    int dp(qreal value) {
+    int dp(qreal value)
+    {
         return dpr(value);
     }
 
-//    bool isDark(const QColor &color) {
+//    bool isDark(const QColor &color)
+//    {
 //        return color.toHsl().lightness() < 128;
 //    }
 
@@ -48,32 +50,37 @@ namespace {
     const int kMinimumButtonWidth = dp(80);
     const int kButtonHeight = dp(28);
 
-    enum Direction {
+    enum Direction
+    {
         Up,
         Down,
         Left,
         Right
     };
 
-    class RectCoordinates {
+    class RectCoordinates
+    {
         QRectF rect;
     public:
         RectCoordinates(const QRectF &rect) : rect(rect) {}
 
-        qreal x(qreal x) {
+        qreal x(qreal x)
+        {
             if (rect.isEmpty())
                 return 0;
             return rect.left() + rect.width() * x;
         }
 
-        qreal y(qreal y) {
+        qreal y(qreal y)
+        {
             if (rect.isEmpty())
                 return 0;
             return rect.top() + rect.height() * y;
         }
     };
 
-    void drawArrow(Direction direction, QPainter *painter, const QRectF &rect, const QColor &color) {
+    void drawArrow(Direction direction, QPainter *painter, const QRectF &rect, const QColor &color)
+    {
         QPainterPath path;
 
         QRectF arrowRect(QPointF(), QSizeF(kArrowSize, kArrowSize));
@@ -81,7 +88,8 @@ namespace {
 
         RectCoordinates rc(arrowRect);
 
-        switch (direction) {
+        switch (direction)
+        {
         case Up:
             path.moveTo(rc.x(0.0), rc.y(0.7));
             path.lineTo(rc.x(0.5), rc.y(0.2));
@@ -119,7 +127,8 @@ namespace {
         painter->restore();
     }
 
-    void drawMenuCheckMark(QPainter *painter, const QRect &rect, const QColor &color) {
+    void drawMenuCheckMark(QPainter *painter, const QRect &rect, const QColor &color)
+    {
         QRect checkRect(QPoint(), QSize(kMenuCheckSize, kMenuCheckSize));
         checkRect.moveTo(rect.left() + (rect.width() - kMenuCheckSize) / 2, rect.top() + (rect.height() - kMenuCheckSize) / 2);
 
@@ -162,50 +171,56 @@ QnPaletteColor QnNxStyle::findColor(const QColor &color) const
 }
 
 void QnNxStyle::drawPrimitive(
-        PrimitiveElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const
+        PrimitiveElement element,
+        const QStyleOption *option,
+        QPainter *painter,
+        const QWidget *widget) const
 {
     switch (element)
     {
     case PE_FrameFocusRect:
         return;
+
     case PE_PanelButtonTool:
-    case PE_PanelButtonCommand: {
-        painter->save();
-
-        const bool pressed = option->state & State_Sunken;
-        const bool hovered = option->state & State_MouseOver;
-
-        QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Button));
-
-        QColor buttonColor = mainColor;
-        QColor shadowColor = mainColor.darker(2);
-        int shadowShift = 1;
-
-        if (pressed)
+    case PE_PanelButtonCommand:
         {
-            buttonColor = mainColor.darker(1);
-            shadowShift = -1;
+            painter->save();
+
+            const bool pressed = option->state & State_Sunken;
+            const bool hovered = option->state & State_MouseOver;
+
+            QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Button));
+
+            QColor buttonColor = mainColor;
+            QColor shadowColor = mainColor.darker(2);
+            int shadowShift = 1;
+
+            if (pressed)
+            {
+                buttonColor = mainColor.darker(1);
+                shadowShift = -1;
+            }
+            else if (hovered)
+            {
+                buttonColor = mainColor.lighter(1);
+                shadowColor = mainColor.darker(1);
+            }
+
+            painter->setPen(Qt::NoPen);
+            painter->setRenderHint(QPainter::Antialiasing);
+
+            QRect rect = option->rect.adjusted(0, 0, 0, -1);
+
+            painter->setBrush(shadowColor);
+            painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
+
+            painter->setBrush(buttonColor);
+            painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
+
+            painter->restore();
         }
-        else if (hovered)
-        {
-            buttonColor = mainColor.lighter(1);
-            shadowColor = mainColor.darker(1);
-        }
-
-        painter->setPen(Qt::NoPen);
-        painter->setRenderHint(QPainter::Antialiasing);
-
-        QRect rect = option->rect.adjusted(0, 0, 0, -1);
-
-        painter->setBrush(shadowColor);
-        painter->drawRoundedRect(rect.adjusted(0, shadowShift, 0, shadowShift), 2, 2);
-
-        painter->setBrush(buttonColor);
-        painter->drawRoundedRect(rect.adjusted(0, qMax(0, -shadowShift), 0, 0), 2, 2);
-
-        painter->restore();
         return;
-    }
+
     case PE_PanelLineEdit:
     case PE_FrameLineEdit:
         {
@@ -241,10 +256,12 @@ void QnNxStyle::drawPrimitive(
             }
 
             painter->restore();
-            return;
         }
+        return;
+
     case PE_FrameGroupBox:
         return;
+
     case PE_IndicatorCheckBox:
         {
             painter->save();
@@ -293,8 +310,9 @@ void QnNxStyle::drawPrimitive(
             }
 
             painter->restore();
-            return;
         }
+        return;
+
     case PE_IndicatorRadioButton:
         {
             painter->save();
@@ -322,10 +340,13 @@ void QnNxStyle::drawPrimitive(
             }
 
             painter->restore();
-            return;
         }
-    case PE_FrameTabBarBase: {
-        if (const QStyleOptionTabBarBase *tabBar = qstyleoption_cast<const QStyleOptionTabBarBase*>(option)) {
+        return;
+
+    case PE_FrameTabBarBase:
+        if (const QStyleOptionTabBarBase *tabBar =
+                qstyleoption_cast<const QStyleOptionTabBarBase*>(option))
+        {
             QnPaletteColor mainColor = findColor(option->palette.color(QPalette::Window)).lighter(2);
 
             QRect rect = tabBar->tabBarRect;
@@ -337,29 +358,33 @@ void QnNxStyle::drawPrimitive(
             painter->setPen(mainColor.darker(1));
             painter->drawLine(rect.topLeft(), rect.topRight());
             painter->restore();
+
             return;
         }
         break;
-    }
+
     case PE_FrameTabWidget:
         return;
+
     case PE_PanelMenu:
-    {
-        const int radius = dp(3);
-        QnPaletteColor backgroundColor = findColor(option->palette.color(QPalette::Window));
-        painter->save();
+        {
+            const int radius = dp(3);
+            QnPaletteColor backgroundColor = findColor(option->palette.color(QPalette::Window));
+            painter->save();
 
-        painter->setPen(backgroundColor.darker(3));
-        painter->setBrush(QBrush(backgroundColor));
-        painter->setRenderHint(QPainter::Antialiasing);
+            painter->setPen(backgroundColor.darker(3));
+            painter->setBrush(QBrush(backgroundColor));
+            painter->setRenderHint(QPainter::Antialiasing);
 
-        painter->drawRoundedRect(option->rect, radius, radius);
+            painter->drawRoundedRect(option->rect, radius, radius);
 
-        painter->restore();
+            painter->restore();
+        }
         return;
-    }
+
     case PE_FrameMenu:
         return;
+
     default:
         break;
     }
@@ -376,7 +401,8 @@ void QnNxStyle::drawComplexControl(
     switch (control)
     {
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox *>(option))
+        if (const QStyleOptionComboBox *comboBox =
+             qstyleoption_cast<const QStyleOptionComboBox *>(option))
         {
             painter->save();
 
@@ -429,37 +455,51 @@ void QnNxStyle::drawComplexControl(
             return;
         }
         break;
+
     case CC_Slider:
-        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+        if (const QStyleOptionSlider *slider =
+                qstyleoption_cast<const QStyleOptionSlider*>(option))
+        {
             QRect groove = proxy()->subControlRect(CC_Slider, option, SC_SliderGroove, widget);
             QRect handle = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             painter->save();
 
-            if (slider->subControls.testFlag(SC_SliderGroove)) {
+            if (slider->subControls.testFlag(SC_SliderGroove))
+            {
                 painter->setPen(QPen(slider->palette.mid(), 1));
                 painter->setBrush(slider->palette.light());
-                if (slider->orientation == Qt::Horizontal) {
-                    if (slider->upsideDown) {
+
+                if (slider->orientation == Qt::Horizontal)
+                {
+                    if (slider->upsideDown)
+                    {
                         int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.width());
                         mid = groove.width() - mid;
                         painter->drawRect(mid, groove.y(), groove.width() - mid, groove.height());
                         painter->setBrush(slider->palette.mid());
                         painter->drawRect(groove.x(), groove.y(), mid, groove.height());
-                    } else {
+                    }
+                    else
+                    {
                         int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.width());
                         painter->drawRect(groove.x(), groove.y(), mid, groove.height());
                         painter->setBrush(slider->palette.mid());
                         painter->drawRect(mid, groove.y(), groove.width() - mid, groove.height());
                     }
-                } else {
-                    if (slider->upsideDown) {
+                }
+                else
+                {
+                    if (slider->upsideDown)
+                    {
                         int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.height());
                         mid = groove.height() - mid;
                         painter->drawRect(groove.x(), mid, groove.width(), groove.height() - mid);
                         painter->setBrush(slider->palette.mid());
                         painter->drawRect(groove.x(), groove.y(), groove.width(), mid);
-                    } else {
+                    }
+                    else
+                    {
                         int mid = sliderPositionFromValue(slider->minimum, slider->maximum, slider->sliderPosition, slider->rect.height());
                         painter->drawRect(groove.x(), groove.y(), groove.width(), mid);
                         painter->setBrush(slider->palette.mid());
@@ -468,7 +508,8 @@ void QnNxStyle::drawComplexControl(
                 }
             }
 
-            if (slider->subControls.testFlag(SC_SliderTickmarks)) {
+            if (slider->subControls.testFlag(SC_SliderTickmarks))
+            {
                 bool horizontal = slider->orientation == Qt::Horizontal;
                 bool ticksAbove = slider->tickPosition & QSlider::TicksAbove;
                 bool ticksBelow = slider->tickPosition & QSlider::TicksBelow;
@@ -477,8 +518,11 @@ void QnNxStyle::drawComplexControl(
                 int tickSize = proxy()->pixelMetric(PM_SliderTickmarkOffset, option, widget);
                 int available = proxy()->pixelMetric(PM_SliderSpaceAvailable, slider, widget);
                 int interval = slider->tickInterval;
-                if (interval <= 0) {
+
+                if (interval <= 0)
+                {
                     interval = slider->singleStep;
+
                     if (QStyle::sliderPositionFromValue(slider->minimum, slider->maximum, interval, available) -
                         QStyle::sliderPositionFromValue(slider->minimum, slider->maximum, 0, available) < 3)
                     {
@@ -490,9 +534,12 @@ void QnNxStyle::drawComplexControl(
 
                 int v = slider->minimum;
                 int len = proxy()->pixelMetric(PM_SliderLength, slider, widget);
-                while (v <= slider->maximum + 1) {
+
+                while (v <= slider->maximum + 1)
+                {
                     if (v == slider->maximum + 1 && interval == 1)
                         break;
+
                     const int v_ = qMin(v, slider->maximum);
                     int pos = sliderPositionFromValue(slider->minimum, slider->maximum,
                                                       v_, (horizontal
@@ -501,21 +548,26 @@ void QnNxStyle::drawComplexControl(
                                                       slider->upsideDown) + len / 2;
                     const int extra = 2;
 
-                    if (horizontal) {
-                        if (ticksAbove) {
+                    if (horizontal)
+                    {
+                        if (ticksAbove)
+                        {
                             painter->drawLine(pos, slider->rect.top() + extra,
                                               pos, slider->rect.top() + tickSize);
                         }
-                        if (ticksBelow) {
+                        if (ticksBelow)
+                        {
                             painter->drawLine(pos, slider->rect.bottom() - extra,
                                               pos, slider->rect.bottom() - tickSize);
                         }
                     } else {
-                        if (ticksAbove) {
+                        if (ticksAbove)
+                        {
                             painter->drawLine(slider->rect.left() + extra, pos,
                                               slider->rect.left() + tickSize, pos);
                         }
-                        if (ticksBelow) {
+                        if (ticksBelow)
+                        {
                             painter->drawLine(slider->rect.right() - extra, pos,
                                               slider->rect.right() - tickSize, pos);
                         }
@@ -529,9 +581,11 @@ void QnNxStyle::drawComplexControl(
                 }
             }
 
-            if (slider->subControls.testFlag(SC_SliderHandle)) {
+            if (slider->subControls.testFlag(SC_SliderHandle))
+            {
                 QPen pen(slider->palette.light(), 2);
                 painter->setPen(pen);
+
                 if (option->state.testFlag(State_Sunken))
                     painter->setBrush(pen.brush());
                 else
@@ -546,8 +600,10 @@ void QnNxStyle::drawComplexControl(
             return;
         }
         break;
+
     case CC_GroupBox:
-        if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
+        if (const QStyleOptionGroupBox *groupBox =
+                qstyleoption_cast<const QStyleOptionGroupBox*>(option))
         {
             painter->save();
 
@@ -615,8 +671,10 @@ void QnNxStyle::drawComplexControl(
             return;
         }
         break;
+
     case CC_SpinBox:
-        if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option))
+        if (const QStyleOptionSpinBox *spinBox =
+                qstyleoption_cast<const QStyleOptionSpinBox*>(option))
         {
             if (option->subControls & SC_SpinBoxFrame)
                 proxy()->drawPrimitive(PE_PanelLineEdit, option, painter, widget);
@@ -631,8 +689,10 @@ void QnNxStyle::drawComplexControl(
             return;
         }
         break;
+
     case CC_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (const QStyleOptionSlider *scrollBar =
+                qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
             QRect scrollBarSlider = proxy()->subControlRect(control, scrollBar, SC_ScrollBarSlider, widget);
             QRect scrollBarGroove = proxy()->subControlRect(control, scrollBar, SC_ScrollBarGroove, widget);
@@ -663,6 +723,7 @@ void QnNxStyle::drawComplexControl(
             return;
         }
         break;
+
     default:
         break;
     }
@@ -670,11 +731,17 @@ void QnNxStyle::drawComplexControl(
     base_type::drawComplexControl(control, option, painter, widget);
 }
 
-void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, QPainter *painter, const QWidget *widget) const {
+void QnNxStyle::drawControl(
+        ControlElement element,
+        const QStyleOption *option,
+        QPainter *painter,
+        const QWidget *widget) const
+{
     switch (element)
     {
     case CE_ShapedFrame:
-        if (const QStyleOptionFrame *frame = qstyleoption_cast<const QStyleOptionFrame *>(option))
+        if (const QStyleOptionFrame *frame =
+                qstyleoption_cast<const QStyleOptionFrame *>(option))
         {
             switch (frame->frameShape)
             {
@@ -708,24 +775,30 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
                     }
 
                     painter->restore();
-                    return;
                 }
+                return;
+
             default:
                 break;
             }
         }
         break;
+
     case CE_ComboBoxLabel:
-        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
+        if (const QStyleOptionComboBox *comboBox =
+                qstyleoption_cast<const QStyleOptionComboBox*>(option))
+        {
             QStyleOptionComboBox opt = *comboBox;
             opt.rect.setLeft(opt.rect.left() + dp(6));
             base_type::drawControl(element, &opt, painter, widget);
             return;
         }
         break;
+
     case CE_CheckBox:
     case CE_RadioButton:
-        if (const QStyleOptionButton *button = qstyleoption_cast<const QStyleOptionButton*>(option))
+        if (const QStyleOptionButton *button =
+                qstyleoption_cast<const QStyleOptionButton*>(option))
         {
             QStyleOptionButton opt = *button;
 
@@ -751,8 +824,10 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             return;
         }
         break;
+
     case CE_TabBarTabShape:
-        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+        if (const QStyleOptionTab *tab =
+                qstyleoption_cast<const QStyleOptionTab*>(option))
         {
             switch (tab->shape)
             {
@@ -771,13 +846,16 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
                     painter->restore();
                 }
                 return;
+
             default:
                 break;
             }
         }
         break;
+
     case CE_TabBarTabLabel:
-        if (const QStyleOptionTab *tab = qstyleoption_cast<const QStyleOptionTab*>(option))
+        if (const QStyleOptionTab *tab =
+                qstyleoption_cast<const QStyleOptionTab*>(option))
         {
             painter->save();
 
@@ -817,10 +895,12 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
                          tab->palette, tab->state & QStyle::State_Enabled, tab->text);
 
             painter->restore();
-            return;
         }
+        return;
+
     case CE_HeaderSection:
-        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader*>(option))
+        if (const QStyleOptionHeader *header =
+                qstyleoption_cast<const QStyleOptionHeader*>(option))
         {
             painter->fillRect(header->rect, header->palette.window());
 
@@ -834,14 +914,19 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             return;
         }
         break;
+
     case CE_HeaderEmptyArea:
-        if (const QStyleOptionHeader *header = qstyleoption_cast<const QStyleOptionHeader*>(option)) {
+        if (const QStyleOptionHeader *header =
+                qstyleoption_cast<const QStyleOptionHeader*>(option))
+        {
             painter->fillRect(header->rect, header->palette.window());
             return;
         }
         break;
+
     case CE_MenuItem:
-        if (const QStyleOptionMenuItem *menuItem = qstyleoption_cast<const QStyleOptionMenuItem*>(option))
+        if (const QStyleOptionMenuItem *menuItem =
+                qstyleoption_cast<const QStyleOptionMenuItem*>(option))
         {
             if (menuItem->menuItemType == QStyleOptionMenuItem::Separator)
             {
@@ -928,7 +1013,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
 
     case CE_ProgressBarGroove:
         if (const QStyleOptionProgressBar *progressBar =
-            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
         {
             QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Shadow));
 
@@ -950,7 +1035,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
 
     case CE_ProgressBarContents:
         if (const QStyleOptionProgressBar *progressBar =
-            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
         {
             QRect rect = progressBar->rect;
             QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Highlight));
@@ -993,7 +1078,7 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
 
     case CE_ProgressBarLabel:
         if (const QStyleOptionProgressBar *progressBar =
-            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
         {
             if (!progressBar->textVisible || progressBar->text.isEmpty())
                 return;
@@ -1060,16 +1145,27 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
     base_type::drawControl(element, option, painter, widget);
 }
 
-QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComplex *option, SubControl subControl, const QWidget *widget) const {
+QRect QnNxStyle::subControlRect(
+        ComplexControl control,
+        const QStyleOptionComplex *option,
+        SubControl subControl,
+        const QWidget *widget) const
+{
     QRect rect = base_type::subControlRect(control, option, subControl, widget);
 
-    switch (control) {
+    switch (control)
+    {
     case CC_Slider:
-        if (const QStyleOptionSlider *slider = qstyleoption_cast<const QStyleOptionSlider*>(option)) {
+        if (const QStyleOptionSlider *slider =
+            qstyleoption_cast<const QStyleOptionSlider*>(option))
+        {
             int tickSize = proxy()->pixelMetric(PM_SliderTickmarkOffset, option, widget);
-            switch (subControl) {
-            case SC_SliderHandle: {
-                if (slider->orientation == Qt::Horizontal) {
+
+            switch (subControl)
+            {
+            case SC_SliderHandle:
+                if (slider->orientation == Qt::Horizontal)
+                {
                     rect.setHeight(proxy()->pixelMetric(PM_SliderControlThickness));
                     rect.setWidth(proxy()->pixelMetric(PM_SliderLength));
                     int centerY = slider->rect.center().y() - rect.height() / 2;
@@ -1078,7 +1174,9 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
                     if (slider->tickPosition & QSlider::TicksBelow)
                         centerY -= tickSize;
                     rect.moveTop(centerY);
-                } else {
+                }
+                else
+                {
                     rect.setWidth(proxy()->pixelMetric(PM_SliderControlThickness));
                     rect.setHeight(proxy()->pixelMetric(PM_SliderLength));
                     int centerX = slider->rect.center().x() - rect.width() / 2;
@@ -1089,96 +1187,125 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
                     rect.moveLeft(centerX);
                 }
                 break;
-            }
-            case SC_SliderGroove: {
-                QPoint grooveCenter = slider->rect.center();
-                const int grooveThickness = dp(3);
-                if (slider->orientation == Qt::Horizontal) {
-                    rect.setHeight(grooveThickness);
-                    if (slider->tickPosition & QSlider::TicksAbove)
-                        grooveCenter.ry() += tickSize;
-                    if (slider->tickPosition & QSlider::TicksBelow)
-                        grooveCenter.ry() -= tickSize;
-                } else {
-                    rect.setWidth(grooveThickness);
-                    if (slider->tickPosition & QSlider::TicksAbove)
-                        grooveCenter.rx() += tickSize;
-                    if (slider->tickPosition & QSlider::TicksBelow)
-                        grooveCenter.rx() -= tickSize;
+
+            case SC_SliderGroove:
+                {
+                    QPoint grooveCenter = slider->rect.center();
+                    const int grooveThickness = dp(3);
+
+                    if (slider->orientation == Qt::Horizontal)
+                    {
+                        rect.setHeight(grooveThickness);
+                        if (slider->tickPosition & QSlider::TicksAbove)
+                            grooveCenter.ry() += tickSize;
+                        if (slider->tickPosition & QSlider::TicksBelow)
+                            grooveCenter.ry() -= tickSize;
+                    }
+                    else
+                    {
+                        rect.setWidth(grooveThickness);
+                        if (slider->tickPosition & QSlider::TicksAbove)
+                            grooveCenter.rx() += tickSize;
+                        if (slider->tickPosition & QSlider::TicksBelow)
+                            grooveCenter.rx() -= tickSize;
+                    }
+                    rect.moveCenter(grooveCenter);
                 }
-                rect.moveCenter(grooveCenter);
                 break;
-            }
+
             default:
                 break;
             }
         }
         break;
+
     case CC_ComboBox:
-        if (const QStyleOptionComboBox *comboBox = qstyleoption_cast<const QStyleOptionComboBox*>(option)) {
-            switch (subControl) {
-            case SC_ComboBoxArrow: {
+        if (const QStyleOptionComboBox *comboBox =
+                qstyleoption_cast<const QStyleOptionComboBox*>(option))
+        {
+            switch (subControl)
+            {
+            case SC_ComboBoxArrow:
                 rect = QRect(comboBox->rect.right() - comboBox->rect.height(), 0,
                              comboBox->rect.height(), comboBox->rect.height());
                 rect.adjust(0, 1, 0, -1);
                 break;
-            }
-            case SC_ComboBoxEditField: {
-                int frameWidth = pixelMetric(PM_ComboBoxFrameWidth, option, widget);
-                rect = comboBox->rect;
-                rect.setRight(rect.right() - rect.height());
-                rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+
+            case SC_ComboBoxEditField:
+                {
+                    int frameWidth = pixelMetric(PM_ComboBoxFrameWidth, option, widget);
+                    rect = comboBox->rect;
+                    rect.setRight(rect.right() - rect.height());
+                    rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+                }
                 break;
-            }
+
             default:
                 break;
             }
         }
         break;
+
     case CC_SpinBox:
-        if (const QStyleOptionSpinBox *spinBox = qstyleoption_cast<const QStyleOptionSpinBox*>(option)) {
-            switch (subControl) {
-            case SC_SpinBoxEditField: {
-                int frameWidth = pixelMetric(PM_SpinBoxFrameWidth, option, widget);
-                int buttonWidth = subControlRect(control, option, SC_SpinBoxDown, widget).width();
-                rect = spinBox->rect;
-                rect.setRight(rect.right() - buttonWidth);
-                rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+        if (const QStyleOptionSpinBox *spinBox =
+                qstyleoption_cast<const QStyleOptionSpinBox*>(option))
+        {
+            switch (subControl)
+            {
+            case SC_SpinBoxEditField:
+                {
+                    int frameWidth = pixelMetric(PM_SpinBoxFrameWidth, option, widget);
+                    int buttonWidth = subControlRect(control, option, SC_SpinBoxDown, widget).width();
+                    rect = spinBox->rect;
+                    rect.setRight(rect.right() - buttonWidth);
+                    rect.adjust(frameWidth, frameWidth, 0, -frameWidth);
+                }
                 break;
-            }
+
             default:
                 break;
             }
         }
         break;
+
     case CC_GroupBox:
-        if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option)) {
-            switch (subControl) {
+        if (const QStyleOptionGroupBox *groupBox =
+                qstyleoption_cast<const QStyleOptionGroupBox*>(option))
+        {
+            switch (subControl)
+            {
             case SC_GroupBoxFrame:
-                if (groupBox->features & QStyleOptionFrame::Flat) {
+                if (groupBox->features & QStyleOptionFrame::Flat)
+                {
                     QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                     rect.setTop(labelRect.bottom() + dp(8));
                 }
                 break;
+
             case SC_GroupBoxLabel:
-                if (!(groupBox->features & QStyleOptionFrame::Flat)) {
+                if (!(groupBox->features & QStyleOptionFrame::Flat))
+                {
                     rect.moveLeft(dp(16));
                 }
                 break;
-            case SC_GroupBoxContents: {
-                if (groupBox->features & QStyleOptionFrame::Flat) {
+
+            case SC_GroupBoxContents:
+                if (groupBox->features & QStyleOptionFrame::Flat)
+                {
                     QRect labelRect = subControlRect(CC_GroupBox, option, SC_GroupBoxLabel, widget);
                     rect.setTop(labelRect.bottom() + dp(24));
                 }
                 break;
-            }
+
             default:
                 break;
             }
         }
         break;
+
     case CC_ScrollBar:
-        if (const QStyleOptionSlider *scrollBar = qstyleoption_cast<const QStyleOptionSlider*>(option))
+        if (const QStyleOptionSlider *scrollBar =
+                qstyleoption_cast<const QStyleOptionSlider*>(option))
         {
             const int w = pixelMetric(PM_ScrollBarExtent, option, widget);
 
@@ -1190,38 +1317,45 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
                 else
                     rect.setLeft(rect.right());
                 break;
+
             case SC_ScrollBarSubLine:
                 if (scrollBar->orientation == Qt::Vertical)
                     rect.setBottom(rect.top());
                 else
                     rect.setRight(rect.left());
                 break;
+
             case SC_ScrollBarGroove:
                 rect = widget->rect();
                 break;
+
             case SC_ScrollBarSlider:
                 if (scrollBar->orientation == Qt::Vertical)
                     rect.adjust(0, -w, 0, w);
                 else
                     rect.adjust(-w, 0, w, 0);
                 break;
+
             case SC_ScrollBarAddPage:
                 if (scrollBar->orientation == Qt::Vertical)
                     rect.adjust(0, w, 0, 0);
                 else
                     rect.adjust(w, 0, 0, 0);
                 break;
+
             case SC_ScrollBarSubPage:
                 if (scrollBar->orientation == Qt::Vertical)
                     rect.adjust(0, 0, 0, -w);
                 else
                     rect.adjust(0, 0, -w, 0);
                 break;
+
             default:
                 break;
             }
         }
         break;
+
     default:
         break;
     }
@@ -1302,8 +1436,13 @@ QRect QnNxStyle::subElementRect(
     return base_type::subElementRect(subElement, option, widget);
 }
 
-int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {
-    switch (metric) {
+int QnNxStyle::pixelMetric(
+        PixelMetric metric,
+        const QStyleOption *option,
+        const QWidget *widget) const
+{
+    switch (metric)
+    {
     case PM_ButtonMargin:
         return dp(10);
     case PM_ButtonShiftVertical:
@@ -1347,8 +1486,14 @@ int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const
     return base_type::pixelMetric(metric, option, widget);
 }
 
-QSize QnNxStyle::sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const {
-    switch (type) {
+QSize QnNxStyle::sizeFromContents(
+        ContentsType type,
+        const QStyleOption *option,
+        const QSize &size,
+        const QWidget *widget) const
+{
+    switch (type)
+    {
     case CT_PushButton:
         return QSize(qMax(kMinimumButtonWidth, size.width() + 2 * pixelMetric(PM_ButtonMargin, option, widget)), qMax(size.height(), kButtonHeight));
     case CT_LineEdit:
@@ -1371,16 +1516,25 @@ QSize QnNxStyle::sizeFromContents(ContentsType type, const QStyleOption *option,
     return base_type::sizeFromContents(type, option, size, widget);
 }
 
-int QnNxStyle::styleHint(StyleHint sh, const QStyleOption *option, const QWidget *widget, QStyleHintReturn *shret) const {
-    switch (sh) {
+int QnNxStyle::styleHint(
+        StyleHint sh,
+        const QStyleOption *option,
+        const QWidget *widget,
+        QStyleHintReturn *shret) const
+{
+    switch (sh)
+    {
     case SH_GroupBox_TextLabelColor:
-        if (const QStyleOptionGroupBox *groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option)) {
+        if (const QStyleOptionGroupBox *groupBox =
+                qstyleoption_cast<const QStyleOptionGroupBox*>(option))
+        {
             if (groupBox->features & QStyleOptionFrame::Flat)
                 return (int)groupBox->palette.color(QPalette::Text).rgba();
             else
                 return (int)groupBox->palette.color(QPalette::WindowText).rgba();
         }
         break;
+
     case SH_Menu_MouseTracking:
     case SH_ComboBox_ListMouseTracking:
         return 1;
@@ -1428,7 +1582,8 @@ void QnNxStyle::polish(QWidget *widget)
     }
 }
 
-void QnNxStyle::unpolish(QWidget *widget) {
+void QnNxStyle::unpolish(QWidget *widget)
+{
     if (qobject_cast<QAbstractButton*>(widget)
         || qobject_cast<QTabBar*>(widget))
     {
