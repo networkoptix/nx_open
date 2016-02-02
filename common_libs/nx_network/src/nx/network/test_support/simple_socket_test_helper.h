@@ -2,6 +2,8 @@
 #ifndef SIMPLE_SOCKET_TEST_HELPER_H
 #define SIMPLE_SOCKET_TEST_HELPER_H
 
+#include <boost/optional.hpp>
+
 #include <utils/thread/sync_queue.h>
 #include <utils/common/systemerror.h>
 #include <utils/common/stoppable.h>
@@ -29,7 +31,7 @@ void syncSocketServerMainFunc(
     const SocketAddress& endpointToBindTo,
     const boost::optional<QByteArray> testMessage,
     int clientCount,
-    const ServerSocketMaker& serverMaker)
+    ServerSocketMaker serverMaker)
 {
     auto server = serverMaker();
     ASSERT_TRUE(server->setReuseAddrFlag(true));
@@ -269,7 +271,7 @@ void socketSimpleTrueAsync(
 {
     nx::SyncQueue<bool> stopQueue;
     socketSimpleAsync<ServerSocketMaker, ClientSocketMaker>(
-        serverMaker, clientMaker, serverAddress, testMessage, clientCount,
+        serverMaker, clientMaker, serverAddress, serverAddress, testMessage, clientCount,
         [&](std::unique_ptr<QnStoppableAsync> socket)
         {
             QnStoppableAsync::pleaseStop([&](){ stopQueue.push(true); },
