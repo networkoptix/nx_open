@@ -21,7 +21,7 @@ namespace media {
 namespace {
     static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
     static const qint64 kLivePosition = -1;
-    static const int kMaxDelayForResyncMs = 30;  //< resync playback timer if video frame late
+    static const int kMaxDelayForResyncMs = 500; //< resync playback timer if video frame too late
     static const int kInitialLiveBufferMs = 200; //< initial duration for live buffer
     static const int kMaxLiveBufferMs = 1200;    //< maximum duration for live buffer. Live buffer can be extended dynamically
     static const qreal kLiveBufferStep = 2.0;    //< increate live buffer at N times if overflow/underflow issues
@@ -263,7 +263,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
     else
         return;
 
-    if (underflowCounter >= kMaxCounterForWrongLiveBuffer && overflowCounter >= kMaxCounterForWrongLiveBuffer)
+    if (underflowCounter + overflowCounter >= kMaxCounterForWrongLiveBuffer)
         liveBufferMs = qMin(liveBufferMs * kLiveBufferStep, kMaxLiveBufferMs); //< too much underflow/overflow issues. extend live buffer
 }
 
@@ -282,7 +282,7 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
         // Calculate time to present next frame
         qint64 mediaQueueLen = usecToMsec(dataConsumer->lastMediaTimeUsec()) - pts;
         const int frameDelayMs = pts - ptsTimerBase - ptsTimer.elapsed();
-        bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < -kMaxDelayForResyncMs;
+        bool liveBufferUnderflow = liveMode && lastVideoPts.is_initialized() && mediaQueueLen == 0 && frameDelayMs < 0;
         bool liveBufferOverflow = liveMode && mediaQueueLen > liveBufferMs;
 
         if (liveMode)
@@ -302,6 +302,7 @@ qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
             metadata.noDelay                                                 ||  //< jump occurred
             pts < lastSeekTimeMs                                             ||  //< 'coarse' frame. Frame time is less than required jump pos
             frameDelayMs < -kMaxDelayForResyncMs                             ||  //< resync because of video frame is late more than threshold
+            liveBufferUnderflow                                              ||
             liveBufferOverflow                                                   //< live buffer overflow
             )
 		{
