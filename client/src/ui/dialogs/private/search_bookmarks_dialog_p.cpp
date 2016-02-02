@@ -311,7 +311,6 @@ void QnSearchBookmarksDialogPrivate::openInNewLayoutHandler()
     setFirstLayoutItemPeriod(extendedWindow, Qn::ItemSliderWindowRole);
 
     menu()->trigger(Qn::BookmarksModeAction);
-    m_owner->close();
 }
 
 void QnSearchBookmarksDialogPrivate::exportBookmarkHandler()
@@ -321,8 +320,7 @@ void QnSearchBookmarksDialogPrivate::exportBookmarkHandler()
     if (!fillActionParameters(params, window))
         return;
 
-    if (menu()->canTrigger(Qn::ExportTimeSelectionAction, params))
-        menu()->trigger(Qn::ExportTimeSelectionAction, params);
+    menu()->triggerIfPossible(Qn::ExportTimeSelectionAction, params);
 }
 
 void QnSearchBookmarksDialogPrivate::updateHeadersWidth()
