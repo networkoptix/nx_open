@@ -44,11 +44,6 @@ void QnMutex::unlock()
     m_impl->mutex.unlock();
 }
 
-bool QnMutex::try_lock()
-{
-    return tryLock();
-}
-
 bool QnMutex::tryLock()
 {
     if( m_impl->mutex.tryLock() )

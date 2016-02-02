@@ -966,7 +966,8 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnRecordingStatsData bitrateStats; // temp stats for virtual bitrate calculation
     qint64 archiveStartTimeMs = -1;
     qint64 bitrateThreshold = DATETIME_NOW;
-    std::lock(catalogHi->m_mutex, catalogLow->m_mutex);
+    QnMutexLocker lock1(&catalogHi->m_mutex);
+    QnMutexLocker lock2(&catalogLow->m_mutex);
 
     if (catalogHi && !catalogHi->m_chunks.empty()) {
         archiveStartTimeMs = catalogHi->m_chunks[0].startTimeMs;
