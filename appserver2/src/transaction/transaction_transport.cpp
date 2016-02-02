@@ -35,8 +35,10 @@
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
-//#define USE_JSON
+#define USE_JSON
+#ifndef USE_JSON
 #define ENCODE_TO_BASE64
+#endif
 //#define PIPELINE_POST_REQUESTS
 
 
