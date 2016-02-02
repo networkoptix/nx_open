@@ -632,12 +632,13 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
+            bool stillHaveThisStorage;
             {
                 QnMutexLocker lk(&m_mutexStorages);
-                bool stillHaveThisStorage = hasStorageUnsafe(storage);
+                stillHaveThisStorage = hasStorageUnsafe(storage);
+            }
                 if (!m_rebuildCancelled && stillHaveThisStorage)
                     replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
-            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
