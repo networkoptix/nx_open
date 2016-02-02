@@ -129,6 +129,12 @@ TEST(CloudStreamSocket, simple_socket_test)
         serverAddress,
         SocketAddress(tempHostName));
 
+    test::shutdownSocket(
+        createServerSocketFunc,
+        createClientSocketFunc,
+        serverAddress,
+        SocketAddress(tempHostName));
+
     nx::network::SocketGlobals::addressResolver().removeFixedAddress(
         tempHostName,
         serverAddress);
@@ -158,7 +164,7 @@ TEST(CloudStreamSocket, cancellation)
         CloudStreamSocket cloudSocket;
         cloudSocket.connectAsync(
             SocketAddress(tempHostName),
-            [](SystemError::ErrorCode code){});
+            [](SystemError::ErrorCode /*code*/){});
         cloudSocket.cancelIOSync(aio::etNone);
     }
 

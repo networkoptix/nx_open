@@ -15,7 +15,9 @@ namespace cloud {
 
 CloudStreamSocket::CloudStreamSocket()
 :
-    m_aioThreadBinder(SocketFactory::createDatagramSocket())
+    m_aioThreadBinder(SocketFactory::createDatagramSocket()),
+    m_recvPromisePtr(nullptr),
+    m_sendPromisePtr(nullptr)
 {
     //getAioThread binds to an aio thread
     m_socketAttributes.aioThread = m_aioThreadBinder->getAioThread();
@@ -27,7 +29,8 @@ CloudStreamSocket::~CloudStreamSocket()
 
 bool CloudStreamSocket::bind(const SocketAddress& localAddress)
 {
-    //TODO #ak 
+    //TODO #ak just ignoring for now. 
+        //Usually, we do not care about exact port on tcp client socket
     return true;
 }
 
@@ -55,7 +58,25 @@ bool CloudStreamSocket::isClosed() const
 
 void CloudStreamSocket::shutdown()
 {
-    //TODO #ak interrupting blocking calls
+    //interrupting blocking calls
+    pleaseStop(
+        [this](){
+            if (m_recvPromisePtr.load())
+            {
+                m_recvPromisePtr.load()->set_value(
+                    std::make_pair(SystemError::interrupted, 0));
+                m_recvPromisePtr.store(nullptr);
+            }
+
+            if (m_sendPromisePtr.load())
+            {
+                m_sendPromisePtr.load()->set_value(
+                    std::make_pair(SystemError::interrupted, 0));
+                m_sendPromisePtr.store(nullptr);
+            }
+        });
+    if (m_socketDelegate)
+        m_socketDelegate->shutdown();
 }
 
 AbstractSocket::SOCKET_HANDLE CloudStreamSocket::handle() const
@@ -108,7 +129,7 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     int totallyRead = 0;
     do
     {
-        //TODO #ak timeout is processed incorrectly since it applies to every recvImpl call
+        //TODO #ak (#CLOUD-209) timeout is processed incorrectly since it is applied to every recvImpl call
 
         const auto lastRead = recvImpl(&tmpBuffer);
         if (lastRead <= 0)
@@ -128,13 +149,17 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
     nx::Buffer sendBuffer = nx::Buffer::fromRawData(
         static_cast<const char*>(buffer),
         bufferLen);
+    m_sendPromisePtr.store(&promise);
     sendAsync(
         sendBuffer,
         [&promise, this](SystemError::ErrorCode code, size_t size)
         {
-            m_aioThreadBinder->post([code, size, &promise]() {
-                promise.set_value(std::make_pair(code, size));
-            });
+            m_aioThreadBinder->post(
+                [this, code, size, &promise]()
+                {
+                    promise.set_value(std::make_pair(code, size));
+                    m_sendPromisePtr.store(nullptr);
+                });
         });
 
     //sendAsync handles timeout properly
@@ -191,9 +216,11 @@ void CloudStreamSocket::cancelIOAsync(
 
 void CloudStreamSocket::cancelIOSync(aio::EventType eventType)
 {
-    //TODO #ak this implementation looks buggy
     if (eventType == aio::etWrite || eventType == aio::etNone)
+    {
         m_asyncConnectGuard->terminate(); // breaks outgoing connects
+        nx::network::SocketGlobals::addressResolver().cancel(this);
+    }
     m_aioThreadBinder->cancelIOSync(eventType);
     if (m_socketDelegate)
         m_socketDelegate->cancelIOSync(eventType);
@@ -360,13 +387,17 @@ bool CloudStreamSocket::startAsyncConnect(
 int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
 {
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    m_recvPromisePtr.store(&promise);
     readSomeAsync(
         buf,
         [this, &promise](SystemError::ErrorCode code, size_t size)
         {
-            m_aioThreadBinder->post([code, size, &promise]() {
-                promise.set_value(std::make_pair(code, size));
-            });
+            m_aioThreadBinder->post(
+                [this, code, size, &promise]()
+                {
+                    promise.set_value(std::make_pair(code, size));
+                    m_recvPromisePtr.store(nullptr);
+                });
         });
 
     auto result = promise.get_future().get();

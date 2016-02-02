@@ -24,6 +24,49 @@ const std::chrono::milliseconds kTestTimeout(500);
 
 }
 
+template<typename ServerSocketMaker>
+void syncSocketServerMainFunc(
+    const SocketAddress& endpointToBindTo,
+    const boost::optional<QByteArray> testMessage,
+    int clientCount,
+    const ServerSocketMaker& serverMaker)
+{
+    auto server = serverMaker();
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+
+    ASSERT_TRUE(server->bind(endpointToBindTo))
+        << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->listen(clientCount))
+        << SystemError::getLastOSErrorText().toStdString();
+
+    for (int i = clientCount; i > 0; --i)
+    {
+        static const int BUF_SIZE = 128;
+
+        QByteArray buffer(BUF_SIZE, char(0));
+        std::unique_ptr<AbstractStreamSocket> client(server->accept());
+        ASSERT_TRUE(client.get())
+            << SystemError::getLastOSErrorText().toStdString() << " on " << i;
+
+        int bufDataSize = 0;
+        for (;;)
+        {
+            const auto bytesRead = client->recv(
+                buffer.data() + bufDataSize,
+                buffer.size() - bufDataSize);
+            ASSERT_NE(-1, bytesRead)
+                << SystemError::getLastOSErrorText().toStdString();
+
+            if (bytesRead == 0)
+                break;  //connection closed
+            bufDataSize += bytesRead;
+        }
+
+        if (testMessage)
+            EXPECT_STREQ(testMessage->constData(), buffer.constData());
+    }
+}
+
 template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
     const ServerSocketMaker& serverMaker,
@@ -33,43 +76,12 @@ void socketSimpleSync(
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    std::thread serverThread([&endpointToBindTo, &testMessage,
-                             clientCount, &serverMaker]()
-    {
-        auto server = serverMaker();
-        ASSERT_TRUE(server->setReuseAddrFlag(true));
-
-        ASSERT_TRUE(server->bind(endpointToBindTo))
-                << SystemError::getLastOSErrorText().toStdString();
-        ASSERT_TRUE(server->listen(clientCount))
-                << SystemError::getLastOSErrorText().toStdString();
-
-        for (int i = clientCount; i > 0; --i)
-        {
-            static const int BUF_SIZE = 128;
-
-            QByteArray buffer(BUF_SIZE, char(0));
-            std::unique_ptr<AbstractStreamSocket> client(server->accept());
-            ASSERT_TRUE(client.get())
-                << SystemError::getLastOSErrorText().toStdString() << " on " << i;
-
-            int bufDataSize = 0;
-            for (;;)
-            {
-                const auto bytesRead = client->recv(
-                    buffer.data() + bufDataSize,
-                    buffer.size() - bufDataSize);
-                ASSERT_NE(-1, bytesRead)
-                        << SystemError::getLastOSErrorText().toStdString();
-
-                if (bytesRead == 0)
-                    break;  //connection closed
-                bufDataSize += bytesRead;
-            }
-
-            EXPECT_STREQ(testMessage.data(), buffer.data());
-        }
-    });
+    std::thread serverThread(
+        syncSocketServerMainFunc<ServerSocketMaker>,
+        endpointToBindTo,
+        testMessage,
+        clientCount,
+        serverMaker);
 
     // give the server some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -179,6 +191,47 @@ void socketSimpleAsync(
     }
 
     stopSocket(std::move(server));
+}
+
+template<typename ServerSocketMaker, typename ClientSocketMaker>
+void shutdownSocket(
+    const ServerSocketMaker& serverMaker,
+    const ClientSocketMaker& clientMaker,
+    const SocketAddress& endpointToBindTo = kServerAddress,
+    const SocketAddress& endpointToConnectTo = kServerAddress)
+{
+    std::thread serverThread(
+        syncSocketServerMainFunc<ServerSocketMaker>,
+        endpointToBindTo,
+        boost::none,
+        1,
+        serverMaker);
+
+    // give the server some time to start
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
+    auto client = clientMaker();
+    ASSERT_TRUE(client->setRecvTimeout(10 * 1000));   //10 seconds
+    EXPECT_TRUE(client->connect(endpointToConnectTo, 500));
+    std::atomic<bool> recvExited(false);
+    std::thread clientThread(
+        [&client, &recvExited]()
+        {
+            nx::Buffer readBuffer;
+            readBuffer.resize(4096);
+            client->recv(readBuffer.data(), readBuffer.size());
+            recvExited = true;
+        });
+
+    //giving client thread some time to start
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    //shutting down socket
+    client->shutdown();
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+    ASSERT_TRUE(recvExited.load());
+
+    serverThread.join();
+    clientThread.join();
 }
 
 namespace {

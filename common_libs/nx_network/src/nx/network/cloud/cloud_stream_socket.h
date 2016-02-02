@@ -2,6 +2,7 @@
 #define NX_CC_CLOUD_STREAM_SOCKET_H
 
 #include <nx/utils/async_operation_guard.h>
+#include <utils/common/cpp14.h>
 
 #include "nx/network/abstract_socket.h"
 #include "nx/network/socket_global.h"
@@ -89,12 +90,14 @@ private:
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractStreamSocket> cloudConnection);
 
-    std::unique_ptr<AbstractStreamSocket> m_socketDelegate;
+    std::atomic_unique_ptr<AbstractStreamSocket> m_socketDelegate;
     std::function<void(SystemError::ErrorCode)> m_connectHandler;
     nx::utils::AsyncOperationGuard m_asyncConnectGuard;
     /** Used to tie this to aio thread.
     //TODO #ak replace with aio thread timer */
     std::unique_ptr<AbstractDatagramSocket> m_aioThreadBinder;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_recvPromisePtr;
+    std::atomic<std::promise<std::pair<SystemError::ErrorCode, size_t>>*> m_sendPromisePtr;
 };
 
 } // namespace cloud
