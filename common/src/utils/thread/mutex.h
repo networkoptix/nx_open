@@ -33,6 +33,8 @@ public:
         int lockID = 0 );
     void unlock();
     bool tryLock();
+    // for std locking utilities compatibility
+    bool try_lock();
 
 private:
     std::unique_ptr<QnMutexImpl> m_impl;

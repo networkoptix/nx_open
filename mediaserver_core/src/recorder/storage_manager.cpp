@@ -632,12 +632,13 @@ void QnStorageManager::loadFullFileCatalogFromMedia(const QnStorageResourcePtr &
             QnTimePeriod rebuildPeriod = QnTimePeriod(0, rebuildEndTime);
             newCatalog->doRebuildArchive(storage, rebuildPeriod);
 
+            bool stillHaveThisStorage;
             {
                 QnMutexLocker lk(&m_mutexStorages);
-                bool stillHaveThisStorage = hasStorageUnsafe(storage);
+                stillHaveThisStorage = hasStorageUnsafe(storage);
+            }
                 if (!m_rebuildCancelled && stillHaveThisStorage)
                     replaceChunks(rebuildPeriod, storage, newCatalog, cameraUniqueId, catalog);
-            }
         }
         currentTask++;
         if (progressCallback && !m_rebuildCancelled)
@@ -965,8 +966,7 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
     QnRecordingStatsData bitrateStats; // temp stats for virtual bitrate calculation
     qint64 archiveStartTimeMs = -1;
     qint64 bitrateThreshold = DATETIME_NOW;
-    QnMutexLocker lock1(&catalogHi->m_mutex);
-    QnMutexLocker lock2(&catalogLow->m_mutex);
+    std::lock(catalogHi->m_mutex, catalogLow->m_mutex);
 
     if (catalogHi && !catalogHi->m_chunks.empty()) {
         archiveStartTimeMs = catalogHi->m_chunks[0].startTimeMs;
