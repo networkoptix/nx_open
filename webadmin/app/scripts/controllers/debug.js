@@ -24,7 +24,7 @@ angular.module('webadminApp')
                 try {
                     params = JSON.parse(params);
                 } catch (a) {
-                    return "GET-params is not a valid json object";
+                    return "GET-params is not a valid json object: " + a;
                 }
             }
 
