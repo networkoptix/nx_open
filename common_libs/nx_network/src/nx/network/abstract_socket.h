@@ -267,6 +267,7 @@ public:
 
     //!Asynchnouosly writes all bytes from input buffer
     /*!
+        \param buf Calling party MUST guarantee that this object is not freed until send completion
         \param handler functor with following parameters:
             \code{.cpp}
                 ( SystemError::ErrorCode errorCode, size_t bytesWritten )

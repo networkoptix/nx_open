@@ -28,17 +28,18 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleSync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& serverAddress = kServerAddress,
+    const SocketAddress& endpointToBindTo = kServerAddress,
+    const SocketAddress& endpointToConnectTo = kServerAddress,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    std::thread serverThread([&serverAddress, &testMessage,
+    std::thread serverThread([&endpointToBindTo, &testMessage,
                              clientCount, &serverMaker]()
     {
         auto server = serverMaker();
         ASSERT_TRUE(server->setReuseAddrFlag(true));
 
-        ASSERT_TRUE(server->bind(serverAddress))
+        ASSERT_TRUE(server->bind(endpointToBindTo))
                 << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(server->listen(clientCount))
                 << SystemError::getLastOSErrorText().toStdString();
@@ -73,15 +74,16 @@ void socketSimpleSync(
     // give the server some time to start
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-    std::thread clientThread([&serverAddress, &testMessage,
+    std::thread clientThread([&endpointToConnectTo, &testMessage,
                               clientCount, &clientMaker]()
     {
         for (int i = clientCount; i > 0; --i)
         {
             auto client = clientMaker();
-            EXPECT_TRUE(client->connect(serverAddress, 500));
-            EXPECT_EQ(client->send(testMessage.data(), testMessage.size() + 1),
-                testMessage.size() + 1);
+            EXPECT_TRUE(client->connect(endpointToConnectTo, 500));
+            EXPECT_EQ(
+                client->send(testMessage.constData(), testMessage.size() + 1),
+                testMessage.size() + 1) << SystemError::getLastOSErrorText().toStdString();
         }
     });
 
@@ -94,7 +96,8 @@ template<typename ServerSocketMaker, typename ClientSocketMaker,
 void socketSimpleAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& serverAddress,
+    const SocketAddress& endpointToBindTo,
+    const SocketAddress& endpointToConnectTo,
     const QByteArray& testMessage,
     int clientCount,
     StopSocketFunc stopSocket)
@@ -106,7 +109,7 @@ void socketSimpleAsync(
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->setReuseAddrFlag(true));
     ASSERT_TRUE(server->setRecvTimeout(5000));
-    ASSERT_TRUE(server->bind(serverAddress)) << SystemError::getLastOSErrorText().toStdString();
+    ASSERT_TRUE(server->bind(endpointToBindTo)) << SystemError::getLastOSErrorText().toStdString();
     ASSERT_TRUE(server->listen(clientCount)) << SystemError::getLastOSErrorText().toStdString();
 
     QByteArray serverBuffer;
@@ -153,7 +156,7 @@ void socketSimpleAsync(
 
         QByteArray clientBuffer;
         clientBuffer.reserve(128);
-        testClient->connectAsync(serverAddress, [&](SystemError::ErrorCode code)
+        testClient->connectAsync(endpointToConnectTo, [&](SystemError::ErrorCode code)
         {
             ASSERT_EQ(code, SystemError::noError);
             testClient->sendAsync(testMessage, [&](SystemError::ErrorCode code,
@@ -188,12 +191,19 @@ template<typename ServerSocketMaker, typename ClientSocketMaker>
 void socketSimpleAsync(
     const ServerSocketMaker& serverMaker,
     const ClientSocketMaker& clientMaker,
-    const SocketAddress& serverAddress = kServerAddress,
+    const SocketAddress& endpointToBindTo = kServerAddress,
+    const SocketAddress& endpointToConnectTo = kServerAddress,
     const QByteArray& testMessage = kTestMessage,
     int clientCount = kClientCount)
 {
-    socketSimpleAsync(serverMaker, clientMaker, serverAddress, testMessage,
-                      clientCount, pleaseStopSync);
+    socketSimpleAsync(
+        serverMaker,
+        clientMaker,
+        endpointToBindTo,
+        endpointToConnectTo,
+        testMessage,
+        clientCount,
+        pleaseStopSync);
 }
 
 template<typename ServerSocketMaker, typename ClientSocketMaker>

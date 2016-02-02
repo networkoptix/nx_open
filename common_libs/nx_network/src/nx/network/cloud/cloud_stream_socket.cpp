@@ -75,21 +75,6 @@ bool CloudStreamSocket::reopen()
     return false;
 }
 
-/** returns \a false if timeout  */
-template<typename Future>
-bool waitFutureMs(Future& future, const boost::optional<unsigned int>& timeoutMillis)
-{
-    if (!timeoutMillis)
-        return true;
-
-    //TODO #ak #msvc2015 ignoring timeout for now since future.wait_for implementation is buggy in msvc2012
-
-    //const auto timeout = std::chrono::milliseconds(*timeoutMillis);
-    //return future.wait_for(timeout) == std::future_status::ready;
-    future.wait();
-    return true;
-}
-
 bool CloudStreamSocket::connect(
     const SocketAddress& remoteAddress,
     unsigned int timeoutMillis)
@@ -105,14 +90,7 @@ bool CloudStreamSocket::connect(
             });
         });
 
-    auto future = promise.get_future();
-    if (!waitFutureMs(future, timeoutMillis))
-    {
-        SystemError::setLastErrorCode(SystemError::timedOut);
-        return false;
-    }
-
-    auto result = future.get();
+    auto result = promise.get_future().get();
     if (result != SystemError::noError)
     {
         SystemError::setLastErrorCode(result);
@@ -130,6 +108,8 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     int totallyRead = 0;
     do
     {
+        //TODO #ak timeout is processed incorrectly since it applies to every recvImpl call
+
         const auto lastRead = recvImpl(&tmpBuffer);
         if (lastRead <= 0)
             return totallyRead;
@@ -145,8 +125,11 @@ int CloudStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
 {
     std::promise<std::pair<SystemError::ErrorCode, size_t>> promise;
+    nx::Buffer sendBuffer = nx::Buffer::fromRawData(
+        static_cast<const char*>(buffer),
+        bufferLen);
     sendAsync(
-        nx::Buffer(static_cast<const char*>(buffer), bufferLen),
+        sendBuffer,
         [&promise, this](SystemError::ErrorCode code, size_t size)
         {
             m_aioThreadBinder->post([code, size, &promise]() {
@@ -154,20 +137,11 @@ int CloudStreamSocket::send(const void* buffer, unsigned int bufferLen)
             });
         });
 
-    auto future = promise.get_future();
-    unsigned int sendTimeout = 0;
-    if (!getSendTimeout(&sendTimeout))
-        return -1;
-    if (!waitFutureMs(future, sendTimeout))
-    {
-        SystemError::setLastErrorCode(SystemError::timedOut);
-        return -1;
-    }
-
-    auto result = future.get();
+    //sendAsync handles timeout properly
+    auto result = promise.get_future().get();
     if (result.first != SystemError::noError)
     {
-        SystemError::setLastErrorCode(result.second);
+        SystemError::setLastErrorCode(result.first);
         return -1;
     }
 
@@ -195,7 +169,10 @@ void CloudStreamSocket::cancelIOAsync(
     std::function<void()> handler)
 {
     if (eventType == aio::etWrite || eventType == aio::etNone)
+    {
         m_asyncConnectGuard->terminate(); // breaks outgoing connects
+        nx::network::SocketGlobals::addressResolver().cancel(this);
+    }
 
     if (m_socketDelegate)
     {
@@ -247,7 +224,7 @@ void CloudStreamSocket::connectAsync(
             &CloudStreamSocket::onAddressResolved,
             this, sharedOperationGuard, remotePort, _1, _2),
         true,
-        this);   //TODO #ak resolve cancellation
+        this);
 }
 
 void CloudStreamSocket::readSomeAsync(
@@ -392,17 +369,7 @@ int CloudStreamSocket::recvImpl(nx::Buffer* const buf)
             });
         });
 
-    auto future = promise.get_future();
-    unsigned int recvTimeout = 0;
-    if (!getRecvTimeout(&recvTimeout))
-        return -1;
-    if (!waitFutureMs(future, recvTimeout))
-    {
-        SystemError::setLastErrorCode(SystemError::timedOut);
-        return -1;
-    }
-
-    auto result = future.get();
+    auto result = promise.get_future().get();
     if (result.first != SystemError::noError)
     {
         SystemError::setLastErrorCode(result.first);
