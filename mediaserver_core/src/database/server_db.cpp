@@ -963,13 +963,19 @@ bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
     return result;
 }
 
-bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark) {
+bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark)
+{
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmarks must not be stored");
+    if (!bookmark.isValid())
+        return false;
+
     if (!containsBookmark(bookmark.guid))
         return false;
     return addOrUpdateBookmark(bookmark);
 }
 
-bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
+bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const
+{
     QnWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
@@ -1010,7 +1016,9 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
 
 
 bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
-    Q_ASSERT_X(!bookmark.cameraId.isNull(), Q_FUNC_INFO, "Empty bookmark camera id");
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+    if (!bookmark.isValid())
+        return false;
 
     QnDbTransactionLocker tran(getTransaction());
 
