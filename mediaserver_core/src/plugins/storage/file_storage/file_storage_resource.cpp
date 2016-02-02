@@ -230,9 +230,12 @@ bool QnFileStorageResource::checkDBCap() const
 #ifdef _WIN32
     return true;
 #else
+    // if storage is mounted via mediaserver (smb://...)
+    // let's not create media DB there
     if (!getLocalPathSafe().isEmpty())
         return false;
-
+    
+    // Same for mounted by hand remote storages (NAS)
     QList<QnPlatformMonitor::PartitionSpace> partitions =
         qnPlatform->monitor()->QnPlatformMonitor::totalPartitionSpaceInfo(
             QnPlatformMonitor::NetworkPartition );
