@@ -789,16 +789,17 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
 {
     QnStorageResourcePtr storage;
     QString delFileName;
+    int storageIndex;
     Chunk deletedChunk;
     {
         QnMutexLocker lock( &m_mutex );
+        storageIndex = m_chunks[0].storageIndex;
 
         if (m_chunks.empty())
             return deletedChunk;
 
         if (!m_chunks.empty())
         {
-            storage = getMyStorageMan()->storageRoot(m_chunks[0].storageIndex);
             delFileName = fullFileName(m_chunks[0]);
             deletedChunk = m_chunks[0];
 
@@ -806,6 +807,7 @@ DeviceFileCatalog::Chunk DeviceFileCatalog::deleteFirstRecord()
         }
     }
 
+    storage = getMyStorageMan()->storageRoot(storageIndex);
     if (storage) {
         if (!delFileName.isEmpty())
         {
