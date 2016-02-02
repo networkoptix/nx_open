@@ -391,7 +391,7 @@ bool QnServerDb::createDatabase()
 
 int QnServerDb::addAuditRecord(const QnAuditRecord& data)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     Q_ASSERT(data.eventType != Qn::AR_NotDefined);
     Q_ASSERT((data.eventType & (data.eventType-1)) == 0);
@@ -417,7 +417,7 @@ int QnServerDb::addAuditRecord(const QnAuditRecord& data)
 
 int QnServerDb::updateAuditRecord(int internalId, const QnAuditRecord& data)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -451,7 +451,7 @@ QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnU
 
 
 
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
     QSqlQuery query(m_sdb);
     query.prepare(request);
     query.addBindValue(period.startTimeMs / 1000);
@@ -592,7 +592,7 @@ bool QnServerDb::cleanupAuditLog()
 
 bool QnServerDb::removeLogForRes(QnUuid resId)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -609,7 +609,7 @@ bool QnServerDb::removeLogForRes(QnUuid resId)
 
 bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -704,7 +704,7 @@ QnBusinessActionDataList QnServerDb::getActions(
     QnBusinessActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare(request);
@@ -756,7 +756,7 @@ void QnServerDb::getAndSerializeActions(
 {
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
     actionsQuery.prepare(request);
@@ -899,7 +899,7 @@ bool QnServerDb::getBookmarks(const QnVirtualCameraResourceList &cameras
                      , createBookmarksFilterSortPart(filter)) ;
 
     {
-        QWriteLocker lock(&m_mutex);
+        QnWriteLocker lock(&m_mutex);
         QSqlQuery query(m_sdb);
         query.setForwardOnly(true);
         query.prepare(queryStr);
@@ -963,14 +963,20 @@ bool QnServerDb::addBookmark(const QnCameraBookmark &bookmark) {
     return result;
 }
 
-bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark) {
+bool QnServerDb::updateBookmark(const QnCameraBookmark &bookmark)
+{
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmarks must not be stored");
+    if (!bookmark.isValid())
+        return false;
+
     if (!containsBookmark(bookmark.guid))
         return false;
     return addOrUpdateBookmark(bookmark);
 }
 
-bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
-    QWriteLocker lock(&m_mutex);
+bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const
+{
+    QnWriteLocker lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -980,7 +986,7 @@ bool QnServerDb::containsBookmark(const QnUuid &bookmarkId) const {
 }
 
 QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
-    QWriteLocker lock(&m_mutex);
+    QnWriteLocker lock(&m_mutex);
 
     QString queryStr("SELECT tag as name, count "
                      "FROM bookmark_tag_counts "
@@ -1010,7 +1016,9 @@ QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit) {
 
 
 bool QnServerDb::addOrUpdateBookmark( const QnCameraBookmark &bookmark) {
-    Q_ASSERT_X(!bookmark.cameraId.isNull(), Q_FUNC_INFO, "Empty bookmark camera id");
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be stored in database");
+    if (!bookmark.isValid())
+        return false;
 
     QnDbTransactionLocker tran(getTransaction());
 
@@ -1079,7 +1087,7 @@ void QnServerDb::updateBookmarkCount()
 {
     std::function<void()> finalHandler;
     {
-        QWriteLocker lock(&m_mutex);
+        QnWriteLocker lock(&m_mutex);
         if (!m_updateBookmarkCount)
             return;
 
@@ -1201,7 +1209,7 @@ qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& c
                                      QnServer::ChunksCatalog catalog) const
 {
     qint64 result = 0;
-    QWriteLocker lk(&m_mutex);
+    QnWriteLocker lk(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare("SELECT timestamp FROM last_backup_time "
@@ -1223,7 +1231,7 @@ qint64 QnServerDb::getLastBackupTime(QnServer::StoragePool pool, const QnUuid& c
 void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
 {
     {
-        QWriteLocker lock(&m_mutex);
+        QnWriteLocker lock(&m_mutex);
         Q_ASSERT_X( !m_updateBookmarkCount, Q_FUNC_INFO, "controller is already set!" );
         m_updateBookmarkCount = std::move(handler);
     }

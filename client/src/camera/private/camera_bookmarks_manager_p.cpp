@@ -77,7 +77,7 @@ QnCameraBookmarksManagerPrivate::OperationInfo::OperationInfo(
 /************************************************************************/
 /* QueryInfo                                                            */
 /************************************************************************/
-QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo() 
+QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
     : queryRef()
     , bookmarksCache()
     , state(QueryState::Invalid)
@@ -151,7 +151,7 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
     auto server = qnCommon->currentServer();
     if (!server) {
         executeCallbackDelayed(callback);
-        return invalidRequestId; 
+        return invalidRequestId;
     }
 
     auto connection = server->apiConnection();
@@ -170,7 +170,12 @@ int QnCameraBookmarksManagerPrivate::getBookmarksAsync(const QnVirtualCameraReso
     return requestId;
 }
 
-void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
+{
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
+    if (!bookmark.isValid())
+        return;
+
     QnVirtualCameraResourcePtr camera = qnResPool->getResourceByUniqueId<QnVirtualCameraResource>(bookmark.cameraId);
     QnMediaServerResourcePtr server = qnCameraHistoryPool->getMediaServerOnTime(camera, bookmark.startTimeMs);
     if (!server || server->getStatus() != Qn::Online)
@@ -189,7 +194,12 @@ void QnCameraBookmarksManagerPrivate::addCameraBookmark(const QnCameraBookmark &
     addUpdatePendingBookmark(bookmark);
 }
 
-void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback) {
+void QnCameraBookmarksManagerPrivate::updateCameraBookmark(const QnCameraBookmark &bookmark, OperationCallbackType callback)
+{
+    Q_ASSERT_X(bookmark.isValid(), Q_FUNC_INFO, "Invalid bookmark must not be added");
+    if (!bookmark.isValid())
+        return;
+
     int handle = qnCommon->currentServer()->apiConnection()->updateBookmarkAsync(bookmark, this, SLOT(handleBookmarkOperation(int, int)));
     m_operations[handle] = OperationInfo(OperationInfo::OperationType::Update, bookmark.guid, callback);
 
@@ -206,7 +216,7 @@ void QnCameraBookmarksManagerPrivate::deleteCameraBookmark(const QnUuid &bookmar
 void QnCameraBookmarksManagerPrivate::handleBookmarkOperation(int status, int handle) {
     if (!m_operations.contains(handle))
         return;
-    
+
     auto operationInfo = m_operations.take(handle);
     if (operationInfo.callback)
         operationInfo.callback(status == 0);
@@ -252,7 +262,8 @@ bool QnCameraBookmarksManagerPrivate::isQueryUpdateRequired(const QUuid &queryId
     case QueryInfo::QueryState::Requested:
         return false;
     case QueryInfo::QueryState::Actual:
-        return (query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
+        return false;
+        //(query->filter().endTimeMs > qnSyncTime->currentMSecsSinceEpoch()) && info.requestTimer.hasExpired(updateLiveBookmarksTimeoutMs);
     default:
         Q_ASSERT_X(false, Q_FUNC_INFO, "Should never get here");
         break;
@@ -274,7 +285,7 @@ void QnCameraBookmarksManagerPrivate::checkQueriesUpdate() {
             continue;
 
         executeQueryRemoteAsync(query, BookmarksCallbackType());
-    }   
+    }
 }
 
 void QnCameraBookmarksManagerPrivate::registerQuery(const QnCameraBookmarksQueryPtr &query) {
