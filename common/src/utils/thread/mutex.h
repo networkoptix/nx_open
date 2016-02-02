@@ -86,9 +86,9 @@ typedef QMutex QnMutex;
 typedef QMutexLocker QnMutexLocker;
 typedef QMutexLocker QnMutexLockerBase;
 
-typedef QnReadWriteLock QReadWriteLock;
-typedef QnReadLocker QReadLocker;
-typedef QnWriteLocker QWriteLocker;
+typedef QReadWriteLock QnReadWriteLock;
+typedef QReadLocker QnReadLocker;
+typedef QWriteLocker QnWriteLocker;
 
 #endif  //USE_OWN_MUTEX
 
