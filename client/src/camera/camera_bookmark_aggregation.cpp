@@ -8,8 +8,10 @@ QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkL
 
 bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
+#ifdef _DEBUG
     /* C++ asserts are required for unit tests to work correctly. */
     assert(!bookmark.isNull());
+#endif
 
     /* Null bookmarks must not be stored in the aggregation. */
     if (bookmark.isNull())
