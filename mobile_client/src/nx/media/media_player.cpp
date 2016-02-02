@@ -21,9 +21,10 @@ namespace media {
 namespace {
     static const qint64 kMaxFrameDuration = 1000 * 5; //< max allowed frame duration. If distance is higher, then frame discontinue
     static const qint64 kLivePosition = -1;
-    static const int kMaxDelayForResyncMs = 30; //< resync playback timer if video frame late
+    static const int kMaxDelayForResyncMs = 30;  //< resync playback timer if video frame late
     static const int kInitialLiveBufferMs = 200; //< initial duration for live buffer
-    static const int kMaxLiveBufferMs = 600;     //< maximum duration for live buffer. Live buffer can be extended dynamically
+    static const int kMaxLiveBufferMs = 1200;    //< maximum duration for live buffer. Live buffer can be extended dynamically
+    static const qreal kLiveBufferStep = 2.0;    //< increate live buffer at N times if overflow/underflow issues
     static const int kMaxCounterForWrongLiveBuffer = 2; //< Max allowed amount of underflow/overflow issues in Live mode before extending live buffer
 
     static qint64 msecToUsec(qint64 posMs)
@@ -263,7 +264,7 @@ void PlayerPrivate::updateLiveBufferState(BufferState value)
         return;
 
     if (underflowCounter >= kMaxCounterForWrongLiveBuffer && overflowCounter >= kMaxCounterForWrongLiveBuffer)
-        liveBufferMs = qMin(liveBufferMs* 1.5, kMaxLiveBufferMs); //< too much underflow/overflow issues. extend live buffer
+        liveBufferMs = qMin(liveBufferMs * kLiveBufferStep, kMaxLiveBufferMs); //< too much underflow/overflow issues. extend live buffer
 }
 
 qint64 PlayerPrivate::getNextTimeToRender(const QnVideoFramePtr& frame)
