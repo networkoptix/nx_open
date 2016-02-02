@@ -455,13 +455,10 @@ QnServer::StoragePool DeviceFileCatalog::getStoragePool() const
     return m_storagePool;
 }
 
-void DeviceFileCatalog::setStoragePool(QnServer::StoragePool kind)
-{
-    QnMutexLocker lk(&m_mutex);
-    m_storagePool = kind;
-}
-
-QnTimePeriod DeviceFileCatalog::timePeriodFromDir(const QnStorageResourcePtr &storage, const QString& dirName)
+QnTimePeriod DeviceFileCatalog::timePeriodFromDir(
+    const QnStorageResourcePtr  &storage,
+    const QString               &dirName
+)
 {
     QnTimePeriod timePeriod;
     const QString path = toLocalStoragePath(storage, dirName);

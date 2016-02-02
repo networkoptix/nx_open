@@ -207,7 +207,6 @@ public:
     QnRecordingStatsData getStatistics(qint64 bitrateAnalizePeriodMs) const;
 
     QnServer::StoragePool getStoragePool() const;
-    void setStoragePool(QnServer::StoragePool value);
 private:
 
     bool csvMigrationCheckFile(const Chunk& chunk, QnStorageResourcePtr storage);
@@ -250,7 +249,7 @@ private:
     const QnServer::ChunksCatalog m_catalog;
     qint64 m_recordingChunkTime;
     QnMutex m_IOMutex;
-    QnServer::StoragePool m_storagePool;
+    const QnServer::StoragePool m_storagePool;
     mutable int64_t m_lastSyncTime;
 };
 
