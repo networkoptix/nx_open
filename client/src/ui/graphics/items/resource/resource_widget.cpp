@@ -50,7 +50,9 @@
 #include <utils/license_usage_helper.h>
 #include <utils/common/string.h>
 
-namespace {
+namespace
+{
+    const auto kButtonsSize = 24.0;
 
     /** Frame extension multiplier determines the width of frame extension relative
      * to frame width.
@@ -224,6 +226,7 @@ QnResourceWidget::~QnResourceWidget() {
 void QnResourceWidget::addInfoOverlay() {
     {
         auto titleLayout = createGraphicsLayout(Qt::Horizontal);
+        titleLayout->setContentsMargins(0, 0, 0, 1);
         titleLayout->setSpacing(2.0);
         titleLayout->addItem(m_overlayWidgets.cameraNameOnlyLabel);
         titleLayout->addStretch(); /* Set large enough stretch for the buttons to be placed at the right end of the layout. */
@@ -302,13 +305,14 @@ void QnResourceWidget::setupIconButton(QGraphicsLinearLayout *layout
 void QnResourceWidget::insertIconButtonCopy(QGraphicsLinearLayout *layout)
 {
     auto iconButtonCopy = new QnImageButtonWidget();
-    iconButtonCopy->setPreferredSize(24.0, 24.0);
+    iconButtonCopy->setPreferredSize(kButtonsSize, kButtonsSize);
 
     setupIconButton(layout, iconButtonCopy);
 }
 
 void QnResourceWidget::addMainOverlay() {
     auto headerLayout = createGraphicsLayout(Qt::Horizontal);
+    headerLayout->setContentsMargins(0, 0, 0, 1);
     headerLayout->setSpacing(2.0);
     headerLayout->addItem(m_overlayWidgets.mainNameLabel);
     headerLayout->addStretch();
@@ -356,7 +360,7 @@ void QnResourceWidget::createButtons() {
     connect(rotateButton, &QnImageButtonWidget::released, this, &QnResourceWidget::rotationStopRequested);
 
     m_buttonBar = new QnImageButtonBar();
-    m_buttonBar->setUniformButtonSize(QSizeF(24.0, 24.0));
+    m_buttonBar->setUniformButtonSize(QSizeF(kButtonsSize, kButtonsSize));
     m_buttonBar->addButton(CloseButton, closeButton);
     m_buttonBar->addButton(InfoButton, infoButton);
     m_buttonBar->addButton(RotateButton, rotateButton);
@@ -364,7 +368,7 @@ void QnResourceWidget::createButtons() {
 
     m_iconButton = new QnImageButtonWidget();
     m_iconButton->setParent(this);
-    m_iconButton->setPreferredSize(24.0, 24.0);
+    m_iconButton->setPreferredSize(kButtonsSize, kButtonsSize);
     m_iconButton->setVisible(false);
 }
 

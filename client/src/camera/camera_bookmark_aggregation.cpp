@@ -8,10 +8,17 @@ QnCameraBookmarkAggregation::QnCameraBookmarkAggregation(const QnCameraBookmarkL
 
 bool QnCameraBookmarkAggregation::addBookmark(const QnCameraBookmark &bookmark)
 {
+    /* C++ asserts are required for unit tests to work correctly. */
+    assert(!bookmark.isNull());
+
+    /* Null bookmarks must not be stored in the aggregation. */
+    if (bookmark.isNull())
+        return false;
+
     // Searches the place to insert new bookmark (by startTimeMs)
     auto it = std::lower_bound(m_bookmarkList.begin(), m_bookmarkList.end(), bookmark);
 
-    if (it->guid == bookmark.guid)
+    if (it != m_bookmarkList.cend() && it->guid == bookmark.guid)
     {
         if (*it == bookmark)
             return false;
