@@ -424,7 +424,7 @@
    <item>
     <widget class="QStackedWidget" name="progressStatusWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="updateTargetPage">
       <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -484,7 +484,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QnProgressBar" name="updateProgessBar"/>
+        <widget class="QProgressBar" name="updateProgessBar"/>
        </item>
        <item>
         <widget class="QPushButton" name="cancelButton">
@@ -541,11 +541,6 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/progress_widget.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QnProgressBar</class>
-   <extends>QProgressBar</extends>
-   <header location="global">ui/widgets/progress_bar.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

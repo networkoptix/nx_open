@@ -19,6 +19,8 @@
 
 #include <QDebug>
 
+#include <utils/common/scoped_painter_rollback.h>
+
 namespace {
     qreal dpr(qreal value) {
     #ifdef Q_OS_MAC
@@ -923,6 +925,134 @@ void QnNxStyle::drawControl(ControlElement element, const QStyleOption *option, 
             return;
         }
         break;
+
+    case CE_ProgressBarGroove:
+        if (const QStyleOptionProgressBar *progressBar =
+            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Shadow));
+
+            painter->fillRect(progressBar->rect, mainColor);
+
+            bool determined = progressBar->minimum < progressBar->maximum;
+            if (determined)
+            {
+                QnScopedPainterPenRollback penRollback(painter, QPen(mainColor.lighter(4)));
+                painter->drawLine(progressBar->rect.left(),
+                                  progressBar->rect.bottom() + 1,
+                                  progressBar->rect.right(),
+                                  progressBar->rect.bottom() + 1);
+            }
+
+            return;
+        }
+        break;
+
+    case CE_ProgressBarContents:
+        if (const QStyleOptionProgressBar *progressBar =
+            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            QRect rect = progressBar->rect;
+            QnPaletteColor mainColor = findColor(progressBar->palette.color(QPalette::Highlight));
+            bool determined = progressBar->minimum < progressBar->maximum;
+
+            if (determined)
+            {
+                int pos = sliderPositionFromValue(
+                            progressBar->minimum,
+                            progressBar->maximum,
+                            progressBar->progress,
+                            progressBar->orientation == Qt::Horizontal ? rect.width() : rect.height(),
+                            progressBar->invertedAppearance);
+
+                if (progressBar->orientation == Qt::Horizontal)
+                {
+                    if (progressBar->invertedAppearance)
+                        rect.setLeft(pos);
+                    else
+                        rect.setRight(pos);
+                }
+                else
+                {
+                    if (progressBar->invertedAppearance)
+                        rect.setTop(pos);
+                    else
+                        rect.setBottom(pos);
+                }
+
+                painter->fillRect(rect, mainColor);
+            }
+            else
+            {
+                painter->fillRect(rect, mainColor.darker(4));
+            }
+
+            return;
+        }
+        break;
+
+    case CE_ProgressBarLabel:
+        if (const QStyleOptionProgressBar *progressBar =
+            qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            if (!progressBar->textVisible || progressBar->text.isEmpty())
+                return;
+
+            QString title;
+            QString text = progressBar->text;
+
+            int sep = text.indexOf(QLatin1Char('\t'));
+            if (sep >= 0)
+            {
+                title = text.left(sep);
+                text = text.mid(sep + 1);
+            }
+
+            QRect rect = progressBar->rect;
+
+            QFont font = painter->font();
+            font.setWeight(QFont::DemiBold);
+            font.setPixelSize(font.pixelSize() - 2);
+
+            QnScopedPainterFontRollback fontRollback(painter, font);
+            QnScopedPainterPenRollback penRollback(painter);
+
+            if (!title.isEmpty())
+            {
+                painter->setPen(progressBar->palette.color(QPalette::Highlight));
+
+                Qt::Alignment alignment = Qt::AlignBottom |
+                                          (progressBar->direction == Qt::LeftToRight ? Qt::AlignLeft : Qt::AlignRight);
+
+                drawItemText(painter,
+                             rect,
+                             alignment,
+                             progressBar->palette,
+                             progressBar->state.testFlag(QStyle::State_Enabled),
+                             title);
+            }
+
+            if (!text.isEmpty())
+            {
+                bool determined = progressBar->minimum < progressBar->maximum;
+
+                Qt::Alignment alignment = Qt::AlignBottom |
+                                          (progressBar->direction == Qt::LeftToRight ? Qt::AlignRight : Qt::AlignLeft);
+
+                painter->setPen(progressBar->palette.color(determined ? QPalette::Text : QPalette::WindowText));
+
+                drawItemText(painter,
+                             rect,
+                             alignment,
+                             progressBar->palette,
+                             progressBar->state.testFlag(QStyle::State_Enabled),
+                             text);
+            }
+
+            return;
+        }
+        break;
+
     default:
         break;
     }
@@ -1099,25 +1229,77 @@ QRect QnNxStyle::subControlRect(ComplexControl control, const QStyleOptionComple
     return rect;
 }
 
-QRect QnNxStyle::subElementRect(QStyle::SubElement subElement, const QStyleOption *option, const QWidget *widget) const {
-    QRect rect = base_type::subElementRect(subElement, option, widget);
-
-    switch (subElement) {
+QRect QnNxStyle::subElementRect(
+        QStyle::SubElement subElement,
+        const QStyleOption *option,
+        const QWidget *widget) const
+{
+    switch (subElement)
+    {
     case SE_LineEditContents:
-        rect.setLeft(rect.left() + dp(6));
-        break;
+        return base_type::subElementRect(subElement, option, widget).adjusted(dp(6), 0, 0, 0);
+
     case SE_PushButtonLayoutItem:
         if (qobject_cast<const QDialogButtonBox *>(widget))
         {
-            const int shift = 8;
-            rect = option->rect.adjusted(-shift, -shift, shift, shift);
+            const int shift = dp(8);
+            return option->rect.adjusted(-shift, -shift, shift, shift);
         }
         break;
+
+    case SE_ProgressBarGroove:
+        if (const QStyleOptionProgressBar *progressBar =
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+            const int kProgressBarWidth = dp(4);
+            QSize size = progressBar->rect.size();
+
+            if (progressBar->orientation == Qt::Horizontal)
+            {
+                size.setHeight(kProgressBarWidth);
+                return alignedRect(progressBar->direction,
+                                   hasText ? Qt::AlignBottom : Qt::AlignVCenter,
+                                   size,
+                                   progressBar->rect.adjusted(0, 0, 0, hasText ? -1 : 0));
+            }
+            else
+            {
+                size.setWidth(kProgressBarWidth);
+                return alignedRect(progressBar->direction,
+                                   hasText ? Qt::AlignLeft : Qt::AlignHCenter,
+                                   size, progressBar->rect);
+            }
+        }
+        break;
+
+    case SE_ProgressBarContents:
+        if (const QStyleOptionProgressBar *progressBar =
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            return subElementRect(SE_ProgressBarGroove, progressBar, widget).adjusted(1, 1, -1, -1);
+        }
+        break;
+
+    case SE_ProgressBarLabel:
+        if (const QStyleOptionProgressBar *progressBar =
+                qstyleoption_cast<const QStyleOptionProgressBar *>(option))
+        {
+            const bool hasText = progressBar->textVisible && !progressBar->text.isEmpty();
+            if (!hasText)
+                break;
+
+            if (progressBar->orientation == Qt::Horizontal)
+                return progressBar->rect.adjusted(0, 0, 0, -dp(8));
+            else
+                return progressBar->rect.adjusted(dp(8), 0, 0, 0);
+        }
+
     default:
         break;
-    }
+    } // switch
 
-    return rect;
+    return base_type::subElementRect(subElement, option, widget);
 }
 
 int QnNxStyle::pixelMetric(PixelMetric metric, const QStyleOption *option, const QWidget *widget) const {

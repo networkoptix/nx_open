@@ -11,17 +11,6 @@ class QnNoptixStyleAnimator;
 class QnSkin;
 class QnCustomizer;
 
-class QnStyleOptionProgressBar: public QStyleOptionProgressBarV2 {
-public:
-    enum StyleOptionVersion { Version = 3 };
-
-    QnStyleOptionProgressBar():
-        QStyleOptionProgressBar(Version)
-    {}
-
-    QList<int> separators;
-};
-
 class QnNoptixStyle: public QProxyStyle, public GraphicsStyle {
     Q_OBJECT;
 
@@ -54,7 +43,6 @@ public:
 protected:
     bool drawMenuItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawItemViewItemControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
-    bool drawProgressBarControl(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;
     bool drawSliderComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawToolButtonComplexControl(const QStyleOptionComplex *option, QPainter *painter, const QWidget *widget) const;
     bool drawTabClosePrimitive(const QStyleOption *option, QPainter *painter, const QWidget *widget) const;

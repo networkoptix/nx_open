@@ -33,7 +33,7 @@ void QnUpdateStatusItemDelegate::paint(QPainter *painter, const QStyleOptionView
 
 
 void QnUpdateStatusItemDelegate::paintProgressBar(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    QnStyleOptionProgressBar progressBarStyleOption;
+    QStyleOptionProgressBar progressBarStyleOption;
     progressBarStyleOption.rect = option.rect.adjusted(4, 4, -4, -4);
 
     const int progress = index.data(QnServerUpdatesModel::ProgressRole).toInt();
