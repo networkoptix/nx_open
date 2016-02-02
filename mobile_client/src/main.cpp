@@ -40,7 +40,7 @@
 
 #include "version.h"
 
-void initDecoders()
+void initDecoders(QQuickWindow *window)
 {
     using namespace nx::media;
 #if defined(Q_OS_ANDROID)
@@ -115,7 +115,7 @@ int runUi(QGuiApplication *application) {
     QObject::connect(&engine, &QQmlEngine::quit, application, &QGuiApplication::quit);
 
     prepareWindow();
-    initDecoders();
+    initDecoders(mainWindow.data());
 
     return application->exec();
 }

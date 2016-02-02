@@ -90,7 +90,7 @@ private:
     void resetLiveBufferState();
     void updateLiveBufferState(BufferState value);
 
-    QnVideoFramePtr PlayerPrivate::scaleFrame(const QnVideoFramePtr& videoFrame);
+    QnVideoFramePtr scaleFrame(const QnVideoFramePtr& videoFrame);
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
