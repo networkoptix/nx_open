@@ -230,7 +230,7 @@ bool QnFileStorageResource::checkDBCap() const
 #ifdef _WIN32
     return true;
 #else
-    if (getLocalPathSafe().isEmpty())
+    if (!getLocalPathSafe().isEmpty())
         return false;
 
     QList<QnPlatformMonitor::PartitionSpace> partitions =
