@@ -464,6 +464,7 @@ void QnNxStyle::drawComplexControl(
             QRect handleRect = proxy()->subControlRect(CC_Slider, option, SC_SliderHandle, widget);
 
             const bool horizontal = slider->orientation == Qt::Horizontal;
+            const bool hovered = slider->state.testFlag(State_MouseOver);
 
             QnPaletteColor mainDark = findColor(slider->palette.color(QPalette::Window));
             QnPaletteColor mainLight = findColor(slider->palette.color(QPalette::WindowText));
@@ -474,7 +475,7 @@ void QnNxStyle::drawComplexControl(
             if (slider->subControls.testFlag(SC_SliderGroove))
             {
                 painter->setPen(mainDark.darker(1));
-                painter->setBrush(QBrush(mainDark.lighter(5)));
+                painter->setBrush(QBrush(mainDark.lighter(hovered ? 6 : 5)));
 
                 painter->drawRect(grooveRect.adjusted(0, 0, -1, -1));
 
@@ -585,6 +586,8 @@ void QnNxStyle::drawComplexControl(
 
                 if (option->activeSubControls.testFlag(SC_SliderHandle))
                     borderColor = mainLight.lighter(4);
+                else if (hovered)
+                    borderColor = mainLight.lighter(2);
 
                 if (option->state.testFlag(State_Sunken))
                     fillColor = mainDark.lighter(3);
